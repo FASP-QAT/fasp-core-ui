@@ -1,11 +1,11 @@
 import React, { Component, lazy } from 'react';
 import { Bar } from 'react-chartjs-2';
-import {MultiSelect} from "react-multi-select-component";
+import { MultiSelect } from "react-multi-select-component";
 import {
     Card,
     CardBody,
     Col,
-    Table, FormGroup, Input, InputGroup, Label, Form, Button,ModalHeader, ModalBody,Modal, CardFooter
+    Table, FormGroup, Input, InputGroup, Label, Form, Button, ModalHeader, ModalBody, Modal, CardFooter
 } from 'reactstrap';
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import i18n from '../../i18n'
@@ -304,12 +304,12 @@ class ForecastSummary extends Component {
             const headers = [];
             headers.push('');
             headers.push((i18n.t('static.product.product')).replaceAll(' ', '%20'));
-            headers.push((('Total Forecasted Quantity').replaceAll(' ', '%20')));
+            headers.push(((i18n.t('static.forecastOutput.totalForecastQuantity')).replaceAll(' ', '%20')));
             if (!this.state.hideColumn) {
                 headers.push((i18n.t('static.report.stock')).replaceAll(' ', '%20') + (i18n.t('static.forecastReport.endOf')).replaceAll(' ', '%20') + this.state.beforeEndDateDisplay + ')');
                 headers.push((i18n.t('static.forecastReport.existingShipments')).replaceAll(' ', '%20') + '(' + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ')');
                 // headers.push((i18n.t('static.report.stock')).replaceAll(' ', '%20') + (i18n.t('static.forecastReport.endOf')).replaceAll(' ', '%20') + this.state.endDateDisplay + ')');
-                headers.push(('Stock or Unmet Demand').replaceAll(' ', '%20') + (i18n.t('static.forecastReport.endOf')).replaceAll(' ', '%20') + this.state.endDateDisplay + ')');
+                headers.push((i18n.t('static.forecastOutput.stockOrUnmedDemand')).replaceAll(' ', '%20') + (i18n.t('static.forecastReport.endOf')).replaceAll(' ', '%20') + this.state.endDateDisplay + ')');
                 headers.push((i18n.t('static.forecastReport.desiredMonthsOfStock')).replaceAll(' ', '%20') + (i18n.t('static.forecastReport.endOf')).replaceAll(' ', '%20') + this.state.endDateDisplay + ')');
                 headers.push((i18n.t('static.forecastReport.desiredStock')).replaceAll(' ', '%20') + (i18n.t('static.forecastReport.endOf')).replaceAll(' ', '%20') + this.state.endDateDisplay + ')');
             }
@@ -473,7 +473,7 @@ class ForecastSummary extends Component {
                     headers.push((i18n.t('static.program.notes')).replaceAll(' ', '%20'));
                 }
 
-                headers.push(('Total Forecasted Quantity').replaceAll(' ', '%20'));
+                headers.push((i18n.t('static.forecastOutput.totalForecastQuantity')).replaceAll(' ', '%20'));
                 A.push([this.addDoubleQuoteToRowContent(headers)]);
 
                 for (var tc = 0; tc < tcList.length; tc++) {
@@ -555,7 +555,7 @@ class ForecastSummary extends Component {
                     headers.push((i18n.t('static.program.notes')).replaceAll(' ', '%20'));
                 }
 
-                headers.push(('Total Forecasted Quantity').replaceAll(' ', '%20'));
+                headers.push((i18n.t('static.forecastOutput.totalForecastQuantity')).replaceAll(' ', '%20'));
                 A.push([this.addDoubleQuoteToRowContent(headers)]);
 
 
@@ -680,19 +680,23 @@ class ForecastSummary extends Component {
                 doc.setFont('helvetica', 'normal')
                 doc.setTextColor("#002f6c");
                 doc.setFont('helvetica', 'bold')
-                doc.text(i18n.t('static.supplyPlan.runDate') + " " + moment(new Date()).format(`${DATE_FORMAT_CAP}`), doc.internal.pageSize.width - 40, 20, {
-                    align: 'right'
-                })
-                doc.setFont('helvetica', 'normal')
-                doc.text(i18n.t('static.supplyPlan.runTime') + " " + moment(new Date()).format('hh:mm A'), doc.internal.pageSize.width - 40, 30, {
-                    align: 'right'
-                })
-                doc.text(i18n.t('static.user.user') + ': ' + AuthenticationService.getLoggedInUsername(), doc.internal.pageSize.width - 40, 40, {
-                    align: 'right'
-                })
-                doc.text(this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + " " + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text), doc.internal.pageSize.width - 40, 50, {
-                    align: 'right'
-                })
+                doc.fromHTML("<font size = '1' color = '#002f6c'><b>" + i18n.t('static.supplyPlan.runDate') + "</b> " + moment(new Date()).format(`${DATE_FORMAT_CAP}`) + "</font>", doc.internal.pageSize.width - 150, 20)
+                doc.fromHTML("<font size = '1' color = '#002f6c'><b>" + i18n.t('static.supplyPlan.runTime') + "</b> " + moment(new Date()).format('hh:mm A') + "</font>", doc.internal.pageSize.width - 150, 30)
+                doc.fromHTML("<font size = '1' color = '#002f6c'><b>" + i18n.t('static.user.user') + ":</b> " + AuthenticationService.getLoggedInUsername() + "</font>", doc.internal.pageSize.width - 150, 40)
+                doc.fromHTML("<font size = '1' color = '#002f6c'><b>" + this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + " " + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "</b> " + "</font>", doc.internal.pageSize.width - 150, 50)
+                // doc.text(i18n.t('static.supplyPlan.runDate') + " " + moment(new Date()).format(`${DATE_FORMAT_CAP}`), doc.internal.pageSize.width - 40, 20, {
+                //     align: 'right'
+                // })
+                // doc.setFont('helvetica', 'normal')
+                // doc.text(i18n.t('static.supplyPlan.runTime') + " " + moment(new Date()).format('hh:mm A'), doc.internal.pageSize.width - 40, 30, {
+                //     align: 'right'
+                // })
+                // doc.text(i18n.t('static.user.user') + ': ' + AuthenticationService.getLoggedInUsername(), doc.internal.pageSize.width - 40, 40, {
+                //     align: 'right'
+                // })
+                // doc.text(this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + " " + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text), doc.internal.pageSize.width - 40, 50, {
+                //     align: 'right'
+                // })
                 // doc.text(document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width - 40, 60, {
                 //     align: 'right'
                 // })
@@ -710,20 +714,25 @@ class ForecastSummary extends Component {
                     // doc.text(i18n.t('static.report.versionFinal*') + ': ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
                     //     align: 'left'
                     // })
-                    doc.setFont('helvetica', 'bold')
-                    doc.text(i18n.t('static.report.dateRange') + ': ' + document.getElementById("forecastPeriod").value, doc.internal.pageSize.width / 8, 90, {
-                        align: 'left'
-                    })
-                    doc.setFont('helvetica', 'normal')
-                    doc.text(i18n.t('static.forecastReport.display') + ': ' + this.state.displayName, doc.internal.pageSize.width / 8, 100, {
-                        align: 'left'
-                    })
+
+                    doc.fromHTML("<font size = '1' color = '#002f6c'><b>" + i18n.t('static.report.dateRange') + ":</b> " + document.getElementById("forecastPeriod").value + "</font>", (doc.internal.pageSize.width / 8) - 50, 90)
+                    doc.fromHTML("<font size = '1' color = '#002f6c'><b>" + i18n.t('static.forecastReport.display') + ":</b> " + this.state.displayName + "</font>", (doc.internal.pageSize.width / 8) - 50, 100)
+
+                    // doc.setFont('helvetica', 'bold')
+                    // doc.text(i18n.t('static.report.dateRange') + ': ' + document.getElementById("forecastPeriod").value, doc.internal.pageSize.width / 8, 90, {
+                    //     align: 'left'
+                    // })
+                    // doc.setFont('helvetica', 'normal')
+                    // doc.text(i18n.t('static.forecastReport.display') + ': ' + this.state.displayName, doc.internal.pageSize.width / 8, 100, {
+                    //     align: 'left'
+                    // })
 
                     let viewById = this.state.displayId;
                     if (viewById == 1) {//National
-                        doc.text(i18n.t('static.forecastReport.hideCalculations') + ': ' + (this.state.hideCalculation == true ? i18n.t('static.realm.yes') : i18n.t('static.program.no')), doc.internal.pageSize.width / 8, 110, {
-                            align: 'left'
-                        })
+                        // doc.text(i18n.t('static.forecastReport.hideCalculations') + ': ' + (this.state.hideCalculation == true ? i18n.t('static.realm.yes') : i18n.t('static.program.no')), doc.internal.pageSize.width / 8, 110, {
+                        //     align: 'left'
+                        // })
+                        doc.fromHTML("<font size = '1' color = '#002f6c'><b>" + i18n.t('static.forecastReport.hideCalculations') + ":</b> " + (this.state.hideCalculation == true ? i18n.t('static.realm.yes') : i18n.t('static.program.no')) + "</font>", (doc.internal.pageSize.width / 8), 110)
                     }
 
                 }
@@ -766,7 +775,7 @@ class ForecastSummary extends Component {
                 }
 
                 header1.push({ content: i18n.t('static.forecastReport.allRegions'), rowSpan: 1, styles: { halign: 'center' } });
-                header2.push({ content: 'Total Forecasted Quantity', styles: { halign: 'center' } },)
+                header2.push({ content: i18n.t('static.forecastOutput.totalForecastQuantity'), styles: { halign: 'center' } },)
 
                 let header = [header1, header2];
                 let data = [];
@@ -853,7 +862,7 @@ class ForecastSummary extends Component {
                 }
 
                 header1.push({ content: i18n.t('static.forecastReport.allRegions'), rowSpan: 1, styles: { halign: 'center' } });
-                header2.push({ content: 'Total Forecasted Quantity', styles: { halign: 'center' } },)
+                header2.push({ content: i18n.t('static.forecastOutput.totalForecastQuantity'), styles: { halign: 'center' } },)
 
                 let header = [header1, header2];
                 let data = [];
@@ -906,10 +915,10 @@ class ForecastSummary extends Component {
         } else {//National
 
             let headers = [];
-            let headers1 = ['', i18n.t('static.product.product'), 'Total Forecasted Quantity'];
+            let headers1 = ['', i18n.t('static.product.product'), i18n.t('static.forecastOutput.totalForecastQuantity')];
             if (!this.state.hideColumn) {
                 // headers1 = headers1.concat([i18n.t('static.report.stock') + i18n.t('static.forecastReport.endOf') + this.state.beforeEndDateDisplay + ')', i18n.t('static.forecastReport.existingShipments') + '(' + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ')', i18n.t('static.report.stock') + i18n.t('static.forecastReport.endOf') + this.state.endDateDisplay + ')', i18n.t('static.forecastReport.desiredMonthsOfStock') + i18n.t('static.forecastReport.endOf') + this.state.endDateDisplay + ')', i18n.t('static.forecastReport.desiredStock') + i18n.t('static.forecastReport.endOf') + this.state.endDateDisplay + ')']);
-                headers1 = headers1.concat([i18n.t('static.report.stock') + i18n.t('static.forecastReport.endOf') + ' ' + this.state.beforeEndDateDisplay + ')', i18n.t('static.forecastReport.existingShipments') + '(' + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ')', 'Stock or Unmet Demand' + i18n.t('static.forecastReport.endOf') + ' ' + this.state.endDateDisplay + ')', i18n.t('static.forecastReport.desiredMonthsOfStock') + i18n.t('static.forecastReport.endOf') + ' ' + this.state.endDateDisplay + ')', i18n.t('static.forecastReport.desiredStock') + i18n.t('static.forecastReport.endOf') + ' ' + this.state.endDateDisplay + ')']);
+                headers1 = headers1.concat([i18n.t('static.report.stock') + i18n.t('static.forecastReport.endOf') + ' ' + this.state.beforeEndDateDisplay + ')', i18n.t('static.forecastReport.existingShipments') + '(' + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ')', i18n.t('static.forecastOutput.stockOrUnmedDemand') + i18n.t('static.forecastReport.endOf') + ' ' + this.state.endDateDisplay + ')', i18n.t('static.forecastReport.desiredMonthsOfStock') + i18n.t('static.forecastReport.endOf') + ' ' + this.state.endDateDisplay + ')', i18n.t('static.forecastReport.desiredStock') + i18n.t('static.forecastReport.endOf') + ' ' + this.state.endDateDisplay + ')']);
             }
             headers1 = headers1.concat([i18n.t('static.forecastReport.procurementSurplus')]);
             if (!this.state.hideColumn) {
@@ -1550,7 +1559,7 @@ class ForecastSummary extends Component {
                                         columns.push({ title: i18n.t('static.program.notes'), type: 'text', width: 100 });//F5
                                     }
                                     columns.push({ title: i18n.t('static.supplyPlan.type'), type: 'hidden', width: 100, readOnly: true });//G6
-                                    columns.push({ title: 'Total Forecasted Quantity', type: 'numeric', textEditor: true, mask: '#,##.00', decimal: '.', width: 100, readOnly: true });//H7
+                                    columns.push({ title: i18n.t('static.forecastOutput.totalForecastQuantity'), type: 'numeric', textEditor: true, mask: '#,##.00', decimal: '.', width: 100, readOnly: true });//H7
                                     columns.push({ title: 'forecast Blank', type: 'hidden', width: 100, readOnly: true });//G6
                                     let nestedHeaders = [];
                                     // nestedHeaders.push(
@@ -1861,7 +1870,7 @@ class ForecastSummary extends Component {
                                 columns.push({ title: i18n.t('static.forecastReport.forecastQuantity'), type: 'numeric', textEditor: true, mask: '#,##.00', decimal: '.', width: 100, readOnly: true });//E4
                                 columns.push({ title: i18n.t('static.program.notes'), type: 'text', width: 100, readOnly: true });//F5
                             }
-                            columns.push({ title: 'Total Forecasted Quantity', type: 'numeric', textEditor: true, mask: '#,##.00', decimal: '.', width: 100, readOnly: true });//H7
+                            columns.push({ title: i18n.t('static.forecastOutput.totalForecastQuantity'), type: 'numeric', textEditor: true, mask: '#,##.00', decimal: '.', width: 100, readOnly: true });//H7
 
                             let nestedHeaders = [];
                             nestedHeaders.push(
@@ -3044,7 +3053,7 @@ class ForecastSummary extends Component {
                 <h5 style={{ color: this.state.color }} id="div2">{this.state.message1}</h5>
 
                 <Card>
-                
+
                     <div className="Card-header-reporticon pb-2">
                         {
                             (this.state.dataArray.length > 0 || this.state.summeryData.length > 0) &&
@@ -3071,13 +3080,13 @@ class ForecastSummary extends Component {
                         } */}
                     </div>
                     <div className="card-header-actions">
-                          <div className="Card-header-reporticon">
+                        <div className="Card-header-reporticon">
                             {/* <a className="pr-lg-0 pt-lg-1">
                                 <span style={{ cursor: 'pointer' }} onClick={() => { this.backToMonthlyForecast() }}><i className="fa fa-long-arrow-left" style={{ color: '#20a8d8', fontSize: '13px' }}></i> <small className="supplyplanformulas">{i18n.t('static.forecastReport.returnToMonthlyForecast')}</small></span>
                             </a> */}
                             <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
                             <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span>
-                            <span className="compareAndSelect-larrowText"> {i18n.t('static.common.backTo')} <a href="/#/forecastReport/forecastOutput" className='supplyplanformulas'>{'Monthly Forecast'}</a> </span>
+                            <span className="compareAndSelect-larrowText"> {i18n.t('static.common.backTo')} <a href="/#/forecastReport/forecastOutput" className='supplyplanformulas'>{i18n.t('static.MonthlyForecast.MonthlyForecast')}</a> </span>
                             <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')} <a href="/#/dataset/commitTree" className="supplyplanformulas">{i18n.t('static.commitProgram.commitProgram')}</a></span>
 
                             {/* <a className="card-header-action">
@@ -3086,12 +3095,12 @@ class ForecastSummary extends Component {
                         </div>
                     </div>
                     <div className="card-header-actions">
-                            <div className="card-header-action pr-lg-4">
-                            <a style={{float:'right'}}>
+                        <div className="card-header-action pr-lg-4">
+                            <a style={{ float: 'right' }}>
                                 <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
                             </a>
-                            </div>
                         </div>
+                    </div>
                     <CardBody className="pb-lg-2 pt-lg-1 ">
                         <div>
                             <div ref={ref}>
@@ -3310,14 +3319,14 @@ class ForecastSummary extends Component {
                                                                     <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th>
                                                                     {/* <th className="text-center" style={{}}> Forecasting Unit </th> */}
                                                                     <th className="text-center ForecastSumarydWidth sticky-col first-col clone" style={{ minWidth: '200px' }}>{i18n.t('static.product.product')}</th>
-                                                                    <th className="text-center" title={i18n.t('static.Tooltip.TotalForecastedQuantity')} style={{ minWidth: '120px' }}>{'Total Forecasted Quantity'} <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                    <th className="text-center" title={i18n.t('static.Tooltip.TotalForecastedQuantity')} style={{ minWidth: '120px' }}>{i18n.t('static.forecastOutput.totalForecastQuantity')} <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
                                                                     {!this.state.hideColumn &&
                                                                         <>
                                                                             <th className="text-center" title={i18n.t('static.Tooltip.StockEndOfDec')} style={{ minWidth: '120px' }}>{i18n.t('static.report.stock')} <span className="FontWeightNormal">{i18n.t('static.forecastReport.endOf')} {this.state.beforeEndDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
                                                                             <th className="text-center" title={i18n.t('static.Tooltip.ExistingShipments')} style={{ minWidth: '120px' }}>{i18n.t('static.forecastReport.existingShipments')} <span className="FontWeightNormal">({this.state.startDateDisplay + ' - ' + this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
                                                                             {/* <th className="text-center" title={(i18n.t('static.report.stock') + ' ' + i18n.t('static.forecastReport.endOf') + ' ' + this.state.beforeEndDateDisplay) + ' + ' + (i18n.t('static.forecastReport.existingShipments') + '( ' + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ' )') + ' - ' + (i18n.t('static.forecastReport.totalForecastQuantity'))} style={{ width: '8%' }}>{i18n.t('static.report.stock')} <span className="FontWeightNormal">{i18n.t('static.forecastReport.endOf')} {this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th> */}
                                                                             {/* <th className="text-center" style={{ minWidth: '120px' }} title={(i18n.t('static.report.stock') + ' ' + i18n.t('static.forecastReport.endOf') + ' ' + this.state.beforeEndDateDisplay) + ' + ' + (i18n.t('static.forecastReport.existingShipments') + '( ' + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ' )') + ' - ' + (i18n.t('static.forecastReport.totalForecastQuantity'))} >{'Stock or Unmet Demand'} <span className="FontWeightNormal">{i18n.t('static.forecastReport.endOf')} {this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th> */}
-                                                                            <th className="text-center" style={{ minWidth: '120px' }} title={i18n.t('static.Tooltip.StockorUnmetDemand')}>{'Stock or Unmet Demand'} <span className="FontWeightNormal">{i18n.t('static.forecastReport.endOf')} {this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                            <th className="text-center" style={{ minWidth: '120px' }} title={i18n.t('static.Tooltip.StockorUnmetDemand')}>{i18n.t('static.forecastOutput.stockOrUnmedDemand')} <span className="FontWeightNormal">{i18n.t('static.forecastReport.endOf')} {this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
                                                                             <th className="text-center" title={i18n.t('static.Tooltip.desiredMonthsOfStock')} style={{ minWidth: '120px' }}>{i18n.t('static.forecastReport.desiredMonthsOfStock')} <span className="FontWeightNormal">{i18n.t('static.forecastReport.endOf')} {this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
                                                                             {/* <th className="text-center" style={{ minWidth: '120px' }} title={(i18n.t('static.forecastReport.desiredMonthsOfStock') + ' ' + i18n.t('static.forecastReport.endOf') + ' ' + this.state.endDateDisplay) + ') * ' + i18n.t('static.forecastReport.totalForecastQuantity') + ' / ' + 'Difference between months'} >{i18n.t('static.forecastReport.desiredStock')} <span className="FontWeightNormal">{i18n.t('static.forecastReport.endOf')} {this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th> */}
                                                                             <th className="text-center" style={{ minWidth: '120px' }} title={i18n.t('static.Tooltip.DesiredStock')} >{i18n.t('static.forecastReport.desiredStock')} <span className="FontWeightNormal">{i18n.t('static.forecastReport.endOf')} {this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
@@ -3332,7 +3341,7 @@ class ForecastSummary extends Component {
                                                                         </>
                                                                     }
                                                                     <th className="text-center" title={i18n.t('static.Tooltip.ProcurementsNeeded')} style={{ minWidth: '120px' }}>{i18n.t('static.forecastReport.ProcurementsNeeded')} <span className="FontWeightNormal">(USD)</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
-                                                                    <th className="text-center"  style={{ minWidth: '140px' }}>{i18n.t('static.program.notes')} </th>
+                                                                    <th className="text-center" style={{ minWidth: '140px' }}>{i18n.t('static.program.notes')} </th>
 
                                                                 </tr>
                                                             </thead>
@@ -3553,110 +3562,110 @@ class ForecastSummary extends Component {
                     </CardFooter>}
                 </Card>
                 <Modal isOpen={this.state.showGuidance}
-className={'modal-lg ' + this.props.className} >
-<ModalHeader toggle={() => this.toggleShowGuidance()} className="ModalHead modal-info-Headher">
-    <strong className="TextWhite">Show Guidance</strong>
-</ModalHeader>
-<div>
-    <ModalBody>
-       <div>
-           <h3 className='ShowGuidanceHeading'>Forecast Summary</h3>
-       </div>
-        <p>
-            <p style={{fontSize:'13px'}}><span className="UnderLineText">Purpose :</span> Enable users to see a summary of their final (selected) forecasts for the entire forecast period. To view the forecasts by month, use the '<a href='/#/forecastReport/forecastOutput' target="_blank" style={{textDecoration:'underline'}}>Monthly Forecast</a>' screen.
-            <ul>
-                <li><b>Regional View:</b>  Use this view to see your forecast across planning units and regions. Directly update the forecast method for every region-planning unit combination and add notes in the table, if desired. Forecast selections can also be updated in the '<a href='/#/report/compareAndSelectScenario' target="_blank" style={{textDecoration:'underline'}}>Compare and Select Forecast</a>' screen.</li>
-                <li><b>National View:</b> Use this view to see your forecast at a <span style={{textDecoration:'underline'}}>national level</span> and evaluate your <span style={{textDecoration:'underline'}}>procurement surplus or gaps</span>. </li>
-            </ul>
-            </p>
-        </p>
-        <p style={{fontSize:'13px'}}>
-            <p style={{fontSize:'13px'}}><span className="UnderLineText">Using this screen (National View) :</span><br></br>
-            <b>Note:</b> This is not a full supply plan, but a high-level procurement surplus/gap analysis. We recommend importing your forecast into the supply planning module for granular supply planning.
-            </p>
-            <p>For the data to display here properly, enter the following data: 
-                <ul>
-                    <li>Under <a href='/#/planningUnitSetting/listPlanningUnitSetting' target="_blank" style={{textDecoration:'underline'}}>Update Planning Unit</a>:
-                    <ul>
-                        <li><b>Stock</b> - at the beginning of your forecast period</li>
-                        <li><b>Existing shipments</b> - during your forecast period</li>
-                        <li><b>Desired Months of stock</b> - at the end of your forecast period</li>
-                        <li><b>Price Type</b> and <b>Unit Prices</b></li>
-                    </ul>
-                    </li>
-                    <li>Under <a href='/#/dataset/versionSettings' target="_blank" style={{textDecoration:'underline'}}>Update Version Settings</a>:
-                        <ul>
-                            <li><b>Freight %</b> - Freight cost is calculated as a percentage of product cost</li>
-                        </ul>
-                    </li>
-                </ul>
-            </p>
-        </p>
-        <p style={{fontSize:'13px'}}>
-        <b>Calculating the Procurement Surplus/Gap </b>
-        <ul>
-            <li><img className="formula-img-mr-showGuidance" src={ProjectStockatForecastend} /><br></br></li>
-            <li><img className="formula-img-mr-showGuidance" src={DesiredStockatForecasend} /><br></br></li>
-            <li><img className="formula-img-mr-showGuidance" src={ProcurementSurplusGap} /><br></br></li>
-            {/* <li>Project Stock at Forecast end = (Starting Stock) + (Existing Shipments) - (Forecasted Quantity) </li>
+                    className={'modal-lg ' + this.props.className} >
+                    <ModalHeader toggle={() => this.toggleShowGuidance()} className="ModalHead modal-info-Headher">
+                        <strong className="TextWhite">Show Guidance</strong>
+                    </ModalHeader>
+                    <div>
+                        <ModalBody>
+                            <div>
+                                <h3 className='ShowGuidanceHeading'>Forecast Summary</h3>
+                            </div>
+                            <p>
+                                <p style={{ fontSize: '13px' }}><span className="UnderLineText">Purpose :</span> Enable users to see a summary of their final (selected) forecasts for the entire forecast period. To view the forecasts by month, use the '<a href='/#/forecastReport/forecastOutput' target="_blank" style={{ textDecoration: 'underline' }}>Monthly Forecast</a>' screen.
+                                    <ul>
+                                        <li><b>Regional View:</b>  Use this view to see your forecast across planning units and regions. Directly update the forecast method for every region-planning unit combination and add notes in the table, if desired. Forecast selections can also be updated in the '<a href='/#/report/compareAndSelectScenario' target="_blank" style={{ textDecoration: 'underline' }}>Compare and Select Forecast</a>' screen.</li>
+                                        <li><b>National View:</b> Use this view to see your forecast at a <span style={{ textDecoration: 'underline' }}>national level</span> and evaluate your <span style={{ textDecoration: 'underline' }}>procurement surplus or gaps</span>. </li>
+                                    </ul>
+                                </p>
+                            </p>
+                            <p style={{ fontSize: '13px' }}>
+                                <p style={{ fontSize: '13px' }}><span className="UnderLineText">Using this screen (National View) :</span><br></br>
+                                    <b>Note:</b> This is not a full supply plan, but a high-level procurement surplus/gap analysis. We recommend importing your forecast into the supply planning module for granular supply planning.
+                                </p>
+                                <p>For the data to display here properly, enter the following data:
+                                    <ul>
+                                        <li>Under <a href='/#/planningUnitSetting/listPlanningUnitSetting' target="_blank" style={{ textDecoration: 'underline' }}>Update Planning Unit</a>:
+                                            <ul>
+                                                <li><b>Stock</b> - at the beginning of your forecast period</li>
+                                                <li><b>Existing shipments</b> - during your forecast period</li>
+                                                <li><b>Desired Months of stock</b> - at the end of your forecast period</li>
+                                                <li><b>Price Type</b> and <b>Unit Prices</b></li>
+                                            </ul>
+                                        </li>
+                                        <li>Under <a href='/#/dataset/versionSettings' target="_blank" style={{ textDecoration: 'underline' }}>Update Version Settings</a>:
+                                            <ul>
+                                                <li><b>Freight %</b> - Freight cost is calculated as a percentage of product cost</li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </p>
+                            </p>
+                            <p style={{ fontSize: '13px' }}>
+                                <b>Calculating the Procurement Surplus/Gap </b>
+                                <ul>
+                                    <li><img className="formula-img-mr-showGuidance" src={ProjectStockatForecastend} /><br></br></li>
+                                    <li><img className="formula-img-mr-showGuidance" src={DesiredStockatForecasend} /><br></br></li>
+                                    <li><img className="formula-img-mr-showGuidance" src={ProcurementSurplusGap} /><br></br></li>
+                                    {/* <li>Project Stock at Forecast end = (Starting Stock) + (Existing Shipments) - (Forecasted Quantity) </li>
             <li>Desired Stock at Forecast end = (Forecasted Quantity) / (Forecast Period) * (Desired Months of Stock) </li>
             <li>Procurement Surplus/Gap = (Projected Stock at Forecast end) - (Desired Stock at Forecast end) </li> */}
-        </ul>
-        </p>
-        <p>
-        For example, a forecast from Jan 2021 to Dec 2023 (36 month forecast)
-        <table className="table table-bordered ">
-                                <thead>
-                                <tr>
-                                    <th>Total Forecasted Quantity</th>
-                                    <th>Stock(end of Dec 2020)</th>
-                                    <th>Existing Shipments (Jan 2021 - Dec 2023)</th>
-                                    <th>Stock(end of Dec 2023)</th>
-                                    <th>Desired Months of Stock (end of Dec 2023)</th>
-                                    <th>Desired Stock(end of Dec 2023)</th>
-                                    <th>Procurement Surplus/Gap</th>
-                                   
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr>
-                                    <td>360,000</td>
-                                    <td>5,000</td>
-                                    <td>20,000</td>
-                                    <td>5,000 + 20,000 - 360,000 = -335,000</td>
-                                    <td>5</td>
-                                    <td>360,000 / 36 * 5 = 50,000</td>
-                                    <td>-335,000 -50,000 = -385,000</td>
-                                   
-                                </tr>
-                                </tbody>
-                                </table>
-        </p>
-        <p style={{fontSize:'13px'}}>
-        <b>Calculating the Procurement Costs  </b><br></br>
-        Note: the cost is only calculated if there is a procurement gap, not if there is a surplus 
+                                </ul>
+                            </p>
+                            <p>
+                                For example, a forecast from Jan 2021 to Dec 2023 (36 month forecast)
+                                <table className="table table-bordered ">
+                                    <thead>
+                                        <tr>
+                                            <th>Total Forecasted Quantity</th>
+                                            <th>Stock(end of Dec 2020)</th>
+                                            <th>Existing Shipments (Jan 2021 - Dec 2023)</th>
+                                            <th>Stock(end of Dec 2023)</th>
+                                            <th>Desired Months of Stock (end of Dec 2023)</th>
+                                            <th>Desired Stock(end of Dec 2023)</th>
+                                            <th>Procurement Surplus/Gap</th>
 
-        <ul>
-        <li><img className="formula-img-mr-showGuidance1 img-fluid" src={ProductCost} /><br></br></li>
-        <li><img className="formula-img-mr-showGuidance1 img-fluid" src={FreightCost} /><br></br></li>
-        <li><img className="formula-img-mr-showGuidance1 img-fluid" src={TotalCost} /><br></br></li>
-            {/* <li>Product Cost = Procurement Gap * Unit Cost </li>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>360,000</td>
+                                            <td>5,000</td>
+                                            <td>20,000</td>
+                                            <td>5,000 + 20,000 - 360,000 = -335,000</td>
+                                            <td>5</td>
+                                            <td>360,000 / 36 * 5 = 50,000</td>
+                                            <td>-335,000 -50,000 = -385,000</td>
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </p>
+                            <p style={{ fontSize: '13px' }}>
+                                <b>Calculating the Procurement Costs  </b><br></br>
+                                Note: the cost is only calculated if there is a procurement gap, not if there is a surplus
+
+                                <ul>
+                                    <li><img className="formula-img-mr-showGuidance1 img-fluid" src={ProductCost} /><br></br></li>
+                                    <li><img className="formula-img-mr-showGuidance1 img-fluid" src={FreightCost} /><br></br></li>
+                                    <li><img className="formula-img-mr-showGuidance1 img-fluid" src={TotalCost} /><br></br></li>
+                                    {/* <li>Product Cost = Procurement Gap * Unit Cost </li>
             <li>Freight Cost = Product Cost * Freight Percentage </li>
             <li>Total Cost = Product Cost + Freight Cost </li> */}
-        </ul>
-        </p>
-        <p>
-        For the example above, assuming a unit cost of 0.10 USD and a freight % of 7%:
-        <ul>
-            <li>Product Cost = -385,000 * 0.10 = $38,500</li>
-            <li>Freight Cost = $38,500 * 7% = $2,695</li>
-            <li>Total Cost = $38,500 + $2,695 = $41,195</li>
-        </ul>
-        </p>
+                                </ul>
+                            </p>
+                            <p>
+                                For the example above, assuming a unit cost of 0.10 USD and a freight % of 7%:
+                                <ul>
+                                    <li>Product Cost = -385,000 * 0.10 = $38,500</li>
+                                    <li>Freight Cost = $38,500 * 7% = $2,695</li>
+                                    <li>Total Cost = $38,500 + $2,695 = $41,195</li>
+                                </ul>
+                            </p>
 
-    </ModalBody>
-</div>
-</Modal>
+                        </ModalBody>
+                    </div>
+                </Modal>
             </div >
         );
     }

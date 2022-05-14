@@ -323,7 +323,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                                     dayOfStockOut: "",
                                                     active: true,
                                                     realmCountryPlanningUnit: {
-                                                        id: rcpuResult.filter(c => c.planningUnit.id == finalImportQATDataFilter[i].v10 && c.multiplier == 1)[0].realmCountryPlanningUnitId,
+                                                        id: rcpuResult.filter(c => c.planningUnit.id == finalImportQATDataFilter[i].v10 && c.multiplier == 1)[0].realmCountryPlanningUnitId ,
                                                     },
                                                     multiplier: 1,
                                                     planningUnit: {

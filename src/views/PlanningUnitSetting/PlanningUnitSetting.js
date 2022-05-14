@@ -210,17 +210,17 @@ export default class PlanningUnitSetting extends Component {
                     if (isNaN(parseInt(value))) {//string value check
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, 'String value not allowed');
+                        this.el.setComments(col, i18n.t('static.planningUnitSetting.stringNotAllowed'));
                         valid = false;
                     } else if (!Number.isInteger(Number(value))) {//decimal value check
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, 'Decimal value not allowed');
+                        this.el.setComments(col, i18n.t('static.planningUnitSetting.decimalNotAllowed'));
                         valid = false;
                     } else if (!(reg.test(value))) {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, 'Please enter 10 digit whole number');
+                        this.el.setComments(col, i18n.t('static.planningUnitSetting.10digitWholeNumber'));
                         valid = false;
                     } else {
                         this.el.setStyle(col, "background-color", "transparent");
@@ -254,17 +254,17 @@ export default class PlanningUnitSetting extends Component {
                     if (isNaN(parseInt(value))) {//string value check
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, 'String value not allowed');
+                        this.el.setComments(col, i18n.t('static.planningUnitSetting.stringNotAllowed'));
                         valid = false;
                     } else if (!Number.isInteger(Number(value))) {//decimal value check
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, 'Decimal value not allowed');
+                        this.el.setComments(col, i18n.t('static.planningUnitSetting.decimalNotAllowed'));
                         valid = false;
                     } else if (!(reg.test(value))) {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, 'Please enter 10 digit whole number');
+                        this.el.setComments(col, i18n.t('static.planningUnitSetting.10digitWholeNumber'));
                         valid = false;
                     } else {
                         this.el.setStyle(col, "background-color", "transparent");
@@ -288,22 +288,22 @@ export default class PlanningUnitSetting extends Component {
                     if (isNaN(parseInt(value))) {//string value check
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, 'String value not allowed');
+                        this.el.setComments(col, i18n.t('static.planningUnitSetting.stringNotAllowed'));
                         valid = false;
                     } else if (!Number.isInteger(Number(value))) {//decimal value check
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, 'Decimal value not allowed');
+                        this.el.setComments(col, i18n.t('static.planningUnitSetting.decimalNotAllowed'));
                         valid = false;
                     } else if (!(reg.test(value))) {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, 'Please enter 10 digit whole number');
+                        this.el.setComments(col, i18n.t('static.planningUnitSetting.10digitWholeNumber'));
                         valid = false;
                     } else if (parseInt(value) > 99) {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, 'Maximum 99 months are allowed');
+                        this.el.setComments(col, i18n.t('static.planningUnitSetting.max99MonthAllowed'));
                         valid = false;
                     } else {
                         this.el.setStyle(col, "background-color", "transparent");
@@ -341,17 +341,17 @@ export default class PlanningUnitSetting extends Component {
                     if (isNaN(parseInt(value))) {//string value check
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, 'String value not allowed');
+                        this.el.setComments(col, i18n.t('static.planningUnitSetting.stringNotAllowed'));
                         valid = false;
                     } else if (Number(value) < 0) {//negative value check
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, 'Negative value not allowed');
+                        this.el.setComments(col, i18n.t('static.planningUnitSetting.negativeValueNotAllowed'));
                         valid = false;
                     } else if (!(reg.test(value))) {//regex check
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, 'Max 10 digit number and 4 digits after decimal are allowed.');
+                        this.el.setComments(col, i18n.t('static.planningUnitSetting.max10Digit4AfterDecimal'));
                         valid = false;
                     } else {
                         this.el.setStyle(col, "background-color", "transparent");
@@ -803,15 +803,15 @@ export default class PlanningUnitSetting extends Component {
                 if (isNaN(parseInt(value))) {//string value check
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, 'String value not allowed')
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.stringNotAllowed'))
                 } else if (!Number.isInteger(Number(value))) {//decimal value check
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, 'Decimal value not allowed')
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.decimalNotAllowed'))
                 } else if (!(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, 'Please enter 10 digit whole number')
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.10digitWholeNumber'))
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
@@ -838,15 +838,15 @@ export default class PlanningUnitSetting extends Component {
                 if (isNaN(parseInt(value))) {//string value check
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, 'String value not allowed')
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.stringNotAllowed'))
                 } else if (!Number.isInteger(Number(value))) {//decimal value check
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, 'Decimal value not allowed')
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.decimalNotAllowed'))
                 } else if (!(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, 'Please enter 10 digit whole number')
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.10digitWholeNumber'))
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
@@ -873,19 +873,19 @@ export default class PlanningUnitSetting extends Component {
                 if (isNaN(parseInt(value))) {//string value check
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, 'String value not allowed')
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.stringNotAllowed'))
                 } else if (!Number.isInteger(Number(value))) {//decimal value check
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, 'Decimal value not allowed')
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.decimalNotAllowed'))
                 } else if (!(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, 'Please enter 10 digit whole number')
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.10digitWholeNumber'))
                 } else if (parseInt(value) > 99) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, 'Maximum 99 months are allowed');
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.max99MonthAllowed'));
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
@@ -936,15 +936,15 @@ export default class PlanningUnitSetting extends Component {
                 if (isNaN(parseInt(value))) {//string value check
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, 'String value not allowed')
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.stringNotAllowed'))
                 } else if (Number(value) < 0) {//negative value check
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, 'Negative value not allowed')
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.negativeValueNotAllowed'))
                 } else if (!(reg.test(value))) {//regex check
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, 'Max 10 digit number and 4 digits after decimal are allowed.')
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.max10Digit4AfterDecimal'))
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
@@ -1914,13 +1914,13 @@ export default class PlanningUnitSetting extends Component {
                 //     // readOnly: true// 0A
                 // },
                 {
-                    title: 'Planning Unit Category',
+                    title: i18n.t('static.productCategory.productCategory'),
                     type: 'autocomplete',
                     source: this.state.productCategoryListNew,
                     // readOnly: true// 0A
                 },
                 {
-                    title: 'Planning Unit',
+                    title: i18n.t('static.dashboard.planningunitheader'),
                     type: 'autocomplete',
                     source: this.state.allPlanningUnitList,
                     // filter: this.filterPlanningUnitListByTracerCategoryId,
@@ -1929,19 +1929,19 @@ export default class PlanningUnitSetting extends Component {
                     // readOnly: true //1B
                 },
                 {
-                    title: 'Consumption Forecast?',
+                    title: i18n.t('static.commitTree.consumptionForecast')+' ?',
                     type: 'checkbox',
                     width: '150'
                     // readOnly: true //2C
                 },
                 {
-                    title: 'Tree Forecast?',
+                    title: i18n.t('static.TreeForecast.TreeForecast')+' ?',
                     type: 'checkbox',
                     width: '150'
                     // readOnly: true //3D
                 },
                 {
-                    title: 'Stock (end of ' + this.state.beforeEndDateDisplay + ')',
+                    title: i18n.t('static.planningUnitSetting.stockEndOf') + this.state.beforeEndDateDisplay + ')',
                     type: 'numeric',
                     textEditor: true,
                     decimal: '.',
@@ -1951,7 +1951,7 @@ export default class PlanningUnitSetting extends Component {
                     // readOnly: true //4E
                 },
                 {
-                    title: 'Existing Shipments (' + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ')',
+                    title: i18n.t('static.planningUnitSetting.existingShipments') + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ')',
                     type: 'numeric',
                     textEditor: true,
                     decimal: '.',
@@ -1961,7 +1961,7 @@ export default class PlanningUnitSetting extends Component {
                     // readOnly: true //5F
                 },
                 {
-                    title: 'Desired Months of Stock (end of ' + this.state.endDateDisplay + ')',
+                    title: i18n.t('static.planningUnitSetting.desiredMonthsOfStock') + this.state.endDateDisplay + ')',
                     type: 'numeric',
                     textEditor: true,
                     decimal: '.',
@@ -1971,7 +1971,7 @@ export default class PlanningUnitSetting extends Component {
                     // readOnly: true //6G
                 },
                 {
-                    title: 'Price Type',
+                    title: i18n.t('static.forecastReport.priceType'),
                     type: 'autocomplete',
                     source: this.state.allProcurementAgentList,
                     width: '180'
@@ -1979,7 +1979,7 @@ export default class PlanningUnitSetting extends Component {
                     // readOnly: true //7H
                 },
                 {
-                    title: 'Unit Price',
+                    title: i18n.t('static.forecastReport.unitPrice'),
                     type: 'numeric',
                     textEditor: true,
                     decimal: '.',
@@ -2974,7 +2974,7 @@ export default class PlanningUnitSetting extends Component {
                                             </div>
                                         </FormGroup>
                                         <FormGroup className="col-md-3" style={{ display: 'none' }}>
-                                            <Label htmlFor="appendedInputButton">Forecast Period</Label>
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.common.forecastPeriod')}</Label>
                                             <div className="controls edit">
 
                                                 <Picker
