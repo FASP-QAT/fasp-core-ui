@@ -13,6 +13,11 @@ class ExtrapolationService {
         );
     }
 
+    regression(json) {
+        return axios.post(`${API_URL}/api/forecastStats/regression`, json, {}
+        );
+    }
+
 }
 
 export default new ExtrapolationService();

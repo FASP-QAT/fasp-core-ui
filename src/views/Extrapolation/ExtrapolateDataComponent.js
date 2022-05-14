@@ -924,7 +924,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                     calculateSemiAverages(inputDataSemiAverage, noOfMonthsForProjection, this);
                 }
                 if (this.state.linearRegressionId && inputDataMovingAvg.filter(c => c.actual != null).length >= 3) {
-                    calculateLinearRegression(inputDataLinearRegression, this.state.confidenceLevelIdLinearRegression, noOfMonthsForProjection, this);
+                    calculateLinearRegression(inputDataLinearRegression, this.state.confidenceLevelIdLinearRegression, noOfMonthsForProjection, this,false);
                 }
                 console.log("inputDataTes.length+++", inputDataTes.length);
                 // if (inputDataTes.length >= (this.state.noOfMonthsForASeason * 2)) {
