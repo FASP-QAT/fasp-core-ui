@@ -8834,7 +8834,7 @@ export default class CreateTreeTemplate extends Component {
                                                         id: item.payload.nodeType.id
                                                     },
                                                     nodeUnit: {
-                                                        id: item.payload.nodeUnit.id
+                                                        id: 1
                                                     },
                                                     label: {
                                                         label_en: item.payload.label.label_en
@@ -8853,7 +8853,7 @@ export default class CreateTreeTemplate extends Component {
                                                                 notes: (item.payload.nodeDataMap[0])[0].notes,
                                                                 manualChangesEffectFuture: (item.payload.nodeDataMap[0])[0].manualChangesEffectFuture,
                                                                 nodeDataModelingList: (item.payload.nodeDataMap[0])[0].nodeDataModelingList,
-                                                                nodeDataMomList: (item.payload.nodeDataMap[0])[0].nodeDataMomList,
+                                                                nodeDataMomList: [],
                                                                 nodeDataOverrideList: (item.payload.nodeDataMap[0])[0].nodeDataOverrideList
                                                             }
                                                         ]
