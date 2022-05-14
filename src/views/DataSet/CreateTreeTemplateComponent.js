@@ -1870,7 +1870,7 @@ export default class CreateTreeTemplate extends Component {
         // var monthDifference = moment(endDate).startOf('month').diff(startDate, 'months', true);
         var monthDifference = parseInt((monthArr.length > 0 ? parseInt(monthArr.length + 1) : 0) + 1);
         console.log("month diff>>>", monthDifference);
-        var momValue = '',percentForOneMonth='';
+        var momValue = '', percentForOneMonth = '';
         var getValue = e.target.value.toString().replaceAll(",", "");
         if (this.state.currentModelingType == 2) {
             var momValue = ((parseFloat(getValue - this.state.currentCalculatorStartValue.toString().replaceAll(",", ""))) / monthDifference).toFixed(4);
@@ -8629,6 +8629,7 @@ export default class CreateTreeTemplate extends Component {
                                                                 usagePeriod: {
                                                                     usagePeriodId: 1
                                                                 },
+                                                                repeatCount: '',
                                                                 repeatUsagePeriod: {
                                                                     usagePeriodId: 1
                                                                 }
@@ -8847,8 +8848,8 @@ export default class CreateTreeTemplate extends Component {
                                                                 // month: '2021-09-01',
                                                                 nodeDataId: (item.payload.nodeDataMap[0])[0].nodeDataId,
                                                                 dataValue: (item.payload.nodeDataMap[0])[0].dataValue,
-                                                                fuNode: (item.payload.nodeDataMap[0])[0].fuNode,
-                                                                puNode: (item.payload.nodeDataMap[0])[0].puNode,
+                                                                fuNode: item.payload.nodeType.id < 4 || item.payload.nodeType.id == 5 ? null : (item.payload.nodeDataMap[0])[0].fuNode,
+                                                                puNode: item.payload.nodeType.id < 4 || item.payload.nodeType.id == 4 ? null : (item.payload.nodeDataMap[0])[0].puNode,
                                                                 notes: (item.payload.nodeDataMap[0])[0].notes,
                                                                 manualChangesEffectFuture: (item.payload.nodeDataMap[0])[0].manualChangesEffectFuture,
                                                                 nodeDataModelingList: (item.payload.nodeDataMap[0])[0].nodeDataModelingList,
@@ -8858,8 +8859,8 @@ export default class CreateTreeTemplate extends Component {
                                                         ]
                                                     }
                                                 },
-                                                level: item.level
-                                                // sortOrder: item.sortOrder
+                                                level: item.level,
+                                                sortOrder: item.sortOrder
                                             }
                                             flatList.push(json);
                                         }
