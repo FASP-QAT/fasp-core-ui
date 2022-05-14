@@ -29,7 +29,8 @@ export function calculateArima(inputData, p, d, q, confidenceLevel, noOfProjecti
         "d": Number(d),
         "q": Number(q),
         "n": Number(noOfProjectionMonths),
-        "seasonality": seasonality
+        "seasonality": seasonality,
+        "level":Number(confidenceLevel)
     }
     console.log("JsonArima@@@@@@", json);
     ExtrapolationService.arima(json)
@@ -41,15 +42,16 @@ export function calculateArima(inputData, p, d, q, confidenceLevel, noOfProjecti
                 var count = 0;
                 for (var k = 0; k < responseData.fits.length; k++) {
                     count += 1;
-                    output.push({ month: count, actual: inputData[k] != undefined && inputData[k].actual != undefined && inputData[k].actual != null && inputData[k].actual != '' ? inputData[k].actual : null, forecast: responseData.fits[k] == 'NA' ? null : responseData.fits[k] > 0 ? responseData.fits[k] : 0 })
+                    output.push({ month: count, actual: inputData[k] != undefined && inputData[k].actual != undefined && inputData[k].actual != null && inputData[k].actual != '' ? inputData[k].actual : null, forecast: responseData.fits[k] == 'NA' ? null : responseData.fits[k] > 0 ? responseData.fits[k] : 0,ci:null })
                 }
-                for (var j = 0; j < responseData.forecasts.length; j++) {
+                for (var j = 0; j < responseData.forecast.length; j++) {
                     count += 1;
-                    output.push({ month: count, actual: inputData[count - 1] != undefined && inputData[count - 1].actual != undefined && inputData[count - 1].actual != null && inputData[count - 1].actual != '' ? inputData[count - 1].actual : null, forecast: responseData.forecasts[j] == 'NA' ? null : responseData.forecasts[j] > 0 ? responseData.forecasts[j] : 0 })
+                    output.push({ month: count, actual: inputData[count - 1] != undefined && inputData[count - 1].actual != undefined && inputData[count - 1].actual != null && inputData[count - 1].actual != '' ? inputData[count - 1].actual : null, forecast: responseData.forecast[j] == 'NA' ? null : responseData.forecast[j] > 0 ? responseData.forecast[j] : 0,ci: responseData.ci[j] > 0 ? responseData.ci[j] : 0 })
                 }
 
                 console.log("OutPutArima@@@@@@@@@@@@@@@@@@@@@@", output)
-                calculateCI(output, Number(confidenceLevel), "arimaData", props)
+                // calculateCI(output, Number(confidenceLevel), "arimaData", props)
+                props.updateState("arimaData", output);
                 calculateError(output, "arimaError", props)
 
             }
