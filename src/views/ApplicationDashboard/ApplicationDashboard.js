@@ -761,7 +761,20 @@ class ApplicationDashboard extends Component {
 
   render() {
     const checkOnline = localStorage.getItem('sessionType');
-    const activeTab1 = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8)), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8)).defaultModuleId;
+    console.log("AuthenticationService.getLoggedInUserRoleBusinessFunctionArray()@@@@@@@@", AuthenticationService.getLoggedInUserRoleBusinessFunctionArray())
+    let defaultModuleId = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8)), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8)).defaultModuleId;
+    if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SUPPLY_PLANNING_MODULE') && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_FORECASTING_MODULE')) {
+      console.log("In if@@@@@@@@")
+      defaultModuleId = activeTab1 != undefined ? activeTab1 : 1;
+    } else if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SUPPLY_PLANNING_MODULE')) {
+      console.log("In else if@@@@@@@@")
+      defaultModuleId = 2;
+    } else {
+      console.log("In else else@@@@@@@@")
+      defaultModuleId = 1;
+    }
+    console.log("Default Module Id@@@@@@@@", defaultModuleId)
+    var activeTab1 = defaultModuleId;
     const { activeIndex } = this.state;
     const { activeIndexProgram } = this.state;
     // const { problemActionlist } = this.state;
