@@ -1230,7 +1230,8 @@ class LoadDeleteDataSet extends Component {
                                 }
                             }
                         } else {
-                            this.setState({ loading: false })
+                            // console.log("In elseMohit@@@@@@@@@@@@@@@");
+                            // this.setState({ loading: false })
                         }
                         if (continueToLoad == 1) {
                             DatasetService.getAllDatasetData(checkboxesChecked)
@@ -1354,6 +1355,15 @@ class LoadDeleteDataSet extends Component {
                                     }.bind(this)
 
                                 }).catch(error => {
+                                    this.setState({
+                                        loading: false,
+                                        message:i18n.t("static.program.errortext"),
+                                        color:"red"
+                                    }, () => {
+                                        this.hideFirstComponent()
+                                    })
+                                    // this.props.history.push(`/dashboard/`+'green/' + 'Dataset loaded successfully')
+                                    // this.setState({ loading: false })
 
                                 })
                         } else {
