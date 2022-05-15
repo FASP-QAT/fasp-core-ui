@@ -164,14 +164,14 @@ export default class syncPage extends Component {
     document.getElementById('div1').style.display = 'block';
     this.state.timeout = setTimeout(function () {
       document.getElementById('div1').style.display = 'none';
-    }, 8000);
+    }, 30000);
   }
 
   hideSecondComponent() {
     document.getElementById('div2').style.display = 'block';
     this.state.timeout = setTimeout(function () {
       document.getElementById('div2').style.display = 'none';
-    }, 8000);
+    }, 30000);
   }
 
   componentWillUnmount() {

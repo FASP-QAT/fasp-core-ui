@@ -574,7 +574,7 @@ export default class ForecastingUnitListComponent extends Component {
             data[3] = getLabelText(forecastingUnitList[j].tracerCategory.label, this.state.lang)
             data[4] = getLabelText(forecastingUnitList[j].unit.label, this.state.lang)
             data[5] = getLabelText(forecastingUnitList[j].genericLabel, this.state.lang)
-            data[6] = getLabelText(forecastingUnitList[j].label, this.state.lang)
+            data[6] = getLabelText(forecastingUnitList[j].label, this.state.lang) + " | " + forecastingUnitList[j].forecastingUnitId
             data[7] = forecastingUnitList[j].lastModifiedBy.username;
             data[8] = (forecastingUnitList[j].lastModifiedDate ? moment(forecastingUnitList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
             data[9] = forecastingUnitList[j].active;
@@ -691,7 +691,7 @@ export default class ForecastingUnitListComponent extends Component {
     hideFirstComponent() {
         this.timeout = setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
     componentWillUnmount() {
         clearTimeout(this.timeout);
@@ -701,7 +701,7 @@ export default class ForecastingUnitListComponent extends Component {
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
 
 

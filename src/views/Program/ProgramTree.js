@@ -154,7 +154,7 @@ class Program extends Component {
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
 
     hideFirstComponent() {
@@ -162,7 +162,7 @@ class Program extends Component {
         clearTimeout(this.state.timeout);
         this.state.timeout = setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
-        }, 8000);
+        }, 30000);
 
     }
 
@@ -344,7 +344,7 @@ class Program extends Component {
                                 if (response.status == 200) {
                                     console.log("Program List", response.data);
                                     this.setState({
-                                        prgList: response.data,
+                                        prgList: response.data.programList,
                                         loading: false
                                     })
                                 } else {

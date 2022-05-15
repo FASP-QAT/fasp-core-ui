@@ -732,7 +732,7 @@ export default class UpdateCountryComponent extends Component {
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
     changeMessage(message) {
         this.setState({ message: message })

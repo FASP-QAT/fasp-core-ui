@@ -1152,6 +1152,7 @@ import {
 } from 'reactstrap';
 import DeleteSpecificRow from '../ProgramProduct/TableFeatureTwo';
 import ProgramService from "../../api/ProgramService";
+import DatasetService from "../../api/DatasetService";
 import ProductService from "../../api/ProductService"
 import OrganisationService from "../../api/OrganisationService"
 import HealthAreaService from "../../api/HealthAreaService"
@@ -1214,7 +1215,7 @@ class AccessControlComponent extends Component {
 
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
     filterProgram() {
         let realmId = this.state.user.realm.realmId;
@@ -1420,7 +1421,7 @@ class AccessControlComponent extends Component {
 
                 },
                 {
-                    title: i18n.t('static.dataSource.program'),
+                    title: i18n.t('static.dashboard.programheader'),
                     type: 'autocomplete',
                     source: programList,
                     // filter: this.filterProgram
@@ -1765,38 +1766,97 @@ class AccessControlComponent extends Component {
                                             ProgramService.getProgramList()
                                                 .then(response => {
                                                     if (response.status == "200") {
-                                                        var listArray = response.data;
-                                                        listArray.sort((a, b) => {
-                                                            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                                                            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
-                                                            return itemLabelA > itemLabelB ? 1 : -1;
-                                                        });
-                                                        this.setState({
-                                                            programs: listArray,
-                                                            selProgram: listArray
-                                                        });
-                                                        UserService.getUserByUserId(this.props.match.params.userId)
-                                                            .then(response => {
-                                                                if (response.status == 200) {
-                                                                    this.setState({
-                                                                        user: response.data,
-                                                                        rows: response.data.userAclList
-                                                                    }, (
-                                                                    ) => {
-                                                                        this.filterData();
-                                                                        this.filterOrganisation();
-                                                                        this.filterHealthArea();
-                                                                        this.filterProgram();
-                                                                        this.buildJexcel();
+                                                        //                                                         var listArray = [...response.data]
+                                                        //                                                         var arr = [];
+                                                        // for (var i = 0; i <= response.data.length; i++) {
+                                                        //     response.data[i].programTypeId = 1;
+                                                        // }
+                                                        // var listArray = response.data;
+                                                        // listArray.sort((a, b) => {
+                                                        //     var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                                                        //     var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                                                        //     return itemLabelA > itemLabelB ? 1 : -1;
+                                                        // });
+                                                        DatasetService.getDatasetList()
+                                                            .then(response1 => {
+                                                                if (response1.status == "200") {
+                                                                    
+                                                                    var listArray = [...response.data, ...response1.data]
+                                                                    listArray.sort((a, b) => {
+                                                                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                                                                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                                                                        return itemLabelA > itemLabelB ? 1 : -1;
                                                                     });
-                                                                } else {
                                                                     this.setState({
-                                                                        message: response.data.messageCode
-                                                                    },
-                                                                        () => {
-                                                                            this.hideSecondComponent();
-                                                                        })
+                                                                        programs: listArray,
+                                                                        selProgram: listArray
+                                                                    });
                                                                 }
+
+
+
+                                                                UserService.getUserByUserId(this.props.match.params.userId)
+                                                                    .then(response => {
+                                                                        if (response.status == 200) {
+                                                                            this.setState({
+                                                                                user: response.data,
+                                                                                rows: response.data.userAclList
+                                                                            }, (
+                                                                            ) => {
+                                                                                this.filterData();
+                                                                                this.filterOrganisation();
+                                                                                this.filterHealthArea();
+                                                                                this.filterProgram();
+                                                                                this.buildJexcel();
+                                                                            });
+                                                                        } else {
+                                                                            this.setState({
+                                                                                message: response.data.messageCode
+                                                                            },
+                                                                                () => {
+                                                                                    this.hideSecondComponent();
+                                                                                })
+                                                                        }
+                                                                    }).catch(
+                                                                        error => {
+                                                                            if (error.message === "Network Error") {
+                                                                                this.setState({
+                                                                                    message: 'static.unkownError',
+                                                                                    loading: false
+                                                                                });
+                                                                            } else {
+                                                                                switch (error.response ? error.response.status : "") {
+
+                                                                                    case 401:
+                                                                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                                                                        break;
+                                                                                    case 403:
+                                                                                        this.props.history.push(`/accessDenied`)
+                                                                                        break;
+                                                                                    case 500:
+                                                                                    case 404:
+                                                                                    case 406:
+                                                                                        this.setState({
+                                                                                            message: error.response.data.messageCode,
+                                                                                            loading: false
+                                                                                        });
+                                                                                        break;
+                                                                                    case 412:
+                                                                                        this.setState({
+                                                                                            message: error.response.data.messageCode,
+                                                                                            loading: false
+                                                                                        });
+                                                                                        break;
+                                                                                    default:
+                                                                                        this.setState({
+                                                                                            message: 'static.unkownError',
+                                                                                            loading: false
+                                                                                        });
+                                                                                        break;
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    );
                                                             }).catch(
                                                                 error => {
                                                                     if (error.message === "Network Error") {
