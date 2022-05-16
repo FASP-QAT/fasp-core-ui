@@ -449,15 +449,9 @@ export default class TreeExtrapolationComponent extends React.Component {
     buildExtrapolationMom() {
         var movingAveragesData = [];
         var semiAveragesData = [];
-        // var linearRegressionDataLower = [];
         var linearRegressionData = [];
-        // var linearRegressionDataUpper = [];
-        // var tesDataLower = [];
         var tesData = [];
-        // var tesDataUpper = [];
-        // var arimaDataLower = [];
         var arimaData = [];
-        // var arimaDataUpper = [];
         var extrapolationDataList = [];
         var momList = [];
         var tableJson = this.state.dataExtrapolation.getJson(null, false);
@@ -503,12 +497,6 @@ export default class TreeExtrapolationComponent extends React.Component {
                     amount: map1.get("5") != "" && map1.get("5") != null ? map1.get("5").toString().replaceAll("%", "") : null,
                 }
                 semiAveragesData.push(semiAveragesJson);
-                // Linear Regression
-                // var linearRegressionLowerJson = {
-                //     month: map1.get("0"),
-                //     amount: map1.get("18") != "" && map1.get("18") != null ? map1.get("18").toString().replaceAll("%", "") : null,
-                // }
-                // linearRegressionDataLower.push(linearRegressionLowerJson);
 
                 var linearRegressionJson = {
                     month: map1.get("0"),
@@ -517,17 +505,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                 }
                 linearRegressionData.push(linearRegressionJson);
 
-                // var linearRegressionUpperJson = {
-                //     month: map1.get("0"),
-                //     amount: map1.get("19") != "" && map1.get("19") != null ? map1.get("19").toString().replaceAll("%", "") : null,
-                // }
-                // linearRegressionDataUpper.push(linearRegressionUpperJson);
-                // TES Data
-                // var tesLowerJson = {
-                //     month: map1.get("0"),
-                //     amount: map1.get("14") != "" && map1.get("14") != null ? map1.get("14").toString().replaceAll("%", "") : null,
-                // }
-                // tesDataLower.push(tesLowerJson);
+                
                 if (this.state.tesData.length > 0) {
                     console.log("result here rama---", map1.get("7") != "" && map1.get("7") != null && map1.get("7") != 'NaN' ? "A" : "B");
                     var tesJson = {
@@ -538,17 +516,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                     tesData.push(tesJson);
                 }
 
-                // var tesUpperJson = {
-                //     month: map1.get("0"),
-                //     amount: map1.get("15") != "" && map1.get("15") != null ? map1.get("15").toString().replaceAll("%", "") : null,
-                // }
-                // tesDataUpper.push(tesUpperJson);
-                //Arima
-                // var arimaLowerJson = {
-                //     month: map1.get("0"),
-                //     amount: map1.get("16") != "" && map1.get("16") != null ? map1.get("16").toString().replaceAll("%", "") : null,
-                // }
-                // arimaDataLower.push(arimaLowerJson);
+              
                 if (this.state.arimaData.length > 0) {
                     var arimaJson = {
                         month: map1.get("0"),
@@ -558,19 +526,10 @@ export default class TreeExtrapolationComponent extends React.Component {
                     arimaData.push(arimaJson);
                 }
                 count++;
-                // var arimaUpperJson = {
-                //     month: map1.get("0"),
-                //     amount: map1.get("17") != "" && map1.get("17") != null ? map1.get("17").toString().replaceAll("%", "") : null,
-                // }
-                // arimaDataUpper.push(arimaUpperJson);
+              
             }
         }
-        // console.log("TES lower---", tesLowerJson);
-        // console.log("TES ---", tesJson);
-        // console.log("TES Upper---", tesUpperJson);
-        // console.log("TES lower data---", tesDataLower);
-        console.log("momList---", momList);
-        // console.log("TES Upper data---", tesDataUpper);
+        
         const { nodeDataExtrapolation } = this.state;
         nodeDataExtrapolation.extrapolationDataList = extrapolationDataList;
         var nodeDataExtrapolationOptionList = [];
@@ -658,7 +617,7 @@ export default class TreeExtrapolationComponent extends React.Component {
             var mom = momList.filter(m => moment(m.month).format('YYYY-MM') == moment(currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].month).format('YYYY-MM'));
             currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].nodeDataExtrapolation = this.state.nodeDataExtrapolation;
             currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].nodeDataMomList = momList;
-            currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].nodeDataModelingList = [];
+            // currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].nodeDataModelingList = [];
             currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].nodeDataExtrapolationOptionList = this.state.nodeDataExtrapolationOptionList;
             // if (currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].dataValue == "" || currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].dataValue == 0) {
             currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].dataValue = mom.length > 0 ? mom[0].calculatedValue : '0';
