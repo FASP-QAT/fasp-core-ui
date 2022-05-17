@@ -207,40 +207,54 @@ const validationSchemaNodeData = function (values) {
                 function (value) {
                     // console.log("*****", document.getElementById("nodeValue").value);
                     var testNumber = (/^\d{0,12}(\.\d{1,4})?$/).test((document.getElementById("forecastingUnitPerPersonsFC").value).replaceAll(",", ""));
-                    // console.log("*****", testNumber);
                     if ((parseInt(document.getElementById("nodeTypeId").value) == 4) && (document.getElementById("forecastingUnitPerPersonsFC").value == "" || testNumber == false)) {
                         return false;
                     } else {
                         return true;
                     }
                 }),
-        // usageFrequency: Yup.string()
-        //     .test('usageFrequency', 'Please enter a valid number having max 12 digits before decimal and max 2 digit after decimal.',
-        //         function (value) {
-        //             // console.log("@@@>1", (parseInt(document.getElementById("nodeTypeId").value) == 4));
-        //             // console.log("@@@>1", document.getElementById("usageTypeIdFU").value == 2);
-        //             // console.log("@@@>2", document.getElementById("usageFrequency").value == "");
-        //             var testNumber = (/^\d{0,12}(\.\d{1,2})?$/).test((document.getElementById("usageFrequency").value).replaceAll(",", ""))
-        //             if (document.getElementById("usageTypeIdFU").value == 2 && (document.getElementById("usageFrequency").value == "" || testNumber == false)) {
-        //                 return false;
-        //             } else {
-        //                 return true;
-        //             }
-        //         }),
-        // usagePeriodId: Yup.string()
-        //     .test('usagePeriodId', 'This field is required.',
-        //         function (value) {
-        //             // console.log("@@@>1", (parseInt(document.getElementById("nodeTypeId").value) == 4));
-        //             // console.log("@@@>1", document.getElementById("usageTypeIdFU").value == 2);
-        //             // console.log("@@@>2", document.getElementById("usageFrequency").value == "");
-        //             if (document.getElementById("usageTypeIdFU").value == 2 && document.getElementById("usagePeriodId").value == "") {
-        //                 return false;
-        //             } else {
-        //                 return true;
-        //             }
+        usageFrequencyCon: Yup.string()
+            .test('usageFrequencyCon', i18n.t('static.tree.decimalValidation12&2'),
+                function (value) {
+                    var testNumber = (/^\d{0,12}(\.\d{1,4})?$/).test((document.getElementById("usageFrequencyCon").value).replaceAll(",", ""))
+                    if (document.getElementById("usageTypeIdFU").value == 2 && (document.getElementById("usageFrequencyCon").value == "" || testNumber == false)) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }),
+        usageFrequencyDis: Yup.string()
+            .test('usageFrequencyDis', i18n.t('static.tree.decimalValidation12&2'),
+                function (value) {
+                    var testNumber = (/^\d{0,12}(\.\d{1,4})?$/).test((document.getElementById("usageFrequencyDis").value).replaceAll(",", ""))
+                    if (document.getElementById("usageTypeIdFU").value == 1 && (document.getElementById("oneTimeUsage").value == 'false' || document.getElementById("oneTimeUsage").value == false) && (document.getElementById("usageFrequencyDis").value == "" || testNumber == false)) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }),
+        usagePeriodIdCon: Yup.string()
+            .test('usagePeriodIdCon', 'This field is required.',
+                function (value) {
+                    if (document.getElementById("usageTypeIdFU").value == 2 && document.getElementById("usagePeriodIdCon").value == "") {
+                        return false;
+                    } else {
+                        return true;
+                    }
 
-        //         }),
+                }),
+        usagePeriodIdDis: Yup.string()
+            .test('usagePeriodIdDis', 'This field is required.',
+                function (value) {
+                    if (document.getElementById("usageTypeIdFU").value == 1 && (document.getElementById("oneTimeUsage").value == 'false' || document.getElementById("oneTimeUsage").value == false) && document.getElementById("usagePeriodIdDis").value == "") {
+                        console.log("usagePeriodIdDis false");
+                        return false;
+                    } else {
+                        console.log("usagePeriodIdDis true");
+                        return true;
+                    }
 
+                }),
         oneTimeUsage: Yup.string()
             .test('oneTimeUsage', i18n.t('static.validation.fieldRequired'),
                 function (value) {
@@ -250,10 +264,18 @@ const validationSchemaNodeData = function (values) {
                         return true;
                     }
                 }),
-        repeatCount: Yup.string().test('forecastingUnitPerPersonsFC', i18n.t('static.tree.decimalValidation12&2'),
+        repeatCount: Yup.string().test('repeatCount', i18n.t('static.tree.decimalValidation12&2'),
             function (value) {
                 var testNumber = (/^\d{0,12}(\.\d{1,4})?$/).test((document.getElementById("repeatCount").value).replaceAll(",", ""));
-                if (document.getElementById("oneTimeUsage").value == 2 && (document.getElementById("repeatCount").value == "" || testNumber == false)) {
+                if (document.getElementById("usageTypeIdFU").value == 1 && (document.getElementById("oneTimeUsage").value === "false" || document.getElementById("oneTimeUsage").value === false) && (document.getElementById("repeatCount").value == "" || testNumber == false)) {
+                    return false;
+                } else {
+                    return true;
+                }
+            }),
+        repeatUsagePeriodId: Yup.string().test('repeatUsagePeriodId', 'This field is required.',
+            function (value) {
+                if (document.getElementById("usageTypeIdFU").value == 1 && (document.getElementById("oneTimeUsage").value == "false" || document.getElementById("oneTimeUsage").value == false) && (document.getElementById("repeatUsagePeriodId").value == "")) {
                     return false;
                 } else {
                     return true;
@@ -4280,7 +4302,7 @@ export default class CreateTreeTemplate extends Component {
             }
             console.log("oneTimeUsage---", oneTimeUsage);
             if (usageTypeId == 2 || (usageTypeId == 1 && oneTimeUsage != null && oneTimeUsage != "true" && oneTimeUsage != true)) {
-                usagePeriodId = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId;
+                usagePeriodId = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId != "" ? (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId : "";
                 console.log("usagePeriodId---", usagePeriodId);
                 console.log("usageFrequency before 5---", (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageFrequency);
                 usageFrequency = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageFrequency.toString().replaceAll(",", "");
@@ -4294,7 +4316,7 @@ export default class CreateTreeTemplate extends Component {
                 oneTimeUsage = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage;
             }
             if (usageTypeId == 2 || (usageTypeId == 1 && oneTimeUsage != null && oneTimeUsage != "true" && oneTimeUsage != true)) {
-                usagePeriodId = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId;
+                usagePeriodId = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId != "" ? (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId : "";
                 console.log("usagePeriodId---", usagePeriodId);
                 usageFrequency = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageFrequency.toString().replaceAll(",", "");
                 console.log("usageFrequency---", usageFrequency);
@@ -4325,7 +4347,7 @@ export default class CreateTreeTemplate extends Component {
                 noOfMonthsInUsagePeriod = oneTimeUsage != "true" && oneTimeUsage != true ? convertToMonth * usageFrequency * noOfFUPatient : noOfFUPatient;
                 console.log("noOfMonthsInUsagePeriod---", noOfMonthsInUsagePeriod);
             }
-        } else if (usageTypeId == 1) {
+        } else if (usageTypeId == 1 && oneTimeUsage != null && (oneTimeUsage == "true" || oneTimeUsage == true)) {
             console.log("inside else if")
             if (this.state.currentItemConfig.context.payload.nodeType.id == 4) {
                 noOfFUPatient = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "") / (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfPersons.toString().replaceAll(",", "");
@@ -4380,6 +4402,7 @@ export default class CreateTreeTemplate extends Component {
 
 
             if ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 || ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage != "true" && (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage != true)) {
+                console.log("usage period Id---",this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usagePeriod.usagePeriodId);
                 selectedText2 = this.state.usagePeriodList.filter(c => c.usagePeriodId == (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId)[0].label.label_en;
             }
         }
@@ -4626,7 +4649,11 @@ export default class CreateTreeTemplate extends Component {
             nodeUnitId: true,
             percentageOfParent: true,
             forecastingUnitId: true,
-            puPerVisit: true
+            puPerVisit: true,
+            usageFrequencyCon: true,
+            usageFrequencyDis: true,
+            usagePeriodIdCon: true,
+            usagePeriodIdDis: true,
             // nodeValue: true
         }
         )
@@ -5709,8 +5736,14 @@ export default class CreateTreeTemplate extends Component {
 
         if (event.target.name === "repeatUsagePeriodId") {
             var fuNode = (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode;
+            var repeatUsagePeriod = document.getElementById("repeatUsagePeriodId");
+            var selectedText = repeatUsagePeriod.options[repeatUsagePeriod.selectedIndex].text;
+
             var repeatUsagePeriod = {
-                usagePeriodId: event.target.value
+                usagePeriodId: event.target.value,
+                label: {
+                    label_en: selectedText
+                }
             }
             fuNode.repeatUsagePeriod = repeatUsagePeriod;
             (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode = fuNode;
@@ -5731,14 +5764,14 @@ export default class CreateTreeTemplate extends Component {
             this.calculateParentValueFromMOM(event.target.value);
         }
 
-        if (event.target.name === "usageFrequency") {
+        if (event.target.name === "usageFrequencyCon" || event.target.name === "usageFrequencyDis") {
             (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageFrequency = event.target.value;
             this.getNoOfMonthsInUsagePeriod();
             this.getNoFURequired();
             this.getUsageText();
         }
 
-        if (event.target.name === "usagePeriodId") {
+        if (event.target.name === "usagePeriodIdCon" || event.target.name === "usagePeriodIdDis") {
             (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId = event.target.value;
             this.getNoOfMonthsInUsagePeriod();
             this.getNoFURequired();
@@ -7454,10 +7487,18 @@ export default class CreateTreeTemplate extends Component {
                                                     <FormGroup className="col-md-2" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != "true" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != true ? 'block' : 'none' }}></FormGroup>
                                                     <FormGroup className="col-md-4" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != "true" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != true ? 'block' : 'none' }}>
                                                         <Input type="text"
-                                                            name="usageFrequency"
+                                                            id="usageFrequencyDis"
+                                                            name="usageFrequencyDis"
                                                             bsSize="sm"
-                                                            onChange={(e) => { this.dataChange(e) }}
+                                                            valid={!errors.usageFrequencyDis && (this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageFrequency != "" : false)}
+                                                            invalid={touched.usageFrequencyDis && !!errors.usageFrequencyDis}
+                                                            onBlur={handleBlur}
+                                                            onChange={(e) => {
+                                                                handleChange(e);
+                                                                this.dataChange(e)
+                                                            }}
                                                             value={this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != "true" ? addCommas(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageFrequency) : ""}></Input>
+                                                        <FormFeedback className="red">{errors.usageFrequencyDis}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup className="col-md-2" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != "true" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != true ? 'block' : 'none' }}>
                                                         <Input type="text"
@@ -7469,10 +7510,16 @@ export default class CreateTreeTemplate extends Component {
                                                     <FormGroup className="col-md-4" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != "true" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != true ? 'block' : 'none' }}>
                                                         <Input
                                                             type="select"
-                                                            id="usagePeriodId"
-                                                            name="usagePeriodId"
+                                                            id="usagePeriodIdDis"
+                                                            name="usagePeriodIdDis"
                                                             bsSize="sm"
-                                                            onChange={(e) => { this.dataChange(e) }}
+                                                            valid={!errors.usagePeriodIdDis && (this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usagePeriod.usagePeriodId != "" : false)}
+                                                            invalid={touched.usagePeriodIdDis && !!errors.usagePeriodIdDis}
+                                                            onBlur={handleBlur}
+                                                            onChange={(e) => {
+                                                                handleChange(e);
+                                                                this.dataChange(e)
+                                                            }}
                                                             required
                                                             value={this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != "true" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != true ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usagePeriod.usagePeriodId : ""}
                                                         >
@@ -7486,6 +7533,7 @@ export default class CreateTreeTemplate extends Component {
                                                                     )
                                                                 }, this)}
                                                         </Input>
+                                                        <FormFeedback className="red">{errors.usagePeriodIdDis}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup className="col-md-2" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != "true" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != true ? 'block' : 'none' }}>
                                                         <Label htmlFor="currencyId">for<span class="red Reqasterisk">*</span></Label>
@@ -7511,7 +7559,13 @@ export default class CreateTreeTemplate extends Component {
                                                             id="repeatUsagePeriodId"
                                                             name="repeatUsagePeriodId"
                                                             bsSize="sm"
-                                                            onChange={(e) => { this.dataChange(e) }}
+                                                            valid={!errors.repeatUsagePeriodId && this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 && (this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage == "false" || this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage == false) ? (this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.repeatUsagePeriod != '' && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.repeatUsagePeriod != null && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.repeatUsagePeriod.usagePeriodId != undefined && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.repeatUsagePeriod.usagePeriodId != null && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.repeatUsagePeriod.usagePeriodId != '') : !errors.repeatUsagePeriodId}
+                                                            invalid={touched.repeatUsagePeriodId && !!errors.repeatUsagePeriodId}
+                                                            onBlur={handleBlur}
+                                                            onChange={(e) => {
+                                                                handleChange(e);
+                                                                this.dataChange(e)
+                                                            }}
                                                             value={this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != "true" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.repeatUsagePeriod != null ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.repeatUsagePeriod.usagePeriodId : ''}>
 
                                                             <option value="">{i18n.t('static.common.select')}</option>
@@ -7524,6 +7578,7 @@ export default class CreateTreeTemplate extends Component {
                                                                     )
                                                                 }, this)}
                                                         </Input>
+                                                        <FormFeedback className="red">{errors.repeatUsagePeriodId}</FormFeedback>
                                                     </FormGroup></>
 
                                                 {/* // } */}
@@ -7540,30 +7595,31 @@ export default class CreateTreeTemplate extends Component {
                                                 </FormGroup>
                                                 <FormGroup className="col-md-5" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 2 ? 'block' : 'none' }}>
                                                     <Input type="text"
-                                                        id="usageFrequency"
-                                                        name="usageFrequency"
+                                                        id="usageFrequencyCon"
+                                                        name="usageFrequencyCon"
                                                         bsSize="sm"
-                                                        // valid={!errors.usageFrequency && (this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageFrequency != "" : false)}
-                                                        // invalid={touched.usageFrequency && !!errors.usageFrequency}
-                                                        // onBlur={handleBlur}
+                                                        valid={!errors.usageFrequencyCon && (this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageFrequency != "" : false)}
+                                                        invalid={touched.usageFrequencyCon && !!errors.usageFrequencyCon}
+                                                        onBlur={handleBlur}
                                                         onChange={(e) => {
-                                                            // handleChange(e); 
+                                                            handleChange(e);
                                                             this.dataChange(e)
                                                         }}
                                                         value={this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 2 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageFrequency : ""}></Input>
+                                                    <FormFeedback className="red">{errors.usageFrequencyCon}</FormFeedback>
                                                     {/* <FormFeedback className="red">{errors.usageFrequency}</FormFeedback> */}
                                                 </FormGroup>
                                                 <FormGroup className="col-md-5" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 ? 'block' : 'none' }}>
                                                     <Input
                                                         type="select"
-                                                        id="usagePeriodId"
-                                                        name="usagePeriodId"
+                                                        id="usagePeriodIdCon"
+                                                        name="usagePeriodIdCon"
                                                         bsSize="sm"
-                                                        // valid={!errors.usagePeriodId && (this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 2 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageFrequency != "" : false)}
-                                                        // invalid={touched.usagePeriodId && !!errors.usagePeriodId}
+                                                        valid={!errors.usagePeriodIdCon && (this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usagePeriod.usagePeriodId != "" : false)}
+                                                        invalid={touched.usagePeriodIdCon && !!errors.usagePeriodIdCon}
                                                         onBlur={handleBlur}
                                                         onChange={(e) => {
-                                                            // handleChange(e); 
+                                                            handleChange(e);
                                                             this.dataChange(e)
                                                         }}
                                                         required
@@ -7579,6 +7635,7 @@ export default class CreateTreeTemplate extends Component {
                                                                 )
                                                             }, this)}
                                                     </Input>
+                                                    <FormFeedback className="red">{errors.usagePeriodIdCon}</FormFeedback>
                                                     {/* <FormFeedback className="red">{errors.usagePeriodId}</FormFeedback> */}
                                                 </FormGroup>
                                             </>
