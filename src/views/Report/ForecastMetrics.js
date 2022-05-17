@@ -58,7 +58,7 @@ import "jspdf-autotable";
 import ReportService from '../../api/ReportService';
 import ProgramService from '../../api/ProgramService';
 import TracerCategoryService from '../../api/TracerCategoryService';
-import MultiSelect from "react-multi-select-component";
+import {MultiSelect} from "react-multi-select-component";
 import jexcel from 'jexcel-pro';
 import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
@@ -813,7 +813,7 @@ class ForecastMetrics extends Component {
 
       }
       // AuthenticationService.setupAxiosInterceptors();
-
+      console.log("report json---", inputjson);
       ReportService.getForecastError(inputjson)
         .then(response => {
           console.log(JSON.stringify(response.data));

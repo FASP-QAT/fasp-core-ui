@@ -29,7 +29,7 @@ import {
 } from 'reactstrap';
 import ReportService from '../../api/ReportService';
 
-import MultiSelect from 'react-multi-select-component';
+import {MultiSelect} from 'react-multi-select-component';
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 const ref = React.createRef();
 const pickerLang = {
@@ -574,7 +574,7 @@ class AnnualShipmentCost extends Component {
 
                     doc.text(doc.internal.pageSize.width / 8, 80, splittext)
                     var y = 80 + splittext.length * 10
-                    splittext = doc.splitTextToSize(i18n.t('static.report.version*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8);
+                    splittext = doc.splitTextToSize(i18n.t('static.report.versionFinal*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8);
 
                     doc.text(doc.internal.pageSize.width / 8, y, splittext)
                     y = y + splittext.length * 10
@@ -1643,7 +1643,7 @@ class AnnualShipmentCost extends Component {
                                         </FormGroup> */}
 
                                             <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.version*')}</Label>
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.versionFinal*')}</Label>
                                                 <div className="controls ">
                                                     <InputGroup>
                                                         <Input
