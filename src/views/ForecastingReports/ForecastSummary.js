@@ -3564,38 +3564,38 @@ class ForecastSummary extends Component {
                 <Modal isOpen={this.state.showGuidance}
                     className={'modal-lg ' + this.props.className} >
                     <ModalHeader toggle={() => this.toggleShowGuidance()} className="ModalHead modal-info-Headher">
-                        <strong className="TextWhite">Show Guidance</strong>
+                        <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
                     </ModalHeader>
                     <div>
                         <ModalBody>
                             <div>
-                                <h3 className='ShowGuidanceHeading'>Forecast Summary</h3>
+                                <h3 className='ShowGuidanceHeading'>{i18n.t('static.ForecastSummary.ForecastSummary')}</h3>
                             </div>
                             <p>
-                                <p style={{ fontSize: '13px' }}><span className="UnderLineText">Purpose :</span> Enable users to see a summary of their final (selected) forecasts for the entire forecast period. To view the forecasts by month, use the '<a href='/#/forecastReport/forecastOutput' target="_blank" style={{ textDecoration: 'underline' }}>Monthly Forecast</a>' screen.
+                                <p style={{ fontSize: '13px' }}><span className="UnderLineText">{i18n.t('static.listTree.purpose')} :</span> Enable users to see a summary of their final (selected) forecasts for the entire forecast period. To view the forecasts by month, use the '<a href='/#/forecastReport/forecastOutput' target="_blank" style={{ textDecoration: 'underline' }}>{i18n.t('static.MonthlyForecast.MonthlyForecast')}</a>' screen.
                                     <ul>
-                                        <li><b>Regional View:</b>  Use this view to see your forecast across planning units and regions. Directly update the forecast method for every region-planning unit combination and add notes in the table, if desired. Forecast selections can also be updated in the '<a href='/#/report/compareAndSelectScenario' target="_blank" style={{ textDecoration: 'underline' }}>Compare and Select Forecast</a>' screen.</li>
-                                        <li><b>National View:</b> Use this view to see your forecast at a <span style={{ textDecoration: 'underline' }}>national level</span> and evaluate your <span style={{ textDecoration: 'underline' }}>procurement surplus or gaps</span>. </li>
+                                        <li><b>{i18n.t('static.forecastReport.regionalView')}:</b>  Use this view to see your forecast across planning units and regions. Directly update the forecast method for every region-planning unit combination and add notes in the table, if desired. Forecast selections can also be updated in the '<a href='/#/report/compareAndSelectScenario' target="_blank" style={{ textDecoration: 'underline' }}>{i18n.t('static.dashboard.compareAndSelect')}</a>' screen.</li>
+                                        <li><b>{i18n.t('static.forecastReport.nationalView')}:</b> Use this view to see your forecast at a <span style={{ textDecoration: 'underline' }}>national level</span> and evaluate your <span style={{ textDecoration: 'underline' }}>procurement surplus or gaps</span>. </li>
                                     </ul>
                                 </p>
                             </p>
                             <p style={{ fontSize: '13px' }}>
-                                <p style={{ fontSize: '13px' }}><span className="UnderLineText">Using this screen (National View) :</span><br></br>
-                                    <b>Note:</b> This is not a full supply plan, but a high-level procurement surplus/gap analysis. We recommend importing your forecast into the supply planning module for granular supply planning.
+                                <p style={{ fontSize: '13px' }}><span className="UnderLineText">{i18n.t('static.listTree.useThisScreen')} ({i18n.t('static.forecastReport.nationalView')}) :</span><br></br>
+                                    <b>{i18n.t('static.tree.Note')}:</b> This is not a full supply plan, but a high-level procurement surplus/gap analysis. We recommend importing your forecast into the supply planning module for granular supply planning.
                                 </p>
                                 <p>For the data to display here properly, enter the following data:
                                     <ul>
-                                        <li>Under <a href='/#/planningUnitSetting/listPlanningUnitSetting' target="_blank" style={{ textDecoration: 'underline' }}>Update Planning Unit</a>:
+                                        <li>Under <a href='/#/planningUnitSetting/listPlanningUnitSetting' target="_blank" style={{ textDecoration: 'underline' }}>{i18n.t('static.Update.PlanningUnits')}</a>:
                                             <ul>
-                                                <li><b>Stock</b> - at the beginning of your forecast period</li>
+                                                <li><b>{i18n.t('static.report.stock')}</b> - at the beginning of your forecast period</li>
                                                 <li><b>Existing shipments</b> - during your forecast period</li>
                                                 <li><b>Desired Months of stock</b> - at the end of your forecast period</li>
-                                                <li><b>Price Type</b> and <b>Unit Prices</b></li>
+                                                <li><b>{i18n.t('static.forecastReport.priceType')}</b> {i18n.t('static.common.and')} <b>Unit Prices</b></li>
                                             </ul>
                                         </li>
                                         <li>Under <a href='/#/dataset/versionSettings' target="_blank" style={{ textDecoration: 'underline' }}>Update Version Settings</a>:
                                             <ul>
-                                                <li><b>Freight %</b> - Freight cost is calculated as a percentage of product cost</li>
+                                                <li><b>{i18n.t('static.forecastReport.freight')} %</b> - Freight cost is calculated as a percentage of product cost</li>
                                             </ul>
                                         </li>
                                     </ul>
@@ -3617,13 +3617,13 @@ class ForecastSummary extends Component {
                                 <table className="table table-bordered ">
                                     <thead>
                                         <tr>
-                                            <th>Total Forecasted Quantity</th>
+                                            <th>{i18n.t('static.forecastOutput.totalForecastQuantity')}</th>
                                             <th>Stock(end of Dec 2020)</th>
                                             <th>Existing Shipments (Jan 2021 - Dec 2023)</th>
                                             <th>Stock(end of Dec 2023)</th>
                                             <th>Desired Months of Stock (end of Dec 2023)</th>
                                             <th>Desired Stock(end of Dec 2023)</th>
-                                            <th>Procurement Surplus/Gap</th>
+                                            <th>{i18n.t('static.forecastReport.procurementSurplus')}</th>
 
                                         </tr>
                                     </thead>
@@ -3657,9 +3657,9 @@ class ForecastSummary extends Component {
                             <p>
                                 For the example above, assuming a unit cost of 0.10 USD and a freight % of 7%:
                                 <ul>
-                                    <li>Product Cost = -385,000 * 0.10 = $38,500</li>
-                                    <li>Freight Cost = $38,500 * 7% = $2,695</li>
-                                    <li>Total Cost = $38,500 + $2,695 = $41,195</li>
+                                    <li>{i18n.t('static.forecastReport.productCost')} = -385,000 * 0.10 = $38,500</li>
+                                    <li>{i18n.t('static.shipment.freightcost')} = $38,500 * 7% = $2,695</li>
+                                    <li>{i18n.t('static.shipment.totalCost')} = $38,500 + $2,695 = $41,195</li>
                                 </ul>
                             </p>
 

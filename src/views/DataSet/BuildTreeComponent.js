@@ -261,7 +261,7 @@ const validationSchemaNodeData = function (values) {
                     }
                 }),
         usagePeriodIdCon: Yup.string()
-            .test('usagePeriodIdCon', 'This field is required.',
+            .test('usagePeriodIdCon', i18n.t('static.label.fieldRequired'),
                 function (value) {
                     // console.log("@@@>1", (parseInt(document.getElementById("nodeTypeId").value) == 4));
                     // console.log("@@@>1", document.getElementById("usageTypeIdFU").value == 2);
@@ -274,7 +274,7 @@ const validationSchemaNodeData = function (values) {
 
                 }),
         usagePeriodIdDis: Yup.string()
-            .test('usagePeriodIdDis', 'This field is required.',
+            .test('usagePeriodIdDis', i18n.t('static.label.fieldRequired'),
                 function (value) {
                     // console.log("@@@>1", (parseInt(document.getElementById("nodeTypeId").value) == 4));
                     // console.log("@@@>1", document.getElementById("usageTypeIdFU").value == 2);
@@ -314,7 +314,7 @@ const validationSchemaNodeData = function (values) {
                     return true;
                 }
             }),
-        repeatUsagePeriodId: Yup.string().test('repeatUsagePeriodId', 'This field is required.',
+        repeatUsagePeriodId: Yup.string().test('repeatUsagePeriodId', i18n.t('static.label.fieldRequired'),
             function (value) {
                 console.log("validate 1---", document.getElementById("repeatUsagePeriodId").value);
                 console.log("validate 2---", document.getElementById("usageTypeIdFU").value);
@@ -4196,7 +4196,7 @@ export default class BuildTree extends Component {
             else if (diff <= 0) {
                 instance.jexcel.setStyle(col, "background-color", "transparent");
                 instance.jexcel.setStyle(col, "background-color", "yellow");
-                instance.jexcel.setComments(col, 'Please enter valid date');
+                instance.jexcel.setComments(col, i18n.t('static.validation.pleaseEnterValidDate'));
             }
             else {
                 instance.jexcel.setStyle(col, "background-color", "transparent");
@@ -7136,7 +7136,7 @@ export default class BuildTree extends Component {
                 levelId: null,
                 levelNo: parseInt(itemConfig.context.level + 1),
                 label: {
-                    label_en: "Level" + " " + parseInt(itemConfig.context.level + 1),
+                    label_en: i18n.t('static.common.level') + " " + parseInt(itemConfig.context.level + 1),
                     label_sp: "",
                     label_pr: "",
                     label_fr: ""
@@ -7919,7 +7919,7 @@ export default class BuildTree extends Component {
                                         <div className="row pl-lg-0 pr-lg-3">
                                             {/* <SupplyPlanFormulas ref="formulaeChild" /> */}
                                             <a className="">
-                                                <span style={{ cursor: 'pointer', color: '20a8d8' }} onClick={() => { this.toggleShowGuidanceNodeData() }} ><small className="supplyplanformulas">{i18n.t('Show Guidance')}</small></span>
+                                                <span style={{ cursor: 'pointer', color: '20a8d8' }} onClick={() => { this.toggleShowGuidanceNodeData() }} ><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
 
                                             </a>
                                         </div>
@@ -9066,7 +9066,7 @@ export default class BuildTree extends Component {
                         <div className="row pl-lg-0 pr-lg-3">
                             {/* <SupplyPlanFormulas ref="formulaeChild" /> */}
                             <a className="">
-                                <span style={{ cursor: 'pointer', color: '20a8d8' }} onClick={() => { this.toggleShowGuidanceModelingTransfer() }}><small className="supplyplanformulas">{i18n.t('Show Guidance')}</small></span>
+                                <span style={{ cursor: 'pointer', color: '20a8d8' }} onClick={() => { this.toggleShowGuidanceModelingTransfer() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
 
                             </a>
                         </div>
@@ -9352,7 +9352,7 @@ export default class BuildTree extends Component {
                                                 showCalculatorFields: false
                                             });
                                         }}><i className="fa fa-times"></i> {'Close'}</Button>
-                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.acceptValue}><i className="fa fa-check"></i> {'Accept'}</Button>
+                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.acceptValue}><i className="fa fa-check"></i> {i18n.t('static.common.accept')}</Button>
 
                                     </FormGroup>
                                     {/* </div> */}
@@ -10391,7 +10391,7 @@ export default class BuildTree extends Component {
                                                                 value={this.state.programId}
                                                                 onChange={(e) => { this.setStartAndStopDateOfProgram(e.target.value) }}
                                                             >
-                                                                <option value="">{"Please select program"}</option>
+                                                                <option value="">{i18n.t('static.mt.selectProgram')}</option>
                                                                 {datasets}
                                                             </Input>
 
@@ -10480,7 +10480,7 @@ export default class BuildTree extends Component {
                                                     {this.state.showDate && <FormGroup className="col-md-3 pl-lg-0">
                                                         <Label htmlFor="languageId">
                                                             {/* {i18n.t('static.supplyPlan.date')}  */}
-                                                            Display Date <i>(Forecast: {this.state.forecastPeriod})</i></Label>
+                                                            Display Date <i>({i18n.t('static.consumption.forcast')}: {this.state.forecastPeriod})</i></Label>
                                                         <div className="controls edit">
                                                             <Picker
                                                                 ref={this.pickAMonth3}
@@ -10869,7 +10869,7 @@ export default class BuildTree extends Component {
             <Modal isOpen={this.state.showGuidanceModelingTransfer}
                 className={'modal-lg ' + this.props.className} >
                 <ModalHeader toggle={() => this.toggleShowGuidanceModelingTransfer()} className="ModalHead modal-info-Headher">
-                    <strong className="TextWhite">Show Guidance</strong>
+                    <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
                 </ModalHeader>
                 <div>
                     <ModalBody>
@@ -10877,7 +10877,7 @@ export default class BuildTree extends Component {
                             <h3 className='ShowGuidanceHeading'>Add/Edit Node - Modeling/Transfer </h3>
                         </div>
                         <p>
-                            <p style={{ fontSize: '14px' }}><span className="UnderLineText">Purpose :</span>If a node changes over time, a user can utilize the Modeling/Transfer tab to model growth/loss within a single node or a transfer from one node to another. Note that this functionality is only available for Number (#) Nodes and Percentage (%) Nodes (including Forecasting Units and Planning Units). </p>
+                            <p style={{ fontSize: '14px' }}><span className="UnderLineText">{i18n.t('static.listTree.purpose')} :</span>If a node changes over time, a user can utilize the Modeling/Transfer tab to model growth/loss within a single node or a transfer from one node to another. Note that this functionality is only available for Number (#) Nodes and Percentage (%) Nodes (including Forecasting Units and Planning Units). </p>
                         </p>
 
                         <p>
@@ -10891,7 +10891,7 @@ export default class BuildTree extends Component {
                                 <table className="table table-bordered ">
                                     <thead>
                                         <tr>
-                                            <th style={{ width: '130px' }}>Modeling Type</th>
+                                            <th style={{ width: '130px' }}>{i18n.t('static.modelingType.modelingType')}</th>
                                             <th># Node Calculation</th>
                                             <th>% Node Calculation</th>
 
@@ -10901,13 +10901,13 @@ export default class BuildTree extends Component {
                                         <tr>
                                             <td>Linear (#)</td>
                                             <td>+/- a static number each month</td>
-                                            <td>N/A</td>
+                                            <td>{i18n.t('static.supplyPlanFormula.na')}</td>
 
                                         </tr>
                                         <tr>
                                             <td>Linear (%)</td>
                                             <td>+/- a static percentage each month, calculated based on the starting month</td>
-                                            <td>N/A</td>
+                                            <td>{i18n.t('static.supplyPlanFormula.na')}</td>
 
                                         </tr>
                                         <tr>
@@ -10918,7 +10918,7 @@ export default class BuildTree extends Component {
                                         </tr>
                                         <tr>
                                             <td>Linear (% point)</td>
-                                            <td>N/A</td>
+                                            <td>{i18n.t('static.supplyPlanFormula.na')}</td>
                                             <td>+/- a static percentage each month (e.g. if the starting month is 30% and the change is +1% each month, next month is 31%, the next is 32%, and so on)</td>
 
                                         </tr>
@@ -10969,7 +10969,7 @@ export default class BuildTree extends Component {
                                 <br></br>
                                 <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0" src={ModelingTransferScreenshot5} style={{border:'1px solid #fff'}}/></span>
                                  </li>
-                                <li><b>Transfer</b> - the example below shows a transfer of 250 patients each month for one year, January 2022 to December 2022, from the current node (Adults 1st Line) to another node (Adults 2nd Line). This transfer will also appear on the other node (Adults 2nd Line) greyed-out to signify an non-editable change.
+                                <li><b>{i18n.t('static.tree.transferToNode')}</b> - the example below shows a transfer of 250 patients each month for one year, January 2022 to December 2022, from the current node (Adults 1st Line) to another node (Adults 2nd Line). This transfer will also appear on the other node (Adults 2nd Line) greyed-out to signify an non-editable change.
                                 <br></br>
                                 <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0" src={ModelingTransferScreenshot6} style={{border:'1px solid #fff'}}/></span>
                                  </li>
@@ -10982,7 +10982,7 @@ export default class BuildTree extends Component {
             <Modal isOpen={this.state.showGuidanceNodeData}
                 className={'modal-lg ' + this.props.className} >
                 <ModalHeader toggle={() => this.toggleShowGuidanceNodeData()} className="ModalHead modal-info-Headher">
-                    <strong className="TextWhite">Show Guidance</strong>
+                    <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
                 </ModalHeader>
                 <div>
                     <ModalBody>
@@ -10990,16 +10990,16 @@ export default class BuildTree extends Component {
                             <h3 className='ShowGuidanceHeading'>Add/Edit Node - Node Data</h3>
                         </div>
                         <p>
-                            <p style={{ fontSize: '14px' }}><span className="UnderLineText">Purpose :</span>Enable allows user to specify the type of node</p>
+                            <p style={{ fontSize: '14px' }}><span className="UnderLineText">{i18n.t('static.listTree.purpose')} :</span>Enable allows user to specify the type of node</p>
                         </p>
 
                         <p>
-                            <p style={{ fontSize: '14px', fontWeight: 'bold' }}><span className="">Node Type :</span></p>
+                            <p style={{ fontSize: '14px', fontWeight: 'bold' }}><span className="">{i18n.t('static.tree.nodeType')} :</span></p>
                             <div className='pl-lg-4 pr-lg-4'>
                                 <table className="table table-bordered ">
                                     <thead>
                                         <tr>
-                                            <th style={{ width: '130px' }}>Node Type</th>
+                                            <th style={{ width: '130px' }}>{i18n.t('static.tree.nodeType')}</th>
                                             <th>Value</th>
                                             <th>Potential Children</th>
                                             <th>Advanced Functionality</th>
@@ -11013,13 +11013,13 @@ export default class BuildTree extends Component {
                                             <td>-</td>
                                         </tr>
                                         <tr>
-                                            <td className='BgLightBlue'><b>Number #</b></td>
+                                            <td className='BgLightBlue'><b>{i18n.t('static.modelingValidation.number')} #</b></td>
                                             <td>Defined at this node</td>
                                             <td>% or <b style={{ background: '#fff', color: '#002f6c', padding: '3px' }}><i class="fa fa-cube" aria-hidden="true"></i></b></td>
                                             <td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i className='fa fa-link'></i>, <i className='fa fa-line-chart'></i></td>
                                         </tr>
                                         <tr>
-                                            <td className='BgLightBlue'><b>Percentage %</b></td>
+                                            <td className='BgLightBlue'><b>{i18n.t('static.whatIf.percentage')} %</b></td>
                                             <td>Defined as a percentage of the parent</td>
                                             <td>% or <b style={{ background: '#fff', color: '#002f6c', padding: '3px' }}><i class="fa fa-cube" aria-hidden="true"></i></b></td>
                                             <td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i className='fa fa-link'></i></td>
@@ -11046,12 +11046,12 @@ export default class BuildTree extends Component {
                             <ul>
                                 <li><b>Modeling/Transfer Tab</b> </li>
                                 <ul>
-                                    <li><b><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i> Modeling:</b> Allows user to specify the exact rate of change</li>
-                                    <li><b><i className='fa fa-link'></i> Transfer:</b> Allows users to link two nodes together - so the decrease</li>
+                                    <li><b><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i> {i18n.t('static.commitTree.modeling')}:</b> Allows user to specify the exact rate of change</li>
+                                    <li><b><i className='fa fa-link'></i> {i18n.t('static.tree.transferToNode')}:</b> Allows users to link two nodes together - so the decrease</li>
                                 </ul>
                                 <li><b>Extrapolation Tab</b> (number nodes only)</li>
                                 <ul>
-                                    <li><b><i className='fa fa-line-chart'></i> Extrapolation:</b> Allows users to use historical data to extrapolate future change. , Enable this feature by checking 'Extrapolation' box. Note that if you do - the Modeling/Transfer Tab will be hidden as it is only possible to use one at a time. Any data previously entered in the Modeling/Transfer Tab will be cleared.</li>
+                                    <li><b><i className='fa fa-line-chart'></i> {i18n.t('static.commitTree.extrapolation')}:</b> Allows users to use historical data to extrapolate future change. , Enable this feature by checking 'Extrapolation' box. Note that if you do - the Modeling/Transfer Tab will be hidden as it is only possible to use one at a time. Any data previously entered in the Modeling/Transfer Tab will be cleared.</li>
                                 </ul>
                             </ul>
                             <p>If no change over time is desired, simply do not use the 'Modeling/Transfer' and 'Extrapolation' tabs, and the node value will equal the value entered or calculated on the 'Node Data' tab.</p>
@@ -11076,14 +11076,14 @@ export default class BuildTree extends Component {
 
                                         </tr>
                                         <tr>
-                                            <td>Node Title</td>
-                                            <td>Month</td>
+                                            <td>{i18n.t('static.tree.nodeTitle')}</td>
+                                            <td>{i18n.t('static.inventoryDate.inventoryReport')}</td>
 
 
                                         </tr>
                                         <tr>
-                                            <td>Node Type</td>
-                                            <td>Notes</td>
+                                            <td>{i18n.t('static.tree.nodeType')}</td>
+                                            <td>{i18n.t('static.common.notes')}</td>
                                         </tr>
                                         <tr>
                                             <td></td>
@@ -11097,14 +11097,14 @@ export default class BuildTree extends Component {
                             <ul>
                                 <li><b> Forecasting Node Type :</b> Select "discrete" if this product will be used for limited time, and "continuous" if it will be used indefinitely.</li>
                                 <li><b> Delayed or phased product usage?</b> Sometimes, the product consumption is delayed in relation the other higher levels of the tree. In the relevant
-                                    <b>Forecasting Unit </b>node, use the <b>Lag</b> field to indicate this delay.
+                                    <b>{i18n.t('static.dashboard.forecastingunit')} </b>node, use the <b>Lag</b> field to indicate this delay.
                                     <ul>
                                         <li>For example, if the product usage will begin 2 months after the parent node dates, enter "2" in this field.  </li>
                                         <li>This field can also be used where the product switches over time for example, if forecasting units A, B, and C are used in secession for two months at a time, you can set up your tree with Forecasting Unit A (discrete for 2 months, lag=0), Forecasting Unit B (discrete for 2 months, lag=2), Forecasting Unit C (discrete for 2 months, lag = 4).</li>
                                     </ul>
                                 </li>
                                 <li><b> Multi-month Consumption Patterns?</b> How often is the product actually "consumed"? is it monthly or every three months? Consumption can be defined at different levels depending on your supply chain. In the <b>Planning Unit Node</b>, use the <b>Consumption Interval</b> field to indicate. For example, if the end user uses a product daily, but only picks up or buys the product every 2 months, enter "2" in the Consumption Interval field to account for a multi-month consumption pattern.  Note that this is only available for Continuous nodes, as product is assumed to be “consumed” at the beginning of the usage period.</li>
-                                <li><b>Repeating Forecasting Usages?</b> If multiple Forecasting Unit nodes share the same settings, consider using the <a href='/#/usageTemplate/listUsageTemplate' target="_blank" style={{textDecoration:'underline'}}>Usage Template </a>screen to save your common usages, and then using the “Copy from Template”  field to populate the  fields in the forecasting unit nodes. </li>
+                                <li><b>Repeating Forecasting Usages?</b> If multiple Forecasting Unit nodes share the same settings, consider using the <a href='/#/usageTemplate/listUsageTemplate' target="_blank" style={{textDecoration:'underline'}}>{i18n.t('static.usageTemplate.usageTemplate')} </a>screen to save your common usages, and then using the “Copy from Template”  field to populate the  fields in the forecasting unit nodes. </li>
                             </ul>
                         </p>
 
@@ -11114,7 +11114,7 @@ export default class BuildTree extends Component {
             <Modal isOpen={this.state.showGuidance}
                 className={'modal-lg ' + this.props.className} >
                 <ModalHeader toggle={() => this.toggleShowGuidance()} className="ModalHead modal-info-Headher">
-                    <strong className="TextWhite">Show Guidance</strong>
+                    <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
                 </ModalHeader>
                 <div>
                     <ModalBody>
@@ -11122,10 +11122,10 @@ export default class BuildTree extends Component {
                             <h3 className='ShowGuidanceHeading'>Manage Tree - Build Trees</h3>
                         </div>
                         <p>
-                            <p style={{ fontSize: '14px' }}><span className="UnderLineText">Purpose :</span>Enable users to manage and build forecast tree and scenarios, for any non-consumption forecasts (demographic, morbidity, services, etc). Note that more guidance is available after clicking into any specific node.</p>
+                            <p style={{ fontSize: '14px' }}><span className="UnderLineText">{i18n.t('static.listTree.purpose')} :</span>Enable users to manage and build forecast tree and scenarios, for any non-consumption forecasts (demographic, morbidity, services, etc). Note that more guidance is available after clicking into any specific node.</p>
                         </p>
                         <p>
-                            <p style={{ fontSize: '14px' }}><span className="UnderLineText">Using this screen :</span><br></br>
+                            <p style={{ fontSize: '14px' }}><span className="UnderLineText">{i18n.t('static.listTree.useThisScreen')} :</span><br></br>
                                 <span style={{ fontWeight: 'bold' }}>Manage the Tree:</span> Click on the gear icon <i class="fa fa-cog" aria-hidden="true"></i> to show and edit or hide the forecast method, tree name, and region.
                             </p>
                             <p><span style={{ fontWeight: 'bold', fontSize: '14px' }}>Building the Tree:</span> The forecast tree is built from the top down, using different types of “nodes”.  See the Node Types and Node Actions below. Each forecast tree must include one or more Planning Unit Nodes, which form the forecast output, for that tree to be available in the 'Compare and Select' screen. Each Planning Unit Node must stem from a Forecasting Unit Node. </p>
@@ -11143,12 +11143,12 @@ export default class BuildTree extends Component {
 
                         </p>
                         <p>
-                            <p style={{ fontSize: '14px', fontWeight: 'bold' }}><span className="">Node Type :</span></p>
+                            <p style={{ fontSize: '14px', fontWeight: 'bold' }}><span className="">{i18n.t('static.tree.nodeType')} :</span></p>
                             <div className='pl-lg-4 pr-lg-4'>
                                 <table className="table table-bordered ">
                                     <thead>
                                         <tr>
-                                            <th style={{ width: '130px' }}>Node Type</th>
+                                            <th style={{ width: '130px' }}>{i18n.t('static.tree.nodeType')}</th>
                                             <th>Value</th>
                                             <th>Potential Children</th>
                                             <th>Advanced Functionality</th>
@@ -11174,13 +11174,13 @@ export default class BuildTree extends Component {
                                             <td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i className='fa fa-link'></i></td>
                                         </tr>
                                         <tr>
-                                            <td className='BgDarkBlue'><b>Forecasting Unit <i class="fa fa-cube" aria-hidden="true"></i></b></td>
+                                            <td className='BgDarkBlue'><b>{i18n.t('static.forecastingunit.forecastingunit')} <i class="fa fa-cube" aria-hidden="true"></i></b></td>
                                             <td>Defined as a percentage of the parent and forecasting unit parameters</td>
                                             <td><b style={{ background: '#fff', color: '#002f6c', padding: '3px' }}><i class="fa fa-cubes" aria-hidden="true"></i></b></td>
                                             <td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i className='fa fa-link'></i></td>
                                         </tr>
                                         <tr>
-                                            <td className='BgDarkBlue'><b>Planning Unit <i class="fa fa-cubes" aria-hidden="true"></i></b></td>
+                                            <td className='BgDarkBlue'><b>{i18n.t('static.common.product')} <i class="fa fa-cubes" aria-hidden="true"></i></b></td>
                                             <td>Defined as a percentage of the parent and planning unit parameters</td>
                                             <td>-</td>
                                             <td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i className='fa fa-link'></i></td>
@@ -11193,9 +11193,9 @@ export default class BuildTree extends Component {
                         <p><span style={{ fontSize: '14px', fontWeight: 'bold' }}>Changes Over Time</span><br></br>
                             While the tree structure stays constant throughout time, node percentages and values can change over time. Use the date dropdown to view the tree at any month. The three functionalities below are available in each node and allow the user to control how nodes change over time:
                             <ul>
-                                <li><b><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i> Modeling:</b> Allows user to specify the exact rate of change</li>
-                                <li><b><i className='fa fa-link'></i> Transfer:</b> Allows users to link two nodes together – so the decrease from the source node is linked to the increase of the destination node. Useful for transitions.</li>
-                                <li><b><i className='fa fa-line-chart'></i> Extrapolation:</b> Allows users to use historical data to extrapolate future change</li>
+                                <li><b><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i> {i18n.t('static.commitTree.modeling')}:</b> Allows user to specify the exact rate of change</li>
+                                <li><b><i className='fa fa-link'></i> {i18n.t('static.tree.transferToNode')}:</b> Allows users to link two nodes together – so the decrease from the source node is linked to the increase of the destination node. Useful for transitions.</li>
+                                <li><b><i className='fa fa-line-chart'></i> {i18n.t('static.commitTree.extrapolation')}:</b> Allows users to use historical data to extrapolate future change</li>
                             </ul>
                         </p>
 
@@ -11218,14 +11218,14 @@ export default class BuildTree extends Component {
 
                                         </tr>
                                         <tr>
-                                            <td>Node Title</td>
-                                            <td>Month</td>
+                                            <td>{i18n.t('static.tree.nodeTitle')}</td>
+                                            <td>{i18n.t('static.inventoryDate.inventoryReport')}</td>
 
 
                                         </tr>
                                         <tr>
-                                            <td>Node Type</td>
-                                            <td>Notes</td>
+                                            <td>{i18n.t('static.tree.nodeType')}</td>
+                                            <td>{i18n.t('static.common.notes')}</td>
                                         </tr>
                                         <tr>
                                             <td></td>

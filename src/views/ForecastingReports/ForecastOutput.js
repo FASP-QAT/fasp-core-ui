@@ -3859,24 +3859,24 @@ class ForecastOutput extends Component {
                 <Modal isOpen={this.state.showGuidance}
                     className={'modal-lg ' + this.props.className} >
                     <ModalHeader toggle={() => this.toggleShowGuidance()} className="ModalHead modal-info-Headher">
-                        <strong className="TextWhite">Show Guidance</strong>
+                        <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
                     </ModalHeader>
                     <div>
                         <ModalBody>
                             <div>
-                                <h3 className='ShowGuidanceHeading'>Monthly Forecast</h3>
+                                <h3 className='ShowGuidanceHeading'>{i18n.t('static.MonthlyForecast.MonthlyForecast')}</h3>
                             </div>
                             <p>
-                                <p style={{ fontSize: '13px' }}><span className="UnderLineText">Purpose :</span> Enable users to view the final (selected) forecasts for a single program, and displays the forecast by product and month. This output aggregates all regional forecasts into one total forecast. If you want to view disaggregated regional forecasts, you can do so by exporting the output as a CSV.</p>
+                                <p style={{ fontSize: '13px' }}><span className="UnderLineText">{i18n.t('static.listTree.purpose')} :</span> Enable users to view the final (selected) forecasts for a single program, and displays the forecast by product and month. This output aggregates all regional forecasts into one total forecast. If you want to view disaggregated regional forecasts, you can do so by exporting the output as a CSV.</p>
                             </p>
                             <p style={{ fontSize: '13px' }}>
-                                <p style={{ fontSize: '13px' }}><span className="UnderLineText">Using this screen :</span></p>
+                                <p style={{ fontSize: '13px' }}><span className="UnderLineText">{i18n.t('static.listTree.useThisScreen')} :</span></p>
                                 <p>
                                     <ul>
-                                        <li>Only selected forecasts will be shown in this output. To select a forecast for a product, go to the '<a href='/#/report/compareAndSelectScenario' target="_blank" style={{ textDecoration: 'underline' }}>Compare and Select Forecast</a>' screen. To see total forecasts across products, go to the '<a href='/#/forecastReport/forecastSummary' target="_blank" style={{ textDecoration: 'underline' }}>Forecast Summary</a>' screen.</li>
-                                        <li>The <b>Report Period</b> will be used to determine the period of time that you would like to see in the graphical/tabular output and must be within the forecast period. </li>
+                                        <li>Only selected forecasts will be shown in this output. To select a forecast for a product, go to the '<a href='/#/report/compareAndSelectScenario' target="_blank" style={{ textDecoration: 'underline' }}>{i18n.t('static.dashboard.compareAndSelect')}</a>' screen. To see total forecasts across products, go to the '<a href='/#/forecastReport/forecastSummary' target="_blank" style={{ textDecoration: 'underline' }}>{i18n.t('static.commitTree.forecastSummary')}</a>' screen.</li>
+                                        <li>The <b>{i18n.t('static.report.dateRange')}</b> will be used to determine the period of time that you would like to see in the graphical/tabular output and must be within the forecast period. </li>
                                         <li>Use the parameters to view the graph/tabular data either by forecasting units or planning units as well as showing the y-axis in equivalency units. </li>
-                                        <li><b>Equivalency Units </b>(EUs) allow users to aggregate data across planning units or forecasting units that are different but have the same equivalency unit. For a further explanation of Equivalency Units, refer to the show guidance in the <a href='/#/equivalancyUnit/listEquivalancyUnit' target="_blank" style={{ textDecoration: 'underline' }}>Equivalency Units</a> screen.</li>
+                                        <li><b>{i18n.t('static.equivalancyUnit.equivalancyUnits')} </b>(EUs) allow users to aggregate data across planning units or forecasting units that are different but have the same equivalency unit. For a further explanation of Equivalency Units, refer to the show guidance in the <a href='/#/equivalancyUnit/listEquivalancyUnit' target="_blank" style={{ textDecoration: 'underline' }}>{i18n.t('static.equivalancyUnit.equivalancyUnits')}</a> screen.</li>
                                         <li>The 'X-axis Aggregate By Year' filter allows you to view the data aggregated by year instead of by month.</li>
                                         <li>For the graph view, there are 3 ways you can hide which products are being displayed:
                                             <ul style={{ listStyle: 'none' }}>
