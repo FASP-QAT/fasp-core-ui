@@ -3349,7 +3349,10 @@ export default class BuildTree extends Component {
         var monthDifference = parseInt(moment(endDate).startOf('month').diff(startDate, 'months', true) + 1);
         console.log("month diff>>>", monthDifference);
         var momValue = '', percentForOneMonth = '';
-        var getValue = e.target.value.toString().replaceAll(",", "");
+        var currentEndValue = document.getElementById("currentEndValue").value;
+        console.log("currentEndValue---",currentEndValue);
+        var getValue = currentEndValue.toString().replaceAll(",", "");
+        console.log("getValue---",getValue);
         if (this.state.currentModelingType == 2) {
             var momValue = ((parseFloat(getValue - this.state.currentCalculatorStartValue.toString().replaceAll(",", ""))) / monthDifference).toFixed(4);
         }
@@ -3389,7 +3392,8 @@ export default class BuildTree extends Component {
         var startDate = this.state.currentCalculatorStartDate;
         var endDate = this.state.currentCalculatorStopDate;
         var monthDifference = parseInt(moment(endDate).diff(startDate, 'months', true) + 1);
-        var getValue = e.target.value != "" ? e.target.value.toString().replaceAll(",", "").match(/^-?\d+(?:\.\d{0,4})?/)[0] : "";
+        var currentTargetChangePercentage = document.getElementById("currentTargetChangePercentage").value;
+        var getValue = currentTargetChangePercentage != "" ? currentTargetChangePercentage.toString().replaceAll(",", "").match(/^-?\d+(?:\.\d{0,4})?/)[0] : "";
         var getEndValueFromPercentage = (this.state.currentCalculatorStartValue.toString().replaceAll(",", "") * getValue) / 100;
 
         console.log("***-----------------1-", this.state.currentCalculatorStartValue.toString().replaceAll(",", ""));
@@ -3438,7 +3442,8 @@ export default class BuildTree extends Component {
         var startDate = this.state.currentCalculatorStartDate;
         var endDate = this.state.currentCalculatorStopDate;
         var monthDifference = parseInt(moment(endDate).diff(startDate, 'months', true) + 1);
-        var getValue = e.target.value.toString().replaceAll(",", "");
+        var currentTargetChangeNumber = document.getElementById("currentTargetChangeNumber").value;
+        var getValue = currentTargetChangeNumber.toString().replaceAll(",", "");
         // var getEndValueFromNumber = parseFloat(this.state.currentCalculatorStartValue) + parseFloat(e.target.value);
         var targetEndValue = parseFloat(this.state.currentCalculatorStartValue.toString().replaceAll(",", "")) + parseFloat(getValue);
 
@@ -9724,8 +9729,23 @@ export default class BuildTree extends Component {
         var date = year + "-" + month + "-01";
         var currentCalculatorStartValue = this.getMomValueForDateRange(date);
         console.log("currentCalculatorStartValue---", currentCalculatorStartValue);
-        this.setState({ currentCalculatorStartDate: date, currentCalculatorStartValue }, () => {
+        console.log("month change currentEndValueEdit---", this.state.currentEndValueEdit);
+        console.log("month change currentTargetChangePercentageEdit---", this.state.currentTargetChangePercentageEdit);
+        console.log("month change currentTargetChangeNumberEdit---", this.state.currentTargetChangeNumberEdit);
 
+        this.setState({ currentCalculatorStartDate: date, currentCalculatorStartValue }, () => {
+            if (!this.state.currentEndValueEdit && !this.state.currentTargetChangePercentageEdit && !this.state.currentTargetChangeNumberEdit) {
+                console.log("Inside if modeling calculator");
+            } else {
+                console.log("Inside else modeling calculator");
+                if (!this.state.currentEndValueEdit) {
+                    this.calculateMomByEndValue();
+                } else if (!this.state.currentTargetChangePercentageEdit) {
+                    this.calculateMomByChangeInPercent();
+                } else if (!this.state.currentTargetChangeNumberEdit) {
+                    this.calculateMomByChangeInNumber();
+                }
+            }
         });
 
     }
@@ -9745,7 +9765,18 @@ export default class BuildTree extends Component {
         // console.log("value>>>", year);
         // console.log("text>>>", month)
         this.setState({ currentCalculatorStopDate: year + "-" + month + "-01" }, () => {
-
+            if (!this.state.currentEndValueEdit && !this.state.currentTargetChangePercentageEdit && !this.state.currentTargetChangeNumberEdit) {
+                console.log("Inside if modeling calculator");
+            } else {
+                console.log("Inside else modeling calculator");
+                if (!this.state.currentEndValueEdit) {
+                    this.calculateMomByEndValue();
+                } else if (!this.state.currentTargetChangePercentageEdit) {
+                    this.calculateMomByChangeInPercent();
+                } else if (!this.state.currentTargetChangeNumberEdit) {
+                    this.calculateMomByChangeInNumber();
+                }
+            }
         });
 
     }
