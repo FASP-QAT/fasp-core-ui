@@ -430,6 +430,37 @@ const getErrorsFromValidationError = (validationError) => {
     }, {})
 }
 
+const validationSchemaScenario = function (values) {
+    return Yup.object().shape({
+        scenarioName: Yup.string()
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
+            .required('Please enter scenario name.'),
+
+    })
+}
+
+const validateScenario = (getValidationSchema) => {
+    return (values) => {
+        const validationSchemaScenario = getValidationSchema(values)
+        try {
+            validationSchemaScenario.validateSync(values, { abortEarly: false })
+            return {}
+        } catch (error) {
+            return getErrorsFromValidationErrorScenario(error)
+        }
+    }
+}
+
+const getErrorsFromValidationErrorScenario = (validationError) => {
+    const FIRST_ERROR = 0
+    return validationError.inner.reduce((errors, error) => {
+        return {
+            ...errors,
+            [error.path]: error.errors[FIRST_ERROR],
+        }
+    }, {})
+}
+
 function addCommas(cell1, row) {
 
     if (cell1 != null && cell1 != "") {
@@ -3289,9 +3320,9 @@ export default class BuildTree extends Component {
         console.log("month diff>>>", monthDifference);
         var momValue = '', percentForOneMonth = '';
         var currentEndValue = document.getElementById("currentEndValue").value;
-        console.log("currentEndValue---",currentEndValue);
+        console.log("currentEndValue---", currentEndValue);
         var getValue = currentEndValue.toString().replaceAll(",", "");
-        console.log("getValue---",getValue);
+        console.log("getValue---", getValue);
         if (this.state.currentModelingType == 2) {
             var momValue = ((parseFloat(getValue - this.state.currentCalculatorStartValue.toString().replaceAll(",", ""))) / monthDifference).toFixed(4);
         }
@@ -5922,6 +5953,29 @@ export default class BuildTree extends Component {
         });
     }
 
+    touchAllScenario(setTouched, errors) {
+        setTouched({
+            scenarioName: true
+        }
+        )
+        this.validateFormScenario(errors)
+    }
+
+    validateFormScenario(errors) {
+        this.findFirstErrorScenario('userForm', (fieldName) => {
+            return Boolean(errors[fieldName])
+        })
+    }
+    findFirstErrorScenario(formName, hasError) {
+        const form = document.forms[formName]
+        for (let i = 0; i < form.length; i++) {
+            if (hasError(form[i].name)) {
+                form[i].focus()
+                break
+            }
+        }
+    }
+
     touchAll(setTouched, errors) {
         setTouched({
             forecastMethodId: true,
@@ -5931,6 +5985,7 @@ export default class BuildTree extends Component {
         )
         this.validateForm(errors)
     }
+
 
     validateForm(errors) {
         this.findFirstError('userForm', (fieldName) => {
@@ -11390,34 +11445,69 @@ export default class BuildTree extends Component {
                 <Modal isOpen={this.state.openAddScenarioModal}
                     className={'modal-md '} >
                     <ModalHeader className="modalHeaderSupplyPlan hideCross">
-                        <strong>{i18n.t('static.tree.Add/EditTreeData')}</strong>
+                        <strong>Add/Edit Scenario</strong>
                         <Button size="md" onClick={this.openScenarioModal} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
                     </ModalHeader>
                     <ModalBody>
-                        <FormGroup>
-                            <Label htmlFor="currencyId">{i18n.t('static.tree.scenarioName')}<span class="red Reqasterisk">*</span></Label>
-                            <Input type="text"
-                                id="scenarioName"
-                                name="scenarioName"
-                                onChange={(e) => { this.scenarioChange(e) }}
-                                value={this.state.scenario.label.label_en}
-                            ></Input>
-                        </FormGroup>
-                        <FormGroup>
-                            <Label htmlFor="currencyId">{i18n.t('static.common.note')}</Label>
-                            <Input type="text"
-                                id="scenarioDesc"
-                                name="scenarioDesc"
-                                onChange={(e) => { this.scenarioChange(e) }}
-                                value={this.state.scenario.notes}
-                            ></Input>
-                        </FormGroup>
-
+                        {/* Validation start */}
+                        <Formik
+                            enableReinitialize={true}
+                            initialValues={{
+                                scenarioName: this.state.scenario.label.label_en
+                            }}
+                            validate={validate(validationSchemaScenario)}
+                            onSubmit={(values, { setSubmitting, setErrors }) => {
+                                this.addScenario();
+                            }}
+                            render={
+                                ({
+                                    values,
+                                    errors,
+                                    touched,
+                                    handleChange,
+                                    handleBlur,
+                                    handleSubmit,
+                                    isSubmitting,
+                                    isValid,
+                                    setTouched,
+                                    handleReset,
+                                    setFieldValue,
+                                    setFieldTouched
+                                }) => (
+                                    <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='userForm' autocomplete="off">
+                                        <FormGroup>
+                                            <Label htmlFor="currencyId">{i18n.t('static.tree.scenarioName')}<span class="red Reqasterisk">*</span></Label>
+                                            <Input type="text"
+                                                id="scenarioName"
+                                                name="scenarioName"
+                                                valid={!errors.scenarioName && this.state.scenario.label.label_en != null ? this.state.scenario.label.label_en : '' != ''}
+                                                invalid={touched.scenarioName && !!errors.scenarioName}
+                                                onBlur={handleBlur}
+                                                onChange={(e) => { handleChange(e); this.scenarioChange(e) }}
+                                                value={this.state.scenario.label.label_en}
+                                            ></Input>
+                                            <FormFeedback>{errors.scenarioName}</FormFeedback>
+                                        </FormGroup>
+                                        <FormGroup>
+                                            <Label htmlFor="currencyId">{i18n.t('static.common.note')}</Label>
+                                            <Input type="text"
+                                                id="scenarioDesc"
+                                                name="scenarioDesc"
+                                                onChange={(e) => { this.scenarioChange(e) }}
+                                                value={this.state.scenario.notes}
+                                            ></Input>
+                                        </FormGroup>
+                                        <FormGroup className="col-md-6 pt-lg-4 float-right">
+                                            <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={this.openScenarioModal}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                            <Button type="submit" size="md" onClick={() => this.touchAllScenario(setTouched, errors)} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>
+                                        </FormGroup>
+                                    </Form>
+                                )} />
                     </ModalBody>
-                    <ModalFooter>
-                        <Button type="submit" size="md" onClick={this.addScenario} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={this.openScenarioModal}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                    </ModalFooter>
+                    {/* <ModalFooter> */}
+                    {/* <Button type="submit" size="md" onClick={this.addScenario} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={this.openScenarioModal}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
+                    {/* </ModalFooter> */}
                 </Modal>
             </Draggable>
             {/* Modal end------------------------ */}
