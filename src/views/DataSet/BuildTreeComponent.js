@@ -263,9 +263,6 @@ const validationSchemaNodeData = function (values) {
         usagePeriodIdCon: Yup.string()
             .test('usagePeriodIdCon', 'This field is required.',
                 function (value) {
-                    // console.log("@@@>1", (parseInt(document.getElementById("nodeTypeId").value) == 4));
-                    // console.log("@@@>1", document.getElementById("usageTypeIdFU").value == 2);
-                    // console.log("@@@>2", document.getElementById("usageFrequency").value == "");
                     if (document.getElementById("usageTypeIdFU").value == 2 && document.getElementById("usagePeriodIdCon").value == "") {
                         return false;
                     } else {
@@ -9040,8 +9037,6 @@ export default class BuildTree extends Component {
                                                     <FormFeedback className="red">{errors.usagePeriodIdCon}</FormFeedback>
                                                 </FormGroup>
                                             </>
-
-                                            {/* } */}
 
                                             <div className="pl-lg-3 pr-lg-3" style={{ clear: 'both', width: '100%' }}>
                                                 {(this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentScenario.fuNode.usageType.id == 2) &&
