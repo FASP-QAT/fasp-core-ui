@@ -1371,10 +1371,10 @@ class CompareAndSelectScenario extends Component {
                 if (planningUnitList.length == 1) {
                     planningUnitId = planningUnitList[0].planningUnit.id;
                     event.target.value = planningUnitList[0].planningUnit.id;
-                } else if (this.props.match.params.planningUnitId != "" && planningUnitList.filter(c => c.planningUnit.id == this.props.match.params.planningUnitId).length > 0 && c.active.toString()=="true") {
+                } else if (this.props.match.params.planningUnitId != "" && planningUnitList.filter(c => c.planningUnit.id == this.props.match.params.planningUnitId && c.active.toString()=="true").length > 0) {
                     planningUnitId = this.props.match.params.planningUnitId;
                     event.target.value = this.props.match.params.planningUnitId;
-                } else if (localStorage.getItem("sesDatasetPlanningUnitId") != "" && planningUnitList.filter(c => c.planningUnit.id == localStorage.getItem("sesDatasetPlanningUnitId")).length > 0 && c.active.toString()=="true") {
+                } else if (localStorage.getItem("sesDatasetPlanningUnitId") != "" && planningUnitList.filter(c => c.planningUnit.id == localStorage.getItem("sesDatasetPlanningUnitId")  && c.active.toString()=="true").length > 0) {
                     planningUnitId = localStorage.getItem("sesDatasetPlanningUnitId");
                     event.target.value = localStorage.getItem("sesDatasetPlanningUnitId");
                 }
