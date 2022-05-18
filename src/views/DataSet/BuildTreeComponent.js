@@ -604,6 +604,13 @@ export default class BuildTree extends Component {
                 },
                 notes: ''
             },
+            scenario1: {
+                id: '',
+                label: {
+                    label_en: ''
+                },
+                notes: ''
+            },
             manualChange: true,
             seasonality: true,
             programId: this.props.match.params.programId,
@@ -2286,7 +2293,7 @@ export default class BuildTree extends Component {
                     var scenario = this.state.scenarioList.filter(x => x.id == scenarioId)[0];
                     console.log("my scenario---", scenario);
                     this.setState({
-                        scenario,
+                        scenario: JSON.parse(JSON.stringify(scenario)),
                         openAddScenarioModal: !this.state.openAddScenarioModal
                     })
                 } else {
@@ -6471,92 +6478,97 @@ export default class BuildTree extends Component {
         var items = curTreeObj.tree.flatList;
         var scenarioId;
         var temNodeDataMap = [];
-        if (type == 1) {
-            var maxScenarioId = Math.max(...scenarioList.map(o => o.id));
-            var minScenarioId = Math.min(...scenarioList.map(o => o.id));
-            scenarioId = parseInt(maxScenarioId) + 1;
-            var newTabObject = {
-                id: scenarioId,
-                label: {
-                    label_en: scenario.label.label_en
-                },
-                notes: scenario.notes,
-                active: true
-            };
-            // console.log("tab data---", newTabObject);
-            scenarioList = [...scenarioList, newTabObject];
-            // console.log("tabList---", tabList1)
-            if (this.state.treeId != "") {
-                if (this.state.scenarioList.length > 1) {
-
-                }
-
-                console.log("***>minScenarioId---", items);
-                var tArr = [];
-                for (var i = 0; i < items.length; i++) {
-                    for (let j = 0; j < scenarioList.length; j++) {
-                        if (items[i].payload.nodeDataMap.hasOwnProperty(scenarioList[j].id)) {
-                            temNodeDataMap.push(items[i].payload.nodeDataMap[scenarioList[j].id][0]);
-                            tArr.push(items[i].payload.nodeDataMap[scenarioList[j].id][0].nodeDataId);
-                        }
-                    }
-                    var tempArray = [];
-                    var nodeDataMap = {};
-                    // tempArray = items[i].payload.nodeDataMap;
-                    tempArray.push(JSON.parse(JSON.stringify((items[i].payload.nodeDataMap[minScenarioId])[0])));
-                    nodeDataMap = items[i].payload.nodeDataMap;
-                    nodeDataMap[scenarioId] = tempArray;
-                    // var nodeDataId = this.getMaxNodeDataId(items);
-                    // console.log("nodeDataId---", nodeDataId);
-                    nodeDataMap[scenarioId][0].nodeDataId = "";
-                    items[i].payload.nodeDataMap = nodeDataMap;
-                }
-                console.log("items-----------%%%%%%", items);
-                console.log("tArr---", tArr);
-
-            }
-        } else if (type == 2 || type == 3) {
-            scenarioId = this.state.selectedScenario;
-            var scenario1 = scenarioList.filter(x => x.id == scenarioId)[0];
-            var findNodeIndex = scenarioList.findIndex(n => n.id == scenarioId);
-            if (type == 2) {
-                console.log("this.state.scenario---", this.state.scenario);
-                scenarioList[findNodeIndex] = this.state.scenario;
-                console.log("my scenarioList---", scenarioList);
-            } else if (type == 3) {
-                items = [];
-                scenarioId = '';
-                scenario1.active = false;
-                scenarioList[findNodeIndex] = scenario1;
-            }
-
-
-        }
-
-        curTreeObj.scenarioList = scenarioList;
-        this.setState({
-            showDiv1: false,
-            curTreeObj,
-            items,
-            selectedScenario: scenarioId,
-            scenarioList: scenarioList.filter(x => x.active == true),
-            openAddScenarioModal: false,
-            isChanged: true
-        }, () => {
-            console.log("final tab list---", this.state.items);
+        var result = scenarioList.filter(x => x.label.label_en.trim() == scenario.label.label_en.trim());
+        if ((type == 1 && result.length == 0) || (type == 2 && ((result.length == 1 && scenario.id == result[0].id) || result.length == 0)) || type == 3) {
             if (type == 1) {
-                var maxNodeDataId = temNodeDataMap.length > 0 ? Math.max(...temNodeDataMap.map(o => o.nodeDataId)) : 0;
-                console.log("scenarioId---", scenarioId);
-                for (var i = 0; i < items.length; i++) {
-                    maxNodeDataId = parseInt(maxNodeDataId) + 1;
-                    (items[i].payload.nodeDataMap[scenarioId])[0].nodeDataId = maxNodeDataId;
-                    console.log("my node data id--->", (items[i].payload.nodeDataMap[scenarioId])[0].nodeDataId);
+                var maxScenarioId = Math.max(...scenarioList.map(o => o.id));
+                var minScenarioId = Math.min(...scenarioList.map(o => o.id));
+                scenarioId = parseInt(maxScenarioId) + 1;
+                var newTabObject = {
+                    id: scenarioId,
+                    label: {
+                        label_en: scenario.label.label_en
+                    },
+                    notes: scenario.notes,
+                    active: true
+                };
+                // console.log("tab data---", newTabObject);
+                scenarioList = [...scenarioList, newTabObject];
+                // console.log("tabList---", tabList1)
+                if (this.state.treeId != "") {
+                    if (this.state.scenarioList.length > 1) {
+
+                    }
+
+                    console.log("***>minScenarioId---", items);
+                    var tArr = [];
+                    for (var i = 0; i < items.length; i++) {
+                        for (let j = 0; j < scenarioList.length; j++) {
+                            if (items[i].payload.nodeDataMap.hasOwnProperty(scenarioList[j].id)) {
+                                temNodeDataMap.push(items[i].payload.nodeDataMap[scenarioList[j].id][0]);
+                                tArr.push(items[i].payload.nodeDataMap[scenarioList[j].id][0].nodeDataId);
+                            }
+                        }
+                        var tempArray = [];
+                        var nodeDataMap = {};
+                        // tempArray = items[i].payload.nodeDataMap;
+                        tempArray.push(JSON.parse(JSON.stringify((items[i].payload.nodeDataMap[minScenarioId])[0])));
+                        nodeDataMap = items[i].payload.nodeDataMap;
+                        nodeDataMap[scenarioId] = tempArray;
+                        // var nodeDataId = this.getMaxNodeDataId(items);
+                        // console.log("nodeDataId---", nodeDataId);
+                        nodeDataMap[scenarioId][0].nodeDataId = "";
+                        items[i].payload.nodeDataMap = nodeDataMap;
+                    }
+                    console.log("items-----------%%%%%%", items);
+                    console.log("tArr---", tArr);
+
                 }
-                this.callAfterScenarioChange(scenarioId);
-                // this.updateTreeData();
+            } else if (type == 2 || type == 3) {
+                scenarioId = this.state.selectedScenario;
+                var scenario1 = scenarioList.filter(x => x.id == scenarioId)[0];
+                var findNodeIndex = scenarioList.findIndex(n => n.id == scenarioId);
+                if (type == 2) {
+                    console.log("this.state.scenario---", this.state.scenario);
+                    scenarioList[findNodeIndex] = this.state.scenario;
+                    console.log("my scenarioList---", scenarioList);
+                } else if (type == 3) {
+                    items = [];
+                    scenarioId = '';
+                    scenario1.active = false;
+                    scenarioList[findNodeIndex] = scenario1;
+                }
+
+
             }
-            this.saveTreeData(false);
-        });
+
+            curTreeObj.scenarioList = scenarioList;
+            this.setState({
+                showDiv1: false,
+                curTreeObj,
+                items,
+                selectedScenario: scenarioId,
+                scenarioList: scenarioList.filter(x => x.active == true),
+                openAddScenarioModal: false,
+                isChanged: true
+            }, () => {
+                console.log("final tab list---", this.state.items);
+                if (type == 1) {
+                    var maxNodeDataId = temNodeDataMap.length > 0 ? Math.max(...temNodeDataMap.map(o => o.nodeDataId)) : 0;
+                    console.log("scenarioId---", scenarioId);
+                    for (var i = 0; i < items.length; i++) {
+                        maxNodeDataId = parseInt(maxNodeDataId) + 1;
+                        (items[i].payload.nodeDataMap[scenarioId])[0].nodeDataId = maxNodeDataId;
+                        console.log("my node data id--->", (items[i].payload.nodeDataMap[scenarioId])[0].nodeDataId);
+                    }
+                    this.callAfterScenarioChange(scenarioId);
+                    // this.updateTreeData();
+                }
+                this.saveTreeData(false);
+            });
+        } else {
+            alert("Scenario name already exist.");
+        }
     }
     nodeTypeChange(value) {
         var nodeTypeId = value;
@@ -6692,6 +6704,7 @@ export default class BuildTree extends Component {
         if (event.target.name === "scenarioDesc") {
             scenario.notes = event.target.value;
         }
+        // scenario.id = 1;
         this.setState({
             scenario
         });
@@ -10590,21 +10603,12 @@ export default class BuildTree extends Component {
                                                         <Label htmlFor="languageId">{i18n.t('static.whatIf.scenario')}</Label>
 
                                                         <InputGroup>
-
-                                                            {/* <InputGroupAddon addonType="append">
-                                                                        <InputGroupText><i class="fa fa-plus icons" aria-hidden="true" data-toggle="tooltip" data-html="true" data-placement="bottom" onClick={this.showPopUp} title=""></i></InputGroupText>
-                                                                    </InputGroupAddon> */}
-
                                                             <Input
                                                                 type="select"
                                                                 name="scenarioId"
                                                                 id="scenarioId"
                                                                 bsSize="sm"
-                                                                // valid={!errors.languageId && this.state.user.language.languageId != ''}
-                                                                // invalid={touched.languageId && !!errors.languageId}
                                                                 onChange={(e) => { this.dataChange(e) }}
-                                                                // onClick={() => { this.onClick1() }}
-                                                                // onBlur={handleBlur}
                                                                 required
                                                                 value={this.state.selectedScenario}
                                                             >
