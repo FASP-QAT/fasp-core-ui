@@ -3289,9 +3289,9 @@ export default class BuildTree extends Component {
         console.log("month diff>>>", monthDifference);
         var momValue = '', percentForOneMonth = '';
         var currentEndValue = document.getElementById("currentEndValue").value;
-        console.log("currentEndValue---",currentEndValue);
+        console.log("currentEndValue---", currentEndValue);
         var getValue = currentEndValue.toString().replaceAll(",", "");
-        console.log("getValue---",getValue);
+        console.log("getValue---", getValue);
         if (this.state.currentModelingType == 2) {
             var momValue = ((parseFloat(getValue - this.state.currentCalculatorStartValue.toString().replaceAll(",", ""))) / monthDifference).toFixed(4);
         }
@@ -3304,7 +3304,7 @@ export default class BuildTree extends Component {
         }
 
         if (this.state.currentModelingType == 5) {
-            var momValue = (parseFloat(getValue - this.state.currentCalculatorStartValue.toString().replaceAll(",", "")) / monthDifference).toFixed(4);
+            var momValue = (parseFloat((getValue - this.state.currentCalculatorStartValue.toString().replaceAll(",", "")) / monthDifference)).toFixed(4);
         }
         // console.log("getmomValue>>>", momValue);
         var targetChangeNumber = '';
@@ -3357,7 +3357,7 @@ export default class BuildTree extends Component {
 
         }
         if (this.state.currentModelingType == 5) {
-            var momValue = (parseFloat(getValue)).toFixed(4);
+            var momValue = (parseFloat(getValue / monthDifference)).toFixed(4);
         }
 
         var targetChangeNumber = '';
