@@ -1068,7 +1068,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                         }
 
                         if (this.state.linearRegressionId) {
-                            calculateLinearRegression(JSON.parse(JSON.stringify(inputDataLinearRegression)), this.state.confidenceLevelIdLinearRegression, Math.trunc(noOfMonthsForProjection), this);
+                            calculateLinearRegression(JSON.parse(JSON.stringify(inputDataLinearRegression)), this.state.confidenceLevelIdLinearRegression, Math.trunc(noOfMonthsForProjection), this,true);
                         } else {
                             this.setState({
                                 linearRegressionData: [],

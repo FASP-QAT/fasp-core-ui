@@ -72,6 +72,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             programListFilter: [],
             forecastPeriod: '',
             selSource1: [],
+            selectedForecastProgramDesc: '',
 
         }
         this.changed = this.changed.bind(this);
@@ -1118,6 +1119,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
         if (e.target.value != "") {
             programListFilter = this.state.programs.filter(c => c.generalProgramJson.realmCountry.realmCountryId == selectedForecastProgram.realmCountry.realmCountryId);
         }
+        let selectedForecastProgramDesc = e.target.options[e.target.selectedIndex].text;
+        this.props.updateStepOneData("selectedForecastProgramDesc", selectedForecastProgramDesc);
         this.setState({
             forecastProgramId: e.target.value,
             versionId: '',
@@ -1238,7 +1241,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
             }, () => {
                 this.props.finishedStepOne();
             })
-
+            let versionId = document.getElementById("versionId").value;
+            this.props.updateStepOneData("versionId", versionId);
             this.props.updateStepOneData("stepOneData", changedpapuList);
             this.props.updateStepOneData("regionList", changedpapuList);
             this.props.updateStepOneData("supplyPlanPlanningUnitIds", supplyPlanPlanningUnitIds);

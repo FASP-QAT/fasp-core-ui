@@ -197,7 +197,7 @@ export default class ListTreeComponent extends Component {
                         //     calculateModelingData(programCopy, this, programId, 0, 1, 1, treeId, false);
                         // } else {
                         confirmAlert({
-                            message: "Do you want to move to manage tree page?",
+                            message: i18n.t('static.listTree.manageTreePage'),
                             buttons: [
                                 {
                                     label: i18n.t('static.program.yes'),
@@ -1167,7 +1167,7 @@ export default class ListTreeComponent extends Component {
                             title: i18n.t('static.common.deleteTree'),
                             onclick: function () {
                                 confirmAlert({
-                                    message: "Are you sure you want to delete this tree.",
+                                    message: i18n.t('static.listTree.deleteTree'),
                                     buttons: [
                                         {
                                             label: i18n.t('static.program.yes'),
@@ -1499,38 +1499,39 @@ export default class ListTreeComponent extends Component {
                     <Modal isOpen={this.state.showGuidance}
                         className={'modal-lg ' + this.props.className} >
                         <ModalHeader toggle={() => this.toggleShowGuidance()} className="ModalHead modal-info-Headher">
-                            <strong className="TextWhite">Show Guidance</strong>
+                            <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
                         </ModalHeader>
                         <div>
                             <ModalBody>
                                 <div>
-                                    <h3 className='ShowGuidanceHeading'>Manage Tree – Tree list</h3>
+                                    <h3 className='ShowGuidanceHeading'>{i18n.t('static.listTree.manageTreeTreeList')}</h3>
                                 </div>
                                 <p>
-                                    <p style={{ fontSize: '14px' }}><span className="UnderLineText">Purpose :</span> Enable users to :</p>
+                                    <p style={{ fontSize: '14px' }}><span className="UnderLineText">{i18n.t('static.listTree.purpose')} :</span> {i18n.t('static.listTree.enableUsersTo')} :</p>
                                     <ul type="1">
-                                        <li>View a list of their existing trees</li>
-                                         <li>Edit an existing tree by clicking any row </li>
-                                        <li>Delete or duplicate existing trees by right clicking on a row</li>
-                                        <li>Add a new tree to a loaded program by clicking on the 'Add Tree' dropdown in the top right corner of the screen. New trees can be built:</li>
+                                        <li>{i18n.t('static.listTree.listExistingTree')}</li>
+                                        <li> {i18n.t('static.listTree.editExistingTree')} </li>
+                                        <li>{i18n.t('static.listTree.deleteDuplicateExistingTree')}</li>
+                                        <li> {i18n.t('static.listTree.newTreeToLoadedProgram')}</li>
                                         <ul>
-                                            <li>manually - select 'Add Tree'</li>
-                                            <li>from a tree template - select the name of the desired template.</li>
+                                            <li>{i18n.t('static.listTree.manuallySelectAddTree')}</li>
+                                            <li>{i18n.t('static.listTree.nameOfDesiredTemplate')}</li>
                                         </ul>
-                                    </ul>
+                                   </ul>
                                 </p>
                                 <p>Note: The table on this screen lists trees for each forecast program that has been loaded. </p>
                                 <p>
-                                    <p style={{ fontSize: '14px' }}><span className="UnderLineText">Using this screen :</span></p>
+                                    <p style={{ fontSize: '14px' }}><span className="UnderLineText">{i18n.t('static.listTree.useThisScreen')} :</span></p>
                                     <p className='pl-lg-4'>
                                         <ul>
-                                            <li>A forecast program must first be loaded in order to build a tree (either manually or from a tree template.)</li>
-                                            <li>Before building and editing a tree, first add the forecast program's planning units in the <a href='/#/planningUnitSetting/listPlanningUnitSetting' target="_blank" style={{textDecoration:'underline'}}>'Update Planning Units'</a> screen before building</li>
-                                            <li>Building a tree similar to an existing tree? Duplicate an existing tree by right clicking on a row and selecting “duplicate” edit. If you want to keep the structure of the tree constant and only change the numbers, build only one tree and use the scenario feature instead. </li>
-                                            <li>Submit a HelpDesk ticket if there is a missing template that would benefit the QAT community. </li>
+                                            <li>{i18n.t('static.listTree.loadedToBuildTree')}</li>
+                                            <li>{i18n.t('static.listTree.addForecastPlanningUnit')} <a href='/#/planningUnitSetting/listPlanningUnitSetting'>{i18n.t('static.updatePlanningUnit.updatePlanningUnit')}</a> {i18n.t('static.listTree.screenBeforeBuilding')}</li>
+                                            <li>{i18n.t('static.listTree.buildSimilarTree')} </li>
+                                            <li>{i18n.t('static.listTree.submitHelpDeskTicket')} </li>
                                         </ul>
                                     </p>
                                 </p>
+                               
                             </ModalBody>
                         </div>
                     </Modal>
@@ -1539,7 +1540,7 @@ export default class ListTreeComponent extends Component {
                     <Modal isOpen={this.state.isModalOpen}
                         className={'modal-lg ' + this.props.className}>
                         <ModalHeader>
-                            <strong>Tree Details</strong>
+                            <strong>{i18n.t('static.listTree.treeDetails')}</strong>
                             <Button size="md" onClick={this.modelOpenClose} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
                         </ModalHeader>
                         <ModalBody className='pb-lg-0'>
@@ -1607,7 +1608,7 @@ export default class ListTreeComponent extends Component {
                                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                                         value={this.state.datasetIdModal}
                                                                     >
-                                                                        <option value="">{"Please select program"}</option>
+                                                                        <option value="">{i18n.t('static.mt.selectProgram')}</option>
                                                                         {datasets}
                                                                     </Input>
                                                                     <FormFeedback>{errors.datasetIdModal}</FormFeedback>
@@ -1642,7 +1643,7 @@ export default class ListTreeComponent extends Component {
                                                     </div>
                                                     <div className="row">
                                                         <FormGroup className={this.state.treeFlag ? "col-md-12" : "col-md-6"}>
-                                                            <Label for="number1">Tree Name<span className="red Reqasterisk">*</span></Label>
+                                                            <Label for="number1">{i18n.t('static.common.treeName')}<span className="red Reqasterisk">*</span></Label>
                                                             <div className="controls">
                                                                 <Input type="text"
                                                                     bsSize="sm"
@@ -1736,7 +1737,7 @@ export default class ListTreeComponent extends Component {
                                                     </div>
 
                                                     <div className="col-md-12 pl-lg-0 pr-lg-0" style={{ display: 'inline-block' }}>
-                                                        <div style={{ display: this.state.missingPUList.length > 0 && !this.state.treeFlag ? 'block' : 'none' }}><div><b>Missing Planning Units : (<a href="/#/planningUnitSetting/listPlanningUnitSetting" className="supplyplanformulas">Update Planning Units</a>)</b></div><br />
+                                                        <div style={{ display: this.state.missingPUList.length > 0 && !this.state.treeFlag ? 'block' : 'none' }}><div><b>{i18n.t('static.listTree.missingPlanningUnits')} : (<a href="/#/planningUnitSetting/listPlanningUnitSetting" className="supplyplanformulas">{i18n.t('static.Update.PlanningUnits')}</a>)</b></div><br />
                                                             <div id="missingPUJexcel" className="RowClickable">
                                                             </div>
                                                         </div>

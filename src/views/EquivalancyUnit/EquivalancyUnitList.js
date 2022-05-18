@@ -2074,7 +2074,7 @@ class EquivalancyUnit extends Component {
                 }
             }
             this.setState({
-                message: 'Duplicate equivalency unit, forecasting unit, program combination not allow',
+                message: i18n.t('static.equivalencyUnit.duplicateEUFUP'),
                 color: "#BA0C2F", loading: false
             },
                 () => {
@@ -2175,7 +2175,7 @@ class EquivalancyUnit extends Component {
                                 case 406:
                                     this.setState({
                                         // message: error.response.data.messageCode,
-                                        message: 'Duplicate equivalency unit, forecasting unit, program combination not allow',
+                                        message: i18n.t('static.equivalencyUnit.duplicateEUFUP'),
                                         color: "#BA0C2F", loading: false
                                     },
                                         () => {
