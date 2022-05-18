@@ -1895,7 +1895,8 @@ export default class CreateTreeTemplate extends Component {
         var monthDifference = parseInt((monthArr.length > 0 ? parseInt(monthArr.length + 1) : 0) + 1);
         console.log("month diff>>>", monthDifference);
         var momValue = '', percentForOneMonth = '';
-        var getValue = e.target.value.toString().replaceAll(",", "");
+        var currentEndValue = document.getElementById("currentEndValue").value;
+        var getValue = currentEndValue.toString().replaceAll(",", "");
         if (this.state.currentModelingType == 2) {
             var momValue = ((parseFloat(getValue - this.state.currentCalculatorStartValue.toString().replaceAll(",", ""))) / monthDifference).toFixed(4);
         }
@@ -1948,7 +1949,8 @@ export default class CreateTreeTemplate extends Component {
         // var monthDifference = moment(endDate).diff(startDate, 'months', true);
         // var monthArr = this.state.monthList.filter(x => x.id > startDate && x.id < endDate);
         // var monthDifference = monthArr.length > 0 ? parseInt(monthArr.length + 1) : 0;
-        var getValue = e.target.value != "" ? e.target.value.toString().replaceAll(",", "").match(/^-?\d+(?:\.\d{0,4})?/)[0] : "";
+        var currentTargetChangePercentage = document.getElementById("currentTargetChangePercentage").value;
+        var getValue = currentTargetChangePercentage != "" ? currentTargetChangePercentage.toString().replaceAll(",", "").match(/^-?\d+(?:\.\d{0,4})?/)[0] : "";
         var getEndValueFromPercentage = (this.state.currentCalculatorStartValue.toString().replaceAll(",", "") * getValue) / 100;
 
 
@@ -2012,7 +2014,8 @@ export default class CreateTreeTemplate extends Component {
         var startDate = this.state.currentCalculatorStartDate;
         var endDate = this.state.currentCalculatorStopDate;
         // var monthDifference = moment(endDate).diff(startDate, 'months', true);
-        var getValue = e.target.value.toString().replaceAll(",", "");
+        var currentTargetChangeNumber = document.getElementById("currentTargetChangeNumber").value;
+        var getValue = currentTargetChangeNumber.toString().replaceAll(",", "");
         // var getEndValueFromNumber = parseFloat(this.state.currentCalculatorStartValue) + parseFloat(e.target.value);
         var targetEndValue = parseFloat(this.state.currentCalculatorStartValue.toString().replaceAll(",", "")) + parseFloat(getValue);
 
@@ -4402,7 +4405,7 @@ export default class CreateTreeTemplate extends Component {
 
 
             if ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 || ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage != "true" && (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage != true)) {
-                console.log("usage period Id---",this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usagePeriod.usagePeriodId);
+                console.log("usage period Id---", this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usagePeriod.usagePeriodId);
                 selectedText2 = this.state.usagePeriodList.filter(c => c.usagePeriodId == (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId)[0].label.label_en;
             }
         }
@@ -5542,11 +5545,37 @@ export default class CreateTreeTemplate extends Component {
 
         if (event.target.name == "calculatorStartDate") {
             var currentCalculatorStartValue = this.getMomValueForDateRange(event.target.value);
-            this.setState({ currentCalculatorStartDate: event.target.value, currentCalculatorStartValue });
+            this.setState({ currentCalculatorStartDate: event.target.value, currentCalculatorStartValue }, () => {
+                if (!this.state.currentEndValueEdit && !this.state.currentTargetChangePercentageEdit && !this.state.currentTargetChangeNumberEdit) {
+                    console.log("Inside if modeling calculator");
+                } else {
+                    console.log("Inside else modeling calculator");
+                    if (!this.state.currentEndValueEdit) {
+                        this.calculateMomByEndValue();
+                    } else if (!this.state.currentTargetChangePercentageEdit) {
+                        this.calculateMomByChangeInPercent();
+                    } else if (!this.state.currentTargetChangeNumberEdit) {
+                        this.calculateMomByChangeInNumber();
+                    }
+                }
+            });
         }
 
         if (event.target.name == "calculatorTargetDate") {
-            this.setState({ currentCalculatorStopDate: event.target.value });
+            this.setState({ currentCalculatorStopDate: event.target.value }, () => {
+                if (!this.state.currentEndValueEdit && !this.state.currentTargetChangePercentageEdit && !this.state.currentTargetChangeNumberEdit) {
+                    console.log("Inside if modeling calculator");
+                } else {
+                    console.log("Inside else modeling calculator");
+                    if (!this.state.currentEndValueEdit) {
+                        this.calculateMomByEndValue();
+                    } else if (!this.state.currentTargetChangePercentageEdit) {
+                        this.calculateMomByChangeInPercent();
+                    } else if (!this.state.currentTargetChangeNumberEdit) {
+                        this.calculateMomByChangeInNumber();
+                    }
+                }
+            });
         }
 
         if (event.target.name == "modelingType") {
