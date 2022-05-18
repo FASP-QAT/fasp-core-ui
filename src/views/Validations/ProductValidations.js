@@ -437,7 +437,7 @@ class ProductValidation extends Component {
                 noOfForecastingUnitsPerPerson = finalData[i].parentNodeNodeDataMap.fuNode.noOfForecastingUnitsPerPerson;
                 usageFrequency = finalData[i].parentNodeNodeDataMap.fuNode.usageFrequency;
                 // selectedText = this.state.currentItemConfig.parentItem.payload.nodeUnit.label.label_en
-                // selectedText = getLabelText(nodeDataList.filter(c => c.flatItem.id == finalData[i].parentNodeFlatItem.parent)[0].flatItem.payload.nodeUnit.label, this.state.lang);
+                selectedText = getLabelText(nodeDataList.filter(c => c.flatItem.id == finalData[i].parentNodeFlatItem.parent)[0].flatItem.payload.nodeUnit.label, this.state.lang);
                 // console.log("+++UNit Label", getLabelText(nodeDataList.filter(c => c.flatItem.id == finalData[i].parentNodeFlatItem.parent)[0].flatItem.payload.nodeUnit.label, this.state.lang));
                 var unitListFilterForFu = this.state.unitList.filter(c => c.unitId == finalData[i].parentNodeNodeDataMap.fuNode.forecastingUnit.unit.id);
                 selectedText1 = getLabelText(unitListFilterForFu[0].label, this.state.lang);
