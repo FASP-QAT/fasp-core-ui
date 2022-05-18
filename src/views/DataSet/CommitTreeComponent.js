@@ -604,12 +604,12 @@ export default class CommitTreeComponent extends React.Component {
                                         for (let i = 0; i < completeFlatList.length; i++) {
                                             var node = completeFlatList[i];
                                             console.log("commit*** node before---", node);
-                                            if (node.payload.nodeType == 1 || node.payload.nodeType == 2 || node.payload.nodeType == 3) {
+                                            if (node.payload.nodeType.id == 1 || node.payload.nodeType.id == 2 || node.payload.nodeType.id == 3) {
                                                 node.payload.nodeDataMap[scenarioList[ndm].id][0].fuNode = null;
                                                 node.payload.nodeDataMap[scenarioList[ndm].id][0].puNode = null;
-                                            } else if (node.payload.nodeType == 4) {
+                                            } else if (node.payload.nodeType.id == 4) {
                                                 node.payload.nodeDataMap[scenarioList[ndm].id][0].puNode = null;
-                                            } else if (node.payload.nodeType == 5) {
+                                            } else if (node.payload.nodeType.id == 5) {
                                                 node.payload.nodeDataMap[scenarioList[ndm].id][0].fuNode = null;
                                             }
                                             console.log("commit*** node after---", node);
