@@ -3596,7 +3596,7 @@ className={'modal-lg ' + this.props.className} >
         <b>Calculating the Procurement Surplus/Gap </b>
         <ul>
             <li><img className="formula-img-mr-showGuidance" src={ProjectStockatForecastend} /><br></br></li>
-            <li><img className="formula-img-mr-showGuidance" src={DesiredStockatForecasend} /><br></br></li>
+            <li><img className="formula-img-mr-showGuidance1 img-fluid pl-lg-0" src={DesiredStockatForecasend} /><br></br></li>
             <li><img className="formula-img-mr-showGuidance" src={ProcurementSurplusGap} /><br></br></li>
             {/* <li>Project Stock at Forecast end = (Starting Stock) + (Existing Shipments) - (Forecasted Quantity) </li>
             <li>Desired Stock at Forecast end = (Forecasted Quantity) / (Forecast Period) * (Desired Months of Stock) </li>

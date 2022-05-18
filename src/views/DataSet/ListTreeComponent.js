@@ -1508,23 +1508,24 @@ export default class ListTreeComponent extends Component {
                                 </div>
                                 <p>
                                     <p style={{ fontSize: '14px' }}><span className="UnderLineText">Purpose :</span> Enable users to :</p>
-                                    <p className='pl-lg-4'>
-                                        1) View a list of their existing trees<br></br>
-                                        2) Edit an existing tree by clicking any row <br></br>
-                                        3) Delete or duplicate existing trees by right clicking on a row<br></br>
-                                        4) Add a new tree to a loaded program by clicking on the 'Add Tree' dropdown in the top right corner of the screen. New trees can be built:<br></br>
+                                    <ul type="1">
+                                        <li>View a list of their existing trees</li>
+                                         <li>Edit an existing tree by clicking any row </li>
+                                        <li>Delete or duplicate existing trees by right clicking on a row</li>
+                                        <li>Add a new tree to a loaded program by clicking on the 'Add Tree' dropdown in the top right corner of the screen. New trees can be built:</li>
                                         <ul>
                                             <li>manually - select 'Add Tree'</li>
                                             <li>from a tree template - select the name of the desired template.</li>
                                         </ul>
-                                    </p>
+                                    </ul>
                                 </p>
+                                <p>Note: The table on this screen lists trees for each forecast program that has been loaded. </p>
                                 <p>
                                     <p style={{ fontSize: '14px' }}><span className="UnderLineText">Using this screen :</span></p>
                                     <p className='pl-lg-4'>
                                         <ul>
                                             <li>A forecast program must first be loaded in order to build a tree (either manually or from a tree template.)</li>
-                                            <li>Before building and editing a tree, first add the forecast program's planning units in the <a href='/#/planningUnitSetting/listPlanningUnitSetting'>'Update Planning Units'</a> screen before building</li>
+                                            <li>Before building and editing a tree, first add the forecast program's planning units in the <a href='/#/planningUnitSetting/listPlanningUnitSetting' target="_blank" style={{textDecoration:'underline'}}>'Update Planning Units'</a> screen before building</li>
                                             <li>Building a tree similar to an existing tree? Duplicate an existing tree by right clicking on a row and selecting “duplicate” edit. If you want to keep the structure of the tree constant and only change the numbers, build only one tree and use the scenario feature instead. </li>
                                             <li>Submit a HelpDesk ticket if there is a missing template that would benefit the QAT community. </li>
                                         </ul>
