@@ -263,9 +263,6 @@ const validationSchemaNodeData = function (values) {
         usagePeriodIdCon: Yup.string()
             .test('usagePeriodIdCon', 'This field is required.',
                 function (value) {
-                    // console.log("@@@>1", (parseInt(document.getElementById("nodeTypeId").value) == 4));
-                    // console.log("@@@>1", document.getElementById("usageTypeIdFU").value == 2);
-                    // console.log("@@@>2", document.getElementById("usageFrequency").value == "");
                     if (document.getElementById("usageTypeIdFU").value == 2 && document.getElementById("usagePeriodIdCon").value == "") {
                         return false;
                     } else {
@@ -433,6 +430,37 @@ const getErrorsFromValidationError = (validationError) => {
     }, {})
 }
 
+const validationSchemaScenario = function (values) {
+    return Yup.object().shape({
+        scenarioName: Yup.string()
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
+            .required('Please enter scenario name.'),
+
+    })
+}
+
+const validateScenario = (getValidationSchema) => {
+    return (values) => {
+        const validationSchemaScenario = getValidationSchema(values)
+        try {
+            validationSchemaScenario.validateSync(values, { abortEarly: false })
+            return {}
+        } catch (error) {
+            return getErrorsFromValidationErrorScenario(error)
+        }
+    }
+}
+
+const getErrorsFromValidationErrorScenario = (validationError) => {
+    const FIRST_ERROR = 0
+    return validationError.inner.reduce((errors, error) => {
+        return {
+            ...errors,
+            [error.path]: error.errors[FIRST_ERROR],
+        }
+    }, {})
+}
+
 function addCommas(cell1, row) {
 
     if (cell1 != null && cell1 != "") {
@@ -570,6 +598,13 @@ export default class BuildTree extends Component {
             scalingMonth: { year: Number(moment(curDate).startOf('month').format("YYYY")), month: Number(moment(curDate).startOf('month').format("M")) },
             showModelingValidation: true,
             scenario: {
+                id: '',
+                label: {
+                    label_en: ''
+                },
+                notes: ''
+            },
+            scenario1: {
                 id: '',
                 label: {
                     label_en: ''
@@ -2258,7 +2293,7 @@ export default class BuildTree extends Component {
                     var scenario = this.state.scenarioList.filter(x => x.id == scenarioId)[0];
                     console.log("my scenario---", scenario);
                     this.setState({
-                        scenario,
+                        scenario: JSON.parse(JSON.stringify(scenario)),
                         openAddScenarioModal: !this.state.openAddScenarioModal
                     })
                 } else {
@@ -2830,80 +2865,107 @@ export default class BuildTree extends Component {
     }
     extrapolate(e) {
         const { currentItemConfig } = this.state;
-        // const newArray = this.state.activeTab1.slice()
-        currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation = e.target.checked == true ? true : false;
-        if (e.target.checked) {
-            console.log("extrapolate outside", currentItemConfig);
-            if (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].calculatedDataValue == "" || currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].calculatedDataValue == null || currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].calculatedDataValue == "0") {
-                currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].calculatedDataValue = "0";
-                currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].dataValue = "0";
-                console.log("extrapolate inside", currentItemConfig);
+        var modelingFlag = false;
+        var scalingList = this.state.currentScenario.nodeDataModelingList == undefined ? [] : this.state.currentScenario.nodeDataModelingList;
+        if (scalingList.length > 0) {
+            var scalingResult = scalingList.filter(x => x.transferNodeDataId != null && x.transferNodeDataId != "");
+            if (scalingResult.length > 0) {
+                modelingFlag = true;
             }
         }
-        console.log("this.state.activeTab1---", currentItemConfig);
-
-        this.setState({
-            currentItemConfig,
-            currentScenario: currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0],
-            activeTab1: e.target.checked == true ? new Array(2).fill('3') : new Array(2).fill('2')
-        }, () => {
-            console.log("extrapolate current item config---", this.state.currentItemConfig);
-            console.log("extrapolate current scenario---", this.state.currentScenario);
-            if (this.state.activeTab1[0] == '3') {
-                if (this.state.modelingEl != "") {
-                    this.state.modelingEl.destroy();
-                    if (this.state.momEl != "") {
-                        this.state.momEl.destroy();
-                    }
-                    else if (this.state.momElPer != "") {
-                        this.state.momElPer.destroy();
-                    }
+        if (this.state.nodeTransferDataList.length == 0 && !modelingFlag) {
+            currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation = e.target.checked == true ? true : false;
+            if (e.target.checked) {
+                console.log("extrapolate outside", currentItemConfig);
+                if (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].calculatedDataValue == "" || currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].calculatedDataValue == null || currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].calculatedDataValue == "0") {
+                    currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].calculatedDataValue = "0";
+                    currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].dataValue = "0";
+                    console.log("extrapolate inside", currentItemConfig);
                 }
-
-                this.refs.extrapolationChild.getExtrapolationMethodList();
-            } else {
-                console.log("***>>>", this.state.currentItemConfig);
-                if (this.state.currentItemConfig.context.payload.nodeType.id != 1) {
-                    var minMonth = this.state.forecastStartDate;
-                    var maxMonth = this.state.forecastStopDate;
-                    console.log("minMonth---", minMonth);
-                    console.log("maxMonth---", maxMonth);
-                    var modelingTypeList = this.state.modelingTypeList;
-                    var arr = [];
-                    if (this.state.currentItemConfig.context.payload.nodeType.id == 2) {
-                        arr = modelingTypeList.filter(x => x.modelingTypeId != 1 && x.modelingTypeId != 5);
-                    } else {
-                        arr = modelingTypeList.filter(x => x.modelingTypeId == 5);
-                    }
-                    console.log("arr---", arr);
-                    var modelingTypeListNew = [];
-                    for (var i = 0; i < arr.length; i++) {
-                        console.log("arr[i]---", arr[i]);
-                        modelingTypeListNew[i] = { id: arr[i].modelingTypeId, name: getLabelText(arr[i].label, this.state.lang) }
-                    }
-                    this.setState({
-                        showModelingJexcelNumber: true,
-                        minMonth, maxMonth, filteredModelingType: modelingTypeListNew
-                    }, () => {
-                        this.buildModelingJexcel();
-                    })
-
-                }
-                else {
-                    this.setState({
-                        showModelingJexcelNumber: true
-                    }, () => {
-                        this.buildModelingJexcel();
-                    })
-                }
-                //  else if (this.state.currentItemConfig.context.payload.nodeType.id == 3) {
-                //     this.setState({ showModelingJexcelPercent: true }, () => {
-                //         this.buildModelingJexcelPercent()
-                //     })
-                // }
             }
+            console.log("this.state.activeTab1---", currentItemConfig);
 
-        });
+            this.setState({
+                currentItemConfig,
+                currentScenario: currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0],
+                activeTab1: e.target.checked == true ? new Array(2).fill('3') : new Array(2).fill('2')
+            }, () => {
+                console.log("extrapolate current item config---", this.state.currentItemConfig);
+                console.log("extrapolate current scenario---", this.state.currentScenario);
+                if (this.state.activeTab1[0] == '3') {
+                    if (this.state.modelingEl != "") {
+                        this.state.modelingEl.destroy();
+                        if (this.state.momEl != "") {
+                            this.state.momEl.destroy();
+                        }
+                        else if (this.state.momElPer != "") {
+                            this.state.momElPer.destroy();
+                        }
+                    }
+
+                    this.refs.extrapolationChild.getExtrapolationMethodList();
+                } else {
+                    console.log("***>>>", this.state.currentItemConfig);
+                    if (this.state.currentItemConfig.context.payload.nodeType.id != 1) {
+                        var minMonth = this.state.forecastStartDate;
+                        var maxMonth = this.state.forecastStopDate;
+                        console.log("minMonth---", minMonth);
+                        console.log("maxMonth---", maxMonth);
+                        var modelingTypeList = this.state.modelingTypeList;
+                        var arr = [];
+                        if (this.state.currentItemConfig.context.payload.nodeType.id == 2) {
+                            arr = modelingTypeList.filter(x => x.modelingTypeId != 1 && x.modelingTypeId != 5);
+                        } else {
+                            arr = modelingTypeList.filter(x => x.modelingTypeId == 5);
+                        }
+                        console.log("arr---", arr);
+                        var modelingTypeListNew = [];
+                        for (var i = 0; i < arr.length; i++) {
+                            console.log("arr[i]---", arr[i]);
+                            modelingTypeListNew[i] = { id: arr[i].modelingTypeId, name: getLabelText(arr[i].label, this.state.lang) }
+                        }
+                        this.setState({
+                            showModelingJexcelNumber: true,
+                            minMonth, maxMonth, filteredModelingType: modelingTypeListNew
+                        }, () => {
+                            this.buildModelingJexcel();
+                        })
+
+                    }
+                    else {
+                        this.setState({
+                            showModelingJexcelNumber: true
+                        }, () => {
+                            this.buildModelingJexcel();
+                        })
+                    }
+                    //  else if (this.state.currentItemConfig.context.payload.nodeType.id == 3) {
+                    //     this.setState({ showModelingJexcelPercent: true }, () => {
+                    //         this.buildModelingJexcelPercent()
+                    //     })
+                    // }
+                }
+
+            });
+        }
+        else if (modelingFlag) {
+            currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation = false;
+            this.setState({
+                currentItemConfig,
+                currentScenario: currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0]
+            }, () => {
+                alert("Extrapolation not allowed on this node because this node is transfering data to some other node.To perform extrapolation please delete the transfer.");
+            });
+        } else if (this.state.nodeTransferDataList.length > 0) {
+            currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation = false;
+            this.setState({
+                currentItemConfig,
+                currentScenario: currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0]
+            }, () => {
+                alert("Extrapolation not allowed on this node because some other node is transfering data to this node.");
+            });
+
+        }
     }
     momCheckbox(e, type) {
         var checked = e.target.checked;
@@ -3095,6 +3157,40 @@ export default class BuildTree extends Component {
         for (var y = 0; y < json.length; y++) {
             var value = this.el.getValueFromCoords(11, y);
             if (parseInt(value) == 1) {
+
+                //Transfer to node
+                var col = ("D").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(3, y);
+                var transferFlag = false;
+                if (value != "") {
+                    var items = this.state.items;
+                    var transfer = value != "" ? value.split('_')[0] : '';
+                    if (transfer != '') {
+                        for (let i = 0; i < items.length; i++) {
+                            var nodeDataId = items[i].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataId;
+                            console.log("nodeDataId---", nodeDataId);
+                            console.log("extrapolation flag---", items[i].payload.nodeDataMap[this.state.selectedScenario]);
+                            if (nodeDataId == transfer && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation) {
+                                transferFlag = true;
+                                break;
+                            }
+                        }
+                    }
+                    console.log("transferFlag---", transferFlag);
+                    if (transferFlag) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, 'You can not transfer data to this node as it is an extrapolation node.');
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+
 
                 //Modeling type
                 var col = ("E").concat(parseInt(y) + 1);
@@ -3291,7 +3387,10 @@ export default class BuildTree extends Component {
         var monthDifference = parseInt(moment(endDate).startOf('month').diff(startDate, 'months', true) + 1);
         console.log("month diff>>>", monthDifference);
         var momValue = '', percentForOneMonth = '';
-        var getValue = e.target.value.toString().replaceAll(",", "");
+        var currentEndValue = document.getElementById("currentEndValue").value;
+        console.log("currentEndValue---", currentEndValue);
+        var getValue = currentEndValue.toString().replaceAll(",", "");
+        console.log("getValue---", getValue);
         if (this.state.currentModelingType == 2) {
             var momValue = ((parseFloat(getValue - this.state.currentCalculatorStartValue.toString().replaceAll(",", ""))) / monthDifference).toFixed(4);
         }
@@ -3304,7 +3403,7 @@ export default class BuildTree extends Component {
         }
 
         if (this.state.currentModelingType == 5) {
-            var momValue = (parseFloat(getValue - this.state.currentCalculatorStartValue.toString().replaceAll(",", "")) / monthDifference).toFixed(4);
+            var momValue = (parseFloat((getValue - this.state.currentCalculatorStartValue.toString().replaceAll(",", "")) / monthDifference)).toFixed(4);
         }
         // console.log("getmomValue>>>", momValue);
         var targetChangeNumber = '';
@@ -3315,9 +3414,9 @@ export default class BuildTree extends Component {
             percentForOneMonth = targetChangePer;
         }
         this.setState({
-            currentTargetChangeNumber: e.target.value != '' ? targetChangeNumber : '',
-            currentTargetChangePercentage: e.target.value != '' ? targetChangePer : '',
-            currentCalculatedMomChange: e.target.value != '' ? momValue : '',
+            currentTargetChangeNumber: currentEndValue != '' ? targetChangeNumber : '',
+            currentTargetChangePercentage: currentEndValue != '' ? targetChangePer : '',
+            currentCalculatedMomChange: currentEndValue != '' ? momValue : '',
             percentForOneMonth
         });
     }
@@ -3331,7 +3430,8 @@ export default class BuildTree extends Component {
         var startDate = this.state.currentCalculatorStartDate;
         var endDate = this.state.currentCalculatorStopDate;
         var monthDifference = parseInt(moment(endDate).diff(startDate, 'months', true) + 1);
-        var getValue = e.target.value != "" ? e.target.value.toString().replaceAll(",", "").match(/^-?\d+(?:\.\d{0,4})?/)[0] : "";
+        var currentTargetChangePercentage = document.getElementById("currentTargetChangePercentage").value;
+        var getValue = currentTargetChangePercentage != "" ? currentTargetChangePercentage.toString().replaceAll(",", "").match(/^-?\d+(?:\.\d{0,4})?/)[0] : "";
         var getEndValueFromPercentage = (this.state.currentCalculatorStartValue.toString().replaceAll(",", "") * getValue) / 100;
 
         console.log("***-----------------1-", this.state.currentCalculatorStartValue.toString().replaceAll(",", ""));
@@ -3356,7 +3456,7 @@ export default class BuildTree extends Component {
 
         }
         if (this.state.currentModelingType == 5) {
-            var momValue = (parseFloat(getValue)).toFixed(4);
+            var momValue = (parseFloat(getValue / monthDifference)).toFixed(4);
         }
 
         var targetChangeNumber = '';
@@ -3380,7 +3480,8 @@ export default class BuildTree extends Component {
         var startDate = this.state.currentCalculatorStartDate;
         var endDate = this.state.currentCalculatorStopDate;
         var monthDifference = parseInt(moment(endDate).diff(startDate, 'months', true) + 1);
-        var getValue = e.target.value.toString().replaceAll(",", "");
+        var currentTargetChangeNumber = document.getElementById("currentTargetChangeNumber").value;
+        var getValue = currentTargetChangeNumber.toString().replaceAll(",", "");
         // var getEndValueFromNumber = parseFloat(this.state.currentCalculatorStartValue) + parseFloat(e.target.value);
         var targetEndValue = parseFloat(this.state.currentCalculatorStartValue.toString().replaceAll(",", "")) + parseFloat(getValue);
 
@@ -4136,11 +4237,34 @@ export default class BuildTree extends Component {
 
         // Transfer to/from node
         if (x == 3) {
+            var col = ("D").concat(parseInt(y) + 1);
+            var transferFlag = false;
             if (value != "") {
                 this.state.modelingEl.setValueFromCoords(5, y, -1, true);
+                var items = this.state.items;
+                var transfer = value != "" ? value.split('_')[0] : '';
+                if (transfer != '') {
+                    for (let i = 0; i < items.length; i++) {
+                        var nodeDataId = items[i].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataId;
+                        if (nodeDataId == transfer && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation) {
+                            transferFlag = true;
+                            break;
+                        }
+                    }
+                }
+                if (transferFlag) {
+                    instance.jexcel.setStyle(col, "background-color", "transparent");
+                    instance.jexcel.setStyle(col, "background-color", "yellow");
+                    instance.jexcel.setComments(col, 'You can not transfer data to this node as it is an extrapolation node.');
+                } else {
+                    instance.jexcel.setStyle(col, "background-color", "transparent");
+                    instance.jexcel.setComments(col, "");
+                }
             }
             else {
                 this.state.modelingEl.setValueFromCoords(5, y, "", true);
+                instance.jexcel.setStyle(col, "background-color", "transparent");
+                instance.jexcel.setComments(col, "");
             }
         }
         //+/-
@@ -5920,6 +6044,29 @@ export default class BuildTree extends Component {
         });
     }
 
+    touchAllScenario(setTouched, errors) {
+        setTouched({
+            scenarioName: true
+        }
+        )
+        this.validateFormScenario(errors)
+    }
+
+    validateFormScenario(errors) {
+        this.findFirstErrorScenario('userForm', (fieldName) => {
+            return Boolean(errors[fieldName])
+        })
+    }
+    findFirstErrorScenario(formName, hasError) {
+        const form = document.forms[formName]
+        for (let i = 0; i < form.length; i++) {
+            if (hasError(form[i].name)) {
+                form[i].focus()
+                break
+            }
+        }
+    }
+
     touchAll(setTouched, errors) {
         setTouched({
             forecastMethodId: true,
@@ -5929,6 +6076,7 @@ export default class BuildTree extends Component {
         )
         this.validateForm(errors)
     }
+
 
     validateForm(errors) {
         this.findFirstError('userForm', (fieldName) => {
@@ -6330,92 +6478,97 @@ export default class BuildTree extends Component {
         var items = curTreeObj.tree.flatList;
         var scenarioId;
         var temNodeDataMap = [];
-        if (type == 1) {
-            var maxScenarioId = Math.max(...scenarioList.map(o => o.id));
-            var minScenarioId = Math.min(...scenarioList.map(o => o.id));
-            scenarioId = parseInt(maxScenarioId) + 1;
-            var newTabObject = {
-                id: scenarioId,
-                label: {
-                    label_en: scenario.label.label_en
-                },
-                notes: scenario.notes,
-                active: true
-            };
-            // console.log("tab data---", newTabObject);
-            scenarioList = [...scenarioList, newTabObject];
-            // console.log("tabList---", tabList1)
-            if (this.state.treeId != "") {
-                if (this.state.scenarioList.length > 1) {
-
-                }
-
-                console.log("***>minScenarioId---", items);
-                var tArr = [];
-                for (var i = 0; i < items.length; i++) {
-                    for (let j = 0; j < scenarioList.length; j++) {
-                        if (items[i].payload.nodeDataMap.hasOwnProperty(scenarioList[j].id)) {
-                            temNodeDataMap.push(items[i].payload.nodeDataMap[scenarioList[j].id][0]);
-                            tArr.push(items[i].payload.nodeDataMap[scenarioList[j].id][0].nodeDataId);
-                        }
-                    }
-                    var tempArray = [];
-                    var nodeDataMap = {};
-                    // tempArray = items[i].payload.nodeDataMap;
-                    tempArray.push(JSON.parse(JSON.stringify((items[i].payload.nodeDataMap[minScenarioId])[0])));
-                    nodeDataMap = items[i].payload.nodeDataMap;
-                    nodeDataMap[scenarioId] = tempArray;
-                    // var nodeDataId = this.getMaxNodeDataId(items);
-                    // console.log("nodeDataId---", nodeDataId);
-                    nodeDataMap[scenarioId][0].nodeDataId = "";
-                    items[i].payload.nodeDataMap = nodeDataMap;
-                }
-                console.log("items-----------%%%%%%", items);
-                console.log("tArr---", tArr);
-
-            }
-        } else if (type == 2 || type == 3) {
-            scenarioId = this.state.selectedScenario;
-            var scenario1 = scenarioList.filter(x => x.id == scenarioId)[0];
-            var findNodeIndex = scenarioList.findIndex(n => n.id == scenarioId);
-            if (type == 2) {
-                console.log("this.state.scenario---", this.state.scenario);
-                scenarioList[findNodeIndex] = this.state.scenario;
-                console.log("my scenarioList---", scenarioList);
-            } else if (type == 3) {
-                items = [];
-                scenarioId = '';
-                scenario1.active = false;
-                scenarioList[findNodeIndex] = scenario1;
-            }
-
-
-        }
-
-        curTreeObj.scenarioList = scenarioList;
-        this.setState({
-            showDiv1: false,
-            curTreeObj,
-            items,
-            selectedScenario: scenarioId,
-            scenarioList: scenarioList.filter(x => x.active == true),
-            openAddScenarioModal: false,
-            isChanged: true
-        }, () => {
-            console.log("final tab list---", this.state.items);
+        var result = scenarioList.filter(x => x.label.label_en.trim() == scenario.label.label_en.trim());
+        if ((type == 1 && result.length == 0) || (type == 2 && ((result.length == 1 && scenario.id == result[0].id) || result.length == 0)) || type == 3) {
             if (type == 1) {
-                var maxNodeDataId = temNodeDataMap.length > 0 ? Math.max(...temNodeDataMap.map(o => o.nodeDataId)) : 0;
-                console.log("scenarioId---", scenarioId);
-                for (var i = 0; i < items.length; i++) {
-                    maxNodeDataId = parseInt(maxNodeDataId) + 1;
-                    (items[i].payload.nodeDataMap[scenarioId])[0].nodeDataId = maxNodeDataId;
-                    console.log("my node data id--->", (items[i].payload.nodeDataMap[scenarioId])[0].nodeDataId);
+                var maxScenarioId = Math.max(...scenarioList.map(o => o.id));
+                var minScenarioId = Math.min(...scenarioList.map(o => o.id));
+                scenarioId = parseInt(maxScenarioId) + 1;
+                var newTabObject = {
+                    id: scenarioId,
+                    label: {
+                        label_en: scenario.label.label_en
+                    },
+                    notes: scenario.notes,
+                    active: true
+                };
+                // console.log("tab data---", newTabObject);
+                scenarioList = [...scenarioList, newTabObject];
+                // console.log("tabList---", tabList1)
+                if (this.state.treeId != "") {
+                    if (this.state.scenarioList.length > 1) {
+
+                    }
+
+                    console.log("***>minScenarioId---", items);
+                    var tArr = [];
+                    for (var i = 0; i < items.length; i++) {
+                        for (let j = 0; j < scenarioList.length; j++) {
+                            if (items[i].payload.nodeDataMap.hasOwnProperty(scenarioList[j].id)) {
+                                temNodeDataMap.push(items[i].payload.nodeDataMap[scenarioList[j].id][0]);
+                                tArr.push(items[i].payload.nodeDataMap[scenarioList[j].id][0].nodeDataId);
+                            }
+                        }
+                        var tempArray = [];
+                        var nodeDataMap = {};
+                        // tempArray = items[i].payload.nodeDataMap;
+                        tempArray.push(JSON.parse(JSON.stringify((items[i].payload.nodeDataMap[minScenarioId])[0])));
+                        nodeDataMap = items[i].payload.nodeDataMap;
+                        nodeDataMap[scenarioId] = tempArray;
+                        // var nodeDataId = this.getMaxNodeDataId(items);
+                        // console.log("nodeDataId---", nodeDataId);
+                        nodeDataMap[scenarioId][0].nodeDataId = "";
+                        items[i].payload.nodeDataMap = nodeDataMap;
+                    }
+                    console.log("items-----------%%%%%%", items);
+                    console.log("tArr---", tArr);
+
                 }
-                this.callAfterScenarioChange(scenarioId);
-                // this.updateTreeData();
+            } else if (type == 2 || type == 3) {
+                scenarioId = this.state.selectedScenario;
+                var scenario1 = scenarioList.filter(x => x.id == scenarioId)[0];
+                var findNodeIndex = scenarioList.findIndex(n => n.id == scenarioId);
+                if (type == 2) {
+                    console.log("this.state.scenario---", this.state.scenario);
+                    scenarioList[findNodeIndex] = this.state.scenario;
+                    console.log("my scenarioList---", scenarioList);
+                } else if (type == 3) {
+                    items = [];
+                    scenarioId = '';
+                    scenario1.active = false;
+                    scenarioList[findNodeIndex] = scenario1;
+                }
+
+
             }
-            this.saveTreeData(false);
-        });
+
+            curTreeObj.scenarioList = scenarioList;
+            this.setState({
+                showDiv1: false,
+                curTreeObj,
+                items,
+                selectedScenario: scenarioId,
+                scenarioList: scenarioList.filter(x => x.active == true),
+                openAddScenarioModal: false,
+                isChanged: true
+            }, () => {
+                console.log("final tab list---", this.state.items);
+                if (type == 1) {
+                    var maxNodeDataId = temNodeDataMap.length > 0 ? Math.max(...temNodeDataMap.map(o => o.nodeDataId)) : 0;
+                    console.log("scenarioId---", scenarioId);
+                    for (var i = 0; i < items.length; i++) {
+                        maxNodeDataId = parseInt(maxNodeDataId) + 1;
+                        (items[i].payload.nodeDataMap[scenarioId])[0].nodeDataId = maxNodeDataId;
+                        console.log("my node data id--->", (items[i].payload.nodeDataMap[scenarioId])[0].nodeDataId);
+                    }
+                    this.callAfterScenarioChange(scenarioId);
+                    // this.updateTreeData();
+                }
+                this.saveTreeData(false);
+            });
+        } else {
+            alert("Scenario name already exist.");
+        }
     }
     nodeTypeChange(value) {
         var nodeTypeId = value;
@@ -6551,6 +6704,7 @@ export default class BuildTree extends Component {
         if (event.target.name === "scenarioDesc") {
             scenario.notes = event.target.value;
         }
+        // scenario.id = 1;
         this.setState({
             scenario
         });
@@ -8957,8 +9111,6 @@ export default class BuildTree extends Component {
                                                 </FormGroup>
                                             </>
 
-                                            {/* } */}
-
                                             <div className="pl-lg-3 pr-lg-3" style={{ clear: 'both', width: '100%' }}>
                                                 {(this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentScenario.fuNode.usageType.id == 2) &&
                                                     <table className="table table-bordered">
@@ -9645,8 +9797,23 @@ export default class BuildTree extends Component {
         var date = year + "-" + month + "-01";
         var currentCalculatorStartValue = this.getMomValueForDateRange(date);
         console.log("currentCalculatorStartValue---", currentCalculatorStartValue);
-        this.setState({ currentCalculatorStartDate: date, currentCalculatorStartValue }, () => {
+        console.log("month change currentEndValueEdit---", this.state.currentEndValueEdit);
+        console.log("month change currentTargetChangePercentageEdit---", this.state.currentTargetChangePercentageEdit);
+        console.log("month change currentTargetChangeNumberEdit---", this.state.currentTargetChangeNumberEdit);
 
+        this.setState({ currentCalculatorStartDate: date, currentCalculatorStartValue }, () => {
+            if (!this.state.currentEndValueEdit && !this.state.currentTargetChangePercentageEdit && !this.state.currentTargetChangeNumberEdit) {
+                console.log("Inside if modeling calculator");
+            } else {
+                console.log("Inside else modeling calculator");
+                if (!this.state.currentEndValueEdit) {
+                    this.calculateMomByEndValue();
+                } else if (!this.state.currentTargetChangePercentageEdit) {
+                    this.calculateMomByChangeInPercent();
+                } else if (!this.state.currentTargetChangeNumberEdit) {
+                    this.calculateMomByChangeInNumber();
+                }
+            }
         });
 
     }
@@ -9666,7 +9833,18 @@ export default class BuildTree extends Component {
         // console.log("value>>>", year);
         // console.log("text>>>", month)
         this.setState({ currentCalculatorStopDate: year + "-" + month + "-01" }, () => {
-
+            if (!this.state.currentEndValueEdit && !this.state.currentTargetChangePercentageEdit && !this.state.currentTargetChangeNumberEdit) {
+                console.log("Inside if modeling calculator");
+            } else {
+                console.log("Inside else modeling calculator");
+                if (!this.state.currentEndValueEdit) {
+                    this.calculateMomByEndValue();
+                } else if (!this.state.currentTargetChangePercentageEdit) {
+                    this.calculateMomByChangeInPercent();
+                } else if (!this.state.currentTargetChangeNumberEdit) {
+                    this.calculateMomByChangeInNumber();
+                }
+            }
         });
 
     }
@@ -9795,9 +9973,9 @@ export default class BuildTree extends Component {
                                 {itemConfig.payload.label.label_en}</div>
                             <div style={{ float: 'right' }}>
                                 {(itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined && itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation == true) && <i class="fa fa-line-chart" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
-                                {this.getPayloadData(itemConfig, 4) == true && <i class="fa fa-long-arrow-up" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
-                                {this.getPayloadData(itemConfig, 6) == true && <i class="fa fa-long-arrow-down" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
-                                {this.getPayloadData(itemConfig, 5) == true && <i class="fa fa-link" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
+                                {(itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined && itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(itemConfig, 4) == true && <i class="fa fa-long-arrow-up" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
+                                {(itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined && itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(itemConfig, 6) == true && <i class="fa fa-long-arrow-down" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
+                                {(itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined && itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(itemConfig, 5) == true && <i class="fa fa-link" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
                                 <b style={{ color: '#212721', float: 'right' }}>
                                     {itemConfig.payload.nodeType.id == 2 ?
                                         <i class="fa fa-hashtag" style={{ fontSize: '11px', color: '#002f6c' }}></i> :
@@ -10425,21 +10603,12 @@ export default class BuildTree extends Component {
                                                         <Label htmlFor="languageId">{i18n.t('static.whatIf.scenario')}</Label>
 
                                                         <InputGroup>
-
-                                                            {/* <InputGroupAddon addonType="append">
-                                                                        <InputGroupText><i class="fa fa-plus icons" aria-hidden="true" data-toggle="tooltip" data-html="true" data-placement="bottom" onClick={this.showPopUp} title=""></i></InputGroupText>
-                                                                    </InputGroupAddon> */}
-
                                                             <Input
                                                                 type="select"
                                                                 name="scenarioId"
                                                                 id="scenarioId"
                                                                 bsSize="sm"
-                                                                // valid={!errors.languageId && this.state.user.language.languageId != ''}
-                                                                // invalid={touched.languageId && !!errors.languageId}
                                                                 onChange={(e) => { this.dataChange(e) }}
-                                                                // onClick={() => { this.onClick1() }}
-                                                                // onBlur={handleBlur}
                                                                 required
                                                                 value={this.state.selectedScenario}
                                                             >
@@ -10945,35 +11114,35 @@ export default class BuildTree extends Component {
                         </p>
                         <p><span style={{ fontSize: '14px' }} className="UnderLineText">Examples :</span>
                             <ul>
-                                <li><b>Simple Growth</b> (linear #) - the example below shows a population growth each month by 500/month from January 2022 to December 2024.   
-                                <br></br>
-                                <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0" src={ModelingTransferScreenshot1} style={{border:'1px solid #fff'}}/></span>
+                                <li><b>Simple Growth</b> (linear #) - the example below shows a population growth each month by 500/month from January 2022 to December 2024.
+                                    <br></br>
+                                    <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0" src={ModelingTransferScreenshot1} style={{ border: '1px solid #fff' }} /></span>
                                 </li>
                                 <li><b>Simple Loss</b> (linear #) - the example below shows attrition each month by 100/month from January 2022 to December 2024. QAT utilizes a negative number to denote a decrease or loss.
-                                <br></br>
-                                <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0" src={ModelingTransferScreenshot2} style={{border:'1px solid #fff'}}/></span>
-                                 </li>
+                                    <br></br>
+                                    <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0" src={ModelingTransferScreenshot2} style={{ border: '1px solid #fff' }} /></span>
+                                </li>
                                 <li><b>Simple Growth</b> (linear %) – the example below shows a steady population growth each month by 2% from January 2022 to December 2024. QAT has calculated this change to be increasing the population by 108.64 each month.
-                                <br></br>
-                                <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0" src={ModelingTransferScreenshot3} style={{border:'1px solid #fff'}}/></span>
-                                 </li>
-                                 <li><b>Simple Growth</b> (exponential %) - the example below shows a population growth each month by 1% from January 2022 to December 2024. Because the growth is exponential, the change differs each month.  
-                                        <ul>
-                                            <li>QAT calculates this change to be 54.32 in Jan-22 month, </li>
-                                            <li>QAT calculates this change to be 54.86 in Feb-22 month, and </li>
-                                            <li>QAT calculates this change to be 55.41 in Mar-22 </li>
-                                        </ul>
-                                        
-                                        <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0 ml-lg-4" src={ModelingTransferScreenshot4} style={{border:'1px solid #fff'}}/></span>
+                                    <br></br>
+                                    <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0" src={ModelingTransferScreenshot3} style={{ border: '1px solid #fff' }} /></span>
+                                </li>
+                                <li><b>Simple Growth</b> (exponential %) - the example below shows a population growth each month by 1% from January 2022 to December 2024. Because the growth is exponential, the change differs each month.
+                                    <ul>
+                                        <li>QAT calculates this change to be 54.32 in Jan-22 month, </li>
+                                        <li>QAT calculates this change to be 54.86 in Feb-22 month, and </li>
+                                        <li>QAT calculates this change to be 55.41 in Mar-22 </li>
+                                    </ul>
+
+                                    <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0 ml-lg-4" src={ModelingTransferScreenshot4} style={{ border: '1px solid #fff' }} /></span>
                                 </li>
                                 <li><b>Multi-year Loss</b> - the example below shows a different rate of attrition (loss) each year. Year 1 (January 2022 to December 2022) decreases the population by 1% or 54.32 each month, Year 2 (January 2023 to December 2023) decreases the population by 2% or 95.6 each month, etc. QAT utilizes a negative number to denote a decrease or loss.
-                                <br></br>
-                                <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0 ml-lg-4" src={ModelingTransferScreenshot5} style={{border:'1px solid #fff'}}/></span>
-                                 </li>
+                                    <br></br>
+                                    <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0 ml-lg-4" src={ModelingTransferScreenshot5} style={{ border: '1px solid #fff' }} /></span>
+                                </li>
                                 <li><b>Transfer</b> - the example below shows a transfer of 250 patients each month for one year, January 2022 to December 2022, from the current node (Adults 1st Line) to another node (Adults 2nd Line). This transfer will also appear on the other node (Adults 2nd Line) greyed-out to signify an non-editable change.
-                                <br></br>
-                                <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0" src={ModelingTransferScreenshot6} style={{border:'1px solid #fff'}}/></span>
-                                 </li>
+                                    <br></br>
+                                    <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0" src={ModelingTransferScreenshot6} style={{ border: '1px solid #fff' }} /></span>
+                                </li>
                             </ul>
                         </p>
 
@@ -11104,7 +11273,7 @@ export default class BuildTree extends Component {
                                     </ul>
                                 </li>
                                 <li><b> Multi-month Consumption Patterns?</b> How often is the product actually "consumed"? is it monthly or every three months? Consumption can be defined at different levels depending on your supply chain. In the <b>Planning Unit Node</b>, use the <b>Consumption Interval</b> field to indicate. For example, if the end user uses a product daily, but only picks up or buys the product every 2 months, enter "2" in the Consumption Interval field to account for a multi-month consumption pattern.  Note that this is only available for Continuous nodes, as product is assumed to be “consumed” at the beginning of the usage period.</li>
-                                <li><b>Repeating Forecasting Usages?</b> If multiple Forecasting Unit nodes share the same settings, consider using the <a href='/#/usageTemplate/listUsageTemplate' target="_blank" style={{textDecoration:'underline'}}>Usage Template </a>screen to save your common usages, and then using the “Copy from Template”  field to populate the  fields in the forecasting unit nodes. </li>
+                                <li><b>Repeating Forecasting Usages?</b> If multiple Forecasting Unit nodes share the same settings, consider using the <a href='/#/usageTemplate/listUsageTemplate' target="_blank" style={{ textDecoration: 'underline' }}>Usage Template </a>screen to save your common usages, and then using the “Copy from Template”  field to populate the  fields in the forecasting unit nodes. </li>
                             </ul>
                         </p>
 
@@ -11364,34 +11533,69 @@ export default class BuildTree extends Component {
                 <Modal isOpen={this.state.openAddScenarioModal}
                     className={'modal-md '} >
                     <ModalHeader className="modalHeaderSupplyPlan hideCross">
-                        <strong>{i18n.t('static.tree.Add/EditTreeData')}</strong>
+                        <strong>Add/Edit Scenario</strong>
                         <Button size="md" onClick={this.openScenarioModal} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
                     </ModalHeader>
                     <ModalBody>
-                        <FormGroup>
-                            <Label htmlFor="currencyId">{i18n.t('static.tree.scenarioName')}<span class="red Reqasterisk">*</span></Label>
-                            <Input type="text"
-                                id="scenarioName"
-                                name="scenarioName"
-                                onChange={(e) => { this.scenarioChange(e) }}
-                                value={this.state.scenario.label.label_en}
-                            ></Input>
-                        </FormGroup>
-                        <FormGroup>
-                            <Label htmlFor="currencyId">{i18n.t('static.common.note')}</Label>
-                            <Input type="text"
-                                id="scenarioDesc"
-                                name="scenarioDesc"
-                                onChange={(e) => { this.scenarioChange(e) }}
-                                value={this.state.scenario.notes}
-                            ></Input>
-                        </FormGroup>
-
+                        {/* Validation start */}
+                        <Formik
+                            enableReinitialize={true}
+                            initialValues={{
+                                scenarioName: this.state.scenario.label.label_en
+                            }}
+                            validate={validate(validationSchemaScenario)}
+                            onSubmit={(values, { setSubmitting, setErrors }) => {
+                                this.addScenario();
+                            }}
+                            render={
+                                ({
+                                    values,
+                                    errors,
+                                    touched,
+                                    handleChange,
+                                    handleBlur,
+                                    handleSubmit,
+                                    isSubmitting,
+                                    isValid,
+                                    setTouched,
+                                    handleReset,
+                                    setFieldValue,
+                                    setFieldTouched
+                                }) => (
+                                    <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='userForm' autocomplete="off">
+                                        <FormGroup>
+                                            <Label htmlFor="currencyId">{i18n.t('static.tree.scenarioName')}<span class="red Reqasterisk">*</span></Label>
+                                            <Input type="text"
+                                                id="scenarioName"
+                                                name="scenarioName"
+                                                valid={!errors.scenarioName && this.state.scenario.label.label_en != null ? this.state.scenario.label.label_en : '' != ''}
+                                                invalid={touched.scenarioName && !!errors.scenarioName}
+                                                onBlur={handleBlur}
+                                                onChange={(e) => { handleChange(e); this.scenarioChange(e) }}
+                                                value={this.state.scenario.label.label_en}
+                                            ></Input>
+                                            <FormFeedback>{errors.scenarioName}</FormFeedback>
+                                        </FormGroup>
+                                        <FormGroup>
+                                            <Label htmlFor="currencyId">{i18n.t('static.common.note')}</Label>
+                                            <Input type="text"
+                                                id="scenarioDesc"
+                                                name="scenarioDesc"
+                                                onChange={(e) => { this.scenarioChange(e) }}
+                                                value={this.state.scenario.notes}
+                                            ></Input>
+                                        </FormGroup>
+                                        <FormGroup className="col-md-6 pt-lg-4 float-right">
+                                            <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={this.openScenarioModal}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                            <Button type="submit" size="md" onClick={() => this.touchAllScenario(setTouched, errors)} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>
+                                        </FormGroup>
+                                    </Form>
+                                )} />
                     </ModalBody>
-                    <ModalFooter>
-                        <Button type="submit" size="md" onClick={this.addScenario} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={this.openScenarioModal}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                    </ModalFooter>
+                    {/* <ModalFooter> */}
+                    {/* <Button type="submit" size="md" onClick={this.addScenario} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={this.openScenarioModal}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
+                    {/* </ModalFooter> */}
                 </Modal>
             </Draggable>
             {/* Modal end------------------------ */}
