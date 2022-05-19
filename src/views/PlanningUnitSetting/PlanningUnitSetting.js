@@ -2866,7 +2866,7 @@ export default class PlanningUnitSetting extends Component {
         data[17] = true;
 
         this.el.insertRow(
-            data, 0, 1
+            data
         );
     };
 

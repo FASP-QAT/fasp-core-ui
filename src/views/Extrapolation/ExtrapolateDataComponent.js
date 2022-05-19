@@ -366,7 +366,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                     var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
                     var datasetJson = JSON.parse(datasetData);
                     console.log("datasetJson%%%%", datasetJson);
-                    var planningUnitList = datasetJson.planningUnitList.filter(c => c.consuptionForecast);
+                    var planningUnitList = datasetJson.planningUnitList.filter(c => c.consuptionForecast && c.active == true);
                     var regionList = datasetJson.regionList;
 
                     planningUnitList.sort((a, b) => {
@@ -924,7 +924,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                     calculateSemiAverages(inputDataSemiAverage, noOfMonthsForProjection, this);
                 }
                 if (this.state.linearRegressionId && inputDataMovingAvg.filter(c => c.actual != null).length >= 3) {
-                    calculateLinearRegression(inputDataLinearRegression, this.state.confidenceLevelIdLinearRegression, noOfMonthsForProjection, this,false);
+                    calculateLinearRegression(inputDataLinearRegression, this.state.confidenceLevelIdLinearRegression, noOfMonthsForProjection, this, false);
                 }
                 console.log("inputDataTes.length+++", inputDataTes.length);
                 // if (inputDataTes.length >= (this.state.noOfMonthsForASeason * 2)) {
@@ -932,7 +932,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                     calculateTES(inputDataTes, this.state.alpha, this.state.beta, this.state.gamma, this.state.confidenceLevelId, noOfMonthsForProjection, this, minStartDate, false);
                 }
                 if (this.state.arimaId && inputDataMovingAvg.filter(c => c.actual != null).length >= 14) {
-                    calculateArima(inputDataArima, this.state.p, this.state.d, this.state.q, this.state.confidenceLevelIdArima, noOfMonthsForProjection, this, minStartDate, false,this.state.seasonality);
+                    calculateArima(inputDataArima, this.state.p, this.state.d, this.state.q, this.state.confidenceLevelIdArima, noOfMonthsForProjection, this, minStartDate, false, this.state.seasonality);
                 }
                 this.setState({
                     extrapolateClicked: true
@@ -1016,6 +1016,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 var rangeValue = { from: { year: Number(moment(startDate).startOf('month').format("YYYY")), month: Number(moment(startDate).startOf('month').format("M")) }, to: { year: Number(moment(stopDate).startOf('month').format("YYYY")), month: Number(moment(stopDate).startOf('month').format("M")) } }
 
                 var planningUnitList = forecastProgramListFilter.planningUnitList;
+                planningUnitList = planningUnitList.filter(c => c.active == true);
                 var planningUnitId = "";
                 var event = {
                     target: {
@@ -1303,7 +1304,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                 "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 4)[0],
                                 "jsonProperties": {
                                     confidenceLevel: this.state.confidenceLevelIdArima,
-                                    seasonality: this.state.seasonality,                            
+                                    seasonality: this.state.seasonality,
                                     p: this.state.p,
                                     d: this.state.d,
                                     q: this.state.q,
@@ -1561,7 +1562,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                     p = consumptionExtrapolationArima[0].jsonProperties.p;
                     d = consumptionExtrapolationArima[0].jsonProperties.d;
                     q = consumptionExtrapolationArima[0].jsonProperties.q;
-                    seasonality = consumptionExtrapolationArima[0].jsonProperties.seasonality;                                    
+                    seasonality = consumptionExtrapolationArima[0].jsonProperties.seasonality;
                     arimaId = true;
                 }
                 // let curDate = startDate;
@@ -1841,7 +1842,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                     p: p,
                     d: d,
                     q: q,
-                    seasonality:seasonalityArima
+                    seasonality: seasonalityArima
                 }, () => {
                     this.buildJxl();
                 })
@@ -3747,7 +3748,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                             />
                                                             <FormFeedback>{errors.qId}</FormFeedback>
                                                         </div>
-                                                        <div className="tab-ml-1 ml-lg-5 ExtraCheckboxFieldWidth" style={{marginTop:'38px'}}>
+                                                        <div className="tab-ml-1 ml-lg-5 ExtraCheckboxFieldWidth" style={{ marginTop: '38px' }}>
                                                             <Input
                                                                 className="form-check-input checkboxMargin"
                                                                 type="checkbox"
@@ -3762,7 +3763,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                 check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
                                                                 <b>{i18n.t('static.extrapolation.seasonality')}</b>
                                                             </Label>
-                                                        </div>                 
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </FormGroup>
