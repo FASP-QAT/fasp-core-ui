@@ -2865,80 +2865,107 @@ export default class BuildTree extends Component {
     }
     extrapolate(e) {
         const { currentItemConfig } = this.state;
-        // const newArray = this.state.activeTab1.slice()
-        currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation = e.target.checked == true ? true : false;
-        if (e.target.checked) {
-            console.log("extrapolate outside", currentItemConfig);
-            if (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].calculatedDataValue == "" || currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].calculatedDataValue == null || currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].calculatedDataValue == "0") {
-                currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].calculatedDataValue = "0";
-                currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].dataValue = "0";
-                console.log("extrapolate inside", currentItemConfig);
+        var modelingFlag = false;
+        var scalingList = this.state.currentScenario.nodeDataModelingList == undefined ? [] : this.state.currentScenario.nodeDataModelingList;
+        if (scalingList.length > 0) {
+            var scalingResult = scalingList.filter(x => x.transferNodeDataId != null && x.transferNodeDataId != "");
+            if (scalingResult.length > 0) {
+                modelingFlag = true;
             }
         }
-        console.log("this.state.activeTab1---", currentItemConfig);
-
-        this.setState({
-            currentItemConfig,
-            currentScenario: currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0],
-            activeTab1: e.target.checked == true ? new Array(2).fill('3') : new Array(2).fill('2')
-        }, () => {
-            console.log("extrapolate current item config---", this.state.currentItemConfig);
-            console.log("extrapolate current scenario---", this.state.currentScenario);
-            if (this.state.activeTab1[0] == '3') {
-                if (this.state.modelingEl != "") {
-                    this.state.modelingEl.destroy();
-                    if (this.state.momEl != "") {
-                        this.state.momEl.destroy();
-                    }
-                    else if (this.state.momElPer != "") {
-                        this.state.momElPer.destroy();
-                    }
+        if (this.state.nodeTransferDataList.length == 0 && !modelingFlag) {
+            currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation = e.target.checked == true ? true : false;
+            if (e.target.checked) {
+                console.log("extrapolate outside", currentItemConfig);
+                if (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].calculatedDataValue == "" || currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].calculatedDataValue == null || currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].calculatedDataValue == "0") {
+                    currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].calculatedDataValue = "0";
+                    currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].dataValue = "0";
+                    console.log("extrapolate inside", currentItemConfig);
                 }
-
-                this.refs.extrapolationChild.getExtrapolationMethodList();
-            } else {
-                console.log("***>>>", this.state.currentItemConfig);
-                if (this.state.currentItemConfig.context.payload.nodeType.id != 1) {
-                    var minMonth = this.state.forecastStartDate;
-                    var maxMonth = this.state.forecastStopDate;
-                    console.log("minMonth---", minMonth);
-                    console.log("maxMonth---", maxMonth);
-                    var modelingTypeList = this.state.modelingTypeList;
-                    var arr = [];
-                    if (this.state.currentItemConfig.context.payload.nodeType.id == 2) {
-                        arr = modelingTypeList.filter(x => x.modelingTypeId != 1 && x.modelingTypeId != 5);
-                    } else {
-                        arr = modelingTypeList.filter(x => x.modelingTypeId == 5);
-                    }
-                    console.log("arr---", arr);
-                    var modelingTypeListNew = [];
-                    for (var i = 0; i < arr.length; i++) {
-                        console.log("arr[i]---", arr[i]);
-                        modelingTypeListNew[i] = { id: arr[i].modelingTypeId, name: getLabelText(arr[i].label, this.state.lang) }
-                    }
-                    this.setState({
-                        showModelingJexcelNumber: true,
-                        minMonth, maxMonth, filteredModelingType: modelingTypeListNew
-                    }, () => {
-                        this.buildModelingJexcel();
-                    })
-
-                }
-                else {
-                    this.setState({
-                        showModelingJexcelNumber: true
-                    }, () => {
-                        this.buildModelingJexcel();
-                    })
-                }
-                //  else if (this.state.currentItemConfig.context.payload.nodeType.id == 3) {
-                //     this.setState({ showModelingJexcelPercent: true }, () => {
-                //         this.buildModelingJexcelPercent()
-                //     })
-                // }
             }
+            console.log("this.state.activeTab1---", currentItemConfig);
 
-        });
+            this.setState({
+                currentItemConfig,
+                currentScenario: currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0],
+                activeTab1: e.target.checked == true ? new Array(2).fill('3') : new Array(2).fill('2')
+            }, () => {
+                console.log("extrapolate current item config---", this.state.currentItemConfig);
+                console.log("extrapolate current scenario---", this.state.currentScenario);
+                if (this.state.activeTab1[0] == '3') {
+                    if (this.state.modelingEl != "") {
+                        this.state.modelingEl.destroy();
+                        if (this.state.momEl != "") {
+                            this.state.momEl.destroy();
+                        }
+                        else if (this.state.momElPer != "") {
+                            this.state.momElPer.destroy();
+                        }
+                    }
+
+                    this.refs.extrapolationChild.getExtrapolationMethodList();
+                } else {
+                    console.log("***>>>", this.state.currentItemConfig);
+                    if (this.state.currentItemConfig.context.payload.nodeType.id != 1) {
+                        var minMonth = this.state.forecastStartDate;
+                        var maxMonth = this.state.forecastStopDate;
+                        console.log("minMonth---", minMonth);
+                        console.log("maxMonth---", maxMonth);
+                        var modelingTypeList = this.state.modelingTypeList;
+                        var arr = [];
+                        if (this.state.currentItemConfig.context.payload.nodeType.id == 2) {
+                            arr = modelingTypeList.filter(x => x.modelingTypeId != 1 && x.modelingTypeId != 5);
+                        } else {
+                            arr = modelingTypeList.filter(x => x.modelingTypeId == 5);
+                        }
+                        console.log("arr---", arr);
+                        var modelingTypeListNew = [];
+                        for (var i = 0; i < arr.length; i++) {
+                            console.log("arr[i]---", arr[i]);
+                            modelingTypeListNew[i] = { id: arr[i].modelingTypeId, name: getLabelText(arr[i].label, this.state.lang) }
+                        }
+                        this.setState({
+                            showModelingJexcelNumber: true,
+                            minMonth, maxMonth, filteredModelingType: modelingTypeListNew
+                        }, () => {
+                            this.buildModelingJexcel();
+                        })
+
+                    }
+                    else {
+                        this.setState({
+                            showModelingJexcelNumber: true
+                        }, () => {
+                            this.buildModelingJexcel();
+                        })
+                    }
+                    //  else if (this.state.currentItemConfig.context.payload.nodeType.id == 3) {
+                    //     this.setState({ showModelingJexcelPercent: true }, () => {
+                    //         this.buildModelingJexcelPercent()
+                    //     })
+                    // }
+                }
+
+            });
+        }
+        else if (modelingFlag) {
+            currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation = false;
+            this.setState({
+                currentItemConfig,
+                currentScenario: currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0]
+            }, () => {
+                alert("Extrapolation not allowed on this node because this node is transfering data to some other node.To perform extrapolation please delete the transfer.");
+            });
+        } else if (this.state.nodeTransferDataList.length > 0) {
+            currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation = false;
+            this.setState({
+                currentItemConfig,
+                currentScenario: currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0]
+            }, () => {
+                alert("Extrapolation not allowed on this node because some other node is transfering data to this node.");
+            });
+
+        }
     }
     momCheckbox(e, type) {
         var checked = e.target.checked;
@@ -3130,6 +3157,40 @@ export default class BuildTree extends Component {
         for (var y = 0; y < json.length; y++) {
             var value = this.el.getValueFromCoords(11, y);
             if (parseInt(value) == 1) {
+
+                //Transfer to node
+                var col = ("D").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(3, y);
+                var transferFlag = false;
+                if (value != "") {
+                    var items = this.state.items;
+                    var transfer = value != "" ? value.split('_')[0] : '';
+                    if (transfer != '') {
+                        for (let i = 0; i < items.length; i++) {
+                            var nodeDataId = items[i].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataId;
+                            console.log("nodeDataId---", nodeDataId);
+                            console.log("extrapolation flag---", items[i].payload.nodeDataMap[this.state.selectedScenario]);
+                            if (nodeDataId == transfer && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation) {
+                                transferFlag = true;
+                                break;
+                            }
+                        }
+                    }
+                    console.log("transferFlag---", transferFlag);
+                    if (transferFlag) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, 'You can not transfer data to this node as it is an extrapolation node.');
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+
 
                 //Modeling type
                 var col = ("E").concat(parseInt(y) + 1);
@@ -4176,11 +4237,34 @@ export default class BuildTree extends Component {
 
         // Transfer to/from node
         if (x == 3) {
+            var col = ("D").concat(parseInt(y) + 1);
+            var transferFlag = false;
             if (value != "") {
                 this.state.modelingEl.setValueFromCoords(5, y, -1, true);
+                var items = this.state.items;
+                var transfer = value != "" ? value.split('_')[0] : '';
+                if (transfer != '') {
+                    for (let i = 0; i < items.length; i++) {
+                        var nodeDataId = items[i].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataId;
+                        if (nodeDataId == transfer && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation) {
+                            transferFlag = true;
+                            break;
+                        }
+                    }
+                }
+                if (transferFlag) {
+                    instance.jexcel.setStyle(col, "background-color", "transparent");
+                    instance.jexcel.setStyle(col, "background-color", "yellow");
+                    instance.jexcel.setComments(col, 'You can not transfer data to this node as it is an extrapolation node.');
+                } else {
+                    instance.jexcel.setStyle(col, "background-color", "transparent");
+                    instance.jexcel.setComments(col, "");
+                }
             }
             else {
                 this.state.modelingEl.setValueFromCoords(5, y, "", true);
+                instance.jexcel.setStyle(col, "background-color", "transparent");
+                instance.jexcel.setComments(col, "");
             }
         }
         //+/-
@@ -9889,9 +9973,9 @@ export default class BuildTree extends Component {
                                 {itemConfig.payload.label.label_en}</div>
                             <div style={{ float: 'right' }}>
                                 {(itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined && itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation == true) && <i class="fa fa-line-chart" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
-                                {this.getPayloadData(itemConfig, 4) == true && <i class="fa fa-long-arrow-up" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
-                                {this.getPayloadData(itemConfig, 6) == true && <i class="fa fa-long-arrow-down" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
-                                {this.getPayloadData(itemConfig, 5) == true && <i class="fa fa-link" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
+                                {(itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined && itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(itemConfig, 4) == true && <i class="fa fa-long-arrow-up" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
+                                {(itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined && itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(itemConfig, 6) == true && <i class="fa fa-long-arrow-down" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
+                                {(itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined && itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(itemConfig, 5) == true && <i class="fa fa-link" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
                                 <b style={{ color: '#212721', float: 'right' }}>
                                     {itemConfig.payload.nodeType.id == 2 ?
                                         <i class="fa fa-hashtag" style={{ fontSize: '11px', color: '#002f6c' }}></i> :
