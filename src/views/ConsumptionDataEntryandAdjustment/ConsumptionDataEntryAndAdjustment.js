@@ -2380,11 +2380,12 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                                  <li>Interpolating missing values: Click the green 'Interpolate' button in the middle right of the screen to search for periods where the consumption value is blank and replace them with an interpolated value. QAT interpolates by finding the nearest values on either side (before or after the blank), calculates the straight line in between them and uses that straight-line formula to calculate the value for the blank(s).  Note that QAT will not interpolate for months where actual consumption is zero. QAT will only interpolate if there is at least one data point before and one data point after the blank value(s).
                                    <br></br>
                                    Mathematically:<br></br>
-                                   Where x's represent months, and y's represent actual consumption,<br></br>
-                                   Where known data values are (x0 , y0) and (x1 , y1) <br></br>
-                                   Where any unknown data values are (x, y) <br></br>
-
-                                        The formula for the interpolated line is <br></br>
+                                   <ul>
+                                   <li>Where x's represent months, and y's represent actual consumption,</li>
+                                   <li>Where known data values are (x0 , y0) and (x1 , y1) </li>
+                                   <li>Where any unknown data values are (x, y) </li>
+                                   <li>The formula for the interpolated line is </li>
+                                        </ul>
                                         <span><img className="formula-img-mr img-fluid mb-lg-0" src={dataentryScreenshot1} style={{border:'1px solid #fff',width:'250px'}}/></span><br></br>
                                     <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0" src={dataentryScreenshot2} style={{border:'1px solid #fff',width:'250px'}}/></span>
 

@@ -1093,7 +1093,9 @@ class LoadDeleteDataSet extends Component {
             getRequest.onerror = function (event) {
             }.bind(this);
             getRequest.onsuccess = function (event) {
-                var datasetList = getRequest.result;
+                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                var datasetList = getRequest.result.filter(c=>c.userId==userId);
 
 
                 var programCheckboxes = document.getElementsByName("programCheckBox");
