@@ -3289,9 +3289,9 @@ export default class BuildTree extends Component {
         console.log("month diff>>>", monthDifference);
         var momValue = '', percentForOneMonth = '';
         var currentEndValue = document.getElementById("currentEndValue").value;
-        console.log("currentEndValue---",currentEndValue);
+        console.log("currentEndValue---", currentEndValue);
         var getValue = currentEndValue.toString().replaceAll(",", "");
-        console.log("getValue---",getValue);
+        console.log("getValue---", getValue);
         if (this.state.currentModelingType == 2) {
             var momValue = ((parseFloat(getValue - this.state.currentCalculatorStartValue.toString().replaceAll(",", ""))) / monthDifference).toFixed(4);
         }
@@ -10966,6 +10966,7 @@ export default class BuildTree extends Component {
                                 <li>Transfers are always negative from the source node and positive to the destination node.</li> */}
                                 <li>Number node can transfer to another number only but they should be at the same level</li>
                                 <li>Percentage,FU & PU nodes can transfer to each othet but they should belog to the same parent</li>
+                                <li>If data is transferred to/from a node then extrapolation is not allowed on that node</li>
                             </ul>
                         </p>
                         <p><span style={{ fontSize: '14px' }} className="UnderLineText">Examples :</span>
@@ -10989,11 +10990,11 @@ export default class BuildTree extends Component {
                                         <li>QAT calculates this change to be 55.41 in Mar-22 </li>
                                     </ul>
 
-                                    <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0" src={ModelingTransferScreenshot4} style={{ border: '1px solid #fff' }} /></span>
+                                    <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0 ml-lg-4" src={ModelingTransferScreenshot4} style={{ border: '1px solid #fff' }} /></span>
                                 </li>
                                 <li><b>Multi-year Loss</b> - the example below shows a different rate of attrition (loss) each year. Year 1 (January 2022 to December 2022) decreases the population by 1% or 54.32 each month, Year 2 (January 2023 to December 2023) decreases the population by 2% or 95.6 each month, etc. QAT utilizes a negative number to denote a decrease or loss.
                                     <br></br>
-                                    <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0" src={ModelingTransferScreenshot5} style={{ border: '1px solid #fff' }} /></span>
+                                    <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0 ml-lg-4" src={ModelingTransferScreenshot5} style={{ border: '1px solid #fff' }} /></span>
                                 </li>
                                 <li><b>Transfer</b> - the example below shows a transfer of 250 patients each month for one year, January 2022 to December 2022, from the current node (Adults 1st Line) to another node (Adults 2nd Line). This transfer will also appear on the other node (Adults 2nd Line) greyed-out to signify an non-editable change.
                                     <br></br>
@@ -11073,7 +11074,7 @@ export default class BuildTree extends Component {
                                 <li><b>Modeling/Transfer Tab</b> </li>
                                 <ul>
                                     <li><b><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i> Modeling:</b> Allows user to specify the exact rate of change</li>
-                                    <li><b><i className='fa fa-link'></i> Transfer:</b> Allows users to link two nodes together - so the decrease</li>
+                                    <li><b><i className='fa fa-link'></i> Transfer:</b> Allows users to link two nodes together - so the decrease from the source node is linked to the increase of the destination node. </li>
                                 </ul>
                                 <li><b>Extrapolation Tab</b> (number nodes only)</li>
                                 <ul>
@@ -11121,9 +11122,8 @@ export default class BuildTree extends Component {
                         </p>
                         <p><span style={{ fontSize: '14px' }} classNames="UnderLineText"><b>Tips for specific use cases:</b></span>
                             <ul>
-                                <li><b> Forecasting Node Type :</b> Select "discrete" if this product will be used for limited time, and "continuous" if it will be used indefinitely.</li>
-                                <li><b> Delayed or phased product usage?</b> Sometimes, the product consumption is delayed in relation the other higher levels of the tree. In the relevant
-                                    <b>Forecasting Unit </b>node, use the <b>Lag</b> field to indicate this delay.
+                                <li><b> Forecasting Node-Type :</b> Select "discrete" if this product will be used for limited time, and "continuous" if it will be used indefinitely.</li>
+                                <li><b> Delayed or phased product usage?</b> Sometimes, the product consumption is delayed in relation the other higher levels of the tree. In the relevant <b> Forecasting Unit </b>node, use the <b>Lag</b> field to indicate this delay.
                                     <ul>
                                         <li>For example, if the product usage will begin 2 months after the parent node dates, enter "2" in this field.  </li>
                                         <li>This field can also be used where the product switches over time for example, if forecasting units A, B, and C are used in secession for two months at a time, you can set up your tree with Forecasting Unit A (discrete for 2 months, lag=0), Forecasting Unit B (discrete for 2 months, lag=2), Forecasting Unit C (discrete for 2 months, lag = 4).</li>
