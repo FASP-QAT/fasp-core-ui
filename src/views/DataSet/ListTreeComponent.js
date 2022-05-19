@@ -1508,17 +1508,18 @@ export default class ListTreeComponent extends Component {
                                 </div>
                                 <p>
                                     <p style={{ fontSize: '14px' }}><span className="UnderLineText">{i18n.t('static.listTree.purpose')} :</span> {i18n.t('static.listTree.enableUsersTo')} :</p>
-                                    <p className='pl-lg-4'>
-                                        1) {i18n.t('static.listTree.listExistingTree')}<br></br>
-                                        2) {i18n.t('static.listTree.editExistingTree')} <br></br>
-                                        3) {i18n.t('static.listTree.deleteDuplicateExistingTree')}<br></br>
-                                        4) {i18n.t('static.listTree.newTreeToLoadedProgram')}<br></br>
+                                    <ul type="1">
+                                        <li>{i18n.t('static.listTree.listExistingTree')}</li>
+                                        <li> {i18n.t('static.listTree.editExistingTree')} </li>
+                                        <li>{i18n.t('static.listTree.deleteDuplicateExistingTree')}</li>
+                                        <li> {i18n.t('static.listTree.newTreeToLoadedProgram')}</li>
                                         <ul>
                                             <li>{i18n.t('static.listTree.manuallySelectAddTree')}</li>
                                             <li>{i18n.t('static.listTree.nameOfDesiredTemplate')}</li>
                                         </ul>
-                                    </p>
+                                   </ul>
                                 </p>
+                                <p>Note: The table on this screen lists trees for each forecast program that has been loaded. </p>
                                 <p>
                                     <p style={{ fontSize: '14px' }}><span className="UnderLineText">{i18n.t('static.listTree.useThisScreen')} :</span></p>
                                     <p className='pl-lg-4'>
@@ -1530,6 +1531,7 @@ export default class ListTreeComponent extends Component {
                                         </ul>
                                     </p>
                                 </p>
+                               
                             </ModalBody>
                         </div>
                     </Modal>
