@@ -120,7 +120,7 @@ const validationSchemaNodeData = function (values) {
                     }
                 }),
         nodeValue: Yup.string()
-            .test('nodeValue', 'Please enter a valid number having less then 10 digits.',
+            .test('nodeValue', i18n.t('static.buildTreeComp.validNumLessThan10Dig'),
                 function (value) {
                     // console.log("*****", document.getElementById("nodeValue").value);
                     var testNumber = (/^(?!$)\d{0,10}(?:\.\d{1,4})?$/).test((document.getElementById("nodeValue").value).replaceAll(",", ""));
@@ -148,8 +148,8 @@ const validationSchemaNodeData = function (values) {
 
                 },
                 then: Yup.string()
-                    .required('Please select forecasting unit')
-                    .typeError('Please select forecasting unit'),
+                    .required(i18n.t('static.buildTreeComp.selectForecastigUnit'))
+                    .typeError(i18n.t('static.buildTreeComp.selectForecastigUnit')),
                 otherwise: Yup.string().notRequired()
             }),
 
@@ -161,8 +161,8 @@ const validationSchemaNodeData = function (values) {
 
                 },
                 then: Yup.string()
-                    .required('Please select planning unit')
-                    .typeError('Please select planning unit'),
+                    .required(i18n.t('static.buildTreeComp.selectPlanningUnit'))
+                    .typeError(i18n.t('static.buildTreeComp.selectPlanningUnit')),
                 otherwise: Yup.string().notRequired()
             }),
         // forecastingUnitId: Yup.string()
@@ -188,7 +188,7 @@ const validationSchemaNodeData = function (values) {
                     }
                 }),
         lagInMonths:
-            Yup.string().test('lagInMonths', 'Please enter a valid number having less then equal to 3 digit.',
+            Yup.string().test('lagInMonths', i18n.t('static.buildTreeComp.validNumLessThanEqual3Dig'),
                 function (value) {
                     // console.log("*****", document.getElementById("nodeValue").value);
                     var testNumber = (/^\d{0,3}?$/).test(document.getElementById("lagInMonths").value);
@@ -201,7 +201,7 @@ const validationSchemaNodeData = function (values) {
                 }),
 
         noOfPersons:
-            Yup.string().test('noOfPersons', 'Please enter a valid 10 digit number.',
+            Yup.string().test('noOfPersons', i18n.t('static.buildTreeComp.valid10DigNum'),
                 function (value) {
                     // console.log("*****", document.getElementById("nodeValue").value);
                     var testNumber = (/^\d{0,10}?$/).test((document.getElementById("noOfPersons").value).replaceAll(",", ""));
@@ -338,7 +338,7 @@ const validationSchemaNodeData = function (values) {
                 }),
 
         refillMonths: Yup.string()
-            .test('refillMonths', 'Please enter a valid number having less then 10 digits.',
+            .test('refillMonths', i18n.t('static.buildTreeComp.validNumLessThan10Dig'),
                 function (value) {
                     // var testNumber = document.getElementById("refillMonths").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("refillMonths").value) : false;
                     var testNumber = (/^[1-9]\d*$/).test((document.getElementById("refillMonths").value).replaceAll(",", ""));
@@ -359,7 +359,7 @@ const validationSchemaNodeData = function (values) {
                     }
                 }),
         puPerVisit: Yup.string()
-            .test('puPerVisit', 'Please enter # of pu per visit.',
+            .test('puPerVisit', i18n.t('static.buildTreeComp.Enter#ofPU'),
                 function (value) {
                     // console.log("*****", document.getElementById("nodeValue").value);
                     // var testNumber = document.getElementById("puPerVisit").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("puPerVisit").value) : false;
@@ -1596,7 +1596,7 @@ export default class BuildTree extends Component {
             })
         } else {
             confirmAlert({
-                message: "Please select a tree.",
+                message: i18n.t('static.buildTreeComp.selectATree'),
                 buttons: [
                     {
                         label: i18n.t('static.report.ok')
@@ -2262,7 +2262,7 @@ export default class BuildTree extends Component {
                         openAddScenarioModal: !this.state.openAddScenarioModal
                     })
                 } else {
-                    alert("Please select scenario first.")
+                    alert(i18n.t('static.buildTreeComp.selectScenarioFirst'))
                 }
             } else {
                 console.log("add scenario");
@@ -2284,7 +2284,7 @@ export default class BuildTree extends Component {
                 var minScenarioId = Math.min(...scenarioList.map(o => o.id));
                 if (minScenarioId != this.state.selectedScenario) {
                     confirmAlert({
-                        message: "Are you sure you want to delete this scenario.",
+                        message: i18n.t('static.buildTreeComp.sureYouWantToDeleteScenario'),
                         buttons: [
                             {
                                 label: i18n.t('static.program.yes'),
@@ -2299,7 +2299,7 @@ export default class BuildTree extends Component {
                     });
                 } else {
                     confirmAlert({
-                        message: "You can't delete the default scenario.",
+                        message: i18n.t('static.buildTreeComp.youCanNotDeleteScenario'),
                         buttons: [
                             {
                                 label: i18n.t('static.report.ok')
@@ -2309,7 +2309,7 @@ export default class BuildTree extends Component {
                 }
             } else {
                 confirmAlert({
-                    message: "Please select scenario first.",
+                    message: i18n.t('static.buildTreeComp.selectScenarioFirst'),
                     buttons: [
                         {
                             label: i18n.t('static.report.ok')

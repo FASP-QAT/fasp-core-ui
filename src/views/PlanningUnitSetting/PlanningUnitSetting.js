@@ -2933,7 +2933,7 @@ export default class PlanningUnitSetting extends Component {
                                         <div>
                                             <Popover placement="top" isOpen={this.state.popoverOpenProgramSetting} target="Popover2" trigger="hover" toggle={this.toggleProgramSetting}>
                                                 {/* <PopoverBody>{i18n.t('static.tooltip.planningProgramSetting')} </PopoverBody> */}
-                                                <PopoverBody>If you dont see the desired program(s), please load them first.</PopoverBody>
+                                                <PopoverBody>{i18n.t('static.planningUnitSettings.desiredProgramLoadFirst')}</PopoverBody>
                                             </Popover>
                                         </div>
                                         <FormGroup className="col-md-3">
