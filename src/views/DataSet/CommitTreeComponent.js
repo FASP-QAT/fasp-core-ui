@@ -216,12 +216,13 @@ export default class CommitTreeComponent extends React.Component {
     }
 
     setProgramId(e) {
+        console.log("In set program Id@@@@@@@@@@@%%%%%%%%%%%%%")
+        var programId = e.target.value;
         this.setState({
             loading: true,
             showCompare: false,
-        })
-        var programId = e.target.value;
-        var myResult = [];
+        },()=>{
+            var myResult = [];
         myResult = this.state.programList;
         localStorage.setItem("sesDatasetId", programId);
         this.setState({
@@ -271,20 +272,25 @@ export default class CommitTreeComponent extends React.Component {
                 programVersionJson = programVersionJson.concat([json]);
                 DatasetService.getAllDatasetData(programVersionJson)
                     .then(response => {
+                        console.log("In response@@@@@@@@@@@%%%%%%%%%%%%%")
                         this.setState({
                             programDataServer: response.data[0],
                             showCompare: true,
                             comparedLatestVersion: response.data[0].currentVersion.versionId
+                        },()=>{
+                            dataCheck(this, programData[0].datasetJson)
                         })
                     })
-                dataCheck(this, programData[0].datasetJson)
+                
 
             }.bind(this)
         }.bind(this)
+        })
     }
 
 
     updateState(parameterName, value) {
+        console.log("In update state@@@@@@@@@@@%%%%%%%%%%%%%")
         console.log("ParameterName$$$", parameterName)
         console.log("Value$$$", value)
         this.setState({
@@ -732,6 +738,7 @@ export default class CommitTreeComponent extends React.Component {
     }
 
     render() {
+        console.log("In render@@@@@@@@@@@%%%%%%%%%%%%%",this.state.loading);
         const { programList } = this.state;
         let programs = programList.length > 0 && programList.map((item, i) => {
             return (
