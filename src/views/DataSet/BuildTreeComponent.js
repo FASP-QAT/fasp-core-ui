@@ -430,6 +430,37 @@ const getErrorsFromValidationError = (validationError) => {
     }, {})
 }
 
+const validationSchemaScenario = function (values) {
+    return Yup.object().shape({
+        scenarioName: Yup.string()
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
+            .required('Please enter scenario name.'),
+
+    })
+}
+
+const validateScenario = (getValidationSchema) => {
+    return (values) => {
+        const validationSchemaScenario = getValidationSchema(values)
+        try {
+            validationSchemaScenario.validateSync(values, { abortEarly: false })
+            return {}
+        } catch (error) {
+            return getErrorsFromValidationErrorScenario(error)
+        }
+    }
+}
+
+const getErrorsFromValidationErrorScenario = (validationError) => {
+    const FIRST_ERROR = 0
+    return validationError.inner.reduce((errors, error) => {
+        return {
+            ...errors,
+            [error.path]: error.errors[FIRST_ERROR],
+        }
+    }, {})
+}
+
 function addCommas(cell1, row) {
 
     if (cell1 != null && cell1 != "") {
@@ -567,6 +598,13 @@ export default class BuildTree extends Component {
             scalingMonth: { year: Number(moment(curDate).startOf('month').format("YYYY")), month: Number(moment(curDate).startOf('month').format("M")) },
             showModelingValidation: true,
             scenario: {
+                id: '',
+                label: {
+                    label_en: ''
+                },
+                notes: ''
+            },
+            scenario1: {
                 id: '',
                 label: {
                     label_en: ''
@@ -2255,7 +2293,7 @@ export default class BuildTree extends Component {
                     var scenario = this.state.scenarioList.filter(x => x.id == scenarioId)[0];
                     console.log("my scenario---", scenario);
                     this.setState({
-                        scenario,
+                        scenario: JSON.parse(JSON.stringify(scenario)),
                         openAddScenarioModal: !this.state.openAddScenarioModal
                     })
                 } else {
@@ -5922,6 +5960,29 @@ export default class BuildTree extends Component {
         });
     }
 
+    touchAllScenario(setTouched, errors) {
+        setTouched({
+            scenarioName: true
+        }
+        )
+        this.validateFormScenario(errors)
+    }
+
+    validateFormScenario(errors) {
+        this.findFirstErrorScenario('userForm', (fieldName) => {
+            return Boolean(errors[fieldName])
+        })
+    }
+    findFirstErrorScenario(formName, hasError) {
+        const form = document.forms[formName]
+        for (let i = 0; i < form.length; i++) {
+            if (hasError(form[i].name)) {
+                form[i].focus()
+                break
+            }
+        }
+    }
+
     touchAll(setTouched, errors) {
         setTouched({
             forecastMethodId: true,
@@ -5931,6 +5992,7 @@ export default class BuildTree extends Component {
         )
         this.validateForm(errors)
     }
+
 
     validateForm(errors) {
         this.findFirstError('userForm', (fieldName) => {
@@ -6332,92 +6394,97 @@ export default class BuildTree extends Component {
         var items = curTreeObj.tree.flatList;
         var scenarioId;
         var temNodeDataMap = [];
-        if (type == 1) {
-            var maxScenarioId = Math.max(...scenarioList.map(o => o.id));
-            var minScenarioId = Math.min(...scenarioList.map(o => o.id));
-            scenarioId = parseInt(maxScenarioId) + 1;
-            var newTabObject = {
-                id: scenarioId,
-                label: {
-                    label_en: scenario.label.label_en
-                },
-                notes: scenario.notes,
-                active: true
-            };
-            // console.log("tab data---", newTabObject);
-            scenarioList = [...scenarioList, newTabObject];
-            // console.log("tabList---", tabList1)
-            if (this.state.treeId != "") {
-                if (this.state.scenarioList.length > 1) {
-
-                }
-
-                console.log("***>minScenarioId---", items);
-                var tArr = [];
-                for (var i = 0; i < items.length; i++) {
-                    for (let j = 0; j < scenarioList.length; j++) {
-                        if (items[i].payload.nodeDataMap.hasOwnProperty(scenarioList[j].id)) {
-                            temNodeDataMap.push(items[i].payload.nodeDataMap[scenarioList[j].id][0]);
-                            tArr.push(items[i].payload.nodeDataMap[scenarioList[j].id][0].nodeDataId);
-                        }
-                    }
-                    var tempArray = [];
-                    var nodeDataMap = {};
-                    // tempArray = items[i].payload.nodeDataMap;
-                    tempArray.push(JSON.parse(JSON.stringify((items[i].payload.nodeDataMap[minScenarioId])[0])));
-                    nodeDataMap = items[i].payload.nodeDataMap;
-                    nodeDataMap[scenarioId] = tempArray;
-                    // var nodeDataId = this.getMaxNodeDataId(items);
-                    // console.log("nodeDataId---", nodeDataId);
-                    nodeDataMap[scenarioId][0].nodeDataId = "";
-                    items[i].payload.nodeDataMap = nodeDataMap;
-                }
-                console.log("items-----------%%%%%%", items);
-                console.log("tArr---", tArr);
-
-            }
-        } else if (type == 2 || type == 3) {
-            scenarioId = this.state.selectedScenario;
-            var scenario1 = scenarioList.filter(x => x.id == scenarioId)[0];
-            var findNodeIndex = scenarioList.findIndex(n => n.id == scenarioId);
-            if (type == 2) {
-                console.log("this.state.scenario---", this.state.scenario);
-                scenarioList[findNodeIndex] = this.state.scenario;
-                console.log("my scenarioList---", scenarioList);
-            } else if (type == 3) {
-                items = [];
-                scenarioId = '';
-                scenario1.active = false;
-                scenarioList[findNodeIndex] = scenario1;
-            }
-
-
-        }
-
-        curTreeObj.scenarioList = scenarioList;
-        this.setState({
-            showDiv1: false,
-            curTreeObj,
-            items,
-            selectedScenario: scenarioId,
-            scenarioList: scenarioList.filter(x => x.active == true),
-            openAddScenarioModal: false,
-            isChanged: true
-        }, () => {
-            console.log("final tab list---", this.state.items);
+        var result = scenarioList.filter(x => x.label.label_en.trim() == scenario.label.label_en.trim());
+        if ((type == 1 && result.length == 0) || (type == 2 && ((result.length == 1 && scenario.id == result[0].id) || result.length == 0)) || type == 3) {
             if (type == 1) {
-                var maxNodeDataId = temNodeDataMap.length > 0 ? Math.max(...temNodeDataMap.map(o => o.nodeDataId)) : 0;
-                console.log("scenarioId---", scenarioId);
-                for (var i = 0; i < items.length; i++) {
-                    maxNodeDataId = parseInt(maxNodeDataId) + 1;
-                    (items[i].payload.nodeDataMap[scenarioId])[0].nodeDataId = maxNodeDataId;
-                    console.log("my node data id--->", (items[i].payload.nodeDataMap[scenarioId])[0].nodeDataId);
+                var maxScenarioId = Math.max(...scenarioList.map(o => o.id));
+                var minScenarioId = Math.min(...scenarioList.map(o => o.id));
+                scenarioId = parseInt(maxScenarioId) + 1;
+                var newTabObject = {
+                    id: scenarioId,
+                    label: {
+                        label_en: scenario.label.label_en
+                    },
+                    notes: scenario.notes,
+                    active: true
+                };
+                // console.log("tab data---", newTabObject);
+                scenarioList = [...scenarioList, newTabObject];
+                // console.log("tabList---", tabList1)
+                if (this.state.treeId != "") {
+                    if (this.state.scenarioList.length > 1) {
+
+                    }
+
+                    console.log("***>minScenarioId---", items);
+                    var tArr = [];
+                    for (var i = 0; i < items.length; i++) {
+                        for (let j = 0; j < scenarioList.length; j++) {
+                            if (items[i].payload.nodeDataMap.hasOwnProperty(scenarioList[j].id)) {
+                                temNodeDataMap.push(items[i].payload.nodeDataMap[scenarioList[j].id][0]);
+                                tArr.push(items[i].payload.nodeDataMap[scenarioList[j].id][0].nodeDataId);
+                            }
+                        }
+                        var tempArray = [];
+                        var nodeDataMap = {};
+                        // tempArray = items[i].payload.nodeDataMap;
+                        tempArray.push(JSON.parse(JSON.stringify((items[i].payload.nodeDataMap[minScenarioId])[0])));
+                        nodeDataMap = items[i].payload.nodeDataMap;
+                        nodeDataMap[scenarioId] = tempArray;
+                        // var nodeDataId = this.getMaxNodeDataId(items);
+                        // console.log("nodeDataId---", nodeDataId);
+                        nodeDataMap[scenarioId][0].nodeDataId = "";
+                        items[i].payload.nodeDataMap = nodeDataMap;
+                    }
+                    console.log("items-----------%%%%%%", items);
+                    console.log("tArr---", tArr);
+
                 }
-                this.callAfterScenarioChange(scenarioId);
-                // this.updateTreeData();
+            } else if (type == 2 || type == 3) {
+                scenarioId = this.state.selectedScenario;
+                var scenario1 = scenarioList.filter(x => x.id == scenarioId)[0];
+                var findNodeIndex = scenarioList.findIndex(n => n.id == scenarioId);
+                if (type == 2) {
+                    console.log("this.state.scenario---", this.state.scenario);
+                    scenarioList[findNodeIndex] = this.state.scenario;
+                    console.log("my scenarioList---", scenarioList);
+                } else if (type == 3) {
+                    items = [];
+                    scenarioId = '';
+                    scenario1.active = false;
+                    scenarioList[findNodeIndex] = scenario1;
+                }
+
+
             }
-            this.saveTreeData(false);
-        });
+
+            curTreeObj.scenarioList = scenarioList;
+            this.setState({
+                showDiv1: false,
+                curTreeObj,
+                items,
+                selectedScenario: scenarioId,
+                scenarioList: scenarioList.filter(x => x.active == true),
+                openAddScenarioModal: false,
+                isChanged: true
+            }, () => {
+                console.log("final tab list---", this.state.items);
+                if (type == 1) {
+                    var maxNodeDataId = temNodeDataMap.length > 0 ? Math.max(...temNodeDataMap.map(o => o.nodeDataId)) : 0;
+                    console.log("scenarioId---", scenarioId);
+                    for (var i = 0; i < items.length; i++) {
+                        maxNodeDataId = parseInt(maxNodeDataId) + 1;
+                        (items[i].payload.nodeDataMap[scenarioId])[0].nodeDataId = maxNodeDataId;
+                        console.log("my node data id--->", (items[i].payload.nodeDataMap[scenarioId])[0].nodeDataId);
+                    }
+                    this.callAfterScenarioChange(scenarioId);
+                    // this.updateTreeData();
+                }
+                this.saveTreeData(false);
+            });
+        } else {
+            alert("Scenario name already exist.");
+        }
     }
     nodeTypeChange(value) {
         var nodeTypeId = value;
@@ -6553,6 +6620,7 @@ export default class BuildTree extends Component {
         if (event.target.name === "scenarioDesc") {
             scenario.notes = event.target.value;
         }
+        // scenario.id = 1;
         this.setState({
             scenario
         });
@@ -10451,21 +10519,12 @@ export default class BuildTree extends Component {
                                                         <Label htmlFor="languageId">{i18n.t('static.whatIf.scenario')}</Label>
 
                                                         <InputGroup>
-
-                                                            {/* <InputGroupAddon addonType="append">
-                                                                        <InputGroupText><i class="fa fa-plus icons" aria-hidden="true" data-toggle="tooltip" data-html="true" data-placement="bottom" onClick={this.showPopUp} title=""></i></InputGroupText>
-                                                                    </InputGroupAddon> */}
-
                                                             <Input
                                                                 type="select"
                                                                 name="scenarioId"
                                                                 id="scenarioId"
                                                                 bsSize="sm"
-                                                                // valid={!errors.languageId && this.state.user.language.languageId != ''}
-                                                                // invalid={touched.languageId && !!errors.languageId}
                                                                 onChange={(e) => { this.dataChange(e) }}
-                                                                // onClick={() => { this.onClick1() }}
-                                                                // onBlur={handleBlur}
                                                                 required
                                                                 value={this.state.selectedScenario}
                                                             >
@@ -11390,34 +11449,69 @@ export default class BuildTree extends Component {
                 <Modal isOpen={this.state.openAddScenarioModal}
                     className={'modal-md '} >
                     <ModalHeader className="modalHeaderSupplyPlan hideCross">
-                        <strong>{i18n.t('static.tree.Add/EditTreeData')}</strong>
+                        <strong>Add/Edit Scenario</strong>
                         <Button size="md" onClick={this.openScenarioModal} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
                     </ModalHeader>
                     <ModalBody>
-                        <FormGroup>
-                            <Label htmlFor="currencyId">{i18n.t('static.tree.scenarioName')}<span class="red Reqasterisk">*</span></Label>
-                            <Input type="text"
-                                id="scenarioName"
-                                name="scenarioName"
-                                onChange={(e) => { this.scenarioChange(e) }}
-                                value={this.state.scenario.label.label_en}
-                            ></Input>
-                        </FormGroup>
-                        <FormGroup>
-                            <Label htmlFor="currencyId">{i18n.t('static.common.note')}</Label>
-                            <Input type="text"
-                                id="scenarioDesc"
-                                name="scenarioDesc"
-                                onChange={(e) => { this.scenarioChange(e) }}
-                                value={this.state.scenario.notes}
-                            ></Input>
-                        </FormGroup>
-
+                        {/* Validation start */}
+                        <Formik
+                            enableReinitialize={true}
+                            initialValues={{
+                                scenarioName: this.state.scenario.label.label_en
+                            }}
+                            validate={validate(validationSchemaScenario)}
+                            onSubmit={(values, { setSubmitting, setErrors }) => {
+                                this.addScenario();
+                            }}
+                            render={
+                                ({
+                                    values,
+                                    errors,
+                                    touched,
+                                    handleChange,
+                                    handleBlur,
+                                    handleSubmit,
+                                    isSubmitting,
+                                    isValid,
+                                    setTouched,
+                                    handleReset,
+                                    setFieldValue,
+                                    setFieldTouched
+                                }) => (
+                                    <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='userForm' autocomplete="off">
+                                        <FormGroup>
+                                            <Label htmlFor="currencyId">{i18n.t('static.tree.scenarioName')}<span class="red Reqasterisk">*</span></Label>
+                                            <Input type="text"
+                                                id="scenarioName"
+                                                name="scenarioName"
+                                                valid={!errors.scenarioName && this.state.scenario.label.label_en != null ? this.state.scenario.label.label_en : '' != ''}
+                                                invalid={touched.scenarioName && !!errors.scenarioName}
+                                                onBlur={handleBlur}
+                                                onChange={(e) => { handleChange(e); this.scenarioChange(e) }}
+                                                value={this.state.scenario.label.label_en}
+                                            ></Input>
+                                            <FormFeedback>{errors.scenarioName}</FormFeedback>
+                                        </FormGroup>
+                                        <FormGroup>
+                                            <Label htmlFor="currencyId">{i18n.t('static.common.note')}</Label>
+                                            <Input type="text"
+                                                id="scenarioDesc"
+                                                name="scenarioDesc"
+                                                onChange={(e) => { this.scenarioChange(e) }}
+                                                value={this.state.scenario.notes}
+                                            ></Input>
+                                        </FormGroup>
+                                        <FormGroup className="col-md-6 pt-lg-4 float-right">
+                                            <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={this.openScenarioModal}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                            <Button type="submit" size="md" onClick={() => this.touchAllScenario(setTouched, errors)} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>
+                                        </FormGroup>
+                                    </Form>
+                                )} />
                     </ModalBody>
-                    <ModalFooter>
-                        <Button type="submit" size="md" onClick={this.addScenario} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={this.openScenarioModal}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                    </ModalFooter>
+                    {/* <ModalFooter> */}
+                    {/* <Button type="submit" size="md" onClick={this.addScenario} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={this.openScenarioModal}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
+                    {/* </ModalFooter> */}
                 </Modal>
             </Draggable>
             {/* Modal end------------------------ */}
