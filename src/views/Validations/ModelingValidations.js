@@ -661,7 +661,11 @@ class ModelingValidation extends Component {
             this.setState({
                 levelId: levelId,
                 levelUnit: levelUnit != null ? levelUnit : "",
-                nodeList: nodeList,
+                nodeList: nodeList.sort(function (a, b) {
+                    a = a.label.toLowerCase();
+                    b = b.label.toLowerCase();
+                    return a < b ? -1 : a > b ? 1 : 0;
+                }),
                 nodeIdArr: nodeIdArr,
                 nodeLabelArr: nodeLabelArr,
                 nodeVal: nodeVal,
