@@ -57,6 +57,7 @@ import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import { Prompt } from 'react-router';
 import AuthenticationService from '../Common/AuthenticationService';
+import RotatedText from 'basicprimitivesreact/dist/umd/Templates/RotatedText';
 
 
 const entityname = 'Tree Template';
@@ -561,7 +562,8 @@ export default class CreateTreeTemplate extends Component {
                     }
                 },
                 active: true
-                , flatList: []
+                , flatList: [],
+                levelList:[]
             },
             forecastMethodList: [],
             nodeTypeList: [],
@@ -674,7 +676,8 @@ export default class CreateTreeTemplate extends Component {
             currentTargetChangeNumberEdit: false,
             currentRowIndex: '',
             lastRowDeleted: false,
-            modelingChanged: false
+            modelingChanged: false,
+            levelModal: false,
 
 
         }
@@ -778,6 +781,134 @@ export default class CreateTreeTemplate extends Component {
         this.calculateParentValueFromMOM = this.calculateParentValueFromMOM.bind(this);
         this.generateMonthList = this.generateMonthList.bind(this);
         this.updateTreeData = this.updateTreeData.bind(this);
+        this.levelDeatilsSaved=this.levelDeatilsSaved.bind(this)
+    }
+
+    levelClicked(data) {
+        var name = "";
+        var unit = "";
+        var levelNo = "";
+        console.log("Data@@@@@@@@@@@@",data!="")
+        if (data != "") {
+            console.log("Data@@@@###############", data.context.levels[0])
+            var treeLevelList = this.state.treeTemplate.levelList != undefined ? this.state.treeTemplate.levelList : [];
+            var levelListFiltered = treeLevelList.filter(c => c.levelNo == data.context.levels[0]);
+            levelNo = data.context.levels[0]
+            if (levelListFiltered.length > 0) {
+                name = levelListFiltered[0].label.label_en;
+                unit = levelListFiltered[0].unit != null ? levelListFiltered[0].unit.id : "";
+            }
+            console.log("Name@@@@###########", name);
+            console.log("Unit@@@@###########", unit);
+        }
+        this.setState({
+            levelModal: !this.state.levelModal,
+            levelName: name,
+            levelNo: levelNo,
+            levelUnit: unit
+        })
+
+    }
+
+    levelNameChanged(e) {
+        this.setState({
+            levelName: e.target.value
+        })
+    }
+
+    levelUnitChange(e) {
+        var nodeUnitId = e.target.value;
+        this.setState({
+            levelUnit: e.target.value
+        })
+    }
+
+    levelDeatilsSaved() {
+        const { treeTemplate } = this.state;
+        var treeLevelList = treeTemplate.levelList != undefined ? treeTemplate.levelList : [];
+        var levelListFiltered = treeLevelList.findIndex(c => c.levelNo == this.state.levelNo);
+        var items = this.state.items;
+        if (levelListFiltered != -1) {
+            if (this.state.levelName != "") {
+                treeLevelList[levelListFiltered].label = {
+                    label_en: this.state.levelName,
+                    label_sp: "",
+                    label_pr: "",
+                    label_fr: ""
+                };
+                var label = {}
+                var levelUnit = null;
+                if (this.state.levelUnit != "") {
+                    label = this.state.nodeUnitList.filter(c => c.unitId == this.state.levelUnit)[0].label;
+                    items.map((i, count) => {
+                        if (i.level == this.state.levelNo && parseInt(i.payload.nodeType.id) <= 3) {
+                            items[count].payload.nodeUnit = {
+                                id: this.state.levelUnit,
+                                label: label
+                            }
+                        }
+                    })
+                    levelUnit = {
+                        id: parseInt(this.state.levelUnit),
+                        label: label
+                    }
+                }
+                treeLevelList[levelListFiltered].unit = levelUnit
+            } else {
+                treeLevelList.splice(levelListFiltered, 1);
+            }
+        } else {
+            if (this.state.levelName != "") {
+                var label = {}
+                var levelUnit = null;
+                if (this.state.levelUnit != "") {
+                    label = this.state.nodeUnitList.filter(c => c.unitId == this.state.levelUnit)[0].label;
+                    items.map((i, count) => {
+                        if (i.level == this.state.levelNo && parseInt(i.payload.nodeType.id) <= 3) {
+                            items[count].payload.nodeUnit = {
+                                id: this.state.levelUnit,
+                                label: label
+                            }
+                        }
+                    })
+                    levelUnit = {
+                        id: parseInt(this.state.levelUnit),
+                        label: label
+                    }
+                }
+                treeLevelList.push({
+                    levelId: null,
+                    levelNo: this.state.levelNo,
+                    label: {
+                        label_en: this.state.levelName,
+                        label_sp: "",
+                        label_pr: "",
+                        label_fr: ""
+                    },
+                    unit: levelUnit
+                })
+            }
+        }
+        treeTemplate.levelList = treeLevelList;
+        console.log("Cur Tree Obj@@@@@", treeTemplate)
+        this.setState({
+            levelModal: false,
+            treeTemplate,
+        }, () => {
+            // this.saveTreeData(false)
+            // console.log("final tab list---", this.state.items);
+            // if (type == 1) {
+            //     var maxNodeDataId = temNodeDataMap.length > 0 ? Math.max(...temNodeDataMap.map(o => o.nodeDataId)) : 0;
+            //     console.log("scenarioId---", scenarioId);
+            //     for (var i = 0; i < items.length; i++) {
+            //         maxNodeDataId = parseInt(maxNodeDataId) + 1;
+            //         (items[i].payload.nodeDataMap[scenarioId])[0].nodeDataId = maxNodeDataId;
+            //         console.log("my node data id--->", (items[i].payload.nodeDataMap[scenarioId])[0].nodeDataId);
+            //     }
+            //     this.callAfterScenarioChange(scenarioId);
+            //     this.updateTreeData();
+            // }
+        });
     }
 
     getMomValueForDateRange(startDate) {
@@ -1069,13 +1200,15 @@ export default class CreateTreeTemplate extends Component {
 
     exportPDF = () => {
         let treeLevel = this.state.items.length;
-        var treeLevelItems = []
+        var treeLevelItems = [];
+        var treeLevels = this.state.treeTemplate.levelList != undefined ? this.state.treeTemplate.levelList : [];
         for (var i = 0; i <= treeLevel; i++) {
+            var treeLevelFiltered = treeLevels.filter(c => c.levelNo == i);
             if (i == 0) {
                 treeLevelItems.push({
                     annotationType: AnnotationType.Level,
                     levels: [0],
-                    title: "Level 0",
+                    title: treeLevelFiltered.length > 0 ? getLabelText(treeLevelFiltered[0].label, this.state.lang) : "Level 0",
                     titleColor: "#002f6c",
                     fontWeight: "bold",
                     transForm: 'rotate(270deg)',
@@ -1090,7 +1223,7 @@ export default class CreateTreeTemplate extends Component {
             else if (i % 2 == 0) {
                 treeLevelItems.push(new LevelAnnotationConfig({
                     levels: [i],
-                    title: "Level " + i,
+                    title: treeLevelFiltered.length > 0 ? getLabelText(treeLevelFiltered[0].label, this.state.lang) : "Level " + i,
                     titleColor: "#002f6c",
                     fontWeight: "bold",
                     transForm: 'rotate(270deg)',
@@ -1106,7 +1239,7 @@ export default class CreateTreeTemplate extends Component {
             else {
                 treeLevelItems.push(new LevelAnnotationConfig({
                     levels: [i],
-                    title: "Level " + i,
+                    title: treeLevelFiltered.length > 0 ? getLabelText(treeLevelFiltered[0].label, this.state.lang) : "Level " + i,
                     titleColor: "#002f6c",
                     fontWeight: "bold",
                     transForm: 'rotate(270deg)',
@@ -5331,7 +5464,21 @@ export default class CreateTreeTemplate extends Component {
                             }
                         }],
                         monthsInPast: 1,
-                        monthsInFuture: 36
+                        monthsInFuture: 36,
+                        levelList: [{
+                            levelId: null,
+                            levelNo: 0,
+                            label: {
+                                label_en: "Level 0",
+                                label_sp: "",
+                                label_pr: "",
+                                label_fr: ""
+                            },
+                            unit: {
+                                id: "",
+                                label: {}
+                            }
+                        }],
                     },
                     items: [{
                         id: 1,
@@ -5898,6 +6045,31 @@ export default class CreateTreeTemplate extends Component {
         var newItem = itemConfig.context;
         newItem.parent = parent;
         newItem.id = nodeId;
+        const { treeTemplate } = this.state;
+        var treeLevelList = treeTemplate.levelList != undefined ? treeTemplate.levelList : [];
+        var levelListFiltered = treeLevelList.findIndex(c => c.levelNo == parseInt(itemConfig.context.level + 1));
+        if (levelListFiltered == -1) {
+            var label = {}
+            var unitId = this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.parentItem.payload.nodeUnit.id : this.state.currentItemConfig.context.payload.nodeUnit.id;
+            if (unitId != "") {
+                label = this.state.nodeUnitList.filter(c => c.unitId == unitId)[0].label;
+            }
+            treeLevelList.push({
+                levelId: null,
+                levelNo: parseInt(itemConfig.context.level + 1),
+                label: {
+                    label_en: "Level" + " " + parseInt(itemConfig.context.level + 1),
+                    label_sp: "",
+                    label_pr: "",
+                    label_fr: ""
+                },
+                unit: {
+                    id: parseInt(unitId),
+                    label: label
+                }
+            })
+        }
+        treeTemplate.levelList = treeLevelList;
         newItem.level = parseInt(itemConfig.context.level + 1);
         newItem.payload.nodeId = nodeId;
         var pu = this.state.planningUnitList.filter(x => x.planningUnitId == this.state.tempPlanningUnitId)[0];
@@ -5943,7 +6115,8 @@ export default class CreateTreeTemplate extends Component {
         this.setState({
             items: [...items, newItem],
             cursorItem: nodeId,
-            converionFactor: pu.multiplier
+            converionFactor: pu.multiplier,
+            treeTemplate
         }, () => {
 
             console.log("on add items-------", this.state.items);
@@ -5967,6 +6140,31 @@ export default class CreateTreeTemplate extends Component {
         var newItem = itemConfig.context;
         newItem.parent = itemConfig.context.parent;
         newItem.id = nodeId;
+        const { treeTemplate } = this.state;
+        var treeLevelList = treeTemplate.levelList != undefined ? treeTemplate.levelList : [];
+        var levelListFiltered = treeLevelList.findIndex(c => c.levelNo == parseInt(itemConfig.context.level + 1));
+        if (levelListFiltered == -1) {
+            var label = {}
+            var unitId = this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.parentItem.payload.nodeUnit.id : this.state.currentItemConfig.context.payload.nodeUnit.id;
+            if (unitId != "") {
+                label = this.state.nodeUnitList.filter(c => c.unitId == unitId)[0].label;
+            }
+            treeLevelList.push({
+                levelId: null,
+                levelNo: parseInt(itemConfig.context.level + 1),
+                label: {
+                    label_en: "Level" + " " + parseInt(itemConfig.context.level + 1),
+                    label_sp: "",
+                    label_pr: "",
+                    label_fr: ""
+                },
+                unit: {
+                    id: parseInt(unitId),
+                    label: label
+                }
+            })
+        }
+        treeTemplate.levelList = treeLevelList;
         newItem.level = parseInt(itemConfig.context.level + 1);
         newItem.payload.nodeId = nodeId;
         var parentSortOrder = items.filter(c => c.id == itemConfig.context.parent)[0].sortOrder;
@@ -5991,7 +6189,8 @@ export default class CreateTreeTemplate extends Component {
         this.setState({
             items: [...items, newItem],
             cursorItem: nodeId,
-            isSubmitClicked: false
+            isSubmitClicked: false,
+            treeTemplate
         }, () => {
             if (itemConfig.context.payload.nodeType.id == 4) {
                 this.createPUNode(JSON.parse(JSON.stringify(itemConfig)), nodeId);
@@ -6282,9 +6481,35 @@ export default class CreateTreeTemplate extends Component {
         }
         nodes[findNodeIndex] = currentItemConfig.context;
         // nodes[findNodeIndex].valueType = currentItemConfig.valueType;
+
+        const { treeTemplate } = this.state;
+
+        var treeLevelList = treeTemplate.levelList;
+        console.log("currentItemConfig.context.level == 0 && treeLevelList != undefined@@@@@@@",currentItemConfig.context.level == 0 && treeLevelList != undefined)
+        console.log("currentItemConfig.context.level == 0 && treeLevelList != undefined@@@@@@@treeLevelList",treeLevelList)
+        
+        if (currentItemConfig.context.level == 0 && treeLevelList != undefined) {
+            var levelListFiltered = treeLevelList.findIndex(c => c.levelNo == parseInt(currentItemConfig.context.level));
+            console.log("levelListFiltered@@@@@@@@@@",levelListFiltered);
+            if (levelListFiltered != -1) {
+                var unitId = currentItemConfig.context.payload.nodeType.id == 4 ? currentItemConfig.parentItem.payload.nodeUnit.id : currentItemConfig.context.payload.nodeUnit.id;
+                var label = {}
+                if (unitId != "") {
+                    label = this.state.nodeUnitList.filter(c => c.unitId == unitId)[0].label;
+                }
+                treeLevelList[levelListFiltered].unit = {
+                    id: parseInt(unitId),
+                    label: label
+                }
+
+            }
+            treeTemplate.levelList = treeLevelList;
+            console.log("TreeTemplate@@@@@@@",treeTemplate)
+        }
         this.setState({
             items: nodes,
-            isSubmitClicked: false
+            isSubmitClicked: false,
+            treeTemplate
         }, () => {
             console.log("updated tree data+++", this.state);
             this.calculateMOMData(0, 0);
@@ -8564,12 +8789,14 @@ export default class CreateTreeTemplate extends Component {
 
         let treeLevel = this.state.items.length;
         const treeLevelItems = []
+        var treeLevels = this.state.treeTemplate.levelList != undefined ? this.state.treeTemplate.levelList : [];
         for (var i = 0; i <= treeLevel; i++) {
+            var treeLevelFiltered = treeLevels.filter(c => c.levelNo == i);
             if (i == 0) {
                 treeLevelItems.push({
                     annotationType: AnnotationType.Level,
                     levels: [0],
-                    title: "Level 0",
+                    title: treeLevelFiltered.length > 0 ? getLabelText(treeLevelFiltered[0].label, this.state.lang) : "Level 0",
                     titleColor: "#002f6c",
                     fontWeight: "bold",
                     transForm: 'rotate(270deg)',
@@ -8584,7 +8811,7 @@ export default class CreateTreeTemplate extends Component {
             else if (i % 2 == 0) {
                 treeLevelItems.push(new LevelAnnotationConfig({
                     levels: [i],
-                    title: "Level " + i,
+                    title: treeLevelFiltered.length > 0 ? getLabelText(treeLevelFiltered[0].label, this.state.lang) : "Level " + i,
                     titleColor: "#002f6c",
                     fontWeight: "bold",
                     transForm: 'rotate(270deg)',
@@ -8600,7 +8827,7 @@ export default class CreateTreeTemplate extends Component {
             else {
                 treeLevelItems.push(new LevelAnnotationConfig({
                     levels: [i],
-                    title: "Level " + i,
+                    title: treeLevelFiltered.length > 0 ? getLabelText(treeLevelFiltered[0].label, this.state.lang) : "Level " + i,
                     // titleColor: Colors.RoyalBlue,
                     titleColor: "#002f6c",
                     fontWeight: "bold",
@@ -8628,6 +8855,51 @@ export default class CreateTreeTemplate extends Component {
             defaultTemplateName: "contactTemplate",
             linesColor: Colors.Black,
             annotations: treeLevelItems,
+            onLevelTitleRender: ((data) => {
+                var { context, width, height } = data;
+                var { title, titleColor } = context;
+                var style = {
+                    position: "absolute",
+                    fontSize: "12px",
+                    fontFamily: "Trebuchet MS, Tahoma, Verdana, Arial, sans-serif",
+                    WebkitTapHighlightColor: "rgba(0,0,0,0)",
+                    WebkitUserSelect: "none",
+                    WebkitTouchCallout: "none",
+                    KhtmlUserSelect: "none",
+                    MozUserSelect: "none",
+                    msUserSelect: "none",
+                    userSelect: "none",
+                    boxSizing: "content-box",
+
+                    MozBorderRadius: "4px",
+                    WebkitBorderRadius: "4px",
+                    KhtmlBorderRadius: "4px",
+                    BorderRadius: "4px",
+
+                    background: "royalblue",
+                    borderWidth: 0,
+                    color: "white",
+                    padding: 0,
+                    width: "100%",
+                    height: "100%",
+                    left: "-1px",
+                    top: "-1px"
+                }
+                return <div style={{ ...style, background: titleColor }} onClick={(event) => {
+                    event.stopPropagation();
+                    //   console.log("Data@@@1111----------->",data)
+                    //   alert(`User clicked on level title ${title}`)
+                    this.levelClicked(data)
+                }}>
+                    <RotatedText
+                        width={width}
+                        height={height}
+                        orientation={'RotateRight'}
+                        horizontalAlignment={'center'}
+                        verticalAlignment={'middle'}
+                    >{title}</RotatedText>
+                </div>
+            }),
             onButtonsRender: (({ context: itemConfig }) => {
                 return <>
                     {itemConfig.parent != null &&
@@ -8666,6 +8938,11 @@ export default class CreateTreeTemplate extends Component {
                                 console.log("add button called---------");
                                 event.stopPropagation();
                                 console.log("add node----", itemConfig);
+                                var getLevelUnit = this.state.treeTemplate.levelList != undefined ? this.state.treeTemplate.levelList.filter(c => c.levelNo == itemConfig.level + 1) : [];
+                                var levelUnitId = ""
+                                if (getLevelUnit.length > 0) {
+                                    levelUnitId = getLevelUnit[0].unit != null ? getLevelUnit[0].unit.id : "";
+                                }
                                 this.setState({
                                     tempPlanningUnitId: '',
                                     showMomDataPercent: false,
@@ -8694,7 +8971,7 @@ export default class CreateTreeTemplate extends Component {
                                                     id: ''
                                                 },
                                                 nodeUnit: {
-                                                    id: ''
+                                                    id: levelUnitId
                                                 },
                                                 nodeDataMap: [
                                                     [
@@ -8974,7 +9251,8 @@ export default class CreateTreeTemplate extends Component {
                                             forecastMethod: {
                                                 id: template.forecastMethod.id
                                             },
-                                            flatList: flatList
+                                            flatList: flatList,
+                                            levelList:template.levelList
                                         }
                                         console.log("template obj---", templateObj);
 
@@ -9483,7 +9761,52 @@ export default class CreateTreeTemplate extends Component {
             </Modal>
             {/* </Draggable> */}
             {/* Scenario Modal end------------------------ */}
-
+{/* Modal for level */}
+            <Modal isOpen={this.state.levelModal}
+                className={'modal-md'}>
+                <ModalHeader toggle={() => this.levelClicked("")} className="modalHeader">
+                    <strong>{i18n.t('static.tree.levelDetails')}</strong>
+                </ModalHeader>
+                <ModalBody>
+                    <FormGroup>
+                        <Label htmlFor="currencyId">{i18n.t('static.tree.levelName')}<span class="red Reqasterisk">*</span></Label>
+                        <Input type="text"
+                            id="levelName"
+                            name="levelName"
+                            required
+                            onChange={(e) => { this.levelNameChanged(e) }}
+                            value={this.state.levelName}
+                        ></Input>
+                    </FormGroup>
+                    <FormGroup>
+                        <Label htmlFor="currencyId">{i18n.t('static.tree.nodeUnit')}</Label>
+                        <Input
+                            type="select"
+                            id="levelUnit"
+                            name="levelUnit"
+                            bsSize="sm"
+                            onChange={(e) => { this.levelUnitChange(e) }}
+                            value={this.state.levelUnit}
+                        >
+                            <option value="">{i18n.t('static.common.select')}</option>
+                            {this.state.nodeUnitList.length > 0
+                                && this.state.nodeUnitList.map((item, i) => {
+                                    return (
+                                        <option key={i} value={item.unitId}>
+                                            {getLabelText(item.label, this.state.lang)}
+                                        </option>
+                                    )
+                                }, this)}
+                        </Input>
+                    </FormGroup>
+                </ModalBody>
+                <ModalFooter>
+                    <div className="mr-0">
+                        <Button type="submit" size="md" color="success" className="submitBtn float-right" onClick={this.levelDeatilsSaved}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>
+                    </div>
+                    <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.levelClicked("")}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                </ModalFooter>
+            </Modal>
         </div>
     }
 }
