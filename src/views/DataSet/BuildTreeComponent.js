@@ -6897,7 +6897,9 @@ export default class BuildTree extends Component {
                 label_sp: '',
                 label_pr: ''
             }
+            console.log("node unit label---",label);
             currentItemConfig.context.payload.nodeUnit.label = label;
+            console.log("after node unit label---",currentItemConfig);
 
         }
         if (event.target.name === "percentageOfParent") {
@@ -7856,7 +7858,13 @@ export default class BuildTree extends Component {
                             display: true,
                             // labelString: this.state.currentItemConfig.context.payload.nodeUnit.label != null ? this.state.currentItemConfig.context.payload.nodeType.id > 3 ? getLabelText(this.state.currentItemConfig.parentItem.payload.nodeUnit.label, this.state.lang) : getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang) : '',
                             // labelString: this.state.currentItemConfig.context.payload.nodeUnit.label != null ? this.state.currentItemConfig.context.payload.nodeType.id > 3 ? getLabelText(this.state.currentItemConfig.parentItem.payload.nodeUnit.label, this.state.lang) : getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang) : '',
-                            labelString: this.state.currentItemConfig.context.payload.nodeType.id > 3 ? this.state.currentItemConfig.context.payload.nodeUnit.id != "" ? getLabelText(this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label, this.state.lang) : "" : this.state.currentItemConfig.context.payload.nodeUnit.label != null ? getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang) : "",
+                            labelString: this.state.currentItemConfig.context.payload.nodeType.id > 2 ? 
+                            this.state.currentItemConfig.context.payload.nodeUnit.id != "" ? 
+                            getLabelText(this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label, this.state.lang) 
+                            : "" 
+                            : this.state.currentItemConfig.context.payload.nodeUnit.label != null ? 
+                            getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang) 
+                            : "",
                             // labelString: "",
                             fontColor: 'black'
                         },
