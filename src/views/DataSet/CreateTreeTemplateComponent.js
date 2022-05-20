@@ -1577,7 +1577,7 @@ export default class CreateTreeTemplate extends Component {
             // fuLabels: []
         }, () => {
             if (nodeTypeId == 4) {
-                this.getForecastingUnitListByTracerCategoryId(0);
+                this.getForecastingUnitListByTracerCategoryId(0, 0);
             }
             console.log("currentItemConfig after---", this.state.orgCurrentItemConfig)
         });
@@ -1988,7 +1988,7 @@ export default class CreateTreeTemplate extends Component {
 
         }
         if (this.state.currentModelingType == 5) {
-            var momValue = (parseFloat(getValue/monthDifference)).toFixed(4);
+            var momValue = (parseFloat(getValue / monthDifference)).toFixed(4);
         }
 
         var targetChangeNumber = '';
@@ -4194,7 +4194,7 @@ export default class CreateTreeTemplate extends Component {
             fuValues: { value: usageTemplate.forecastingUnit.id, label: getLabelText(usageTemplate.forecastingUnit.label, this.state.lang) + " | " + usageTemplate.forecastingUnit.id },
         }, () => {
             console.log("copy from template---", this.state.currentItemConfig);
-            this.getForecastingUnitListByTracerCategoryId(0);
+            this.getForecastingUnitListByTracerCategoryId(0, usageTemplate.forecastingUnit.id);
             this.getNoOfMonthsInUsagePeriod();
             this.getNoFURequired();
             this.getNoOfFUPatient();
@@ -4461,7 +4461,7 @@ export default class CreateTreeTemplate extends Component {
         });
 
     }
-    getForecastingUnitListByTracerCategoryId(type) {
+    getForecastingUnitListByTracerCategoryId(type, isUsageTemplate) {
         var tracerCategoryId = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.tracerCategory.id;
         console.log("tracerCategoryId new---", tracerCategoryId)
         if (tracerCategoryId != "" && tracerCategoryId != undefined && tracerCategoryId != 'undefined') {
@@ -4504,7 +4504,11 @@ export default class CreateTreeTemplate extends Component {
                             this.getPlanningUnitListByFUId(response.data[0].forecastingUnitId);
                         })
                     } else if (this.state.addNodeFlag) {
-                        this.setState({ planningUnitList: [] });
+                        if (isUsageTemplate > 0) {
+                            this.getPlanningUnitListByFUId(isUsageTemplate);
+                        } else {
+                            this.setState({ planningUnitList: [] });
+                        }
                     }
                     // else {
                     //     const currentItemConfig = this.state.currentItemConfig;
@@ -6210,7 +6214,7 @@ export default class CreateTreeTemplate extends Component {
                     // });
                 }
                 if (data.context.payload.nodeType.id == 4) {
-                    this.getForecastingUnitListByTracerCategoryId(1);
+                    this.getForecastingUnitListByTracerCategoryId(1, 0);
                     this.setState({
                         fuValues: { value: (data.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id, label: getLabelText((data.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label, this.state.lang) + " | " + (data.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id }
                         // fuLabels: getLabelText(this.state.currentScenario.fuNode.forecastingUnit.label, this.state.lang) + " | " + this.state.currentScenario.fuNode.forecastingUnit.id
@@ -7188,7 +7192,7 @@ export default class CreateTreeTemplate extends Component {
                                                     // invalid={touched.tracerCategoryId && !!errors.tracerCategoryId}
                                                     onBlur={handleBlur}
                                                     onChange={(e) => {
-                                                        this.dataChange(e); this.getForecastingUnitListByTracerCategoryId(0)
+                                                        this.dataChange(e); this.getForecastingUnitListByTracerCategoryId(0, 0)
                                                     }}
                                                     required
                                                     value={this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.forecastingUnit.tracerCategory.id : ""}
