@@ -3066,7 +3066,7 @@ export default class BuildTree extends Component {
                             modelingJexcelLoader: false
                         }, () => {
                             // setTimeout(() => {
-                            alert("You are creating a new node.Please submit the node data first and then apply modeling/transfer.");
+                            alert(i18n.t('static.buildTreeComp.creatingANewNode'));
                             // confirmAlert({
                             //     message: "You are creating a new node.Please submit the node data first and then apply modeling/transfer.",
                             //     buttons: [
@@ -3824,7 +3824,7 @@ export default class BuildTree extends Component {
                     // at start
                     if (obj.options.allowInsertRow == true) {
                         items.push({
-                            title: "Insert Row",
+                            title: i18n.t('static.buildTreeComp.InsertRow'),
                             onclick: function () {
                                 var data = [];
                                 data[0] = ''
@@ -3967,7 +3967,7 @@ export default class BuildTree extends Component {
                 })
 
             } else {
-                alert("Please select modeling type before proceeding.");
+                alert(i18n.t('static.buildTreeComp.selectModelingTypeBeforeProceeding'));
                 // confirmAlert({
                 //     message: "Please select modeling type before proceeding.",
                 //     buttons: [
@@ -4634,7 +4634,7 @@ export default class BuildTree extends Component {
         });
 
         Packer.toBlob(doc).then(blob => {
-            saveAs(blob, this.state.dataSetObj.programData.programCode + "-" + i18n.t("static.supplyPlan.v") + this.state.dataSetObj.programData.currentVersion.versionId + "-" + i18n.t('static.common.managetree') + "-" + "TreeValidation" + "-" + document.getElementById("treeId").selectedOptions[0].text + "-" + document.getElementById("scenarioId").selectedOptions[0].text + ".docx");
+            saveAs(blob, this.state.dataSetObj.programData.programCode + "-" + i18n.t("static.supplyPlan.v") + this.state.dataSetObj.programData.currentVersion.versionId + "-" + i18n.t('static.common.managetree') + "-" + i18n.t('static.buildTreeComp.treeValidation') + "-" + document.getElementById("treeId").selectedOptions[0].text + "-" + document.getElementById("scenarioId").selectedOptions[0].text + ".docx");
         });
     }
 
@@ -4877,7 +4877,7 @@ export default class BuildTree extends Component {
                 window.saveAs(string, this.state.dataSetObj.programData.programCode + "-" + i18n.t("static.supplyPlan.v") + this.state.dataSetObj.programData.currentVersion.versionId + "-" + i18n.t('static.common.managetree') + "-" + document.getElementById("treeId").selectedOptions[0].text + "-" + document.getElementById("scenarioId").selectedOptions[0].text + ".pdf");
             }.bind(this));
         } else {
-            alert('Error: Failed to create file stream.');
+            alert(i18n.t('static.buildTreeComp.failToCreateFileStream'));
         }
 
     }
@@ -5744,7 +5744,7 @@ export default class BuildTree extends Component {
                         usageText = i18n.t('static.usageTemplate.every') + " " + addCommas(noOfPersons) + " " + selectedText.trim() + "" + i18n.t('static.usageTemplate.requires') + " " + addCommas(noOfForecastingUnitsPerPerson) + " " + selectedText1.trim() + "(s)";
                     }
                 } else {
-                    usageText = i18n.t('static.usageTemplate.every') + " " + addCommas(noOfPersons) + " " + selectedText.trim() + "" + i18n.t('static.usageTemplate.requires') + " " + addCommas(noOfForecastingUnitsPerPerson) + " " + selectedText1.trim() + "(s) " + i18n.t('static.usageTemplate.every') + " " + addCommas(usageFrequency) + " " + selectedText2.trim() + " indefinitely";
+                    usageText = i18n.t('static.usageTemplate.every') + " " + addCommas(noOfPersons) + " " + selectedText.trim() + "" + i18n.t('static.usageTemplate.requires') + " " + addCommas(noOfForecastingUnitsPerPerson) + " " + selectedText1.trim() + "(s) " + i18n.t('static.usageTemplate.every') + " " + addCommas(usageFrequency) + " " + selectedText2.trim() + " "+i18n.t('static.buildTreeComp.indefinately');
                 }
             } else {
                 //PU
@@ -8446,7 +8446,7 @@ export default class BuildTree extends Component {
                                             </FormGroup>
                                             {this.state.currentItemConfig.context.payload.nodeType.id == 5 && <>
                                                 <FormGroup className="col-md-2" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 5 ? 'block' : 'none' }}>
-                                                    <Label htmlFor="currencyId">{this.state.currentItemConfig.parentItem != null && this.state.parentScenario.fuNode != null && this.state.parentScenario.fuNode.usageType.id == 2 ? "QAT Calculated PU per interval per " : "QAT Calculated PU per usage per "}{this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.parent != null && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id).length > 0 && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id)[0].label.label_en}?</Label>
+                                                    <Label htmlFor="currencyId">{this.state.currentItemConfig.parentItem != null && this.state.parentScenario.fuNode != null && this.state.parentScenario.fuNode.usageType.id == 2 ? i18n.t('static.buildTreeComp.calculatePUPerInterval')+" " : i18n.t('static.buildTreeComp.CalculatePuPerUsage')+" "}{this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.parent != null && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id).length > 0 && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id)[0].label.label_en}?</Label>
                                                 </FormGroup>
                                                 <FormGroup className="col-md-10" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 5 ? 'block' : 'none' }}>
                                                     <Input type="number"
@@ -8460,7 +8460,7 @@ export default class BuildTree extends Component {
                                                     </Input>
                                                 </FormGroup></>}
                                             <FormGroup className="col-md-2" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 5 ? 'block' : 'none' }}>
-                                                <Label htmlFor="currencyId">{this.state.currentItemConfig.parentItem != null && this.state.parentScenario.fuNode != null && this.state.parentScenario.fuNode.usageType.id == 2 ? "How many PU per interval per " : "How many PU per usage per "}{this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.parent != null && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id).length > 0 && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id)[0].label.label_en}?</Label>
+                                                <Label htmlFor="currencyId">{this.state.currentItemConfig.parentItem != null && this.state.parentScenario.fuNode != null && this.state.parentScenario.fuNode.usageType.id == 2 ? i18n.t('static.buildTreeComp.howManyPUPerInterval')+" " : i18n.t('static.buildTreeComp.howManyPUPerUsage')+" "}{this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.parent != null && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id).length > 0 && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id)[0].label.label_en}?</Label>
                                             </FormGroup>
                                             <FormGroup className="col-md-10" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 5 ? 'block' : 'none' }}>
                                                 <Input type="number"
@@ -9222,7 +9222,7 @@ export default class BuildTree extends Component {
                                         <input type="hidden" id="percentForOneMonth" name="percentForOneMonth" value={this.state.percentForOneMonth} />
                                         <FormGroup className="col-md-5">
                                             <Label htmlFor="currencyId">
-                                                {this.state.currentItemConfig.context.payload.nodeType.id > 2 ? 'Change (% points)' : 'Target change (%)'}
+                                                {this.state.currentItemConfig.context.payload.nodeType.id > 2 ? i18n.t('static.buildTreeComp.change%Points') : i18n.t('static.buildTreeComp.targetChange%')}
                                                 <span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover26" onClick={this.toggleTargetChangePercent} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                             <Input type="number"
                                                 id="currentTargetChangePercentage"
@@ -9305,7 +9305,7 @@ export default class BuildTree extends Component {
                                                     <Label
                                                         className="form-check-label"
                                                         check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                        <b>{'Linear (%)'}</b>
+                                                        <b>{i18n.t('static.buildTreeComp.Linear')}{' (%)'}</b>
                                                     </Label>
                                                 </div>
                                                 }
@@ -9322,7 +9322,7 @@ export default class BuildTree extends Component {
                                                     <Label
                                                         className="form-check-label"
                                                         check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                        <b>{'Linear (#)'}</b>
+                                                        <b>{i18n.t('static.buildTreeComp.Linear')}{' (#)'}</b>
                                                     </Label>
                                                 </div>}
                                                 {this.state.currentItemConfig.context.payload.nodeType.id > 2 && <div className="col-md-12 form-group">
@@ -9338,7 +9338,7 @@ export default class BuildTree extends Component {
                                                     <Label
                                                         className="form-check-label"
                                                         check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                        <b>{'Linear (% point)'}</b>
+                                                        <b>{i18n.t('static.buildTreeComp.Linear')}{' (% point)'}</b>
                                                     </Label>
                                                 </div>}
                                             </div>
@@ -9397,7 +9397,7 @@ export default class BuildTree extends Component {
                                                 <Label
                                                     className="form-check-label"
                                                     check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                    <b>{'Manual Change affects future month'}</b>
+                                                    <b>{i18n.t('static.buildTreeComp.manualChangesAffect')}</b>
                                                 </Label>
                                             </div>
                                             <div>
@@ -9413,7 +9413,7 @@ export default class BuildTree extends Component {
                                                 <Label
                                                     className="form-check-label"
                                                     check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                    <b>{'Show Seasonality & manual change'}</b>
+                                                    <b>{i18n.t('static.buildTreeComp.showSeasonalityAndmanualChange')}</b>
                                                 </Label>
                                             </div>
                                         </div>
@@ -9627,7 +9627,7 @@ export default class BuildTree extends Component {
             })
         } else {
             if (type == 1) {
-                alert("Please select date within forecast range");
+                alert(i18n.t('static.buildTreeComp.selectDateWithinForecast'));
             }
         }
     }
@@ -9817,7 +9817,7 @@ export default class BuildTree extends Component {
                     <div className="ContactPhone ContactPhoneValue">
                         <span style={{ textAlign: 'center', fontWeight: '500' }}>{this.getPayloadData(itemConfig, 1)}</span>
                         <div style={{ overflow: 'inherit', fontStyle: 'italic' }}><p className="" style={{ textAlign: 'center' }}>{this.getPayloadData(itemConfig, 2)}</p></div>
-                        {this.state.showModelingValidation && <div className="treeValidation"><span style={{ textAlign: 'center', fontWeight: '500' }}>{this.getPayloadData(itemConfig, 3) != "" ? "Sum of children: " : ""}</span><span className={this.getPayloadData(itemConfig, 3) != 100 ? "treeValidationRed" : ""}>{this.getPayloadData(itemConfig, 3) != "" ? this.getPayloadData(itemConfig, 3) + "%" : ""}</span></div>}
+                        {this.state.showModelingValidation && <div className="treeValidation"><span style={{ textAlign: 'center', fontWeight: '500' }}>{this.getPayloadData(itemConfig, 3) != "" ? i18n.t('static.buildTreeComp.sumOfChildren')+" " : ""}</span><span className={this.getPayloadData(itemConfig, 3) != 100 ? "treeValidationRed" : ""}>{this.getPayloadData(itemConfig, 3) != "" ? this.getPayloadData(itemConfig, 3) + "%" : ""}</span></div>}
                     </div>
                 </div>
             ))
@@ -10037,7 +10037,7 @@ export default class BuildTree extends Component {
                                 onClick={(event) => {
                                     event.stopPropagation();
                                     confirmAlert({
-                                        message: "Are you sure you want to delete this node.",
+                                        message: i18n.t('static.buildTreeComp.sureYouWantToDeleteNode'),
                                         buttons: [
                                             {
                                                 label: i18n.t('static.program.yes'),
@@ -10312,7 +10312,7 @@ export default class BuildTree extends Component {
                             <div className="Card-header-reporticon pb-1">
                                 <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
                                 <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span>
-                                <span className="compareAndSelect-larrowText" style={{ cursor: 'pointer' }} onClick={this.cancelClicked}> {i18n.t('static.common.backTo')} <small className="supplyplanformulas">{'Tree List'}</small></span>
+                                <span className="compareAndSelect-larrowText" style={{ cursor: 'pointer' }} onClick={this.cancelClicked}> {i18n.t('static.common.backTo')} <small className="supplyplanformulas">{i18n.t('static.buildTreeComp.treeList')}</small></span>
                                 <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')}  <a href="/#/validation/productValidation" className="supplyplanformulas">{i18n.t('static.dashboard.productValidation')}</a> {i18n.t('static.tree.or')} <a href="/#/validation/modelingValidation" className="supplyplanformulas">{i18n.t('static.dashboard.modelingValidation')}</a> </span>
                             </div>
                             {/* <div className="card-header-actions">
@@ -10456,9 +10456,9 @@ export default class BuildTree extends Component {
                                                                             <i class="fa fa-cog icons" data-bind="label" id="searchLabel" title=""></i>
                                                                         </DropdownToggle>
                                                                         <DropdownMenu right className="MarginLeftDropdown">
-                                                                            <DropdownItem onClick={() => { this.openScenarioModal(1) }}>Add Scenario</DropdownItem>
-                                                                            <DropdownItem onClick={() => { this.openScenarioModal(2) }}>Edit Scenario</DropdownItem>
-                                                                            <DropdownItem onClick={() => { this.openScenarioModal(3) }}>Delete Scenario</DropdownItem>
+                                                                            <DropdownItem onClick={() => { this.openScenarioModal(1) }}>{i18n.t('static.buildTreeComp.addScenario')}</DropdownItem>
+                                                                            <DropdownItem onClick={() => { this.openScenarioModal(2) }}>{i18n.t('static.buildTreeComp.editScenario')}</DropdownItem>
+                                                                            <DropdownItem onClick={() => { this.openScenarioModal(3) }}>{i18n.t('static.buildTreeComp.deleteScenario')}</DropdownItem>
                                                                         </DropdownMenu>
                                                                     </ButtonDropdown>
                                                                 </InputGroupText>
@@ -10480,7 +10480,7 @@ export default class BuildTree extends Component {
                                                     {this.state.showDate && <FormGroup className="col-md-3 pl-lg-0">
                                                         <Label htmlFor="languageId">
                                                             {/* {i18n.t('static.supplyPlan.date')}  */}
-                                                            Display Date <i>({i18n.t('static.consumption.forcast')}: {this.state.forecastPeriod})</i></Label>
+                                                            {i18n.t('static.buildTreeComp.DispalyDate')} <i>({i18n.t('static.consumption.forcast')}: {this.state.forecastPeriod})</i></Label>
                                                         <div className="controls edit">
                                                             <Picker
                                                                 ref={this.pickAMonth3}
@@ -10874,15 +10874,15 @@ export default class BuildTree extends Component {
                 <div>
                     <ModalBody>
                         <div>
-                            <h3 className='ShowGuidanceHeading'>Add/Edit Node - Modeling/Transfer </h3>
+                            <h3 className='ShowGuidanceHeading'>{i18n.t('static.buildTreeComp.AddEditNodeModelingTransfer')} </h3>
                         </div>
                         <p>
-                            <p style={{ fontSize: '14px' }}><span className="UnderLineText">{i18n.t('static.listTree.purpose')} :</span>If a node changes over time, a user can utilize the Modeling/Transfer tab to model growth/loss within a single node or a transfer from one node to another. Note that this functionality is only available for Number (#) Nodes and Percentage (%) Nodes (including Forecasting Units and Planning Units). </p>
+                            <p style={{ fontSize: '14px' }}><span className="UnderLineText">{i18n.t('static.listTree.purpose')} :</span>{i18n.t('static.buildTreeComp.nodeChangesOverTime')} </p>
                         </p>
 
                         <p>
-                            <p style={{ fontSize: '14px' }}><span className="UnderLineText">Using this tab :</span>
-                                <br></br>Modeling and transfer can have four different modeling types: </p>
+                            <p style={{ fontSize: '14px' }}><span className="UnderLineText">{i18n.t('static.buildTreeComp.usingThisTab')} :</span>
+                                <br></br>{i18n.t('static.buildTreeComp.modelingAndTranferHaveDifferentModelingType')} </p>
                         </p>
 
                         <p>
@@ -10892,34 +10892,34 @@ export default class BuildTree extends Component {
                                     <thead>
                                         <tr>
                                             <th style={{ width: '130px' }}>{i18n.t('static.modelingType.modelingType')}</th>
-                                            <th># Node Calculation</th>
-                                            <th>% Node Calculation</th>
+                                            <th># {i18n.t('static.buildTreeComp.nodeCalculations')}</th>
+                                            <th>% {i18n.t('static.buildTreeComp.nodeCalculations')}</th>
 
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr>
-                                            <td>Linear (#)</td>
-                                            <td>+/- a static number each month</td>
+                                            <td>{i18n.t('static.buildTreeComp.Linear')} (#)</td>
+                                            <td>+/- {i18n.t('static.buildTreeComp.staticNumEachMonth')}</td>
                                             <td>{i18n.t('static.supplyPlanFormula.na')}</td>
 
                                         </tr>
                                         <tr>
-                                            <td>Linear (%)</td>
-                                            <td>+/- a static percentage each month, calculated based on the starting month</td>
+                                            <td>{i18n.t('static.buildTreeComp.Linear')} (%)</td>
+                                            <td>+/- {i18n.t('static.buildTreeComp.staticPercentEachMonth')}</td>
                                             <td>{i18n.t('static.supplyPlanFormula.na')}</td>
 
                                         </tr>
                                         <tr>
-                                            <td>Exponential (%)</td>
-                                            <td>+/- a percentage each month, calculated on the previous month as a rolling percentage</td>
+                                            <td>{i18n.t('static.buildTreeComp.exponential')} (%)</td>
+                                            <td>+/- {i18n.t('static.buildTreeComp.percentetEachMonth')}</td>
                                             <td>N/A</td>
 
                                         </tr>
                                         <tr>
-                                            <td>Linear (% point)</td>
+                                            <td>{i18n.t('static.buildTreeComp.Linear')} (% {i18n.t('static.buildTreeComp.point')})</td>
                                             <td>{i18n.t('static.supplyPlanFormula.na')}</td>
-                                            <td>+/- a static percentage each month (e.g. if the starting month is 30% and the change is +1% each month, next month is 31%, the next is 32%, and so on)</td>
+                                            <td>+/- {i18n.t('static.buildTreeComp.staticPercentEachMonthIfStartingMonthIs30%')}</td>
 
                                         </tr>
 
@@ -10928,48 +10928,48 @@ export default class BuildTree extends Component {
                             </div>
                         </p>
 
-                        <p><b><i class="fa fa-calculator" aria-hidden="true"></i></b> QAT has a modeling calculator tool for users should they need assistance in calculating the month-on-month change over time based on an ending target date & percentage or total percentage change over time. The modelling calculator is only available for a # node and a % node.<br>
-                        </br>Additionally, by clicking on “Show Monthly Data,” users can see how their modelling and transfer inputs have affected the monthly data in both a graphical and tabular form. In the tabular data, users may add a manual change for a specific month or input a seasonality index percentage (only available for % nodes), as needed. If a user checks “Manual Change affects future month,” the manual amount added to the end of the month will carry over to the beginning of the next month. If neither of these fields are relevant, users can uncheck “Show (seasonality &) manual change” to hide these columns.
+                        <p><b><i class="fa fa-calculator" aria-hidden="true"></i></b> {i18n.t('static.buildTreeComp.qatModelingCalculationTool')}<br>
+                        </br>{i18n.t('static.buildTreeComp.additionallyClickingOnMonthlyData')}
                         </p>
 
-                        <p><span style={{ fontSize: '14px' }} className="UnderLineText">Rules for Transfer Nodes:</span>
+                        <p><span style={{ fontSize: '14px' }} className="UnderLineText">{i18n.t('static.buildTreeComp.rulesForTransferNode')}:</span>
                             <ul>
                                 {/* <li>Transfers must occur between nodes be on the same level</li>
                                 <li>Users can only transfer to nodes that are of the same type (i.e. a forecasting unit may transfer node data to another forecasting unit, but not a planning unit as they are not the same node type).</li>
                                 <li>The order of operations for calculating a transfer occurs from the left to the right in the forecast tree. A transfer cannot be made from right to left, thus a user should be careful when designing their tree and determining where each node should be placed. </li>
                                 <li>Transfers are always negative from the source node and positive to the destination node.</li> */}
-                                <li>Number node can transfer to another number only but they should be at the same level</li>
-                                <li>Percentage,FU & PU nodes can transfer to each othet but they should belog to the same parent</li>
+                                <li>{i18n.t('static.buildTreeComp.')}</li>
+                                <li>{i18n.t('static.buildTreeComp.percentetFUPUNodes')}</li>
                             </ul>
                         </p>
-                        <p><span style={{ fontSize: '14px' }} className="UnderLineText">Examples :</span>
+                        <p><span style={{ fontSize: '14px' }} className="UnderLineText">{i18n.t('static.buildTreeComp.example')} :</span>
                             <ul>
-                                <li><b>Simple Growth</b> (linear #) - the example below shows a population growth each month by 500/month from January 2022 to December 2024.   
+                                <li><b>{i18n.t('static.buildTreeComp.simpleGrowth')}</b> {i18n.t('static.buildTreeComp.exampleBelowShowPopularGrowth')}
                                 <br></br>
                                 <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0" src={ModelingTransferScreenshot1} style={{border:'1px solid #fff'}}/></span>
                                 </li>
-                                <li><b>Simple Loss</b> (linear #) - the example below shows attrition each month by 100/month from January 2022 to December 2024. QAT utilizes a negative number to denote a decrease or loss.
+                                <li><b>{i18n.t('static.buildTreeComp.simpleLoss')}</b> {i18n.t('static.buildTreeComp.exampleBelowShowAttrition')}
                                 <br></br>
                                 <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0" src={ModelingTransferScreenshot2} style={{border:'1px solid #fff'}}/></span>
                                  </li>
-                                <li><b>Simple Growth</b> (linear %) – the example below shows a steady population growth each month by 2% from January 2022 to December 2024. QAT has calculated this change to be increasing the population by 108.64 each month.
+                                <li><b>{i18n.t('static.buildTreeComp.simpleGrowth')}</b> {i18n.t('static.buildTreeComp.exampleBelowShowSteady')}
                                 <br></br>
                                 <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0" src={ModelingTransferScreenshot3} style={{border:'1px solid #fff'}}/></span>
                                  </li>
-                                 <li><b>Simple Growth</b> (exponential %) - the example below shows a population growth each month by 1% from January 2022 to December 2024. Because the growth is exponential, the change differs each month.  
+                                 <li><b>{i18n.t('static.buildTreeComp.simpleGrowth')}</b> {i18n.t('static.buildTreeComp.exampleBelowShowPopulation')}
                                         <ul>
-                                            <li>QAT calculates this change to be 54.32 in Jan-22 month, </li>
-                                            <li>QAT calculates this change to be 54.86 in Feb-22 month, and </li>
-                                            <li>QAT calculates this change to be 55.41 in Mar-22 </li>
+                                            <li>{i18n.t('static.buildTreeComp.QATCalculationChanges')} </li>
+                                            <li>{i18n.t('static.buildTreeComp.QATCalculationChanges54.32')} </li>
+                                            <li>{i18n.t('static.buildTreeComp.QATCalculatesChange55.41')} </li>
                                         </ul>
                                         
                                         <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0" src={ModelingTransferScreenshot4} style={{border:'1px solid #fff'}}/></span>
                                 </li>
-                                <li><b>Multi-year Loss</b> - the example below shows a different rate of attrition (loss) each year. Year 1 (January 2022 to December 2022) decreases the population by 1% or 54.32 each month, Year 2 (January 2023 to December 2023) decreases the population by 2% or 95.6 each month, etc. QAT utilizes a negative number to denote a decrease or loss.
+                                <li><b>{i18n.t('static.buildTreeComp.multiYearLoss')}</b> - {i18n.t('static.buildTreeComp.exampleShowDifferentRates')}
                                 <br></br>
                                 <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0" src={ModelingTransferScreenshot5} style={{border:'1px solid #fff'}}/></span>
                                  </li>
-                                <li><b>{i18n.t('static.tree.transferToNode')}</b> - the example below shows a transfer of 250 patients each month for one year, January 2022 to December 2022, from the current node (Adults 1st Line) to another node (Adults 2nd Line). This transfer will also appear on the other node (Adults 2nd Line) greyed-out to signify an non-editable change.
+                                <li><b>{i18n.t('static.tree.transferToNode')}</b> - {i18n.t('static.buildTreeComp.exampleShowTransfer')}
                                 <br></br>
                                 <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0" src={ModelingTransferScreenshot6} style={{border:'1px solid #fff'}}/></span>
                                  </li>
@@ -10987,10 +10987,10 @@ export default class BuildTree extends Component {
                 <div>
                     <ModalBody>
                         <div>
-                            <h3 className='ShowGuidanceHeading'>Add/Edit Node - Node Data</h3>
+                            <h3 className='ShowGuidanceHeading'>{i18n.t('static.buildTreeComp.addEditNodeData')}</h3>
                         </div>
                         <p>
-                            <p style={{ fontSize: '14px' }}><span className="UnderLineText">{i18n.t('static.listTree.purpose')} :</span>Enable allows user to specify the type of node</p>
+                            <p style={{ fontSize: '14px' }}><span className="UnderLineText">{i18n.t('static.listTree.purpose')} :</span>{i18n.t('static.buildTreeComp.allowUserToSpecifyTypeOfNode')}</p>
                         </p>
 
                         <p>
@@ -11000,39 +11000,39 @@ export default class BuildTree extends Component {
                                     <thead>
                                         <tr>
                                             <th style={{ width: '130px' }}>{i18n.t('static.tree.nodeType')}</th>
-                                            <th>Value</th>
-                                            <th>Potential Children</th>
-                                            <th>Advanced Functionality</th>
+                                            <th>{i18n.t('static.buildTreeComp.value')}</th>
+                                            <th>{i18n.t('static.buildTreeComp.potentialChildren')}</th>
+                                            <th>{i18n.t('static.buildTreeComp.advanceFunctionality')}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr>
-                                            <td className='BgLightBlue'><b>Aggregation ∑</b></td>
-                                            <td>Sum of children</td>
-                                            <td><b style={{ color: '#002f6c' }}>∑</b> or Number</td>
+                                            <td className='BgLightBlue'><b>{i18n.t('static.buildTreeComp.aggregation')}</b></td>
+                                            <td>{i18n.t('static.buildTreeComp.sumOfChildren')}</td>
+                                            <td><b style={{ color: '#002f6c' }}>∑</b> {i18n.t('static.buildTreeComp.orNumber')}</td>
                                             <td>-</td>
                                         </tr>
                                         <tr>
                                             <td className='BgLightBlue'><b>{i18n.t('static.modelingValidation.number')} #</b></td>
-                                            <td>Defined at this node</td>
+                                            <td>{i18n.t('static.buildTreeComp.definedAtThisNode')}</td>
                                             <td>% or <b style={{ background: '#fff', color: '#002f6c', padding: '3px' }}><i class="fa fa-cube" aria-hidden="true"></i></b></td>
                                             <td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i className='fa fa-link'></i>, <i className='fa fa-line-chart'></i></td>
                                         </tr>
                                         <tr>
                                             <td className='BgLightBlue'><b>{i18n.t('static.whatIf.percentage')} %</b></td>
-                                            <td>Defined as a percentage of the parent</td>
+                                            <td>{i18n.t('static.buildTreeComp.definedAsAPercentage')}</td>
                                             <td>% or <b style={{ background: '#fff', color: '#002f6c', padding: '3px' }}><i class="fa fa-cube" aria-hidden="true"></i></b></td>
                                             <td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i className='fa fa-link'></i></td>
                                         </tr>
                                         <tr>
-                                            <td className='BgDarkBlue'><b>Forecasting Unit <i class="fa fa-cube" aria-hidden="true"></i></b></td>
-                                            <td>Defined as a percentage of the parent and forecasting unit parameters</td>
+                                            <td className='BgDarkBlue'><b>{i18n.t('static.forecastingunit.forecastingunit')} <i class="fa fa-cube" aria-hidden="true"></i></b></td>
+                                            <td>{i18n.t('static.buildTreeComp.definedAsAPercentageParentFU')}</td>
                                             <td><b style={{ background: '#fff', color: '#002f6c', padding: '3px' }}><i class="fa fa-cubes" aria-hidden="true"></i></b></td>
                                             <td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i className='fa fa-link'></i></td>
                                         </tr>
                                         <tr>
-                                            <td className='BgDarkBlue'><b>Planning Unit <i class="fa fa-cubes" aria-hidden="true"></i></b></td>
-                                            <td>Defined as a percentage of the parent and planning unit parameters</td>
+                                            <td className='BgDarkBlue'><b>{i18n.t('static.product.product')} <i class="fa fa-cubes" aria-hidden="true"></i></b></td>
+                                            <td>{i18n.t('static.buildTreeComp.definedAsAPercentageParentPU')}</td>
                                             <td>-</td>
                                             <td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i className='fa fa-link'></i></td>
                                         </tr>
@@ -11041,37 +11041,37 @@ export default class BuildTree extends Component {
                             </div>
                         </p>
 
-                        <p><span style={{ fontSize: '14px', fontWeight: 'bold' }}>Changes Over Time</span><br></br>
-                            While the tree structure stays constant throughout time, node percentages and values can change over time.  The three functionalities below are available in each node and allow the user to control how nodes change over time:
+                        <p><span style={{ fontSize: '14px', fontWeight: 'bold' }}>{i18n.t('static.buildTreeComp.changesOverTime')}</span><br></br>
+                        {i18n.t('static.buildTreeComp.treeStructureStayConstant')}
                             <ul>
-                                <li><b>Modeling/Transfer Tab</b> </li>
+                                <li><b>{i18n.t('static.buildTreeComp.modelingTranferTab')}</b> </li>
                                 <ul>
-                                    <li><b><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i> {i18n.t('static.commitTree.modeling')}:</b> Allows user to specify the exact rate of change</li>
-                                    <li><b><i className='fa fa-link'></i> {i18n.t('static.tree.transferToNode')}:</b> Allows users to link two nodes together - so the decrease</li>
+                                    <li><b><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i> {i18n.t('static.commitTree.modeling')}:</b> {i18n.t('static.buildTreeComp.allowUserToSpecifyExactRate')}</li>
+                                    <li><b><i className='fa fa-link'></i> {i18n.t('static.tree.transferToNode')}:</b> {i18n.t('static.buildTreeComp.allowUserToLinkTwoNode')}</li>
                                 </ul>
-                                <li><b>Extrapolation Tab</b> (number nodes only)</li>
+                                <li><b>{i18n.t('static.buildTreeComp.extrapolationTab')}</b> {i18n.t('static.buildTreeComp.numberNodeOnly')}</li>
                                 <ul>
-                                    <li><b><i className='fa fa-line-chart'></i> {i18n.t('static.commitTree.extrapolation')}:</b> Allows users to use historical data to extrapolate future change. , Enable this feature by checking 'Extrapolation' box. Note that if you do - the Modeling/Transfer Tab will be hidden as it is only possible to use one at a time. Any data previously entered in the Modeling/Transfer Tab will be cleared.</li>
+                                    <li><b><i className='fa fa-line-chart'></i> {i18n.t('static.commitTree.extrapolation')}:</b> {i18n.t('static.buildTreeComp.allowUserToUseHistoricalData')}</li>
                                 </ul>
                             </ul>
-                            <p>If no change over time is desired, simply do not use the 'Modeling/Transfer' and 'Extrapolation' tabs, and the node value will equal the value entered or calculated on the 'Node Data' tab.</p>
+                            <p>{i18n.t('static.buildTreeComp.noChangeOverTimeDesired')}</p>
                         </p>
 
-                        <p><span style={{ fontSize: '14px', fontWeight: 'bold' }}>Using Scenarios :</span>
-                            Scenarios are used to model different values for the same tree.
+                        <p><span style={{ fontSize: '14px', fontWeight: 'bold' }}>{i18n.t('static.buildTreeComp.usingScenarios')} :</span>
+                        {i18n.t('static.buildTreeComp.modelDifferentValues')}
                             <div className='pl-lg-4 pr-lg-4 pt-lg-4'>
                                 <table className="table table-bordered ">
                                     <thead>
                                         <tr>
-                                            <th style={{ width: '130px' }}>Fixed for All Scenarios</th>
-                                            <th style={{ width: '230px' }}>Unique to each Scenario</th>
+                                            <th style={{ width: '130px' }}>{i18n.t('static.buildTreeComp.fixedAllScenarios')}</th>
+                                            <th style={{ width: '230px' }}>{i18n.t('static.buildTreeComp.uniqueToAllScenarios')}</th>
 
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr>
-                                            <td>Tree structure</td>
-                                            <td>Node value</td>
+                                            <td>{i18n.t('static.buildTreeComp.treeStructure')}</td>
+                                            <td>{i18n.t('static.buildTreeComp.nodeValue')}</td>
 
 
                                         </tr>
@@ -11087,24 +11087,24 @@ export default class BuildTree extends Component {
                                         </tr>
                                         <tr>
                                             <td></td>
-                                            <td>Modeling/Transfer/Extrapolation</td>
+                                            <td>{i18n.t('static.buildTreeComp.modelingTranferExtrapolation')}</td>
                                         </tr>
                                     </tbody>
                                 </table>
                             </div>
                         </p>
-                        <p><span style={{ fontSize: '14px' }} classNames="UnderLineText"><b>Tips for specific use cases:</b></span>
+                        <p><span style={{ fontSize: '14px' }} classNames="UnderLineText"><b>{i18n.t('static.buildTreeComp.tipsForSpecificUse')}</b></span>
                             <ul>
-                                <li><b> Forecasting Node Type :</b> Select "discrete" if this product will be used for limited time, and "continuous" if it will be used indefinitely.</li>
-                                <li><b> Delayed or phased product usage?</b> Sometimes, the product consumption is delayed in relation the other higher levels of the tree. In the relevant
-                                    <b>{i18n.t('static.dashboard.forecastingunit')} </b>node, use the <b>Lag</b> field to indicate this delay.
+                                <li><b> {i18n.t('static.buildTreeComp.forecastingNodeType')} :</b> {i18n.t('static.buildTreeComp.selectDiscrete')}</li>
+                                <li><b> {i18n.t('static.buildTreeComp.delayedOrPhasedProduct')}</b> {i18n.t('static.buildTreeComp.productConsumptionIsDelayed')}
+                                    <b>{i18n.t('static.dashboard.forecastingunit')} </b>{i18n.t('static.buildTreeComp.nodeUse')} <b>{i18n.t('static.buildTreeComp.lag')}</b> {i18n.t('static.buildTreeComp.fieldIndicateDelayed')}
                                     <ul>
-                                        <li>For example, if the product usage will begin 2 months after the parent node dates, enter "2" in this field.  </li>
-                                        <li>This field can also be used where the product switches over time for example, if forecasting units A, B, and C are used in secession for two months at a time, you can set up your tree with Forecasting Unit A (discrete for 2 months, lag=0), Forecasting Unit B (discrete for 2 months, lag=2), Forecasting Unit C (discrete for 2 months, lag = 4).</li>
+                                        <li>{i18n.t('static.buildTreeComp.productUsageBegain')}  </li>
+                                        <li>{i18n.t('static.buildTreeComp.fieldCanAlsoBeUsed')}</li>
                                     </ul>
                                 </li>
-                                <li><b> Multi-month Consumption Patterns?</b> How often is the product actually "consumed"? is it monthly or every three months? Consumption can be defined at different levels depending on your supply chain. In the <b>Planning Unit Node</b>, use the <b>Consumption Interval</b> field to indicate. For example, if the end user uses a product daily, but only picks up or buys the product every 2 months, enter "2" in the Consumption Interval field to account for a multi-month consumption pattern.  Note that this is only available for Continuous nodes, as product is assumed to be “consumed” at the beginning of the usage period.</li>
-                                <li><b>Repeating Forecasting Usages?</b> If multiple Forecasting Unit nodes share the same settings, consider using the <a href='/#/usageTemplate/listUsageTemplate' target="_blank" style={{textDecoration:'underline'}}>{i18n.t('static.usageTemplate.usageTemplate')} </a>screen to save your common usages, and then using the “Copy from Template”  field to populate the  fields in the forecasting unit nodes. </li>
+                                <li><b> {i18n.t('static.buildTreeComp.multiMonthConsumption')}</b> {i18n.t('static.buildTreeComp.HowOftenIsTheProduct')} <b>{i18n.t('static.buildTreeComp.planningUnitNode')}</b>, {i18n.t('static.buildTreeComp.useThe')} <b>{i18n.t('static.buildTreeComp.consumptionInterval')}</b> {i18n.t('static.buildTreeComp.fieldToIndicate')}</li>
+                                <li><b>{i18n.t('static.buildTreeComp.repetingForecastingUsage')}</b> {i18n.t('static.buildTreeComp.multipleFUNodes')} <a href='/#/usageTemplate/listUsageTemplate' target="_blank" style={{textDecoration:'underline'}}>{i18n.t('static.usageTemplate.usageTemplate')} </a>{i18n.t('static.buildTreeComp.saveYourCommonUsage')} </li>
                             </ul>
                         </p>
 
@@ -11119,25 +11119,25 @@ export default class BuildTree extends Component {
                 <div>
                     <ModalBody>
                         <div>
-                            <h3 className='ShowGuidanceHeading'>Manage Tree - Build Trees</h3>
+                            <h3 className='ShowGuidanceHeading'>{i18n.t('static.buildTreeComp.manageTreeBuildTree')}</h3>
                         </div>
                         <p>
-                            <p style={{ fontSize: '14px' }}><span className="UnderLineText">{i18n.t('static.listTree.purpose')} :</span>Enable users to manage and build forecast tree and scenarios, for any non-consumption forecasts (demographic, morbidity, services, etc). Note that more guidance is available after clicking into any specific node.</p>
+                            <p style={{ fontSize: '14px' }}><span className="UnderLineText">{i18n.t('static.listTree.purpose')} :</span>{i18n.t('static.buildTreeComp.enableUserToManageAndBuildForecast')}</p>
                         </p>
                         <p>
                             <p style={{ fontSize: '14px' }}><span className="UnderLineText">{i18n.t('static.listTree.useThisScreen')} :</span><br></br>
-                                <span style={{ fontWeight: 'bold' }}>Manage the Tree:</span> Click on the gear icon <i class="fa fa-cog" aria-hidden="true"></i> to show and edit or hide the forecast method, tree name, and region.
+                                <span style={{ fontWeight: 'bold' }}>{i18n.t('static.buildTreeComp.manageTheTree')}:</span> {i18n.t('static.buildTreeComp.clickOnGearIcon')} <i class="fa fa-cog" aria-hidden="true"></i> {i18n.t('static.buildTreeComp.showEditHideForecastmethod')}
                             </p>
-                            <p><span style={{ fontWeight: 'bold', fontSize: '14px' }}>Building the Tree:</span> The forecast tree is built from the top down, using different types of “nodes”.  See the Node Types and Node Actions below. Each forecast tree must include one or more Planning Unit Nodes, which form the forecast output, for that tree to be available in the 'Compare and Select' screen. Each Planning Unit Node must stem from a Forecasting Unit Node. </p>
+                            <p><span style={{ fontWeight: 'bold', fontSize: '14px' }}>{i18n.t('static.buildTreeComp.buildingTheTree')}:</span> {i18n.t('static.buildTreeComp.forecastTreeIsBuildFromTopDown')} </p>
 
                         </p>
                         <p>
-                            <p style={{ fontSize: '14px', fontWeight: 'bold' }}><span className="">Node Actions :</span></p>
+                            <p style={{ fontSize: '14px', fontWeight: 'bold' }}><span className="">{i18n.t('static.buildTreeComp.nodeActions')} :</span></p>
 
                             <ul className='pl-lg-4'>
-                                <li><i class="fa fa-trash-o" aria-hidden="true" style={{ color: '#002f6c' }}></i> Delete: Deletes the selected node</li>
-                                <li><i class="fa fa-clone" aria-hidden="true" style={{ color: '#002f6c' }}></i> Duplicate: Duplicates the selected node under the same parent</li>
-                                <li><i class="fa fa-plus-square-o" aria-hidden="true" style={{ color: '#002f6c' }}></i> Add: Adds a child to the selected node.</li>
+                                <li><i class="fa fa-trash-o" aria-hidden="true" style={{ color: '#002f6c' }}></i> {i18n.t('static.buildTreeComp.deleteSelectedNode')}</li>
+                                <li><i class="fa fa-clone" aria-hidden="true" style={{ color: '#002f6c' }}></i> {i18n.t('static.buildTreeComp.duplicateSelectedNode')}</li>
+                                <li><i class="fa fa-plus-square-o" aria-hidden="true" style={{ color: '#002f6c' }}></i> {i18n.t('static.buildTreeComp.addChildernToSelectedNode')}</li>
 
                             </ul>
 
@@ -11149,39 +11149,39 @@ export default class BuildTree extends Component {
                                     <thead>
                                         <tr>
                                             <th style={{ width: '130px' }}>{i18n.t('static.tree.nodeType')}</th>
-                                            <th>Value</th>
-                                            <th>Potential Children</th>
-                                            <th>Advanced Functionality</th>
+                                            <th>{i18n.t('static.buildTreeComp.value')}</th>
+                                            <th>{i18n.t('static.buildTreeComp.potentialChildren')}</th>
+                                            <th>{i18n.t('static.buildTreeComp.advanceFunctionality')}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr>
-                                            <td className='BgLightBlue'><b>Aggregation ∑</b></td>
-                                            <td>Sum of children</td>
-                                            <td><b style={{ color: '#002f6c' }}>∑</b> or Number</td>
+                                            <td className='BgLightBlue'><b>{i18n.t('static.buildTreeComp.aggregation')}</b></td>
+                                            <td>{i18n.t('static.buildTreeComp.sumOfChildren')}</td>
+                                            <td><b style={{ color: '#002f6c' }}>∑</b> {i18n.t('static.buildTreeComp.orNumber')}</td>
                                             <td>-</td>
                                         </tr>
                                         <tr>
-                                            <td className='BgLightBlue'><b>Number #</b></td>
-                                            <td>Defined at this node</td>
+                                            <td className='BgLightBlue'><b>{i18n.t('static.modelingValidation.number')} #</b></td>
+                                            <td>{i18n.t('static.buildTreeComp.definedAtThisNode')}</td>
                                             <td>% or <b style={{ background: '#fff', color: '#002f6c', padding: '3px' }}><i class="fa fa-cube" aria-hidden="true"></i></b></td>
                                             <td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i className='fa fa-link'></i>, <i className='fa fa-line-chart'></i></td>
                                         </tr>
                                         <tr>
-                                            <td className='BgLightBlue'><b>Percentage %</b></td>
-                                            <td>Defined as a percentage of the parent</td>
+                                            <td className='BgLightBlue'><b>{i18n.t('static.whatIf.percentage')} %</b></td>
+                                            <td>{i18n.t('static.buildTreeComp.definedAsAPercentage')}</td>
                                             <td>% or <b style={{ background: '#fff', color: '#002f6c', padding: '3px' }}><i class="fa fa-cube" aria-hidden="true"></i></b></td>
                                             <td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i className='fa fa-link'></i></td>
                                         </tr>
                                         <tr>
                                             <td className='BgDarkBlue'><b>{i18n.t('static.forecastingunit.forecastingunit')} <i class="fa fa-cube" aria-hidden="true"></i></b></td>
-                                            <td>Defined as a percentage of the parent and forecasting unit parameters</td>
+                                            <td>{i18n.t('static.buildTreeComp.definedAsAPercentageParentFU')}</td>
                                             <td><b style={{ background: '#fff', color: '#002f6c', padding: '3px' }}><i class="fa fa-cubes" aria-hidden="true"></i></b></td>
                                             <td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i className='fa fa-link'></i></td>
                                         </tr>
                                         <tr>
                                             <td className='BgDarkBlue'><b>{i18n.t('static.common.product')} <i class="fa fa-cubes" aria-hidden="true"></i></b></td>
-                                            <td>Defined as a percentage of the parent and planning unit parameters</td>
+                                            <td>{i18n.t('static.buildTreeComp.definedAsAPercentageParentPU')}</td>
                                             <td>-</td>
                                             <td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i className='fa fa-link'></i></td>
                                         </tr>
@@ -11190,30 +11190,30 @@ export default class BuildTree extends Component {
                             </div>
                         </p>
 
-                        <p><span style={{ fontSize: '14px', fontWeight: 'bold' }}>Changes Over Time</span><br></br>
-                            While the tree structure stays constant throughout time, node percentages and values can change over time. Use the date dropdown to view the tree at any month. The three functionalities below are available in each node and allow the user to control how nodes change over time:
+                        <p><span style={{ fontSize: '14px', fontWeight: 'bold' }}>{i18n.t('static.buildTreeComp.changesOverTime')}</span><br></br>
+                        {i18n.t('static.buildTreeComp.treeStructureStayConstant')}
                             <ul>
-                                <li><b><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i> {i18n.t('static.commitTree.modeling')}:</b> Allows user to specify the exact rate of change</li>
-                                <li><b><i className='fa fa-link'></i> {i18n.t('static.tree.transferToNode')}:</b> Allows users to link two nodes together – so the decrease from the source node is linked to the increase of the destination node. Useful for transitions.</li>
-                                <li><b><i className='fa fa-line-chart'></i> {i18n.t('static.commitTree.extrapolation')}:</b> Allows users to use historical data to extrapolate future change</li>
+                                <li><b><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i> {i18n.t('static.commitTree.modeling')}:</b> {i18n.t('static.buildTreeComp.allowUserToSpecifyExactRate')}</li>
+                                <li><b><i className='fa fa-link'></i> {i18n.t('static.tree.transferToNode')}:</b> {i18n.t('static.buildTreeComp.linkTwoNodesTogether')}</li>
+                                <li><b><i className='fa fa-line-chart'></i> {i18n.t('static.commitTree.extrapolation')}:</b> {i18n.t('static.buildTreeComp.userToUseHistoricalData')}</li>
                             </ul>
                         </p>
 
-                        <p><span style={{ fontSize: '14px', fontWeight: 'bold' }}>Using Scenarios :</span><br></br>
-                            Scenarios are used to model different values for the same tree. To add, edit or delete a scenario, use the <i class="fa fa-cog" aria-hidden="true"></i> icon next to the scenario dropdown. Use the scenario dropdown to select which scenario to view and edit.
+                        <p><span style={{ fontSize: '14px', fontWeight: 'bold' }}>{i18n.t('static.buildTreeComp.usingScenarios')} :</span><br></br>
+                        {i18n.t('static.buildTreeComp.modelDifferentValuesScenarios')} <i class="fa fa-cog" aria-hidden="true"></i> {i18n.t('static.buildTreeComp.oiconNextToScenario')}
                             <div className='pl-lg-4 pr-lg-4 pt-lg-4'>
                                 <table className="table table-bordered ">
                                     <thead>
                                         <tr>
-                                            <th style={{ width: '130px' }}>Fixed for All Scenarios</th>
-                                            <th style={{ width: '230px' }}>Unique to each Scenario</th>
+                                            <th style={{ width: '130px' }}>{i18n.t('static.buildTreeComp.fixedAllScenarios')}</th>
+                                            <th style={{ width: '230px' }}>{i18n.t('static.buildTreeComp.uniqueToAllScenarios')}</th>
 
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr>
-                                            <td>Tree structure</td>
-                                            <td>Node value</td>
+                                            <td>{i18n.t('static.buildTreeComp.treeStructure')}</td>
+                                            <td>{i18n.t('static.buildTreeComp.nodeValue')}</td>
 
 
                                         </tr>
@@ -11229,7 +11229,7 @@ export default class BuildTree extends Component {
                                         </tr>
                                         <tr>
                                             <td></td>
-                                            <td>Modeling/Transfer/Extrapolation</td>
+                                            <td>{i18n.t('static.buildTreeComp.modelingTranferExtrapolation')}</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -11441,7 +11441,7 @@ export default class BuildTree extends Component {
                                         onClick={() => { this.toggleModal(0, '3'); }}
                                     >
                                         {/* {i18n.t('static.tree.extrapolation')} */}
-                                        Extrapolation
+                                        {i18n.t('static.commitTree.extrapolation')}
                                     </NavLink>
                                 </NavItem>
 
