@@ -123,7 +123,7 @@ const validationSchemaNodeData = function (values) {
                     }
                 }),
         nodeValue: Yup.string()
-            .test('nodeValue', 'Please enter a valid number having less then 10 digits.',
+            .test('nodeValue', i18n.t('static.buildTreeComp.validNumLessThan10Dig'),
                 function (value) {
                     // console.log("*****", document.getElementById("nodeValue").value);
                     var testNumber = (/^(?!$)\d{0,10}(?:\.\d{1,4})?$/).test((document.getElementById("nodeValue").value).replaceAll(",", ""));
@@ -151,8 +151,8 @@ const validationSchemaNodeData = function (values) {
 
                 },
                 then: Yup.string()
-                    .required('Please select forecasting unit')
-                    .typeError('Please select forecasting unit'),
+                    .required(i18n.t('static.buildTreeComp.selectForecastigUnit'))
+                    .typeError(i18n.t('static.buildTreeComp.selectForecastigUnit')),
                 otherwise: Yup.string().notRequired()
             }),
         planningUnitIdFUFlag: Yup.boolean(),
@@ -163,8 +163,8 @@ const validationSchemaNodeData = function (values) {
 
                 },
                 then: Yup.string()
-                    .required('Please select planning unit')
-                    .typeError('Please select planning unit'),
+                    .required(i18n.t('static.buildTreeComp.selectPlanningUnit'))
+                    .typeError(i18n.t('static.buildTreeComp.selectPlanningUnit')),
                 otherwise: Yup.string().notRequired()
             }),
         usageTypeIdFU: Yup.string()
@@ -177,7 +177,7 @@ const validationSchemaNodeData = function (values) {
                     }
                 }),
         lagInMonths:
-            Yup.string().test('lagInMonths', 'Please enter a valid number having less then equal to 3 digit.',
+            Yup.string().test('lagInMonths', i18n.t('static.buildTreeComp.validNumLessThanEqual3Dig'),
                 function (value) {
                     // console.log("*****", document.getElementById("nodeValue").value);
                     var testNumber = (/^\d{0,3}?$/).test(document.getElementById("lagInMonths").value);
@@ -190,7 +190,7 @@ const validationSchemaNodeData = function (values) {
                 }),
 
         noOfPersons:
-            Yup.string().test('noOfPersons', 'Please enter a valid 10 digit number.',
+            Yup.string().test('noOfPersons', i18n.t('static.buildTreeComp.valid10DigNum'),
                 function (value) {
                     // console.log("*****", document.getElementById("nodeValue").value);
                     var testNumber = (/^\d{0,10}?$/).test((document.getElementById("noOfPersons").value).replaceAll(",", ""));
@@ -270,7 +270,7 @@ const validationSchemaNodeData = function (values) {
                 }),
 
         refillMonths: Yup.string()
-            .test('refillMonths', 'Please enter a valid number having less then 10 digits.',
+            .test('refillMonths', i18n.t('static.buildTreeComp.validNumLessThan10Dig'),
                 function (value) {
                     // console.log("*****", document.getElementById("nodeValue").value);
                     var testNumber = (/^[1-9]\d*$/).test((document.getElementById("refillMonths").value).replaceAll(",", ""));
@@ -291,7 +291,7 @@ const validationSchemaNodeData = function (values) {
                     }
                 }),
         puPerVisit: Yup.string()
-            .test('puPerVisit', 'Please enter # of pu per visit.',
+            .test('puPerVisit', i18n.t('static.buildTreeComp.Enter#ofPU'),
                 function (value) {
                     // console.log("*****", document.getElementById("nodeValue").value);
                     // var testNumber = document.getElementById("puPerVisit").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("puPerVisit").value) : false;
@@ -333,15 +333,15 @@ const getErrorsFromValidationErrorNodeData = (validationError) => {
 const validationSchema = function (values) {
     return Yup.object().shape({
         forecastMethodId: Yup.string()
-            .required("Please select forecast method"),
+            .required(i18n.t('static.validation.selectForecastMethod')),
         treeName: Yup.string()
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.tree.templateNameRequired')),
         monthsInPast: Yup.string()
-            .matches(/^\d{0,15}(,\d{3})*(\.\d{1,2})?$/, 'Enter valid positive numbers')
+            .matches(/^\d{0,15}(,\d{3})*(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount'))
             .required("Please enter a number"),
         monthsInFuture: Yup.string()
-            .matches(/^\d{0,15}(,\d{3})*(\.\d{1,2})?$/, 'Enter valid positive numbers')
+            .matches(/^\d{0,15}(,\d{3})*(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount'))
             .required("Please enter a number")
 
     })
@@ -1169,25 +1169,25 @@ export default class CreateTreeTemplate extends Component {
             .fillColor('#002f6c')
             .fontSize(12)
             .font('Helvetica')
-            .text("Forecast Method" + ': ' + document.getElementById("forecastMethodId").selectedOptions[0].text, 30, 85);
+            .text(i18n.t('static.forecastMethod.forecastMethod') + ': ' + document.getElementById("forecastMethodId").selectedOptions[0].text, 30, 85);
 
         doc
             .fillColor('#002f6c')
             .fontSize(12)
             .font('Helvetica')
-            .text("Template Name" + ': ' + this.state.treeTemplate.label.label_en, 30, 100);
+            .text(i18n.t('static.listTreeTemp.templateName') + ': ' + this.state.treeTemplate.label.label_en, 30, 100);
 
         doc
             .fillColor('#002f6c')
             .fontSize(12)
             .font('Helvetica')
-            .text("Months In Past" + ': ' + document.getElementById("monthsInPast").value, 30, 115);
+            .text(i18n.t('static.program.monthsInPast') + ': ' + document.getElementById("monthsInPast").value, 30, 115);
 
         doc
             .fillColor('#002f6c')
             .fontSize(12)
             .font('Helvetica')
-            .text("Months In Future" + ': ' + document.getElementById("monthsInFuture").value, 30, 130);
+            .text(i18n.t('static.program.monthsInFuture') + ': ' + document.getElementById("monthsInFuture").value, 30, 130);
 
 
         sampleChart.draw(doc, 60, 165);
@@ -1202,7 +1202,7 @@ export default class CreateTreeTemplate extends Component {
                 window.saveAs(string, i18n.t('static.dataset.TreeTemplate') + '.pdf');
             });
         } else {
-            alert('Error: Failed to create file stream.');
+            alert(i18n.t('static.buildTreeComp.failToCreateFileStream'));
         }
 
     }
@@ -1650,7 +1650,7 @@ export default class CreateTreeTemplate extends Component {
                             modelingJexcelLoader: false
                         }, () => {
                             // setTimeout(() => {
-                            alert("You are creating a new node.Please submit the node data first and then apply modeling/transfer.");
+                            alert(i18n.t('static.buildTreeComp.creatingANewNode'));
                             // confirmAlert({
                             //     message: "You are creating a new node.Please submit the node data first and then apply modeling/transfer.",
                             //     buttons: [
@@ -3234,7 +3234,7 @@ export default class CreateTreeTemplate extends Component {
                     // at start
                     if (obj.options.allowInsertRow == true) {
                         items.push({
-                            title: "Insert Row",
+                            title: i18n.t('static.buildTreeComp.InsertRow'),
                             onclick: function () {
                                 var data = [];
                                 data[0] = 0;
@@ -3371,7 +3371,7 @@ export default class CreateTreeTemplate extends Component {
                     });
                 })
             } else {
-                alert("Please select modeling type before proceeding.");
+                alert(i18n.t('static.buildTreeComp.selectModelingTypeBeforeProceeding'));
             }
         }
     }.bind(this)
@@ -3678,22 +3678,22 @@ export default class CreateTreeTemplate extends Component {
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: 'Transfer to/from',
+                    title: i18n.t('static.treeTemplate.transferToFrom'),
                     type: 'dropdown',
                     source: this.state.sameLevelNodeList
                 },
                 {
-                    title: "Note",
+                    title: i18n.t('static.tree.Note'),
                     type: 'text',
 
                 },
                 {
-                    title: 'Modeling type',
+                    title: i18n.t('static.tree.modelingType'),
                     type: 'dropdown',
                     source: this.state.modelingTypeList
                 },
                 {
-                    title: 'Start Date',
+                    title: i18n.t('static.treeTemplate.startDate'),
                     type: 'calendar',
                     options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' }, width: 100
                 },
@@ -3707,17 +3707,17 @@ export default class CreateTreeTemplate extends Component {
                     type: 'text',
                 },
                 {
-                    title: "Period",
+                    title: i18n.t('static.treeTemplate.period'),
                     type: 'dropdown',
                     source: [
-                        { id: 1, name: "Every year" },
-                        { id: 2, name: "Every 6 months" },
-                        { id: 3, name: "Every quarter" },
-                        { id: 4, name: "Every month" },
+                        { id: 1, name: i18n.t('static.treeTemplate.everyYear') },
+                        { id: 2, name: i18n.t('static.treeTemplate.every6Month') },
+                        { id: 3, name: i18n.t('static.treeTemplate.everyQuater') },
+                        { id: 4, name: i18n.t('static.treeTemplate.everyMonth') },
                     ]
                 },
                 {
-                    title: "Calculated change for month",
+                    title: i18n.t('static.treeTemplate.calculatedChangeForMonth'),
                     type: 'text',
                     readOnly: true
                 }
@@ -6591,7 +6591,7 @@ export default class CreateTreeTemplate extends Component {
                                                     </Popover>
                                                 </div>
                                                 <FormGroup className="col-md-6">
-                                                    <Label htmlFor="currencyId">Parent <i class="fa fa-info-circle icons pl-lg-2" id="Popover2" onClick={this.toggleParent} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                    <Label htmlFor="currencyId">{i18n.t('static.tree.parent')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover2" onClick={this.toggleParent} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                     {/* <Label htmlFor="currencyId">Parent</Label> */}
                                                     <Input type="text"
                                                         name="parent"
@@ -6610,7 +6610,7 @@ export default class CreateTreeTemplate extends Component {
                                             </Popover>
                                         </div>
                                         <FormGroup className="col-md-6">
-                                            <Label htmlFor="currencyId">Node Title<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover3" onClick={this.toggleNodeTitle} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                            <Label htmlFor="currencyId">{i18n.t('static.tree.nodeTitle')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover3" onClick={this.toggleNodeTitle} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                             <Input type="text"
                                                 id="nodeTitle"
                                                 name="nodeTitle"
@@ -6629,7 +6629,7 @@ export default class CreateTreeTemplate extends Component {
                                             </Popover>
                                         </div>
                                         <FormGroup className="col-md-6">
-                                            <Label htmlFor="currencyId">Node Type<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover4" onClick={this.toggleNodeType} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                            <Label htmlFor="currencyId">{i18n.t('static.tree.nodeType')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover4" onClick={this.toggleNodeType} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                             <Input
                                                 type="select"
                                                 id="nodeTypeId"
@@ -6658,7 +6658,7 @@ export default class CreateTreeTemplate extends Component {
                                         {/* {this.state.aggregationNode && */}
 
                                         <FormGroup className="col-md-6" style={{ display: this.state.aggregationNode ? 'block' : 'none' }}>
-                                            <Label htmlFor="currencyId">Node Unit<span class="red Reqasterisk">*</span></Label>
+                                            <Label htmlFor="currencyId">{i18n.t('static.tree.nodeUnit')}<span class="red Reqasterisk">*</span></Label>
                                             <Input
                                                 type="select"
                                                 id="nodeUnitId"
@@ -6743,7 +6743,7 @@ export default class CreateTreeTemplate extends Component {
                                             </Popover>
                                         </div>
                                         <FormGroup className="col-md-6" style={{ display: this.state.numberNode ? 'block' : 'none' }}>
-                                            <Label htmlFor="currencyId">Percentage of Parent<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover5" onClick={this.togglePercentageOfParent} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                            <Label htmlFor="currencyId">{i18n.t('static.tree.percentageOfParent')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover5" onClick={this.togglePercentageOfParent} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                             <InputGroup>
                                                 <Input type="number"
                                                     id="percentageOfParent"
@@ -6786,7 +6786,7 @@ export default class CreateTreeTemplate extends Component {
                                             </Popover>
                                         </div>
                                         <FormGroup className="col-md-6" style={{ display: this.state.aggregationNode ? 'block' : 'none' }}>
-                                            <Label htmlFor="currencyId">Node Value<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover7" onClick={this.toggleNodeValue} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                            <Label htmlFor="currencyId">{i18n.t('static.tree.nodeValue')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover7" onClick={this.toggleNodeValue} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                             <Input type="text"
                                                 id="nodeValue"
                                                 name="nodeValue"
@@ -6852,7 +6852,7 @@ export default class CreateTreeTemplate extends Component {
                                                         </Input>
                                                     </FormGroup>
                                                     <FormGroup className="col-md-2">
-                                                        <Label htmlFor="currencyId">Forecasting unit</Label>
+                                                        <Label htmlFor="currencyId">{i18n.t('static.product.unit')}</Label>
 
                                                     </FormGroup>
                                                     <FormGroup className="col-md-10">
@@ -6935,7 +6935,7 @@ export default class CreateTreeTemplate extends Component {
                                                         </Popover>
                                                     </div>
                                                     <FormGroup className="col-md-2">
-                                                        <Label htmlFor="currencyId">Conversion Factor (FU:PU) <i class="fa fa-info-circle icons pl-lg-2" id="Popover9" onClick={this.toggleConversionFactorFUPU} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                        <Label htmlFor="currencyId">{i18n.t('static.conversion.ConversionFactorFUPU')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover9" onClick={this.toggleConversionFactorFUPU} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                     </FormGroup>
                                                     <FormGroup className="col-md-10">
                                                         <Input type="text"
@@ -7055,8 +7055,8 @@ export default class CreateTreeTemplate extends Component {
                                                     value={this.state.currentItemConfig.context.payload.nodeType.id == 5 ? (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.sharePlanningUnit : ""}>
 
                                                     <option value="">{i18n.t('static.common.select')}</option>
-                                                    <option value="true">Yes</option>
-                                                    <option value="false">No</option>
+                                                    <option value="true">{i18n.t('static.program.yes')}</option>
+                                                    <option value="false">{i18n.t('static.program.no')}</option>
 
                                                 </Input>
                                                 <FormFeedback className="red">{errors.sharePlanningUnit}</FormFeedback>
@@ -7065,7 +7065,7 @@ export default class CreateTreeTemplate extends Component {
                                             {/* <> */}
                                             {this.state.currentItemConfig.context.payload.nodeType.id == 5 && <>
                                                 <FormGroup className="col-md-2" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 5 ? 'block' : 'none' }}>
-                                                    <Label htmlFor="currencyId">{this.state.currentItemConfig.parentItem != null && (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode != null && (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 ? "QAT Calculated PU per interval per " : "QAT Calculated PU per usage per "}{this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.parent != null && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id).length > 0 && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id)[0].label.label_en}?</Label>
+                                                    <Label htmlFor="currencyId">{this.state.currentItemConfig.parentItem != null && (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode != null && (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 ? i18n.t('static.buildTreeComp.calculatePUPerInterval')+" " : i18n.t('static.buildTreeComp.CalculatePuPerUsage')+" "}{this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.parent != null && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id).length > 0 && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id)[0].label.label_en}?</Label>
                                                 </FormGroup>
                                                 <FormGroup className="col-md-10" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 5 ? 'block' : 'none' }}>
                                                     <Input type="number"
@@ -7081,7 +7081,7 @@ export default class CreateTreeTemplate extends Component {
                                                 </FormGroup></>}
 
                                             <FormGroup className="col-md-2" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 5 ? 'block' : 'none' }}>
-                                                <Label htmlFor="currencyId">{this.state.currentItemConfig.parentItem != null && (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode != null && (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 ? "How many PU per interval per " : "How many PU per usage per "}{this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.parent != null && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id).length > 0 && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id)[0].label.label_en}?</Label>
+                                                <Label htmlFor="currencyId">{this.state.currentItemConfig.parentItem != null && (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode != null && (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 ? i18n.t('static.buildTreeComp.howManyPUPerInterval')+" " : i18n.t('static.buildTreeComp.howManyPUPerUsage')+" "}{this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.parent != null && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id).length > 0 && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id)[0].label.label_en}?</Label>
                                             </FormGroup>
                                             <FormGroup className="col-md-10" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 5 ? 'block' : 'none' }}>
                                                 <Input type="number"
@@ -7975,7 +7975,7 @@ export default class CreateTreeTemplate extends Component {
                                                 showCalculatorFields: false
                                             });
                                         }}><i className="fa fa-times"></i> {'Close'}</Button>
-                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.acceptValue}><i className="fa fa-check"></i> {'Accept'}</Button>
+                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.acceptValue}><i className="fa fa-check"></i> {i18n.t('static.common.accept')}</Button>
 
                                     </FormGroup>
                                     {/* </div> */}
@@ -8018,7 +8018,7 @@ export default class CreateTreeTemplate extends Component {
                                                     <Label
                                                         className="form-check-label"
                                                         check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                        <b>{'Manual Change affects future month'}</b>
+                                                        <b>{i18n.t('static.buildTreeComp.manualChangesAffect')}</b>
                                                     </Label>
                                                 </div>
                                                 <div>
@@ -8034,7 +8034,7 @@ export default class CreateTreeTemplate extends Component {
                                                     <Label
                                                         className="form-check-label"
                                                         check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                        <b>{'Show Seasonality & manual change'}</b>
+                                                        <b>{i18n.t('static.buildTreeComp.showSeasonalityAndmanualChange')}</b>
                                                     </Label>
                                                 </div>
                                             </div>
@@ -8103,7 +8103,7 @@ export default class CreateTreeTemplate extends Component {
                                                     <Label
                                                         className="form-check-label"
                                                         check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                        <b>{'Manual Change affects future month'}</b>
+                                                        <b>{i18n.t('static.buildTreeComp.manualChangesAffect')}</b>
                                                     </Label>
                                                 </div>
                                             </div>
@@ -8287,7 +8287,7 @@ export default class CreateTreeTemplate extends Component {
             },
         }));
         dataArray.push(new Paragraph({
-            children: [new TextRun({ "text": "Template Name" + " : ", bold: true }), new TextRun({ "text": document.getElementById("treeName").value })],
+            children: [new TextRun({ "text": i18n.t('static.listTreeTemp.templateName') + " : ", bold: true }), new TextRun({ "text": document.getElementById("treeName").value })],
             spacing: {
                 after: 150,
             },
@@ -8421,7 +8421,7 @@ export default class CreateTreeTemplate extends Component {
                     <div className="ContactPhone ContactPhoneValue">
                         <span style={{ textAlign: 'center', fontWeight: '500' }}>{this.getPayloadData(itemConfig, 1)}</span>
                         <div style={{ overflow: 'inherit', fontStyle: 'italic' }}><p className="" style={{ textAlign: 'center' }}> {this.getPayloadData(itemConfig, 2)}</p></div>
-                        <div className="treeValidation"><span style={{ textAlign: 'center', fontWeight: '500' }}>{this.getPayloadData(itemConfig, 3) != "" ? "Sum of children: " : ""}</span><span className={this.getPayloadData(itemConfig, 3) != 100 ? "treeValidationRed" : ""}>{this.getPayloadData(itemConfig, 3) != "" ? this.getPayloadData(itemConfig, 3) + "%" : ""}</span></div>
+                        <div className="treeValidation"><span style={{ textAlign: 'center', fontWeight: '500' }}>{this.getPayloadData(itemConfig, 3) != "" ? i18n.t('static.buildTreeComp.sumOfChildren')+" " : ""}</span><span className={this.getPayloadData(itemConfig, 3) != 100 ? "treeValidationRed" : ""}>{this.getPayloadData(itemConfig, 3) != "" ? this.getPayloadData(itemConfig, 3) + "%" : ""}</span></div>
                     </div>
                 </div>
             ))
@@ -8553,7 +8553,7 @@ export default class CreateTreeTemplate extends Component {
                                 onClick={(event) => {
                                     event.stopPropagation();
                                     confirmAlert({
-                                        message: "Are you sure you want to delete this node.",
+                                        message: i18n.t('static.buildTreeComp.sureYouWantToDeleteNode'),
                                         buttons: [
                                             {
                                                 label: i18n.t('static.program.yes'),
@@ -8792,7 +8792,7 @@ export default class CreateTreeTemplate extends Component {
                             <div className="card-header-actions col-md-12 pl-lg-0 pr-lg-0 pt-lg-0">
                                 {/* <div className="card-header-actions pr-4 pt-1"> */}
                                 <a className="pr-lg-0 pt-lg-0 float-left">
-                                    <span style={{ cursor: 'pointer' }} onClick={this.cancelClicked}><i className="cui-arrow-left icons" style={{ color: '#002F6C', fontSize: '13px' }}></i> <small className="supplyplanformulas">{'Return To List'}</small></span>
+                                    <span style={{ cursor: 'pointer' }} onClick={this.cancelClicked}><i className="cui-arrow-left icons" style={{ color: '#002F6C', fontSize: '13px' }}></i> <small className="supplyplanformulas">{i18n.t('static.treeTemplate.returnToList')}</small></span>
                                     {/* <Link to='/supplyPlanFormulas' target="_blank"><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></Link> */}
                                 </a>
                                 <a className="pr-lg-0 pt-lg-0 float-right">
@@ -9090,7 +9090,7 @@ export default class CreateTreeTemplate extends Component {
                                                         <div className="col-md-12 pl-lg-0">
                                                             <Row>
                                                                 <FormGroup className="col-md-3 pl-lg-0" style={{ marginBottom: '0px' }}>
-                                                                    <Label htmlFor="languageId">{'Forecast Method'}<span class="red Reqasterisk">*</span></Label>
+                                                                    <Label htmlFor="languageId">{i18n.t('static.forecastMethod.forecastMethod')}<span class="red Reqasterisk">*</span></Label>
                                                                     <Input
                                                                         type="select"
                                                                         name="forecastMethodId"
@@ -9110,7 +9110,7 @@ export default class CreateTreeTemplate extends Component {
                                                                 </FormGroup>
 
                                                                 <FormGroup className="col-md-3 pl-lg-0">
-                                                                    <Label htmlFor="languageId">{'Template Name'}<span class="red Reqasterisk">*</span></Label>
+                                                                    <Label htmlFor="languageId">{i18n.t('static.listTreeTemp.templateName')}<span class="red Reqasterisk">*</span></Label>
                                                                     <Input
                                                                         type="text"
                                                                         name="treeName"
@@ -9198,11 +9198,11 @@ export default class CreateTreeTemplate extends Component {
                                                                 </FormGroup>
                                                                 <div>
                                                                     <Popover placement="top" isOpen={this.state.popoverOpenMonthInPast} target="Popover26" trigger="hover" toggle={this.toggleMonthInPast}>
-                                                                        <PopoverBody>Need to add info</PopoverBody>
+                                                                        <PopoverBody>{i18n.t('static.treeTemplate.needToAddInfo')}</PopoverBody>
                                                                     </Popover>
                                                                 </div>
                                                                 <FormGroup className="col-md-3 pl-lg-0">
-                                                                    <Label htmlFor="languageId">{'Months In Past'}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover26" onClick={this.toggleMonthInPast} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                                    <Label htmlFor="languageId">{i18n.t('static.program.monthsInPast')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover26" onClick={this.toggleMonthInPast} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                                     <Input
                                                                         type="number"
                                                                         name="monthsInPast"
@@ -9222,7 +9222,7 @@ export default class CreateTreeTemplate extends Component {
                                                                 </FormGroup>
                                                                 <div>
                                                                     <Popover placement="top" isOpen={this.state.popoverOpenMonthInFuture} target="Popover27" trigger="hover" toggle={this.toggleMonthInFuture}>
-                                                                        <PopoverBody>Need to add info</PopoverBody>
+                                                                        <PopoverBody>{i18n.t('static.treeTemplate.needToAddInfo')}</PopoverBody>
                                                                     </Popover>
                                                                 </div>
                                                                 <FormGroup className="col-md-3 pl-lg-0">
@@ -9279,7 +9279,7 @@ export default class CreateTreeTemplate extends Component {
                                                                 </FormGroup> */}
                                                             </Row>
                                                             <FormGroup className="row col-md-3 pl-lg-0 MarginTopMonthSelector">
-                                                                <Label htmlFor="languageId">{'Month Selector'}</Label>
+                                                                <Label htmlFor="languageId">{i18n.t('static.treeTemplate.monthSector')}</Label>
                                                                 <Input
                                                                     type="select"
                                                                     name="monthId"
@@ -9344,7 +9344,7 @@ export default class CreateTreeTemplate extends Component {
             <Modal isOpen={this.state.openAddNodeModal}
                 className={'modal-xl'} >
                 <ModalHeader className="modalHeaderSupplyPlan hideCross">
-                    <strong>Add/Edit Node</strong>     {this.state.activeTab1[0] === '2' && <div className="HeaderNodeText"> {
+                    <strong>{i18n.t('static.tree.Add/EditNode')}</strong>     {this.state.activeTab1[0] === '2' && <div className="HeaderNodeText"> {
                         this.state.currentItemConfig.context.payload.nodeType.id == 2 ? <i class="fa fa-hashtag" style={{ fontSize: '11px', color: '#20a8d8' }}></i> :
                             (this.state.currentItemConfig.context.payload.nodeType.id == 3 ? <i class="fa fa-percent " style={{ fontSize: '11px', color: '#20a8d8' }} ></i> :
                                 (this.state.currentItemConfig.context.payload.nodeType.id == 4 ? <i class="fa fa-cube" style={{ fontSize: '11px', color: '#20a8d8' }} ></i> :
@@ -9364,7 +9364,7 @@ export default class CreateTreeTemplate extends Component {
                                         active={this.state.activeTab1[0] === '1'}
                                         onClick={() => { this.toggleModal(0, '1'); }}
                                     >
-                                        Node Data
+                                        {i18n.t('static.tree.nodeData')}
                                     </NavLink>
                                 </NavItem>
                                 <NavItem>
@@ -9372,7 +9372,7 @@ export default class CreateTreeTemplate extends Component {
                                         active={this.state.activeTab1[0] === '2'}
                                         onClick={() => { this.toggleModal(0, '2'); }}
                                     >
-                                        Modeling/Transfer
+                                        {i18n.t('static.tree.Modeling/Transfer')}
                                     </NavLink>
                                 </NavItem>
 
