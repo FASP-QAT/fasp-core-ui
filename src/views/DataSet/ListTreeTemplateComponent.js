@@ -365,6 +365,7 @@ export default class ListTreeTemplate extends Component {
                 var items = [];
                 if (y != null) {
                     if (obj.options.allowInsertRow == true) {
+                        if(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE_TEMPLATE')){
                         items.push({
                             title: i18n.t('static.common.duplicateTemplate'),
                             onclick: function () {
@@ -375,6 +376,7 @@ export default class ListTreeTemplate extends Component {
                                 })
                             }.bind(this)
                         });
+                    }
                     }
                 }
 
