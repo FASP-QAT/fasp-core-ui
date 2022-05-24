@@ -1090,6 +1090,7 @@ class VersionSettingsComponent extends Component {
             onchange: this.changed,
             oneditionend: this.oneditionend,
             oncreateeditor: this.oncreateeditor,
+            editable: ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_VERSION_SETTINGS')) ? true : false),
             copyCompatibility: true,
             allowExport: false,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
@@ -1496,13 +1497,13 @@ class VersionSettingsComponent extends Component {
 
                     </CardBody>
                     <CardFooter className="CardFooterVesionsettingMarginTop">
-                        {/* {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_REALM_COUNTRY_PLANNING_UNIT') && */}
+                    {(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_VERSION_SETTINGS')) &&
                         <FormGroup>
                             <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                             {this.state.isChanged && <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
                             &nbsp;
                         </FormGroup>
-                        {/* } */}
+                        }
                     </CardFooter>
                 </Card>
                 <Modal isOpen={this.state.showGuidance}
@@ -1660,7 +1661,7 @@ class VersionSettingsComponent extends Component {
                         </ModalBody>
                         <div className="col-md-12 pb-lg-5 pt-lg-3">
                             <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => { this.openModalPopup() }}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                            <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={this.synchronize}><i className="fa fa-check"></i>{i18n.t('static.report.ok')}</Button>
+                            {/* <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={this.synchronize}><i className="fa fa-check"></i>{i18n.t('static.report.ok')}</Button> */}
                         </div>
                     </div>
                 </Modal >
