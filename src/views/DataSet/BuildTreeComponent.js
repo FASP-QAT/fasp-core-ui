@@ -1404,7 +1404,7 @@ export default class BuildTree extends Component {
         }, () => {
             console.log("reset node data function called 3---", this.state.currentScenario);
             if (nodeTypeId == 4) {
-                this.getForecastingUnitListByTracerCategoryId(0);
+                this.getForecastingUnitListByTracerCategoryId(0, 0);
             }
             console.log("currentItemConfig after---", this.state.orgCurrentItemConfig)
         });
@@ -5630,7 +5630,7 @@ export default class BuildTree extends Component {
             fuValues: { value: usageTemplate.forecastingUnit.id, label: getLabelText(usageTemplate.forecastingUnit.label, this.state.lang) + " | " + usageTemplate.forecastingUnit.id },
         }, () => {
             console.log("copy from template---", this.state.currentScenario);
-            this.getForecastingUnitListByTracerCategoryId(0);
+            this.getForecastingUnitListByTracerCategoryId(0, usageTemplate.forecastingUnit.id);
             this.getNoOfMonthsInUsagePeriod();
             this.getNoFURequired();
             this.getNoOfFUPatient();
@@ -5913,7 +5913,7 @@ export default class BuildTree extends Component {
         }
 
     }
-    getForecastingUnitListByTracerCategoryId(type) {
+    getForecastingUnitListByTracerCategoryId(type, isUsageTemplate) {
         var scenarioId = this.state.selectedScenario;
         console.log("my tracer category---", this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId][0])
         console.log("this.state.currentScenario---", this.state.currentScenario.fuNode.forecastingUnit.tracerCategory.id);
@@ -5983,7 +5983,11 @@ export default class BuildTree extends Component {
                     this.getPlanningUnitListByFUId(filteredForecastingUnitList[0].id);
                 })
             } else if (this.state.addNodeFlag) {
-                this.setState({ planningUnitList: [] });
+                if (isUsageTemplate > 0) {
+                    this.getPlanningUnitListByFUId(isUsageTemplate);
+                } else {
+                    this.setState({ planningUnitList: [] });
+                }
             }
 
         });
@@ -6893,7 +6897,9 @@ export default class BuildTree extends Component {
                 label_sp: '',
                 label_pr: ''
             }
+            console.log("node unit label---",label);
             currentItemConfig.context.payload.nodeUnit.label = label;
+            console.log("after node unit label---",currentItemConfig);
 
         }
         if (event.target.name === "percentageOfParent") {
@@ -7611,7 +7617,7 @@ export default class BuildTree extends Component {
                     this.setState({
                         fuValues: { value: this.state.currentScenario.fuNode.forecastingUnit.id, label: getLabelText(this.state.currentScenario.fuNode.forecastingUnit.label, this.state.lang) + " | " + this.state.currentScenario.fuNode.forecastingUnit.id }
                     });
-                    this.getForecastingUnitListByTracerCategoryId(1);
+                    this.getForecastingUnitListByTracerCategoryId(1, 0);
                     this.getNodeUnitOfPrent();
                     this.getNoOfFUPatient();
                     this.getNoOfMonthsInUsagePeriod();
@@ -7852,7 +7858,13 @@ export default class BuildTree extends Component {
                             display: true,
                             // labelString: this.state.currentItemConfig.context.payload.nodeUnit.label != null ? this.state.currentItemConfig.context.payload.nodeType.id > 3 ? getLabelText(this.state.currentItemConfig.parentItem.payload.nodeUnit.label, this.state.lang) : getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang) : '',
                             // labelString: this.state.currentItemConfig.context.payload.nodeUnit.label != null ? this.state.currentItemConfig.context.payload.nodeType.id > 3 ? getLabelText(this.state.currentItemConfig.parentItem.payload.nodeUnit.label, this.state.lang) : getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang) : '',
-                            labelString: this.state.currentItemConfig.context.payload.nodeType.id > 3 ? this.state.currentItemConfig.context.payload.nodeUnit.id != "" ? getLabelText(this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label, this.state.lang) : "" : this.state.currentItemConfig.context.payload.nodeUnit.label != null ? getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang) : "",
+                            labelString: this.state.currentItemConfig.context.payload.nodeType.id > 2 ? 
+                            this.state.currentItemConfig.context.payload.nodeUnit.id != "" ? 
+                            getLabelText(this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label, this.state.lang) 
+                            : "" 
+                            : this.state.currentItemConfig.context.payload.nodeUnit.label != null ? 
+                            getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang) 
+                            : "",
                             // labelString: "",
                             fontColor: 'black'
                         },
@@ -8661,7 +8673,7 @@ export default class BuildTree extends Component {
                                                     // invalid={touched.tracerCategoryId && !!errors.tracerCategoryId}
                                                     onBlur={handleBlur}
                                                     onChange={(e) => {
-                                                        this.dataChange(e); this.getForecastingUnitListByTracerCategoryId(0)
+                                                        this.dataChange(e); this.getForecastingUnitListByTracerCategoryId(0, 0)
                                                     }}
                                                     required
                                                     value={this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentScenario.fuNode.forecastingUnit.tracerCategory.id : ""}
@@ -10418,7 +10430,7 @@ export default class BuildTree extends Component {
 
                                         }
                                         this.filterUsageTemplateList(tracerCategoryId);
-                                        this.getForecastingUnitListByTracerCategoryId(0);
+                                        this.getForecastingUnitListByTracerCategoryId(0, 0);
                                     }
                                     else if (itemConfig.payload.nodeType.id == 4) {
                                         this.getNoOfFUPatient();
