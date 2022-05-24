@@ -452,6 +452,7 @@ export default class CreateTreeTemplate extends Component {
         this.pickAMonth2 = React.createRef()
         this.pickAMonth1 = React.createRef()
         this.state = {
+            isTemplateChanged: false,
             percentForOneMonth: '',
             sameLevelNodeList1: [],
             nodeUnitListPlural: [],
@@ -4838,7 +4839,7 @@ export default class CreateTreeTemplate extends Component {
     }
 
     componentDidUpdate = () => {
-        if (this.state.isChanged == true) {
+        if (this.state.isChanged == true || this.state.isTemplateChanged == true) {
             window.onbeforeunload = () => true
         } else {
             window.onbeforeunload = undefined
@@ -5755,6 +5756,7 @@ export default class CreateTreeTemplate extends Component {
 
         if (event.target.name == "active") {
             treeTemplate.active = event.target.id === "active2" ? false : true;
+            this.setState({ isTemplateChanged: true })
         }
 
         if (event.target.name === "sharePlanningUnit") {
@@ -5775,32 +5777,28 @@ export default class CreateTreeTemplate extends Component {
 
         if (event.target.name === "forecastMethodId") {
             treeTemplate.forecastMethod.id = event.target.value;
+            this.setState({ isTemplateChanged: true })
         }
 
         if (event.target.name === "treeName") {
             treeTemplate.label.label_en = event.target.value;
+            this.setState({ isTemplateChanged: true })
         }
 
         if (event.target.name === "monthsInPast") {
             treeTemplate.monthsInPast = event.target.value;
-            // var curDate = (moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD'));
-            this.generateMonthList();
-            // var minMonth = moment(curDate).subtract(event.target.value, 'months').startOf('month').format("YYYY-MM-DD");
-            // var maxMonth = moment(curDate).add(parseInt(treeTemplate.monthsInFuture) - parseInt(1), 'months').endOf('month').format("YYYY-MM-DD");
+            this.setState({ isTemplateChanged: true }, () => {
+                this.generateMonthList();
+            })
+
 
         }
 
         if (event.target.name === "monthsInFuture") {
             treeTemplate.monthsInFuture = event.target.value;
-            // var curDate = (moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD'));
-            // var monthList = JSON.parse(JSON.stringify(this.state.monthList));
-            // var minDate = monthList[0].id;
-            // var maxDate = monthList.sort((a, b) => b.id - a.id)[0].id;
-            // this.setState({
-            //     minDate, maxDate
-            // }, () => {
-            this.generateMonthList();
-            // })
+            this.setState({ isTemplateChanged: true }, () => {
+                this.generateMonthList();
+            })
         }
 
         if (event.target.name === "usageTemplateId") {
@@ -5877,6 +5875,7 @@ export default class CreateTreeTemplate extends Component {
         }
         if (event.target.name === "templateNotes") {
             treeTemplate.notes = event.target.value;
+            this.setState({ isTemplateChanged: true });
         }
 
         if (event.target.name === "tracerCategoryId") {
@@ -7946,7 +7945,7 @@ export default class CreateTreeTemplate extends Component {
                                     }
                                     {/* disabled={!isValid} */}
                                     <FormGroup className="pb-lg-3">
-                                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false, cursorItem: 0, highlightItem: 0, activeTab1: new Array(2).fill('1') })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false, cursorItem: 0, highlightItem: 0, isChanged: false, activeTab1: new Array(2).fill('1') })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                         <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={() => this.resetNodeData()} ><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllNodeData(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                     </FormGroup>
@@ -9146,7 +9145,7 @@ export default class CreateTreeTemplate extends Component {
         }
         return <div className="animated fadeIn">
             <Prompt
-                when={this.state.isChanged == true}
+                when={this.state.isChanged == true || this.state.isTemplateChanged == true}
                 message={i18n.t("static.dataentry.confirmmsg")}
             />
             <AuthenticationServiceComponent history={this.props.history} />
@@ -9293,7 +9292,8 @@ export default class CreateTreeTemplate extends Component {
                                                             message: i18n.t('static.message.addTreeTemplate'),
                                                             color: 'green',
                                                             loading: true,
-                                                            isChanged: false
+                                                            isChanged: false,
+                                                            isTemplateChanged: false
                                                         }, () => {
                                                             this.hideSecondComponent();
                                                             this.calculateMOMData(1, 2);
@@ -9379,7 +9379,8 @@ export default class CreateTreeTemplate extends Component {
                                                             message: i18n.t('static.message.editTreeTemplate'),
                                                             loading: true,
                                                             color: 'green',
-                                                            isChanged: false
+                                                            isChanged: false,
+                                                            isTemplateChanged: false
                                                         }, () => {
                                                             this.hideSecondComponent();
                                                             this.calculateMOMData(1, 2);
@@ -9720,7 +9721,7 @@ export default class CreateTreeTemplate extends Component {
                                         (this.state.currentItemConfig.context.payload.nodeType.id == 1 ? <i><img src={AggregationNode} className="AggregationNodeSize" /></i> : "")
                                     )))}
                         <b className="supplyplanformulas ScalingheadTitle">{this.state.currentItemConfig.context.payload.label.label_en}</b></div>}
-                    <Button size="md" onClick={() => this.setState({ openAddNodeModal: false, cursorItem: 0, highlightItem: 0, activeTab1: new Array(2).fill('1') })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
+                    <Button size="md" onClick={() => this.setState({ openAddNodeModal: false, isChanged: false, cursorItem: 0, highlightItem: 0, activeTab1: new Array(2).fill('1') })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
                 </ModalHeader>
                 <ModalBody>
                     <Row>
