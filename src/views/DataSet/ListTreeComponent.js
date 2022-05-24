@@ -667,6 +667,7 @@ export default class ListTreeComponent extends Component {
                     nodeDataMap[1] = tempArray;
                     flatList[i].payload.nodeDataMap = nodeDataMap;
                 }
+                console.log("treeTemplate@@@@@@@@@@@@@@",treeTemplate)
                 tempTree = {
                     treeId: treeId,
                     active: this.state.active,
@@ -679,7 +680,7 @@ export default class ListTreeComponent extends Component {
                     },
                     notes: this.state.notes,
                     regionList: this.state.regionList,
-                    levelList: [],
+                    levelList: treeTemplate.levelList,
                     scenarioList: [{
                         id: 1,
                         label: {
@@ -816,7 +817,7 @@ export default class ListTreeComponent extends Component {
 
             treeList.push(tempTree);
         }
-
+        console.log("TreeList@@@@@@@@@@@@@@",treeList)
         tempProgram.programData.treeList = treeList;
         var programCopy = JSON.parse(JSON.stringify(tempProgram));
         var programData = (CryptoJS.AES.encrypt(JSON.stringify(tempProgram.programData), SECRET_KEY)).toString();
