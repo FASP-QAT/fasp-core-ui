@@ -505,7 +505,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                 }
                 linearRegressionData.push(linearRegressionJson);
 
-                
+
                 if (this.state.tesData.length > 0) {
                     console.log("result here rama---", map1.get("7") != "" && map1.get("7") != null && map1.get("7") != 'NaN' ? "A" : "B");
                     var tesJson = {
@@ -516,7 +516,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                     tesData.push(tesJson);
                 }
 
-              
+
                 if (this.state.arimaData.length > 0) {
                     var arimaJson = {
                         month: map1.get("0"),
@@ -526,10 +526,10 @@ export default class TreeExtrapolationComponent extends React.Component {
                     arimaData.push(arimaJson);
                 }
                 count++;
-              
+
             }
         }
-        
+
         const { nodeDataExtrapolation } = this.state;
         nodeDataExtrapolation.extrapolationDataList = extrapolationDataList;
         var nodeDataExtrapolationOptionList = [];
@@ -1027,7 +1027,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                         }
 
                         if (this.state.linearRegressionId) {
-                            calculateLinearRegression(JSON.parse(JSON.stringify(inputDataLinearRegression)), this.state.confidenceLevelIdLinearRegression, Math.trunc(noOfMonthsForProjection), this,true);
+                            calculateLinearRegression(JSON.parse(JSON.stringify(inputDataLinearRegression)), this.state.confidenceLevelIdLinearRegression, Math.trunc(noOfMonthsForProjection), this, true);
                         } else {
                             this.setState({
                                 linearRegressionData: [],
@@ -1437,6 +1437,11 @@ export default class TreeExtrapolationComponent extends React.Component {
 
                             }
                             console.log("filteredExtrapolationMethodList---", filteredExtrapolationMethodList)
+                            filteredExtrapolationMethodList = filteredExtrapolationMethodList.length > 0 && filteredExtrapolationMethodList.sort((a, b) => {
+                                var itemLabelA = a.sortOrder; // ignore upper and lowercase
+                                var itemLabelB = b.sortOrder; // ignore upper and lowercase                   
+                                return itemLabelA > itemLabelB ? 1 : -1;
+                            });
                             this.setState({
                                 nodeDataExtrapolation, p, d, q,
                                 confidenceLevelId, confidenceLevelIdLinearRegression,
@@ -2397,15 +2402,22 @@ export default class TreeExtrapolationComponent extends React.Component {
 
     render() {
         const { filteredExtrapolationMethodList } = this.state;
-        console.log("render filteredExtrapolationMethodList ---", filteredExtrapolationMethodList)
-        let extrapolationMethods = filteredExtrapolationMethodList.length > 0
-            && filteredExtrapolationMethodList.map((item, i) => {
+        console.log("render filteredExtrapolationMethodList ---", filteredExtrapolationMethodList);
+        var filteredExtrapolationMethodListNew = filteredExtrapolationMethodList.length > 0 && filteredExtrapolationMethodList.sort((a, b) => {
+            var itemLabelA = a.sortOrder; // ignore upper and lowercase
+            var itemLabelB = b.sortOrder; // ignore upper and lowercase                   
+            return itemLabelA > itemLabelB ? 1 : -1;
+        });
+        let extrapolationMethods = filteredExtrapolationMethodListNew.length > 0
+            && filteredExtrapolationMethodListNew.map((item, i) => {
                 return (
                     <option key={i} value={item.id}>
                         {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
             }, this);
+        // console.log("extrapolationMethods---", extrapolationMethods);
+        
         const pickerLang = {
             months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
             from: 'From', to: 'To',
@@ -4379,7 +4391,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                             <p>
                                 <p style={{ fontSize: '14px' }}><span className="UnderLineText">Purpose :</span>The extrapolation tab allows users to forecast future
                                     node values by extrapolating from past values. This functionality only available on
-                                    number nodes, and is similar to the '<a href="/#/Extrapolation/extrapolateData" target="_blank" style={{textDecoration:'underline'}}>Extrapolation</a>' screen, but is conducted at a
+                                    number nodes, and is similar to the '<a href="/#/Extrapolation/extrapolateData" target="_blank" style={{ textDecoration: 'underline' }}>Extrapolation</a>' screen, but is conducted at a
                                     tree node instead. View the guidance on that page for more details on extrapolation
                                     methods.
                                 </p>
