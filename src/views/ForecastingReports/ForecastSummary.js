@@ -3619,7 +3619,7 @@ class ForecastSummary extends Component {
                                         <tr>
                                             <th>{i18n.t('static.forecastOutput.totalForecastQuantity')}</th>
                                             <th>{i18n.t('static.forecastSummary.stockEndOfDec')}</th>
-                                            <th>{i18n.t('static.forecastSummary.existingShipments')}</th>
+                                            <th>{i18n.t('static.forecastSummary.existingShipmentsJan2021')}</th>
                                             <th>{i18n.t('static.forecastSummary.stockEndOfDec2023')}</th>
                                             <th>{i18n.t('static.forecastSummary.desiredMonthOfStockEndOfDec2023')}</th>
                                             <th>{i18n.t('static.forecastSummary.desiredStockEndOfDec2023')}</th>
