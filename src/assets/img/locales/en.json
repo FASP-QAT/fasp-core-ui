@@ -134,7 +134,7 @@
     "static.report.mospast": "Months in Past for AMC",
     "static.supplyPlanFormula.suggestedOrderQtyEx6": "Unmet Demand = 120",
     "static.forecastReport.nationalView": "National View",
-    "static.common.errors": "Errors",
+    "static.common.errors": "Type of Forecast Error",
     "static.problemReport.rejectedDesc": "The submitted supply plan has not been approved. There are either outstanding problems that need to be closed via data entry or 'Addressed' with a sufficient explanation. Users should then recommit their final supply plan.",
     "static.mt.reminders2D3": "Your order in the ERP system is 20 packs (10 chocolate bars per pack), but your supply plan is in packs of 100 chocolate bars. To calculate the conversion factor, consider how many single units you have in the ERP pack size (10) and divide by how many single units you have in your QAT planning unit (100). In this example, the conversion factor is 10 bars / 100 bars = 0.1. Multiplying the ERP shipment quantity by 0.1 results in the converted QAT shipment quantity of 2, which is the number that will be used in your supply plan.  ",
     "static.quantimed.conversionFactor": "Conversion Factor (Quantimed to QAT Planning)",
