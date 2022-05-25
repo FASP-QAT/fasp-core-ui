@@ -3431,7 +3431,10 @@ export default class BuildTree extends Component {
         var endDate = this.state.currentCalculatorStopDate;
         var monthDifference = parseInt(moment(endDate).diff(startDate, 'months', true) + 1);
         var currentTargetChangePercentage = document.getElementById("currentTargetChangePercentage").value;
+        currentTargetChangePercentage = currentTargetChangePercentage != "" ? parseFloat(currentTargetChangePercentage) : ''
+        console.log("currentTargetChangePercentage---", parseFloat(currentTargetChangePercentage));
         var getValue = currentTargetChangePercentage != "" ? currentTargetChangePercentage.toString().replaceAll(",", "").match(/^-?\d+(?:\.\d{0,4})?/)[0] : "";
+        console.log("getValue---", getValue);
         var getEndValueFromPercentage = (this.state.currentCalculatorStartValue.toString().replaceAll(",", "") * getValue) / 100;
 
         console.log("***-----------------1-", this.state.currentCalculatorStartValue.toString().replaceAll(",", ""));
@@ -3455,6 +3458,7 @@ export default class BuildTree extends Component {
             percentForOneMonth = getValue / monthDifference;
 
         }
+        // console.log("percentForOneMonth---",percentForOneMonth);
         if (this.state.currentModelingType == 5) {
             var momValue = (parseFloat(getValue / monthDifference)).toFixed(4);
         }
@@ -6846,6 +6850,13 @@ export default class BuildTree extends Component {
             else {
                 this.state.currentModelingType = 5
             }
+            if (!this.state.currentTargetChangeNumberEdit && this.state.currentModelingType != 2) {
+                console.log("inside if calculator radio button");
+                this.setState({
+                    currentTargetChangePercentageEdit: false,
+                    currentEndValueEdit: false
+                });
+            }
 
         }
 
@@ -6897,9 +6908,9 @@ export default class BuildTree extends Component {
                 label_sp: '',
                 label_pr: ''
             }
-            console.log("node unit label---",label);
+            console.log("node unit label---", label);
             currentItemConfig.context.payload.nodeUnit.label = label;
-            console.log("after node unit label---",currentItemConfig);
+            console.log("after node unit label---", currentItemConfig);
 
         }
         if (event.target.name === "percentageOfParent") {
@@ -7858,13 +7869,13 @@ export default class BuildTree extends Component {
                             display: true,
                             // labelString: this.state.currentItemConfig.context.payload.nodeUnit.label != null ? this.state.currentItemConfig.context.payload.nodeType.id > 3 ? getLabelText(this.state.currentItemConfig.parentItem.payload.nodeUnit.label, this.state.lang) : getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang) : '',
                             // labelString: this.state.currentItemConfig.context.payload.nodeUnit.label != null ? this.state.currentItemConfig.context.payload.nodeType.id > 3 ? getLabelText(this.state.currentItemConfig.parentItem.payload.nodeUnit.label, this.state.lang) : getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang) : '',
-                            labelString: this.state.currentItemConfig.context.payload.nodeType.id > 2 ? 
-                            this.state.currentItemConfig.context.payload.nodeUnit.id != "" ? 
-                            getLabelText(this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label, this.state.lang) 
-                            : "" 
-                            : this.state.currentItemConfig.context.payload.nodeUnit.label != null ? 
-                            getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang) 
-                            : "",
+                            labelString: this.state.currentItemConfig.context.payload.nodeType.id > 2 ?
+                                this.state.currentItemConfig.context.payload.nodeUnit.id != "" ?
+                                    getLabelText(this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label, this.state.lang)
+                                    : ""
+                                : this.state.currentItemConfig.context.payload.nodeUnit.label != null ?
+                                    getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang)
+                                    : "",
                             // labelString: "",
                             fontColor: 'black'
                         },

@@ -563,7 +563,7 @@ export default class CreateTreeTemplate extends Component {
                 },
                 active: true
                 , flatList: [],
-                levelList:[]
+                levelList: []
             },
             forecastMethodList: [],
             nodeTypeList: [],
@@ -781,14 +781,14 @@ export default class CreateTreeTemplate extends Component {
         this.calculateParentValueFromMOM = this.calculateParentValueFromMOM.bind(this);
         this.generateMonthList = this.generateMonthList.bind(this);
         this.updateTreeData = this.updateTreeData.bind(this);
-        this.levelDeatilsSaved=this.levelDeatilsSaved.bind(this)
+        this.levelDeatilsSaved = this.levelDeatilsSaved.bind(this)
     }
 
     levelClicked(data) {
         var name = "";
         var unit = "";
         var levelNo = "";
-        console.log("Data@@@@@@@@@@@@",data!="")
+        console.log("Data@@@@@@@@@@@@", data != "")
         if (data != "") {
             console.log("Data@@@@###############", data.context.levels[0])
             var treeLevelList = this.state.treeTemplate.levelList != undefined ? this.state.treeTemplate.levelList : [];
@@ -2083,6 +2083,7 @@ export default class CreateTreeTemplate extends Component {
         // var monthArr = this.state.monthList.filter(x => x.id > startDate && x.id < endDate);
         // var monthDifference = monthArr.length > 0 ? parseInt(monthArr.length + 1) : 0;
         var currentTargetChangePercentage = document.getElementById("currentTargetChangePercentage").value;
+        currentTargetChangePercentage = currentTargetChangePercentage != "" ? parseFloat(currentTargetChangePercentage) : ''
         var getValue = currentTargetChangePercentage != "" ? currentTargetChangePercentage.toString().replaceAll(",", "").match(/^-?\d+(?:\.\d{0,4})?/)[0] : "";
         var getEndValueFromPercentage = (this.state.currentCalculatorStartValue.toString().replaceAll(",", "") * getValue) / 100;
 
@@ -5730,6 +5731,7 @@ export default class CreateTreeTemplate extends Component {
         }
 
         if (event.target.name == "modelingType") {
+
             if (event.target.id === "active1") {
                 this.state.currentModelingType = 4
             }
@@ -5742,6 +5744,28 @@ export default class CreateTreeTemplate extends Component {
             else {
                 this.state.currentModelingType = 5
             }
+            // console.log("this.state.currentTargetChangeNumberEdit---", this.state.currentTargetChangeNumberEdit);
+            // console.log("this.state.currentModelingType---", this.state.currentModelingType);
+            if (!this.state.currentTargetChangeNumberEdit && this.state.currentModelingType != 2) {
+                console.log("inside if calculator radio button");
+                this.setState({
+                    currentTargetChangePercentageEdit: false,
+                    currentEndValueEdit: false
+                });
+            }
+
+            // if (!this.state.currentEndValueEdit && !this.state.currentTargetChangePercentageEdit && !this.state.currentTargetChangeNumberEdit) {
+            //     console.log("Inside if modeling calculator");
+            // } else {
+            //     console.log("Inside else modeling calculator");
+            //     if (!this.state.currentEndValueEdit) {
+            //         this.calculateMomByEndValue();
+            //     } else if (!this.state.currentTargetChangePercentageEdit) {
+            //         this.calculateMomByChangeInPercent();
+            //     } else if (!this.state.currentTargetChangeNumberEdit) {
+            //         this.calculateMomByChangeInNumber();
+            //     }
+            // }
 
         }
         if (event.target.name == "monthId") {
@@ -6485,12 +6509,12 @@ export default class CreateTreeTemplate extends Component {
         const { treeTemplate } = this.state;
 
         var treeLevelList = treeTemplate.levelList;
-        console.log("currentItemConfig.context.level == 0 && treeLevelList != undefined@@@@@@@",currentItemConfig.context.level == 0 && treeLevelList != undefined)
-        console.log("currentItemConfig.context.level == 0 && treeLevelList != undefined@@@@@@@treeLevelList",treeLevelList)
-        
+        console.log("currentItemConfig.context.level == 0 && treeLevelList != undefined@@@@@@@", currentItemConfig.context.level == 0 && treeLevelList != undefined)
+        console.log("currentItemConfig.context.level == 0 && treeLevelList != undefined@@@@@@@treeLevelList", treeLevelList)
+
         if (currentItemConfig.context.level == 0 && treeLevelList != undefined) {
             var levelListFiltered = treeLevelList.findIndex(c => c.levelNo == parseInt(currentItemConfig.context.level));
-            console.log("levelListFiltered@@@@@@@@@@",levelListFiltered);
+            console.log("levelListFiltered@@@@@@@@@@", levelListFiltered);
             if (levelListFiltered != -1) {
                 var unitId = currentItemConfig.context.payload.nodeType.id == 4 ? currentItemConfig.parentItem.payload.nodeUnit.id : currentItemConfig.context.payload.nodeUnit.id;
                 var label = {}
@@ -6504,7 +6528,7 @@ export default class CreateTreeTemplate extends Component {
 
             }
             treeTemplate.levelList = treeLevelList;
-            console.log("TreeTemplate@@@@@@@",treeTemplate)
+            console.log("TreeTemplate@@@@@@@", treeTemplate)
         }
         this.setState({
             items: nodes,
@@ -9252,7 +9276,7 @@ export default class CreateTreeTemplate extends Component {
                                                 id: template.forecastMethod.id
                                             },
                                             flatList: flatList,
-                                            levelList:template.levelList
+                                            levelList: template.levelList
                                         }
                                         console.log("template obj---", templateObj);
 
@@ -9761,7 +9785,7 @@ export default class CreateTreeTemplate extends Component {
             </Modal>
             {/* </Draggable> */}
             {/* Scenario Modal end------------------------ */}
-{/* Modal for level */}
+            {/* Modal for level */}
             <Modal isOpen={this.state.levelModal}
                 className={'modal-md'}>
                 <ModalHeader toggle={() => this.levelClicked("")} className="modalHeader">
