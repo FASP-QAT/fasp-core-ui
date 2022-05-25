@@ -216,12 +216,13 @@ export default class CommitTreeComponent extends React.Component {
     }
 
     setProgramId(e) {
+        console.log("In set program Id@@@@@@@@@@@%%%%%%%%%%%%%")
+        var programId = e.target.value;
         this.setState({
             loading: true,
             showCompare: false,
-        })
-        var programId = e.target.value;
-        var myResult = [];
+        },()=>{
+            var myResult = [];
         myResult = this.state.programList;
         localStorage.setItem("sesDatasetId", programId);
         this.setState({
@@ -271,20 +272,25 @@ export default class CommitTreeComponent extends React.Component {
                 programVersionJson = programVersionJson.concat([json]);
                 DatasetService.getAllDatasetData(programVersionJson)
                     .then(response => {
+                        console.log("In response@@@@@@@@@@@%%%%%%%%%%%%%")
                         this.setState({
                             programDataServer: response.data[0],
                             showCompare: true,
                             comparedLatestVersion: response.data[0].currentVersion.versionId
+                        },()=>{
+                            dataCheck(this, programData[0].datasetJson)
                         })
                     })
-                dataCheck(this, programData[0].datasetJson)
+                
 
             }.bind(this)
         }.bind(this)
+        })
     }
 
 
     updateState(parameterName, value) {
+        console.log("In update state@@@@@@@@@@@%%%%%%%%%%%%%")
         console.log("ParameterName$$$", parameterName)
         console.log("Value$$$", value)
         this.setState({
@@ -321,69 +327,69 @@ export default class CommitTreeComponent extends React.Component {
 
     redirectToDashbaord(commitRequestId) {
         this.setState({ loading: true });
-
-        const sendGetRequest = async () => {
-            try {
-                AuthenticationService.setupAxiosInterceptors();
-                const resp = await ProgramService.sendNotificationAsync(commitRequestId);
-                var curUser = AuthenticationService.getLoggedInUserId();
-                if (resp.data.createdBy.userId == curUser && resp.data.status == 2) {
+        // console.log("method called", commitRequestId);
+        AuthenticationService.setupAxiosInterceptors();
+        ProgramService.sendNotificationAsync(commitRequestId).then(resp => {
+            var curUser = AuthenticationService.getLoggedInUserId();
+            if (resp.data.createdBy.userId == curUser && resp.data.status == 1) {
+                setTimeout(function () {
+                    this.redirectToDashbaord(commitRequestId)
+                }.bind(this), 10000);
+            } else if (resp.data.createdBy.userId == curUser && resp.data.status == 2) {
+                this.setState({
+                    progressPer: 75
+                    , message: i18n.t('static.commitVersion.serverProcessingCompleted'), color: 'green'
+                }, () => {
+                    this.hideFirstComponent();
+                    this.getLatestProgram({ openModal: true, notificationDetails: resp.data });
+                })
+            } else if (resp.data.createdBy.userId == curUser && resp.data.status == 3) {
+                var db1;
+                getDatabase();
+                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                openRequest.onerror = function (event) {
                     this.setState({
-                        progressPer: 75
-                        , message: i18n.t('static.commitVersion.serverProcessingCompleted'), color: 'green'
-                    }, () => {
-                        this.hideFirstComponent();
-                        this.getLatestProgram({ openModal: true, notificationDetails: resp.data });
+                        message: i18n.t('static.program.errortext'),
+                        color: 'red'
                     })
-                } else if (resp.data.createdBy.userId == curUser && resp.data.status == 3) {
-                    var db1;
-                    getDatabase();
-                    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                    openRequest.onerror = function (event) {
+                    this.hideFirstComponent()
+                }.bind(this);
+                openRequest.onsuccess = function (e) {
+                    db1 = e.target.result;
+                    var transaction = db1.transaction(['datasetDetails'], 'readwrite');
+                    var program = transaction.objectStore('datasetDetails');
+                    var getRequest = program.get((this.state.programId));
+                    getRequest.onerror = function (event) {
                         this.setState({
                             message: i18n.t('static.program.errortext'),
                             color: 'red'
                         })
                         this.hideFirstComponent()
                     }.bind(this);
-                    openRequest.onsuccess = function (e) {
-                        db1 = e.target.result;
-                        var transaction = db1.transaction(['datasetDetails'], 'readwrite');
-                        var program = transaction.objectStore('datasetDetails');
-                        var getRequest = program.get((this.state.programId));
-                        getRequest.onerror = function (event) {
+                    getRequest.onsuccess = function (event) {
+                        var myResult = [];
+                        myResult = getRequest.result;
+                        myResult.readonly = 0;
+                        var transaction1 = db1.transaction(['datasetDetails'], 'readwrite');
+                        var program1 = transaction1.objectStore('datasetDetails');
+                        var getRequest1 = program1.put(myResult);
+                        var message = i18n.t('static.commitTree.commitFailed').concat(" - ").concat(resp.data.failedReason).toString().replaceAll(":", " ");
+                        getRequest1.onsuccess = function (e) {
                             this.setState({
-                                message: i18n.t('static.program.errortext'),
-                                color: 'red'
+                                message: message,
+                                color: 'red',
+                                loading: false
                             })
                             this.hideFirstComponent()
-                        }.bind(this);
-                        getRequest.onsuccess = function (event) {
-                            var myResult = [];
-                            myResult = getRequest.result;
-                            myResult.readonly = 0;
-                            var transaction1 = db1.transaction(['datasetDetails'], 'readwrite');
-                            var program1 = transaction1.objectStore('datasetDetails');
-                            var getRequest1 = program1.put(myResult);
-                            var message = i18n.t('static.commitTree.commitFailed').concat(" - ").concat(resp.data.failedReason).toString().replaceAll(":", " ");
-                            getRequest1.onsuccess = function (e) {
-                                this.setState({
-                                    message: message,
-                                    color: 'red',
-                                    loading: false
-                                })
-                                this.hideFirstComponent()
-                            }.bind(this)
                         }.bind(this)
                     }.bind(this)
-                }
-            } catch (err) {
-                // Handle Error Here
-                console.error("Error+++", err);
-                this.setState({ loading: false });
+                }.bind(this)
             }
-        };
-        sendGetRequest();
+
+        }).catch(
+            error => {
+                this.redirectToDashbaord(commitRequestId)
+            })
     }
 
     getLatestProgram(notificationDetails) {
@@ -518,137 +524,212 @@ export default class CommitTreeComponent extends React.Component {
 
 
     synchronize() {
-        this.setState({ showValidation: !this.state.showValidation }, () => {
-            this.setState({
-                loading: true,
-            }, () => {
-                var db1;
-                getDatabase();
-                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                openRequest.onerror = function (event) {
-                    this.setState({
-                        supplyPlanError: i18n.t('static.program.errortext')
-                    })
-                }.bind(this);
-                openRequest.onsuccess = function (e) {
-                    db1 = e.target.result;
-                    var programDataTransaction = db1.transaction(['datasetData'], 'readwrite');
-                    var programDataOs = programDataTransaction.objectStore('datasetData');
-                    var programRequest = programDataOs.get((this.state.programId));
-                    programRequest.onerror = function (event) {
+        var checkIfThereAreTreesWithBlankPU = false;
+        var checkIfThereAreTreesWithBlankFU = false;
+        var localDatasetData = this.state.programDataLocal;
+        var treeList = localDatasetData.treeList;
+        for (var tl = 0; tl < treeList.length && !checkIfThereAreTreesWithBlankPU && !checkIfThereAreTreesWithBlankFU; tl++) {
+            var tree = treeList[tl];
+            var scenarioList = tree.scenarioList
+            for (var ndm = 0; ndm < scenarioList.length && !checkIfThereAreTreesWithBlankPU && !checkIfThereAreTreesWithBlankFU; ndm++) {
+                var flatList = (tree.tree).flatList.filter(c => c.payload.nodeType.id == 5 && c.payload.nodeDataMap[scenarioList[ndm].id][0].puNode.planningUnit.id == null);
+                if (flatList.length > 0) {
+                    checkIfThereAreTreesWithBlankPU = true;
+                }
+                var flatList1 = (tree.tree).flatList.filter(c => c.payload.nodeType.id == 4 && c.payload.nodeDataMap[scenarioList[ndm].id][0].fuNode.forecastingUnit.id == null);
+                if (flatList.length > 0) {
+                    checkIfThereAreTreesWithBlankPU = true;
+                }
+                if (flatList1.length > 0) {
+                    checkIfThereAreTreesWithBlankFU = true;
+                }
+                // var completeFlatList = (tree.tree).flatList;
+                // console.log("completeFlatList---", completeFlatList);
+                // for (let i = 0; i < completeFlatList.length; i++) {
+                //     var node = completeFlatList[i];
+                //     console.log("node---", node);
+                //     if (node.payload.nodeType == 1 || node.payload.nodeType == 2 || node.payload.nodeType == 3) {
+                //         node.payload.nodeDataMap[scenarioList[ndm].id][0].fuNode = null;
+                //         node.payload.nodeDataMap[scenarioList[ndm].id][0].puNode = null;
+                //     } else if (node.payload.nodeType == 4) {
+                //         node.payload.nodeDataMap[scenarioList[ndm].id][0].puNode = null;
+                //     } else if (node.payload.nodeType == 5) {
+                //         node.payload.nodeDataMap[scenarioList[ndm].id][0].fuNode = null;
+                //     }
+                // }
+
+            }
+        }
+
+        if (checkIfThereAreTreesWithBlankFU || checkIfThereAreTreesWithBlankPU) {
+            alert(i18n.t("static.commitTree.noPUorFUMapping"));
+        } else {
+            this.setState({ showValidation: !this.state.showValidation }, () => {
+                this.setState({
+                    loading: true,
+                }, () => {
+                    var db1;
+                    getDatabase();
+                    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                    openRequest.onerror = function (event) {
                         this.setState({
                             supplyPlanError: i18n.t('static.program.errortext')
                         })
                     }.bind(this);
-                    programRequest.onsuccess = function (e) {
-                        var programQPLDetailsTransaction1 = db1.transaction(['datasetDetails'], 'readwrite');
-                        var programQPLDetailsOs1 = programQPLDetailsTransaction1.objectStore('datasetDetails');
-                        var programQPLDetailsGetRequest = programQPLDetailsOs1.get((this.state.programId));
-                        programQPLDetailsGetRequest.onsuccess = function (event) {
-                            var programQPLDetails = programQPLDetailsGetRequest.result;
-                            var datasetDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                            var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
-                            var datasetJson = JSON.parse(datasetData);
-                            var programJson = datasetJson;
-                            programJson.currentVersion.versionType = { id: document.getElementById("versionTypeId").value };
-                            programJson.currentVersion.notes = document.getElementById("notes").value;;
-                            console.log("ProgramJson+++", programJson);
-                            console.log("this.state.comparedLatestVersion----", this.state.comparedLatestVersion);
-                            //create saveDatasetData in ProgramService
-                            DatasetService.saveDatasetData(programJson, this.state.comparedLatestVersion).then(response => {
-                                if (response.status == 200) {
-                                    var transactionForProgramQPLDetails = db1.transaction(['datasetDetails'], 'readwrite');
-                                    var programQPLDetailSaveData = transactionForProgramQPLDetails.objectStore('datasetDetails');
-                                    programQPLDetails.readonly = 1;
-                                    var putRequest2 = programQPLDetailSaveData.put(programQPLDetails);
-                                    localStorage.setItem("sesProgramId", "");
-                                    this.setState({
-                                        progressPer: 50
-                                        , message: i18n.t('static.commitVersion.sendLocalToServerCompleted'), color: 'green'
-                                    }, () => {
-                                        this.hideFirstComponent();
-                                        // getLatestProgram also copy , use getAllDatasetData instead getAllProgramData
-                                        this.redirectToDashbaord(response.data);
-                                    })
-                                } else {
-                                    this.setState({
-                                        message: response.data.messageCode,
-                                        color: "red",
-                                        loading: false
-                                    })
-                                    this.hideFirstComponent();
-                                }
+                    openRequest.onsuccess = function (e) {
+                        db1 = e.target.result;
+                        var programDataTransaction = db1.transaction(['datasetData'], 'readwrite');
+                        var programDataOs = programDataTransaction.objectStore('datasetData');
+                        var programRequest = programDataOs.get((this.state.programId));
+                        programRequest.onerror = function (event) {
+                            this.setState({
+                                supplyPlanError: i18n.t('static.program.errortext')
                             })
-                                .catch(
-                                    error => {
-                                        if (error.message === "Network Error") {
-                                            this.setState({
-                                                message: 'static.common.networkError',
-                                                color: "red",
-                                                loading: false
-                                            }, () => {
-                                                this.hideFirstComponent();
-                                            });
-                                        } else {
-                                            switch (error.response ? error.response.status : "") {
-
-                                                case 401:
-                                                    this.props.history.push(`/login/static.message.sessionExpired`)
-                                                    break;
-                                                case 403:
-                                                    this.props.history.push(`/accessDenied`)
-                                                    break;
-                                                case 406:
-                                                    if (error.response.data.messageCode == 'static.commitVersion.versionIsOutDated') {
-                                                        alert(i18n.t("static.commitVersion.versionIsOutDated"));
-                                                    }
-                                                    this.setState({
-                                                        message: error.response.data.messageCode,
-                                                        color: "red",
-                                                        loading: false
-                                                    }, () => {
-                                                        this.hideFirstComponent()
-                                                        if (error.response.data.messageCode == 'static.commitVersion.versionIsOutDated') {
-                                                            var event = {
-                                                                target: {
-                                                                    value: this.state.programId
-                                                                }
-                                                            };
-
-                                                            this.setProgramId(event);
-                                                        }
-                                                    });
-                                                    break;
-                                                case 500:
-                                                case 404:
-                                                case 412:
-                                                    this.setState({
-                                                        message: error.response.data.messageCode,
-                                                        loading: false,
-                                                        color: "red"
-                                                    }, () => {
-                                                        this.hideFirstComponent()
-                                                    });
-                                                    break;
-                                                default:
-                                                    this.setState({
-                                                        message: 'static.unkownError',
-                                                        loading: false,
-                                                        color: "red"
-                                                    }, () => {
-                                                        this.hideFirstComponent()
-                                                    });
-                                                    break;
+                        }.bind(this);
+                        programRequest.onsuccess = function (e) {
+                            var programQPLDetailsTransaction1 = db1.transaction(['datasetDetails'], 'readwrite');
+                            var programQPLDetailsOs1 = programQPLDetailsTransaction1.objectStore('datasetDetails');
+                            var programQPLDetailsGetRequest = programQPLDetailsOs1.get((this.state.programId));
+                            programQPLDetailsGetRequest.onsuccess = function (event) {
+                                var programQPLDetails = programQPLDetailsGetRequest.result;
+                                var datasetDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                                var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
+                                var datasetJson = JSON.parse(datasetData);
+                                var programJson = datasetJson;
+                                programJson.currentVersion.versionType = { id: document.getElementById("versionTypeId").value };
+                                programJson.currentVersion.notes = document.getElementById("notes").value;;
+                                console.log("ProgramJson+++", programJson);
+                                console.log("this.state.comparedLatestVersion----", this.state.comparedLatestVersion);
+                                var treeList = programJson.treeList;
+                                for (var tl = 0; tl < treeList.length; tl++) {
+                                    var tree = treeList[tl];
+                                    var scenarioList = tree.scenarioList;
+                                    var completeFlatList = (tree.tree).flatList;
+                                    for (var ndm = 0; ndm < scenarioList.length; ndm++) {
+                                        console.log("commit*** completeFlatList before---", completeFlatList);
+                                        for (let i = 0; i < completeFlatList.length; i++) {
+                                            var node = completeFlatList[i];
+                                            console.log("commit*** node before---", node);
+                                            if (node.payload.nodeType.id == 1 || node.payload.nodeType.id == 2 || node.payload.nodeType.id == 3) {
+                                                node.payload.nodeDataMap[scenarioList[ndm].id][0].fuNode = null;
+                                                node.payload.nodeDataMap[scenarioList[ndm].id][0].puNode = null;
+                                            } else if (node.payload.nodeType.id == 4) {
+                                                node.payload.nodeDataMap[scenarioList[ndm].id][0].puNode = null;
+                                            } else if (node.payload.nodeType.id == 5) {
+                                                node.payload.nodeDataMap[scenarioList[ndm].id][0].fuNode = null;
                                             }
+                                            console.log("commit*** node after---", node);
+                                            var findNodeIndex = completeFlatList.findIndex(n => n.id == node.id);
+                                            console.log("commit*** findNodeIndex1---", findNodeIndex);
+                                            completeFlatList[findNodeIndex] = node;
+                                            console.log("commit*** completeFlatList after---", completeFlatList);
                                         }
                                     }
-                                );
+                                    tree.tree.flatList = completeFlatList;
+                                    console.log("commit*** tree---", tree);
+                                    var findTreeIndex = treeList.findIndex(n => n.treeId == tree.treeId);
+                                    console.log("commit*** findTreeIndex---", findTreeIndex);
+                                    treeList[findTreeIndex] = tree;
+                                    console.log("commit*** treeList---", treeList);
+                                }
+                                programJson.treeList = treeList;
+                                console.log("commit*** final programJson---",programJson);
+
+                                //create saveDatasetData in ProgramService
+                                DatasetService.saveDatasetData(programJson, this.state.comparedLatestVersion).then(response => {
+                                    if (response.status == 200) {
+                                        var transactionForProgramQPLDetails = db1.transaction(['datasetDetails'], 'readwrite');
+                                        var programQPLDetailSaveData = transactionForProgramQPLDetails.objectStore('datasetDetails');
+                                        programQPLDetails.readonly = 1;
+                                        var putRequest2 = programQPLDetailSaveData.put(programQPLDetails);
+                                        localStorage.setItem("sesProgramId", "");
+                                        this.setState({
+                                            progressPer: 50
+                                            , message: i18n.t('static.commitVersion.sendLocalToServerCompleted'), color: 'green'
+                                        }, () => {
+                                            this.hideFirstComponent();
+                                            // getLatestProgram also copy , use getAllDatasetData instead getAllProgramData
+                                            this.redirectToDashbaord(response.data);
+                                        })
+                                    } else {
+                                        this.setState({
+                                            message: response.data.messageCode,
+                                            color: "red",
+                                            loading: false
+                                        })
+                                        this.hideFirstComponent();
+                                    }
+                                })
+                                    .catch(
+                                        error => {
+                                            if (error.message === "Network Error") {
+                                                this.setState({
+                                                    message: 'static.common.networkError',
+                                                    color: "red",
+                                                    loading: false
+                                                }, () => {
+                                                    this.hideFirstComponent();
+                                                });
+                                            } else {
+                                                switch (error.response ? error.response.status : "") {
+
+                                                    case 401:
+                                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                                        break;
+                                                    case 403:
+                                                        this.props.history.push(`/accessDenied`)
+                                                        break;
+                                                    case 406:
+                                                        if (error.response.data.messageCode == 'static.commitVersion.versionIsOutDated') {
+                                                            alert(i18n.t("static.commitVersion.versionIsOutDated"));
+                                                        }
+                                                        this.setState({
+                                                            message: error.response.data.messageCode,
+                                                            color: "red",
+                                                            loading: false
+                                                        }, () => {
+                                                            this.hideFirstComponent()
+                                                            if (error.response.data.messageCode == 'static.commitVersion.versionIsOutDated') {
+                                                                var event = {
+                                                                    target: {
+                                                                        value: this.state.programId
+                                                                    }
+                                                                };
+
+                                                                this.setProgramId(event);
+                                                            }
+                                                        });
+                                                        break;
+                                                    case 500:
+                                                    case 404:
+                                                    case 412:
+                                                        this.setState({
+                                                            message: error.response.data.messageCode,
+                                                            loading: false,
+                                                            color: "red"
+                                                        }, () => {
+                                                            this.hideFirstComponent()
+                                                        });
+                                                        break;
+                                                    default:
+                                                        this.setState({
+                                                            message: 'static.unkownError',
+                                                            loading: false,
+                                                            color: "red"
+                                                        }, () => {
+                                                            this.hideFirstComponent()
+                                                        });
+                                                        break;
+                                                }
+                                            }
+                                        }
+                                    );
+                            }.bind(this)
                         }.bind(this)
                     }.bind(this)
-                }.bind(this)
+                })
             })
-        })
-
+        }
     }
 
     cancelClicked() {
@@ -708,6 +789,7 @@ export default class CommitTreeComponent extends React.Component {
     }
 
     render() {
+        console.log("In render@@@@@@@@@@@%%%%%%%%%%%%%",this.state.loading);
         const { programList } = this.state;
         let programs = programList.length > 0 && programList.map((item, i) => {
             return (

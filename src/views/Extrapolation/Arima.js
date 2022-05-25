@@ -18,31 +18,6 @@ export function calculateArima(inputData, p, d, q, confidenceLevel, noOfProjecti
     console.log("StartParam@@@@@@", startParam);
     // var date = minStartDate;
     var data = []
-//     inputData=[{"month":1,"actual":10000,"forecast":null},
-// {"month":1,"actual":20500,"forecast":null},
-// {"month":1,"actual":31000,"forecast":null},
-// {"month":1,"actual":41500,"forecast":null},
-// {"month":1,"actual":52000,"forecast":null},
-// {"month":1,"actual":62500,"forecast":null},
-// {"month":1,"actual":73000,"forecast":null},
-// {"month":1,"actual":83500,"forecast":null},
-// {"month":1,"actual":94000,"forecast":null},
-// {"month":1,"actual":104500,"forecast":null},
-// {"month":1,"actual":115000,"forecast":null},
-// {"month":1,"actual":125500,"forecast":null},
-// {"month":1,"actual":136000,"forecast":null},
-// {"month":1,"actual":146500,"forecast":null},
-// {"month":1,"actual":157000,"forecast":null},
-// {"month":1,"actual":167500,"forecast":null},
-// {"month":1,"actual":178000,"forecast":null},
-// {"month":1,"actual":188500,"forecast":null},
-// {"month":1,"actual":199000,"forecast":null},
-// {"month":1,"actual":209500,"forecast":null},
-// {"month":1,"actual":220000,"forecast":null},
-// {"month":1,"actual":230500,"forecast":null},
-// {"month":1,"actual":241000,"forecast":null},
-// {"month":1,"actual":251500,"forecast":null}]
-
     for (var i = 0; i < inputData.length; i++) {
         data.push(Number(inputData[i].actual));
     }
@@ -55,9 +30,7 @@ export function calculateArima(inputData, p, d, q, confidenceLevel, noOfProjecti
         "q": Number(q),
         "n": Number(noOfProjectionMonths),
         "seasonality": seasonality,
-        // "p": 0,
-        // "d": 1,
-        // "q": 1
+        "level":Number(confidenceLevel)
     }
     console.log("JsonArima@@@@@@", json);
     ExtrapolationService.arima(json)
@@ -69,15 +42,16 @@ export function calculateArima(inputData, p, d, q, confidenceLevel, noOfProjecti
                 var count = 0;
                 for (var k = 0; k < responseData.fits.length; k++) {
                     count += 1;
-                    output.push({ month: count, actual: inputData[k] != undefined && inputData[k].actual != undefined && inputData[k].actual != null && inputData[k].actual != '' ? inputData[k].actual : null, forecast: responseData.fits[k] == 'NA' ? null : responseData.fits[k] > 0 ? responseData.fits[k] : 0 })
+                    output.push({ month: count, actual: inputData[k] != undefined && inputData[k].actual != undefined && inputData[k].actual != null && inputData[k].actual != '' ? inputData[k].actual : null, forecast: responseData.fits[k] == 'NA' ? null : responseData.fits[k] > 0 ? responseData.fits[k] : 0,ci:null })
                 }
-                for (var j = 0; j < responseData.forecasts.length; j++) {
+                for (var j = 0; j < responseData.forecast.length; j++) {
                     count += 1;
-                    output.push({ month: count, actual: inputData[count - 1] != undefined && inputData[count - 1].actual != undefined && inputData[count - 1].actual != null && inputData[count - 1].actual != '' ? inputData[count - 1].actual : null, forecast: responseData.forecasts[j] == 'NA' ? null : responseData.forecasts[j] > 0 ? responseData.forecasts[j] : 0 })
+                    output.push({ month: count, actual: inputData[count - 1] != undefined && inputData[count - 1].actual != undefined && inputData[count - 1].actual != null && inputData[count - 1].actual != '' ? inputData[count - 1].actual : null, forecast: responseData.forecast[j] == 'NA' ? null : responseData.forecast[j] > 0 ? responseData.forecast[j] : 0,ci: responseData.ci[j] > 0 ? responseData.ci[j] : 0 })
                 }
 
                 console.log("OutPutArima@@@@@@@@@@@@@@@@@@@@@@", output)
-                calculateCI(output, Number(confidenceLevel), "arimaData", props)
+                // calculateCI(output, Number(confidenceLevel), "arimaData", props)
+                props.updateState("arimaData", output);
                 calculateError(output, "arimaError", props)
 
             }

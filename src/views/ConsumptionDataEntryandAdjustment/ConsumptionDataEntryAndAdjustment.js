@@ -34,6 +34,9 @@ import * as Yup from 'yup';
 import { confirmAlert } from "react-confirm-alert";
 import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
+import dataentryScreenshot1 from '../../assets/img/dataentryScreenshot-1.png';
+import dataentryScreenshot2 from '../../assets/img/dataentryScreenshot-2.png';
+import dataentryScreenshot3 from '../../assets/img/dataentryScreenshot-3.png';
 
 const entityname = i18n.t('static.dashboard.dataEntryAndAdjustment');
 const ref = React.createRef();
@@ -128,7 +131,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       dataEnteredInUnitList: [],
       minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
       singleValue2: localStorage.getItem("sesDataentryDateRange") != "" ? JSON.parse(localStorage.getItem("sesDataentryDateRange")) : { from: { year: Number(moment(startDate).startOf('month').format("YYYY")), month: Number(moment(startDate).startOf('month').format("M")) }, to: { year: Number(moment(stopDate).startOf('month').format("YYYY")), month: Number(moment(stopDate).startOf('month').format("M")) } },
-      maxDate: { year: Number(moment(Date.now()).startOf('month').format("YYYY")), month: Number(moment(Date.now()).startOf('month').format("M")) }
+      maxDate: { year: Number(moment(Date.now()).startOf('month').format("YYYY")), month: Number(moment(Date.now()).startOf('month').format("M")) },
+      planningUnitTotalList: []
     }
     this.loaded = this.loaded.bind(this);
     this.buildDataJexcel = this.buildDataJexcel.bind(this);
@@ -1517,7 +1521,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                       daysOfStockOut = 0;
                       qtyInPU = ""
                     }
-                    planningUnitTotalListRegion.push({ planningUnitId: planningUnitList[cul].planningUnit.id, month: curDate, qty: qty != "" ? Math.round(qty) : "", qtyInPU: qtyInPU != "" ? Math.round(qtyInPU) : "", reportingRate: reportingRate, region: regionList[r], multiplier: multiplier, actualConsumption: actualConsumption, daysOfStockOut: daysOfStockOut, noOfDays: noOfDays })
+                    planningUnitTotalListRegion.push({ planningUnitId: planningUnitList[cul].planningUnit.id, month: curDate, qty: qty != "" ? Math.round(qty) : "", qtyInPU: qty !== "" ? Math.round(qtyInPU) : "", reportingRate: reportingRate, region: regionList[r], multiplier: multiplier, actualConsumption: actualConsumption, daysOfStockOut: daysOfStockOut, noOfDays: noOfDays })
                     console.log("planningUnitTotalListRegion-->", planningUnitTotalListRegion);
                     if (qty !== "") {
                       totalQty = Number(totalQty) + Number(qty);
@@ -1525,7 +1529,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                     }
                   }
                   console.log("&&totalQty--->", totalQty)
-                  planningUnitTotalList.push({ planningUnitId: planningUnitList[cul].planningUnit.id, month: curDate, qty: totalQty !== "" ? Math.round(totalQty) : "", qtyInPU: totalQtyPU != "" ? Math.round(totalQtyPU) : "" })
+                  planningUnitTotalList.push({ planningUnitId: planningUnitList[cul].planningUnit.id, month: curDate, qty: totalQty !== "" ? Math.round(totalQty) : "", qtyInPU: totalQty !== "" ? Math.round(totalQtyPU) : "" })
                   console.log("&&planningUnitTotalList------>", planningUnitTotalList)
                   totalPlanningUnit += totalQty;
                   totalPlanningUnitPU += totalQtyPU;
@@ -1537,6 +1541,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               var forecastingUnitList = fuResult.filter(c => tracerCategoryIds.includes(c.tracerCategory.id));
               var forecastingUnitIds = [...new Set(forecastingUnitList.map(ele => (ele.forecastingUnitId)))];
               var allPlanningUnitList = puResult.filter(c => forecastingUnitIds.includes(c.forecastingUnit.forecastingUnitId));
+              console.log("&&planningUnitList------>", planningUnitList)
 
               this.setState({
                 consumptionList: consumptionList,
@@ -2336,12 +2341,101 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           </ModalHeader>
           <div>
             <ModalBody>
-              <p>Methods are organized from simple to robust
+            <div>
+                               <h3 className='ShowGuidanceHeading'>Data Entry and Adjustment </h3>
+                           </div>
+                            <p>
+                                <p style={{fontSize:'13px'}}><span className="UnderLineText">Purpose :</span> Enable users to prepare historical consumption data before moving on the '<a href="/#/Extrapolation/extrapolateData" target="_blank" style={{textDecoration:'underline'}}>Extrapolation</a>' screen. Historical actual consumption can be quantities sold, quantities dispensed to user or quantities issued by storage facilities. On this screen, users can adjust historical consumption data that has been either manually entered on this screen or that has been imported from a QAT supply plan program (if you desire to import, please proceed first to the '<a href="/#/importFromQATSupplyPlan/listImportFromQATSupplyPlan" target="_blank" style={{textDecoration:'underline'}}>Import from QAT Supply Plan</a>' screen). </p>
+                            </p>
+                            <p>
+                                <p style={{fontSize:'13px'}}><span className="UnderLineText">Using this screen :</span></p>
+                               <ol>
+                                 <li>Select the forecast program and the desired review period. By default, QAT pre-selects a date range of 36 months prior to the start of the forecasting period. A non-editable table and all products related to this forecast program are displayed, along with their consumption data if you have previously entered that data; otherwise you will see yellow cells indicating that no consumption data has been entered. By default, the products and consumption are shown in planning units. The user can also expand each row of the table to display the consumption by region, if managing a multi-region program.   </li>
+                                 <li>On the top table, click on a product to display the detailed data table for that product. The detailed data table will have a section for each region in your program. 
+                                 </li>
+                                 <li>The detailed data table allows users to add, edit, adjust, or delete historical consumption records. 
+                                   <ol type="a">
+                                      <li>If you would like to enter data manually, enter the historical consumption for each region and month in the 'Actual Consumption' row.  </li>
+                                      <li>If you have imported data from QAT, you will see your imported historical consumption in the 'Actual Consumption' row.  </li>
+                                      <li>By default, data is assumed to be entered in the Planning Unit. However, the user can specify the appropriate unit for the detailed data by clicking on the “change” link under the product name and in the subsequent pop-up, choosing to enter data using the planning unit, the forecasting unit quantities (applying a realm-managed conversion factor) or another user-entered unit (and conversion factor). </li>
+                                   </ol>
+                                 </li>
+                                 <li>There are three ways to adjust the data:  
+                                   <ol type="a">
+                                     <li><b>Adjust for under-reporting</b>: The default value is 100% reporting every month. The user can change this to the correct value. QAT will calculate the adjusted consumption due to underreporting. </li>
+                                     <li><b>Adjust for stock outs</b>: For imported data, the number of stock out days is pulled in from the QAT supply plan program, if data is collected. The default value for stock out days is zero days (product assumed always in stock). The user can change this to the correct value. The default value for number of days in a month are based on the calendar days, but users can adjust the number of days used for the stock out calculation in '<a href="/#/dataset/versionSettings" target="_blank" style={{textDecoration:'underline'}}>Update Version Settings</a>'. </li>
+                                   
+                                   <p className="pl-lg-5">
+                                   <span style={{fontStyle:'italic'}}><b>Stock Out Rate</b> = Stocked Out (days)/ (# of Days in Month). </span><br></br>
+
+                                    <span style={{fontStyle:'italic'}}><b>Adjusted Consumption</b> = Actual Consumption / Reporting Rate / (1 - Stock Out Rate) </span>
+                                  </p>
+                                  <p>For example, if for a given month, a product had a consumption of 1,000 units, was out-of-stock for 5 out of 31 days in the month and the reporting rate was 98%: <br></br>
+
+                                  <span className="pl-lg-5" style={{fontStyle:'italic'}}><b> Stock Out Rate </b>= 5 days stocked out /31 days in a month = 16.1%. </span><br></br>
+
+                                  <span className="pl-lg-5" style={{fontStyle:'italic'}}><b>  Adjusted Consumption </b>= 1,000 units / 98% Reporting / (1 - 16.1%) = 1,217</span>  </p>
+                                 
+                                 <li>Interpolating missing values: Click the green 'Interpolate' button in the middle right of the screen to search for periods where the consumption value is blank and replace them with an interpolated value. QAT interpolates by finding the nearest values on either side (before or after the blank), calculates the straight line in between them and uses that straight-line formula to calculate the value for the blank(s).  Note that QAT will not interpolate for months where actual consumption is zero. QAT will only interpolate if there is at least one data point before and one data point after the blank value(s).
+                                   <br></br>
+                                   Mathematically:<br></br>
+                                   <ul>
+                                   <li>Where x's represent months, and y's represent actual consumption,</li>
+                                   <li>Where known data values are (x0 , y0) and (x1 , y1) </li>
+                                   <li>Where any unknown data values are (x, y) </li>
+                                   <li>The formula for the interpolated line is </li>
+                                        </ul>
+                                        <span><img className="formula-img-mr img-fluid mb-lg-0" src={dataentryScreenshot1} style={{border:'1px solid #fff',width:'250px'}}/></span><br></br>
+                                    <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0" src={dataentryScreenshot2} style={{border:'1px solid #fff',width:'250px'}}/></span>
+
+                                 </li>
+                                 <li>
+                                   Use the graph below the Detailed Data table to view the adjusted data </li>
+                                  </ol>
+                                   </li>
+                                 {/* <li>The detailed data table allows users to add, edit, adjust, or delete historical consumption records. 
+                                   <ol type="a">
+                                     <li><b>Interpolating missing values:</b> Click the green 'Interpolate' button above the top right corner of the unit table to search for periods where the consumption value is blank and replace them with an interpolated value. QAT interpolates by finding the nearest values on either side (before or after the blank), calculates the straight line in between them and uses that straight-line formula to calculate the value for the blank(s).  Note that QAT will not interpolate for months where actual consumption is zero. QAT will only interpolate if there is at least one data point before and one data point after the blank <br></br>value(s).
+                                     Mathematically:<br></br>
+                                    Where x's represent months, and y's represent actual consumption,<br></br>
+                                    Where known data values are (x0 , y0) and (x1 , y1)<br></br>
+                                    Where any unknown data values are (x, y)<br></br>
+                                    The formula for the interpolated line is<br></br>
+                                    <span><img className="formula-img-mr img-fluid mb-lg-0" src={dataentryScreenshot1} style={{border:'1px solid #fff',width:'250px'}}/></span><br></br>
+                                    <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0" src={dataentryScreenshot2} style={{border:'1px solid #fff',width:'250px'}}/></span>
+
+                                     </li>
+                                     <li><b>Adjust for under-reporting:</b> The default value is 100% reporting every month. The user can change this to the correct value. QAT will calculate the adjusted consumption due to underreporting using the formula below. </li>
+                                     <li><b>Adjust for stock outs:</b> For imported data, the number of stock out days is pulled in from the QAT supply plan program, if data is collected. The default value for stock out days is zero days (product assumed always in stock). The user can change this to the correct value. The default value for number of days in a month are based on the calendar days, but users can adjust the number of days used for the stock out calculation in '<a href="/#/Extrapolation/extrapolateData" target="_blank" style={{textDecoration:'underline'}}>Update Version Settings</a>'.</li><br></br>
+                                     <p>
+                                      <span style={{fontStyle:'italic'}}><b>Stock Out Rate</b> = Stocked Out (days)/ (# of Days in Month).</span><br></br>
+                                      <span style={{fontStyle:'italic'}}><b> Adjusted Consumption</b> = Actual Consumption / Reporting Rate / (1 - Stock Out Rate)</span></p>
+                                      <p>
+                                      For example, if for a given month, a product had a consumption of 1,000 units, was out-of-stock for 5 out of 31 days in the month and the reporting rate was 98%:<br></br>
+                                      Stock Out Rate = 5 days stocked out /31 days in a month = 16.1%.<br></br>
+                                      Adjusted Consumption = 1,000 units / 98% Reporting / (1 - 16.1%) = 1,217
+
+                                 </p>
+                                 <li>Use the graph below the Detailed Data table to view the adjusted data</li>
+                                
+                                   </ol>
+                                   </li>
+                                */}
+                                 <li>Click ‘Submit’ to save any entered data </li>
+                                 <li>Repeat steps 2-4 for each planning unit 
+                                 
+                                 {/* <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0" src={dataentryScreenshot3} style={{border:'1px solid #fff'}}/></span> */}
+                                 </li>
+                                
+                                 
+                               </ol>
+                            </p>
+              {/* <p>Methods are organized from simple to robust
 
                 More sophisticated models are more sensitive to problems in the data
 
                 If you have poorer data (missing data points, variable reporting rates, less than 12 months of data), use simpler forecast methods
-              </p>
+              </p> */}
             </ModalBody>
           </div>
         </Modal>

@@ -38,7 +38,7 @@ import ProgramService from '../../api/ProgramService';
 import FundingSourceService from '../../api/FundingSourceService';
 import ShipmentStatusService from '../../api/ShipmentStatusService';
 import { Online, Offline } from "react-detect-offline";
-import MultiSelect from 'react-multi-select-component';
+import {MultiSelect} from 'react-multi-select-component';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { Multiselect } from 'multiselect-react-dropdown';
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
@@ -2128,7 +2128,8 @@ class ShipmentGlobalDemandView extends Component {
             && programLst.map((item, i) => {
                 return (
 
-                    { label: getLabelText(item.label, this.state.lang), value: item.programId }
+                    // { label: getLabelText(item.label, this.state.lang), value: item.programId }
+                    { label: (item.programCode), value: item.programId }
 
                 )
             }, this);

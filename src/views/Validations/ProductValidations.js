@@ -436,9 +436,10 @@ class ProductValidation extends Component {
                 noOfPersons = finalData[i].parentNodeNodeDataMap.fuNode.noOfPersons;
                 noOfForecastingUnitsPerPerson = finalData[i].parentNodeNodeDataMap.fuNode.noOfForecastingUnitsPerPerson;
                 usageFrequency = finalData[i].parentNodeNodeDataMap.fuNode.usageFrequency;
+                var unitList=this.state.unitList;
                 // selectedText = this.state.currentItemConfig.parentItem.payload.nodeUnit.label.label_en
-                selectedText = getLabelText(nodeDataList.filter(c => c.flatItem.id == finalData[i].parentNodeFlatItem.parent)[0].flatItem.payload.nodeUnit.label, this.state.lang);
-                console.log("+++UNit Label", getLabelText(nodeDataList.filter(c => c.flatItem.id == finalData[i].parentNodeFlatItem.parent)[0].flatItem.payload.nodeUnit.label, this.state.lang));
+                selectedText = getLabelText(unitList.filter(c=>c.unitId==nodeDataList.filter(c => c.flatItem.id == finalData[i].parentNodeFlatItem.parent)[0].flatItem.payload.nodeUnit.id)[0].label, this.state.lang);
+                // console.log("+++UNit Label", getLabelText(nodeDataList.filter(c => c.flatItem.id == finalData[i].parentNodeFlatItem.parent)[0].flatItem.payload.nodeUnit.label, this.state.lang));
                 var unitListFilterForFu = this.state.unitList.filter(c => c.unitId == finalData[i].parentNodeNodeDataMap.fuNode.forecastingUnit.unit.id);
                 selectedText1 = getLabelText(unitListFilterForFu[0].label, this.state.lang);
                 if (finalData[i].parentNodeNodeDataMap.fuNode.usageType.id == 2 || finalData[i].parentNodeNodeDataMap.fuNode.oneTimeUsage != "true") {
@@ -871,8 +872,8 @@ class ProductValidation extends Component {
                                 }
                                 this.setState({
                                     datasetList: datasetList.sort(function (a, b) {
-                                        a = a.name.toLowerCase();
-                                        b = b.name.toLowerCase();
+                                        a = a.code.toLowerCase();
+                                        b = b.code.toLowerCase();
                                         return a < b ? -1 : a > b ? 1 : 0;
                                     }),
                                     currencyList: currencyList,
@@ -965,7 +966,7 @@ class ProductValidation extends Component {
                 doc.text(this.state.datasetData.programCode + " " + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text), doc.internal.pageSize.width - 40, 50, {
                     align: 'right'
                 })
-                doc.text(document.getElementById("datasetId").selectedOptions[0].text, doc.internal.pageSize.width - 40, 60, {
+                doc.text(getLabelText(this.state.datasetData.label,this.state.lang), doc.internal.pageSize.width - 40, 60, {
                     align: 'right'
                 })
                 doc.setFontSize(TITLE_FONT)
@@ -977,11 +978,11 @@ class ProductValidation extends Component {
                     align: 'center'
                 })
                 if (i == 1) {
-                    doc.setFont('helvetica', 'normal')
-                    doc.setFontSize(8)
-                    doc.text(i18n.t('static.dashboard.programheader') + ' : ' + document.getElementById("datasetId").selectedOptions[0].text, doc.internal.pageSize.width / 20, 90, {
-                        align: 'left'
-                    })
+                    // doc.setFont('helvetica', 'normal')
+                    // doc.setFontSize(8)
+                    // doc.text(i18n.t('static.dashboard.programheader') + ': ' + document.getElementById("datasetId").selectedOptions[0].text, doc.internal.pageSize.width / 20, 90, {
+                    //     align: 'left'
+                    // })
 
                 }
 
@@ -1001,20 +1002,20 @@ class ProductValidation extends Component {
         doc.setTextColor("#002f6c");
 
 
-        var y = 110;
-        var planningText = doc.splitTextToSize(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width * 3 / 4);
-        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
-        for (var i = 0; i < planningText.length; i++) {
-            if (y > doc.internal.pageSize.height - 100) {
-                doc.addPage();
-                y = 80;
+        var y = 80;
+        // var planningText = doc.splitTextToSize(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width * 3 / 4);
+        // // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+        // for (var i = 0; i < planningText.length; i++) {
+        //     if (y > doc.internal.pageSize.height - 100) {
+        //         doc.addPage();
+        //         y = 80;
 
-            }
-            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
-            y = y + 10;
-            console.log(y)
-        }
-        planningText = doc.splitTextToSize(i18n.t('static.common.treeName') + ' : ' + document.getElementById("treeId").selectedOptions[0].text, doc.internal.pageSize.width * 3 / 4);
+        //     }
+        //     doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+        //     y = y + 10;
+        //     console.log(y)
+        // }
+        var planningText = doc.splitTextToSize(i18n.t('static.common.treeName') + ': ' + document.getElementById("treeId").selectedOptions[0].text, doc.internal.pageSize.width * 3 / 4);
         //  doc.text(doc.internal.pageSize.width / 8, 130, planningText)
         y = y + 10;
         for (var i = 0; i < planningText.length; i++) {
@@ -1024,13 +1025,13 @@ class ProductValidation extends Component {
 
             }
             doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
-            y = y + 10;
+            y = y + 5;
             console.log(y)
         }
 
-        planningText = doc.splitTextToSize((i18n.t('static.whatIf.scenario') + ' : ' + document.getElementById("scenarioId").selectedOptions[0].text), doc.internal.pageSize.width * 3 / 4);
+        planningText = doc.splitTextToSize((i18n.t('static.whatIf.scenario') + ': ' + document.getElementById("scenarioId").selectedOptions[0].text), doc.internal.pageSize.width * 3 / 4);
         // doc.text(doc.internal.pageSize.width / 9, this.state.programLabels.size > 5 ? 190 : 150, planningText)
-        y = y + 10;
+        y = y + 5;
         for (var i = 0; i < planningText.length; i++) {
             if (y > doc.internal.pageSize.height - 100) {
                 doc.addPage();
@@ -1038,14 +1039,14 @@ class ProductValidation extends Component {
 
             }
             doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
-            y = y + 10;
+            y = y + 5;
             console.log(y)
         }
-        y = y + 10;
-        doc.text(i18n.t('static.country.currency') + ' : ' + document.getElementById("currencyId").selectedOptions[0].text, doc.internal.pageSize.width / 20, y, {
+        y = y + 5;
+        doc.text(i18n.t('static.country.currency') + ': ' + document.getElementById("currencyId").selectedOptions[0].text, doc.internal.pageSize.width / 20, y, {
             align: 'left'
         })
-        y = y + 10;
+        y = y + 5;
 
 
 
@@ -1080,9 +1081,9 @@ class ProductValidation extends Component {
         columns.push(i18n.t('static.forecastingunit.forecastingunit') + " " + i18n.t('static.common.text'));
         columns.push(i18n.t('static.common.product'));
         columns.push(i18n.t('static.common.product') + " " + i18n.t('static.common.text'));
-        columns.push(i18n.t('static.report.qty'));
+        columns.push(i18n.t('static.report.qty')+"/"+i18n.t('static.common.person'));
         columns.push(i18n.t('static.supplyPlan.pricePerPlanningUnit'));
-        columns.push(i18n.t('static.productValidation.cost'));
+        columns.push(i18n.t('static.productValidation.cost')+"/"+i18n.t("static.common.person"));
         const headers = [columns]
         const data = this.state.dataEl.getJson(null, false).map(ele => [ele[0], ele[1], ele[2], ele[3], ele[4], ele[5], this.formatter(ele[6]), this.formatter(ele[7]), ele[8] != "" ? this.formatter(Number(ele[8]).toFixed(2)) : ""]);
         // doc.addPage()
@@ -1115,27 +1116,17 @@ class ProductValidation extends Component {
     exportCSV() {
         var csvRow = [];
 
-        csvRow.push('"' + (i18n.t('static.supplyPlan.runDate') + ' : ' + moment(new Date()).format(`${DATE_FORMAT_CAP}`)).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.supplyPlan.runTime') + ' : ' + moment(new Date()).format('hh:mm A')).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.user.user') + ' : ' + AuthenticationService.getLoggedInUsername()).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.supplyPlan.runDate')+" "  + moment(new Date()).format(`${DATE_FORMAT_CAP}`)).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.supplyPlan.runTime')+" " + moment(new Date()).format('hh:mm A')).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.user.user') + ': ' + AuthenticationService.getLoggedInUsername()).replaceAll(' ', '%20') + '"')
         csvRow.push('"' + (this.state.datasetData.programCode + " " + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
-        csvRow.push('"' + (document.getElementById("datasetId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
+        csvRow.push('"' + (getLabelText(this.state.datasetData.label, this.state.lang)).replaceAll(' ', '%20') + '"')
 
-        csvRow.push('"' + (i18n.t('static.dashboard.programheader') + ' : ' + document.getElementById("datasetId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.common.treeName') + ' : ' + document.getElementById("treeId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.whatIf.scenario') + ' : ' + document.getElementById("scenarioId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.country.currency') + ' : ' + document.getElementById("currencyId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
+        // csvRow.push('"' + (i18n.t('static.dashboard.programheader') + ' : ' + document.getElementById("datasetId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        // csvRow.push('"' + (i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.common.treeName') + ': ' + document.getElementById("treeId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.whatIf.scenario') + ': ' + document.getElementById("scenarioId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.country.currency') + ': ' + document.getElementById("currencyId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
 
         csvRow.push('')
         csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
@@ -1148,9 +1139,9 @@ class ProductValidation extends Component {
         columns.push(i18n.t('static.forecastingunit.forecastingunit') + " " + i18n.t('static.common.text'));
         columns.push(i18n.t('static.common.product'));
         columns.push(i18n.t('static.common.product') + " " + i18n.t('static.common.text'));
-        columns.push(i18n.t('static.report.qty'));
+        columns.push(i18n.t('static.report.qty')+"/"+i18n.t('static.common.person'));
         columns.push(i18n.t('static.supplyPlan.pricePerPlanningUnit'));
-        columns.push(i18n.t('static.productValidation.cost'));
+        columns.push(i18n.t('static.productValidation.cost')+"/"+i18n.t("static.common.person"));
         const headers = [];
         columns.map((item, idx) => { headers[idx] = (item).replaceAll(' ', '%20') });
 
@@ -1241,17 +1232,21 @@ class ProductValidation extends Component {
                 <Card>
                     <div className="Card-header-reporticon pb-2">
                         {/* {this.state.dataList.length > 0 && */}
-                        <div className="card-header-actions BacktoLink col-md-12 pl-lg-0 pr-lg-0 pt-lg-2">
-                            {this.state.treeId > 0 && this.state.scenarioId > 0 && this.state.localProgramId != "" &&
-                                <a className="pr-lg-0 pt-lg-3 float-left">
-                                    <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
-                                    <span className="compareAndSelect-larrowText"> {i18n.t('static.common.backTo')} <a href={`/#/dataSet/buildTree/tree/` + this.state.treeId + `/` + this.state.localProgramId + `/` + this.state.scenarioId} className="supplyplanformulas">{i18n.t('static.common.managetree')}</a></span>
+                        <div className="card-header-actions BacktoLink col-md-12 pl-lg-0 pr-lg-0 pt-lg-3">
+                            {/* {this.state.treeId > 0 && this.state.scenarioId > 0 && this.state.localProgramId != "" && */}
+                                <a className="pr-lg-0 pt-lg-3">
+                                     <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
+                        <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span>
+                        <span className="compareAndSelect-larrowText"> {i18n.t('static.common.backTo')} <a href={this.state.datasetId != -1 && this.state.datasetId != "" && this.state.datasetId != undefined && this.state.localProgramId != "" ? "/#/dataSet/buildTree/tree/0/" + this.state.datasetId : "/#/dataSet/buildTree"} className="supplyplanformulas">{i18n.t('static.common.managetree')}</a> </span>
+                        <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')} <a href="/#/report/compareAndSelectScenario" className="supplyplanformulas">{i18n.t('static.dashboard.compareAndSelect')}</a> {i18n.t('static.tree.or')} <a href="/#/validation/modelingValidation" className='supplyplanformulas'>{i18n.t('static.dashboard.modelingValidation')}</a></span>
                                 </a>
-                            }
-                            <a className="pr-lg-0 pt-lg-3 float-right">
+                            {/* } */}
+                            </div>
+                            <div className="Card-header-reporticon pb-0">
+                            <a className="pr-lg-0 pt-lg-2 float-right">
                                 {this.state.dataEl != "" && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />}
                             </a>
-                            <a className="pr-lg-2 pt-lg-3 float-right">
+                            <a className="pr-lg-2 pt-lg-2 float-right">
                                 {this.state.dataEl != "" && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF()} />}
                             </a>
 

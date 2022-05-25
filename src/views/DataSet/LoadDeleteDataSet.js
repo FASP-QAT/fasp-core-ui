@@ -1093,7 +1093,9 @@ class LoadDeleteDataSet extends Component {
             getRequest.onerror = function (event) {
             }.bind(this);
             getRequest.onsuccess = function (event) {
-                var datasetList = getRequest.result;
+                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                var datasetList = getRequest.result.filter(c=>c.userId==userId);
 
 
                 var programCheckboxes = document.getElementsByName("programCheckBox");
@@ -1230,7 +1232,8 @@ class LoadDeleteDataSet extends Component {
                                 }
                             }
                         } else {
-                            this.setState({ loading: false })
+                            // console.log("In elseMohit@@@@@@@@@@@@@@@");
+                            // this.setState({ loading: false })
                         }
                         if (continueToLoad == 1) {
                             DatasetService.getAllDatasetData(checkboxesChecked)
@@ -1354,6 +1357,15 @@ class LoadDeleteDataSet extends Component {
                                     }.bind(this)
 
                                 }).catch(error => {
+                                    this.setState({
+                                        loading: false,
+                                        message:i18n.t("static.program.errortext"),
+                                        color:"red"
+                                    }, () => {
+                                        this.hideFirstComponent()
+                                    })
+                                    // this.props.history.push(`/dashboard/`+'green/' + 'Dataset loaded successfully')
+                                    // this.setState({ loading: false })
 
                                 })
                         } else {

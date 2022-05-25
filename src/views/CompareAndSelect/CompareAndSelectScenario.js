@@ -4,7 +4,7 @@ import {
     Card,
     CardBody,
     Col,
-    Table, FormGroup, Input, InputGroup, Label, Form, Button, CardFooter
+    Table, FormGroup, Input, InputGroup, Label, Form, Button, ModalHeader, ModalBody, Modal, CardFooter
 } from 'reactstrap';
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import i18n from '../../i18n'
@@ -27,6 +27,7 @@ import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunction
 import NumberFormat from 'react-number-format';
 import jsPDF from "jspdf";
 import { LOGO } from '../../CommonComponent/Logo';
+import forcasterror from '../../assets/img/ForecastError-Formula.png';
 
 const ref = React.createRef();
 const pickerLang = {
@@ -173,7 +174,14 @@ class CompareAndSelectScenario extends Component {
             //     var selectedEquivalencyUnit = this.state.equivalencyUnitList.filter(c => c.equivalencyUnitMappingId == this.state.equivalencyUnitId);
             //     multiplier = selectedEquivalencyUnit.length > 0 ? selectedEquivalencyUnit[0].convertToEu : 1;
             // }
+            
             let startDate = moment.min(datasetJson.actualConsumptionList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId).map(d => moment(d.month)));
+            let actualMinDate=startDate;
+            let forecastStartDate=moment(datasetJson.currentVersion.forecastStartDate).format("YYYY-MM-DD")
+            if(moment(actualMinDate).format("YYYY-MM")>moment(forecastStartDate).format("YYYY-MM")){
+                actualMinDate=forecastStartDate;
+            }
+
             let stopDate = moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM-DD")
             // let curDate = moment(startDate).format("YYYY-MM-DD");
             // let stopDate = this.state.stopDate;
@@ -186,7 +194,7 @@ class CompareAndSelectScenario extends Component {
             // if (this.state.showForecastPeriod) {
             //     monthList1 = this.state.monthList1
             // }
-            var rangeValue = { from: { year: Number(moment(startDate).startOf('month').format("YYYY")), month: Number(moment(startDate).startOf('month').format("M")) }, to: { year: Number(moment(stopDate).startOf('month').format("YYYY")), month: Number(moment(stopDate).startOf('month').format("M")) } }
+            var rangeValue = { from: { year: Number(moment(actualMinDate).startOf('month').format("YYYY")), month: Number(moment(actualMinDate).startOf('month').format("M")) }, to: { year: Number(moment(stopDate).startOf('month').format("YYYY")), month: Number(moment(stopDate).startOf('month').format("M")) } }
 
             var treeScenarioList = [];
             var treeList = datasetJson.treeList.filter(c => c.active.toString() == "true");
@@ -212,7 +220,7 @@ class CompareAndSelectScenario extends Component {
                         colourArrayCount = 0;
                     }
                     var readonly = flatList.length > 0 ? false : true
-                    var dataForPlanningUnit = treeList[tl].tree.flatList.filter(c => (c.payload.nodeDataMap[scenarioList[sl].id])[0].puNode != null && (c.payload.nodeDataMap[scenarioList[sl].id])[0].puNode.planningUnit.id == this.state.planningUnitId);
+                    var dataForPlanningUnit = treeList[tl].tree.flatList.filter(c => (c.payload.nodeDataMap[scenarioList[sl].id])[0].puNode != null && (c.payload.nodeDataMap[scenarioList[sl].id])[0].puNode.planningUnit.id == this.state.planningUnitId && (c.payload).nodeType.id==5);
                     console.log("dataForPlanningUnit####", dataForPlanningUnit);
                     var data = [];
                     if (dataForPlanningUnit.length > 0) {
@@ -257,7 +265,7 @@ class CompareAndSelectScenario extends Component {
                 selectedTreeScenarioId: selectedTreeScenarioId,
                 forecastNotes: forecastNotes,
                 singleValue2: rangeValue,
-                minDate: { year: Number(moment(startDate).startOf('month').format("YYYY")), month: Number(moment(startDate).startOf('month').format("M")) },
+                minDate: { year: Number(moment(actualMinDate).startOf('month').format("YYYY")), month: Number(moment(actualMinDate).startOf('month').format("M")) },
                 // monthList1: monthList1,
                 showAllData: true,
                 loading: false
@@ -434,13 +442,33 @@ class CompareAndSelectScenario extends Component {
 
         console.log("@@@@Month1 List", this.state.monthList1)
         var monthArrayListWithoutFormat = this.state.monthList1;
+        var multiplier = 1;
+        var selectedPlanningUnit = this.state.planningUnitList.filter(c => c.planningUnit.id == this.state.planningUnitId);
+        if (this.state.viewById == 2) {
+            multiplier = selectedPlanningUnit.length > 0 ? selectedPlanningUnit[0].planningUnit.multiplier : 1;
+        }
+        if (this.state.viewById == 3) {
+            var selectedEquivalencyUnit = this.state.equivalencyUnitListAll.filter(c => c.equivalencyUnitMappingId == this.state.equivalencyUnitId);
+            multiplier = selectedEquivalencyUnit.length > 0 ? selectedEquivalencyUnit[0].convertToEu : 1;
+        }
+        var actualCalculationDataType = selectedPlanningUnit[0].consumptionDataType;
+        console.log("actualCalculationDataType@@@@@@@@@@",actualCalculationDataType)
+        var actualMultiplier = 1;
+        // 1=Forecast, 2=PlanningUnit, 3=Other Unit
+        // if (actualCalculationDataType == 1) {
+        //     actualMultiplier = 1;
+        // } else if (selectedPlanningUnit[0].consumptionDataType == 2) {
+        //     actualMultiplier = selectedPlanningUnit[0].planningUnit.multiplier;
+        // } else if (selectedPlanningUnit[0].consumptionDataType == 3) {
+        //     actualMultiplier = selectedPlanningUnit[0].otherUnit.multiplier
+        // }
         for (var m = 0; m < monthArrayListWithoutFormat.length; m++) {
             data = [];
             data[0] = monthArrayListWithoutFormat[m];
 
             var actualFilter = consumptionData.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayListWithoutFormat[m]).format("YYYY-MM"));
 
-            data[1] = actualFilter.length > 0 ? (Number(actualFilter[0].puAmount) * Number(actualMultiplier) * Number(multiplier)).toFixed(2) : "";
+            data[1] = actualFilter.length > 0 ? (Number(actualFilter[0].puAmount) * Number(actualMultiplier)* Number(multiplier)).toFixed(2) : "";
             actualConsumptionListForMonth.push(actualFilter.length > 0 ? (Number(actualFilter[0].puAmount) * Number(actualMultiplier) * Number(multiplier)).toFixed(2) : null);
             for (var tsl = 0; tsl < treeScenarioList.length; tsl++) {
                 // if (tsl == 0) {
@@ -1363,10 +1391,10 @@ class CompareAndSelectScenario extends Component {
                 if (planningUnitList.length == 1) {
                     planningUnitId = planningUnitList[0].planningUnit.id;
                     event.target.value = planningUnitList[0].planningUnit.id;
-                } else if (this.props.match.params.planningUnitId != "" && planningUnitList.filter(c => c.planningUnit.id == this.props.match.params.planningUnitId).length > 0) {
+                } else if (this.props.match.params.planningUnitId != "" && planningUnitList.filter(c => c.planningUnit.id == this.props.match.params.planningUnitId && c.active.toString()=="true").length > 0) {
                     planningUnitId = this.props.match.params.planningUnitId;
                     event.target.value = this.props.match.params.planningUnitId;
-                } else if (localStorage.getItem("sesDatasetPlanningUnitId") != "" && planningUnitList.filter(c => c.planningUnit.id == localStorage.getItem("sesDatasetPlanningUnitId")).length > 0) {
+                } else if (localStorage.getItem("sesDatasetPlanningUnitId") != "" && planningUnitList.filter(c => c.planningUnit.id == localStorage.getItem("sesDatasetPlanningUnitId")  && c.active.toString()=="true").length > 0) {
                     planningUnitId = localStorage.getItem("sesDatasetPlanningUnitId");
                     event.target.value = localStorage.getItem("sesDatasetPlanningUnitId");
                 }
@@ -1397,7 +1425,7 @@ class CompareAndSelectScenario extends Component {
                         b = getLabelText(b.label, this.state.lang).toLowerCase();
                         return a < b ? -1 : a > b ? 1 : 0;
                     }.bind(this)),
-                    planningUnitList: datasetJson.planningUnitList.sort(function (a, b) {
+                    planningUnitList: datasetJson.planningUnitList.filter(c=> c.active.toString()=="true").sort(function (a, b) {
                         a = getLabelText(a.planningUnit.label, this.state.lang).toLowerCase();
                         b = getLabelText(b.planningUnit.label, this.state.lang).toLowerCase();
                         return a < b ? -1 : a > b ? 1 : 0;
@@ -1624,7 +1652,11 @@ class CompareAndSelectScenario extends Component {
                         message: 'static.compareAndSelect.dataSaved',
                         color: 'green',
                         datasetJson: datasetForEncryption,
-                        planningUnitList: planningUnitList1
+                        planningUnitList: planningUnitList1.filter(c=> c.active.toString()=="true").sort(function (a, b) {
+                            a = getLabelText(a.planningUnit.label, this.state.lang).toLowerCase();
+                            b = getLabelText(b.planningUnit.label, this.state.lang).toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        }.bind(this))
                     }, () => {
                         this.hideFirstComponent()
                         this.showData();
@@ -1643,6 +1675,12 @@ class CompareAndSelectScenario extends Component {
     cancelClicked() {
         let id = AuthenticationService.displayDashboardBasedOnRole();
         this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
+    }
+
+    toggleShowGuidance() {
+        this.setState({
+            showGuidance: !this.state.showGuidance
+        })
     }
 
     render() {
@@ -1880,24 +1918,32 @@ class CompareAndSelectScenario extends Component {
                 <h5 className="red" id="div1" className={this.state.color}>{i18n.t(this.state.message)}</h5>
 
                 <Card>
-                    <div className="Card-header-reporticon pb-2">
+               
+                    <div className="Card-header-reporticon pb-0">
+                   
                         <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
                         <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span>
                         <span className="compareAndSelect-larrowText"> {i18n.t('static.common.backTo')} <a href={this.state.datasetId != -1 && this.state.datasetId != "" && this.state.datasetId != undefined ? "/#/dataSet/buildTree/tree/0/" + this.state.datasetId : "/#/dataSet/buildTree"} className="supplyplanformulas">{i18n.t('static.common.managetree')}</a> {i18n.t('static.tree.or')} <a href="/#/extrapolation/extrapolateData" className='supplyplanformulas'>{i18n.t('static.dashboard.consExtrapolation')}</a></span>
                         <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')} <a href={this.state.datasetId != -1 && this.state.datasetId != "" && this.state.datasetId != undefined ? "/#/forecastReport/forecastOutput/" + this.state.datasetId.toString().split("_")[0] + "/" + (this.state.datasetId.toString().split("_")[1]).toString().substring(1) : "/#/forecastReport/forecastOutput/"} className="supplyplanformulas">{i18n.t('static.dashboard.monthlyForecast')}</a></span><br />
                         {
                             this.state.showAllData &&
-                            <div className="card-header-actions">
-                                <a className="card-header-action">
+                            <div className="col-md-12 card-header-actions">
+                                <a className="card-header-action" style={{float:'right'}}>
 
                                     <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t("static.report.exportPdf")} onClick={() => this.exportPDF()} />
 
 
                                 </a>
-                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
+                                <img style={{ height: '25px', width: '25px', cursor: 'pointer',float:'right',marginTop:'4px' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
                             </div>
                         }
+                        
                     </div>
+                    <div className="card-header-action pr-lg-4">
+                            <a style={{float:'right'}}>
+                                <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
+                            </a>
+                            </div>
                     <CardBody className="pb-lg-2 pt-lg-0 ">
                         <div>
                             <div ref={ref}>
@@ -2174,7 +2220,7 @@ class CompareAndSelectScenario extends Component {
                                                             </InputGroup>
                                                         </div>
                                                     </FormGroup>
-                                                    <FormGroup className="col-md-3">
+                                                    <FormGroup className="col-md-2">
                                                         <Input
                                                             className="form-check-input"
                                                             type="checkbox"
@@ -2189,7 +2235,7 @@ class CompareAndSelectScenario extends Component {
                                                             {i18n.t('static.compareAndSelect.showOnlyForecastPeriod')}
                                                         </Label>
                                                     </FormGroup>
-                                                    {!this.state.showForecastPeriod && <FormGroup className="col-md-3">
+                                                    {!this.state.showForecastPeriod && <FormGroup className="col-md-3 compareAndSelectDatePicker">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.compareAndSelect.startMonthForGraph')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                                                         <div className="controls edit">
                                                             <Picker
@@ -2269,6 +2315,48 @@ class CompareAndSelectScenario extends Component {
                         </FormGroup>
                     </CardFooter>
                 </Card>
+                <Modal isOpen={this.state.showGuidance}
+                    className={'modal-lg ' + this.props.className} >
+                    <ModalHeader toggle={() => this.toggleShowGuidance()} className="ModalHead modal-info-Headher">
+                        <strong className="TextWhite">Show Guidance</strong>
+                    </ModalHeader>
+                    <div>
+                        <ModalBody>
+                           <div>
+                               <h3 className='ShowGuidanceHeading'>Compare and Select</h3>
+                           </div>
+                            <p>
+                                <p style={{fontSize:'13px'}}><span className="UnderLineText">Purpose :</span> Enable users to compare all the available forecasts (from tree and consumption methods), and select their final forecast. In this screen, users select their forecasts one planning unit and region at a time. For selecting forecasts across multiple planning units and regions, use the <a href="/#/forecastReport/forecastSummary" target="_blank" style={{textDecoration:'underline'}}>Forecast Summary</a> screen.</p>
+                            </p>
+                            <p style={{fontSize:'13px'}}>
+                                <p style={{fontSize:'13px'}}><span className="UnderLineText">Using this screen :</span></p>
+                                <ul style={{listStyle:'none'}}>
+                                   <li>1. Check to make sure all expected forecasts appear in the Compare & Select table. To add forecasts, navigate to the &nbsp;&nbsp;&nbsp;&nbsp;<a href='/#/dataset/listTree' target="_blank" style={{textDecoration:'underline'}}>Manage Tree</a> screen to build a tree forecast or the <a href='/#/Extrapolation/extrapolateData' target="_blank" style={{textDecoration:'underline'}}>Extrapolation</a> screen to build a consumption-based forecast. The <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>  &nbsp;&nbsp;&nbsp;&nbsp;symbol denotes that there is no forecast quantity available; the entire row will be gray and non-editable as there is nothing  &nbsp;&nbsp;&nbsp;&nbsp;to display or select.</li>
+                                   <li>2. Review available forecasts using the following information on the screen:
+                                       <ul style={{listStyle:'none'}}>
+                                           <li>a. <b>Forecast Error (%):</b> this error is calculated using the Weighted Absolute Percentage Error (WAPE) calculation. If the &nbsp;&nbsp;&nbsp;&nbsp;forecast error is highlighted in <span style={{color:'rgb(17, 139, 112)'}}>green text</span>, this forecast has the lowest forecast error out of the available forecasts.  &nbsp;&nbsp;&nbsp;&nbsp;Example WAPE calculation using the default 6-month time window:
+                                           <img className="img-fluid" src={forcasterror} /><br></br>
+                                           &nbsp;&nbsp;&nbsp;&nbsp;If 6 months of data is not available, QAT will utilize as many months as available and denote it in this column.
+                                           </li>
+                                           <li>b. <b>Compare to Consumption Forecast:</b> QAT compares available Consumption Forecasts and Tree Forecasts. For  &nbsp;&nbsp;&nbsp;&nbsp;any Tree Forecasts, QAT will flag the percentage above the highest or below the lowest Consumption Forecast. The &nbsp;&nbsp;&nbsp;&nbsp;comparison will be highlighted in <span style={{color:'#BA0C2F'}}>red text</span> if it is outside of the threshold percentages set by the user in the <br></br> &nbsp;&nbsp;&nbsp;&nbsp; <a href='/#/dataset/versionSettings' target="_blank" style={{textDecoration:'underline'}}>Version Settings</a> screen.Assuming reliable actual consumption data, this comparison helps users determine if their  &nbsp;&nbsp;&nbsp;&nbsp;Tree Forecasts are realistic. </li>
+                                           <li>c. <b>Graph:</b> Visually compare the different forecasts. The selected forecast will appear <b>bolded.</b></li>
+                                           <li>d. <b>Tabular Data Table:</b> Compare the data between forecasts side-by-side by clicking the “Show Data” button below the &nbsp;&nbsp;&nbsp;&nbsp;graph. Any <b>bolded/<span style={{color:'#800080',fontStyle:'italic'}}>bolded italicized purple</span></b> data fall within the forecast period. </li>
+                                       </ul>
+                                   </li>
+                                   <li>3.Select the final forecast in the Compare & Select table. Repeat steps 1-3 for each planning unit and region. Once completed, &nbsp;&nbsp;&nbsp;&nbsp;continue forward to the <a href='/#/forecastReport/forecastOutput' target="_blank" style={{textDecoration:'underline'}}>Monthly Forecasts</a> to verify all planning units together.</li>
+                               </ul>
+                            </p>
+                            <p style={{fontSize:'13px'}}>
+                            <span className="UnderLineText">Tips on Using the Graph & Tabular Data:</span>
+                            <ul>
+                                <li>By default, QAT will display all available forecasts by Planning Unit and any actuals entered or imported from QAT Supply Planning module; however, a user may deselect the “Display?” checkbox for any forecasts in the top table if they do not wish to view it in the graph.  </li>
+                                <li>A user may view the graph in Forecasting Unit, Equivalency Unit, and for a specific period of time. If a user choses to “Show only Forecast Period,” the graph will display only the period of time the user chose as the forecast period in the <a href='/#/dataset/versionSettings' target="_blank" style={{textDecoration:'underline'}}>Version Settings</a> screen. </li>
+                            </ul>
+                            </p>
+                        </ModalBody>
+                    </div>
+                </Modal>
+                
             </div >
         );
     }

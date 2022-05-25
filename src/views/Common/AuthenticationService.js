@@ -462,19 +462,23 @@ class AuthenticationService {
     }
 
     getLoggedInUserRoleBusinessFunctionArray() {
-        let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-        // console.log("decryptedCurUser---", decryptedCurUser);
-        let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
-        // console.log("decryptedUser---", decryptedUser);
-        let businessFunctionList = decryptedUser.businessFunctionList;
-        // console.log("decryptedUser.businessfunctions---" + decryptedUser.businessFunctionList);
+        if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != '') {
+            let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+            // console.log("decryptedCurUser---", decryptedCurUser);
+            let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+            // console.log("decryptedUser---", decryptedUser);
+            let businessFunctionList = decryptedUser.businessFunctionList;
+            // console.log("decryptedUser.businessfunctions---" + decryptedUser.businessFunctionList);
 
-        var bfunction = [];
-        for (let i = 0; i < businessFunctionList.length; i++) {
-            bfunction.push(businessFunctionList[i]);
+            var bfunction = [];
+            for (let i = 0; i < businessFunctionList.length; i++) {
+                bfunction.push(businessFunctionList[i]);
+            }
+            // console.log("bfuntion---", bfunction);
+            return bfunction;
+        } else {
+            return [];
         }
-        // console.log("bfuntion---", bfunction);
-        return bfunction;
     }
     authenticatedRoute(route, url) {
         if (url == "") {
@@ -941,6 +945,7 @@ class AuthenticationService {
                         }
                         break;
                     case "/consumptionDetails":
+                    case "/consumptionDetails/:programId/:versionId/:planningUnitId":
                         if (bfunction.includes("ROLE_BF_CONSUMPTION_DATA")) {
                             localStorage.setItem("isOfflinePage", 1);
                             console.log("offline 2---------------")
@@ -1259,8 +1264,6 @@ class AuthenticationService {
                             return true;
                         }
                         break;
-                    case "/consumptionDetails/:programId/:versionId/:planningUnitId": return true
-                        break;
                     case "/report/problemList/:programId/:calculate/:color/:message":
                     case "/report/problemList/:color/:message":
                     case "/report/problemList/1/:programId/:calculate":
@@ -1370,25 +1373,58 @@ class AuthenticationService {
                         }
                         break;
                     case "/dataset/listTree":
-                    case "/dataset/loadDeleteDataSet":
-                    case "/dataset/exportDataset":
-                    case "/dataset/importDataset":
+                        if (bfunction.includes("ROLE_BF_LIST_TREE")) {
+                            return true;
+                        }
+                        break;
                     case "/dataset/loadDeleteDataSet/:message":
-                    case "/dataSet/buildTree/tree/:treeId/:programId":
-                    case "/dataSet/buildTree/tree/:treeId/:programId/:scenarioId":
-                    case "/dataSet/buildTree/":
-                    case "/dataset/createTreeTemplate/:templateId":
-                    case "/dataset/listTreeTemplate/":
-                    case "/dataset/listTreeTemplate/:color/:message":
-                    case "/dataSet/buildTree/template/:templateId":
-                    case "/dataset/listTree/:color/:message":
-                    case "/dataset/versionSettings":
-                        if (bfunction.includes("ROLE_BF_LIST_REALM_COUNTRY")) {
+                    case "/dataset/loadDeleteDataSet":
+                        if (bfunction.includes("ROLE_BF_LOAD_DELETE_DATASET")) {
+                            return true;
+                        }
+                        break;
+                    case "/dataset/exportDataset":
+                        if (bfunction.includes("ROLE_BF_EXPORT_DATASET")) {
                             return true;
                         }
                         break;
 
+                    case "/dataset/importDataset":
+                        if (bfunction.includes("ROLE_BF_IMPORT_DATASET")) {
+                            return true;
+                        }
+                        break;
 
+                    case "/dataSet/buildTree/tree/:treeId/:programId":
+                    case "/dataSet/buildTree/tree/:treeId/:programId/:scenarioId":
+                    case "/dataSet/buildTree/":
+                    case "/dataSet/buildTree/template/:templateId":
+                        if (bfunction.includes("ROLE_BF_ADD_TREE")) {
+                            return true;
+                        }
+                        break;
+
+                    case "/dataset/createTreeTemplate/:templateId":
+                        if (bfunction.includes("ROLE_BF_EDIT_TREE_TEMPLATE")) {
+                            return true;
+                        }
+                        break;
+                    case "/dataset/listTreeTemplate/":
+                    case "/dataset/listTreeTemplate/:color/:message":
+                        if (bfunction.includes("ROLE_BF_LIST_TREE_TEMPLATE")) {
+                            return true;
+                        }
+                        break;
+                    case "/dataset/listTree/:color/:message":
+                        if (bfunction.includes("ROLE_BF_LIST_TREE")) {
+                            return true;
+                        }
+                        break;
+                    case "/dataset/versionSettings":
+                        if (bfunction.includes("ROLE_BF_VERSION_SETTINGS")) {
+                            return true;
+                        }
+                        break;
                     case "/usageTemplate/listUsageTemplate":
                     case "/usageTemplate/listUsageTemplate/:color/:message":
                         if (bfunction.includes("ROLE_BF_LIST_USAGE_TEMPLATE")) {
@@ -1428,6 +1464,10 @@ class AuthenticationService {
                         break;
 
                     case "/forecastReport/consumptionForecastError":
+                        if (bfunction.includes("ROLE_BF_CONSUMPTION_FORECAST_ERROR")) {
+                            return true;
+                        }
+                        break;
                     case "/forecastReport/compareScenario":
                         return true;
 

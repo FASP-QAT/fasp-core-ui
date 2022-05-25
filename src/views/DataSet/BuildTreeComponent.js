@@ -54,6 +54,12 @@ import Size from '../../../node_modules/basicprimitives/src/graphics/structs/Siz
 import { Prompt } from 'react-router';
 import { i } from 'mathjs';
 import RotatedText from 'basicprimitivesreact/dist/umd/Templates/RotatedText';
+import ModelingTransferScreenshot1 from '../../assets/img/ModelingTransferScreenshot1.jpg';
+import ModelingTransferScreenshot2 from '../../assets/img/ModelingTransferScreenshot2.jpg';
+import ModelingTransferScreenshot3 from '../../assets/img/ModelingTransferScreenshot3.jpg';
+import ModelingTransferScreenshot4 from '../../assets/img/ModelingTransferScreenshot4.jpg';
+import ModelingTransferScreenshot5 from '../../assets/img/ModelingTransferScreenshot5.jpg';
+import ModelingTransferScreenshot6 from '../../assets/img/ModelingTransferScreenshot6.jpg';
 
 // const ref = React.createRef();
 const entityname = 'Tree';
@@ -257,9 +263,6 @@ const validationSchemaNodeData = function (values) {
         usagePeriodIdCon: Yup.string()
             .test('usagePeriodIdCon', 'This field is required.',
                 function (value) {
-                    // console.log("@@@>1", (parseInt(document.getElementById("nodeTypeId").value) == 4));
-                    // console.log("@@@>1", document.getElementById("usageTypeIdFU").value == 2);
-                    // console.log("@@@>2", document.getElementById("usageFrequency").value == "");
                     if (document.getElementById("usageTypeIdFU").value == 2 && document.getElementById("usagePeriodIdCon").value == "") {
                         return false;
                     } else {
@@ -427,6 +430,37 @@ const getErrorsFromValidationError = (validationError) => {
     }, {})
 }
 
+const validationSchemaScenario = function (values) {
+    return Yup.object().shape({
+        scenarioName: Yup.string()
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
+            .required('Please enter scenario name.'),
+
+    })
+}
+
+const validateScenario = (getValidationSchema) => {
+    return (values) => {
+        const validationSchemaScenario = getValidationSchema(values)
+        try {
+            validationSchemaScenario.validateSync(values, { abortEarly: false })
+            return {}
+        } catch (error) {
+            return getErrorsFromValidationErrorScenario(error)
+        }
+    }
+}
+
+const getErrorsFromValidationErrorScenario = (validationError) => {
+    const FIRST_ERROR = 0
+    return validationError.inner.reduce((errors, error) => {
+        return {
+            ...errors,
+            [error.path]: error.errors[FIRST_ERROR],
+        }
+    }, {})
+}
+
 function addCommas(cell1, row) {
 
     if (cell1 != null && cell1 != "") {
@@ -501,6 +535,12 @@ export default class BuildTree extends Component {
         this.pickAMonth4 = React.createRef()
         this.pickAMonth5 = React.createRef()
         this.state = {
+            percentForOneMonth: '',
+            popoverOpenStartValueModelingTool: false,
+            showGuidanceModelingTransfer: false,
+            showGuidanceModelingTransfer: false,
+            showGuidanceNodeData: false,
+            showGuidance: false,
             sameLevelNodeList1: [],
             nodeUnitListPlural: [],
             nodeTransferDataList: [],
@@ -558,6 +598,13 @@ export default class BuildTree extends Component {
             scalingMonth: { year: Number(moment(curDate).startOf('month').format("YYYY")), month: Number(moment(curDate).startOf('month').format("M")) },
             showModelingValidation: true,
             scenario: {
+                id: '',
+                label: {
+                    label_en: ''
+                },
+                notes: ''
+            },
+            scenario1: {
                 id: '',
                 label: {
                     label_en: ''
@@ -760,6 +807,8 @@ export default class BuildTree extends Component {
             showDate: false,
             modelingChanged: false
         }
+        // this.showGuidanceNodaData = this.showGuidanceNodaData.bind(this);
+        this.toggleStartValueModelingTool = this.toggleStartValueModelingTool.bind(this);
         this.getMomValueForDateRange = this.getMomValueForDateRange.bind(this);
         this.toggleDeropdownSetting = this.toggleDeropdownSetting.bind(this);
         // this.onClick1 = this.onClick1.bind(this);
@@ -958,30 +1007,33 @@ export default class BuildTree extends Component {
         var currentItemConfig = this.state.currentItemConfig;
         var qatCalculatedPUPerVisit = "";
         console.log("currentItemConfig qat cal---", currentItemConfig)
-        if (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit.id != "") {
-            var pu = this.state.planningUnitList.filter(x => x.id == currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit.id)[0];
-            console.log("pu qat cal 1---", pu.multiplier)
-            console.log("pu qat cal 2---", currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.noOfForecastingUnitsPerPerson);
-            // this.getNoOfMonthsInUsagePeriod();
-            if (currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.usageType.id == 2) {
-                var refillMonths = currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.refillMonths != "" && currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.refillMonths != null ? currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.refillMonths : this.round(parseFloat(pu.multiplier / (currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod)).toFixed(4))
-                console.log("refillMonths qat cal---", refillMonths)
-                console.log("noOfmonths qat cal---", this.state.noOfMonthsInUsagePeriod);
-                qatCalculatedPUPerVisit = this.round(parseFloat(((currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) * refillMonths) / pu.multiplier).toFixed(4));
-            } else {
-                if (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.sharePlanningUnit == "true" || currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.sharePlanningUnit == true) {
-                    qatCalculatedPUPerVisit = addCommas(this.state.noOfMonthsInUsagePeriod / pu.multiplier);
-                } else {
-                    qatCalculatedPUPerVisit = this.round(this.state.noOfMonthsInUsagePeriod / pu.multiplier);
-                }
-            }
-            console.log("inside qat cal val---", qatCalculatedPUPerVisit)
-
-            if (type == 1) {
+        var planningUnitList = this.state.planningUnitList;
+        if (planningUnitList.length > 0 && currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit.id != "") {
+            if (planningUnitList.filter(x => x.id == currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit.id).length > 0) {
+                var pu = planningUnitList.filter(x => x.id == currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit.id)[0];
+                console.log("pu qat cal 1---", pu.multiplier)
+                console.log("pu qat cal 2---", currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.noOfForecastingUnitsPerPerson);
+                // this.getNoOfMonthsInUsagePeriod();
                 if (currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.usageType.id == 2) {
-                    currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.refillMonths = refillMonths;
+                    var refillMonths = currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.refillMonths != "" && currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.refillMonths != null ? currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.refillMonths : this.round(parseFloat(pu.multiplier / (currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod)).toFixed(4))
+                    console.log("refillMonths qat cal---", refillMonths)
+                    console.log("noOfmonths qat cal---", this.state.noOfMonthsInUsagePeriod);
+                    qatCalculatedPUPerVisit = this.round(parseFloat(((currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) * refillMonths) / pu.multiplier).toFixed(4));
+                } else {
+                    if (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.sharePlanningUnit == "true" || currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.sharePlanningUnit == true) {
+                        qatCalculatedPUPerVisit = addCommas(this.state.noOfMonthsInUsagePeriod / pu.multiplier);
+                    } else {
+                        qatCalculatedPUPerVisit = this.round(this.state.noOfMonthsInUsagePeriod / pu.multiplier);
+                    }
                 }
-                currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.puPerVisit = qatCalculatedPUPerVisit;
+                console.log("inside qat cal val---", qatCalculatedPUPerVisit)
+
+                if (type == 1) {
+                    if (currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.usageType.id == 2) {
+                        currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.refillMonths = refillMonths;
+                    }
+                    currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.puPerVisit = qatCalculatedPUPerVisit;
+                }
             }
         }
         this.setState({ qatCalculatedPUPerVisit });
@@ -1096,7 +1148,7 @@ export default class BuildTree extends Component {
             levelModal: false,
             curTreeObj,
         }, () => {
-            this.saveTreeData()
+            this.saveTreeData(false)
             // console.log("final tab list---", this.state.items);
             // if (type == 1) {
             //     var maxNodeDataId = temNodeDataMap.length > 0 ? Math.max(...temNodeDataMap.map(o => o.nodeDataId)) : 0;
@@ -1222,6 +1274,7 @@ export default class BuildTree extends Component {
         var programData = dataSetObj.programData;
         console.log("program data>>> 1", programData);
         console.log("program data treeData>>> 1.1", treeData);
+        console.log("program data curTreeObj>>> 1.1", curTreeObj);
         programData.treeList = treeData;
         console.log("program data>>> 2", programData);
         // alert("27---")
@@ -1233,7 +1286,7 @@ export default class BuildTree extends Component {
         programData.treeList = treeData;
         dataSetObj.programData = programData;
         console.log("dataSetDecrypt>>>", dataSetObj);
-        calculateModelingData(dataSetObj, this, '', (nodeId != 0 ? nodeId : this.state.currentItemConfig.context.id), this.state.selectedScenario, type, this.state.treeId, false,false);
+        calculateModelingData(dataSetObj, this, '', (nodeId != 0 ? nodeId : this.state.currentItemConfig.context.id), this.state.selectedScenario, type, this.state.treeId, false, false);
         // }
     }
     fetchTracerCategoryList(programData) {
@@ -1351,7 +1404,7 @@ export default class BuildTree extends Component {
         }, () => {
             console.log("reset node data function called 3---", this.state.currentScenario);
             if (nodeTypeId == 4) {
-                this.getForecastingUnitListByTracerCategoryId(0);
+                this.getForecastingUnitListByTracerCategoryId(0, 0);
             }
             console.log("currentItemConfig after---", this.state.orgCurrentItemConfig)
         });
@@ -1407,6 +1460,21 @@ export default class BuildTree extends Component {
     //     )
 
     //     };
+    toggleStartValueModelingTool() {
+        this.setState({
+            popoverOpenStartValueModelingTool: !this.state.popoverOpenStartValueModelingTool
+        })
+    }
+    toggleShowGuidanceNodeData() {
+        this.setState({
+            showGuidanceNodeData: !this.state.showGuidanceNodeData
+        })
+    }
+    toggleShowGuidanceModelingTransfer() {
+        this.setState({
+            showGuidanceModelingTransfer: !this.state.showGuidanceModelingTransfer
+        })
+    }
     toggleShowGuidance() {
         this.setState({
             showGuidance: !this.state.showGuidance
@@ -1588,13 +1656,19 @@ export default class BuildTree extends Component {
         this.setState({
             [parameterName]: value
         }, () => {
-
             var items = this.state.items;
+            console.log("items before update 1234567---", items);
             if (parameterName == 'currentItemConfig') {
+                console.log("node id for update state 1----", value.context.id);
                 var findNodeIndex = items.findIndex(n => n.id == value.context.id);
                 console.log("findNodeIndex1---", findNodeIndex);
                 items[findNodeIndex] = value.context;
-                this.calculateMOMData(0, 2);
+                console.log("node id for update state 2----", value.context);
+                console.log("node id for update state 3----", items);
+                this.setState({ items }, () => {
+                    console.log("node id for update state 4----", this.state.items);
+                    this.saveTreeData(true);
+                })
             }
             if (parameterName == 'nodeId' && (value != null && value != 0)) {
                 var nodeDataMomList = this.state.nodeDataMomList;
@@ -1613,16 +1687,11 @@ export default class BuildTree extends Component {
                         items[findNodeIndex] = node;
                     }
                 }
-                // var node = items.filter(n => n.id == value)[0];
-                // (node.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataMomList = this.state.nodeDataMomList.length == 1 ? this.state.nodeDataMomList : [];
-                // var findNodeIndex = items.findIndex(n => n.id == value);
-                // console.log("findNodeIndex---", findNodeIndex);
-                // items[findNodeIndex] = node;
                 console.log("items---***", items);
                 this.setState({ items })
             }
-            console.log("this.state.currentItemConfig.context.payload.extrapolation----", this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation);
-            if (parameterName == 'type' && (value == 0 || value == 1) && this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true && this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != "true") {
+            // console.log("this.state.currentItemConfig.context.payload.extrapolation----", this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation);
+            if (parameterName == 'type' && (value == 0 || value == 1) && this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != undefined && this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true && this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != "true") {
                 if (this.state.currentItemConfig.context.payload.nodeType.id == 1 || this.state.currentItemConfig.context.payload.nodeType.id == 2) {
                     console.log("mom list ret---", this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id));
                     this.setState({ momList: this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id)[0].nodeDataMomList }, () => {
@@ -1647,26 +1716,15 @@ export default class BuildTree extends Component {
                 }
 
             }
-            this.saveTreeData();
-            // if (parameterName == 'type' && value == 0) {
-            //     this.saveTreeData();
-            //     this.updateTreeData();
-            //     this.calculateValuesForAggregateNode(this.state.items);
-            // }
+            if (parameterName != 'currentItemConfig') {
+                this.saveTreeData(false);
+            }
             console.log("returmed list---", this.state.nodeDataMomList);
 
         })
     }
 
     calculateAfterDragDrop() {
-        // var dataSetObj = this.state.datasetList.filter(c => c.programId == this.state.programId)[0];
-        // var dataEnc = dataSetObj;
-        // var databytes = CryptoJS.AES.decrypt(dataSetObj.programData, SECRET_KEY);
-        // var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
-        // console.log("dataSetObj.programData***>>>", programData);
-        // this.setState({ dataSetObj: dataSetObj, forecastStartDate: programData.currentVersion.forecastStartDate, forecastStopDate: programData.currentVersion.forecastStopDate }, () => {
-
-        // });
         var items = this.state.curTreeObj.tree.flatList;
         console.log("items>>>", items);
         for (let i = 0; i < items.length; i++) {
@@ -1678,10 +1736,10 @@ export default class BuildTree extends Component {
             items,
         })
     }
-    saveTreeData() {
+    saveTreeData(flag) {
         console.log("saving tree data for calculation>>>");
         this.setState({ loading: true }, () => {
-            let { curTreeObj } = this.state;
+            var curTreeObj = this.state.curTreeObj;
             let { treeData } = this.state;
             let { dataSetObj } = this.state;
             var items = this.state.items;
@@ -1702,15 +1760,23 @@ export default class BuildTree extends Component {
             // var databytes = CryptoJS.AES.decrypt(dataSetObj.programData, SECRET_KEY);
             // var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
             var programData = tempProgram.programData;
+            console.log("save tree data items 1>>>", items);
             programData.treeList = treeData;
-            console.log("program data>>>", programData);
+            console.log("save tree data items 2>>>", items);
+            console.log("program data 3>>>", programData);
 
             curTreeObj.scenarioList = this.state.scenarioList;
             if (items.length > 0) {
+                console.log("inside if items > 0---", items);
+                console.log("inside if cu tree obj before---", curTreeObj);
                 curTreeObj.tree.flatList = items;
+                console.log("inside if cu tree obj---", curTreeObj);
             }
+            console.log("inside if cur tree obj out---", curTreeObj);
             var findTreeIndex = treeData.findIndex(n => n.treeId == curTreeObj.treeId);
+            console.log("cur tree findTreeIndex---", findTreeIndex);
             treeData[findTreeIndex] = curTreeObj;
+            console.log("treeData before saving---", treeData);
 
             // var databytes = CryptoJS.AES.decrypt(dataSetObj.programData, SECRET_KEY);
             // var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
@@ -1774,6 +1840,9 @@ export default class BuildTree extends Component {
                                 console.log("hide pu---", this.state.hidePUNode);
                                 this.handleAMonthDissmis3(this.state.singleValue2, 0);
                                 this.hideSecondComponent();
+                                if (flag) {
+                                    this.calculateMOMData(0, 2);
+                                }
                             });
                             console.log("Data update success");
                         }.bind(this)
@@ -2160,7 +2229,7 @@ export default class BuildTree extends Component {
                     // dataSetObjCopy.programData = programData;
                     // dataSetObj.programData = programData;
                     console.log("dataSetDecrypt>>>", programData);
-                    calculateModelingData(dataSetObjCopy, this, '', currentItemConfig.context.id, this.state.selectedScenario, 1, this.state.treeId, false,false);
+                    calculateModelingData(dataSetObjCopy, this, '', currentItemConfig.context.id, this.state.selectedScenario, 1, this.state.treeId, false, false);
                     // store update object in indexdb
                     //     var db1;
                     //     getDatabase();
@@ -2224,7 +2293,7 @@ export default class BuildTree extends Component {
                     var scenario = this.state.scenarioList.filter(x => x.id == scenarioId)[0];
                     console.log("my scenario---", scenario);
                     this.setState({
-                        scenario,
+                        scenario: JSON.parse(JSON.stringify(scenario)),
                         openAddScenarioModal: !this.state.openAddScenarioModal
                     })
                 } else {
@@ -2796,80 +2865,107 @@ export default class BuildTree extends Component {
     }
     extrapolate(e) {
         const { currentItemConfig } = this.state;
-        // const newArray = this.state.activeTab1.slice()
-        currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation = e.target.checked == true ? true : false;
-        if (e.target.checked) {
-            console.log("extrapolate outside", currentItemConfig);
-            if (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].calculatedDataValue == "" || currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].calculatedDataValue == null || currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].calculatedDataValue == "0") {
-                currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].calculatedDataValue = "0";
-                currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].dataValue = "0";
-                console.log("extrapolate inside", currentItemConfig);
+        var modelingFlag = false;
+        var scalingList = this.state.currentScenario.nodeDataModelingList == undefined ? [] : this.state.currentScenario.nodeDataModelingList;
+        if (scalingList.length > 0) {
+            var scalingResult = scalingList.filter(x => x.transferNodeDataId != null && x.transferNodeDataId != "");
+            if (scalingResult.length > 0) {
+                modelingFlag = true;
             }
         }
-        console.log("this.state.activeTab1---", currentItemConfig);
-
-        this.setState({
-            currentItemConfig,
-            currentScenario: currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0],
-            activeTab1: e.target.checked == true ? new Array(2).fill('3') : new Array(2).fill('2')
-        }, () => {
-            console.log("extrapolate current item config---", this.state.currentItemConfig);
-            console.log("extrapolate current scenario---", this.state.currentScenario);
-            if (this.state.activeTab1[0] == '3') {
-                if (this.state.modelingEl != "") {
-                    this.state.modelingEl.destroy();
-                    if (this.state.momEl != "") {
-                        this.state.momEl.destroy();
-                    }
-                    else if (this.state.momElPer != "") {
-                        this.state.momElPer.destroy();
-                    }
+        if (this.state.nodeTransferDataList.length == 0 && !modelingFlag) {
+            currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation = e.target.checked == true ? true : false;
+            if (e.target.checked) {
+                console.log("extrapolate outside", currentItemConfig);
+                if (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].calculatedDataValue == "" || currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].calculatedDataValue == null || currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].calculatedDataValue == "0") {
+                    currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].calculatedDataValue = "0";
+                    currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].dataValue = "0";
+                    console.log("extrapolate inside", currentItemConfig);
                 }
-
-                this.refs.extrapolationChild.getExtrapolationMethodList();
-            } else {
-                console.log("***>>>", this.state.currentItemConfig);
-                if (this.state.currentItemConfig.context.payload.nodeType.id != 1) {
-                    var minMonth = this.state.forecastStartDate;
-                    var maxMonth = this.state.forecastStopDate;
-                    console.log("minMonth---", minMonth);
-                    console.log("maxMonth---", maxMonth);
-                    var modelingTypeList = this.state.modelingTypeList;
-                    var arr = [];
-                    if (this.state.currentItemConfig.context.payload.nodeType.id == 2) {
-                        arr = modelingTypeList.filter(x => x.modelingTypeId != 1 && x.modelingTypeId != 5);
-                    } else {
-                        arr = modelingTypeList.filter(x => x.modelingTypeId == 5);
-                    }
-                    console.log("arr---", arr);
-                    var modelingTypeListNew = [];
-                    for (var i = 0; i < arr.length; i++) {
-                        console.log("arr[i]---", arr[i]);
-                        modelingTypeListNew[i] = { id: arr[i].modelingTypeId, name: getLabelText(arr[i].label, this.state.lang) }
-                    }
-                    this.setState({
-                        showModelingJexcelNumber: true,
-                        minMonth, maxMonth, filteredModelingType: modelingTypeListNew
-                    }, () => {
-                        this.buildModelingJexcel();
-                    })
-
-                }
-                else {
-                    this.setState({
-                        showModelingJexcelNumber: true
-                    }, () => {
-                        this.buildModelingJexcel();
-                    })
-                }
-                //  else if (this.state.currentItemConfig.context.payload.nodeType.id == 3) {
-                //     this.setState({ showModelingJexcelPercent: true }, () => {
-                //         this.buildModelingJexcelPercent()
-                //     })
-                // }
             }
+            console.log("this.state.activeTab1---", currentItemConfig);
 
-        });
+            this.setState({
+                currentItemConfig,
+                currentScenario: currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0],
+                activeTab1: e.target.checked == true ? new Array(2).fill('3') : new Array(2).fill('2')
+            }, () => {
+                console.log("extrapolate current item config---", this.state.currentItemConfig);
+                console.log("extrapolate current scenario---", this.state.currentScenario);
+                if (this.state.activeTab1[0] == '3') {
+                    if (this.state.modelingEl != "") {
+                        this.state.modelingEl.destroy();
+                        if (this.state.momEl != "") {
+                            this.state.momEl.destroy();
+                        }
+                        else if (this.state.momElPer != "") {
+                            this.state.momElPer.destroy();
+                        }
+                    }
+
+                    this.refs.extrapolationChild.getExtrapolationMethodList();
+                } else {
+                    console.log("***>>>", this.state.currentItemConfig);
+                    if (this.state.currentItemConfig.context.payload.nodeType.id != 1) {
+                        var minMonth = this.state.forecastStartDate;
+                        var maxMonth = this.state.forecastStopDate;
+                        console.log("minMonth---", minMonth);
+                        console.log("maxMonth---", maxMonth);
+                        var modelingTypeList = this.state.modelingTypeList;
+                        var arr = [];
+                        if (this.state.currentItemConfig.context.payload.nodeType.id == 2) {
+                            arr = modelingTypeList.filter(x => x.modelingTypeId != 1 && x.modelingTypeId != 5);
+                        } else {
+                            arr = modelingTypeList.filter(x => x.modelingTypeId == 5);
+                        }
+                        console.log("arr---", arr);
+                        var modelingTypeListNew = [];
+                        for (var i = 0; i < arr.length; i++) {
+                            console.log("arr[i]---", arr[i]);
+                            modelingTypeListNew[i] = { id: arr[i].modelingTypeId, name: getLabelText(arr[i].label, this.state.lang) }
+                        }
+                        this.setState({
+                            showModelingJexcelNumber: true,
+                            minMonth, maxMonth, filteredModelingType: modelingTypeListNew
+                        }, () => {
+                            this.buildModelingJexcel();
+                        })
+
+                    }
+                    else {
+                        this.setState({
+                            showModelingJexcelNumber: true
+                        }, () => {
+                            this.buildModelingJexcel();
+                        })
+                    }
+                    //  else if (this.state.currentItemConfig.context.payload.nodeType.id == 3) {
+                    //     this.setState({ showModelingJexcelPercent: true }, () => {
+                    //         this.buildModelingJexcelPercent()
+                    //     })
+                    // }
+                }
+
+            });
+        }
+        else if (modelingFlag) {
+            currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation = false;
+            this.setState({
+                currentItemConfig,
+                currentScenario: currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0]
+            }, () => {
+                alert("Extrapolation not allowed on this node because this node is transfering data to some other node.To perform extrapolation please delete the transfer.");
+            });
+        } else if (this.state.nodeTransferDataList.length > 0) {
+            currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation = false;
+            this.setState({
+                currentItemConfig,
+                currentScenario: currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0]
+            }, () => {
+                alert("Extrapolation not allowed on this node because some other node is transfering data to this node.");
+            });
+
+        }
     }
     momCheckbox(e, type) {
         var checked = e.target.checked;
@@ -3062,6 +3158,40 @@ export default class BuildTree extends Component {
             var value = this.el.getValueFromCoords(11, y);
             if (parseInt(value) == 1) {
 
+                //Transfer to node
+                var col = ("D").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(3, y);
+                var transferFlag = false;
+                if (value != "") {
+                    var items = this.state.items;
+                    var transfer = value != "" ? value.split('_')[0] : '';
+                    if (transfer != '') {
+                        for (let i = 0; i < items.length; i++) {
+                            var nodeDataId = items[i].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataId;
+                            console.log("nodeDataId---", nodeDataId);
+                            console.log("extrapolation flag---", items[i].payload.nodeDataMap[this.state.selectedScenario]);
+                            if (nodeDataId == transfer && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation) {
+                                transferFlag = true;
+                                break;
+                            }
+                        }
+                    }
+                    console.log("transferFlag---", transferFlag);
+                    if (transferFlag) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, 'You can not transfer data to this node as it is an extrapolation node.');
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+
+
                 //Modeling type
                 var col = ("E").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(4, y);
@@ -3225,18 +3355,18 @@ export default class BuildTree extends Component {
                 elInstance.setValueFromCoords(9, this.state.currentRowIndex, parseFloat(this.state.currentCalculatedMomChange).toFixed(4), true);
             } else if (this.state.currentModelingType == 3) { //Linear %
                 elInstance.setValueFromCoords(4, this.state.currentRowIndex, this.state.currentModelingType, true);
-                elInstance.setValueFromCoords(5, this.state.currentRowIndex, parseFloat(this.state.currentTargetChangePercentage) < 0 ? -1 : 1, true);
+                elInstance.setValueFromCoords(5, this.state.currentRowIndex, parseFloat(this.state.percentForOneMonth) < 0 ? -1 : 1, true);
                 elInstance.setValueFromCoords(1, this.state.currentRowIndex, this.state.currentCalculatorStartDate, true);
                 elInstance.setValueFromCoords(2, this.state.currentRowIndex, this.state.currentCalculatorStopDate, true);
-                elInstance.setValueFromCoords(6, this.state.currentRowIndex, parseFloat(this.state.currentTargetChangePercentage) < 0 ? parseFloat(this.state.currentTargetChangePercentage * -1).toFixed(4) : parseFloat(this.state.currentTargetChangePercentage).toFixed(4), true);
+                elInstance.setValueFromCoords(6, this.state.currentRowIndex, parseFloat(this.state.percentForOneMonth) < 0 ? parseFloat(this.state.percentForOneMonth * -1).toFixed(4) : parseFloat(this.state.percentForOneMonth).toFixed(4), true);
                 elInstance.setValueFromCoords(7, this.state.currentRowIndex, '', true);
                 elInstance.setValueFromCoords(9, this.state.currentRowIndex, parseFloat(this.state.currentCalculatedMomChange).toFixed(4), true);
             } else if (this.state.currentModelingType == 4) { // Exponential %
                 elInstance.setValueFromCoords(4, this.state.currentRowIndex, this.state.currentModelingType, true);
-                elInstance.setValueFromCoords(5, this.state.currentRowIndex, parseFloat(this.state.currentTargetChangePercentage) < 0 ? -1 : 1, true);
+                elInstance.setValueFromCoords(5, this.state.currentRowIndex, parseFloat(this.state.percentForOneMonth) < 0 ? -1 : 1, true);
                 elInstance.setValueFromCoords(1, this.state.currentRowIndex, this.state.currentCalculatorStartDate, true);
                 elInstance.setValueFromCoords(2, this.state.currentRowIndex, this.state.currentCalculatorStopDate, true);
-                elInstance.setValueFromCoords(6, this.state.currentRowIndex, parseFloat(this.state.currentTargetChangePercentage) < 0 ? parseFloat(this.state.currentTargetChangePercentage * -1).toFixed(4) : parseFloat(this.state.currentTargetChangePercentage).toFixed(4), true);
+                elInstance.setValueFromCoords(6, this.state.currentRowIndex, parseFloat(this.state.percentForOneMonth) < 0 ? parseFloat(this.state.percentForOneMonth * -1).toFixed(4) : parseFloat(this.state.percentForOneMonth).toFixed(4), true);
                 elInstance.setValueFromCoords(7, this.state.currentRowIndex, '', true);
                 elInstance.setValueFromCoords(9, this.state.currentRowIndex, parseFloat(this.state.currentCalculatedMomChange).toFixed(4), true);
             }
@@ -3250,26 +3380,22 @@ export default class BuildTree extends Component {
             currentCalculatedMomChange: '',
             currentTargetChangeNumber: '',
             currentTargetChangePercentage: '',
+            percentForOneMonth: ''
         });
         var startDate = this.state.currentCalculatorStartDate;
         var endDate = this.state.currentCalculatorStopDate;
         var monthDifference = parseInt(moment(endDate).startOf('month').diff(startDate, 'months', true) + 1);
         console.log("month diff>>>", monthDifference);
-        var momValue = ''
-        var getValue = e.target.value.toString().replaceAll(",", "");
+        var momValue = '', percentForOneMonth = '';
+        var currentEndValue = document.getElementById("currentEndValue").value;
+        console.log("currentEndValue---", currentEndValue);
+        var getValue = currentEndValue.toString().replaceAll(",", "");
+        console.log("getValue---", getValue);
         if (this.state.currentModelingType == 2) {
             var momValue = ((parseFloat(getValue - this.state.currentCalculatorStartValue.toString().replaceAll(",", ""))) / monthDifference).toFixed(4);
         }
         if (this.state.currentModelingType == 3) {
-            if (this.state.currentItemConfig.context.payload.nodeType.id > 2) {
-                var getChangeInPercent = (parseFloat(getValue - this.state.currentScenario.dataValue) / monthDifference).toFixed(4);
-                var momValue = (this.state.currentScenario.calculatedDataValue * getChangeInPercent / 100).toFixed(4);
-                // console.log("getChangeInPercent>>>",getChangeInPercent);
-                // console.log("momValue>>>",momValue)
-            } else {
-                // var momValue = ((parseFloat(getValue - this.state.currentCalculatorStartValue)) / monthDifference / this.state.currentCalculatorStartValue * 100).toFixed(4);
-                var momValue = ((parseFloat(getValue - this.state.currentCalculatorStartValue.toString().replaceAll(",", ""))) / monthDifference).toFixed(4);
-            }
+            var momValue = ((parseFloat(getValue - this.state.currentCalculatorStartValue.toString().replaceAll(",", ""))) / monthDifference).toFixed(4);
         }
         if (this.state.currentModelingType == 4) {
             // var momValue = ((Math.pow(parseFloat(getValue / this.state.currentCalculatorStartValue), parseFloat(1 / monthDifference)) - 1) * 100).toFixed(4);
@@ -3277,7 +3403,7 @@ export default class BuildTree extends Component {
         }
 
         if (this.state.currentModelingType == 5) {
-            var momValue = (parseFloat(getValue - this.state.currentCalculatorStartValue.toString().replaceAll(",", "")) / monthDifference).toFixed(4);
+            var momValue = (parseFloat((getValue - this.state.currentCalculatorStartValue.toString().replaceAll(",", "")) / monthDifference)).toFixed(4);
         }
         // console.log("getmomValue>>>", momValue);
         var targetChangeNumber = '';
@@ -3285,51 +3411,52 @@ export default class BuildTree extends Component {
         if (this.state.currentItemConfig.context.payload.nodeType.id < 3) {
             targetChangeNumber = (parseFloat(getValue - this.state.currentCalculatorStartValue.toString().replaceAll(",", "")) / monthDifference).toFixed(4);
             targetChangePer = (parseFloat(targetChangeNumber / this.state.currentCalculatorStartValue.toString().replaceAll(",", "")) * 100).toFixed(4);
+            percentForOneMonth = targetChangePer;
         }
         this.setState({
-            currentTargetChangeNumber: e.target.value != '' ? targetChangeNumber : '',
-            currentTargetChangePercentage: e.target.value != '' ? targetChangePer : '',
-            currentCalculatedMomChange: e.target.value != '' ? momValue : ''
+            currentTargetChangeNumber: currentEndValue != '' ? targetChangeNumber : '',
+            currentTargetChangePercentage: currentEndValue != '' ? targetChangePer : '',
+            currentCalculatedMomChange: currentEndValue != '' ? momValue : '',
+            percentForOneMonth
         });
     }
     calculateMomByChangeInPercent(e) {
         this.setState({
             currentEndValue: '',
             currentCalculatedMomChange: '',
-            currentTargetChangeNumber: ''
+            currentTargetChangeNumber: '',
+            percentForOneMonth: ''
         });
         var startDate = this.state.currentCalculatorStartDate;
         var endDate = this.state.currentCalculatorStopDate;
         var monthDifference = parseInt(moment(endDate).diff(startDate, 'months', true) + 1);
-        var getValue = e.target.value != "" ? e.target.value.toString().replaceAll(",", "").match(/^-?\d+(?:\.\d{0,4})?/)[0] : "";
+        var currentTargetChangePercentage = document.getElementById("currentTargetChangePercentage").value;
+        var getValue = currentTargetChangePercentage != "" ? currentTargetChangePercentage.toString().replaceAll(",", "").match(/^-?\d+(?:\.\d{0,4})?/)[0] : "";
         var getEndValueFromPercentage = (this.state.currentCalculatorStartValue.toString().replaceAll(",", "") * getValue) / 100;
 
         console.log("***-----------------1-", this.state.currentCalculatorStartValue.toString().replaceAll(",", ""));
         console.log("***-----------------2-", getEndValueFromPercentage);
         var targetEndValue = (parseFloat(this.state.currentCalculatorStartValue.toString().replaceAll(",", "")) + parseFloat(getEndValueFromPercentage)).toFixed(4);
 
-        var momValue = ''
+        var momValue = '', percentForOneMonth = '';
         if (this.state.currentModelingType == 2) {
             // var momValue = ((parseFloat(targetEndValue - this.state.currentCalculatorStartValue)) / monthDifference).toFixed(4);
-            var momValue = ((parseFloat((this.state.currentCalculatorStartValue.toString().replaceAll(",", "") * getValue) / 100))).toFixed(4);
+            var momValue = ((parseFloat((this.state.currentCalculatorStartValue.toString().replaceAll(",", "") * getValue) / 100) / monthDifference)).toFixed(4);
+            // percentForOneMonth = getValue / monthDifference;
         }
         if (this.state.currentModelingType == 3) {
-            if (this.state.currentItemConfig.context.payload.nodeType.id > 2) {
-                var getChangeInPercent = getValue;
-                var momValue = (this.state.currentScenario.calculatedDataValue * getChangeInPercent / 100).toFixed(4);
-            } else {
-                // var momValue = ((parseFloat(targetEndValue - this.state.currentCalculatorStartValue)) / monthDifference / this.state.currentCalculatorStartValue * 100).toFixed(4);
-                var momValue = ((parseFloat((this.state.currentCalculatorStartValue.toString().replaceAll(",", "") * getValue) / 100))).toFixed(4);
-            }
+            var momValue = ((parseFloat(((this.state.currentCalculatorStartValue.toString().replaceAll(",", "") * getValue) / 100) / monthDifference))).toFixed(4);
+            percentForOneMonth = getValue / monthDifference;
 
         }
         if (this.state.currentModelingType == 4) {
             // var momValue = ((Math.pow(parseFloat(targetEndValue / this.state.currentCalculatorStartValue), parseFloat(1 / monthDifference)) - 1) * 100).toFixed(4);
-            var momValue = ((parseFloat((this.state.currentCalculatorStartValue.toString().replaceAll(",", "") * getValue) / 100))).toFixed(4);
+            var momValue = (parseFloat(((this.state.currentCalculatorStartValue.toString().replaceAll(",", "") * getValue) / 100) / monthDifference)).toFixed(4);
+            percentForOneMonth = getValue / monthDifference;
 
         }
         if (this.state.currentModelingType == 5) {
-            var momValue = (parseFloat(getValue)).toFixed(4);
+            var momValue = (parseFloat(getValue / monthDifference)).toFixed(4);
         }
 
         var targetChangeNumber = '';
@@ -3341,6 +3468,7 @@ export default class BuildTree extends Component {
             currentEndValue: (getValue != '' && this.state.currentModelingType != 3 && this.state.currentModelingType != 5) ? targetEndValue : '',
             currentCalculatedMomChange: getValue != '' ? momValue : '',
             currentTargetChangeNumber: getValue != '' ? targetChangeNumber : '',
+            percentForOneMonth
         });
     }
     calculateMomByChangeInNumber(e) {
@@ -3352,7 +3480,8 @@ export default class BuildTree extends Component {
         var startDate = this.state.currentCalculatorStartDate;
         var endDate = this.state.currentCalculatorStopDate;
         var monthDifference = parseInt(moment(endDate).diff(startDate, 'months', true) + 1);
-        var getValue = e.target.value.toString().replaceAll(",", "");
+        var currentTargetChangeNumber = document.getElementById("currentTargetChangeNumber").value;
+        var getValue = currentTargetChangeNumber.toString().replaceAll(",", "");
         // var getEndValueFromNumber = parseFloat(this.state.currentCalculatorStartValue) + parseFloat(e.target.value);
         var targetEndValue = parseFloat(this.state.currentCalculatorStartValue.toString().replaceAll(",", "")) + parseFloat(getValue);
 
@@ -3905,36 +4034,52 @@ export default class BuildTree extends Component {
     }.bind(this)
     selected = function (instance, cell, x, y, value) {
         if (y == 8) {
-            this.setState({
-                currentRowIndex: '',
-                // showCalculatorFields: '',
-                currentModelingType: '',
-                currentCalculatorStartDate: '',
-                currentCalculatorStopDate: '',
-                currentCalculatorStartValue: '',
-            }, () => {
-                // console.log("x row data===>", this.el.getRowData(x));
-                var elInstance = this.state.modelingEl;
-                var rowData = elInstance.getRowData(x);
-                var startValue = this.getMomValueForDateRange(rowData[1]);
-                console.log("***MOM final start value---", startValue)
+            var elInstance = this.state.modelingEl;
+            var rowData = elInstance.getRowData(x);
+            if (rowData[4] != "" && rowData[4] != null) {
                 this.setState({
-                    currentRowIndex: x,
-                    showCalculatorFields: this.state.aggregationNode ? !this.state.showCalculatorFields : false,
-                    currentModelingType: rowData[4],
-                    currentCalculatorStartDate: rowData[1],
-                    currentCalculatorStopDate: rowData[2],
-                    currentCalculatorStartValue: startValue,
-                    currentCalculatedMomChange: '',
-                    currentTargetChangeNumber: '',
-                    currentTargetChangeNumberEdit: false,
-                    currentTargetChangePercentage: '',
-                    currentTargetChangePercentageEdit: false,
-                    currentEndValue: '',
-                    currentEndValueEdit: false
-                });
-            })
+                    currentRowIndex: '',
+                    // showCalculatorFields: '',
+                    currentModelingType: '',
+                    currentCalculatorStartDate: '',
+                    currentCalculatorStopDate: '',
+                    currentCalculatorStartValue: '',
+                }, () => {
+                    // console.log("x row data===>", this.el.getRowData(x));
+                    var startValue = this.getMomValueForDateRange(rowData[1]);
+                    console.log("***MOM final start value---", startValue)
+                    this.setState({
+                        currentRowIndex: x,
+                        showCalculatorFields: this.state.aggregationNode ? !this.state.showCalculatorFields : false,
+                        currentModelingType: rowData[4],
+                        currentCalculatorStartDate: rowData[1],
+                        currentCalculatorStopDate: rowData[2],
+                        currentCalculatorStartValue: startValue,
+                        currentCalculatedMomChange: '',
+                        currentTargetChangeNumber: '',
+                        currentTargetChangeNumberEdit: false,
+                        currentTargetChangePercentage: '',
+                        currentTargetChangePercentageEdit: false,
+                        currentEndValue: '',
+                        currentEndValueEdit: false
+                    }, () => {
+                        // this.calculateMOMData(0, 3);
+                    });
+                })
 
+            } else {
+                alert("Please select modeling type before proceeding.");
+                // confirmAlert({
+                //     message: "Please select modeling type before proceeding.",
+                //     buttons: [
+                //         {
+                //             label: i18n.t('static.report.ok'),
+                //             onClick: () => {
+                //             }
+                //         }
+                //     ]
+                // });
+            }
         }
     }.bind(this)
 
@@ -4092,11 +4237,34 @@ export default class BuildTree extends Component {
 
         // Transfer to/from node
         if (x == 3) {
+            var col = ("D").concat(parseInt(y) + 1);
+            var transferFlag = false;
             if (value != "") {
                 this.state.modelingEl.setValueFromCoords(5, y, -1, true);
+                var items = this.state.items;
+                var transfer = value != "" ? value.split('_')[0] : '';
+                if (transfer != '') {
+                    for (let i = 0; i < items.length; i++) {
+                        var nodeDataId = items[i].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataId;
+                        if (nodeDataId == transfer && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation) {
+                            transferFlag = true;
+                            break;
+                        }
+                    }
+                }
+                if (transferFlag) {
+                    instance.jexcel.setStyle(col, "background-color", "transparent");
+                    instance.jexcel.setStyle(col, "background-color", "yellow");
+                    instance.jexcel.setComments(col, 'You can not transfer data to this node as it is an extrapolation node.');
+                } else {
+                    instance.jexcel.setStyle(col, "background-color", "transparent");
+                    instance.jexcel.setComments(col, "");
+                }
             }
             else {
                 this.state.modelingEl.setValueFromCoords(5, y, "", true);
+                instance.jexcel.setStyle(col, "background-color", "transparent");
+                instance.jexcel.setComments(col, "");
             }
         }
         //+/-
@@ -4737,7 +4905,9 @@ export default class BuildTree extends Component {
             e.showModelingValidation = this.state.showModelingValidation
             console.log("1------------------->>>>", this.getPayloadData(items1[i], 4))
             console.log("2------------------->>>>", this.getPayloadData(items1[i], 3))
-            e.result = this.getPayloadData(items1[i], 4)
+            e.result = this.getPayloadData(items1[i], 4)//Up
+            e.result1 = this.getPayloadData(items1[i], 6)//Down
+            e.result2 = this.getPayloadData(items1[i], 5)//Link
             var text = this.getPayloadData(items1[i], 3)
             e.text = text;
             newItems.push(e)
@@ -5010,12 +5180,8 @@ export default class BuildTree extends Component {
                 // selectedScenario:0
             }, () => {
                 if (curTreeObj.scenarioList.length == 1) {
-                    // this.setState({ selectedScenario: curTreeObj.scenarioList[0].id })
-
                     var scenarioId = curTreeObj.scenarioList[0].id;
-                    // var scenario = document.getElementById("scenarioId");
                     var selectedText = curTreeObj.scenarioList[0].label.label_en;
-
                     this.setState({
                         selectedScenario: scenarioId,
                         selectedScenarioLabel: selectedText,
@@ -5225,47 +5391,90 @@ export default class BuildTree extends Component {
     duplicateNode(itemConfig) {
         console.log("duplicate node called 1---", this.state.currentItemConfig);
         console.log("duplicate node called 2---", itemConfig);
+        // var childList = [];
+        var items1 = this.state.items;
         const { items } = this.state;
-        var maxNodeId = items.length > 0 ? Math.max(...items.map(o => o.id)) : 0;
-        var nodeId = parseInt(maxNodeId + 1);
-        var newItem = {
-            id: nodeId,
-            level: itemConfig.level,
-            parent: itemConfig.parent,
-            payload: itemConfig.payload
-        };
-        newItem.payload.nodeId = nodeId;
-        var parentSortOrder = items.filter(c => c.id == itemConfig.parent)[0].sortOrder;
-        var childList = items.filter(c => c.parent == itemConfig.parent);
-        newItem.sortOrder = parentSortOrder.concat(".").concat(("0" + (Number(childList.length) + 1)).slice(-2));
+        // var maxNodeId = items.length > 0 ? Math.max(...items.map(o => o.id)) : 0;
+        // var nodeId = parseInt(maxNodeId + 1);
+        // var newItem = {
+        //     id: nodeId,
+        //     level: itemConfig.level,
+        //     parent: itemConfig.parent,
+        //     payload: itemConfig.payload
+        // };
+        // newItem.payload.nodeId = nodeId;
+        // var parentSortOrder = items.filter(c => c.id == itemConfig.parent)[0].sortOrder;
+        // var childList = items.filter(c => c.parent == itemConfig.parent);
+        // newItem.sortOrder = parentSortOrder.concat(".").concat(("0" + (Number(childList.length) + 1)).slice(-2));
         var maxNodeDataId = this.getMaxNodeDataId();
-        (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataId = maxNodeDataId;
+        // (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataId = maxNodeDataId;
+        console.log("initial maxNodeDataId---", maxNodeDataId);
+        var childList = items1.filter(x => x.sortOrder.startsWith(itemConfig.sortOrder));
+        var childListArr = [];
+        var json;
+        var sortOrder = itemConfig.sortOrder;
+        console.log("childList---", childList);
         var scenarioList = this.state.scenarioList;
-        if (scenarioList.length > 0) {
-            for (let i = 0; i < scenarioList.length; i++) {
-                if (scenarioList[i].id != this.state.selectedScenario) {
-                    (newItem.payload.nodeDataMap[scenarioList[i].id])[0].nodeDataId = parseInt(maxNodeDataId + 1);
-                    // var tempArray = [];
-                    // var nodeDataMap = {};
-                    // tempArray.push(JSON.parse(JSON.stringify((newItem.payload.nodeDataMap[this.state.selectedScenario])[0])));
-                    // console.log("tempArray---", tempArray);
-                    // nodeDataMap = newItem.payload.nodeDataMap;
-                    // tempArray[0].nodeDataId = this.getMaxNodeDataId();
-                    // nodeDataMap[scenarioList[i].id] = tempArray;
-                    // // nodeDataMap[scenarioList[i].id][0].nodeDataId = scenarioList[i].id;
-                    // newItem.payload.nodeDataMap = nodeDataMap;
-                    // (newItem.payload.nodeDataMap[scenarioList[i].id])[0] = (newItem.payload.nodeDataMap[this.state.selectedScenario]);
+        for (let i = 0; i < childList.length; i++) {
+            var child = JSON.parse(JSON.stringify(childList[i]));
+            console.log("child before---", child);
+            var maxNodeId = items.length > 0 ? Math.max(...items.map(o => o.id)) : 0;
+            console.log("maxNodeId---", maxNodeId);
+            var nodeId = parseInt(maxNodeId + 1);
+            console.log("nodeId---", nodeId);
+            if (sortOrder == child.sortOrder) {
+                child.payload.nodeId = nodeId;
+                child.id = nodeId;
+                var parentSortOrder = items.filter(c => c.id == itemConfig.parent)[0].sortOrder;
+                var childList1 = items.filter(c => c.parent == itemConfig.parent);
+                child.sortOrder = parentSortOrder.concat(".").concat(("0" + (Number(childList1.length) + 1)).slice(-2));
+                json = {
+                    oldId: itemConfig.id,
+                    newId: nodeId,
+                    oldSortOrder: itemConfig.sortOrder,
+                    newSortOrder: child.sortOrder
+                }
+                childListArr.push(json);
+            } else {
+                console.log("childListArr---", childListArr + " child.parent---", child.parent);
+                var parentNode = childListArr.filter(x => x.oldId == child.parent)[0];
+                console.log("parentNode---", parentNode)
+                child.payload.nodeId = nodeId;
+                var oldId = child.id;
+                var oldSortOrder = child.sortOrder;
+                child.id = nodeId;
+                child.parent = parentNode.newId;
+                var parentSortOrder = parentNode.newSortOrder;
+                var childList1 = items.filter(c => c.parent == parentNode.newId);
+                child.sortOrder = parentSortOrder.concat(".").concat(("0" + (Number(childList1.length) + 1)).slice(-2));
+                json = {
+                    oldId: oldId,
+                    newId: nodeId,
+                    oldSortOrder: oldSortOrder,
+                    newSortOrder: child.sortOrder
+                }
+                childListArr.push(json);
+            }
+            if (scenarioList.length > 0) {
+                for (let i = 0; i < scenarioList.length; i++) {
+                    (child.payload.nodeDataMap[scenarioList[i].id])[0].nodeDataId = maxNodeDataId;
+                    maxNodeDataId++;
                 }
             }
+            console.log("child after---", child);
+            items.push(child);
+            // childList.push(immidiateChilds[i]);
         }
-        console.log("duplicate button clicked value after update---", newItem);
+
+
+        console.log("duplicate button clicked value after update---", items);
         this.setState({
-            items: [...items, newItem],
+            // items: [...items, newItem],
+            items,
             cursorItem: nodeId
         }, () => {
             console.log("on add items-------", this.state.items);
-            this.calculateMOMData(newItem.id, 2);
-            // this.calculateValuesForAggregateNode(this.state.items);
+            this.calculateMOMData(0, 2);
         });
     }
     cancelClicked() {
@@ -5285,8 +5494,9 @@ export default class BuildTree extends Component {
             // console.log("filtered planning unit list tempPlanningUnitId---", this.state.tempPlanningUnitId);
             if (this.state.planningUnitList.length == 1) {
                 var { currentItemConfig } = this.state;
-                console.log("pl 1---");
-                if ((currentItemConfig.context.payload.nodeType.id == 4 && !this.state.addNodeFlag) || (currentItemConfig.context.payload.nodeType.id == 5 && this.state.addNodeFlag)) {
+                console.log("pl 1---", this.state.planningUnitList);
+                console.log("currentItemConfig pl 1---", currentItemConfig);
+                if ((currentItemConfig.context.payload.nodeType.id == 4 && this.state.addNodeFlag) || (currentItemConfig.context.payload.nodeType.id == 5 && this.state.addNodeFlag)) {
                     currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit.id = this.state.planningUnitList[0].id;
                     console.log("pl 2---");
                     currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit.label = this.state.planningUnitList[0].label;
@@ -5420,7 +5630,7 @@ export default class BuildTree extends Component {
             fuValues: { value: usageTemplate.forecastingUnit.id, label: getLabelText(usageTemplate.forecastingUnit.label, this.state.lang) + " | " + usageTemplate.forecastingUnit.id },
         }, () => {
             console.log("copy from template---", this.state.currentScenario);
-            this.getForecastingUnitListByTracerCategoryId(0);
+            this.getForecastingUnitListByTracerCategoryId(0, usageTemplate.forecastingUnit.id);
             this.getNoOfMonthsInUsagePeriod();
             this.getNoFURequired();
             this.getNoOfFUPatient();
@@ -5703,7 +5913,7 @@ export default class BuildTree extends Component {
         }
 
     }
-    getForecastingUnitListByTracerCategoryId(type) {
+    getForecastingUnitListByTracerCategoryId(type, isUsageTemplate) {
         var scenarioId = this.state.selectedScenario;
         console.log("my tracer category---", this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId][0])
         console.log("this.state.currentScenario---", this.state.currentScenario.fuNode.forecastingUnit.tracerCategory.id);
@@ -5773,7 +5983,11 @@ export default class BuildTree extends Component {
                     this.getPlanningUnitListByFUId(filteredForecastingUnitList[0].id);
                 })
             } else if (this.state.addNodeFlag) {
-                this.setState({ planningUnitList: [] });
+                if (isUsageTemplate > 0) {
+                    this.getPlanningUnitListByFUId(isUsageTemplate);
+                } else {
+                    this.setState({ planningUnitList: [] });
+                }
             }
 
         });
@@ -5834,6 +6048,29 @@ export default class BuildTree extends Component {
         });
     }
 
+    touchAllScenario(setTouched, errors) {
+        setTouched({
+            scenarioName: true
+        }
+        )
+        this.validateFormScenario(errors)
+    }
+
+    validateFormScenario(errors) {
+        this.findFirstErrorScenario('userForm', (fieldName) => {
+            return Boolean(errors[fieldName])
+        })
+    }
+    findFirstErrorScenario(formName, hasError) {
+        const form = document.forms[formName]
+        for (let i = 0; i < form.length; i++) {
+            if (hasError(form[i].name)) {
+                form[i].focus()
+                break
+            }
+        }
+    }
+
     touchAll(setTouched, errors) {
         setTouched({
             forecastMethodId: true,
@@ -5843,6 +6080,7 @@ export default class BuildTree extends Component {
         )
         this.validateForm(errors)
     }
+
 
     validateForm(errors) {
         this.findFirstError('userForm', (fieldName) => {
@@ -6215,12 +6453,12 @@ export default class BuildTree extends Component {
     }
 
     componentDidMount() {
-        
+
         this.setState({
             treeId: this.props.match.params.treeId,
             templateId: this.props.match.params.templateId
         }, () => {
-            console.log("on mount ---",this.state.programId);
+            console.log("on mount ---", this.state.programId);
             this.getUsagePeriodList();
             this.getTreeList();
             this.getForecastMethodList();
@@ -6244,92 +6482,97 @@ export default class BuildTree extends Component {
         var items = curTreeObj.tree.flatList;
         var scenarioId;
         var temNodeDataMap = [];
-        if (type == 1) {
-            var maxScenarioId = Math.max(...scenarioList.map(o => o.id));
-            var minScenarioId = Math.min(...scenarioList.map(o => o.id));
-            scenarioId = parseInt(maxScenarioId) + 1;
-            var newTabObject = {
-                id: scenarioId,
-                label: {
-                    label_en: scenario.label.label_en
-                },
-                notes: scenario.notes,
-                active: true
-            };
-            // console.log("tab data---", newTabObject);
-            scenarioList = [...scenarioList, newTabObject];
-            // console.log("tabList---", tabList1)
-            if (this.state.treeId != "") {
-                if (this.state.scenarioList.length > 1) {
-
-                }
-
-                console.log("***>minScenarioId---", items);
-                var tArr = [];
-                for (var i = 0; i < items.length; i++) {
-                    for (let j = 0; j < scenarioList.length; j++) {
-                        if (items[i].payload.nodeDataMap.hasOwnProperty(scenarioList[j].id)) {
-                            temNodeDataMap.push(items[i].payload.nodeDataMap[scenarioList[j].id][0]);
-                            tArr.push(items[i].payload.nodeDataMap[scenarioList[j].id][0].nodeDataId);
-                        }
-                    }
-                    var tempArray = [];
-                    var nodeDataMap = {};
-                    // tempArray = items[i].payload.nodeDataMap;
-                    tempArray.push(JSON.parse(JSON.stringify((items[i].payload.nodeDataMap[minScenarioId])[0])));
-                    nodeDataMap = items[i].payload.nodeDataMap;
-                    nodeDataMap[scenarioId] = tempArray;
-                    // var nodeDataId = this.getMaxNodeDataId(items);
-                    // console.log("nodeDataId---", nodeDataId);
-                    nodeDataMap[scenarioId][0].nodeDataId = "";
-                    items[i].payload.nodeDataMap = nodeDataMap;
-                }
-                console.log("items-----------%%%%%%", items);
-                console.log("tArr---", tArr);
-
-            }
-        } else if (type == 2 || type == 3) {
-            scenarioId = this.state.selectedScenario;
-            var scenario1 = scenarioList.filter(x => x.id == scenarioId)[0];
-            var findNodeIndex = scenarioList.findIndex(n => n.id == scenarioId);
-            if (type == 2) {
-                console.log("this.state.scenario---", this.state.scenario);
-                scenarioList[findNodeIndex] = this.state.scenario;
-                console.log("my scenarioList---", scenarioList);
-            } else if (type == 3) {
-                items = [];
-                scenarioId = '';
-                scenario1.active = false;
-                scenarioList[findNodeIndex] = scenario1;
-            }
-
-
-        }
-
-        curTreeObj.scenarioList = scenarioList;
-        this.setState({
-            showDiv1: false,
-            curTreeObj,
-            items,
-            selectedScenario: scenarioId,
-            scenarioList: scenarioList.filter(x => x.active == true),
-            openAddScenarioModal: false,
-            isChanged: true
-        }, () => {
-            console.log("final tab list---", this.state.items);
+        var result = scenarioList.filter(x => x.label.label_en.trim() == scenario.label.label_en.trim());
+        if ((type == 1 && result.length == 0) || (type == 2 && ((result.length == 1 && scenario.id == result[0].id) || result.length == 0)) || type == 3) {
             if (type == 1) {
-                var maxNodeDataId = temNodeDataMap.length > 0 ? Math.max(...temNodeDataMap.map(o => o.nodeDataId)) : 0;
-                console.log("scenarioId---", scenarioId);
-                for (var i = 0; i < items.length; i++) {
-                    maxNodeDataId = parseInt(maxNodeDataId) + 1;
-                    (items[i].payload.nodeDataMap[scenarioId])[0].nodeDataId = maxNodeDataId;
-                    console.log("my node data id--->", (items[i].payload.nodeDataMap[scenarioId])[0].nodeDataId);
+                var maxScenarioId = Math.max(...scenarioList.map(o => o.id));
+                var minScenarioId = Math.min(...scenarioList.map(o => o.id));
+                scenarioId = parseInt(maxScenarioId) + 1;
+                var newTabObject = {
+                    id: scenarioId,
+                    label: {
+                        label_en: scenario.label.label_en
+                    },
+                    notes: scenario.notes,
+                    active: true
+                };
+                // console.log("tab data---", newTabObject);
+                scenarioList = [...scenarioList, newTabObject];
+                // console.log("tabList---", tabList1)
+                if (this.state.treeId != "") {
+                    if (this.state.scenarioList.length > 1) {
+
+                    }
+
+                    console.log("***>minScenarioId---", items);
+                    var tArr = [];
+                    for (var i = 0; i < items.length; i++) {
+                        for (let j = 0; j < scenarioList.length; j++) {
+                            if (items[i].payload.nodeDataMap.hasOwnProperty(scenarioList[j].id)) {
+                                temNodeDataMap.push(items[i].payload.nodeDataMap[scenarioList[j].id][0]);
+                                tArr.push(items[i].payload.nodeDataMap[scenarioList[j].id][0].nodeDataId);
+                            }
+                        }
+                        var tempArray = [];
+                        var nodeDataMap = {};
+                        // tempArray = items[i].payload.nodeDataMap;
+                        tempArray.push(JSON.parse(JSON.stringify((items[i].payload.nodeDataMap[minScenarioId])[0])));
+                        nodeDataMap = items[i].payload.nodeDataMap;
+                        nodeDataMap[scenarioId] = tempArray;
+                        // var nodeDataId = this.getMaxNodeDataId(items);
+                        // console.log("nodeDataId---", nodeDataId);
+                        nodeDataMap[scenarioId][0].nodeDataId = "";
+                        items[i].payload.nodeDataMap = nodeDataMap;
+                    }
+                    console.log("items-----------%%%%%%", items);
+                    console.log("tArr---", tArr);
+
                 }
-                this.callAfterScenarioChange(scenarioId);
-                // this.updateTreeData();
+            } else if (type == 2 || type == 3) {
+                scenarioId = this.state.selectedScenario;
+                var scenario1 = scenarioList.filter(x => x.id == scenarioId)[0];
+                var findNodeIndex = scenarioList.findIndex(n => n.id == scenarioId);
+                if (type == 2) {
+                    console.log("this.state.scenario---", this.state.scenario);
+                    scenarioList[findNodeIndex] = this.state.scenario;
+                    console.log("my scenarioList---", scenarioList);
+                } else if (type == 3) {
+                    items = [];
+                    scenarioId = '';
+                    scenario1.active = false;
+                    scenarioList[findNodeIndex] = scenario1;
+                }
+
+
             }
-            this.saveTreeData();
-        });
+
+            curTreeObj.scenarioList = scenarioList;
+            this.setState({
+                showDiv1: false,
+                curTreeObj,
+                items,
+                selectedScenario: scenarioId,
+                scenarioList: scenarioList.filter(x => x.active == true),
+                openAddScenarioModal: false,
+                isChanged: true
+            }, () => {
+                console.log("final tab list---", this.state.items);
+                if (type == 1) {
+                    var maxNodeDataId = temNodeDataMap.length > 0 ? Math.max(...temNodeDataMap.map(o => o.nodeDataId)) : 0;
+                    console.log("scenarioId---", scenarioId);
+                    for (var i = 0; i < items.length; i++) {
+                        maxNodeDataId = parseInt(maxNodeDataId) + 1;
+                        (items[i].payload.nodeDataMap[scenarioId])[0].nodeDataId = maxNodeDataId;
+                        console.log("my node data id--->", (items[i].payload.nodeDataMap[scenarioId])[0].nodeDataId);
+                    }
+                    this.callAfterScenarioChange(scenarioId);
+                    // this.updateTreeData();
+                }
+                this.saveTreeData(false);
+            });
+        } else {
+            alert("Scenario name already exist.");
+        }
     }
     nodeTypeChange(value) {
         var nodeTypeId = value;
@@ -6465,6 +6708,7 @@ export default class BuildTree extends Component {
         if (event.target.name === "scenarioDesc") {
             scenario.notes = event.target.value;
         }
+        // scenario.id = 1;
         this.setState({
             scenario
         });
@@ -6653,7 +6897,9 @@ export default class BuildTree extends Component {
                 label_sp: '',
                 label_pr: ''
             }
+            console.log("node unit label---",label);
             currentItemConfig.context.payload.nodeUnit.label = label;
+            console.log("after node unit label---",currentItemConfig);
 
         }
         if (event.target.name === "percentageOfParent") {
@@ -7371,7 +7617,7 @@ export default class BuildTree extends Component {
                     this.setState({
                         fuValues: { value: this.state.currentScenario.fuNode.forecastingUnit.id, label: getLabelText(this.state.currentScenario.fuNode.forecastingUnit.label, this.state.lang) + " | " + this.state.currentScenario.fuNode.forecastingUnit.id }
                     });
-                    this.getForecastingUnitListByTracerCategoryId(1);
+                    this.getForecastingUnitListByTracerCategoryId(1, 0);
                     this.getNodeUnitOfPrent();
                     this.getNoOfFUPatient();
                     this.getNoOfMonthsInUsagePeriod();
@@ -7612,7 +7858,13 @@ export default class BuildTree extends Component {
                             display: true,
                             // labelString: this.state.currentItemConfig.context.payload.nodeUnit.label != null ? this.state.currentItemConfig.context.payload.nodeType.id > 3 ? getLabelText(this.state.currentItemConfig.parentItem.payload.nodeUnit.label, this.state.lang) : getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang) : '',
                             // labelString: this.state.currentItemConfig.context.payload.nodeUnit.label != null ? this.state.currentItemConfig.context.payload.nodeType.id > 3 ? getLabelText(this.state.currentItemConfig.parentItem.payload.nodeUnit.label, this.state.lang) : getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang) : '',
-                            labelString: this.state.currentItemConfig.context.payload.nodeType.id > 3 ? this.state.currentItemConfig.context.payload.nodeUnit.id != "" ? getLabelText(this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label, this.state.lang) : "" : this.state.currentItemConfig.context.payload.nodeUnit.label != null ? getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang) : "",
+                            labelString: this.state.currentItemConfig.context.payload.nodeType.id > 2 ? 
+                            this.state.currentItemConfig.context.payload.nodeUnit.id != "" ? 
+                            getLabelText(this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label, this.state.lang) 
+                            : "" 
+                            : this.state.currentItemConfig.context.payload.nodeUnit.label != null ? 
+                            getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang) 
+                            : "",
                             // labelString: "",
                             fontColor: 'black'
                         },
@@ -7833,7 +8085,7 @@ export default class BuildTree extends Component {
                                         <div className="row pl-lg-0 pr-lg-3">
                                             {/* <SupplyPlanFormulas ref="formulaeChild" /> */}
                                             <a className="">
-                                                <span style={{ cursor: 'pointer', color: '20a8d8' }} ><small className="supplyplanformulas">{i18n.t('Show Guidance')}</small></span>
+                                                <span style={{ cursor: 'pointer', color: '20a8d8' }} onClick={() => { this.toggleShowGuidanceNodeData() }} ><small className="supplyplanformulas">{i18n.t('Show Guidance')}</small></span>
 
                                             </a>
                                         </div>
@@ -8421,7 +8673,7 @@ export default class BuildTree extends Component {
                                                     // invalid={touched.tracerCategoryId && !!errors.tracerCategoryId}
                                                     onBlur={handleBlur}
                                                     onChange={(e) => {
-                                                        this.dataChange(e); this.getForecastingUnitListByTracerCategoryId(0)
+                                                        this.dataChange(e); this.getForecastingUnitListByTracerCategoryId(0, 0)
                                                     }}
                                                     required
                                                     value={this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentScenario.fuNode.forecastingUnit.tracerCategory.id : ""}
@@ -8871,8 +9123,6 @@ export default class BuildTree extends Component {
                                                 </FormGroup>
                                             </>
 
-                                            {/* } */}
-
                                             <div className="pl-lg-3 pr-lg-3" style={{ clear: 'both', width: '100%' }}>
                                                 {(this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentScenario.fuNode.usageType.id == 2) &&
                                                     <table className="table table-bordered">
@@ -8980,7 +9230,7 @@ export default class BuildTree extends Component {
                         <div className="row pl-lg-0 pr-lg-3">
                             {/* <SupplyPlanFormulas ref="formulaeChild" /> */}
                             <a className="">
-                                <span style={{ cursor: 'pointer', color: '20a8d8' }} ><small className="supplyplanformulas">{i18n.t('Show Guidance')}</small></span>
+                                <span style={{ cursor: 'pointer', color: '20a8d8' }} onClick={() => { this.toggleShowGuidanceModelingTransfer() }}><small className="supplyplanformulas">{i18n.t('Show Guidance')}</small></span>
 
                             </a>
                         </div>
@@ -9068,19 +9318,27 @@ export default class BuildTree extends Component {
                                                 <MonthBox value={this.makeText({ year: new Date(this.state.currentCalculatorStopDate.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStopDate.replace(/-/g, '\/')).getMonth() + 1)).slice(-2) })} onClick={this.handleClickMonthBox5} />
                                             </Picker>
                                         </FormGroup>
-                                        {this.state.currentItemConfig.context.payload.nodeType.id <= 2 && <FormGroup className="col-md-6">
-                                            <Label htmlFor="currencyId">{i18n.t('static.tree.startValue')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="text"
-                                                id="startValue"
-                                                name="startValue"
-                                                bsSize="sm"
-                                                readOnly={true}
-                                                value={addCommas(this.state.currentCalculatorStartValue)}
+                                        {this.state.currentItemConfig.context.payload.nodeType.id <= 2 &&
+                                            <>
+                                                <div>
+                                                    <Popover placement="top" isOpen={this.state.popoverOpenStartValueModelingTool} target="Popover53" trigger="hover" toggle={this.toggleStartValueModelingTool}>
+                                                        <PopoverBody>{i18n.t('static.tooltip.StartValueModelingTool')}</PopoverBody>
+                                                    </Popover>
+                                                </div>
+                                                <FormGroup className="col-md-6">
+                                                    <Label htmlFor="currencyId">{i18n.t('static.tree.startValue')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover53" onClick={this.toggleStartValueModelingTool} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                    <Input type="text"
+                                                        id="startValue"
+                                                        name="startValue"
+                                                        bsSize="sm"
+                                                        readOnly={true}
+                                                        value={addCommas(this.state.currentCalculatorStartValue)}
 
-                                            >
-                                            </Input>
-                                            {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
-                                        </FormGroup>
+                                                    >
+                                                    </Input>
+                                                    {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
+                                                </FormGroup>
+                                            </>
                                         }
                                         {this.state.currentItemConfig.context.payload.nodeType.id > 2 && <FormGroup className="col-md-6">
                                             <Label htmlFor="currencyId">{i18n.t('static.tree.StartPercentage')}<span class="red Reqasterisk">*</span></Label>
@@ -9125,6 +9383,7 @@ export default class BuildTree extends Component {
                                                 <PopoverBody>{i18n.t('static.tooltip.TargetChangePercent')}</PopoverBody>
                                             </Popover>
                                         </div>
+                                        <input type="hidden" id="percentForOneMonth" name="percentForOneMonth" value={this.state.percentForOneMonth} />
                                         <FormGroup className="col-md-5">
                                             <Label htmlFor="currencyId">
                                                 {this.state.currentItemConfig.context.payload.nodeType.id > 2 ? 'Change (% points)' : 'Target change (%)'}
@@ -9550,8 +9809,23 @@ export default class BuildTree extends Component {
         var date = year + "-" + month + "-01";
         var currentCalculatorStartValue = this.getMomValueForDateRange(date);
         console.log("currentCalculatorStartValue---", currentCalculatorStartValue);
-        this.setState({ currentCalculatorStartDate: date, currentCalculatorStartValue }, () => {
+        console.log("month change currentEndValueEdit---", this.state.currentEndValueEdit);
+        console.log("month change currentTargetChangePercentageEdit---", this.state.currentTargetChangePercentageEdit);
+        console.log("month change currentTargetChangeNumberEdit---", this.state.currentTargetChangeNumberEdit);
 
+        this.setState({ currentCalculatorStartDate: date, currentCalculatorStartValue }, () => {
+            if (!this.state.currentEndValueEdit && !this.state.currentTargetChangePercentageEdit && !this.state.currentTargetChangeNumberEdit) {
+                console.log("Inside if modeling calculator");
+            } else {
+                console.log("Inside else modeling calculator");
+                if (!this.state.currentEndValueEdit) {
+                    this.calculateMomByEndValue();
+                } else if (!this.state.currentTargetChangePercentageEdit) {
+                    this.calculateMomByChangeInPercent();
+                } else if (!this.state.currentTargetChangeNumberEdit) {
+                    this.calculateMomByChangeInNumber();
+                }
+            }
         });
 
     }
@@ -9571,7 +9845,18 @@ export default class BuildTree extends Component {
         // console.log("value>>>", year);
         // console.log("text>>>", month)
         this.setState({ currentCalculatorStopDate: year + "-" + month + "-01" }, () => {
-
+            if (!this.state.currentEndValueEdit && !this.state.currentTargetChangePercentageEdit && !this.state.currentTargetChangeNumberEdit) {
+                console.log("Inside if modeling calculator");
+            } else {
+                console.log("Inside else modeling calculator");
+                if (!this.state.currentEndValueEdit) {
+                    this.calculateMomByEndValue();
+                } else if (!this.state.currentTargetChangePercentageEdit) {
+                    this.calculateMomByChangeInPercent();
+                } else if (!this.state.currentTargetChangeNumberEdit) {
+                    this.calculateMomByChangeInNumber();
+                }
+            }
         });
 
     }
@@ -9696,13 +9981,13 @@ export default class BuildTree extends Component {
                         <div className={itemConfig.payload.nodeType.id == 5 ||
                             itemConfig.payload.nodeType.id == 4 ? "ContactTitle TitleColorWhite" :
                             "ContactTitle TitleColor"}>
-                            <div title={itemConfig.payload.label.label_en} style={{ fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '137px', float: 'left', fontWeight: 'bold', }}>
+                            <div title={itemConfig.payload.label.label_en} style={{ fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '128px', float: 'left', fontWeight: 'bold', }}>
                                 {itemConfig.payload.label.label_en}</div>
                             <div style={{ float: 'right' }}>
-                                {itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation == true && <i class="fa fa-line-chart" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
-                                {this.getPayloadData(itemConfig, 4) == true && <i class="fa fa-long-arrow-up" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
-                                {this.getPayloadData(itemConfig, 6) == true && <i class="fa fa-long-arrow-down" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
-                                {this.getPayloadData(itemConfig, 5) == true && <i class="fa fa-link" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
+                                {(itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined && itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation == true) && <i class="fa fa-line-chart" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
+                                {(itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined && itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(itemConfig, 4) == true && <i class="fa fa-long-arrow-up" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
+                                {(itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined && itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(itemConfig, 6) == true && <i class="fa fa-long-arrow-down" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
+                                {(itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined && itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(itemConfig, 5) == true && <i class="fa fa-link" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
                                 <b style={{ color: '#212721', float: 'right' }}>
                                     {itemConfig.payload.nodeType.id == 2 ?
                                         <i class="fa fa-hashtag" style={{ fontSize: '11px', color: '#002f6c' }}></i> :
@@ -10145,7 +10430,7 @@ export default class BuildTree extends Component {
 
                                         }
                                         this.filterUsageTemplateList(tracerCategoryId);
-                                        this.getForecastingUnitListByTracerCategoryId(0);
+                                        this.getForecastingUnitListByTracerCategoryId(0, 0);
                                     }
                                     else if (itemConfig.payload.nodeType.id == 4) {
                                         this.getNoOfFUPatient();
@@ -10212,15 +10497,13 @@ export default class BuildTree extends Component {
             <Row>
                 <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                     <Card className="mb-lg-0">
+
                         <div className="pb-lg-0">
-                            <div className="Card-header-reporticon pb-1" style={{ display: 'grid', float: 'right' }}>
-                            <a style={{marginLeft:'106px'}}>
-                                <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
-                            </a>
-                                {/* <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span> */}
-                                {/* <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span> */}
-                                <span className="compareAndSelect-larrowText"> {i18n.t('static.common.continueTo')} <a href="/#/validation/modelingValidation" className="supplyplanformulas">{i18n.t('static.dashboard.modelingValidation')}</a>  <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span></span>
-                                <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')}  <a href="/#/validation/productValidation" className="supplyplanformulas">{i18n.t('static.dashboard.productValidation')}</a> <span className="compareAndSelect-rarrow"><i className="cui-arrow-right icons " > </i></span></span>
+                            <div className="Card-header-reporticon pb-1">
+                                <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
+                                <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span>
+                                <span className="compareAndSelect-larrowText" style={{ cursor: 'pointer' }} onClick={this.cancelClicked}> {i18n.t('static.common.backTo')} <small className="supplyplanformulas">{'Tree List'}</small></span>
+                                <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')}  <a href="/#/validation/productValidation" className="supplyplanformulas">{i18n.t('static.dashboard.productValidation')}</a> {i18n.t('static.tree.or')} <a href="/#/validation/modelingValidation" className="supplyplanformulas">{i18n.t('static.dashboard.modelingValidation')}</a> </span>
                             </div>
                             {/* <div className="card-header-actions">
                                 <div className="card-header-action pr-4 pt-lg-0">
@@ -10247,21 +10530,21 @@ export default class BuildTree extends Component {
                                     </Col>
                                 </div>
                             </div>  */}
-                            <div className="row">
-                                <div className="col-md-12 pl-lg-0">
-                                    <div className='col-md-4 pt-lg-0'>
+                            {/* <div className="row"> */}
+                            {/* <div className="col-md-12 pl-lg-0"> */}
+                            {/* <div className='col-md-4 pt-lg-0'>
                                         <a className="pr-lg-0 pt-lg-1 float-left">
                                             <span style={{ cursor: 'pointer' }} onClick={this.cancelClicked}><i className="cui-arrow-left icons" style={{ color: '#002F6C', fontSize: '13px' }}></i> <small className="supplyplanformulas">{'Return To List'}</small></span>
                                         </a>
-                                    </div>
-                                    {/* <div className="col-md-6">
+                                    </div> */}
+                            {/* <div className="col-md-6">
                                         <span className="pr-lg-0 pt-lg-0 float-right">
                                             <h5 style={{ color: '#BA0C2F' }}>{i18n.t('static.tree.pleaseSaveAndDoARecalculateAfterDragAndDrop.')}</h5>
                                         </span>
                                     </div> */}
 
-                                </div>
-                            </div>
+                            {/* </div> */}
+                            {/* </div> */}
                             {/* <div className="row">
                                 <div className="col-md-12 pl-lg-3">
                                     <div className="col-md-12">
@@ -10272,6 +10555,13 @@ export default class BuildTree extends Component {
 
                                 </div>
                             </div> */}
+                        </div>
+                        <div className="row pt-lg-0 pr-lg-4">
+                            <div className="col-md-12">
+                                <a style={{ float: 'right' }}>
+                                    <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
+                                </a>
+                            </div>
                         </div>
                         <CardBody className="pt-lg-1 pl-lg-0 pr-lg-0">
                             <div className="container-fluid pl-lg-3 pr-lg-3">
@@ -10325,21 +10615,12 @@ export default class BuildTree extends Component {
                                                         <Label htmlFor="languageId">{i18n.t('static.whatIf.scenario')}</Label>
 
                                                         <InputGroup>
-
-                                                            {/* <InputGroupAddon addonType="append">
-                                                                        <InputGroupText><i class="fa fa-plus icons" aria-hidden="true" data-toggle="tooltip" data-html="true" data-placement="bottom" onClick={this.showPopUp} title=""></i></InputGroupText>
-                                                                    </InputGroupAddon> */}
-
                                                             <Input
                                                                 type="select"
                                                                 name="scenarioId"
                                                                 id="scenarioId"
                                                                 bsSize="sm"
-                                                                // valid={!errors.languageId && this.state.user.language.languageId != ''}
-                                                                // invalid={touched.languageId && !!errors.languageId}
                                                                 onChange={(e) => { this.dataChange(e) }}
-                                                                // onClick={() => { this.onClick1() }}
-                                                                // onBlur={handleBlur}
                                                                 required
                                                                 value={this.state.selectedScenario}
                                                             >
@@ -10492,7 +10773,7 @@ export default class BuildTree extends Component {
                                                 }}
                                                 validate={validate(validationSchema)}
                                                 onSubmit={(values, { setSubmitting, setErrors }) => {
-                                                    this.saveTreeData();
+                                                    this.saveTreeData(false);
                                                     // this.createOrUpdateTree();
                                                 }}
                                                 render={
@@ -10766,147 +11047,379 @@ export default class BuildTree extends Component {
                         </CardBody>
 
                     </Card></Col></Row>
-                    <Modal isOpen={this.state.showGuidance}
-                    className={'modal-lg ' + this.props.className} >
-                    <ModalHeader toggle={() => this.toggleShowGuidance()} className="ModalHead modal-info-Headher">
-                        <strong className="TextWhite">Show Guidance</strong>
-                    </ModalHeader>
-                    <div>
-                        <ModalBody>
-                           <div>
-                               <h3 className='ShowGuidanceHeading'>Manage Tree – Tree list</h3>
-                           </div>
-                            <p>
-                                <p style={{fontSize:'14px'}}><span className="UnderLineText">Purpose :</span>Enable users to manage and build forecast tree and scenarios, for any non-consumption forecasts (demographic, morbidity, services, etc). Note that more guidance is available after clicking into any specific node.</p>
-                           </p>
-                            <p>
-                                <p style={{fontSize:'14px'}}><span className="UnderLineText">Using this screen :</span><br></br>
-                               <span style={{fontWeight:'bold'}}>Manage the Tree:</span> Click on the gear icon <i class="fa fa-cog" aria-hidden="true"></i> to show and edit or hide the forecast method, tree name, and region.
-                                </p>
-                                <p><span style={{fontWeight:'bold',fontSize:'14px'}}>Building the Tree:</span> The forecast tree is built from the top down, using different types of “nodes”.  See the Node Types and Node Actions below. Each forecast tree must include one or more Planning Unit Nodes, which form the forecast output, for that tree to be available in the 'Compare and Select' screen. Each Planning Unit Node must stem from a Forecasting Unit Node. </p>
-                                
-                            </p>
-                            <p>
-                                <p style={{fontSize:'14px',fontWeight:'bold'}}><span className="">Node Actions :</span></p>
-                               
-                                <ul className='pl-lg-4'>
-                                    <li><i class="fa fa-trash-o" aria-hidden="true" style={{color:'#002f6c'}}></i> Delete: Deletes the selected node</li>
-                                    <li><i class="fa fa-clone" aria-hidden="true" style={{color:'#002f6c'}}></i> Duplicate: Duplicates the selected node under the same parent</li>
-                                    <li><i class="fa fa-plus-square-o" aria-hidden="true" style={{color:'#002f6c'}}></i> Add: Adds a child to the selected node.</li>
-                                   
-                                </ul>
-                               
-                            </p>
-                            <p>
-                            <p style={{fontSize:'14px',fontWeight:'bold'}}><span className="">Node Type :</span></p>
+            <Modal isOpen={this.state.showGuidanceModelingTransfer}
+                className={'modal-lg ' + this.props.className} >
+                <ModalHeader toggle={() => this.toggleShowGuidanceModelingTransfer()} className="ModalHead modal-info-Headher">
+                    <strong className="TextWhite">Show Guidance</strong>
+                </ModalHeader>
+                <div>
+                    <ModalBody>
+                        <div>
+                            <h3 className='ShowGuidanceHeading'>Add/Edit Node - Modeling/Transfer </h3>
+                        </div>
+                        <p>
+                            <p style={{ fontSize: '14px' }}><span className="UnderLineText">Purpose :</span>If a node changes over time, a user can utilize the Modeling/Transfer tab to model growth/loss within a single node or a transfer from one node to another. Note that this functionality is only available for Number (#) Nodes and Percentage (%) Nodes (including Forecasting Units and Planning Units). </p>
+                        </p>
+
+                        <p>
+                            <p style={{ fontSize: '14px' }}><span className="UnderLineText">Using this tab :</span>
+                                <br></br>Modeling and transfer can have four different modeling types: </p>
+                        </p>
+
+                        <p>
+
                             <div className='pl-lg-4 pr-lg-4'>
-                            <table className="table table-bordered ">
-                                <thead>
-                                <tr>
-                                    <th style={{width:'130px'}}>Node Type</th>
-                                    <th>Value</th>
-                                    <th>Potential Children</th>
-                                    <th>Advanced Functionality</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr>
-                                    <td className='BgLightBlue'><b>Aggregation ∑</b></td>
-                                    <td>Sum of children</td>
-                                    <td><b style={{color:'#002f6c'}}>∑</b> or Number</td>
-                                    <td>-</td>
-                                </tr>
-                                <tr>
-                                    <td className='BgLightBlue'><b>Number #</b></td>
-                                    <td>Defined at this node</td>
-                                    <td>% or <b style={{background: '#002f6c',color: '#fff',padding: '3px'}}><i class="fa fa-cube" aria-hidden="true"></i></b></td>
-                                    <td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i className='fa fa-link'></i>, <i className='fa fa-line-chart'></i></td>
-                                </tr>
-                                <tr>
-                                    <td className='BgLightBlue'><b>Percentage %</b></td>
-                                    <td>Defined as a percentage of the parent</td>
-                                    <td>% or <b style={{background: '#002f6c',color: '#fff',padding: '3px'}}><i class="fa fa-cube" aria-hidden="true"></i></b></td>
-                                    <td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i className='fa fa-link'></i></td>
-                                </tr>
-                                <tr>
-                                    <td className='BgDarkBlue'><b>Forecasting Unit <i class="fa fa-cube" aria-hidden="true"></i></b></td>
-                                    <td>Defined as a percentage of the parent and forecasting unit parameters</td>
-                                    <td><b style={{background: '#002f6c',color: '#fff',padding: '3px'}}><i class="fa fa-cubes" aria-hidden="true"></i></b></td>
-                                    <td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i className='fa fa-link'></i></td>
-                                </tr>
-                                <tr>
-                                    <td className='BgDarkBlue'><b>Planning Unit <i class="fa fa-cubes" aria-hidden="true"></i></b></td>
-                                    <td>Defined as a percentage of the parent and planning unit parameters</td>
-                                    <td>-</td>
-                                    <td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i className='fa fa-link'></i></td>
-                                </tr>
-                                </tbody>
-                            </table>
-                            </div>
-                             </p>
-                            
-                             <p><span  style={{fontSize:'14px',fontWeight:'bold'}}>Changes Over Time</span><br></br>
-                             While the tree structure stays constant throughout time, node percentages and values can change over time. Use the date dropdown to view the tree at any month. The three functionalities below are available in each node and allow the user to control how nodes change over time:
-                             <ul>
-                                 <li><b><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i> Modeling:</b> Allows user to specify the exact rate of change</li>
-                                 <li><b><i className='fa fa-link'></i> Transfer:</b> Allows users to link two nodes together – so the decrease from the source node is linked to the increase of the destination node. Useful for transitions.</li>
-                                 <li><b><i className='fa fa-line-chart'></i> Extrapolation:</b> Allows users to use historical data to extrapolate future change</li>
-                             </ul>
-                             </p>
-                            
-                             <p><span  style={{fontSize:'14px',fontWeight:'bold'}}>Using Scenarios :</span><br></br>
-                             Scenarios are used to model different values for the same tree. To add, edit or delete a scenario, use the <i class="fa fa-cog" aria-hidden="true"></i> icon next to the scenario dropdown. Use the scenario dropdown to select which scenario to view and edit.
-                             <div className='pl-lg-4 pr-lg-4 pt-lg-4'>
-                            <table className="table table-bordered ">
-                            <thead>
-                                <tr>
-                                    <th style={{width:'130px'}}>Fixed for All Scenarios</th>
-                                    <th style={{width:'230px'}}>Unique to each Scenario</th>
-                                   
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr>
-                                    <td>Tree structure</td>
-                                    <td>Node value</td>
-                                   
-                                  
-                                </tr>
-                                <tr>
-                                <td>Node Title</td>
-                                <td>Month</td>
-                                
-                                  
-                                </tr>
-                                <tr>
-                                <td>Node Type</td>
-                                <td>Notes</td>
-                                </tr>
-                                <tr>
-                                <td></td>
-                                <td>Modeling/Transfer/Extrapolation</td>
-                                </tr>
-                                </tbody>
+                                <table className="table table-bordered ">
+                                    <thead>
+                                        <tr>
+                                            <th style={{ width: '130px' }}>Modeling Type</th>
+                                            <th># Node Calculation</th>
+                                            <th>% Node Calculation</th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Linear (#)</td>
+                                            <td>+/- a static number each month</td>
+                                            <td>N/A</td>
+
+                                        </tr>
+                                        <tr>
+                                            <td>Linear (%)</td>
+                                            <td>+/- a static percentage each month, calculated based on the starting month</td>
+                                            <td>N/A</td>
+
+                                        </tr>
+                                        <tr>
+                                            <td>Exponential (%)</td>
+                                            <td>+/- a percentage each month, calculated on the previous month as a rolling percentage</td>
+                                            <td>N/A</td>
+
+                                        </tr>
+                                        <tr>
+                                            <td>Linear (% point)</td>
+                                            <td>N/A</td>
+                                            <td>+/- a static percentage each month (e.g. if the starting month is 30% and the change is +1% each month, next month is 31%, the next is 32%, and so on)</td>
+
+                                        </tr>
+
+                                    </tbody>
                                 </table>
-                                </div>
-                             </p>
-                             <p><span  style={{fontSize:'14px'}} classNames="UnderLineText">Tips for specific use cases:</span>
-                             <ul>
-                                 <li><b> Forecasting Node Type :</b> Select "discrete" if this product will be used for limited time, and "continuous" if it will be used indefinitely.</li>
-                                 <li><b> Delayed or phased product usage?</b> Sometimes, the product consumption is delayed in relation the other higher levels of the tree. In the relevant 
-                                 <b>Forecasting Unit </b>node, use the <b>Lag</b> field to indicate this delay.
-                                 <ul>
-                                     <li>For example, if the product usage will begin 2 months after the parent node dates, enter "2" in this field.  </li>
-                                     <li>This field can also be used where the product switches over time for example, if forecasting units A, B, and C are used in secession for two months at a time, you can set up your tree with Forecasting Unit A (discrete for 2 months, lag=0), Forecasting Unit B (discrete for 2 months, lag=2), Forecasting Unit C (discrete for 2 months, lag = 4).</li>
-                                 </ul>
-                                 </li>
-                                 <li><b> Multi-month Consumption Patterns?</b> How often is the product actually "consumed"? is it monthly or every three months? Consumption can be defined at different levels depending on your supply chain. In the <b>Planning Unit Node</b>, use the <b>Consumption Interval</b> field to indicate. For example, if the end user uses a product daily, but only picks up or buys the product every 2 months, enter "2" in the Consumption Interval field to account for a multi-month consumption pattern.  Note that this is only available for Continuous nodes, as product is assumed to be “consumed” at the beginning of the usage period.</li>
-                                 <li><b>Repeating Forecasting Usages?</b> If multiple Forecasting Unit nodes share the same settings, consider using the <a href='/#/usageTemplate/listUsageTemplate'>Usage Template </a>screen to save your common usages, and then using the “Copy from Template”  field to populate the  fields in the forecasting unit nodes. </li>
-                             </ul>
-                             </p>
-                        </ModalBody>
-                    </div>
-                </Modal> 
+                            </div>
+                        </p>
+
+                        <p><b><i class="fa fa-calculator" aria-hidden="true"></i></b> QAT has a modeling calculator tool for users should they need assistance in calculating the month-on-month change over time based on an ending target date & percentage or total percentage change over time. The modelling calculator is only available for a # node and a % node.<br>
+                        </br>Additionally, by clicking on “Show Monthly Data,” users can see how their modelling and transfer inputs have affected the monthly data in both a graphical and tabular form. In the tabular data, users may add a manual change for a specific month or input a seasonality index percentage (only available for % nodes), as needed. If a user checks “Manual Change affects future month,” the manual amount added to the end of the month will carry over to the beginning of the next month. If neither of these fields are relevant, users can uncheck “Show (seasonality &) manual change” to hide these columns.
+                        </p>
+
+                        <p><span style={{ fontSize: '14px' }} className="UnderLineText">Rules for Transfer Nodes:</span>
+                            <ul>
+                                {/* <li>Transfers must occur between nodes be on the same level</li>
+                                <li>Users can only transfer to nodes that are of the same type (i.e. a forecasting unit may transfer node data to another forecasting unit, but not a planning unit as they are not the same node type).</li>
+                                <li>The order of operations for calculating a transfer occurs from the left to the right in the forecast tree. A transfer cannot be made from right to left, thus a user should be careful when designing their tree and determining where each node should be placed. </li>
+                                <li>Transfers are always negative from the source node and positive to the destination node.</li> */}
+                                <li>Number node can transfer to another number only but they should be at the same level</li>
+                                <li>Percentage,FU & PU nodes can transfer to each othet but they should belog to the same parent</li>
+                                <li>If data is transferred to/from a node then extrapolation is not allowed on that node</li>
+                            </ul>
+                        </p>
+                        <p><span style={{ fontSize: '14px' }} className="UnderLineText">Examples :</span>
+                            <ul>
+                                <li><b>Simple Growth</b> (linear #) - the example below shows a population growth each month by 500/month from January 2022 to December 2024.
+                                    <br></br>
+                                    <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0" src={ModelingTransferScreenshot1} style={{ border: '1px solid #fff' }} /></span>
+                                </li>
+                                <li><b>Simple Loss</b> (linear #) - the example below shows attrition each month by 100/month from January 2022 to December 2024. QAT utilizes a negative number to denote a decrease or loss.
+                                    <br></br>
+                                    <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0" src={ModelingTransferScreenshot2} style={{ border: '1px solid #fff' }} /></span>
+                                </li>
+                                <li><b>Simple Growth</b> (linear %) – the example below shows a steady population growth each month by 2% from January 2022 to December 2024. QAT has calculated this change to be increasing the population by 108.64 each month.
+                                    <br></br>
+                                    <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0" src={ModelingTransferScreenshot3} style={{ border: '1px solid #fff' }} /></span>
+                                </li>
+                                <li><b>Simple Growth</b> (exponential %) - the example below shows a population growth each month by 1% from January 2022 to December 2024. Because the growth is exponential, the change differs each month.
+                                    <ul>
+                                        <li>QAT calculates this change to be 54.32 in Jan-22 month, </li>
+                                        <li>QAT calculates this change to be 54.86 in Feb-22 month, and </li>
+                                        <li>QAT calculates this change to be 55.41 in Mar-22 </li>
+                                    </ul>
+
+                                    <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0 ml-lg-4" src={ModelingTransferScreenshot4} style={{ border: '1px solid #fff' }} /></span>
+                                </li>
+                                <li><b>Multi-year Loss</b> - the example below shows a different rate of attrition (loss) each year. Year 1 (January 2022 to December 2022) decreases the population by 1% or 54.32 each month, Year 2 (January 2023 to December 2023) decreases the population by 2% or 95.6 each month, etc. QAT utilizes a negative number to denote a decrease or loss.
+                                    <br></br>
+                                    <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0 ml-lg-4" src={ModelingTransferScreenshot5} style={{ border: '1px solid #fff' }} /></span>
+                                </li>
+                                <li><b>Transfer</b> - the example below shows a transfer of 250 patients each month for one year, January 2022 to December 2022, from the current node (Adults 1st Line) to another node (Adults 2nd Line). This transfer will also appear on the other node (Adults 2nd Line) greyed-out to signify an non-editable change.
+                                    <br></br>
+                                    <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0" src={ModelingTransferScreenshot6} style={{ border: '1px solid #fff' }} /></span>
+                                </li>
+                            </ul>
+                        </p>
+
+                    </ModalBody>
+                </div>
+            </Modal>
+            <Modal isOpen={this.state.showGuidanceNodeData}
+                className={'modal-lg ' + this.props.className} >
+                <ModalHeader toggle={() => this.toggleShowGuidanceNodeData()} className="ModalHead modal-info-Headher">
+                    <strong className="TextWhite">Show Guidance</strong>
+                </ModalHeader>
+                <div>
+                    <ModalBody>
+                        <div>
+                            <h3 className='ShowGuidanceHeading'>Add/Edit Node - Node Data</h3>
+                        </div>
+                        <p>
+                            <p style={{ fontSize: '14px' }}><span className="UnderLineText">Purpose :</span>Enable allows user to specify the type of node</p>
+                        </p>
+
+                        <p>
+                            <p style={{ fontSize: '14px', fontWeight: 'bold' }}><span className="">Node Type :</span></p>
+                            <div className='pl-lg-4 pr-lg-4'>
+                                <table className="table table-bordered ">
+                                    <thead>
+                                        <tr>
+                                            <th style={{ width: '130px' }}>Node Type</th>
+                                            <th>Value</th>
+                                            <th>Potential Children</th>
+                                            <th>Advanced Functionality</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td className='BgLightBlue'><b>Aggregation ∑</b></td>
+                                            <td>Sum of children</td>
+                                            <td><b style={{ color: '#002f6c' }}>∑</b> or Number</td>
+                                            <td>-</td>
+                                        </tr>
+                                        <tr>
+                                            <td className='BgLightBlue'><b>Number #</b></td>
+                                            <td>Defined at this node</td>
+                                            <td>% or <b style={{ background: '#fff', color: '#002f6c', padding: '3px' }}><i class="fa fa-cube" aria-hidden="true"></i></b></td>
+                                            <td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i className='fa fa-link'></i>, <i className='fa fa-line-chart'></i></td>
+                                        </tr>
+                                        <tr>
+                                            <td className='BgLightBlue'><b>Percentage %</b></td>
+                                            <td>Defined as a percentage of the parent</td>
+                                            <td>% or <b style={{ background: '#fff', color: '#002f6c', padding: '3px' }}><i class="fa fa-cube" aria-hidden="true"></i></b></td>
+                                            <td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i className='fa fa-link'></i></td>
+                                        </tr>
+                                        <tr>
+                                            <td className='BgDarkBlue'><b>Forecasting Unit <i class="fa fa-cube" aria-hidden="true"></i></b></td>
+                                            <td>Defined as a percentage of the parent and forecasting unit parameters</td>
+                                            <td><b style={{ background: '#fff', color: '#002f6c', padding: '3px' }}><i class="fa fa-cubes" aria-hidden="true"></i></b></td>
+                                            <td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i className='fa fa-link'></i></td>
+                                        </tr>
+                                        <tr>
+                                            <td className='BgDarkBlue'><b>Planning Unit <i class="fa fa-cubes" aria-hidden="true"></i></b></td>
+                                            <td>Defined as a percentage of the parent and planning unit parameters</td>
+                                            <td>-</td>
+                                            <td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i className='fa fa-link'></i></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </p>
+
+                        <p><span style={{ fontSize: '14px', fontWeight: 'bold' }}>Changes Over Time</span><br></br>
+                            While the tree structure stays constant throughout time, node percentages and values can change over time.  The three functionalities below are available in each node and allow the user to control how nodes change over time:
+                            <ul>
+                                <li><b>Modeling/Transfer Tab</b> </li>
+                                <ul>
+                                    <li><b><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i> Modeling:</b> Allows user to specify the exact rate of change</li>
+                                    <li><b><i className='fa fa-link'></i> Transfer:</b> Allows users to link two nodes together - so the decrease from the source node is linked to the increase of the destination node. </li>
+                                </ul>
+                                <li><b>Extrapolation Tab</b> (number nodes only)</li>
+                                <ul>
+                                    <li><b><i className='fa fa-line-chart'></i> Extrapolation:</b> Allows users to use historical data to extrapolate future change. , Enable this feature by checking 'Extrapolation' box. Note that if you do - the Modeling/Transfer Tab will be hidden as it is only possible to use one at a time. Any data previously entered in the Modeling/Transfer Tab will be cleared.</li>
+                                </ul>
+                            </ul>
+                            <p>If no change over time is desired, simply do not use the 'Modeling/Transfer' and 'Extrapolation' tabs, and the node value will equal the value entered or calculated on the 'Node Data' tab.</p>
+                        </p>
+
+                        <p><span style={{ fontSize: '14px', fontWeight: 'bold' }}>Using Scenarios :</span>
+                            Scenarios are used to model different values for the same tree.
+                            <div className='pl-lg-4 pr-lg-4 pt-lg-4'>
+                                <table className="table table-bordered ">
+                                    <thead>
+                                        <tr>
+                                            <th style={{ width: '130px' }}>Fixed for All Scenarios</th>
+                                            <th style={{ width: '230px' }}>Unique to each Scenario</th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Tree structure</td>
+                                            <td>Node value</td>
+
+
+                                        </tr>
+                                        <tr>
+                                            <td>Node Title</td>
+                                            <td>Month</td>
+
+
+                                        </tr>
+                                        <tr>
+                                            <td>Node Type</td>
+                                            <td>Notes</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td>Modeling/Transfer/Extrapolation</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </p>
+                        <p><span style={{ fontSize: '14px' }} classNames="UnderLineText"><b>Tips for specific use cases:</b></span>
+                            <ul>
+                                <li><b> Forecasting Node-Type :</b> Select "discrete" if this product will be used for limited time, and "continuous" if it will be used indefinitely.</li>
+                                <li><b> Delayed or phased product usage?</b> Sometimes, the product consumption is delayed in relation the other higher levels of the tree. In the relevant <b> Forecasting Unit </b>node, use the <b>Lag</b> field to indicate this delay.
+                                    <ul>
+                                        <li>For example, if the product usage will begin 2 months after the parent node dates, enter "2" in this field.  </li>
+                                        <li>This field can also be used where the product switches over time for example, if forecasting units A, B, and C are used in secession for two months at a time, you can set up your tree with Forecasting Unit A (discrete for 2 months, lag=0), Forecasting Unit B (discrete for 2 months, lag=2), Forecasting Unit C (discrete for 2 months, lag = 4).</li>
+                                    </ul>
+                                </li>
+                                <li><b> Multi-month Consumption Patterns?</b> How often is the product actually "consumed"? is it monthly or every three months? Consumption can be defined at different levels depending on your supply chain. In the <b>Planning Unit Node</b>, use the <b>Consumption Interval</b> field to indicate. For example, if the end user uses a product daily, but only picks up or buys the product every 2 months, enter "2" in the Consumption Interval field to account for a multi-month consumption pattern.  Note that this is only available for Continuous nodes, as product is assumed to be “consumed” at the beginning of the usage period.</li>
+                                <li><b>Repeating Forecasting Usages?</b> If multiple Forecasting Unit nodes share the same settings, consider using the <a href='/#/usageTemplate/listUsageTemplate' target="_blank" style={{ textDecoration: 'underline' }}>Usage Template </a>screen to save your common usages, and then using the “Copy from Template”  field to populate the  fields in the forecasting unit nodes. </li>
+                            </ul>
+                        </p>
+
+                    </ModalBody>
+                </div>
+            </Modal>
+            <Modal isOpen={this.state.showGuidance}
+                className={'modal-lg ' + this.props.className} >
+                <ModalHeader toggle={() => this.toggleShowGuidance()} className="ModalHead modal-info-Headher">
+                    <strong className="TextWhite">Show Guidance</strong>
+                </ModalHeader>
+                <div>
+                    <ModalBody>
+                        <div>
+                            <h3 className='ShowGuidanceHeading'>Manage Tree - Build Trees</h3>
+                        </div>
+                        <p>
+                            <p style={{ fontSize: '14px' }}><span className="UnderLineText">Purpose :</span>Enable users to manage and build forecast tree and scenarios, for any non-consumption forecasts (demographic, morbidity, services, etc). Note that more guidance is available after clicking into any specific node.</p>
+                        </p>
+                        <p>
+                            <p style={{ fontSize: '14px' }}><span className="UnderLineText">Using this screen :</span><br></br>
+                                <span style={{ fontWeight: 'bold' }}>Manage the Tree:</span> Click on the gear icon <i class="fa fa-cog" aria-hidden="true"></i> to show and edit or hide the forecast method, tree name, and region.
+                            </p>
+                            <p><span style={{ fontWeight: 'bold', fontSize: '14px' }}>Building the Tree:</span> The forecast tree is built from the top down, using different types of “nodes”.  See the Node Types and Node Actions below. Each forecast tree must include one or more Planning Unit Nodes, which form the forecast output, for that tree to be available in the 'Compare and Select' screen. Each Planning Unit Node must stem from a Forecasting Unit Node. </p>
+
+                        </p>
+                        <p>
+                            <p style={{ fontSize: '14px', fontWeight: 'bold' }}><span className="">Node Actions :</span></p>
+
+                            <ul className='pl-lg-4'>
+                                <li><i class="fa fa-trash-o" aria-hidden="true" style={{ color: '#002f6c' }}></i> Delete: Deletes the selected node</li>
+                                <li><i class="fa fa-clone" aria-hidden="true" style={{ color: '#002f6c' }}></i> Duplicate: Duplicates the selected node under the same parent</li>
+                                <li><i class="fa fa-plus-square-o" aria-hidden="true" style={{ color: '#002f6c' }}></i> Add: Adds a child to the selected node.</li>
+
+                            </ul>
+
+                        </p>
+                        <p>
+                            <p style={{ fontSize: '14px', fontWeight: 'bold' }}><span className="">Node Type :</span></p>
+                            <div className='pl-lg-4 pr-lg-4'>
+                                <table className="table table-bordered ">
+                                    <thead>
+                                        <tr>
+                                            <th style={{ width: '130px' }}>Node Type</th>
+                                            <th>Value</th>
+                                            <th>Potential Children</th>
+                                            <th>Advanced Functionality</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td className='BgLightBlue'><b>Aggregation ∑</b></td>
+                                            <td>Sum of children</td>
+                                            <td><b style={{ color: '#002f6c' }}>∑</b> or Number</td>
+                                            <td>-</td>
+                                        </tr>
+                                        <tr>
+                                            <td className='BgLightBlue'><b>Number #</b></td>
+                                            <td>Defined at this node</td>
+                                            <td>% or <b style={{ background: '#fff', color: '#002f6c', padding: '3px' }}><i class="fa fa-cube" aria-hidden="true"></i></b></td>
+                                            <td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i className='fa fa-link'></i>, <i className='fa fa-line-chart'></i></td>
+                                        </tr>
+                                        <tr>
+                                            <td className='BgLightBlue'><b>Percentage %</b></td>
+                                            <td>Defined as a percentage of the parent</td>
+                                            <td>% or <b style={{ background: '#fff', color: '#002f6c', padding: '3px' }}><i class="fa fa-cube" aria-hidden="true"></i></b></td>
+                                            <td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i className='fa fa-link'></i></td>
+                                        </tr>
+                                        <tr>
+                                            <td className='BgDarkBlue'><b>Forecasting Unit <i class="fa fa-cube" aria-hidden="true"></i></b></td>
+                                            <td>Defined as a percentage of the parent and forecasting unit parameters</td>
+                                            <td><b style={{ background: '#fff', color: '#002f6c', padding: '3px' }}><i class="fa fa-cubes" aria-hidden="true"></i></b></td>
+                                            <td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i className='fa fa-link'></i></td>
+                                        </tr>
+                                        <tr>
+                                            <td className='BgDarkBlue'><b>Planning Unit <i class="fa fa-cubes" aria-hidden="true"></i></b></td>
+                                            <td>Defined as a percentage of the parent and planning unit parameters</td>
+                                            <td>-</td>
+                                            <td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i className='fa fa-link'></i></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </p>
+
+                        <p><span style={{ fontSize: '14px', fontWeight: 'bold' }}>Changes Over Time</span><br></br>
+                            While the tree structure stays constant throughout time, node percentages and values can change over time. Use the date dropdown to view the tree at any month. The three functionalities below are available in each node and allow the user to control how nodes change over time:
+                            <ul>
+                                <li><b><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i> Modeling:</b> Allows user to specify the exact rate of change</li>
+                                <li><b><i className='fa fa-link'></i> Transfer:</b> Allows users to link two nodes together – so the decrease from the source node is linked to the increase of the destination node. Useful for transitions.</li>
+                                <li><b><i className='fa fa-line-chart'></i> Extrapolation:</b> Allows users to use historical data to extrapolate future change</li>
+                            </ul>
+                        </p>
+
+                        <p><span style={{ fontSize: '14px', fontWeight: 'bold' }}>Using Scenarios :</span><br></br>
+                            Scenarios are used to model different values for the same tree. To add, edit or delete a scenario, use the <i class="fa fa-cog" aria-hidden="true"></i> icon next to the scenario dropdown. Use the scenario dropdown to select which scenario to view and edit.
+                            <div className='pl-lg-4 pr-lg-4 pt-lg-4'>
+                                <table className="table table-bordered ">
+                                    <thead>
+                                        <tr>
+                                            <th style={{ width: '130px' }}>Fixed for All Scenarios</th>
+                                            <th style={{ width: '230px' }}>Unique to each Scenario</th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Tree structure</td>
+                                            <td>Node value</td>
+
+
+                                        </tr>
+                                        <tr>
+                                            <td>Node Title</td>
+                                            <td>Month</td>
+
+
+                                        </tr>
+                                        <tr>
+                                            <td>Node Type</td>
+                                            <td>Notes</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td>Modeling/Transfer/Extrapolation</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </p>
+
+                    </ModalBody>
+                </div>
+            </Modal>
 
             {/* tree fields Modal start------------------- */}
             <Draggable handle=".modal-title">
@@ -11032,34 +11545,69 @@ export default class BuildTree extends Component {
                 <Modal isOpen={this.state.openAddScenarioModal}
                     className={'modal-md '} >
                     <ModalHeader className="modalHeaderSupplyPlan hideCross">
-                        <strong>{i18n.t('static.tree.Add/EditTreeData')}</strong>
+                        <strong>Add/Edit Scenario</strong>
                         <Button size="md" onClick={this.openScenarioModal} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
                     </ModalHeader>
                     <ModalBody>
-                        <FormGroup>
-                            <Label htmlFor="currencyId">{i18n.t('static.tree.scenarioName')}<span class="red Reqasterisk">*</span></Label>
-                            <Input type="text"
-                                id="scenarioName"
-                                name="scenarioName"
-                                onChange={(e) => { this.scenarioChange(e) }}
-                                value={this.state.scenario.label.label_en}
-                            ></Input>
-                        </FormGroup>
-                        <FormGroup>
-                            <Label htmlFor="currencyId">{i18n.t('static.common.note')}</Label>
-                            <Input type="text"
-                                id="scenarioDesc"
-                                name="scenarioDesc"
-                                onChange={(e) => { this.scenarioChange(e) }}
-                                value={this.state.scenario.notes}
-                            ></Input>
-                        </FormGroup>
-
+                        {/* Validation start */}
+                        <Formik
+                            enableReinitialize={true}
+                            initialValues={{
+                                scenarioName: this.state.scenario.label.label_en
+                            }}
+                            validate={validate(validationSchemaScenario)}
+                            onSubmit={(values, { setSubmitting, setErrors }) => {
+                                this.addScenario();
+                            }}
+                            render={
+                                ({
+                                    values,
+                                    errors,
+                                    touched,
+                                    handleChange,
+                                    handleBlur,
+                                    handleSubmit,
+                                    isSubmitting,
+                                    isValid,
+                                    setTouched,
+                                    handleReset,
+                                    setFieldValue,
+                                    setFieldTouched
+                                }) => (
+                                    <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='userForm' autocomplete="off">
+                                        <FormGroup>
+                                            <Label htmlFor="currencyId">{i18n.t('static.tree.scenarioName')}<span class="red Reqasterisk">*</span></Label>
+                                            <Input type="text"
+                                                id="scenarioName"
+                                                name="scenarioName"
+                                                valid={!errors.scenarioName && this.state.scenario.label.label_en != null ? this.state.scenario.label.label_en : '' != ''}
+                                                invalid={touched.scenarioName && !!errors.scenarioName}
+                                                onBlur={handleBlur}
+                                                onChange={(e) => { handleChange(e); this.scenarioChange(e) }}
+                                                value={this.state.scenario.label.label_en}
+                                            ></Input>
+                                            <FormFeedback>{errors.scenarioName}</FormFeedback>
+                                        </FormGroup>
+                                        <FormGroup>
+                                            <Label htmlFor="currencyId">{i18n.t('static.common.note')}</Label>
+                                            <Input type="text"
+                                                id="scenarioDesc"
+                                                name="scenarioDesc"
+                                                onChange={(e) => { this.scenarioChange(e) }}
+                                                value={this.state.scenario.notes}
+                                            ></Input>
+                                        </FormGroup>
+                                        <FormGroup className="col-md-6 pt-lg-4 float-right">
+                                            <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={this.openScenarioModal}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                            <Button type="submit" size="md" onClick={() => this.touchAllScenario(setTouched, errors)} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>
+                                        </FormGroup>
+                                    </Form>
+                                )} />
                     </ModalBody>
-                    <ModalFooter>
-                        <Button type="submit" size="md" onClick={this.addScenario} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={this.openScenarioModal}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                    </ModalFooter>
+                    {/* <ModalFooter> */}
+                    {/* <Button type="submit" size="md" onClick={this.addScenario} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={this.openScenarioModal}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
+                    {/* </ModalFooter> */}
                 </Modal>
             </Draggable>
             {/* Modal end------------------------ */}
