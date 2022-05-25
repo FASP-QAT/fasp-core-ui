@@ -4369,40 +4369,36 @@ export default class TreeExtrapolationComponent extends React.Component {
                 <Modal isOpen={this.state.showGuidance}
                     className={'modal-lg ' + this.props.className} >
                     <ModalHeader toggle={() => this.toggleShowGuidance()} className="ModalHead modal-info-Headher">
-                        <strong className="TextWhite">Show Guidance</strong>
+                        <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
                     </ModalHeader>
                     <div>
                         <ModalBody>
                             <div>
-                                <h3 className='ShowGuidanceHeading'>Add/Edit Node - Extrapolation Node</h3>
+                                <h3 className='ShowGuidanceHeading'>{i18n.t('static.extrapolation.ExtrapolationNode')}</h3>
                             </div>
                             <p>
-                                <p style={{ fontSize: '14px' }}><span className="UnderLineText">Purpose :</span>The extrapolation tab allows users to forecast future
-                                    node values by extrapolating from past values. This functionality only available on
-                                    number nodes, and is similar to the '<a href="/#/Extrapolation/extrapolateData" target="_blank" style={{textDecoration:'underline'}}>Extrapolation</a>' screen, but is conducted at a
-                                    tree node instead. View the guidance on that page for more details on extrapolation
-                                    methods.
+                                <p style={{ fontSize: '14px' }}><span className="UnderLineText">{i18n.t('static.listTree.purpose')} :</span>{i18n.t('static.extrapolation.ExtrapolationTabAllowUser')} '<a href="/#/Extrapolation/extrapolateData" target="_blank" style={{textDecoration:'underline'}}>{i18n.t('static.dashboard.extrapolation')}</a>' {i18n.t('static.extrapolation.ExtrapolationMethods')}
                                 </p>
 
                             </p>
                             <p>
-                                <p style={{ fontSize: '14px' }}><span className="UnderLineText">Using this tab:  </span></p>
+                                <p style={{ fontSize: '14px' }}><span className="UnderLineText">{i18n.t('static.ModelingTransfer.UsingThisTab')}:  </span></p>
                                 <p className='pl-lg-4'>
-                                    <ul style={{ listStyle: 'none' }}>
-                                        <li>1. In the table, enter any actual values and reporting rates for your past data. From this input, QAT will calculate adjusted &nbsp;&nbsp;&nbsp;&nbsp;historical values.</li>
-                                        <li>2. If there is missing data, use the green Interpolate button to fill in missing data.</li>
-                                        <li>3. (optional) At the top of the screen, select which forecast methods you wish to display and update the extrapolation &nbsp;&nbsp;&nbsp;&nbsp;parameters.</li>
-                                        <li>4. Click "Extrapolate." All selected forecasts will display in the main table and the graphs. </li>
+                                    <ol type="1">
+                                        <li>{i18n.t('static.extrapolation.EnterActualValues')}</li>
+                                        <li>{i18n.t('static.extrapolation.MissingData')}</li>
+                                        <li>{i18n.t('static.extrapolation.OptionalTopScreen')}</li>
+                                        <li>{i18n.t('static.extrapolation.ClickExtrapolate')} </li>
 
-                                        <p className="pl-lg-4"><b>NOTE:</b>  The minimum values needed for the various features are below:<br></br>
-                                            <span className="ml-lg-5">* TES, Holt-Winters:  Needs at least 24 months of actual consumption data<br></br></span>
-                                            <span className="ml-lg-5">* ARIMA: With seasonality : At least 13 months historical data required.Without seasonality : At least 2 months historical data required<br></br></span>
-                                            <span className="ml-lg-5">* Moving Average, Semi-Averages, and Linear Regression: At least 3 months of historical data</span>
+                                        <p className="pl-lg-4"><b>{i18n.t('static.versionSettings.note')}:</b>  {i18n.t('static.extrapolation.MinimumValues')}:<br></br>
+                                            <span className="ml-lg-5">* {i18n.t('static.extrapolation.TESHoltWinters')}:  {i18n.t('static.extrapolation.ActualConsumption')}<br></br></span>
+                                            <span className="ml-lg-5">* {i18n.t('static.extrapolation.ARIMA')}: {i18n.t('static.extrapolation.Seasonality')} : {i18n.t('static.extrapolation.WithoutSeasonality')}<br></br></span>
+                                            <span className="ml-lg-5">* {i18n.t('static.extrapolation.MovingAverage')}</span>
                                         </p>
-                                        <li>5. (optional) In the table, add any manual changes (+/-). These changes are added or subtracted on top of the extrapolated &nbsp;&nbsp;&nbsp;&nbsp;values.</li>
-                                        <li>6. After reviewing the main table, the error table, and the graphs, select the desired forecast method at the bottom of the screen &nbsp;&nbsp;&nbsp;&nbsp;and click “Save.”
+                                        <li>{i18n.t('static.extrapolation.ExtrapolatedValues')}</li>
+                                        <li>{i18n.t('static.extrapolation.AfterReviewing')}
                                         </li>
-                                    </ul>
+                                    </ol>
                                 </p>
                             </p>
                             <p>

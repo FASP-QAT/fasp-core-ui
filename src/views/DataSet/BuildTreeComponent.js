@@ -11038,20 +11038,20 @@ export default class BuildTree extends Component {
             <Modal isOpen={this.state.showGuidanceModelingTransfer}
                 className={'modal-lg ' + this.props.className} >
                 <ModalHeader toggle={() => this.toggleShowGuidanceModelingTransfer()} className="ModalHead modal-info-Headher">
-                    <strong className="TextWhite">Show Guidance</strong>
+                    <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
                 </ModalHeader>
                 <div>
                     <ModalBody>
                         <div>
-                            <h3 className='ShowGuidanceHeading'>Add/Edit Node - Modeling/Transfer </h3>
+                            <h3 className='ShowGuidanceHeading'>{i18n.t('static.ModelingTransfer.ModelingTransfer')} </h3>
                         </div>
                         <p>
-                            <p style={{ fontSize: '14px' }}><span className="UnderLineText">Purpose :</span>If a node changes over time, a user can utilize the Modeling/Transfer tab to model growth/loss within a single node or a transfer from one node to another. Note that this functionality is only available for Number (#) Nodes and Percentage (%) Nodes (including Forecasting Units and Planning Units). </p>
+                            <p style={{ fontSize: '14px' }}><span className="UnderLineText">{i18n.t('static.listTree.purpose')} :</span>{i18n.t('static.ModelingTransfer.NodeChange')} </p>
                         </p>
 
                         <p>
-                            <p style={{ fontSize: '14px' }}><span className="UnderLineText">Using this tab :</span>
-                                <br></br>Modeling and transfer can have four different modeling types: </p>
+                            <p style={{ fontSize: '14px' }}><span className="UnderLineText">{i18n.t('static.ModelingTransfer.UsingThisTab')} :</span>
+                                <br></br>{i18n.t('static.ModelingTransfer.ModelingTypes')}: </p>
                         </p>
 
                         <p>
@@ -11060,35 +11060,35 @@ export default class BuildTree extends Component {
                                 <table className="table table-bordered ">
                                     <thead>
                                         <tr>
-                                            <th style={{ width: '130px' }}>Modeling Type</th>
-                                            <th># Node Calculation</th>
-                                            <th>% Node Calculation</th>
+                                            <th style={{ width: '130px' }}>{i18n.t('static.ModelingTransfer.ModelingType')}</th>
+                                            <th># {i18n.t('static.ModelingTransfer.NodeCalculation')}</th>
+                                            <th>% {i18n.t('static.ModelingTransfer.NodeCalculation')}</th>
 
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr>
-                                            <td>Linear (#)</td>
-                                            <td>+/- a static number each month</td>
-                                            <td>N/A</td>
+                                            <td>{i18n.t('static.ModelingTransfer.Linear')} (#)</td>
+                                            <td>+/- {i18n.t('static.ModelingTransfer.StaticNumber')}</td>
+                                            <td>{i18n.t('static.ModelingTransfer.NA')}</td>
 
                                         </tr>
                                         <tr>
-                                            <td>Linear (%)</td>
-                                            <td>+/- a static percentage each month, calculated based on the starting month</td>
-                                            <td>N/A</td>
+                                            <td>{i18n.t('static.ModelingTransfer.Linear')} (%)</td>
+                                            <td>+/- {i18n.t('static.ModelingTransfer.PercentageMonth')}</td>
+                                            <td>{i18n.t('static.ModelingTransfer.NA')}</td>
 
                                         </tr>
                                         <tr>
-                                            <td>Exponential (%)</td>
-                                            <td>+/- a percentage each month, calculated on the previous month as a rolling percentage</td>
-                                            <td>N/A</td>
+                                            <td>{i18n.t('static.ModelingTransfer.Exponential')} (%)</td>
+                                            <td>+/- {i18n.t('static.ModelingTransfer.RollingPercentage')}</td>
+                                            <td>{i18n.t('static.ModelingTransfer.NA')}</td>
 
                                         </tr>
                                         <tr>
-                                            <td>Linear (% point)</td>
-                                            <td>N/A</td>
-                                            <td>+/- a static percentage each month (e.g. if the starting month is 30% and the change is +1% each month, next month is 31%, the next is 32%, and so on)</td>
+                                            <td>{i18n.t('static.ModelingTransfer.Linear')} (% point)</td>
+                                            <td>{i18n.t('static.ModelingTransfer.NA')}</td>
+                                            <td>+/- {i18n.t('static.ModelingTransfer.StaticEachMonth')}</td>
 
                                         </tr>
 
@@ -11097,49 +11097,49 @@ export default class BuildTree extends Component {
                             </div>
                         </p>
 
-                        <p><b><i class="fa fa-calculator" aria-hidden="true"></i></b> QAT has a modeling calculator tool for users should they need assistance in calculating the month-on-month change over time based on an ending target date & percentage or total percentage change over time. The modelling calculator is only available for a # node and a % node.<br>
-                        </br>Additionally, by clicking on “Show Monthly Data,” users can see how their modelling and transfer inputs have affected the monthly data in both a graphical and tabular form. In the tabular data, users may add a manual change for a specific month or input a seasonality index percentage (only available for % nodes), as needed. If a user checks “Manual Change affects future month,” the manual amount added to the end of the month will carry over to the beginning of the next month. If neither of these fields are relevant, users can uncheck “Show (seasonality &) manual change” to hide these columns.
+                        <p><b><i class="fa fa-calculator" aria-hidden="true"></i></b> {i18n.t('static.ModelingTransfer.CalculatorTool')}<br>
+                        </br>{i18n.t('static.ModelingTransfer.ShowMonthlyData')}
                         </p>
 
-                        <p><span style={{ fontSize: '14px' }} className="UnderLineText">Rules for Transfer Nodes:</span>
+                        <p><span style={{ fontSize: '14px' }} className="UnderLineText">{i18n.t('static.ModelingTransfer.RulesTransfer')}:</span>
                             <ul>
                                 {/* <li>Transfers must occur between nodes be on the same level</li>
                                 <li>Users can only transfer to nodes that are of the same type (i.e. a forecasting unit may transfer node data to another forecasting unit, but not a planning unit as they are not the same node type).</li>
                                 <li>The order of operations for calculating a transfer occurs from the left to the right in the forecast tree. A transfer cannot be made from right to left, thus a user should be careful when designing their tree and determining where each node should be placed. </li>
                                 <li>Transfers are always negative from the source node and positive to the destination node.</li> */}
-                                <li>Number node can transfer to another number only but they should be at the same level</li>
-                                <li>Percentage,FU & PU nodes can transfer to each othet but they should belog to the same parent</li>
-                                <li>If data is transferred to/from a node then extrapolation is not allowed on that node</li>
+                                <li>{i18n.t('static.ModelingTransfer.NumberNode')}</li>
+                                <li>{i18n.t('static.ModelingTransfer.PercentageFUPU')}</li>
+                                <li>{i18n.t('static.ModelingTransfer.DataTransferred')}</li>
                             </ul>
                         </p>
-                        <p><span style={{ fontSize: '14px' }} className="UnderLineText">Examples :</span>
+                        <p><span style={{ fontSize: '14px' }} className="UnderLineText">{i18n.t('static.ModelingTransfer.Examples')} :</span>
                             <ul>
-                                <li><b>Simple Growth</b> (linear #) - the example below shows a population growth each month by 500/month from January 2022 to December 2024.
+                                <li><b>{i18n.t('static.ModelingTransfer.SimpleGrowth')}</b> {i18n.t('static.ModelingTransfer.PopulationGrowth')}
                                     <br></br>
                                     <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0" src={ModelingTransferScreenshot1} style={{ border: '1px solid #fff' }} /></span>
                                 </li>
-                                <li><b>Simple Loss</b> (linear #) - the example below shows attrition each month by 100/month from January 2022 to December 2024. QAT utilizes a negative number to denote a decrease or loss.
+                                <li><b>{i18n.t('static.ModelingTransfer.SimpleLoss')}</b> {i18n.t('static.ModelingTransfer.AttritionHash')}
                                     <br></br>
                                     <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0" src={ModelingTransferScreenshot2} style={{ border: '1px solid #fff' }} /></span>
                                 </li>
-                                <li><b>Simple Growth</b> (linear %) – the example below shows a steady population growth each month by 2% from January 2022 to December 2024. QAT has calculated this change to be increasing the population by 108.64 each month.
+                                <li><b>{i18n.t('static.ModelingTransfer.SimpleGrowth')}</b> {i18n.t('static.ModelingTransfer.PopulationPercentage')}
                                     <br></br>
                                     <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0" src={ModelingTransferScreenshot3} style={{ border: '1px solid #fff' }} /></span>
                                 </li>
-                                <li><b>Simple Growth</b> (exponential %) - the example below shows a population growth each month by 1% from January 2022 to December 2024. Because the growth is exponential, the change differs each month.
+                                <li><b>{i18n.t('static.ModelingTransfer.SimpleGrowth')}</b> {i18n.t('static.ModelingTransfer.SimpleGrowthExponential')} 
                                     <ul>
-                                        <li>QAT calculates this change to be 54.32 in Jan-22 month, </li>
-                                        <li>QAT calculates this change to be 54.86 in Feb-22 month, and </li>
-                                        <li>QAT calculates this change to be 55.41 in Mar-22 </li>
+                                        <li>{i18n.t('static.ModelingTransfer.calculatesJanMonth')} </li>
+                                        <li>{i18n.t('static.ModelingTransfer.calculatesFebMonth')} </li>
+                                        <li>{i18n.t('static.ModelingTransfer.calculatesMarMonth')}  </li>
                                     </ul>
 
                                     <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0 ml-lg-4" src={ModelingTransferScreenshot4} style={{ border: '1px solid #fff' }} /></span>
                                 </li>
-                                <li><b>Multi-year Loss</b> - the example below shows a different rate of attrition (loss) each year. Year 1 (January 2022 to December 2022) decreases the population by 1% or 54.32 each month, Year 2 (January 2023 to December 2023) decreases the population by 2% or 95.6 each month, etc. QAT utilizes a negative number to denote a decrease or loss.
+                                <li><b>{i18n.t('static.ModelingTransfer.MultiYearLoss')}</b> - {i18n.t('static.ModelingTransfer.MultiYearLossText')} 
                                     <br></br>
                                     <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0 ml-lg-4" src={ModelingTransferScreenshot5} style={{ border: '1px solid #fff' }} /></span>
                                 </li>
-                                <li><b>Transfer</b> - the example below shows a transfer of 250 patients each month for one year, January 2022 to December 2022, from the current node (Adults 1st Line) to another node (Adults 2nd Line). This transfer will also appear on the other node (Adults 2nd Line) greyed-out to signify an non-editable change.
+                                <li><b>{i18n.t('static.ManageTree.Transfer')}</b> - {i18n.t('static.ModelingTransfer.TransferText')}
                                     <br></br>
                                     <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0" src={ModelingTransferScreenshot6} style={{ border: '1px solid #fff' }} /></span>
                                 </li>
