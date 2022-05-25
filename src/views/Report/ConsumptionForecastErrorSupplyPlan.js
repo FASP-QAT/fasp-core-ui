@@ -20,6 +20,7 @@ import i18n from '../../i18n'
 import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import moment from "moment";
+import ReportService from '../../api/ReportService';
 import pdfIcon from '../../assets/img/pdf.png';
 import csvicon from '../../assets/img/csv.png'
 import { LOGO } from '../../CommonComponent/Logo.js'
@@ -59,7 +60,8 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             consumptionData: [],
             equivalencyUnitList: [],
             programEquivalencyUnitList: [],
-            reportConsumptionList: [],
+            dataList: [],
+            consumptionAdjForStockOutId: 0,
             show: false,
             rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
@@ -89,9 +91,11 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
 
 
     setProgramId(event) {
+
         this.setState({
             programId: event.target.value,
-            versionId: ''
+            versionId: '',
+            show: false
         }, () => {
             localStorage.setItem("sesVersionIdReport", '');
             this.filterVersion();
@@ -110,7 +114,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                 .then(response => {
                     console.log(JSON.stringify(response.data))
                     this.setState({
-                        programs: response.data, loading: false
+                        programs: response.data, loading: false, show: false
                     }, () => { this.consolidatedProgramList() })
                 }).catch(
                     error => {
@@ -266,7 +270,8 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                     this.setState({
                         versions: [],
                         planningUnits: [],
-                        forecastingUnits: []
+                        forecastingUnits: [],
+                        show: false
                     }, () => {
                         this.setState({
                             versions: program[0].versionList.filter(function (x, i, a) {
@@ -278,22 +283,25 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                     this.setState({
                         versions: [],
                         planningUnits: [],
-                        forecastingUnits: []
+                        forecastingUnits: [],
+                        show: false
                     }, () => { this.consolidatedVersionList(programId) })
                 }
             } else {
                 this.setState({
                     versions: [],
                     planningUnits: [],
-                    planningUnitValues: []
+                    planningUnitValues: [],
+                    show: false
                 })
-                // this.fetchData();
+                this.fetchData();
             }
         } else {
             this.setState({
                 versions: [],
                 planningUnits: [],
-                forecastingUnits: []
+                forecastingUnits: [],
+                show: false
             })
         }
     }
@@ -374,7 +382,8 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                     this.setState({
                         regions: [],
                         planningUnits: [],
-                        forecastingUnits: []
+                        forecastingUnits: [],
+                        show: false
                     }, () => {
                         this.setState({
                             regions: program[0].regionList.filter(function (x, i, a) {
@@ -386,20 +395,23 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                     this.setState({
                         regions: [],
                         planningUnits: [],
-                        forecastingUnits: []
+                        forecastingUnits: [],
+                        show: false
                     }, () => { this.consolidatedRegionList(programId) })
                 }
             } else {
                 this.setState({
                     regions: [],
                     planningUnits: [],
-                    planningUnitValues: []
+                    planningUnitValues: [],
+                    show: false
                 })
-                // this.fetchData();
+                this.fetchData();
             }
         } else {
             this.setState({
-                regions: []
+                regions: [],
+                show: false
             })
         }
 
@@ -440,7 +452,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                 this.setState({
                     regions: regionList,
                 }, () => {
-                    // this.getPlanningUnitAndForcastingUnit();
+                    this.getPlanningUnitAndForcastingUnit();
                 })
             }.bind(this);
         }.bind(this)
@@ -451,7 +463,8 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         var selectedText = planningUnitId.options[planningUnitId.selectedIndex].text;
         this.setState({
             planningUnitId: e.target.value,
-            planningUnitLabel: selectedText
+            planningUnitLabel: selectedText,
+            show: false
         }, () => {
             this.fetchData();
         })
@@ -461,7 +474,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         let programId = document.getElementById("programId").value;
         let versionId = document.getElementById("versionId").value;
         this.setState({
-            planningUnits: []
+            planningUnits: [],
+            forecastingUnits: [],
+            show: false
         }, () => {
             if (versionId == 0) {
                 this.setState({ message: i18n.t('static.program.validversion'), data: [] }, () => {
@@ -515,7 +530,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                     return a < b ? -1 : a > b ? 1 : 0;
                                 }), message: ''
                             }, () => {
-                                // this.fetchData();
+                                this.fetchData();
                             })
                         }.bind(this);
                     }.bind(this)
@@ -524,8 +539,16 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                     // AuthenticationService.setupAxiosInterceptors();
 
                     ProgramService.getActiveProgramPlaningUnitListByProgramId(programId).then(response => {
-                        console.log('**' + JSON.stringify(response.data))
+                        console.log('**JSON.stringify(response.data)' + JSON.stringify(response.data))
                         var listArray = response.data;
+                        var forcastingUnitList = listArray.map(c => c.forecastingUnit);
+                        forcastingUnitList.sort((a, b) => {
+                            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        });
+                        console.log("CheckPU------------------>2", forcastingUnitList);
+
                         listArray.sort((a, b) => {
                             var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
                             var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
@@ -533,9 +556,10 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                         });
                         this.setState({
                             planningUnits: listArray,
+                            forecastingUnits: forcastingUnitList,
                             message: ''
                         }, () => {
-                            // this.fetchData();
+                            this.fetchData();
                         })
                     }).catch(
                         error => {
@@ -588,14 +612,15 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
 
     setVersionId(event) {
         this.setState({
-            versionId: event.target.value
+            versionId: event.target.value,
+            show: false
         }, () => {
-            if (this.state.matricsList.length != 0) {
-                localStorage.setItem("sesVersionIdReport", this.state.versionId);
-                // this.fetchData();
-            } else {
-                // this.getPlanningUnit();
-            }
+            // if (this.state.matricsList.length != 0) {
+            localStorage.setItem("sesVersionIdReport", this.state.versionId);
+            this.fetchData();
+            // } else {
+            // this.getPlanningUnit();
+            // }
         })
     }
 
@@ -611,7 +636,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             regionLabels: regionIds.map(ele => ele.label),
             regionListFiltered: event,
         }, () => {
-            //  this.fetchData()
+            this.fetchData()
         })
     }
 
@@ -626,15 +651,16 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             monthArrayList: [],
             errorValues: [],
             regionListFiltered: [],
+            show: false
         }, () => {
             if (viewById == 2) {
                 document.getElementById("forecastingUnitDiv").style.display = "block";
                 document.getElementById("planningUnitDiv").style.display = "none";
-                //  this.fetchData();
+                this.fetchData();
             } else {
                 document.getElementById("planningUnitDiv").style.display = "block";
                 document.getElementById("forecastingUnitDiv").style.display = "none";
-                //this.fetchData();
+                this.fetchData();
             }
         })
     }
@@ -651,7 +677,8 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             // if (this.state.viewById == 2 && forecastingUnitId) {
             //     this.showData();
             // }
-            // this.fetchData();
+            console.log("calling fetch")
+            this.fetchData();
         })
     }
 
@@ -681,9 +708,20 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         }
     }
 
+    consumptionStockOutCheckbox(event){
+        var falg = event.target.checked ? 1 : 0
+        if (falg) {
+            this.fetchData();
+        }
+    }
+
     getEquivalencyUnitData() {
         let programId = document.getElementById("programId").value;
         let versionId = document.getElementById("versionId").value;
+        let planningUnitId = -1;
+        let forecastingUnitId = -1;
+        planningUnitId = document.getElementById("planningUnitId").value;
+        forecastingUnitId = document.getElementById("forecastingUnitId").value;
         this.setState({
         }, () => {
             if (programId > 0 && versionId != 0) {
@@ -705,48 +743,74 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                         planningunitRequest.onsuccess = function (e) {
                             var myResult = [];
                             myResult = planningunitRequest.result;
-                            // var programId = (document.getElementById("programId").value).split("_")[0];
                             var filteredEquList = []
-                            console.log("EquivalencyUnitList---------->", myResult);
                             for (var i = 0; i < myResult.length; i++) {
-                                if (myResult[i].program == null) {
-                                    // if (myResult[i].program.id == programId && myResult[i].active == true) {
+                                if (myResult[i].program != null) {
+                                    if (myResult[i].program.id == programId && myResult[i].active == true) {
+                                        filteredEquList.push(myResult[i]);
+                                    }
+                                } else {
                                     filteredEquList.push(myResult[i]);
-                                    // }
-                                }
-                                //  else {
-                                //     filteredEquList.push(myResult[i]);
-                                // }
-                            }
-                            console.log("EquivalencyUnitList---------->1", filteredEquList);
-                            let fuList = this.state.forecastingUnits;
-                            let newList = [];
-                            for (var i = 0; i < filteredEquList.length; i++) {
-                                let temp = fuList.filter(c => c.id == filteredEquList[i].forecastingUnit.id);
-                                if (temp.length > 0) {
-                                    newList.push(filteredEquList[i]);
                                 }
                             }
-                            filteredEquList = newList;
-                            let duplicateEquiUnit = filteredEquList.map(c => c.equivalencyUnit);
-                            const ids = duplicateEquiUnit.map(o => o.equivalencyUnitId)
-                            const filteredEQUnit = duplicateEquiUnit.filter(({ equivalencyUnitId }, index) => !ids.includes(equivalencyUnitId, index + 1))
-                            console.log("EquivalencyUnitList---------->2", filteredEQUnit);
+                            console.log("filteredEquList---Result-->", filteredEquList);
+                            var filteredEQUnit;
+                            if (forecastingUnitId != -1) {
+                                filteredEQUnit = filteredEquList.filter(c => c.forecastingUnit.id == forecastingUnitId);
+                            } else if (planningUnitId != -1) {
+                                var planningList = this.state.planningUnits;
+                                console.log("planningList---Result-->", planningList);
+                                let filteredPlanningUnit = planningList.filter(c => c.planningUnit.id == planningUnitId)
+                                console.log("filteredPlanningUnit---Result-->", filteredPlanningUnit);
+                                filteredEQUnit = filteredEquList.filter(c => c.forecastingUnit.id == filteredPlanningUnit.forecastingUnit.id)
+                            }
+                            console.log("filteredEQUnit---Result-->", filteredEQUnit);
+                            let EquiUnitList = filteredEQUnit.map(c => c.equivalencyUnit);
+                            console.log("EquiUnitList", EquiUnitList);
+
+
+                            // var filteredEQUnit;
+                            // if (planningUnitId != -1) {
+                            //     planningList = this.state.planningUnits;
+                            //     let filteredPlanningUnit = planningList.filter(c => c.planningUnit.id == planningUnitId)
+                            //     console.log("filteredPlanningUnit---------->1", filteredPlanningUnit);
+                            //     console.log("EquivalencyUnitList---------->1", filteredEquList);
+                            //     filteredEQUnit = filteredEquList.filter(c => c.forecastingUnit.id == filteredPlanningUnit.forecastingUnit.id);
+                            //     console.log("filteredEquList---------->Finala", filteredEQUnit);
+                            // } else if (forecastingUnitId != -1) {
+                            //     console.log("filteredEquList---------->FinalforecastingUnitId", forecastingUnitId);
+                            //     filteredEQUnit = filteredEquList.filter(c => c.forecastingUnit.id == forecastingUnitId);
+                            //     console.log("filteredEquList---------->Finalb", filteredEQUnit);
+                            // }
+                            // let fuList = this.state.forecastingUnits;
+                            // let newList = [];
+                            // for (var i = 0; i < filteredEquList.length; i++) {
+                            //     let temp = fuList.filter(c => c.id == filteredEquList[i].forecastingUnit.id);
+                            //     if (temp.length > 0) {
+                            //         newList.push(filteredEquList[i]);
+                            //     }
+                            // }
+                            // filteredEquList = newList;
+                            // let duplicateEquiUnit = filteredEquList.map(c => c.equivalencyUnit);
+                            // const ids = duplicateEquiUnit.map(o => o.equivalencyUnitId)
+                            // const filteredEQUnit = duplicateEquiUnit.filter(({ equivalencyUnitId }, index) => !ids.includes(equivalencyUnitId, index + 1))
+                            // console.log("EquivalencyUnitList---------->2", filteredEQUnit);
                             var lang = this.state.lang;
                             this.setState({
-                                equivalencyUnitList: filteredEQUnit.sort(function (a, b) {
+                                equivalencyUnitList: EquiUnitList.sort(function (a, b) {
                                     a = getLabelText(a.label, lang).toLowerCase();
                                     b = getLabelText(b.label, lang).toLowerCase();
                                     return a < b ? -1 : a > b ? 1 : 0;
                                 }),
                                 programEquivalencyUnitList: filteredEquList,
                             }, () => {
-                                // this.fetchData();
+                                // this.filterData();
                             })
                         }.bind(this);
                     }.bind(this)
                 } else {//api call
                     EquivalancyUnitService.getEquivalancyUnitMappingList().then(response => {
+                        console.log("response.status == 200*******", response.status);
                         if (response.status == 200) {
                             console.log("EQ1------->", response.data);
                             var listArray = response.data;
@@ -766,29 +830,44 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                 }
                             }
                             console.log("EquivalencyUnitList---------->1", filteredEquList);
-                            let fuList = this.state.forecastingUnits;
-                            let newList = [];
-                            for (var i = 0; i < filteredEquList.length; i++) {
-                                let temp = fuList.filter(c => c.id == filteredEquList[i].forecastingUnit.id);
-                                if (temp.length > 0) {
-                                    newList.push(filteredEquList[i]);
-                                }
+                            // let fuList = this.state.forecastingUnits;
+                            // let newList = [];
+                            // for (var i = 0; i < filteredEquList.length; i++) {
+                            //     let temp = fuList.filter(c => c.id == filteredEquList[i].forecastingUnit.id);
+                            //     if (temp.length > 0) {
+                            //         newList.push(filteredEquList[i]);
+                            //     }
+                            // }
+                            // filteredEquList = newList;
+                            // let duplicateEquiUnit = filteredEquList.map(c => c.equivalencyUnit);
+                            // const ids = duplicateEquiUnit.map(o => o.equivalencyUnitId)
+                            // const filteredEQUnit = duplicateEquiUnit.filter(({ equivalencyUnitId }, index) => !ids.includes(equivalencyUnitId, index + 1))
+                            // console.log("EquivalencyUnitList---------->2", filteredEQUnit);
+                            var filteredEQUnit = [];
+                            if (forecastingUnitId != -1) {
+                                filteredEQUnit = filteredEquList.filter(c => c.forecastingUnit.id == forecastingUnitId);
+                            } else if (planningUnitId != -1) {
+                                var planningList = this.state.planningUnits;
+                                console.log("planningList---Result-->", planningList);
+                                let filteredPlanningUnit = planningList.filter(c => c.planningUnit.id == planningUnitId)
+                                console.log("filteredPlanningUnit---Result-->", filteredPlanningUnit);
+                                filteredEQUnit = filteredEquList.filter(c => c.forecastingUnit.id == filteredPlanningUnit.forecastingUnit.id);
+                                console.log("filteredEQUnit---Result-->", filteredEQUnit);
                             }
-                            filteredEquList = newList;
-                            let duplicateEquiUnit = filteredEquList.map(c => c.equivalencyUnit);
-                            const ids = duplicateEquiUnit.map(o => o.equivalencyUnitId)
-                            const filteredEQUnit = duplicateEquiUnit.filter(({ equivalencyUnitId }, index) => !ids.includes(equivalencyUnitId, index + 1))
-                            console.log("EquivalencyUnitList---------->2", filteredEQUnit);
+
+                            let EquiUnitList = filteredEQUnit.map(c => c.equivalencyUnit);
+                            console.log("EquiUnitList", EquiUnitList);
+
                             var lang = this.state.lang;
                             this.setState({
-                                equivalencyUnitList: filteredEQUnit.sort(function (a, b) {
+                                equivalencyUnitList: EquiUnitList.sort(function (a, b) {
                                     a = getLabelText(a.label, lang).toLowerCase();
                                     b = getLabelText(b.label, lang).toLowerCase();
                                     return a < b ? -1 : a > b ? 1 : 0;
                                 }),
                                 programEquivalencyUnitList: filteredEquList,
                             }, () => {
-                                // this.fetchData();
+                                // this.filterData();
                             })
                         } else {
                             this.setState({
@@ -798,7 +877,6 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                     this.hideSecondComponent();
                                 })
                         }
-
                     })
                         .catch(
                             error => {
@@ -853,127 +931,387 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         console.log("fetchData-------------");
         let programId = document.getElementById("programId").value;
         let versionId = document.getElementById("versionId").value;
-        // let planningUnitId = document.getElementById("planningUnitId").value;
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         let stopDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
-        let viewById = document.getElementById("viewById").value;
+        let viewById = this.state.viewById
         let yaxisEquUnit = document.getElementById("yaxisEquUnit").value;
         let consumptionAdjForStockOutId = document.getElementById("consumptionAdjusted").value;
+        console.log("viewById----", viewById)
         let regionIds = this.state.regionValues.map(ele => (ele.value).toString())
-        console.log("regionIds-------------", regionIds);
-
-
+        let regionList = this.state.regions;
+        var dataList = [];
         let planningUnitId = -1;
         let forecastingUnitId = -1;
-        (viewById == 1 ? planningUnitId = document.getElementById("planningUnitId").value : forecastingUnitId = document.getElementById("forecastingUnitId").value);
-        if (programId > 0 && planningUnitId > 0 && versionId != 0) {
+        planningUnitId = document.getElementById("planningUnitId").value
+        forecastingUnitId = document.getElementById("forecastingUnitId").value;
+        var planningUnitIdList = [];
+        console.log("planningUnitId----->", planningUnitId);
+        console.log("forecastingUnitId----->", forecastingUnitId);
+
+        if (programId > 0 && (planningUnitId > 0 || forecastingUnitId > 0) && versionId != 0) {
             console.log("Inside If")
             if (versionId.includes('Local')) {
                 this.setState({ loading: true })
                 var db1;
                 getDatabase();
-                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                openRequest.onerror = function (event) {
-                    this.setState({
-                        loading: false
-                    })
-                }.bind(this);
-                openRequest.onsuccess = function (e) {
-                    db1 = e.target.result;
-                    var transaction = db1.transaction(['programData'], 'readwrite');
-                    var programTransaction = transaction.objectStore('programData');
-                    var version = (versionId.split('(')[0]).trim()
-                    var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                    var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                    var program = `${programId}_v${version}_uId_${userId}`
-                    var data = [];
-                    var programRequest = programTransaction.get(program);
-                    programRequest.onerror = function (event) {
+                console.log("Inside If IF", forecastingUnitId)
+                if (forecastingUnitId > 0) {
+                    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                    openRequest.onerror = function (event) {
                         this.setState({
                             loading: false
                         })
                     }.bind(this);
-                    programRequest.onsuccess = function (event) {
-                        var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
-                        var planningUnitDataFilter = planningUnitDataList.filter(c => c.planningUnitId == planningUnitId);
-                        var programJson = {};
-                        if (planningUnitDataFilter.length > 0) {
-                            var planningUnitData = planningUnitDataFilter[0]
-                            var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
-                            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                            programJson = JSON.parse(programData);
-                        } else {
-                            programJson = {
-                                consumptionList: [],
-                                inventoryList: [],
-                                shipmentList: [],
-                                batchInfoList: [],
-                                supplyPlan: []
+                    openRequest.onsuccess = function (e) {
+                        db1 = e.target.result;
+                        var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+                        var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
+                        var planningunitRequest = planningunitOs.getAll();
+                        planningunitRequest.onerror = function (event) {
+                            // Handle errors!
+                        }.bind(this);
+                        planningunitRequest.onsuccess = function (e) {
+                            var myResult = [];
+                            myResult = planningunitRequest.result;
+                            console.log("Inside If IF $$$$$$$$$$ myResult", myResult)
+
+                            // var programId = (document.getElementById("programId").value).split("_")[0];
+                            var proList = []
+                            console.log(myResult)
+                            for (var i = 0; i < myResult.length; i++) {
+                                if (myResult[i].program.id == programId && myResult[i].active == true) {
+                                    proList[i] = myResult[i]
+                                }
                             }
-                        }
-                        var consumptionListUnFiltered = (programJson.consumptionList);
-                        console.log("consumptionListUnFiltered-------------", consumptionListUnFiltered)
-                        console.log("regionIds-------------", regionIds)
-                        var consumptionList;
-                        if (regionIds != "") {
-                            console.log("regionIds !=-------------", regionIds)
-                            for (let k = 0; k < regionIds.length; k++) {
-                                console.log("Inside if-------------", regionIds[k])
-                                consumptionList = consumptionListUnFiltered.filter(c => c.region.id == regionIds[k]);
+                            var proListDataFilter = proList.filter(c => c.forecastingUnit.id == forecastingUnitId);
+                            console.log("proListDataFilter", proListDataFilter);
+                            planningUnitIdList = proListDataFilter.map(c => c.planningUnit.id)
+                            console.log("planningUnitIdList", planningUnitIdList);
+
+                            //****************************************************************************************************************** */
+                            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                            openRequest.onerror = function (event) {
+                            }.bind(this);
+                            openRequest.onsuccess = function (e) {
+                                db1 = e.target.result;
+                                var transaction = db1.transaction(['programData'], 'readwrite');
+                                var programTransaction = transaction.objectStore('programData');
+                                var version = (versionId.split('(')[0]).trim()
+                                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                                var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                                var program = `${programId}_v${version}_uId_${userId}`
+                                var data = [];
+                                var programRequest = programTransaction.get(program);
+                                programRequest.onerror = function (event) {
+                                }.bind(this);
+                                programRequest.onsuccess = function (event) {
+                                    var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
+                                    var consumptionList = [];
+                                    for (var con = 0; con < planningUnitIdList.length; con++) {
+                                        var planningUnitDataFilter = planningUnitDataList.filter(c => c.planningUnitId == planningUnitIdList[con]);
+                                        var programJson = {};
+                                        if (planningUnitDataFilter.length > 0) {
+                                            var planningUnitData = planningUnitDataFilter[0]
+                                            var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                                            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                                            programJson = JSON.parse(programData);
+                                        } else {
+                                            programJson = {
+                                                consumptionList: [],
+                                                inventoryList: [],
+                                                shipmentList: [],
+                                                batchInfoList: [],
+                                                supplyPlan: []
+                                            }
+                                        }
+                                        consumptionList = (programJson.consumptionList);
+                                    }
+                                    console.log("consumptionList---", consumptionList);
+                                    var monthArray = [];
+                                    var curDate = startDate;
+                                    for (var m = 0; moment(curDate).format("YYYY-MM") < moment(stopDate).format("YYYY-MM"); m++) {
+                                        curDate = moment(startDate).add(m, 'months').format("YYYY-MM-DD");
+                                        var noOfDays = moment(curDate, "YYYY-MM").daysInMonth();
+                                        monthArray.push({ date: curDate, noOfDays: noOfDays })
+                                        // var totalConsumptionQtyOutOfStockData = "";
+                                        var totalActualQty = "";
+                                        var totalForecastQty = "";
+                                        var errorPerc = "";
+                                        var regionData = [];
+
+                                        for (let k = 0; k < regionList.length; k++) {
+                                            var consumptionactualQty = "";
+                                            var consumptionforecastQty = "";
+                                            var actualQty = "";
+                                            var forecastQty = "";
+                                            var daysOfStockOut = "";
+                                            var consumptionQtyOutOfStockData = "";
+                                            consumptionforecastQty = consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(curDate).format("YYYY-MM") && c.actualFlag == false && c.active == true && c.region.id == regionList[k].regionId);
+                                            if (consumptionforecastQty.length > 0) {
+                                                for (var con = 0; con < consumptionforecastQty.length; con++) {
+                                                    forecastQty += consumptionforecastQty[con].consumptionQty;
+                                                }
+                                            } else {
+                                                forecastQty = "";
+                                            }
+                                            consumptionactualQty = consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(curDate).format("YYYY-MM") && c.actualFlag == true && c.active == true && c.region.id == regionList[k].regionId);
+                                            if (consumptionactualQty.length > 0) {
+                                                for (var con = 0; con < consumptionactualQty.length; con++) {
+                                                    actualQty += consumptionactualQty[con].consumptionQty;
+                                                    daysOfStockOut += consumptionactualQty[con].dayOfStockOut;
+                                                    // consumptionQtyOutOfStockData += consumptionactualQty[con].consumptionQty / (noOfDays - consumptionactualQty[con].dayOfStockOut) * noOfDays;
+                                                }
+                                            } else {
+                                                actualQty = "";
+                                                daysOfStockOut = "";
+                                                // consumptionQtyOutOfStockData = "";
+                                            }
+                                            totalActualQty += actualQty;
+                                            totalForecastQty += forecastQty;
+                                            // totalConsumptionQtyOutOfStockData += consumptionQtyOutOfStockData;
+                                            var region = { id: regionList[k].regionId, lable: regionList[k].label };
+                                            regionData.push({
+                                                region: region,
+                                                actualQty: actualQty,
+                                                forecastQty: forecastQty,
+                                                daysOfStockOut: daysOfStockOut
+                                                // consumptionQtyOutOfStockData: consumptionQtyOutOfStockData
+                                            });
+                                        }
+                                        var absEbar = (Math.abs(totalForecastQty - totalActualQty)) / totalActualQty;
+                                        errorPerc = absEbar * 100;
+                                        dataList.push({
+                                            month: moment(curDate).format("YYYY-MM"),
+                                            regionData: regionData,
+                                            actualQty: totalActualQty,
+                                            forecastQty: totalForecastQty,
+                                            errorPerc: errorPerc,
+                                            noOfDays: noOfDays
+                                            // consumptionAdjForStockOutId: consumptionAdjForStockOutId,
+                                            // consumptionQtyStockedOut: totalConsumptionQtyOutOfStockData
+                                        });
+                                    }
+                                    console.log("Complete dataList----------------------", dataList);
+                                    this.setState({
+                                        monthArray: monthArray,
+                                        dataList: dataList,
+                                        consumptionAdjForStockOutId: consumptionAdjForStockOutId
+                                    })
+                                }.bind(this);
+                            }.bind(this);
+                        }.bind(this);
+                    }.bind(this);
+                } else {
+                    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                    openRequest.onerror = function (event) {
+                        this.setState({
+                            loading: false
+                        })
+                    }.bind(this);
+                    openRequest.onsuccess = function (e) {
+                        db1 = e.target.result;
+                        var transaction = db1.transaction(['programData'], 'readwrite');
+                        var programTransaction = transaction.objectStore('programData');
+                        var version = (versionId.split('(')[0]).trim()
+                        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                        var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                        var program = `${programId}_v${version}_uId_${userId}`
+                        var data = [];
+                        var programRequest = programTransaction.get(program);
+                        programRequest.onerror = function (event) {
+                            this.setState({
+                                loading: false
+                            })
+                        }.bind(this);
+                        programRequest.onsuccess = function (event) {
+                            var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
+                            var planningUnitDataFilter = planningUnitDataList.filter(c => c.planningUnitId == planningUnitId);
+                            var programJson = {};
+                            if (planningUnitDataFilter.length > 0) {
+                                var planningUnitData = planningUnitDataFilter[0]
+                                var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                                programJson = JSON.parse(programData);
+                            } else {
+                                programJson = {
+                                    consumptionList: [],
+                                    inventoryList: [],
+                                    shipmentList: [],
+                                    batchInfoList: [],
+                                    supplyPlan: []
+                                }
                             }
-                        }
-                        console.log("consumptionList-------------", consumptionList)
-                        // var dayOfStockOut = consumptionList.dayOfStockOut;
+                            var consumptionList = (programJson.consumptionList);
+                            var monthArray = [];
+                            var curDate = startDate;
+                            for (var m = 0; moment(curDate).format("YYYY-MM") < moment(stopDate).format("YYYY-MM"); m++) {
+                                curDate = moment(startDate).add(m, 'months').format("YYYY-MM-DD");
+                                var noOfDays = moment(curDate, "YYYY-MM").daysInMonth();
+                                monthArray.push({ date: curDate, noOfDays: noOfDays })
+                                // var totalConsumptionQtyOutOfStockData = "";
+                                var totalActualQty = "";
+                                var totalForecastQty = "";
+                                var errorPerc = "";
+
+                                var regionData = [];
+                                for (let k = 0; k < regionList.length; k++) {
+                                    var consumptionactualQty = "";
+                                    var consumptionforecastQty = "";
+                                    var actualQty = "";
+                                    var forecastQty = "";
+                                    var daysOfStockOut = "";
+                                    var consumptionQtyOutOfStockData = "";
+                                    consumptionforecastQty = consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(curDate).format("YYYY-MM") && c.actualFlag == false && c.active == true && c.region.id == regionList[k].regionId);
+                                    if (consumptionforecastQty.length > 0) {
+                                        for (var con = 0; con < consumptionforecastQty.length; con++) {
+                                            forecastQty += consumptionforecastQty[con].consumptionQty;
+                                        }
+                                    } else {
+                                        forecastQty = "";
+                                    }
+                                    consumptionactualQty = consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(curDate).format("YYYY-MM") && c.actualFlag == true && c.active == true && c.region.id == regionList[k].regionId);
+                                    if (consumptionactualQty.length > 0) {
+                                        for (var con = 0; con < consumptionactualQty.length; con++) {
+                                            actualQty += consumptionactualQty[con].consumptionQty;
+                                            daysOfStockOut += consumptionactualQty[con].dayOfStockOut;
+                                            // consumptionQtyOutOfStockData += consumptionactualQty[con].consumptionQty / (noOfDays - consumptionactualQty[con].dayOfStockOut) * noOfDays;
+                                        }
+                                    } else {
+                                        actualQty = "";
+                                        daysOfStockOut = "";
+                                        // consumptionQtyOutOfStockData = "";
+                                    }
+                                    totalActualQty += actualQty;
+                                    totalForecastQty += forecastQty;
+                                    // totalConsumptionQtyOutOfStockData += consumptionQtyOutOfStockData;
+                                    var region = { id: regionList[k].regionId, lable: regionList[k].label };
+                                    regionData.push({
+                                        region: region,
+                                        actualQty: actualQty,
+                                        forecastQty: forecastQty,
+                                        daysOfStockOut: daysOfStockOut
+                                        // consumptionQtyOutOfStockData: consumptionQtyOutOfStockData
+                                    });
+                                }
+                                var absEbar = (Math.abs(totalForecastQty - totalActualQty)) / totalActualQty;
+                                errorPerc = absEbar * 100;
+                                dataList.push({
+                                    month: moment(curDate).format("YYYY-MM"),
+                                    regionData: regionData,
+                                    actualQty: totalActualQty,
+                                    forecastQty: totalForecastQty,
+                                    errorPerc: errorPerc,
+                                    noOfDays: noOfDays
+                                    // consumptionAdjForStockOutId: consumptionAdjForStockOutId,
+                                    // consumptionQtyStockedOut: totalConsumptionQtyOutOfStockData
+                                });
+                            }
+                            console.log("Complete dataList----------------------", dataList);
+                            this.setState({
+                                monthArray: monthArray,
+                                dataList: dataList,
+                                consumptionAdjForStockOutId: consumptionAdjForStockOutId
+                            })
+                        }.bind(this);
+                    }.bind(this);
+                }
+            } else {
+                this.setState({
+                    message: '',
+                    loading: true
+                })
+                console.log("viewBy--->", viewById);
+                var inputjson = {
+                    programId: programId,
+                    versionId: versionId,
+                    viewBy: viewById,
+                    unitId: viewById == 1 ? planningUnitId : forecastingUnitId,
+                    startDate: startDate,
+                    stopDate: stopDate,
+                    equivalencyUnitId: 0,
+                    regionIds: regionIds
+                }
+                console.log("JSON INPUT---------->", inputjson);
+                ReportService.forecastError(inputjson)
+                    .then(response => {
+                        console.log("RESP---------->", response.data);
                         var monthArray = [];
                         var curDate = startDate;
-                        var reportConsumptionList = [];
                         for (var m = 0; moment(curDate).format("YYYY-MM") < moment(stopDate).format("YYYY-MM"); m++) {
                             curDate = moment(startDate).add(m, 'months').format("YYYY-MM-DD");
                             var noOfDays = moment(curDate, "YYYY-MM").daysInMonth();
                             monthArray.push({ date: curDate, noOfDays: noOfDays })
-                            for (var r = 0; r < regionIds.length; r++) {
-                                var consumptionDataForMonth = consumptionList.filter(c => c.region.id == regionIds[r].regionId && moment(c.consumptionDate).format("YYYY-MM") == moment(curDate).format("YYYY-MM"))
-                                reportConsumptionList.push({
-                                    // region:
-                                    // month:
-                                    // value:
-                                    // daysOfStockOut:
-                                    // noOfDays:
-                                    // consumptionQty:
-                                    monthArray: monthArray,
-                                    consumptionDataForMonth: consumptionDataForMonth,
-                                    dayOfStockOut: consumptionDataForMonth.dayOfStockOut,
-                                    noOfDays: noOfDays,
-                                    region: regionIds
+                        }
+
+                        this.setState({
+                            dataList: response.data,
+                            monthArray: monthArray,
+                            consumptionAdjForStockOutId: consumptionAdjForStockOutId,
+                            message: '',
+                            loading: false
+                        },
+                            () => {
+
+                            })
+                    }).catch(
+                        error => {
+                            if (error.message === "Network Error") {
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
                                 });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
+
+                                    case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
+                                    case 404:
+                                    case 406:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    case 412:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    default:
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                        break;
+                                }
                             }
                         }
-                        console.log("reportConsumptionListregion-------------", reportConsumptionList.region)
-
-                        console.log("reportConsumptionList.monthArray-------------", reportConsumptionList.consumptionDataForMonth)
-
-                        console.log("monthArray-------------", monthArray)
-                        this.setState({
-                            monthArray: monthArray,
-                            // loading: false,
-                            reportConsumptionList: reportConsumptionList,
-
-                        })
-                        console.log("this.state.monthArray-------------", this.state.monthArray)
-
-                    }.bind(this);
-                }.bind(this);
-            } else { }
+                    );
+            }
 
         }
     }
 
     render() {
+
         const { rangeValue } = this.state
         const pickerLang = {
             months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
             from: 'From', to: 'To',
         }
+        let totalError = 0;
+        let totalActal = 0;
+        let totalForcaste = 0;
+        let countError = 0;
+        let countActal = 0;
+        let countForcaste = 0;
+        let totalDaysOfStockOut = 0;
 
         const { forecastingUnits } = this.state;
         let forcastingUnitList = forecastingUnits.length > 0
@@ -1032,6 +1370,194 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                 return ({ label: getLabelText(item.label, this.state.lang), value: item.regionId })
 
             }, this);
+
+
+
+        var chartOptions = {
+            title: {
+                display: true,
+                // text: (this.state.yaxisEquUnit > 0 ? this.state.equivalencyUnitLabel : 'Monthly Forecast ' + (this.state.viewById == 1 ? '(' + i18n.t('static.product.product') + ')' : '(' + i18n.t('static.forecastingunit.forecastingunit') + ')'))
+                text: 'Monthly Forecast - ' + (this.state.programs.filter(c => c.programId == this.state.programId).length > 0 ? this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode : '') + ' - ' + (this.state.versions.filter(c => c.versionId == this.state.versionId).length > 0 ? this.state.versions.filter(c => c.versionId == this.state.versionId)[0].versionId : '')
+            },
+            scales: {
+                yAxes: [
+                    {
+                        id: 'A',
+                        scaleLabel: {
+                            display: true,
+                            labelString: (this.state.yaxisEquUnit > 0 ? this.state.equivalencyUnitLabel : (this.state.viewById == 1 ? i18n.t('static.product.product') : i18n.t('static.forecastingunit.forecastingunit'))),
+                            fontColor: 'black'
+                        },
+                        stacked: true,//stacked
+                        ticks: {
+                            beginAtZero: true,
+                            fontColor: 'black',
+                            callback: function (value) {
+                                var cell1 = value
+                                cell1 += '';
+                                var x = cell1.split('.');
+                                var x1 = x[0];
+                                var x2 = x.length > 1 ? '.' + x[1] : '';
+                                var rgx = /(\d+)(\d{3})/;
+                                while (rgx.test(x1)) {
+                                    x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                                }
+                                return x1 + x2;
+                            }
+                        },
+                        gridLines: {
+                            drawBorder: true, lineWidth: 0
+                        },
+                        position: 'left',
+                    },
+                    {
+                        id: 'B',
+                        scaleLabel: {
+                            display: true,
+                            labelString: "Forecast Error",
+                            fontColor: 'black'
+                        },
+                        stacked: true,
+                        ticks: {
+                            beginAtZero: true,
+                            fontColor: 'black'
+                        },
+                        gridLines: {
+                            drawBorder: true, lineWidth: 0
+                        },
+                        position: 'right',
+                    }
+                ],
+                xAxes: [{
+                    ticks: {
+                        fontColor: 'black'
+                    },
+                    gridLines: {
+                        drawBorder: true, lineWidth: 0
+                    }
+                }]
+            },
+            tooltips: {
+                callbacks: {
+                    label: function (tooltipItem, data) {
+
+                        let label = data.labels[tooltipItem.index];
+                        let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+
+                        var cell1 = value
+                        cell1 += '';
+                        var x = cell1.split('.');
+                        var x1 = x[0];
+                        var x2 = x.length > 1 ? '.' + x[1] : '';
+                        var rgx = /(\d+)(\d{3})/;
+                        while (rgx.test(x1)) {
+                            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                        }
+                        return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
+                    }
+                },
+                // callbacks: {
+                //     label: function (tooltipItems, data) {
+                //         if (tooltipItems.datasetIndex == 0) {
+                //             var details = this.state.expiredStockArr[tooltipItems.index].details;
+                //             var infoToShow = [];
+                //             details.map(c => {
+                //                 infoToShow.push(c.batchNo + " - " + c.expiredQty.toLocaleString());
+                //             });
+                //             return (infoToShow.join(' | '));
+                //         } else {
+                //             return (tooltipItems.yLabel.toLocaleString());
+                //         }
+                //     }.bind(this)
+                // },
+                enabled: false,
+                intersect: false,
+                custom: CustomTooltips
+            },
+            maintainAspectRatio: false
+            ,
+            legend: {
+                display: true,
+                position: 'bottom',
+                labels: {
+                    usePointStyle: true,
+                    fontColor: 'black'
+                }
+            }
+        }
+
+        let bar = {}
+        var datasetListForGraph = [];
+        var colourArray = ["#002F6C", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"]
+
+        var elInstance = this.state.dataList;
+        if (elInstance != undefined) {
+            var colourCount = 0;
+            datasetListForGraph.push({
+                label: 'Error',
+                data: this.state.dataList.map(item => (item.errorPerc !== "" ? item.errorPerc : null)),
+                type: 'line',
+                stack: 3,
+                yAxisID: 'A',
+                backgroundColor: (this.state.yaxisEquUnit > 0 ? '#002F6C' : 'transparent'),
+                borderColor: '#EDB944',
+                borderStyle: 'dotted',
+                borderWidth: 5,
+                ticks: {
+                    fontSize: 2,
+                    fontColor: 'transparent',
+                },
+                lineTension: 0,
+                pointStyle: 'line',
+                pointRadius: 0,
+                showInLegend: true,
+                pointRadius: 4,
+            })
+
+            var consumptionActualValue = [];
+            var consumptionForecastValue = [];
+            for (var i = 0; i < elInstance.length; i++) {
+                var value = elInstance[i];
+                if (value) {
+                    consumptionActualValue.push(value.actualQty)
+                    consumptionForecastValue.push(value.forecastQty)
+                } else {
+                    consumptionActualValue.push("");
+                    consumptionForecastValue.push("");
+                }
+            }
+            datasetListForGraph.push({
+                label: "Forecast",
+                data: consumptionForecastValue,
+                stack: 2,
+                backgroundColor: '#002F6C',
+                ticks: {
+                    fontSize: 2,
+                    fontColor: 'transparent',
+                },
+                showInLegend: true,
+            })
+
+            datasetListForGraph.push({
+                label: "Actual",
+                data: consumptionActualValue,
+                stack: 1,
+                backgroundColor: '#BA0C2F',
+                ticks: {
+                    fontSize: 2,
+                    fontColor: 'transparent',
+                },
+                showInLegend: true,
+            })
+        }
+        console.log("datasetListForGraph--", datasetListForGraph)
+
+        if (this.state.dataList.length > 0) {
+            bar = {
+                labels: this.state.monthArray.map((item, index) => (moment(item.date).format(DATE_FORMAT_CAP_WITHOUT_DATE))),
+                datasets: datasetListForGraph
+            };
+        }
 
         return (
             <div className="animated fadeIn" >
@@ -1106,6 +1632,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                         value={rangeValue}
                                                         lang={pickerLang}
                                                         //theme="light"
+                                                        key={JSON.stringify(rangeValue)}
                                                         onChange={this.handleRangeChange}
                                                         onDismiss={this.handleRangeDissmis}
                                                     >
@@ -1151,8 +1678,8 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                         title={i18n.t('static.report.planningUnit')}>
                                                         {i18n.t('static.report.planningUnit')}
                                                     </Label>
-                                                    </FormGroup>
-                                                    <FormGroup check inline>
+                                                </FormGroup>
+                                                <FormGroup check inline>
                                                     <Input
                                                         className="form-check-input"
                                                         type="radio"
@@ -1178,7 +1705,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                     <InputGroup>
                                                         <Input
                                                             type="select"
-                                                            name="foreccastingUnitId"
+                                                            name="forecastingUnitId"
                                                             id="forecastingUnitId"
                                                             value={this.state.forecastingUnitId}
                                                             onChange={(e) => { this.setForecastingUnit(e); }}
@@ -1274,33 +1801,13 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                         name="consumptionAdjusted"
                                                     // checked={true}
                                                     // checked={this.state.yaxisEquUnit}
-                                                    // onClick={(e) => { this.yaxisEquUnitCheckbox(e); }}
+                                                    onClick={(e) => { this.consumptionStockOutCheckbox(e); }}
                                                     />
                                                     <Label
                                                         className="form-check-label"
                                                         check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
                                                         Show consumption adjusted for stock out?
                                                     </Label>
-                                                </div>
-                                            </FormGroup>
-
-                                            <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.timeWindow')}</Label>
-                                                <div className="controls">
-                                                    <InputGroup>
-                                                        <Input
-                                                            type="select"
-                                                            name="timeWindowId"
-                                                            id="timeWindowId"
-                                                            bsSize="sm"
-                                                        // onChange={this.fetchData}
-                                                        >
-                                                            <option value="6">6 {i18n.t('static.dashboard.months')}</option>
-                                                            <option value="3">3 {i18n.t('static.dashboard.months')}</option>
-                                                            <option value="9">9 {i18n.t('static.dashboard.months')}</option>
-                                                            <option value="12">12 {i18n.t('static.dashboard.months')}</option>
-                                                        </Input>
-                                                    </InputGroup>
                                                 </div>
                                             </FormGroup>
                                         </div>
@@ -1310,29 +1817,127 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                 <Col md="12 pl-0">
                                     <div className="row" style={{ display: this.state.show ? "block" : "none" }}>
                                         <div className="col-md-12">
-                                            {this.state.show && this.state.reportConsumptionList.length > 0 &&
+                                            <div className="chart-wrapper chart-graph-report">
+                                                <Bar id="cool-canvas" data={bar} options={chartOptions} /> <div>
+                                                </div>
+                                            </div>
+                                            <b>* The error calculations here are not real - would be WAPE calculation we've been using</b>
+                                        </div>
+                                        <div className="col-md-12">
+                                            {/* {this.state.showDetailTable && */}
+
+                                            {/* } */}
+                                            {this.state.show && this.state.dataList.length > 0 &&
                                                 <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm">
                                                     <thead>
                                                         <tr>
                                                             <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th>
-                                                            <th className="dataentryTdWidth sticky-col first-col clone">Average</th>
+                                                            <th className="sticky-col first-col clone"></th>
                                                             {this.state.monthArray.map((item, count) => {
                                                                 return (<th>{moment(item.date).format(DATE_FORMAT_CAP_WITHOUT_DATE)}</th>)
                                                             })}
+                                                            <th className="sticky-col first-col clone">Average</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        {this.state.reportConsumptionList.map(item => {
-                                                            return <>
-                                                                <tr className="hoverTd">
-                                                                    {/* <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordion(0)}>
-                                                                        {this.state.consumptionUnitShowArr.includes(0) ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
-                                                                    </td> */}
-                                                                    <td className="sticky-col first-col clone hoverTd" align="left"></td>
-                                                                </tr>
-                                                            </>
-                                                        }
-                                                        )}
+                                                        <tr className="hoverTd">
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                            <td className="sticky-col first-col clone hoverTd" align="left">Error*</td>
+                                                            {this.state.monthArray.map((item1, count) => {
+                                                                var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
+                                                                totalError += Number(data[0].errorPerc);
+                                                                countError += 1;
+                                                                return (<td><NumberFormat displayType={'text'} thousandSeparator={true} />{data[0].errorPerc}</td>)
+                                                            })}
+                                                            <td className="sticky-col first-col clone hoverTd" align="left">{totalError / countError}</td>
+                                                        </tr>
+                                                        <tr className="hoverTd">
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordion(0)}>
+                                                                {this.state.consumptionUnitShowArr.includes(0) ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
+                                                            </td>
+                                                            <td className="sticky-col first-col clone hoverTd" align="left">Forecast</td>
+                                                            {this.state.monthArray.map((item1, count) => {
+                                                                var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
+                                                                totalForcaste += Number(data[0].forecastQty);
+                                                                countForcaste += 1;
+                                                                return (<td><NumberFormat displayType={'text'} thousandSeparator={true} />{data[0].forecastQty}</td>)
+                                                            })}
+                                                            <td className="sticky-col first-col clone hoverTd" align="left">{totalForcaste / countForcaste}</td>
+                                                        </tr>
+                                                        {this.state.regions.map(r => {
+                                                            var totalRegion = 0;
+                                                            var totalRegionCount = 0;
+                                                            return (<tr style={{ display: this.state.consumptionUnitShowArr.includes(0) ? "" : "none" }}>
+                                                                <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                                <td className="sticky-col first-col clone text-left" style={{ textIndent: '30px' }}>{"   " + getLabelText(r.label, this.state.lang)}</td>
+                                                                {this.state.monthArray.map((item1, count) => {
+                                                                    var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.regionData[0].region.id == r.regionId)
+                                                                    totalRegion += Number(data[0].forecastQty);
+                                                                    totalRegionCount += 1;
+                                                                    return (<td><NumberFormat displayType={'text'} thousandSeparator={true} />{data[0].forecastQty}</td>)
+                                                                })}
+                                                                <td className="sticky-col first-col clone text-left">{totalRegion / totalRegionCount}</td>
+                                                            </tr>)
+                                                        })}
+                                                        <tr className="hoverTd">
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordion(1)}>
+                                                                {this.state.consumptionUnitShowArr.includes(1) ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
+                                                            </td>
+                                                            <td className="sticky-col first-col clone hoverTd" align="left">Actual</td>
+                                                            {this.state.monthArray.map((item1, count) => {
+                                                                var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
+                                                                // actualQty/(noOfDays - dayOfStockOut) * noOfDays
+                                                                totalActal += Number(this.state.consumptionAdjForStockOutId ? (data[0].actualQty / (item1.noOfDays - totalDaysOfStockOut) * item1.noOfDays) : data[0].actualQty);
+                                                                countActal += 1;
+                                                                return (<td><NumberFormat displayType={'text'} thousandSeparator={true} />{this.state.consumptionAdjForStockOutId ? (data[0].actualQty / (item1.noOfDays - totalDaysOfStockOut) * item1.noOfDays) : data[0].actualQty}</td>)
+                                                            })}
+                                                            <td className="sticky-col first-col clone hoverTd" align="left">{totalActal / countActal}</td>
+                                                        </tr>
+                                                        {this.state.regions.map(r => {
+                                                            var totalRegion = 0;
+                                                            var totalRegionCount = 0;
+                                                            return (<tr style={{ display: this.state.consumptionUnitShowArr.includes(1) ? "" : "none" }}>
+                                                                <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                                <td className="sticky-col first-col clone text-left" style={{ textIndent: '30px' }}>{"   " + getLabelText(r.label, this.state.lang)}</td>
+                                                                {this.state.monthArray.map((item1, count) => {
+                                                                    var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.regionData[0].region.id == r.regionId)
+                                                                    totalRegion += Number(this.state.consumptionAdjForStockOutId ? (data[0].actualQty / (item1.noOfDays - data[0].daysOfStockOut) * item1.noOfDays) : data[0].actualQty);
+                                                                    totalRegionCount += 1;
+                                                                    totalDaysOfStockOut+=data[0].daysOfStockOut;
+                                                                    return (<td><NumberFormat displayType={'text'} thousandSeparator={true} />{this.state.consumptionAdjForStockOutId ? (data[0].actualQty / (item1.noOfDays - data[0].daysOfStockOut) * item1.noOfDays) : data[0].actualQty}</td>)
+                                                                })}
+                                                                <td className="sticky-col first-col clone text-left">{totalRegion / totalRegionCount}</td>
+                                                            </tr>)
+                                                        })}
+                                                        <tr className="hoverTd">
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordion(2)}>
+                                                                {this.state.consumptionUnitShowArr.includes(2) ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
+                                                            </td>
+                                                            <td className="sticky-col first-col clone hoverTd" align="left">Difference</td>
+                                                            {this.state.monthArray.map((item1, count) => {
+                                                                var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
+                                                                return (<td><NumberFormat displayType={'text'} thousandSeparator={true} />{data[0].actualQty - data[0].forecastQty}</td>)
+                                                            })}
+                                                            <td className="sticky-col first-col clone hoverTd" align="left">{(totalActal / countActal) - (totalForcaste / countForcaste)}</td>
+                                                        </tr>
+                                                        {this.state.regions.map(r => {
+                                                            var totalRegion = 0;
+                                                            var totalRegionCount = 0;
+                                                            return (<tr style={{ display: this.state.consumptionUnitShowArr.includes(2) ? "" : "none" }}>
+                                                                <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                                <td className="sticky-col first-col clone text-left" style={{ textIndent: '30px' }}>{"   " + getLabelText(r.label, this.state.lang)}</td>
+                                                                {this.state.monthArray.map((item1, count) => {
+                                                                    var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.regionData[0].region.id == r.regionId)
+                                                                    totalRegion += Number(data[0].actualQty - data[0].forecastQty);
+                                                                    totalRegionCount += 1;
+                                                                    return (<td><NumberFormat displayType={'text'} thousandSeparator={true} />{data[0].actualQty - data[0].forecastQty}</td>)
+                                                                })}
+                                                                <td className="sticky-col first-col clone text-left">{totalRegion / totalRegionCount}</td>
+                                                            </tr>)
+                                                        })}
+                                                        {/* </>)
+                                                        } 
+                                                        )} */}
                                                     </tbody>
                                                 </Table>
                                             }
@@ -1345,7 +1950,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
 
                     <CardFooter>
                         <FormGroup>
-                            {this.state.reportConsumptionList != "" && <button className="mr-1 float-right btn btn-info btn-md" onClick={this.toggledata}>{this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}</button>}
+                            {this.state.dataList != "" && <button className="mr-1 float-right btn btn-info btn-md" onClick={this.toggledata}>{this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}</button>}
                             &nbsp;
                         </FormGroup>
                     </CardFooter>
