@@ -12,6 +12,7 @@ import RealmService from "../../api/RealmService";
 import UserService from "../../api/UserService";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import moment from 'moment';
+import { Nav, NavItem, NavLink, TabContent, TabPane } from 'reactstrap';
 import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_SM } from '../../Constants.js';
 import jexcel from 'jexcel-pro';
 import "../../../node_modules/jexcel-pro/dist/jexcel.css";
@@ -41,6 +42,7 @@ class ListUserComponent extends Component {
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.buildJExcel = this.buildJExcel.bind(this);
+        this.toggleModal = this.toggleModal.bind(this);
     }
     hideFirstComponent() {
         this.timeout = setTimeout(function () {
@@ -437,6 +439,30 @@ class ListUserComponent extends Component {
             return "";
         }
     }
+
+    toggleModal(tabPane, tab) {
+        const newArray = this.state.activeTab1.slice()
+        newArray[tabPane] = tab
+        this.setState({
+            activeTab1: newArray,
+            showCalculatorFields: false
+        }, () => {
+            if (tab == 1) {
+
+            } else if (tab == 2) {
+
+            }
+        });
+
+    }
+
+    tabPane1() {
+
+
+
+
+    }
+
     render() {
         const { realms } = this.state;
         let realmList = realms.length > 0
@@ -495,14 +521,14 @@ class ListUserComponent extends Component {
                         }
                         {/* <div id="loader" className="center"></div> */}
 
-{/* 
+
                         <Nav tabs>
                             <NavItem>
                                 <NavLink
                                     active={this.state.activeTab1[0] === '1'}
                                     onClick={() => { this.toggleModal(0, '1'); }}
                                 >
-                                    {i18n.t('static.tree.nodeData')}
+                                    {'Tab-1'}
                                 </NavLink>
                             </NavItem>
                             <NavItem style={{ display: !this.state.currentScenario.extrapolation || this.state.currentItemConfig.context.payload.nodeType.id != 2 ? 'block' : 'none' }}>
@@ -510,13 +536,13 @@ class ListUserComponent extends Component {
                                     active={this.state.activeTab1[0] === '2'}
                                     onClick={() => { this.toggleModal(0, '2'); }}
                                 >
-                                    {i18n.t('static.tree.Modeling/Transfer')}
+                                    {'Tab-2'}
                                 </NavLink>
                             </NavItem>
                         </Nav>
                         <TabContent activeTab={this.state.activeTab1[0]}>
                             {this.tabPane1()}
-                        </TabContent> */}
+                        </TabContent>
                         <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USER') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>
