@@ -10938,7 +10938,7 @@ export default class BuildTree extends Component {
                                 <li>Users can only transfer to nodes that are of the same type (i.e. a forecasting unit may transfer node data to another forecasting unit, but not a planning unit as they are not the same node type).</li>
                                 <li>The order of operations for calculating a transfer occurs from the left to the right in the forecast tree. A transfer cannot be made from right to left, thus a user should be careful when designing their tree and determining where each node should be placed. </li>
                                 <li>Transfers are always negative from the source node and positive to the destination node.</li> */}
-                                <li>{i18n.t('static.buildTreeComp.')}</li>
+                                <li>{i18n.t('static.buildTreeComp.NumberNodeCanTransfer')}</li>
                                 <li>{i18n.t('static.buildTreeComp.percentetFUPUNodes')}</li>
                             </ul>
                         </p>
