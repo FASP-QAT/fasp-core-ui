@@ -564,7 +564,7 @@ export default class CreateTreeTemplate extends Component {
                 },
                 active: true
                 , flatList: [],
-                levelList:[]
+                levelList: []
             },
             forecastMethodList: [],
             nodeTypeList: [],
@@ -679,7 +679,7 @@ export default class CreateTreeTemplate extends Component {
             lastRowDeleted: false,
             modelingChanged: false,
             levelModal: false,
-
+            nodeTransferDataList: []
 
         }
         this.getMomValueForDateRange = this.getMomValueForDateRange.bind(this);
@@ -782,14 +782,14 @@ export default class CreateTreeTemplate extends Component {
         this.calculateParentValueFromMOM = this.calculateParentValueFromMOM.bind(this);
         this.generateMonthList = this.generateMonthList.bind(this);
         this.updateTreeData = this.updateTreeData.bind(this);
-        this.levelDeatilsSaved=this.levelDeatilsSaved.bind(this)
+        this.levelDeatilsSaved = this.levelDeatilsSaved.bind(this)
     }
 
     levelClicked(data) {
         var name = "";
         var unit = "";
         var levelNo = "";
-        console.log("Data@@@@@@@@@@@@",data!="")
+        console.log("Data@@@@@@@@@@@@", data != "")
         if (data != "") {
             console.log("Data@@@@###############", data.context.levels[0])
             var treeLevelList = this.state.treeTemplate.levelList != undefined ? this.state.treeTemplate.levelList : [];
@@ -3165,32 +3165,34 @@ export default class CreateTreeTemplate extends Component {
             dataArray[count] = data;
             count++;
         }
-        for (var j = 0; j < nodeTransferDataList.length; j++) {
-            data = [];
-            data[0] = nodeTransferDataList[j].notes
-            data[1] = nodeTransferDataList[j].startDateNo
-            data[2] = nodeTransferDataList[j].stopDateNo
-            data[3] = nodeTransferDataList[j].transferNodeDataId + "_F"
-            // console.log("modeling type---", scalingList[j].modelingType.id);
-            data[4] = nodeTransferDataList[j].modelingType.id
-            data[5] = 1
-            data[6] = nodeTransferDataList[j].modelingType.id != 2 ? parseFloat(nodeTransferDataList[j].dataValue).toFixed(4) : ''
-            data[7] = nodeTransferDataList[j].modelingType.id == 2 ? (nodeTransferDataList[j].dataValue) : ''
-            data[8] = ""
-            var nodeValue = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue;
-            var calculatedChangeForMonth;
-            if (nodeTransferDataList[j].modelingType.id == 2 || nodeTransferDataList[j].modelingType.id == 5) {
-                calculatedChangeForMonth = nodeTransferDataList[j].dataValue;
-            } else if (nodeTransferDataList[j].modelingType.id == 3 || nodeTransferDataList[j].modelingType.id == 4) {
-                calculatedChangeForMonth = (nodeValue * (nodeTransferDataList[j].dataValue)) / 100;
+        if (nodeTransferDataList.length > 0) {
+            for (var j = 0; j < nodeTransferDataList.length; j++) {
+                data = [];
+                data[0] = nodeTransferDataList[j].notes
+                data[1] = nodeTransferDataList[j].startDateNo
+                data[2] = nodeTransferDataList[j].stopDateNo
+                data[3] = nodeTransferDataList[j].transferNodeDataId + "_F"
+                // console.log("modeling type---", scalingList[j].modelingType.id);
+                data[4] = nodeTransferDataList[j].modelingType.id
+                data[5] = 1
+                data[6] = nodeTransferDataList[j].modelingType.id != 2 ? parseFloat(nodeTransferDataList[j].dataValue).toFixed(4) : ''
+                data[7] = nodeTransferDataList[j].modelingType.id == 2 ? (nodeTransferDataList[j].dataValue) : ''
+                data[8] = ""
+                var nodeValue = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue;
+                var calculatedChangeForMonth;
+                if (nodeTransferDataList[j].modelingType.id == 2 || nodeTransferDataList[j].modelingType.id == 5) {
+                    calculatedChangeForMonth = nodeTransferDataList[j].dataValue;
+                } else if (nodeTransferDataList[j].modelingType.id == 3 || nodeTransferDataList[j].modelingType.id == 4) {
+                    calculatedChangeForMonth = (nodeValue * (nodeTransferDataList[j].dataValue)) / 100;
+                }
+                data[9] = calculatedChangeForMonth
+                data[10] = nodeTransferDataList[j].nodeDataModelingId
+                data[11] = 0
+                data[12] = 1
+                scalingTotal = parseFloat(scalingTotal) + parseFloat(calculatedChangeForMonth);
+                dataArray[count] = data;
+                count++;
             }
-            data[9] = calculatedChangeForMonth
-            data[10] = nodeTransferDataList[j].nodeDataModelingId
-            data[11] = 0
-            data[12] = 1
-            scalingTotal = parseFloat(scalingTotal) + parseFloat(calculatedChangeForMonth);
-            dataArray[count] = data;
-            count++;
         }
         this.setState({ scalingTotal });
         this.el = jexcel(document.getElementById("modelingJexcel"), '');
@@ -4191,7 +4193,7 @@ export default class CreateTreeTemplate extends Component {
         if (forecastingUnit.length > 0) {
             (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.unit.id = forecastingUnit[0].unit.id;
         }
-        console.log("currentItemConfig---", currentItemConfig);
+        console.log("currentItemConfig fu unit---", currentItemConfig);
         this.setState({
             currentItemConfig
         });
@@ -6108,6 +6110,7 @@ export default class CreateTreeTemplate extends Component {
 
         (newItem.payload.nodeDataMap[0])[0].puNode.sharePlanningUnit = false;
         (newItem.payload.nodeDataMap[0])[0].puNode.planningUnit.multiplier = pu.multiplier;
+        (newItem.payload.nodeDataMap[0])[0].puNode.planningUnit.unit.id = pu.unit.id;
 
         console.log("pu node add button clicked value after update---", newItem);
         console.log("pu node add button clicked value after update---", newItem.payload.nodeDataMap.length);
@@ -6484,12 +6487,12 @@ export default class CreateTreeTemplate extends Component {
         const { treeTemplate } = this.state;
 
         var treeLevelList = treeTemplate.levelList;
-        console.log("currentItemConfig.context.level == 0 && treeLevelList != undefined@@@@@@@",currentItemConfig.context.level == 0 && treeLevelList != undefined)
-        console.log("currentItemConfig.context.level == 0 && treeLevelList != undefined@@@@@@@treeLevelList",treeLevelList)
-        
+        console.log("currentItemConfig.context.level == 0 && treeLevelList != undefined@@@@@@@", currentItemConfig.context.level == 0 && treeLevelList != undefined)
+        console.log("currentItemConfig.context.level == 0 && treeLevelList != undefined@@@@@@@treeLevelList", treeLevelList)
+
         if (currentItemConfig.context.level == 0 && treeLevelList != undefined) {
             var levelListFiltered = treeLevelList.findIndex(c => c.levelNo == parseInt(currentItemConfig.context.level));
-            console.log("levelListFiltered@@@@@@@@@@",levelListFiltered);
+            console.log("levelListFiltered@@@@@@@@@@", levelListFiltered);
             if (levelListFiltered != -1) {
                 var unitId = currentItemConfig.context.payload.nodeType.id == 4 ? currentItemConfig.parentItem.payload.nodeUnit.id : currentItemConfig.context.payload.nodeUnit.id;
                 var label = {}
@@ -6503,7 +6506,7 @@ export default class CreateTreeTemplate extends Component {
 
             }
             treeTemplate.levelList = treeLevelList;
-            console.log("TreeTemplate@@@@@@@",treeTemplate)
+            console.log("TreeTemplate@@@@@@@", treeTemplate)
         }
         this.setState({
             items: nodes,
@@ -6655,7 +6658,14 @@ export default class CreateTreeTemplate extends Component {
                         id: 'A',
                         scaleLabel: {
                             display: true,
-                            labelString: this.state.currentItemConfig.context.payload.nodeType.id > 3 ? this.state.currentItemConfig.context.payload.nodeUnit.id != "" ? getLabelText(this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label, this.state.lang) : "" : this.state.currentItemConfig.context.payload.nodeUnit.label != null ? getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang) : "",
+                            labelString: this.state.currentItemConfig.context.payload.nodeType.id > 2 ?
+                                // this.state.currentItemConfig.context.payload.nodeUnit.id != "" ?
+                                this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.forecastingUnit.unit.id != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.forecastingUnit.unit.id != null ? getLabelText(this.state.unitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.forecastingUnit.unit.id)[0].label, this.state.lang) : ""
+                                    : this.state.currentItemConfig.context.payload.nodeType.id == 5 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.planningUnit.unit.id != "" ? getLabelText(this.state.unitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.planningUnit.unit.id)[0].label, this.state.lang) : ""
+                                        : this.state.currentItemConfig.context.payload.nodeUnit.id != "" ? getLabelText(this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label, this.state.lang)
+                                            : ""
+                                // : ""
+                                : "",
                             // labelString: "",
                             fontColor: 'black'
                         },
@@ -8424,7 +8434,14 @@ export default class CreateTreeTemplate extends Component {
                                         </FormGroup>
                                     </div>
                                 </div>
-                                <div className="pt-lg-2 pl-lg-0"><i>{i18n.t('static.tree.tableDisplays')} <b>{this.state.currentItemConfig.context.payload.nodeUnit.label != null ? getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang) : ''}</b> {i18n.t('static.tree.forNode')} <b>{this.state.currentItemConfig.context.payload.label != null ? getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) : ''}</b> {i18n.t('static.tree.asA%OfParent')} <b>{this.state.currentItemConfig.parentItem.payload.label != null ? getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang) : ''}</b></i></div>
+                                <div className="pt-lg-2 pl-lg-0"><i>{i18n.t('static.tree.tableDisplays')} <b>{
+                                    this.state.currentItemConfig.context.payload.nodeType.id > 2 ?
+                                            this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.forecastingUnit.unit.id != null && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.forecastingUnit.unit.id != "" ? getLabelText(this.state.unitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.forecastingUnit.unit.id)[0].label, this.state.lang) : ""
+                                                : this.state.currentItemConfig.context.payload.nodeType.id == 5 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.planningUnit.unit.id != "" ? getLabelText(this.state.unitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.planningUnit.unit.id)[0].label, this.state.lang) : ""
+                                                    : this.state.currentItemConfig.context.payload.nodeUnit.id != "" ? getLabelText(this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label, this.state.lang)
+                                            : ""
+                                        : ""}</b> {i18n.t('static.tree.forNode')} <b>{this.state.currentItemConfig.context.payload.label != null ? getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) : ''}</b> {i18n.t('static.tree.asA%OfParent')} <b>{this.state.currentItemConfig.parentItem.payload.label != null ? getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang) : ''
+                                        }</b></i></div>
                                 {/* <div className="pt-lg-2 pl-lg-0"><i>Table displays <b>{getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang)}</b></div> */}
                                 <div className="col-md-12 pl-lg-0 pr-lg-0" style={{ display: 'inline-block' }}>
                                     <div id="momJexcelPer" className={"RowClickable perNodeData FiltermomjexcelPer"} style={{ display: this.state.momJexcelLoader ? "none" : "block" }}>
@@ -8942,6 +8959,7 @@ export default class CreateTreeTemplate extends Component {
                                 if (getLevelUnit.length > 0) {
                                     levelUnitId = getLevelUnit[0].unit != null ? getLevelUnit[0].unit.id : "";
                                 }
+                                console.log("level unit id on add button click---", levelUnitId);
                                 this.setState({
                                     tempPlanningUnitId: '',
                                     showMomDataPercent: false,
@@ -9251,7 +9269,7 @@ export default class CreateTreeTemplate extends Component {
                                                 id: template.forecastMethod.id
                                             },
                                             flatList: flatList,
-                                            levelList:template.levelList
+                                            levelList: template.levelList
                                         }
                                         console.log("template obj---", templateObj);
 
@@ -9762,7 +9780,7 @@ export default class CreateTreeTemplate extends Component {
             </Modal>
             {/* </Draggable> */}
             {/* Scenario Modal end------------------------ */}
-{/* Modal for level */}
+            {/* Modal for level */}
             <Modal isOpen={this.state.levelModal}
                 className={'modal-md'}>
                 <ModalHeader toggle={() => this.levelClicked("")} className="modalHeader">
