@@ -2084,6 +2084,7 @@ export default class CreateTreeTemplate extends Component {
         // var monthArr = this.state.monthList.filter(x => x.id > startDate && x.id < endDate);
         // var monthDifference = monthArr.length > 0 ? parseInt(monthArr.length + 1) : 0;
         var currentTargetChangePercentage = document.getElementById("currentTargetChangePercentage").value;
+        currentTargetChangePercentage = currentTargetChangePercentage != "" ? parseFloat(currentTargetChangePercentage) : ''
         var getValue = currentTargetChangePercentage != "" ? currentTargetChangePercentage.toString().replaceAll(",", "").match(/^-?\d+(?:\.\d{0,4})?/)[0] : "";
         var getEndValueFromPercentage = (this.state.currentCalculatorStartValue.toString().replaceAll(",", "") * getValue) / 100;
 
@@ -5733,6 +5734,7 @@ export default class CreateTreeTemplate extends Component {
         }
 
         if (event.target.name == "modelingType") {
+
             if (event.target.id === "active1") {
                 this.state.currentModelingType = 4
             }
@@ -5745,6 +5747,28 @@ export default class CreateTreeTemplate extends Component {
             else {
                 this.state.currentModelingType = 5
             }
+            // console.log("this.state.currentTargetChangeNumberEdit---", this.state.currentTargetChangeNumberEdit);
+            // console.log("this.state.currentModelingType---", this.state.currentModelingType);
+            if (!this.state.currentTargetChangeNumberEdit && this.state.currentModelingType != 2) {
+                console.log("inside if calculator radio button");
+                this.setState({
+                    currentTargetChangePercentageEdit: false,
+                    currentEndValueEdit: false
+                });
+            }
+
+            // if (!this.state.currentEndValueEdit && !this.state.currentTargetChangePercentageEdit && !this.state.currentTargetChangeNumberEdit) {
+            //     console.log("Inside if modeling calculator");
+            // } else {
+            //     console.log("Inside else modeling calculator");
+            //     if (!this.state.currentEndValueEdit) {
+            //         this.calculateMomByEndValue();
+            //     } else if (!this.state.currentTargetChangePercentageEdit) {
+            //         this.calculateMomByChangeInPercent();
+            //     } else if (!this.state.currentTargetChangeNumberEdit) {
+            //         this.calculateMomByChangeInNumber();
+            //     }
+            // }
 
         }
         if (event.target.name == "monthId") {
