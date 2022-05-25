@@ -6909,9 +6909,9 @@ export default class BuildTree extends Component {
                 label_sp: '',
                 label_pr: ''
             }
-            console.log("node unit label---",label);
+            console.log("node unit label---", label);
             currentItemConfig.context.payload.nodeUnit.label = label;
-            console.log("after node unit label---",currentItemConfig);
+            console.log("after node unit label---", currentItemConfig);
 
         }
         if (event.target.name === "percentageOfParent") {
@@ -7870,13 +7870,13 @@ export default class BuildTree extends Component {
                             display: true,
                             // labelString: this.state.currentItemConfig.context.payload.nodeUnit.label != null ? this.state.currentItemConfig.context.payload.nodeType.id > 3 ? getLabelText(this.state.currentItemConfig.parentItem.payload.nodeUnit.label, this.state.lang) : getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang) : '',
                             // labelString: this.state.currentItemConfig.context.payload.nodeUnit.label != null ? this.state.currentItemConfig.context.payload.nodeType.id > 3 ? getLabelText(this.state.currentItemConfig.parentItem.payload.nodeUnit.label, this.state.lang) : getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang) : '',
-                            labelString: this.state.currentItemConfig.context.payload.nodeType.id > 2 ? 
-                            this.state.currentItemConfig.context.payload.nodeUnit.id != "" ? 
-                            getLabelText(this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label, this.state.lang) 
-                            : "" 
-                            : this.state.currentItemConfig.context.payload.nodeUnit.label != null ? 
-                            getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang) 
-                            : "",
+                            labelString: this.state.currentItemConfig.context.payload.nodeType.id > 2 ?
+                                this.state.currentItemConfig.context.payload.nodeUnit.id != "" ?
+                                    this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentScenario.fuNode.forecastingUnit.unit.id != "" ? getLabelText(this.state.unitList.filter(c => c.unitId == this.state.currentScenario.fuNode.forecastingUnit.unit.id)[0].label, this.state.lang) : ""
+                                        : this.state.currentItemConfig.context.payload.nodeType.id == 5 ? this.state.currentScenario.puNode.planningUnit.unit.id != "" ? getLabelText(this.state.unitList.filter(c => c.unitId == this.state.currentScenario.puNode.planningUnit.unit.id)[0].label, this.state.lang) : ""
+                                            : getLabelText(this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label, this.state.lang)
+                                    : ""
+                                : "",
                             // labelString: "",
                             fontColor: 'black'
                         },
@@ -9668,7 +9668,14 @@ export default class BuildTree extends Component {
                                         </FormGroup>
                                     </div>
                                 </div>
-                                <div className="pt-lg-2 pl-lg-0"><i>{i18n.t('static.tree.tableDisplays')} <b>{this.state.currentItemConfig.context.payload.nodeUnit.label != null ? getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang) : ''}</b> {i18n.t('static.tree.forNode')} <b>{this.state.currentItemConfig.context.payload.label != null ? getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) : ''}</b> {i18n.t('static.tree.asA%OfParent')} <b>{this.state.currentItemConfig.parentItem.payload.label != null ? getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang) : ''}</b></i></div>
+                                <div className="pt-lg-2 pl-lg-0"><i>{i18n.t('static.tree.tableDisplays')} <b>{
+                                    this.state.currentItemConfig.context.payload.nodeType.id > 2 ?
+                                        this.state.currentItemConfig.context.payload.nodeUnit.id != "" ?
+                                            this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentScenario.fuNode.forecastingUnit.unit.id != "" ? getLabelText(this.state.unitList.filter(c => c.unitId == this.state.currentScenario.fuNode.forecastingUnit.unit.id)[0].label, this.state.lang) : ""
+                                            : this.state.currentItemConfig.context.payload.nodeType.id == 5 ? this.state.currentScenario.puNode.planningUnit.unit.id != "" ? getLabelText(this.state.unitList.filter(c => c.unitId == this.state.currentScenario.puNode.planningUnit.unit.id)[0].label, this.state.lang) : ""
+                                                    : getLabelText(this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label, this.state.lang)
+                                            : ""
+                                        : ""}</b> {i18n.t('static.tree.forNode')} <b>{this.state.currentItemConfig.context.payload.label != null ? getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) : ''}</b> {i18n.t('static.tree.asA%OfParent')} <b>{this.state.currentItemConfig.parentItem.payload.label != null ? getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang) : ''}</b></i></div>
                                 {/* <div className="pt-lg-2 pl-lg-0"><i>Table displays <b>{getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang)}</b></div> */}
                                 <div className="col-md-12 pl-lg-0 pr-lg-0" style={{ display: 'inline-block' }}>
                                     <div id="momJexcelPer" className={"RowClickable perNodeData FiltermomjexcelPer"} style={{ display: this.state.momJexcelLoader ? "none" : "block" }}>
@@ -10320,6 +10327,7 @@ export default class BuildTree extends Component {
                                 if (getLevelUnit.length > 0) {
                                     levelUnitId = getLevelUnit[0].unit != null ? getLevelUnit[0].unit.id : "";
                                 }
+                                console.log("level unit id on add button click---",levelUnitId);
                                 // tempArray.push(nodeDataMap);
                                 this.setState({
                                     showMomDataPercent: false,
