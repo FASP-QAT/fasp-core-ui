@@ -164,7 +164,8 @@ class AddUserComponent extends Component {
             roleId: '',
             roleList: [],
             message: '',
-            validateRealm: ''
+            validateRealm: '',
+            isValid: false,
         }
         this.cancelClicked = this.cancelClicked.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
@@ -220,7 +221,6 @@ class AddUserComponent extends Component {
         let { user } = this.state;
         if (event.target.name == "username") {
             user.username = event.target.value;
-            this.changed();
         }
         if (event.target.name == "emailId") {
             user.emailId = event.target.value;
@@ -695,8 +695,58 @@ class AddUserComponent extends Component {
 
     changed = function (instance, cell, x, y, value) {
 
-        console.log("changed---------------------->x", x);
-        console.log("changed---------------------->y", y);
+        //Country
+        if (x == 1) {
+            var col = ("B").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+        }
+
+        //TechnicalArea
+        if (x == 2) {
+            var col = ("C").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+        }
+
+        //Organisation
+        if (x == 3) {
+            var col = ("D").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+        }
+
+        //Program
+        if (x == 4) {
+            var col = ("E").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+        }
+
 
 
     }.bind(this);
@@ -833,7 +883,7 @@ class AddUserComponent extends Component {
 
                 {
                     title: i18n.t('static.username.username'),
-                    type: 'text',
+                    type: 'hidden',
                     readOnly: true
                 },
                 {
@@ -1044,6 +1094,17 @@ class AddUserComponent extends Component {
         this.setState({
             loading: false
         })
+    }
+
+    loaded = function (instance, cell, x, y, value) {
+        jExcelLoadedFunction(instance);
+        var asterisk = document.getElementsByClassName("resizable")[0];
+        var tr = asterisk.firstChild;
+        // tr.children[1].classList.add('AsteriskTheadtrTd');
+        tr.children[2].classList.add('AsteriskTheadtrTd');
+        tr.children[3].classList.add('AsteriskTheadtrTd');
+        tr.children[4].classList.add('AsteriskTheadtrTd');
+        tr.children[5].classList.add('AsteriskTheadtrTd');
     }
 
     addRow() {
@@ -1279,6 +1340,67 @@ class AddUserComponent extends Component {
         }
     }
 
+    checkValidation() {
+        var valid = true;
+        var json = this.el.getJson(null, false);
+        for (var y = 0; y < json.length; y++) {
+
+            //Country
+            var col = ("B").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(1, y);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+
+            //TechnicalArea
+            var col = ("C").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(2, y);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+
+            //Organisation
+            var col = ("D").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(3, y);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+
+            //Program
+            var col = ("E").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(4, y);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+
+        }
+        return valid;
+    }
+
     render() {
         const { realms } = this.state;
         const { languages } = this.state;
@@ -1318,67 +1440,78 @@ class AddUserComponent extends Component {
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
-                                    this.setState({
-                                        loading: true
-                                    })
-                                    console.log("user object--->>>>", this.state.user)
-                                    this.setState({
-                                        message: ''
-                                    })
-                                    console.log("user object---------------------", this.state.user);
-                                    UserService.addNewUser(this.state.user)
-                                        .then(response => {
-                                            if (response.status == 200) {
-                                                this.props.history.push(`/user/listUser/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
-                                            } else {
-                                                this.setState({
-                                                    message: response.data.messageCode, loading: false
-                                                },
-                                                    () => {
-                                                        this.hideSecondComponent();
-                                                    })
-                                            }
 
-                                        }).catch(
-                                            error => {
-                                                if (error.message === "Network Error") {
-                                                    this.setState({
-                                                        message: 'static.unkownError',
-                                                        loading: false
-                                                    });
+                                    let isValid = this.checkValidation();
+                                    console.log("isValid------------>", isValid);
+                                    if (isValid) {
+                                        this.setState({
+                                            loading: true
+                                        })
+                                        console.log("user object--->>>>", this.state.user)
+                                        this.setState({
+                                            message: ''
+                                        })
+                                        console.log("user object---------------------", this.state.user);
+                                        UserService.addNewUser(this.state.user)
+                                            .then(response => {
+                                                if (response.status == 200) {
+                                                    this.props.history.push(`/user/listUser/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                                 } else {
-                                                    switch (error.response ? error.response.status : "") {
+                                                    this.setState({
+                                                        message: response.data.messageCode, loading: false
+                                                    },
+                                                        () => {
+                                                            this.hideSecondComponent();
+                                                        })
+                                                }
 
-                                                        case 401:
-                                                            this.props.history.push(`/login/static.message.sessionExpired`)
-                                                            break;
-                                                        case 403:
-                                                            this.props.history.push(`/accessDenied`)
-                                                            break;
-                                                        case 500:
-                                                        case 404:
-                                                        case 406:
-                                                            this.setState({
-                                                                message: error.response.data.messageCode,
-                                                                loading: false
-                                                            });
-                                                            break;
-                                                        case 412:
-                                                            this.setState({
-                                                                message: error.response.data.messageCode,
-                                                                loading: false
-                                                            });
-                                                            break;
-                                                        default:
-                                                            this.setState({
-                                                                message: 'static.unkownError',
-                                                                loading: false
-                                                            });
-                                                            break;
+                                            }).catch(
+                                                error => {
+                                                    if (error.message === "Network Error") {
+                                                        this.setState({
+                                                            message: 'static.unkownError',
+                                                            loading: false
+                                                        });
+                                                    } else {
+                                                        switch (error.response ? error.response.status : "") {
+
+                                                            case 401:
+                                                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                                                break;
+                                                            case 403:
+                                                                this.props.history.push(`/accessDenied`)
+                                                                break;
+                                                            case 500:
+                                                            case 404:
+                                                            case 406:
+                                                                this.setState({
+                                                                    message: error.response.data.messageCode,
+                                                                    loading: false
+                                                                });
+                                                                break;
+                                                            case 412:
+                                                                this.setState({
+                                                                    message: error.response.data.messageCode,
+                                                                    loading: false
+                                                                });
+                                                                break;
+                                                            default:
+                                                                this.setState({
+                                                                    message: 'static.unkownError',
+                                                                    loading: false
+                                                                });
+                                                                break;
+                                                        }
                                                     }
                                                 }
-                                            }
-                                        );
+                                            );
+                                    } else {
+                                        this.setState({
+                                            message: 'validation fail',
+                                            loading: false
+                                        });
+                                    }
+
                                 }}
                                 render={
                                     ({
@@ -1545,13 +1678,19 @@ class AddUserComponent extends Component {
                                                     <FormFeedback>{errors.languageId}</FormFeedback>
                                                 </FormGroup>
                                                 <FormGroup>
-                                                    <h6><Label htmlFor="select">{'Access control'}</Label></h6>
+                                                    <h5><Label htmlFor="select">{'Access control'}</Label></h5>
                                                 </FormGroup>
 
                                                 <div id="paputableDiv">
 
                                                 </div>
                                             </CardBody>
+                                            <CardFooter>
+                                                <FormGroup>
+                                                    <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>
+                                                    &nbsp;
+                                                </FormGroup>
+                                            </CardFooter>
                                             <Row style={{ display: this.state.loading ? "block" : "none" }}>
                                                 <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                                                     <div class="align-items-center">
@@ -1601,8 +1740,10 @@ class AddUserComponent extends Component {
         this.setState(
             {
                 user
-            }
-        )
+            },
+            () => {
+                this.getAccessControlData();
+            })
     }
 }
 

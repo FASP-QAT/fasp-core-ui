@@ -494,6 +494,29 @@ class ListUserComponent extends Component {
                             </Col>
                         }
                         {/* <div id="loader" className="center"></div> */}
+
+{/* 
+                        <Nav tabs>
+                            <NavItem>
+                                <NavLink
+                                    active={this.state.activeTab1[0] === '1'}
+                                    onClick={() => { this.toggleModal(0, '1'); }}
+                                >
+                                    {i18n.t('static.tree.nodeData')}
+                                </NavLink>
+                            </NavItem>
+                            <NavItem style={{ display: !this.state.currentScenario.extrapolation || this.state.currentItemConfig.context.payload.nodeType.id != 2 ? 'block' : 'none' }}>
+                                <NavLink
+                                    active={this.state.activeTab1[0] === '2'}
+                                    onClick={() => { this.toggleModal(0, '2'); }}
+                                >
+                                    {i18n.t('static.tree.Modeling/Transfer')}
+                                </NavLink>
+                            </NavItem>
+                        </Nav>
+                        <TabContent activeTab={this.state.activeTab1[0]}>
+                            {this.tabPane1()}
+                        </TabContent> */}
                         <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USER') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>
