@@ -2504,7 +2504,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                 <Form onSubmit={handleSubmit} noValidate name='dataEnteredInForm'>
                   {/* <CardBody style={{ display: this.state.loading ? "none" : "block" }}> */}
                   <ModalBody>
+                    <div className="dataEnteredTable">
                     <div id="mapPlanningUnit">
+                    </div>
                     </div>
                     <Label id="dataEnteredInTableExLabel" style={{ display: "none" }} htmlFor="appendedInputButton">{i18n.t('static.dataentry.dataEnteredInTableEx')} <span id="dataEnteredInTableExSpan" /> {i18n.t('static.common.planningUnits')}
                     </Label>
