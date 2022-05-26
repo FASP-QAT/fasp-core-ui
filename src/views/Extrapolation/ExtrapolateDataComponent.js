@@ -1304,7 +1304,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                 "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 4)[0],
                                 "jsonProperties": {
                                     confidenceLevel: this.state.confidenceLevelIdArima,
-                                    seasonality: this.state.seasonality,
+                                    seasonality: this.state.seasonality,                            
                                     p: this.state.p,
                                     d: this.state.d,
                                     q: this.state.q,
@@ -3748,7 +3748,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                             />
                                                             <FormFeedback>{errors.qId}</FormFeedback>
                                                         </div>
-                                                        <div className="tab-ml-1 ml-lg-5 ExtraCheckboxFieldWidth" style={{ marginTop: '38px' }}>
+                                                        <div className="tab-ml-1 ml-lg-5 ExtraCheckboxFieldWidth" style={{marginTop:'38px'}}>
                                                             <Input
                                                                 className="form-check-input checkboxMargin"
                                                                 type="checkbox"
@@ -3763,7 +3763,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                 check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
                                                                 <b>{i18n.t('static.extrapolation.seasonality')}</b>
                                                             </Label>
-                                                        </div>
+                                                        </div>                 
                                                     </div>
                                                 </div>
                                             </FormGroup>

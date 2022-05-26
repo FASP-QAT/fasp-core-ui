@@ -37,6 +37,7 @@ import MonthBox from '../../CommonComponent/MonthBox.js'
 import dataentryScreenshot1 from '../../assets/img/dataentryScreenshot-1.png';
 import dataentryScreenshot2 from '../../assets/img/dataentryScreenshot-2.png';
 import dataentryScreenshot3 from '../../assets/img/dataentryScreenshot-3.png';
+import { round } from "mathjs";
 
 const entityname = i18n.t('static.dashboard.dataEntryAndAdjustment');
 const ref = React.createRef();
@@ -127,7 +128,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     this.filterList = this.filterList.bind(this)
     this.resetClicked = this.resetClicked.bind(this)
     this.buildJexcel = this.buildJexcel.bind(this);
-    this.setDataEnteredIn = this.setDataEnteredIn.bind(this);
+    // this.setDataEnteredIn = this.setDataEnteredIn.bind(this);
     this.saveConsumptionList = this.saveConsumptionList.bind(this);
   }
 
@@ -938,7 +939,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
   }
 
   loadedJexcel = function (instance, cell, x, y, value) {
-    jExcelLoadedFunction(instance);
+    jExcelLoadedFunctionOnlyHideRow(instance);
+
     var elInstance = instance.jexcel;
     var consumptionDataType = this.state.tempConsumptionUnitObject.consumptionDataType;
 
@@ -958,12 +960,16 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       var cell2 = elInstance.getCell(`D3`)//other multiplier
       cell1.classList.remove('readonly');
       cell2.classList.remove('readonly');
+      document.getElementById("dataEnteredInTableExLabel").style.display = "block";
+      document.getElementById("dataEnteredInTableExSpan").innerHTML = Math.round(Number(1 / this.state.tempConsumptionUnitObject.planningUnit.multiplier * this.state.tempConsumptionUnitObject.otherUnit.multiplier).toFixed(4) * 1000);
     } else {
       // console.log("consumptionDataType", consumptionDataType)
       var cell1 = elInstance.getCell(`C3`)//other name
       var cell2 = elInstance.getCell(`D3`)//other multiplier
       cell1.classList.add('readonly');
       cell2.classList.add('readonly');
+      document.getElementById("dataEnteredInTableExLabel").style.display = "none";
+
     }
   }
 
@@ -1468,13 +1474,12 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               var datasetJson = JSON.parse(datasetData);
               console.log("datasetJson@@@@@@@@@@@@@@", datasetJson);
               var consumptionList = datasetJson.actualConsumptionList;
-              var planningUnitList = datasetJson.planningUnitList.filter(c => c.active && c.consuptionForecast);
+              var planningUnitList = datasetJson.planningUnitList.filter(c => c.consuptionForecast);
               planningUnitList.sort((a, b) => {
-                var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                var itemLabelA = (this.state.showInPlanningUnit ? getLabelText(a.planningUnit.label, this.state.lang) : a.consumptionDataType == 1 ? getLabelText(a.planningUnit.forecastingUnit.label, this.state.lang) : a.consumptionDataType == 2 ? getLabelText(a.planningUnit.label, this.state.lang) : getLabelText(a.otherUnit.label, this.state.lang)).toUpperCase(); // ignore upper and lowercase
+                var itemLabelB = (this.state.showInPlanningUnit ? getLabelText(b.planningUnit.label, this.state.lang) : b.consumptionDataType == 1 ? getLabelText(b.planningUnit.forecastingUnit.label, this.state.lang) : b.consumptionDataType == 2 ? getLabelText(b.planningUnit.label, this.state.lang) : getLabelText(b.otherUnit.label, this.state.lang)).toUpperCase(); // ignore upper and lowercase                   
                 return itemLabelA > itemLabelB ? 1 : -1;
               });
-
               var regionList = datasetJson.regionList;
               regionList.sort((a, b) => {
                 var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -2235,14 +2240,14 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                         {this.state.showDetailTable &&
                           <>
                             <FormGroup className="col-md-4">
-                              <Label htmlFor="appendedInputButton">{i18n.t('static.tree.for')} {i18n.t('static.dashboard.planningunitheader')}: {getLabelText(this.state.selectedConsumptionUnitObject.planningUnit.label, this.state.lang)}
+                              <Label htmlFor="appendedInputButton">{i18n.t('static.common.for')} {i18n.t('static.dashboard.planningunitheader')}: <b>{getLabelText(this.state.selectedConsumptionUnitObject.planningUnit.label, this.state.lang)}</b>
                               </Label>
-                              <Label htmlFor="appendedInputButton">{i18n.t('static.common.dataEnteredIn')}: {this.state.tempConsumptionUnitObject.consumptionDataType == 1 ? (this.state.tempConsumptionUnitObject.planningUnit.forecastingUnit.label.label_en) : this.state.tempConsumptionUnitObject.consumptionDataType == 2 ? this.state.tempConsumptionUnitObject.planningUnit.label.label_en : this.state.tempConsumptionUnitObject.otherUnit.label.label_en}
+                              <Label htmlFor="appendedInputButton">{i18n.t('static.common.dataEnteredIn')}: <b>{this.state.tempConsumptionUnitObject.consumptionDataType == 1 ? (this.state.tempConsumptionUnitObject.planningUnit.forecastingUnit.label.label_en) : this.state.tempConsumptionUnitObject.consumptionDataType == 2 ? this.state.tempConsumptionUnitObject.planningUnit.label.label_en : this.state.tempConsumptionUnitObject.otherUnit.label.label_en}</b>
                                 <a className="card-header-action">
-                                  <span style={{ cursor: 'pointer' }} className="hoverDiv" onClick={() => { this.changeUnit(this.state.selectedConsumptionUnitId) }}>({i18n.t('static.dataentry.change')})</span>
+                                  <span style={{ cursor: 'pointer' }} className="hoverDiv" onClick={() => { this.changeUnit(this.state.selectedConsumptionUnitId) }}><u>({i18n.t('static.dataentry.change')})</u></span>
                                 </a>
                               </Label>
-                              <Label htmlFor="appendedInputButton">{i18n.t('static.dataentry.conversionToPu')}: {this.state.tempConsumptionUnitObject.consumptionDataType == 1 ? 1 : this.state.tempConsumptionUnitObject.consumptionDataType == 2 ? this.state.tempConsumptionUnitObject.planningUnit.multiplier : Number(1 / this.state.tempConsumptionUnitObject.planningUnit.multiplier * this.state.tempConsumptionUnitObject.otherUnit.multiplier).toFixed(4)}
+                              <Label htmlFor="appendedInputButton">{i18n.t('static.dataentry.conversionToPu')}: <b>{this.state.tempConsumptionUnitObject.consumptionDataType == 1 ? Number(1 / this.state.tempConsumptionUnitObject.planningUnit.multiplier).toFixed(4) : this.state.tempConsumptionUnitObject.consumptionDataType == 2 ? 1 : Number(1 / this.state.tempConsumptionUnitObject.planningUnit.multiplier * this.state.tempConsumptionUnitObject.otherUnit.multiplier).toFixed(4)}</b>
                               </Label>
 
                             </FormGroup></>}
@@ -2501,6 +2506,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                   <ModalBody>
                     <div id="mapPlanningUnit">
                     </div>
+                    <Label id="dataEnteredInTableExLabel" style={{ display: "none" }} htmlFor="appendedInputButton">{i18n.t('static.dataentry.dataEnteredInTableEx')} <span id="dataEnteredInTableExSpan" /> {i18n.t('static.common.planningUnits')}
+                    </Label>
                   </ModalBody>
                   <ModalFooter>
                     <Button type="submit" size="md" onClick={(e) => { this.touchAll(setTouched, errors) }} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>Submit</Button>
@@ -2744,7 +2751,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     var elInstance = instance.jexcel;
     var rowData = elInstance.getRowData(y);
 
-    this.setDataEnteredIn(rowData[5]);
+    // this.setDataEnteredIn(rowData[5]);
     var consumptionDataType = rowData[5];
     var cell1 = elInstance.getCell(`C1`)//other name
     var cell2 = elInstance.getCell(`C2`)//other name
@@ -2757,18 +2764,19 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     cell2.classList.add('readonly');
 
     if (consumptionDataType == 3) {// grade out
-      console.log("other consumptionDataType")
       var cell1 = elInstance.getCell(`C3`)//other name
       var cell2 = elInstance.getCell(`D3`)//other multiplier
       cell1.classList.remove('readonly');
       cell2.classList.remove('readonly');
-
+      document.getElementById("dataEnteredInTableExLabel").style.display = "block";
+      document.getElementById("dataEnteredInTableExSpan").innerHTML = Math.round(1 / this.state.selectedConsumptionUnitObject.planningUnit.multiplier * Number(rowData[3].toString().replaceAll(',', '')) * 1000);
     } else {
-      console.log("consumptionDataType", consumptionDataType)
+      // console.log("consumptionDataType", consumptionDataType)
       var cell1 = elInstance.getCell(`C3`)//other name
       var cell2 = elInstance.getCell(`D3`)//other multiplier
       cell1.classList.add('readonly');
       cell2.classList.add('readonly');
+      document.getElementById("dataEnteredInTableExLabel").style.display = "none";
     }
     // console.log("stop----", new Date())
 
@@ -2810,10 +2818,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
     this.el.destroy();
 
-    var json = [];
-
     var data = dataArray1;
-
     var options = {
       data: data,
       columnDrag: true,
@@ -2826,47 +2831,37 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         { title: i18n.t('static.dataentry.conversionToPu'), type: 'numeric', decimal: '.', readOnly: true },//4 E
         { title: 'Conversion Type', type: 'hidden' }//5 F
       ],
-      updateTable: function (el, cell, x, y, source, value, id) {
-        if (y != null) {
-
-          var elInstance = el.jexcel;
-          //left align
-          elInstance.setStyle(`C${parseInt(y) + 1}`, 'text-align', 'left');
-        }
-
-      }.bind(this),
-      // selectionCopy: false,
-      // pagination: localStorage.getItem("sesRecordCount"),
-      pagination: 5000000,
-      filters: true,
-      search: true,
-      columnSorting: true,
-      tableOverflow: true,
-      wordWrap: true,
-      paginationOptions: JEXCEL_PAGINATION_OPTION,
-      position: 'top',
-      allowInsertColumn: false,
-      allowManualInsertColumn: false,
-      // allowDeleteRow: true,
-      onchange: this.changed,
-      // oneditionend: this.onedit,
-      copyCompatibility: true,
-      allowManualInsertRow: false,
-      parseFormulas: true,
-      // onpaste: this.onPaste,
-      // oneditionend: this.oneditionend,
       text: {
+        // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
         showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
         show: '',
         entries: '',
       },
+      updateTable: function (el, cell, x, y, source, value, id) {
+      },
       onload: this.loadedJexcel,
-      editable: true,
+      onchange: this.changed,
+      pagination: false,
+      search: false,
+      columnSorting: false,
+      tableOverflow: true,
+      wordWrap: true,
+      allowInsertColumn: false,
+      allowManualInsertColumn: false,
+      allowInsertRow: false,
+      allowManualInsertRow: false,
+      allowDeleteRow: false,
+      copyCompatibility: true,
+      allowExport: false,
+      paginationOptions: JEXCEL_PAGINATION_OPTION,
+      position: 'top',
+      filters: false,
+      freezeColumns: 1,
       license: JEXCEL_PRO_KEY,
-      // contextMenu: false
+      parseFormulas: true,
       contextMenu: function (obj, x, y, e) {
-        return false;
-      }.bind(this)
+        return [];
+      }.bind(this),
     };
     var jexcelDataEl = jexcel(document.getElementById("mapPlanningUnit"), options);
     this.el = jexcelDataEl;
