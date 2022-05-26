@@ -2342,5 +2342,7 @@
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Máx = 7",
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Máx = Menor entre (7,18)",
     "static.dataentry.conversionToPu": "Conversão para PU",
-    "static.dataentry.conversionToFu": "Conversão para FU"
+    "static.dataentry.conversionToFu": "Conversão para FU",
+    "static.dataentry.dataEnteredInTableEx": "por exemplo. Se eu inserir 1.000 unidades, isso será convertido em",
+    "static.common.planningUnits": "unidades de planejamento"
 }

@@ -2342,5 +2342,9 @@
     "static.organisation.organisationheader": "Organization",
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Max = 7",
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )",
-    "static.dataentry.conversionToPu": "Conversion to PU"
+    "static.dataentry.conversionToPu": "Conversion to PU",
+    "static.dataentry.conversionToFu": "Conversion to FU",
+    "static.dataentry.dataEnteredInTableEx": "e.g. If I enter 1,000 units, this will be converted into",
+    "static.common.planningUnits": "planning units"
+
 }
