@@ -5399,6 +5399,7 @@ export default class CreateTreeTemplate extends Component {
                             level: 0,
                             parent: null,
                             sortOrder: "00",
+                            newTemplateFlag: 0,
                             payload: {
                                 nodeId: 1,
                                 label: {
@@ -5489,6 +5490,7 @@ export default class CreateTreeTemplate extends Component {
                         level: 0,
                         parent: null,
                         sortOrder: "00",
+                        newTemplateFlag: 0,
                         payload: {
                             nodeId: 1,
                             label: {
@@ -6505,6 +6507,7 @@ export default class CreateTreeTemplate extends Component {
         } else {
             currentItemConfig.context.isVisible = true;
         }
+        currentItemConfig.context.newTemplateFlag = 1;
         nodes[findNodeIndex] = currentItemConfig.context;
         // nodes[findNodeIndex].valueType = currentItemConfig.valueType;
 
@@ -8460,10 +8463,10 @@ export default class CreateTreeTemplate extends Component {
                                 </div>
                                 <div className="pt-lg-2 pl-lg-0"><i>{i18n.t('static.tree.tableDisplays')} <b>{
                                     this.state.currentItemConfig.context.payload.nodeType.id > 2 ?
-                                            this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.forecastingUnit.unit.id != null && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.forecastingUnit.unit.id != "" ? getLabelText(this.state.unitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.forecastingUnit.unit.id)[0].label, this.state.lang) : ""
-                                                : this.state.currentItemConfig.context.payload.nodeType.id == 5 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.planningUnit.unit.id != "" ? getLabelText(this.state.unitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.planningUnit.unit.id)[0].label, this.state.lang) : ""
-                                                    : this.state.currentItemConfig.context.payload.nodeUnit.id != "" ? getLabelText(this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label, this.state.lang)
-                                            : ""
+                                        this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.forecastingUnit.unit.id != null && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.forecastingUnit.unit.id != "" ? getLabelText(this.state.unitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.forecastingUnit.unit.id)[0].label, this.state.lang) : ""
+                                            : this.state.currentItemConfig.context.payload.nodeType.id == 5 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.planningUnit.unit.id != "" ? getLabelText(this.state.unitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.planningUnit.unit.id)[0].label, this.state.lang) : ""
+                                                : this.state.currentItemConfig.context.payload.nodeUnit.id != "" ? getLabelText(this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label, this.state.lang)
+                                                    : ""
                                         : ""}</b> {i18n.t('static.tree.forNode')} <b>{this.state.currentItemConfig.context.payload.label != null ? getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) : ''}</b> {i18n.t('static.tree.asA%OfParent')} <b>{this.state.currentItemConfig.parentItem.payload.label != null ? getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang) : ''
                                         }</b></i></div>
                                 {/* <div className="pt-lg-2 pl-lg-0"><i>Table displays <b>{getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang)}</b></div> */}
@@ -9298,98 +9301,104 @@ export default class CreateTreeTemplate extends Component {
                                         console.log("template obj---", templateObj);
 
                                         if (template.treeTemplateId == 0) {
-                                            DatasetService.addTreeTemplate(templateObj)
-                                                .then(response => {
-                                                    console.log("after adding tree---", response.data);
-                                                    if (response.status == 200) {
-                                                        var items = response.data.flatList;
-                                                        var arr = [];
-                                                        for (let i = 0; i < items.length; i++) {
+                                            if (template.flatList[0].newTemplateFlag == 0) {
+                                                this.setState({
+                                                    loading: false
+                                                }, () => { alert(i18n.t('static.tree.rootNodeInfoMissing')); });
 
-                                                            if (items[i].payload.nodeType.id == 1 || items[i].payload.nodeType.id == 2) {
-                                                                (items[i].payload.nodeDataMap[0])[0].calculatedDataValue = (items[i].payload.nodeDataMap[0])[0].dataValue;
-                                                            } else {
+                                            } else {
+                                                DatasetService.addTreeTemplate(templateObj)
+                                                    .then(response => {
+                                                        console.log("after adding tree---", response.data);
+                                                        if (response.status == 200) {
+                                                            var items = response.data.flatList;
+                                                            var arr = [];
+                                                            for (let i = 0; i < items.length; i++) {
 
-                                                                var findNodeIndex = items.findIndex(n => n.id == items[i].parent);
-                                                                var parentValue = (items[findNodeIndex].payload.nodeDataMap[0])[0].calculatedDataValue;
-                                                                console.log("api parent value---", parentValue);
-
-                                                                (items[i].payload.nodeDataMap[0])[0].calculatedDataValue = (parentValue * (items[i].payload.nodeDataMap[0])[0].dataValue) / 100;
-                                                                if (this.state.hideFUPUNode) {
-                                                                    if (items[i].payload.nodeType.id == 4 || items[i].payload.nodeType.id == 5) {
-                                                                        items[i].isVisible = false;
-                                                                    }
-                                                                } else if (this.state.hidePUNode && items[i].payload.nodeType.id == 5) {
-                                                                    items[i].isVisible = false;
+                                                                if (items[i].payload.nodeType.id == 1 || items[i].payload.nodeType.id == 2) {
+                                                                    (items[i].payload.nodeDataMap[0])[0].calculatedDataValue = (items[i].payload.nodeDataMap[0])[0].dataValue;
                                                                 } else {
-                                                                    items[i].isVisible = true;
+
+                                                                    var findNodeIndex = items.findIndex(n => n.id == items[i].parent);
+                                                                    var parentValue = (items[findNodeIndex].payload.nodeDataMap[0])[0].calculatedDataValue;
+                                                                    console.log("api parent value---", parentValue);
+
+                                                                    (items[i].payload.nodeDataMap[0])[0].calculatedDataValue = (parentValue * (items[i].payload.nodeDataMap[0])[0].dataValue) / 100;
+                                                                    if (this.state.hideFUPUNode) {
+                                                                        if (items[i].payload.nodeType.id == 4 || items[i].payload.nodeType.id == 5) {
+                                                                            items[i].isVisible = false;
+                                                                        }
+                                                                    } else if (this.state.hidePUNode && items[i].payload.nodeType.id == 5) {
+                                                                        items[i].isVisible = false;
+                                                                    } else {
+                                                                        items[i].isVisible = true;
+                                                                    }
+                                                                }
+                                                                console.log("load---", items[i])
+                                                                // arr.push(items[i]);
+                                                            }
+                                                            this.setState({
+                                                                treeTemplate: response.data,
+                                                                items,
+                                                                message: i18n.t('static.message.addTreeTemplate'),
+                                                                color: 'green',
+                                                                loading: true,
+                                                                isChanged: false
+                                                            }, () => {
+                                                                this.hideSecondComponent();
+                                                                this.calculateMOMData(1, 2);
+                                                            });
+                                                            // this.props.history.push(`/dataset/listTreeTemplate/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
+                                                        } else {
+                                                            this.setState({
+                                                                message: response.data.messageCode, loading: false
+                                                            },
+                                                                () => {
+                                                                    this.hideSecondComponent();
+                                                                })
+                                                        }
+
+                                                    }).catch(
+                                                        error => {
+                                                            if (error.message === "Network Error") {
+                                                                this.setState({
+                                                                    message: 'static.unkownError',
+                                                                    loading: false
+                                                                });
+                                                            } else {
+                                                                switch (error.response ? error.response.status : "") {
+
+                                                                    case 401:
+                                                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                                                        break;
+                                                                    case 403:
+                                                                        this.props.history.push(`/accessDenied`)
+                                                                        break;
+                                                                    case 500:
+                                                                    case 404:
+                                                                    case 406:
+                                                                        this.setState({
+                                                                            message: error.response.data.messageCode,
+                                                                            loading: false
+                                                                        });
+                                                                        break;
+                                                                    case 412:
+                                                                        this.setState({
+                                                                            message: error.response.data.messageCode,
+                                                                            loading: false
+                                                                        });
+                                                                        break;
+                                                                    default:
+                                                                        this.setState({
+                                                                            message: 'static.unkownError',
+                                                                            loading: false
+                                                                        });
+                                                                        break;
                                                                 }
                                                             }
-                                                            console.log("load---", items[i])
-                                                            // arr.push(items[i]);
                                                         }
-                                                        this.setState({
-                                                            treeTemplate: response.data,
-                                                            items,
-                                                            message: i18n.t('static.message.addTreeTemplate'),
-                                                            color: 'green',
-                                                            loading: true,
-                                                            isChanged: false,
-                                                            isTemplateChanged: false
-                                                        }, () => {
-                                                            this.hideSecondComponent();
-                                                            this.calculateMOMData(1, 2);
-                                                        });
-                                                        // this.props.history.push(`/dataset/listTreeTemplate/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
-                                                    } else {
-                                                        this.setState({
-                                                            message: response.data.messageCode, loading: false
-                                                        },
-                                                            () => {
-                                                                this.hideSecondComponent();
-                                                            })
-                                                    }
-
-                                                }).catch(
-                                                    error => {
-                                                        if (error.message === "Network Error") {
-                                                            this.setState({
-                                                                message: 'static.unkownError',
-                                                                loading: false
-                                                            });
-                                                        } else {
-                                                            switch (error.response ? error.response.status : "") {
-
-                                                                case 401:
-                                                                    this.props.history.push(`/login/static.message.sessionExpired`)
-                                                                    break;
-                                                                case 403:
-                                                                    this.props.history.push(`/accessDenied`)
-                                                                    break;
-                                                                case 500:
-                                                                case 404:
-                                                                case 406:
-                                                                    this.setState({
-                                                                        message: error.response.data.messageCode,
-                                                                        loading: false
-                                                                    });
-                                                                    break;
-                                                                case 412:
-                                                                    this.setState({
-                                                                        message: error.response.data.messageCode,
-                                                                        loading: false
-                                                                    });
-                                                                    break;
-                                                                default:
-                                                                    this.setState({
-                                                                        message: 'static.unkownError',
-                                                                        loading: false
-                                                                    });
-                                                                    break;
-                                                            }
-                                                        }
-                                                    }
-                                                );
+                                                    );
+                                            }
                                         } else {
                                             console.log("templateObj for update>>>", templateObj);
                                             DatasetService.updateTreeTemplate(templateObj)
