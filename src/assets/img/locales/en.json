@@ -2537,6 +2537,7 @@
     "static.dataentry.conversionToPu": "Conversion to PU",
     "static.dataentry.conversionToFu": "Conversion to FU",
     "static.dataentry.dataEnteredInTableEx": "e.g. If I enter 1,000 units, this will be converted into",
-    "static.common.planningUnits": "planning units"
+    "static.common.planningUnits": "planning units",
+    "static.tree.rootNodeInfoMissing":"Please update the root node info"
 
 }
