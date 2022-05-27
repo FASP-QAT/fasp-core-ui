@@ -3502,7 +3502,7 @@ export default class CreateTreeTemplate extends Component {
         if (y == 8) {
             var elInstance = this.state.modelingEl;
             var rowData = elInstance.getRowData(x);
-            if (rowData[4] != "" && rowData[4] != null) {
+            if (rowData[4] != "" && rowData[4] != null && rowData[1] != "" && rowData[1] != null && rowData[2] != "" && rowData[2] != null) {
                 this.setState({
                     currentRowIndex: '',
                     // showCalculatorFields: '',
@@ -3529,8 +3529,14 @@ export default class CreateTreeTemplate extends Component {
                         currentEndValueEdit: false
                     });
                 })
-            } else {
+            }  else if (rowData[4] == "" ||  rowData[4] == null) {
                 alert("Please select modeling type before proceeding.");
+            }
+            else if (rowData[1] == "" || rowData[1] == null) {
+                alert("Please select start date before proceeding.");
+            }
+            else if (rowData[2] == "" || rowData[2] == null) {
+                alert("Please select end date before proceeding.");
             }
         }
     }.bind(this)
