@@ -128,7 +128,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     this.filterList = this.filterList.bind(this)
     this.resetClicked = this.resetClicked.bind(this)
     this.buildJexcel = this.buildJexcel.bind(this);
-    // this.setDataEnteredIn = this.setDataEnteredIn.bind(this);
+    this.setDataEnteredIn = this.setDataEnteredIn.bind(this);
     this.saveConsumptionList = this.saveConsumptionList.bind(this);
   }
 
@@ -2241,12 +2241,12 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                           <>
                             <FormGroup className="col-md-4">
                               <Label htmlFor="appendedInputButton">{i18n.t('static.common.for')} {i18n.t('static.dashboard.planningunitheader')}: <b>{getLabelText(this.state.selectedConsumptionUnitObject.planningUnit.label, this.state.lang)}</b>
-                              </Label>
+                              </Label><br/>
                               <Label htmlFor="appendedInputButton">{i18n.t('static.common.dataEnteredIn')}: <b>{this.state.tempConsumptionUnitObject.consumptionDataType == 1 ? (this.state.tempConsumptionUnitObject.planningUnit.forecastingUnit.label.label_en) : this.state.tempConsumptionUnitObject.consumptionDataType == 2 ? this.state.tempConsumptionUnitObject.planningUnit.label.label_en : this.state.tempConsumptionUnitObject.otherUnit.label.label_en}</b>
                                 <a className="card-header-action">
                                   <span style={{ cursor: 'pointer' }} className="hoverDiv" onClick={() => { this.changeUnit(this.state.selectedConsumptionUnitId) }}><u>({i18n.t('static.dataentry.change')})</u></span>
                                 </a>
-                              </Label>
+                              </Label><br/>
                               <Label htmlFor="appendedInputButton">{i18n.t('static.dataentry.conversionToPu')}: <b>{this.state.tempConsumptionUnitObject.consumptionDataType == 1 ? Number(1 / this.state.tempConsumptionUnitObject.planningUnit.multiplier).toFixed(4) : this.state.tempConsumptionUnitObject.consumptionDataType == 2 ? 1 : Number(1 / this.state.tempConsumptionUnitObject.planningUnit.multiplier * this.state.tempConsumptionUnitObject.otherUnit.multiplier).toFixed(4)}</b>
                               </Label>
 
@@ -2504,7 +2504,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                 <Form onSubmit={handleSubmit} noValidate name='dataEnteredInForm'>
                   {/* <CardBody style={{ display: this.state.loading ? "none" : "block" }}> */}
                   <ModalBody>
+                    <div className="dataEnteredTable">
                     <div id="mapPlanningUnit">
+                    </div>
                     </div>
                     <Label id="dataEnteredInTableExLabel" style={{ display: "none" }} htmlFor="appendedInputButton">{i18n.t('static.dataentry.dataEnteredInTableEx')} <span id="dataEnteredInTableExSpan" /> {i18n.t('static.common.planningUnits')}
                     </Label>
@@ -2751,7 +2753,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     var elInstance = instance.jexcel;
     var rowData = elInstance.getRowData(y);
 
-    // this.setDataEnteredIn(rowData[5]);
+    this.setDataEnteredIn(rowData[5]);
     var consumptionDataType = rowData[5];
     var cell1 = elInstance.getCell(`C1`)//other name
     var cell2 = elInstance.getCell(`C2`)//other name

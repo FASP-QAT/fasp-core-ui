@@ -3920,23 +3920,6 @@ export default class BuildTree extends Component {
                 var items = [];
                 if (y == null) {
                     // Sorting
-                    // if (obj.options.columnSorting == true) {
-                    //     // Line
-                    //     items.push({ type: 'line' });
-
-                    //     items.push({
-                    //         title: obj.options.text.orderAscending,
-                    //         onclick: function () {
-                    //             obj.orderBy(x, 0);
-                    //         }
-                    //     });
-                    //     items.push({
-                    //         title: obj.options.text.orderDescending,
-                    //         onclick: function () {
-                    //             obj.orderBy(x, 1);
-                    //         }
-                    //     });
-                    // }
                 } else {
                     // at start
                     if (obj.options.allowInsertRow == true) {
@@ -3963,46 +3946,45 @@ export default class BuildTree extends Component {
                     }
                     // Delete a row
                     if (obj.options.allowDeleteRow == true) {
-                        // region id
-                        // if (obj.getRowData(y)[9] == "" || obj.getRowData(y)[9] == 0) {
-                        items.push({
-                            title: i18n.t("static.common.deleterow"),
-                            onclick: function () {
-                                if (obj.getJson(null, false).length == 1) {
-                                    var data = [];
-                                    data[0] = ''
-                                    data[1] = moment(this.state.currentScenario.month).startOf('month').add(1, 'months').format("YYYY-MM-DD")
-                                    data[2] = this.state.maxMonth
-                                    data[3] = ''
-                                    data[4] = this.state.currentItemConfig.context.payload.nodeType.id == PERCENTAGE_NODE_ID || this.state.currentItemConfig.context.payload.nodeType.id == FU_NODE_ID || this.state.currentItemConfig.context.payload.nodeType.id == PU_NODE_ID ? 5 : '';
-                                    data[5] = ''
-                                    data[6] = ''
-                                    data[7] = ''
-                                    data[8] = cleanUp
-                                    data[9] = ''
-                                    data[10] = ''
-                                    data[11] = ''
-                                    data[12] = 0
-                                    obj.insertRow(data, 0, 1);
-                                    obj.deleteRow(parseInt(y) + 1);
-                                    var col = ("C").concat(parseInt(0) + 1);
-                                    obj.setStyle(col, "background-color", "transparent");
-                                    obj.setComments(col, "");
-                                    var col = ("F").concat(parseInt(0) + 1);
-                                    obj.setStyle(col, "background-color", "transparent");
-                                    obj.setComments(col, "");
-                                    this.setState({
-                                        lastRowDeleted: true,
-                                        scalingTotal: ""
-                                    })
-                                } else {
-                                    obj.deleteRow(parseInt(y));
-                                }
+                        if (obj.getRowData(y)[12] == 0) {
+                            items.push({
+                                title: i18n.t("static.common.deleterow"),
+                                onclick: function () {
+                                    if (obj.getJson(null, false).length == 1) {
+                                        var data = [];
+                                        data[0] = ''
+                                        data[1] = moment(this.state.currentScenario.month).startOf('month').add(1, 'months').format("YYYY-MM-DD")
+                                        data[2] = this.state.maxMonth
+                                        data[3] = ''
+                                        data[4] = this.state.currentItemConfig.context.payload.nodeType.id == PERCENTAGE_NODE_ID || this.state.currentItemConfig.context.payload.nodeType.id == FU_NODE_ID || this.state.currentItemConfig.context.payload.nodeType.id == PU_NODE_ID ? 5 : '';
+                                        data[5] = ''
+                                        data[6] = ''
+                                        data[7] = ''
+                                        data[8] = cleanUp
+                                        data[9] = ''
+                                        data[10] = ''
+                                        data[11] = ''
+                                        data[12] = 0
+                                        obj.insertRow(data, 0, 1);
+                                        obj.deleteRow(parseInt(y) + 1);
+                                        var col = ("C").concat(parseInt(0) + 1);
+                                        obj.setStyle(col, "background-color", "transparent");
+                                        obj.setComments(col, "");
+                                        var col = ("F").concat(parseInt(0) + 1);
+                                        obj.setStyle(col, "background-color", "transparent");
+                                        obj.setComments(col, "");
+                                        this.setState({
+                                            lastRowDeleted: true,
+                                            scalingTotal: ""
+                                        })
+                                    } else {
+                                        obj.deleteRow(parseInt(y));
+                                    }
 
 
-                            }.bind(this)
-                        });
-                        // }
+                                }.bind(this)
+                            });
+                        }
                     }
                 }
 

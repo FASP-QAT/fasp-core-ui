@@ -6401,3 +6401,13 @@ top: calc(20em + 3px);
   padding: 10px;
   border-radius: 5px;
 }
+
+.dataEnteredTable .jexcel>thead>tr>td:nth-child(2) {
+  border: none!important;
+}
+.dataEnteredTable .jexcel>thead>tr>td:nth-child(3) {
+  border: none!important;
+}
+.dataEnteredTable .jexcel>thead>tr>td:nth-child(4) {
+  border: none!important;
+}
