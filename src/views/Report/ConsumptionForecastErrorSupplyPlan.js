@@ -74,6 +74,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
         this.setViewById = this.setViewById.bind(this);
         this.fetchData = this.fetchData.bind(this);
+        this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
     }
 
     toggleAccordion(consumptionUnitId) {
@@ -159,30 +160,6 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                         }
                     }
                 );
-            // .catch(
-            //   error => {
-            //     this.setState({
-            //       programs: [], loading: false
-            //     }, () => { this.consolidatedProgramList() })
-            //     if (error.message === "Network Error") {
-            //       this.setState({ loading: false, message: error.message });
-            //     } else {
-            //       switch (error.response ? error.response.status : "") {
-            //         case 500:
-            //         case 401:
-            //         case 404:
-            //         case 406:
-            //         case 412:
-            //           this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
-            //           break;
-            //         default:
-            //           this.setState({ loading: false, message: 'static.unkownError' });
-            //           break;
-            //       }
-            //     }
-            //   }
-            // );
-
         } else {
             console.log('offline')
             this.consolidatedProgramList()
@@ -537,7 +514,6 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                 }
                 else {
                     // AuthenticationService.setupAxiosInterceptors();
-
                     ProgramService.getActiveProgramPlaningUnitListByProgramId(programId).then(response => {
                         console.log('**JSON.stringify(response.data)' + JSON.stringify(response.data))
                         var listArray = response.data;
@@ -548,7 +524,6 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                             return itemLabelA > itemLabelB ? 1 : -1;
                         });
                         console.log("CheckPU------------------>2", forcastingUnitList);
-
                         listArray.sort((a, b) => {
                             var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
                             var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
@@ -708,7 +683,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         }
     }
 
-    consumptionStockOutCheckbox(event){
+    consumptionStockOutCheckbox(event) {
         var falg = event.target.checked ? 1 : 0
         if (falg) {
             this.fetchData();
@@ -724,207 +699,200 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         forecastingUnitId = document.getElementById("forecastingUnitId").value;
         this.setState({
         }, () => {
-            if (programId > 0 && versionId != 0) {
-                if (versionId.includes('Local')) {
-                    const lan = 'en';
-                    var db1;
-                    var storeOS;
-                    getDatabase();
-                    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                    openRequest.onsuccess = function (e) {
-                        db1 = e.target.result;
-                        var planningunitTransaction = db1.transaction(['equivalencyUnit'], 'readwrite');
-                        var planningunitOs = planningunitTransaction.objectStore('equivalencyUnit');
-                        var planningunitRequest = planningunitOs.getAll();
-                        var planningList = []
-                        planningunitRequest.onerror = function (event) {
-                            // Handle errors!
-                        };
-                        planningunitRequest.onsuccess = function (e) {
-                            var myResult = [];
-                            myResult = planningunitRequest.result;
-                            var filteredEquList = []
-                            for (var i = 0; i < myResult.length; i++) {
-                                if (myResult[i].program != null) {
-                                    if (myResult[i].program.id == programId && myResult[i].active == true) {
-                                        filteredEquList.push(myResult[i]);
-                                    }
-                                } else {
-                                    filteredEquList.push(myResult[i]);
-                                }
-                            }
-                            console.log("filteredEquList---Result-->", filteredEquList);
-                            var filteredEQUnit;
-                            if (forecastingUnitId != -1) {
-                                filteredEQUnit = filteredEquList.filter(c => c.forecastingUnit.id == forecastingUnitId);
-                            } else if (planningUnitId != -1) {
-                                var planningList = this.state.planningUnits;
-                                console.log("planningList---Result-->", planningList);
-                                let filteredPlanningUnit = planningList.filter(c => c.planningUnit.id == planningUnitId)
-                                console.log("filteredPlanningUnit---Result-->", filteredPlanningUnit);
-                                filteredEQUnit = filteredEquList.filter(c => c.forecastingUnit.id == filteredPlanningUnit.forecastingUnit.id)
-                            }
-                            console.log("filteredEQUnit---Result-->", filteredEQUnit);
-                            let EquiUnitList = filteredEQUnit.map(c => c.equivalencyUnit);
-                            console.log("EquiUnitList", EquiUnitList);
-
-
-                            // var filteredEQUnit;
-                            // if (planningUnitId != -1) {
-                            //     planningList = this.state.planningUnits;
-                            //     let filteredPlanningUnit = planningList.filter(c => c.planningUnit.id == planningUnitId)
-                            //     console.log("filteredPlanningUnit---------->1", filteredPlanningUnit);
-                            //     console.log("EquivalencyUnitList---------->1", filteredEquList);
-                            //     filteredEQUnit = filteredEquList.filter(c => c.forecastingUnit.id == filteredPlanningUnit.forecastingUnit.id);
-                            //     console.log("filteredEquList---------->Finala", filteredEQUnit);
-                            // } else if (forecastingUnitId != -1) {
-                            //     console.log("filteredEquList---------->FinalforecastingUnitId", forecastingUnitId);
-                            //     filteredEQUnit = filteredEquList.filter(c => c.forecastingUnit.id == forecastingUnitId);
-                            //     console.log("filteredEquList---------->Finalb", filteredEQUnit);
-                            // }
-                            // let fuList = this.state.forecastingUnits;
-                            // let newList = [];
-                            // for (var i = 0; i < filteredEquList.length; i++) {
-                            //     let temp = fuList.filter(c => c.id == filteredEquList[i].forecastingUnit.id);
-                            //     if (temp.length > 0) {
-                            //         newList.push(filteredEquList[i]);
-                            //     }
-                            // }
-                            // filteredEquList = newList;
-                            // let duplicateEquiUnit = filteredEquList.map(c => c.equivalencyUnit);
-                            // const ids = duplicateEquiUnit.map(o => o.equivalencyUnitId)
-                            // const filteredEQUnit = duplicateEquiUnit.filter(({ equivalencyUnitId }, index) => !ids.includes(equivalencyUnitId, index + 1))
-                            // console.log("EquivalencyUnitList---------->2", filteredEQUnit);
-                            var lang = this.state.lang;
-                            this.setState({
-                                equivalencyUnitList: EquiUnitList.sort(function (a, b) {
-                                    a = getLabelText(a.label, lang).toLowerCase();
-                                    b = getLabelText(b.label, lang).toLowerCase();
-                                    return a < b ? -1 : a > b ? 1 : 0;
-                                }),
-                                programEquivalencyUnitList: filteredEquList,
-                            }, () => {
-                                // this.filterData();
-                            })
-                        }.bind(this);
-                    }.bind(this)
-                } else {//api call
-                    EquivalancyUnitService.getEquivalancyUnitMappingList().then(response => {
-                        console.log("response.status == 200*******", response.status);
-                        if (response.status == 200) {
-                            console.log("EQ1------->", response.data);
-                            var listArray = response.data;
-                            listArray.sort((a, b) => {
-                                var itemLabelA = getLabelText(a.equivalencyUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                                var itemLabelB = getLabelText(b.equivalencyUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
-                                return itemLabelA > itemLabelB ? 1 : -1;
-                            });
-                            var filteredEquList = []
-                            for (var i = 0; i < listArray.length; i++) {
-                                if (listArray[i].program != null) {
-                                    if (listArray[i].program.id == programId && listArray[i].active == true) {
-                                        filteredEquList.push(listArray[i]);
-                                    }
-                                } else {
-                                    filteredEquList.push(listArray[i]);
-                                }
-                            }
-                            console.log("EquivalencyUnitList---------->1", filteredEquList);
-                            // let fuList = this.state.forecastingUnits;
-                            // let newList = [];
-                            // for (var i = 0; i < filteredEquList.length; i++) {
-                            //     let temp = fuList.filter(c => c.id == filteredEquList[i].forecastingUnit.id);
-                            //     if (temp.length > 0) {
-                            //         newList.push(filteredEquList[i]);
-                            //     }
-                            // }
-                            // filteredEquList = newList;
-                            // let duplicateEquiUnit = filteredEquList.map(c => c.equivalencyUnit);
-                            // const ids = duplicateEquiUnit.map(o => o.equivalencyUnitId)
-                            // const filteredEQUnit = duplicateEquiUnit.filter(({ equivalencyUnitId }, index) => !ids.includes(equivalencyUnitId, index + 1))
-                            // console.log("EquivalencyUnitList---------->2", filteredEQUnit);
-                            var filteredEQUnit = [];
-                            if (forecastingUnitId != -1) {
-                                filteredEQUnit = filteredEquList.filter(c => c.forecastingUnit.id == forecastingUnitId);
-                            } else if (planningUnitId != -1) {
-                                var planningList = this.state.planningUnits;
-                                console.log("planningList---Result-->", planningList);
-                                let filteredPlanningUnit = planningList.filter(c => c.planningUnit.id == planningUnitId)
-                                console.log("filteredPlanningUnit---Result-->", filteredPlanningUnit);
-                                filteredEQUnit = filteredEquList.filter(c => c.forecastingUnit.id == filteredPlanningUnit.forecastingUnit.id);
-                                console.log("filteredEQUnit---Result-->", filteredEQUnit);
-                            }
-
-                            let EquiUnitList = filteredEQUnit.map(c => c.equivalencyUnit);
-                            console.log("EquiUnitList", EquiUnitList);
-
-                            var lang = this.state.lang;
-                            this.setState({
-                                equivalencyUnitList: EquiUnitList.sort(function (a, b) {
-                                    a = getLabelText(a.label, lang).toLowerCase();
-                                    b = getLabelText(b.label, lang).toLowerCase();
-                                    return a < b ? -1 : a > b ? 1 : 0;
-                                }),
-                                programEquivalencyUnitList: filteredEquList,
-                            }, () => {
-                                // this.filterData();
-                            })
-                        } else {
-                            this.setState({
-                                message: response.data.messageCode, loading: false
-                            },
-                                () => {
-                                    this.hideSecondComponent();
-                                })
+            // if (programId > 0 && versionId != 0) {
+            if (versionId.includes('Local') || !isSiteOnline()) {
+                // if (versionId.includes('Local')) {
+                const lan = 'en';
+                var db1;
+                var storeOS;
+                getDatabase();
+                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                openRequest.onsuccess = function (e) {
+                    db1 = e.target.result;
+                    var planningunitTransaction = db1.transaction(['equivalencyUnit'], 'readwrite');
+                    var planningunitOs = planningunitTransaction.objectStore('equivalencyUnit');
+                    var planningunitRequest = planningunitOs.getAll();
+                    var planningList = []
+                    planningunitRequest.onerror = function (event) {
+                        // Handle errors!
+                    };
+                    planningunitRequest.onsuccess = function (e) {
+                        var myResult = [];
+                        myResult = planningunitRequest.result;
+                        console.log("Result-->", myResult);
+                        console.log("forecastingUnitId-->", forecastingUnitId)
+                        console.log("planningUnitId--->", planningUnitId);
+                        var filteredEQUnit = [];
+                        if (forecastingUnitId != -1) {
+                            filteredEQUnit = myResult.filter(c => c.forecastingUnit.id == forecastingUnitId && c.active == true);
+                            console.log("filteredEQUnit in forecastingUnitId ---Result-->", filteredEQUnit);
+                        } else if (planningUnitId != -1) {
+                            var planningList = this.state.planningUnits;
+                            console.log("planningList---Result-->", planningList);
+                            let filteredPlanningUnit = planningList.filter(c => c.planningUnit.id == planningUnitId && c.active == true)
+                            console.log("filteredPlanningUnit---Result-->", filteredPlanningUnit[0]);
+                            console.log("filteredPlanningUnit.forecastingUnit.id---Result-->", filteredPlanningUnit[0].forecastingUnit.id);
+                            filteredEQUnit = myResult.filter(c => c.forecastingUnit.id == filteredPlanningUnit[0].forecastingUnit.id)
+                            console.log("filteredEQUnit in Planning ---Result-->", filteredEQUnit);
                         }
-                    })
-                        .catch(
-                            error => {
-                                if (error.message === "Network Error") {
-                                    this.setState({
-                                        message: 'static.unkownError',
-                                        loading: false,
-                                        color: "#BA0C2F",
-                                    });
-                                } else {
-                                    switch (error.response ? error.response.status : "") {
 
-                                        case 401:
-                                            this.props.history.push(`/login/static.message.sessionExpired`)
-                                            break;
-                                        case 403:
-                                            this.props.history.push(`/accessDenied`)
-                                            break;
-                                        case 500:
-                                        case 404:
-                                        case 406:
-                                            this.setState({
-                                                message: error.response.data.messageCode,
-                                                loading: false,
-                                                color: "#BA0C2F",
-                                            });
-                                            break;
-                                        case 412:
-                                            this.setState({
-                                                message: error.response.data.messageCode,
-                                                loading: false,
-                                                color: "#BA0C2F",
-                                            });
-                                            break;
-                                        default:
-                                            this.setState({
-                                                message: 'static.unkownError',
-                                                loading: false,
-                                                color: "#BA0C2F",
-                                            });
-                                            break;
+                        var filteredEquList = [];
+                        if (filteredEQUnit != '') {
+                            for (var i = 0; i < filteredEQUnit.length; i++) {
+                                if (filteredEQUnit[i].program != null) {
+                                    if (filteredEQUnit[i].program.id == programId && filteredEQUnit[i].active == true) {
+                                        filteredEquList.push(filteredEQUnit[i]);
                                     }
+                                } else {
+                                    filteredEquList.push(filteredEQUnit[i]);
                                 }
                             }
-                        );
-                }
+                            if (filteredEquList.length == 0) {
+                                console.log("filteredEquList---Result-->", filteredEquList);
+                                console.log("No EquivalencyUnitData")
+                                this.setState({ message: "No EquivalencyUnitData Available", equivalencyUnitList: [] });
+
+                            }
+                        } else {
+                            this.setState({ message: "No EquivalencyUnitData Available for the selected forcecastingUnit ", equivalencyUnitList: [] });
+                            console.log("No FU associated");
+                        }
+                        console.log("filteredEQUnit---Result-->", filteredEQUnit);
+                        let EquiUnitList = [];
+                        if (filteredEquList.length > 0) {
+                            EquiUnitList = filteredEquList.map(c => c.equivalencyUnit);
+                            console.log("EquiUnitList", EquiUnitList);
+                        }
+
+                        var lang = this.state.lang;
+                        this.setState({
+                            equivalencyUnitList: EquiUnitList.sort(function (a, b) {
+                                a = getLabelText(a.label, lang).toLowerCase();
+                                b = getLabelText(b.label, lang).toLowerCase();
+                                return a < b ? -1 : a > b ? 1 : 0;
+                            }),
+                            programEquivalencyUnitList: filteredEquList,
+                        }, () => {
+                            this.filterData();
+                        })
+                    }.bind(this);
+                }.bind(this)
             }
+            else {//api call
+                if (forecastingUnitId == -1 && planningUnitId != -1) {
+                    var planningList = this.state.planningUnits;
+                    let filteredPlanningUnit = planningList.filter(c => c.planningUnit.id == planningUnitId && c.active == true)
+                    forecastingUnitId = filteredPlanningUnit[0].forecastingUnit.id;
+                }
+
+                EquivalancyUnitService.getEquivalencyUnitMappingForForecastingUnit(forecastingUnitId, programId).then(response => {
+                    console.log("response.status == 200*******", response.status);
+                    if (response.status == 200) {
+                        console.log("EQ1------->", response.data);
+                        var listArray = response.data;
+                        listArray.sort((a, b) => {
+                            var itemLabelA = getLabelText(a.equivalencyUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                            var itemLabelB = getLabelText(b.equivalencyUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        });
+                        var filteredEquList = []
+                        // for (var i = 0; i < listArray.length; i++) {
+                        //     if (listArray[i].program != null) {
+                        //         if (listArray[i].program.id == programId && listArray[i].active == true) {
+                        //             filteredEquList.push(listArray[i]);
+                        //         }
+                        //     } else {
+                        //         filteredEquList.push(listArray[i]);
+                        //     }
+                        // }
+                        console.log("EquivalencyUnitList---------->1", filteredEquList);
+                        // var filteredEQUnit = [];
+                        // if (forecastingUnitId != -1) {
+                        //     filteredEQUnit = filteredEquList.filter(c => c.forecastingUnit.id == forecastingUnitId);
+                        // } else if (planningUnitId != -1) {
+                        //     var planningList = this.state.planningUnits;
+                        //     console.log("planningList---Result-->", planningList);
+                        //     let filteredPlanningUnit = planningList.filter(c => c.planningUnit.id == planningUnitId)
+                        //     console.log("filteredPlanningUnit---Result-->", filteredPlanningUnit);
+                        //     filteredEQUnit = filteredEquList.filter(c => c.forecastingUnit.id == filteredPlanningUnit.forecastingUnit.id);
+                        //     console.log("filteredEQUnit---Result-->", filteredEQUnit);
+                        // }
+
+                        // let EquiUnitList = filteredEQUnit.map(c => c.equivalencyUnit);
+                        // console.log("EquiUnitList", EquiUnitList);
+
+                        var lang = this.state.lang;
+                        this.setState({
+                            // equivalencyUnitList: EquiUnitList.sort(function (a, b) {
+                            //     a = getLabelText(a.label, lang).toLowerCase();
+                            //     b = getLabelText(b.label, lang).toLowerCase();
+                            //     return a < b ? -1 : a > b ? 1 : 0;
+                            // }),
+                            equivalencyUnitList: listArray,
+                            // programEquivalencyUnitList: filteredEquList,
+                        }, () => {
+                            this.filterData();
+                        })
+                    } else {
+                        this.setState({
+                            message: response.data.messageCode, loading: false
+                        },
+                            () => {
+                                this.hideSecondComponent();
+                            })
+                    }
+                })
+                    .catch(
+                        error => {
+                            if (error.message === "Network Error") {
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
+
+                                    case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
+                                    case 404:
+                                    case 406:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false,
+                                            color: "#BA0C2F",
+                                        });
+                                        break;
+                                    case 412:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false,
+                                            color: "#BA0C2F",
+                                        });
+                                        break;
+                                    default:
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false,
+                                            color: "#BA0C2F",
+                                        });
+                                        break;
+                                }
+                            }
+                        }
+                    );
+            }
+            // }
         })
+    }
+
+    _handleClickRangeBox(e) {
+        this.refs.pickRange.show()
     }
 
     fetchData() {
@@ -1049,7 +1017,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                             consumptionforecastQty = consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(curDate).format("YYYY-MM") && c.actualFlag == false && c.active == true && c.region.id == regionList[k].regionId);
                                             if (consumptionforecastQty.length > 0) {
                                                 for (var con = 0; con < consumptionforecastQty.length; con++) {
-                                                    forecastQty += consumptionforecastQty[con].consumptionQty;
+                                                    forecastQty += consumptionforecastQty[con].consumptionQty * consumptionforecastQty[con].multiplier;
                                                 }
                                             } else {
                                                 forecastQty = "";
@@ -1057,7 +1025,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                             consumptionactualQty = consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(curDate).format("YYYY-MM") && c.actualFlag == true && c.active == true && c.region.id == regionList[k].regionId);
                                             if (consumptionactualQty.length > 0) {
                                                 for (var con = 0; con < consumptionactualQty.length; con++) {
-                                                    actualQty += consumptionactualQty[con].consumptionQty;
+                                                    actualQty += consumptionactualQty[con].consumptionQty * consumptionforecastQty[con].multiplier;
                                                     daysOfStockOut += consumptionactualQty[con].dayOfStockOut;
                                                     // consumptionQtyOutOfStockData += consumptionactualQty[con].consumptionQty / (noOfDays - consumptionactualQty[con].dayOfStockOut) * noOfDays;
                                                 }
@@ -1295,6 +1263,17 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                     );
             }
 
+        } else if (programId == -1) {//validation message            
+            this.setState({ message: i18n.t('static.common.selectProgram'), monthArrayList: [], datasetList: [], versions: [], planningUnits: [], planningUnitValues: [], planningUnitLabels: [], forecastingUnits: [], forecastingUnitValues: [], forecastingUnitLabels: [], equivalencyUnitList: [], programId: '', versionId: '', forecastPeriod: '', yaxisEquUnit: -1 });
+
+        } else if (versionId == -1) {
+            this.setState({ message: i18n.t('static.program.validversion'), monthArrayList: [], datasetList: [], planningUnits: [], planningUnitValues: [], planningUnitLabels: [], forecastingUnits: [], forecastingUnitValues: [], forecastingUnitLabels: [], equivalencyUnitList: [], versionId: '', forecastPeriod: '', yaxisEquUnit: -1 });
+
+        } else if (viewById == 1 && planningUnitId == -1) {
+            this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), monthArrayList: [], datasetList: [], planningUnitValues: [], planningUnitLabels: [], forecastingUnitValues: [], forecastingUnitLabels: [] });
+
+        } else if (viewById == 2 && forecastingUnitId.length == -1) {
+            this.setState({ message: i18n.t('static.planningunit.forcastingunittext'), monthArrayList: [], datasetList: [], planningUnitValues: [], planningUnitLabels: [], forecastingUnitValues: [], forecastingUnitLabels: [] });
         }
     }
 
@@ -1799,9 +1778,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                         type="checkbox"
                                                         id="consumptionAdjusted"
                                                         name="consumptionAdjusted"
-                                                    // checked={true}
-                                                    // checked={this.state.yaxisEquUnit}
-                                                    onClick={(e) => { this.consumptionStockOutCheckbox(e); }}
+                                                        // checked={true}
+                                                        // checked={this.state.yaxisEquUnit}
+                                                        onClick={(e) => { this.consumptionStockOutCheckbox(e); }}
                                                     />
                                                     <Label
                                                         className="form-check-label"
@@ -1847,7 +1826,8 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                                 var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
                                                                 totalError += Number(data[0].errorPerc);
                                                                 countError += 1;
-                                                                return (<td><NumberFormat displayType={'text'} thousandSeparator={true} />{data[0].errorPerc}</td>)
+                                                                return (<td><NumberFormat displayType={'text'} thousandSeparator={true} />{parseFloat(data[0].errorPerc).toFixed(2)}</td>)
+
                                                             })}
                                                             <td className="sticky-col first-col clone hoverTd" align="left">{totalError / countError}</td>
                                                         </tr>
@@ -1860,7 +1840,8 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                                 var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
                                                                 totalForcaste += Number(data[0].forecastQty);
                                                                 countForcaste += 1;
-                                                                return (<td><NumberFormat displayType={'text'} thousandSeparator={true} />{data[0].forecastQty}</td>)
+                                                                return (<td><NumberFormat displayType={'text'} thousandSeparator={true} /> {(Number(data[0].forecastQty).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>)
+
                                                             })}
                                                             <td className="sticky-col first-col clone hoverTd" align="left">{totalForcaste / countForcaste}</td>
                                                         </tr>
@@ -1874,7 +1855,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                                     var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.regionData[0].region.id == r.regionId)
                                                                     totalRegion += Number(data[0].forecastQty);
                                                                     totalRegionCount += 1;
-                                                                    return (<td><NumberFormat displayType={'text'} thousandSeparator={true} />{data[0].forecastQty}</td>)
+                                                                    return (<td><NumberFormat displayType={'text'} thousandSeparator={true} />{(Number(data[0].forecastQty).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>)
                                                                 })}
                                                                 <td className="sticky-col first-col clone text-left">{totalRegion / totalRegionCount}</td>
                                                             </tr>)
@@ -1903,7 +1884,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                                     var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.regionData[0].region.id == r.regionId)
                                                                     totalRegion += Number(this.state.consumptionAdjForStockOutId ? (data[0].actualQty / (item1.noOfDays - data[0].daysOfStockOut) * item1.noOfDays) : data[0].actualQty);
                                                                     totalRegionCount += 1;
-                                                                    totalDaysOfStockOut+=data[0].daysOfStockOut;
+                                                                    totalDaysOfStockOut += data[0].daysOfStockOut;
                                                                     return (<td><NumberFormat displayType={'text'} thousandSeparator={true} />{this.state.consumptionAdjForStockOutId ? (data[0].actualQty / (item1.noOfDays - data[0].daysOfStockOut) * item1.noOfDays) : data[0].actualQty}</td>)
                                                                 })}
                                                                 <td className="sticky-col first-col clone text-left">{totalRegion / totalRegionCount}</td>
