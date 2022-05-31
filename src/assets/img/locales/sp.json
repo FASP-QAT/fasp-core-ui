@@ -2340,5 +2340,11 @@
     "static.supplyPlanFormula.maxMonthOfStockEx2": "Max = MIN ([MAX (4,3) +3], 18)",
     "static.organisation.organisationheader": "Organización",
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Max = 7",
-    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18)"
+    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18)",
+    "static.dashboard.procurementagenttypeheader": "Tipo de agente de compras",
+    "static.dashboard.procurementagenttype": "Tipo de agente de compras",
+    "static.procurementagenttype.codetext": "El nombre para mostrar del tipo de agente de adquisiciones es obligatorio",
+    "static.procurementAgenTtype.procurementagenttypenametext": "El nombre del tipo de agente de compras es obligatorio",
+    "static.procurementagenttype.procurementtypename": "Nombre del tipo de agente de compras",
+    "static.procurementagenttype.procurementagenttypecode": "Nombre para mostrar del tipo de agente de compras"
 }
