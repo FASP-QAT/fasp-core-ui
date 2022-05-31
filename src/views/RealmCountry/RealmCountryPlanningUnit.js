@@ -114,7 +114,7 @@ class PlanningUnitCountry extends Component {
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
                 var index = (instance.jexcel).getValue(`I${parseInt(data[i].y) + 1}`, true);
-                if (index == "" || index == null || index == undefined) {
+                if (index === "" || index == null || index == undefined) {
                     (instance.jexcel).setValueFromCoords(7, data[i].y, this.props.match.params.realmCountryId, true);
                     (instance.jexcel).setValueFromCoords(8, data[i].y, 0, true);
                     (instance.jexcel).setValueFromCoords(9, data[i].y, 1, true);
