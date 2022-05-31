@@ -3532,7 +3532,7 @@ export default class CreateTreeTemplate extends Component {
                         currentEndValueEdit: false
                     });
                 })
-            }  else if (rowData[4] == "" ||  rowData[4] == null) {
+            } else if (rowData[4] == "" || rowData[4] == null) {
                 alert("Please select modeling type before proceeding.");
             }
             else if (rowData[1] == "" || rowData[1] == null) {
@@ -9349,7 +9349,8 @@ export default class CreateTreeTemplate extends Component {
                                                                 message: i18n.t('static.message.addTreeTemplate'),
                                                                 color: 'green',
                                                                 loading: true,
-                                                                isChanged: false
+                                                                isChanged: false,
+                                                                isTemplateChanged: false
                                                             }, () => {
                                                                 this.hideSecondComponent();
                                                                 this.calculateMOMData(1, 2);

@@ -546,7 +546,7 @@ export default class QunatimedImportStepTwo extends Component {
                                 { type: 'text', readOnly: true },
                                 { type: 'dropdown', source: programPlanningUnitsArr, autocomplete: true },
                                 { type: 'hidden' },
-                                { type: 'numeric', mask: '#,##.##', decimal: '.', readOnly: true },
+                                { type: 'numeric', mask: '#,##.00', decimal: '.', readOnly: true },
                             ],
                             text: {
                                 // showingPage: 'Showing {0} to {1} of {1}',
