@@ -1808,7 +1808,7 @@ export default class ConsumptionDetails extends React.Component {
                             {this.state.showProblemDashboard == 1 && <ProblemListDashboard problemListUnFilttered={this.state.problemReportListUnFiltered} problemCategoryList={this.state.problemCategoryList} problemStatusList={this.state.problemStatusList} />}
 
                             {/* <div className="ProgramListSearch"> */}
-                            <div id="tableDiv">
+                            <div id="tableDiv" className='consumptionDataEntryTable'>
                             </div>
                             {/* </div> */}
                         </div>

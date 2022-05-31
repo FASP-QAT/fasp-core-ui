@@ -1375,7 +1375,7 @@ class ProductValidation extends Component {
 
                                         {/* // <div className="table-scroll">
                                                     // <div className="table-wrap table-responsive"> */}
-                                        <div id="tableDiv" className="jexcelremoveReadonlybackground" style={{ display: !this.state.loading ? "block" : "none" }}>
+                                        <div id="tableDiv" className="jexcelremoveReadonlybackground consumptionDataEntryTable" style={{ display: !this.state.loading ? "block" : "none" }}>
                                         </div>
                                         {/* // </div>
                                                 // </div> */}

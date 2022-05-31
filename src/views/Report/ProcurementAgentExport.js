@@ -2757,7 +2757,7 @@ class ProcurementAgentExport extends Component {
                             </div>
                         </div>
                         <div className="ReportSearchMarginTop" style={{ display: this.state.loading ? "none" : "block" }}>
-                            <div id="tableDiv" className="jexcelremoveReadonlybackground">
+                            <div id="tableDiv" className="jexcelremoveReadonlybackground consumptionDataEntryTable">
                             </div>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>

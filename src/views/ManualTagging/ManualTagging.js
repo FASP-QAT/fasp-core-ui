@@ -3223,7 +3223,7 @@ export default class ManualTagging extends Component {
                                     </FormGroup>}
                             </Row>
 
-                            <div className="ReportSearchMarginTop" style={{ display: this.state.loading ? "none" : "block" }}>
+                            <div className="ReportSearchMarginTop consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
                                 <div id="tableDiv" className="jexcelremoveReadonlybackground RowClickable">
                                 </div>
                             </div>
