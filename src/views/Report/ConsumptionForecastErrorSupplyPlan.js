@@ -57,6 +57,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             viewById: 1,
             planningUnitId: "",
             forecastingUnitId: "",
+            equivalencyUnitId: "",
             consumptionData: [],
             equivalencyUnitList: [],
             programEquivalencyUnitList: [],
@@ -447,6 +448,18 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         })
     }
 
+    setYaxisEquUnitId(e) {
+        var equivalencyUnitId = document.getElementById("equivelencyUnitDiv");
+        var selectedText = equivalencyUnitId.options[equivalencyUnitId.selectedIndex].text;
+        this.setState({
+            equivalencyUnitId: e.target.value,
+            equivalencyUnitLabel: selectedText,
+            show: false
+        }, () => {
+            this.fetchData();
+        })
+    }
+
     getPlanningUnitAndForcastingUnit = () => {
         let programId = document.getElementById("programId").value;
         let versionId = document.getElementById("versionId").value;
@@ -676,8 +689,12 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
 
         var falg = event.target.checked ? 1 : 0
         if (falg) {
-            document.getElementById("equivelencyUnitDiv").style.display = "block";
-            this.getEquivalencyUnitData();
+            this.setState({
+                // viewById : 3
+            }, () => {
+                document.getElementById("equivelencyUnitDiv").style.display = "block";
+                this.getEquivalencyUnitData();
+            })
         } else {
             document.getElementById("equivelencyUnitDiv").style.display = "none";
         }
@@ -748,12 +765,14 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                 }
                             }
                             if (filteredEquList.length == 0) {
+                                document.getElementById("equivelencyUnitDiv").style.display = "none";
                                 console.log("filteredEquList---Result-->", filteredEquList);
                                 console.log("No EquivalencyUnitData")
                                 this.setState({ message: "No EquivalencyUnitData Available", equivalencyUnitList: [] });
-
                             }
                         } else {
+
+                            document.getElementById("equivelencyUnitDiv").style.display = "none";
                             this.setState({ message: "No EquivalencyUnitData Available for the selected forcecastingUnit ", equivalencyUnitList: [] });
                             console.log("No FU associated");
                         }
@@ -773,7 +792,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                             }),
                             programEquivalencyUnitList: filteredEquList,
                         }, () => {
-                            this.filterData();
+                            this.fetchData();
                         })
                     }.bind(this);
                 }.bind(this)
@@ -790,49 +809,55 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                     if (response.status == 200) {
                         console.log("EQ1------->", response.data);
                         var listArray = response.data;
-                        listArray.sort((a, b) => {
-                            var itemLabelA = getLabelText(a.equivalencyUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                            var itemLabelB = getLabelText(b.equivalencyUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
-                            return itemLabelA > itemLabelB ? 1 : -1;
-                        });
-                        var filteredEquList = []
-                        // for (var i = 0; i < listArray.length; i++) {
-                        //     if (listArray[i].program != null) {
-                        //         if (listArray[i].program.id == programId && listArray[i].active == true) {
-                        //             filteredEquList.push(listArray[i]);
-                        //         }
-                        //     } else {
-                        //         filteredEquList.push(listArray[i]);
-                        //     }
-                        // }
-                        console.log("EquivalencyUnitList---------->1", filteredEquList);
-                        // var filteredEQUnit = [];
-                        // if (forecastingUnitId != -1) {
-                        //     filteredEQUnit = filteredEquList.filter(c => c.forecastingUnit.id == forecastingUnitId);
-                        // } else if (planningUnitId != -1) {
-                        //     var planningList = this.state.planningUnits;
-                        //     console.log("planningList---Result-->", planningList);
-                        //     let filteredPlanningUnit = planningList.filter(c => c.planningUnit.id == planningUnitId)
-                        //     console.log("filteredPlanningUnit---Result-->", filteredPlanningUnit);
-                        //     filteredEQUnit = filteredEquList.filter(c => c.forecastingUnit.id == filteredPlanningUnit.forecastingUnit.id);
-                        //     console.log("filteredEQUnit---Result-->", filteredEQUnit);
-                        // }
+                        if (listArray.length == 0) {
+                            document.getElementById("equivelencyUnitDiv").style.display = "none";
+                            this.setState({ message: 'No EquivalencyUnitData Available for the selected forcecastingUnit' });
+                        } else {
 
-                        // let EquiUnitList = filteredEQUnit.map(c => c.equivalencyUnit);
-                        // console.log("EquiUnitList", EquiUnitList);
+                            listArray.sort((a, b) => {
+                                var itemLabelA = getLabelText(a.equivalencyUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                                var itemLabelB = getLabelText(b.equivalencyUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                                return itemLabelA > itemLabelB ? 1 : -1;
+                            });
+                            var filteredEquList = []
+                            // for (var i = 0; i < listArray.length; i++) {
+                            //     if (listArray[i].program != null) {
+                            //         if (listArray[i].program.id == programId && listArray[i].active == true) {
+                            //             filteredEquList.push(listArray[i]);
+                            //         }
+                            //     } else {
+                            //         filteredEquList.push(listArray[i]);
+                            //     }
+                            // }
+                            console.log("EquivalencyUnitList---------->1", filteredEquList);
+                            // var filteredEQUnit = [];
+                            // if (forecastingUnitId != -1) {
+                            //     filteredEQUnit = filteredEquList.filter(c => c.forecastingUnit.id == forecastingUnitId);
+                            // } else if (planningUnitId != -1) {
+                            //     var planningList = this.state.planningUnits;
+                            //     console.log("planningList---Result-->", planningList);
+                            //     let filteredPlanningUnit = planningList.filter(c => c.planningUnit.id == planningUnitId)
+                            //     console.log("filteredPlanningUnit---Result-->", filteredPlanningUnit);
+                            //     filteredEQUnit = filteredEquList.filter(c => c.forecastingUnit.id == filteredPlanningUnit.forecastingUnit.id);
+                            //     console.log("filteredEQUnit---Result-->", filteredEQUnit);
+                            // }
 
-                        var lang = this.state.lang;
-                        this.setState({
-                            // equivalencyUnitList: EquiUnitList.sort(function (a, b) {
-                            //     a = getLabelText(a.label, lang).toLowerCase();
-                            //     b = getLabelText(b.label, lang).toLowerCase();
-                            //     return a < b ? -1 : a > b ? 1 : 0;
-                            // }),
-                            equivalencyUnitList: listArray,
-                            // programEquivalencyUnitList: filteredEquList,
-                        }, () => {
-                            this.filterData();
-                        })
+                            // let EquiUnitList = filteredEQUnit.map(c => c.equivalencyUnit);
+                            // console.log("EquiUnitList", EquiUnitList);
+
+                            var lang = this.state.lang;
+                            this.setState({
+                                // equivalencyUnitList: EquiUnitList.sort(function (a, b) {
+                                //     a = getLabelText(a.label, lang).toLowerCase();
+                                //     b = getLabelText(b.label, lang).toLowerCase();
+                                //     return a < b ? -1 : a > b ? 1 : 0;
+                                // }),
+                                equivalencyUnitList: listArray,
+                                // programEquivalencyUnitList: filteredEquList,
+                            }, () => {
+                                this.fetchData();
+                            })
+                        }
                     } else {
                         this.setState({
                             message: response.data.messageCode, loading: false
@@ -902,14 +927,15 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         let stopDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
         let viewById = this.state.viewById
-        let yaxisEquUnit = document.getElementById("yaxisEquUnit").value;
         let consumptionAdjForStockOutId = document.getElementById("consumptionAdjusted").value;
         console.log("viewById----", viewById)
         let regionIds = this.state.regionValues.map(ele => (ele.value).toString())
         let regionList = this.state.regions;
         var dataList = [];
+        let equivalencyUnitId = -1;
         let planningUnitId = -1;
         let forecastingUnitId = -1;
+        equivalencyUnitId = document.getElementById("yaxisEquUnit").value;
         planningUnitId = document.getElementById("planningUnitId").value
         forecastingUnitId = document.getElementById("forecastingUnitId").value;
         var planningUnitIdList = [];
@@ -1025,7 +1051,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                             consumptionactualQty = consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(curDate).format("YYYY-MM") && c.actualFlag == true && c.active == true && c.region.id == regionList[k].regionId);
                                             if (consumptionactualQty.length > 0) {
                                                 for (var con = 0; con < consumptionactualQty.length; con++) {
-                                                    actualQty += consumptionactualQty[con].consumptionQty * consumptionforecastQty[con].multiplier;
+                                                    actualQty += consumptionactualQty[con].consumptionQty * consumptionactualQty[con].multiplier;
                                                     daysOfStockOut += consumptionactualQty[con].dayOfStockOut;
                                                     // consumptionQtyOutOfStockData += consumptionactualQty[con].consumptionQty / (noOfDays - consumptionactualQty[con].dayOfStockOut) * noOfDays;
                                                 }
@@ -1189,14 +1215,16 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                     loading: true
                 })
                 console.log("viewBy--->", viewById);
+                console.log("equivalencyUnitId--->", equivalencyUnitId);
+
                 var inputjson = {
                     programId: programId,
                     versionId: versionId,
-                    viewBy: viewById,
-                    unitId: viewById == 1 ? planningUnitId : forecastingUnitId,
+                    viewBy: equivalencyUnitId != '' ? 3 : viewById,
+                    unitId: equivalencyUnitId != '' ? equivalencyUnitId : viewById == 1 ? planningUnitId : forecastingUnitId,
                     startDate: startDate,
                     stopDate: stopDate,
-                    equivalencyUnitId: 0,
+                    equivalencyUnitId: equivalencyUnitId,
                     regionIds: regionIds
                 }
                 console.log("JSON INPUT---------->", inputjson);
@@ -1272,10 +1300,460 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         } else if (viewById == 1 && planningUnitId == -1) {
             this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), monthArrayList: [], datasetList: [], planningUnitValues: [], planningUnitLabels: [], forecastingUnitValues: [], forecastingUnitLabels: [] });
 
-        } else if (viewById == 2 && forecastingUnitId.length == -1) {
+        } else if (viewById == 2 && forecastingUnitId == -1) {
             this.setState({ message: i18n.t('static.planningunit.forcastingunittext'), monthArrayList: [], datasetList: [], planningUnitValues: [], planningUnitLabels: [], forecastingUnitValues: [], forecastingUnitLabels: [] });
         }
     }
+
+    addDoubleQuoteToRowContent = (arr) => {
+        return arr.map(ele => '"' + ele + '"')
+    }
+
+    exportCSV() {
+
+        var csvRow = [];
+        csvRow.push('"' + (i18n.t('static.supplyPlan.runDate') + ' : ' + moment(new Date()).format(`${DATE_FORMAT_CAP}`)).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.supplyPlan.runTime') + ' : ' + moment(new Date()).format('hh:mm A')).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.user.user') + ' : ' + AuthenticationService.getLoggedInUsername()).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + " " + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.report.versionFinal*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        // csvRow.push('"' + ('Report View' + ' : ' + document.getElementById("viewById").value == 1 ? 'PlanningUnit' : 'ForecastingUnit').replaceAll(' ', '%20') + '"')
+        // csvRow.push('')
+        if (document.getElementById("viewById").value == 1) {
+            csvRow.push('"' + ('Planning Unit' + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+            csvRow.push('')
+        } else {
+            csvRow.push('"' + ('Forecasting unit' + ' : ' + document.getElementById("forecastingUnitId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+            csvRow.push('')
+        }
+        this.state.regions.map(ele =>
+            csvRow.push('"' + ('Region' + ' : ' + getLabelText(ele.label, this.state.lang)).replaceAll(' ', '%20') + '"'))
+        csvRow.push('')
+        csvRow.push('"' + ('Show consumption adjusted for stock out' + ' : ' + document.getElementById("consumptionAdjusted")).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        // csvRow.push('"' + (i18n.t('static.forecastReport.yAxisInEquivalencyUnit') + ' : ' + document.getElementById("yaxisEquUnit").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        // csvRow.push('')
+        csvRow.push('')
+        csvRow.push('')
+
+        var columns = [];
+        columns.push('');
+        this.state.monthArray.map(item => (
+            columns.push(moment(item.date).format(DATE_FORMAT_CAP_WITHOUT_DATE))
+        ))
+        columns.push('Average'.replaceAll(' ', '%20'));
+        let headers = [];
+        columns.map((item, idx) => { headers[idx] = (item).replaceAll(' ', '%20') });
+        var A = [this.addDoubleQuoteToRowContent(headers)];
+
+        var totalError = 0;
+        var countError = 0;
+        var totalForcaste = 0;
+        var countForcaste = 0;
+        var totalActual = 0;
+        var countActual = 0;
+        var totalDifference = 0;
+        var countDifference = 0;
+        var datacsv = [];
+        datacsv.push([(('Error*').replaceAll(',', ' ')).replaceAll(' ', '%20')])
+        this.state.monthArray.map((item1, count) => {
+            var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
+            totalError += Number(data[0].errorPerc);
+            countError += 1;
+            datacsv.push((data[0].errorPerc))
+        })
+        datacsv.push((totalError / countError));
+        // datacsv.push(this.state.showInPlanningUnit ? Math.round(totalPU) : Math.round(total));
+        // datacsv.push("100 %");
+        A.push(this.addDoubleQuoteToRowContent(datacsv))
+
+        datacsv = [];
+        datacsv.push([(('Forcaste').replaceAll(',', ' ')).replaceAll(' ', '%20')])
+        this.state.monthArray.map((item1, count) => {
+            var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
+            totalForcaste += Number(data[0].forecastQty);
+            countForcaste += 1;
+            datacsv.push((data[0].forecastQty))
+        })
+        datacsv.push((totalForcaste / countForcaste));
+        A.push(this.addDoubleQuoteToRowContent(datacsv))
+
+        this.state.regions.map(r => {
+            var datacsv = [];
+            var totalRegion = 0;
+            var totalRegionCount = 0;
+            datacsv.push((getLabelText(r.label, this.state.lang)).replaceAll(' ', '%20'))
+            {
+                this.state.monthArray.map((item1, count) => {
+                    var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.regionData[0].region.id == r.regionId)
+                    totalRegion += Number(data[0].forecastQty);
+                    totalRegionCount += 1;
+                    datacsv.push(data[0].forecastQty)
+                })
+            }
+            datacsv.push((totalRegion / totalRegionCount));
+            A.push(this.addDoubleQuoteToRowContent(datacsv))
+        });
+
+        datacsv = [];
+        datacsv.push([(('Actual').replaceAll(',', ' ')).replaceAll(' ', '%20')])
+        this.state.monthArray.map((item1, count) => {
+            var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
+            totalActual += Number(data[0].actualQty);
+            countActual += 1;
+            datacsv.push((data[0].actualQty))
+        })
+        datacsv.push((totalActual / countActual));
+        A.push(this.addDoubleQuoteToRowContent(datacsv))
+
+        this.state.regions.map(r => {
+            var datacsv = [];
+            var totalRegion = 0;
+            var totalRegionCount = 0;
+            datacsv.push((getLabelText(r.label, this.state.lang)).replaceAll(' ', '%20'))
+            {
+                this.state.monthArray.map((item1, count) => {
+                    var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.regionData[0].region.id == r.regionId)
+                    totalRegion += Number(data[0].actualQty);
+                    totalRegionCount += 1;
+                    datacsv.push(data[0].actualQty)
+                })
+            }
+            datacsv.push((totalRegion / totalRegionCount));
+            A.push(this.addDoubleQuoteToRowContent(datacsv))
+        });
+        datacsv = [];
+        datacsv.push([(('Difference').replaceAll(',', ' ')).replaceAll(' ', '%20')])
+        this.state.monthArray.map((item1, count) => {
+            var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
+            totalDifference += Number(data[0].actualQty) - Number(data[0].forecastQty);
+            countDifference += 1;
+            datacsv.push((data[0].actualQty) - (data[0].forecastQty))
+        })
+        datacsv.push((totalDifference / countDifference));
+        A.push(this.addDoubleQuoteToRowContent(datacsv))
+
+        this.state.regions.map(r => {
+            var datacsv = [];
+            var totalRegion = 0;
+            var totalRegionCount = 0;
+            datacsv.push((getLabelText(r.label, this.state.lang)).replaceAll(' ', '%20'))
+            {
+                this.state.monthArray.map((item1, count) => {
+                    var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.regionData[0].region.id == r.regionId)
+                    totalRegion += Number(data[0].actualQty);
+                    totalRegionCount += 1;
+                    datacsv.push((data[0].actualQty) - (data[0].forecastQty))
+                })
+            }
+            datacsv.push((totalRegion / totalRegionCount));
+            A.push(this.addDoubleQuoteToRowContent(datacsv))
+        });
+
+        for (var i = 0; i < A.length; i++) {
+            csvRow.push(A[i].join(","))
+        }
+
+        var csvString = csvRow.join("%0A")
+        // console.log('csvString' + csvString)
+        var a = document.createElement("a")
+        a.href = 'data:attachment/csv,' + csvString
+        a.target = "_Blank"
+        a.download = this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "-" + 'Consumption Forecast Error' + ".csv"
+        document.body.appendChild(a)
+        a.click();
+
+    }
+
+    exportPDF = () => {
+        const addFooters = doc => {
+            const pageCount = doc.internal.getNumberOfPages()
+            doc.setFont('helvetica', 'bold')
+            doc.setFontSize(6)
+            for (var i = 1; i <= pageCount; i++) {
+                doc.setPage(i)
+                doc.setPage(i)
+                doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
+                    align: 'center'
+                })
+                doc.text('Copyright © 2020 ' + i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+                    align: 'center'
+                })
+            }
+        }
+        const addHeaders = doc => {
+            const pageCount = doc.internal.getNumberOfPages()
+            for (var i = 1; i <= pageCount; i++) {
+                doc.setFontSize(12)
+                doc.setFont('helvetica', 'bold')
+                doc.setPage(i)
+                doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
+                doc.setTextColor("#002f6c");
+                doc.setFontSize(8)
+                doc.setFont('helvetica', 'normal')
+                doc.setTextColor("#002f6c");
+                doc.text(i18n.t('static.supplyPlan.runDate') + " " + moment(new Date()).format(`${DATE_FORMAT_CAP}`), doc.internal.pageSize.width - 40, 20, {
+                    align: 'right'
+                })
+                doc.text(i18n.t('static.supplyPlan.runTime') + " " + moment(new Date()).format('hh:mm A'), doc.internal.pageSize.width - 40, 30, {
+                    align: 'right'
+                })
+                doc.text(i18n.t('static.user.user') + ': ' + AuthenticationService.getLoggedInUsername(), doc.internal.pageSize.width - 40, 40, {
+                    align: 'right'
+                })
+                doc.text(this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + " " + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text), doc.internal.pageSize.width - 40, 50, {
+                    align: 'right'
+                })
+                doc.text(document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width - 40, 60, {
+                    align: 'right'
+                })
+                doc.setFontSize(TITLE_FONT)
+                doc.setTextColor("#002f6c");
+                doc.text(i18n.t('static.dashboard.monthlyForecast'), doc.internal.pageSize.width / 2, 60, {
+                    align: 'center'
+                })
+                if (i == 1) {
+                    doc.setFont('helvetica', 'normal')
+                    doc.setFontSize(8)
+                    doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
+                        align: 'left'
+                    })
+                    doc.text(i18n.t('static.report.versionFinal*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
+                        align: 'left'
+                    })
+                    doc.text(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 150, {
+                        align: 'left'
+                    })
+                    // doc.text(i18n.t('static.forecastReport.yAxisInEquivalencyUnit') + ' : ' + document.getElementById("yaxisEquUnit").selectedOptions[0].text, doc.internal.pageSize.width / 8, 190, {
+                    //     align: 'left'
+                    // })
+                    // doc.text('Reporting View' + ' : ' + document.getElementById("viewById").selectedOptions[0].text, doc.internal.pageSize.width / 8, 210, {
+                    //     align: 'left'
+                    // })
+                    if (document.getElementById("viewById").value == 1) {
+                        doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 230, {
+                            align: 'left'
+                        })
+                    }
+                    else {
+                        doc.text(i18n.t('static.forecastingunit.forecastingunit') + ' : ' + document.getElementById("forecastingUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 230, {
+                            align: 'left'
+                        })
+                    }
+                    // let startY1 = 0;
+
+                    var regionText = doc.splitTextToSize(('Region' + ' : ' + this.state.regionLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+                    doc.text(doc.internal.pageSize.width / 8, 250, regionText)
+                    doc.text('Show consumption adjusted for stock out' + ' : Yes', doc.internal.pageSize.width / 8, 270, {
+                        align: 'left'
+                    })
+                }
+
+            }
+        }
+
+        const unit = "pt";
+        const size = "A4"; // Use A1, A2, A3 or A4
+        const orientation = "landscape"; // portrait or landscape
+
+        const marginLeft = 10;
+        const doc = new jsPDF(orientation, unit, size);
+
+        doc.setFontSize(8);
+        var canvas = document.getElementById("cool-canvas");
+
+        //creates image
+
+        var canvasImg = canvas.toDataURL("image/png", 1.0);
+        var width = doc.internal.pageSize.width;
+        var height = doc.internal.pageSize.height;
+        var h1 = 100;
+        var aspectwidth1 = (width - h1);
+
+        doc.addImage(canvasImg, 'png', 50, 280, 750, 260, 'CANVAS');
+
+        //table start
+        const headers = [];
+
+        headers.push('');
+        this.state.monthArray.map(item => (
+            headers.push(moment(item.date).format(DATE_FORMAT_CAP_WITHOUT_DATE))
+        ))
+        headers.push('Average')
+
+        var header = [headers]
+        var A = [];
+        let data = [];
+        // let t1 = [];
+
+        A.push('Error')
+        {
+            var totalError = 0;
+            var countError = 0;
+            this.state.monthArray.map((item1, count) => {
+                var datavalue = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
+                totalError += Number(datavalue[0].errorPerc);
+                countError += 1;
+                A.push(Number(datavalue[0].errorPerc))
+            })
+            A.push(Number(totalError / countError))
+        }
+        data.push(A);
+        A = [];
+
+        A.push('Forecast')
+        {
+            var totalForecast = 0;
+            var countForecast = 0;
+            this.state.monthArray.map((item1, count) => {
+                var datavalue = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
+                totalForecast += Number(datavalue[0].forecastQty);
+                countForecast += 1;
+                A.push(Number(datavalue[0].forecastQty))
+            })
+            A.push(Number(totalForecast / countForecast))
+        }
+        data.push(A);
+        A = [];
+        {
+            this.state.regions.map(r => {
+                var totalRegion = 0;
+                var totalRegionCount = 0;
+                A.push(getLabelText(r.label, this.state.lang))
+                {
+                    this.state.monthArray.map((item1, count) => {
+                        var datavalue = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.regionData[0].region.id == r.regionId)
+                        totalRegion += Number(datavalue[0].forecastQty);
+                        totalRegionCount += 1;
+                        A.push(Number(datavalue[0].forecastQty))
+                    })
+                }
+                A.push(Number(totalRegion / totalRegionCount))
+            })
+        }
+        data.push(A);
+        A = [];
+
+        A.push('Actual')
+        {
+            var totalActal = 0;
+            var countActal = 0;
+            this.state.monthArray.map((item1, count) => {
+                var datavalue = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
+                var totalDaysOfStockOut = 0;
+                this.state.regions.map(r => {
+                    var datavalue = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.regionData[0].region.id == r.regionId)
+                    totalDaysOfStockOut += datavalue[0].daysOfStockOut != undefined ? datavalue[0].daysOfStockOut : 0;
+                })
+                totalActal += Number(this.state.consumptionAdjForStockOutId ? (datavalue[0].actualQty / (item1.noOfDays - totalDaysOfStockOut) * item1.noOfDays) : datavalue[0].actualQty);
+                countActal += 1;
+                A.push(this.state.consumptionAdjForStockOutId ? (datavalue[0].actualQty / (item1.noOfDays - totalDaysOfStockOut) * item1.noOfDays) : datavalue[0].actualQty)
+            })
+            A.push(Number(totalActal / countActal))
+        }
+        data.push(A);
+        A = [];
+        {
+            this.state.regions.map(r => {
+                var totalRegion = 0;
+                var totalRegionCount = 0;
+                A.push(getLabelText(r.label, this.state.lang))
+                {
+                    this.state.monthArray.map((item1, count) => {
+                        var datavalue = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.regionData[0].region.id == r.regionId)
+                        totalRegion += Number(this.state.consumptionAdjForStockOutId ? (datavalue[0].actualQty / (item1.noOfDays - (datavalue[0].daysOfStockOut!=undefined?datavalue[0].daysOfStockOut:0)) * item1.noOfDays) : datavalue[0].actualQty);;
+                        totalRegionCount += 1;
+                        console.log("this.state.consumptionAdjForStockOutId--->", this.state.consumptionAdjForStockOutId)
+
+                        console.log("datavalue[0].actualQty--->", datavalue[0].actualQty)
+
+                        // console.log("item1.noOfDays--->", item1.noOfDays)
+
+                        console.log("datavalue[0].daysOfStockOut--->", datavalue[0].daysOfStockOut != undefined ? datavalue[0].daysOfStockOut : 0)
+
+                        console.log("item1.noOfDays--->", (item1.noOfDays - (datavalue[0].daysOfStockOut != undefined ? datavalue[0].daysOfStockOut : 0)))
+
+                        console.log("(datavalue[0].actualQty / (item1.noOfDays - datavalue[0].daysOfStockOut) * item1.noOfDays)--->", (datavalue[0].actualQty / (item1.noOfDays - datavalue[0].daysOfStockOut) * item1.noOfDays))
+
+
+                        A.push(Number(this.state.consumptionAdjForStockOutId ? (datavalue[0].actualQty / (item1.noOfDays - (datavalue[0].daysOfStockOut != undefined ? datavalue[0].daysOfStockOut : 0)) * item1.noOfDays) : datavalue[0].actualQty))
+                    })
+                }
+                A.push(Number(totalRegion / totalRegionCount))
+            })
+        }
+        data.push(A);
+        A = [];
+
+        A.push('Difference')
+        {
+            var totalDiff = 0;
+            var countDiff = 0;
+            this.state.monthArray.map((item1, count) => {
+                var datavalue = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
+                var totalDaysOfStockOut = 0;
+                this.state.regions.map(r => {
+                    var datavalue = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.regionData[0].region.id == r.regionId)
+                    totalDaysOfStockOut += datavalue[0].daysOfStockOut != undefined ? datavalue[0].daysOfStockOut : 0;
+                })
+                totalDiff += Number(this.state.consumptionAdjForStockOutId ? (datavalue[0].actualQty / (item1.noOfDays - totalDaysOfStockOut) * item1.noOfDays) : datavalue[0].actualQty) - Number(datavalue[0].forecastQty);
+                countDiff += 1;
+                A.push((Number(this.state.consumptionAdjForStockOutId ? (datavalue[0].actualQty / (item1.noOfDays - totalDaysOfStockOut) * item1.noOfDays) : datavalue[0].actualQty) - Number(datavalue[0].forecastQty)))
+            })
+            A.push(Number(totalActal / countActal))
+        }
+        data.push(A);
+        A = [];
+        {
+            this.state.regions.map(r => {
+                var totalRegion = 0;
+                var totalRegionCount = 0;
+                A.push(getLabelText(r.label, this.state.lang))
+                {
+                    this.state.monthArray.map((item1, count) => {
+                        var datavalue = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.regionData[0].region.id == r.regionId)
+                        totalRegion += Number(this.state.consumptionAdjForStockOutId ? (datavalue[0].actualQty / (item1.noOfDays - (datavalue[0].daysOfStockOut != undefined ? datavalue[0].daysOfStockOut : 0)) * item1.noOfDays) : datavalue[0].actualQty) - Number(datavalue[0].forecastQty);
+                        totalRegionCount += 1;
+                        A.push(Number(this.state.consumptionAdjForStockOutId ? (datavalue[0].actualQty / (item1.noOfDays - (datavalue[0].daysOfStockOut != undefined ? datavalue[0].daysOfStockOut : 0)) * item1.noOfDays) : datavalue[0].actualQty) - Number(datavalue[0].forecastQty))
+                    })
+                }
+                A.push(Number(totalRegion / totalRegionCount))
+            })
+        }
+        data.push(A);
+
+        let content = {
+            margin: { top: 80, bottom: 50 },
+            startY: height,
+            head: header,
+            body: data,
+            styles: { lineWidth: 1, fontSize: 8, halign: 'center' },
+            // rowPageBreak: 'auto',
+            // tableWidth: 'auto',
+            horizontalPageBreak: true,
+            horizontalPageBreakRepeat: 0,
+            columnStyles: [
+                { halign: "left" },
+                { halign: "left" },
+            ]
+
+        };
+
+        doc.autoTable(content);
+        addHeaders(doc)
+        addFooters(doc)
+        doc.save(this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "-" + 'Consumption Forecast Error' + ".pdf")
+    }
+
 
     render() {
 
@@ -1545,9 +2023,14 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
                 <Card>
                     <div className="Card-header-reporticon pb-2">
-                        <div className="card-header-actions">
-                        </div>
-                    </div>
+                        {this.state.dataList.length > 0 &&
+                            <div className="card-header-actions">
+                                <a className="card-header-action">
+                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF()} />
+                                </a>
+                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
+                            </div>
+                        }  </div>
                     <CardBody className="pb-lg-2 pt-lg-0">
                         <div className="" >
                             <div ref={ref}>
@@ -1761,7 +2244,8 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                             id="yaxisEquUnit"
                                                             bsSize="sm"
                                                             value={this.state.yaxisEquUnit}
-                                                            onChange={(e) => { this.yAxisChange(e); }}
+                                                            onChange={(e) => { this.setYaxisEquUnitId(e); }}
+                                                        // onChange={(e) => { this.yAxisChange(e); }}
                                                         // onChange={(e) => { this.dataChange(e); this.formSubmit() }}
                                                         >
                                                             {equivalencyUnitList1}
@@ -1794,7 +2278,8 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                 </Form>
                                 {/* <Col md="12 pl-0" style={{ display: this.state.loading ? "none" : "block" }}> */}
                                 <Col md="12 pl-0">
-                                    <div className="row" style={{ display: this.state.show ? "block" : "none" }}>
+                                    {/* <div className="row" style={{ display: this.state.show ? "block" : "none" }}> */}
+                                    {this.state.dataList.length > 0 &&
                                         <div className="col-md-12">
                                             <div className="chart-wrapper chart-graph-report">
                                                 <Bar id="cool-canvas" data={bar} options={chartOptions} /> <div>
@@ -1802,128 +2287,129 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                             </div>
                                             <b>* The error calculations here are not real - would be WAPE calculation we've been using</b>
                                         </div>
-                                        <div className="col-md-12">
-                                            {/* {this.state.showDetailTable && */}
+                                    }
+                                    <div className="col-md-12">
+                                        {/* {this.state.showDetailTable && */}
 
-                                            {/* } */}
-                                            {this.state.show && this.state.dataList.length > 0 &&
-                                                <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm">
-                                                    <thead>
-                                                        <tr>
-                                                            <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th>
-                                                            <th className="sticky-col first-col clone"></th>
-                                                            {this.state.monthArray.map((item, count) => {
-                                                                return (<th>{moment(item.date).format(DATE_FORMAT_CAP_WITHOUT_DATE)}</th>)
-                                                            })}
-                                                            <th className="sticky-col first-col clone">Average</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <tr className="hoverTd">
+                                        {/* } */}
+                                        {this.state.show && this.state.dataList.length > 0 &&
+                                            <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm">
+                                                <thead>
+                                                    <tr>
+                                                        <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th>
+                                                        <th className="sticky-col first-col clone"></th>
+                                                        {this.state.monthArray.map((item, count) => {
+                                                            return (<th>{moment(item.date).format(DATE_FORMAT_CAP_WITHOUT_DATE)}</th>)
+                                                        })}
+                                                        <th className="sticky-col first-col clone">Average</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr className="hoverTd">
+                                                        <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                        <td className="sticky-col first-col clone hoverTd" align="left">Error*</td>
+                                                        {this.state.monthArray.map((item1, count) => {
+                                                            var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
+                                                            totalError += Number(data[0].errorPerc);
+                                                            countError += 1;
+                                                            return (<td><NumberFormat displayType={'text'} thousandSeparator={true} />{parseFloat(data[0].errorPerc).toFixed(2)}</td>)
+
+                                                        })}
+                                                        <td className="sticky-col first-col clone hoverTd" align="left">{(Number(totalError / countError).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                    </tr>
+                                                    <tr className="hoverTd">
+                                                        <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordion(0)}>
+                                                            {this.state.consumptionUnitShowArr.includes(0) ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
+                                                        </td>
+                                                        <td className="sticky-col first-col clone hoverTd" align="left">Forecast</td>
+                                                        {this.state.monthArray.map((item1, count) => {
+                                                            var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
+                                                            totalForcaste += Number(data[0].forecastQty);
+                                                            countForcaste += 1;
+                                                            return (<td><NumberFormat displayType={'text'} thousandSeparator={true} /> {(Number(data[0].forecastQty).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>)
+
+                                                        })}
+                                                        <td className="sticky-col first-col clone hoverTd" align="left">{(Number(totalForcaste / countForcaste).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                    </tr>
+                                                    {this.state.regions.map(r => {
+                                                        var totalRegion = 0;
+                                                        var totalRegionCount = 0;
+                                                        return (<tr style={{ display: this.state.consumptionUnitShowArr.includes(0) ? "" : "none" }}>
                                                             <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                                            <td className="sticky-col first-col clone hoverTd" align="left">Error*</td>
+                                                            <td className="sticky-col first-col clone text-left" style={{ textIndent: '30px' }}>{"   " + getLabelText(r.label, this.state.lang)}</td>
                                                             {this.state.monthArray.map((item1, count) => {
-                                                                var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
-                                                                totalError += Number(data[0].errorPerc);
-                                                                countError += 1;
-                                                                return (<td><NumberFormat displayType={'text'} thousandSeparator={true} />{parseFloat(data[0].errorPerc).toFixed(2)}</td>)
-
+                                                                var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.regionData[0].region.id == r.regionId)
+                                                                totalRegion += Number(data[0].forecastQty);
+                                                                totalRegionCount += 1;
+                                                                return (<td><NumberFormat displayType={'text'} thousandSeparator={true} />{(Number(data[0].forecastQty).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>)
                                                             })}
-                                                            <td className="sticky-col first-col clone hoverTd" align="left">{totalError / countError}</td>
-                                                        </tr>
-                                                        <tr className="hoverTd">
-                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordion(0)}>
-                                                                {this.state.consumptionUnitShowArr.includes(0) ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
-                                                            </td>
-                                                            <td className="sticky-col first-col clone hoverTd" align="left">Forecast</td>
-                                                            {this.state.monthArray.map((item1, count) => {
-                                                                var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
-                                                                totalForcaste += Number(data[0].forecastQty);
-                                                                countForcaste += 1;
-                                                                return (<td><NumberFormat displayType={'text'} thousandSeparator={true} /> {(Number(data[0].forecastQty).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>)
-
-                                                            })}
-                                                            <td className="sticky-col first-col clone hoverTd" align="left">{totalForcaste / countForcaste}</td>
-                                                        </tr>
-                                                        {this.state.regions.map(r => {
-                                                            var totalRegion = 0;
-                                                            var totalRegionCount = 0;
-                                                            return (<tr style={{ display: this.state.consumptionUnitShowArr.includes(0) ? "" : "none" }}>
-                                                                <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                                                <td className="sticky-col first-col clone text-left" style={{ textIndent: '30px' }}>{"   " + getLabelText(r.label, this.state.lang)}</td>
-                                                                {this.state.monthArray.map((item1, count) => {
-                                                                    var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.regionData[0].region.id == r.regionId)
-                                                                    totalRegion += Number(data[0].forecastQty);
-                                                                    totalRegionCount += 1;
-                                                                    return (<td><NumberFormat displayType={'text'} thousandSeparator={true} />{(Number(data[0].forecastQty).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>)
-                                                                })}
-                                                                <td className="sticky-col first-col clone text-left">{totalRegion / totalRegionCount}</td>
-                                                            </tr>)
+                                                            <td className="sticky-col first-col clone text-left">{(Number(totalRegion / totalRegionCount).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                        </tr>)
+                                                    })}
+                                                    <tr className="hoverTd">
+                                                        <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordion(1)}>
+                                                            {this.state.consumptionUnitShowArr.includes(1) ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
+                                                        </td>
+                                                        <td className="sticky-col first-col clone hoverTd" align="left">Actual</td>
+                                                        {this.state.monthArray.map((item1, count) => {
+                                                            var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
+                                                            // actualQty/(noOfDays - dayOfStockOut) * noOfDays
+                                                            totalActal += Number(this.state.consumptionAdjForStockOutId ? (data[0].actualQty / (item1.noOfDays - totalDaysOfStockOut) * item1.noOfDays) : data[0].actualQty);
+                                                            countActal += 1;
+                                                            return (<td><NumberFormat displayType={'text'} thousandSeparator={true} />{(Number(this.state.consumptionAdjForStockOutId ? (data[0].actualQty / (item1.noOfDays - totalDaysOfStockOut) * item1.noOfDays) : (data[0].actualQty)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>)
                                                         })}
-                                                        <tr className="hoverTd">
-                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordion(1)}>
-                                                                {this.state.consumptionUnitShowArr.includes(1) ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
-                                                            </td>
-                                                            <td className="sticky-col first-col clone hoverTd" align="left">Actual</td>
+                                                        <td className="sticky-col first-col clone hoverTd" align="left">{(Number(totalActal / countActal).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                    </tr>
+                                                    {this.state.regions.map(r => {
+                                                        var totalRegion = 0;
+                                                        var totalRegionCount = 0;
+                                                        return (<tr style={{ display: this.state.consumptionUnitShowArr.includes(1) ? "" : "none" }}>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                            <td className="sticky-col first-col clone text-left" style={{ textIndent: '30px' }}>{"   " + getLabelText(r.label, this.state.lang)}</td>
                                                             {this.state.monthArray.map((item1, count) => {
-                                                                var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
-                                                                // actualQty/(noOfDays - dayOfStockOut) * noOfDays
-                                                                totalActal += Number(this.state.consumptionAdjForStockOutId ? (data[0].actualQty / (item1.noOfDays - totalDaysOfStockOut) * item1.noOfDays) : data[0].actualQty);
-                                                                countActal += 1;
-                                                                return (<td><NumberFormat displayType={'text'} thousandSeparator={true} />{this.state.consumptionAdjForStockOutId ? (data[0].actualQty / (item1.noOfDays - totalDaysOfStockOut) * item1.noOfDays) : data[0].actualQty}</td>)
+                                                                var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.regionData[0].region.id == r.regionId)
+                                                                totalRegion += Number(this.state.consumptionAdjForStockOutId ? (data[0].actualQty / (item1.noOfDays - (data[0].daysOfStockOut!=undefined?data[0].daysOfStockOut:0)) * item1.noOfDays) : data[0].actualQty);
+                                                                totalRegionCount += 1;
+                                                                totalDaysOfStockOut += data[0].daysOfStockOut;
+                                                                return (<td><NumberFormat displayType={'text'} thousandSeparator={true} />{Number((this.state.consumptionAdjForStockOutId ? (data[0].actualQty / (item1.noOfDays - (data[0].daysOfStockOut!=undefined?data[0].daysOfStockOut:0)) * item1.noOfDays) : (data[0].actualQty)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>)
                                                             })}
-                                                            <td className="sticky-col first-col clone hoverTd" align="left">{totalActal / countActal}</td>
-                                                        </tr>
-                                                        {this.state.regions.map(r => {
-                                                            var totalRegion = 0;
-                                                            var totalRegionCount = 0;
-                                                            return (<tr style={{ display: this.state.consumptionUnitShowArr.includes(1) ? "" : "none" }}>
-                                                                <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                                                <td className="sticky-col first-col clone text-left" style={{ textIndent: '30px' }}>{"   " + getLabelText(r.label, this.state.lang)}</td>
-                                                                {this.state.monthArray.map((item1, count) => {
-                                                                    var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.regionData[0].region.id == r.regionId)
-                                                                    totalRegion += Number(this.state.consumptionAdjForStockOutId ? (data[0].actualQty / (item1.noOfDays - data[0].daysOfStockOut) * item1.noOfDays) : data[0].actualQty);
-                                                                    totalRegionCount += 1;
-                                                                    totalDaysOfStockOut += data[0].daysOfStockOut;
-                                                                    return (<td><NumberFormat displayType={'text'} thousandSeparator={true} />{this.state.consumptionAdjForStockOutId ? (data[0].actualQty / (item1.noOfDays - data[0].daysOfStockOut) * item1.noOfDays) : data[0].actualQty}</td>)
-                                                                })}
-                                                                <td className="sticky-col first-col clone text-left">{totalRegion / totalRegionCount}</td>
-                                                            </tr>)
+                                                            <td className="sticky-col first-col clone text-left">{(Number(totalRegion / totalRegionCount).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                        </tr>)
+                                                    })}
+                                                    <tr className="hoverTd">
+                                                        <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordion(2)}>
+                                                            {this.state.consumptionUnitShowArr.includes(2) ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
+                                                        </td>
+                                                        <td className="sticky-col first-col clone hoverTd" align="left">Difference</td>
+                                                        {this.state.monthArray.map((item1, count) => {
+                                                            var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
+                                                            return (<td><NumberFormat displayType={'text'} thousandSeparator={true} />{(Number(data[0].actualQty - data[0].forecastQty).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>)
                                                         })}
-                                                        <tr className="hoverTd">
-                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordion(2)}>
-                                                                {this.state.consumptionUnitShowArr.includes(2) ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
-                                                            </td>
-                                                            <td className="sticky-col first-col clone hoverTd" align="left">Difference</td>
+                                                        <td className="sticky-col first-col clone hoverTd" align="left">{(Number((totalActal / countActal) - (totalForcaste / countForcaste)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                    </tr>
+                                                    {this.state.regions.map(r => {
+                                                        var totalRegion = 0;
+                                                        var totalRegionCount = 0;
+                                                        return (<tr style={{ display: this.state.consumptionUnitShowArr.includes(2) ? "" : "none" }}>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                            <td className="sticky-col first-col clone text-left" style={{ textIndent: '30px' }}>{"   " + getLabelText(r.label, this.state.lang)}</td>
                                                             {this.state.monthArray.map((item1, count) => {
-                                                                var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
-                                                                return (<td><NumberFormat displayType={'text'} thousandSeparator={true} />{data[0].actualQty - data[0].forecastQty}</td>)
+                                                                var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.regionData[0].region.id == r.regionId)
+                                                                totalRegion += Number(data[0].actualQty - data[0].forecastQty);
+                                                                totalRegionCount += 1;
+                                                                return (<td><NumberFormat displayType={'text'} thousandSeparator={true} />{(Number(data[0].actualQty - data[0].forecastQty).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>)
                                                             })}
-                                                            <td className="sticky-col first-col clone hoverTd" align="left">{(totalActal / countActal) - (totalForcaste / countForcaste)}</td>
-                                                        </tr>
-                                                        {this.state.regions.map(r => {
-                                                            var totalRegion = 0;
-                                                            var totalRegionCount = 0;
-                                                            return (<tr style={{ display: this.state.consumptionUnitShowArr.includes(2) ? "" : "none" }}>
-                                                                <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                                                <td className="sticky-col first-col clone text-left" style={{ textIndent: '30px' }}>{"   " + getLabelText(r.label, this.state.lang)}</td>
-                                                                {this.state.monthArray.map((item1, count) => {
-                                                                    var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.regionData[0].region.id == r.regionId)
-                                                                    totalRegion += Number(data[0].actualQty - data[0].forecastQty);
-                                                                    totalRegionCount += 1;
-                                                                    return (<td><NumberFormat displayType={'text'} thousandSeparator={true} />{data[0].actualQty - data[0].forecastQty}</td>)
-                                                                })}
-                                                                <td className="sticky-col first-col clone text-left">{totalRegion / totalRegionCount}</td>
-                                                            </tr>)
-                                                        })}
-                                                        {/* </>)
+                                                            <td className="sticky-col first-col clone text-left">{(Number(totalRegion / totalRegionCount).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                        </tr>)
+                                                    })}
+                                                    {/* </>)
                                                         } 
                                                         )} */}
-                                                    </tbody>
-                                                </Table>
-                                            }
-                                        </div>
+                                                </tbody>
+                                            </Table>
+                                        }
                                     </div>
+                                    {/* </div> */}
                                 </Col>
                             </div>
                         </div>
