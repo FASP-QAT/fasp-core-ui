@@ -1983,7 +1983,7 @@ class StockStatus extends Component {
                                   }
                                   return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
                                 }
-                              }
+                              },intersect: false,
                             },
                             maintainAspectRatio: false,
                             legend: {
@@ -2385,7 +2385,7 @@ class StockStatus extends Component {
                     }
                     return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
                   }
-                }
+                },intersect: false
               },
               maintainAspectRatio: false,
               legend: {
@@ -3126,7 +3126,7 @@ class StockStatus extends Component {
             }
             return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
           }
-        }
+        },intersect: false
       },
       maintainAspectRatio: false,
       legend: {
@@ -3249,7 +3249,7 @@ class StockStatus extends Component {
             }
             return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
           }
-        }
+        },intersect: false
       },
       maintainAspectRatio: false,
       legend: {
