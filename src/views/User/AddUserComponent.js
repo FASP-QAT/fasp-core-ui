@@ -166,6 +166,7 @@ class AddUserComponent extends Component {
             message: '',
             validateRealm: '',
             isValid: false,
+            loading1: true,
         }
         this.cancelClicked = this.cancelClicked.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
@@ -341,56 +342,71 @@ class AddUserComponent extends Component {
     }
 
     filterProgram() {
-        let realmId = this.state.user.realm.realmId;
-        if (realmId != 0 && realmId != null) {
-            const selProgram = this.state.programs.filter(c => c.realmCountry.realm.realmId == realmId && c.active.toString() == "true")
-            this.setState({
-                selProgram
-            });
-        } else {
-            this.setState({
-                selProgram: this.state.programs
-            });
-        }
+        // let realmId = this.state.user.realm.realmId;
+        // if (realmId != 0 && realmId != null) {
+        //     const selProgram = this.state.programs.filter(c => c.realmCountry.realm.realmId == realmId && c.active.toString() == "true")
+        //     this.setState({
+        //         selProgram
+        //     });
+        // } else {
+        //     this.setState({
+        //         selProgram: this.state.programs
+        //     });
+        // }
+
+        const selProgram = this.state.programs.filter(c => c.active.toString() == "true")
+        this.setState({
+            selProgram
+        });
     }
     filterHealthArea() {
         let realmId = this.state.user.realm.realmId;
         let selHealthArea;
-        if (realmId != 0 && realmId != null) {
-            selHealthArea = this.state.healthAreas.filter(c => c.realm.realmId == realmId)
-        } else {
-            selHealthArea = this.state.healthAreas
-        }
+        // if (realmId != 0 && realmId != null) {
+        //     selHealthArea = this.state.healthAreas.filter(c => c.realm.realmId == realmId)
+        // } else {
+        //     selHealthArea = this.state.healthAreas
+        // }
 
+        selHealthArea = this.state.healthAreas
         this.setState({
             selHealthArea
         });
     }
     filterOrganisation() {
         let realmId = this.state.user.realm.realmId;
-        if (realmId != 0 && realmId != null) {
-            const selOrganisation = this.state.organisations.filter(c => c.realm.realmId == realmId && c.active.toString() == "true")
-            this.setState({
-                selOrganisation
-            });
-        } else {
-            this.setState({
-                selOrganisation: this.state.organisations
-            });
-        }
+        // if (realmId != 0 && realmId != null) {
+        //     const selOrganisation = this.state.organisations.filter(c => c.realm.realmId == realmId && c.active.toString() == "true")
+        //     this.setState({
+        //         selOrganisation
+        //     });
+        // } else {
+        //     this.setState({
+        //         selOrganisation: this.state.organisations
+        //     });
+        // }
+
+        this.setState({
+            selOrganisation: this.state.organisations.filter(c => c.active.toString() == "true")
+        });
     }
     filterData() {
         let realmId = this.state.user.realm.realmId;
-        if (realmId != 0 && realmId != null) {
-            const selRealmCountry = this.state.realmCountryList.filter(c => c.realm.realmId == realmId && c.active.toString() == "true")
-            this.setState({
-                selRealmCountry
-            });
-        } else {
-            this.setState({
-                selRealmCountry: this.state.realmCountryList
-            });
-        }
+        // if (realmId != 0 && realmId != null) {
+        //     const selRealmCountry = this.state.realmCountryList.filter(c => c.realm.realmId == realmId && c.active.toString() == "true")
+        //     this.setState({
+        //         selRealmCountry
+        //     });
+        // } else {
+        //     this.setState({
+        //         selRealmCountry: this.state.realmCountryList
+        //     });
+        // }
+
+        this.setState({
+            selRealmCountry: this.state.realmCountryList.filter(c => c.active.toString() == "true")
+        });
+
     }
 
     getAccessControlData() {
@@ -405,7 +421,7 @@ class AddUserComponent extends Component {
                     });
                     this.setState({
                         realmCountryList: listArray,
-                        selRealmCountry: listArray
+                        selRealmCountry: listArray.filter(c => c.active.toString() == "true")
                     })
                     OrganisationService.getOrganisationList()
                         .then(response => {
@@ -451,7 +467,7 @@ class AddUserComponent extends Component {
                                                                         programs: listArray,
                                                                         selProgram: listArray
                                                                     }, () => {
-                                                                        this.filterData();
+                                                                        // this.filterData();
                                                                         this.filterOrganisation();
                                                                         this.filterHealthArea();
                                                                         this.filterProgram();
@@ -1092,7 +1108,8 @@ class AddUserComponent extends Component {
 
         this.el = jexcel(document.getElementById("paputableDiv"), options);
         this.setState({
-            loading: false
+            loading: false,
+            loading1: false
         })
     }
 
@@ -1444,16 +1461,89 @@ class AddUserComponent extends Component {
                                     let isValid = this.checkValidation();
                                     console.log("isValid------------>", isValid);
                                     if (isValid) {
+
+                                        let user = this.state.user;
+
+                                        var tableJson = this.el.getJson(null, false);
+                                        let userAcls = [];
+                                        for (var i = 0; i < tableJson.length; i++) {
+                                            var map1 = new Map(Object.entries(tableJson[i]));
+
+                                            let json = {
+                                                "userId": '',
+                                                "realmCountryId": parseInt(map1.get("1")),
+                                                "countryName": {
+                                                    "createdBy": null,
+                                                    "createdDate": null,
+                                                    "lastModifiedBy": null,
+                                                    "lastModifiedDate": null,
+                                                    "active": true,
+                                                    "labelId": 0,
+                                                    "label_en": null,
+                                                    "label_sp": null,
+                                                    "label_fr": null,
+                                                    "label_pr": null
+                                                },
+                                                "healthAreaId": parseInt(map1.get("2")),
+                                                "healthAreaName": {
+                                                    "createdBy": null,
+                                                    "createdDate": null,
+                                                    "lastModifiedBy": null,
+                                                    "lastModifiedDate": null,
+                                                    "active": true,
+                                                    "labelId": 0,
+                                                    "label_en": null,
+                                                    "label_sp": null,
+                                                    "label_fr": null,
+                                                    "label_pr": null
+                                                },
+                                                "organisationId": parseInt(map1.get("3")),
+                                                "organisationName": {
+                                                    "createdBy": null,
+                                                    "createdDate": null,
+                                                    "lastModifiedBy": null,
+                                                    "lastModifiedDate": null,
+                                                    "active": true,
+                                                    "labelId": 0,
+                                                    "label_en": null,
+                                                    "label_sp": null,
+                                                    "label_fr": null,
+                                                    "label_pr": null
+                                                },
+                                                "programId": parseInt(map1.get("4")),
+                                                "programName": {
+                                                    "createdBy": null,
+                                                    "createdDate": null,
+                                                    "lastModifiedBy": null,
+                                                    "lastModifiedDate": null,
+                                                    "active": true,
+                                                    "labelId": 0,
+                                                    "label_en": null,
+                                                    "label_sp": null,
+                                                    "label_fr": null,
+                                                    "label_pr": null
+                                                },
+                                                "lastModifiedDate": "2020-12-02 12:10:15"
+                                            }
+
+                                            userAcls.push(json);
+
+                                        }
+
+                                        user.userAcls = userAcls;
+
+
                                         this.setState({
                                             loading: true
                                         })
-                                        console.log("user object--->>>>", this.state.user)
+                                        console.log("user object--->>>>", user)
                                         this.setState({
                                             message: ''
                                         })
-                                        console.log("user object---------------------", this.state.user);
-                                        UserService.addNewUser(this.state.user)
+                                        console.log("user object---------------------", user);
+                                        UserService.addNewUser(user)
                                             .then(response => {
+                                                console.log("user object--->>>>response", response);
                                                 if (response.status == 200) {
                                                     this.props.history.push(`/user/listUser/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                                 } else {
@@ -1681,8 +1771,19 @@ class AddUserComponent extends Component {
                                                     <h5><Label htmlFor="select">{'Access control'}</Label></h5>
                                                 </FormGroup>
 
-                                                <div id="paputableDiv">
+                                                <div id="paputableDiv" style={{ display: this.state.loading1 ? "none" : "block" }}>
 
+                                                </div>
+                                                <div style={{ display: this.state.loading1 ? "block" : "none" }}>
+                                                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                                        <div class="align-items-center">
+                                                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                                            <div class="spinner-border blue ml-4" role="status">
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </CardBody>
                                             <CardFooter>
