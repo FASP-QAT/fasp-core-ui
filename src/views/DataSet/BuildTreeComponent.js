@@ -3431,7 +3431,10 @@ export default class BuildTree extends Component {
         var endDate = this.state.currentCalculatorStopDate;
         var monthDifference = parseInt(moment(endDate).diff(startDate, 'months', true) + 1);
         var currentTargetChangePercentage = document.getElementById("currentTargetChangePercentage").value;
+        currentTargetChangePercentage = currentTargetChangePercentage != "" ? parseFloat(currentTargetChangePercentage) : ''
+        console.log("currentTargetChangePercentage---", parseFloat(currentTargetChangePercentage));
         var getValue = currentTargetChangePercentage != "" ? currentTargetChangePercentage.toString().replaceAll(",", "").match(/^-?\d+(?:\.\d{0,4})?/)[0] : "";
+        console.log("getValue---", getValue);
         var getEndValueFromPercentage = (this.state.currentCalculatorStartValue.toString().replaceAll(",", "") * getValue) / 100;
 
         console.log("***-----------------1-", this.state.currentCalculatorStartValue.toString().replaceAll(",", ""));
@@ -3455,6 +3458,7 @@ export default class BuildTree extends Component {
             percentForOneMonth = getValue / monthDifference;
 
         }
+        // console.log("percentForOneMonth---",percentForOneMonth);
         if (this.state.currentModelingType == 5) {
             var momValue = (parseFloat(getValue / monthDifference)).toFixed(4);
         }
@@ -4018,7 +4022,7 @@ export default class BuildTree extends Component {
         if (y == 8) {
             var elInstance = this.state.modelingEl;
             var rowData = elInstance.getRowData(x);
-            if (rowData[4] != "" && rowData[4] != null) {
+            if (rowData[4] != "" && rowData[4] != null && rowData[1] != "" && rowData[1] != null && rowData[2] != "" && rowData[2] != null) {
                 this.setState({
                     currentRowIndex: '',
                     // showCalculatorFields: '',
@@ -4049,19 +4053,15 @@ export default class BuildTree extends Component {
                     });
                 })
 
-            } else {
+            } else if (rowData[4] == "" ||  rowData[4] == null) {
                 alert("Please select modeling type before proceeding.");
-                // confirmAlert({
-                //     message: "Please select modeling type before proceeding.",
-                //     buttons: [
-                //         {
-                //             label: i18n.t('static.report.ok'),
-                //             onClick: () => {
-                //             }
-                //         }
-                //     ]
-                // });
             }
+            else if (rowData[1] == "" || rowData[1] == null) {
+                alert("Please select start date before proceeding.");
+            }
+            else if (rowData[2] == "" || rowData[2] == null) {
+                alert("Please select end date before proceeding.");
+            } 
         }
     }.bind(this)
 
@@ -6828,6 +6828,13 @@ export default class BuildTree extends Component {
             else {
                 this.state.currentModelingType = 5
             }
+            if (!this.state.currentTargetChangeNumberEdit && this.state.currentModelingType != 2) {
+                console.log("inside if calculator radio button");
+                this.setState({
+                    currentTargetChangePercentageEdit: false,
+                    currentEndValueEdit: false
+                });
+            }
 
         }
 
@@ -7842,11 +7849,19 @@ export default class BuildTree extends Component {
                             // labelString: this.state.currentItemConfig.context.payload.nodeUnit.label != null ? this.state.currentItemConfig.context.payload.nodeType.id > 3 ? getLabelText(this.state.currentItemConfig.parentItem.payload.nodeUnit.label, this.state.lang) : getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang) : '',
                             labelString: this.state.currentItemConfig.context.payload.nodeType.id > 2 ?
                                 this.state.currentItemConfig.context.payload.nodeUnit.id != "" ?
+<<<<<<< HEAD
                                     this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentScenario.fuNode.forecastingUnit.unit.id != "" ? getLabelText(this.state.unitList.filter(c => c.unitId == this.state.currentScenario.fuNode.forecastingUnit.unit.id)[0].label, this.state.lang) : ""
                                         : this.state.currentItemConfig.context.payload.nodeType.id == 5 ? this.state.currentScenario.puNode.planningUnit.unit.id != "" ? getLabelText(this.state.unitList.filter(c => c.unitId == this.state.currentScenario.puNode.planningUnit.unit.id)[0].label, this.state.lang) : ""
                                             : getLabelText(this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label, this.state.lang)
                                     : ""
                                 : "",
+=======
+                                    getLabelText(this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label, this.state.lang)
+                                    : ""
+                                : this.state.currentItemConfig.context.payload.nodeUnit.label != null ?
+                                    getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang)
+                                    : "",
+>>>>>>> QAT-1878
                             // labelString: "",
                             fontColor: 'black'
                         },
