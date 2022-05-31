@@ -3006,7 +3006,7 @@ export default class PlanningUnitSetting extends Component {
                             </div>
                         </div>
 
-                        <div className="UpdatePlanningSettingTable" style={{ display: this.state.loading ? "none" : "block" }}>
+                        <div className="UpdatePlanningSettingTable consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
                             <div id="tableDiv">
                             </div>
                         </div>

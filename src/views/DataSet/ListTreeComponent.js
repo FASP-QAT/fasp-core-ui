@@ -1481,7 +1481,7 @@ export default class ListTreeComponent extends Component {
                             </div>
                         </Col>
                         {/* <div id="loader" className="center"></div> */}
-                        <div className="listtreetable">
+                        <div className="listtreetable consumptionDataEntryTable">
                             <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DIMENSION') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
                             </div>
                         </div>

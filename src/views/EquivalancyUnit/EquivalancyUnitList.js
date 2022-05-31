@@ -3059,7 +3059,7 @@ className={'modal-lg ' + this.props.className} >
                             <span><h5 style={{ color: this.state.color }} id="div3">{this.state.message}</h5></span>
                             {/* <h6 className="red" id="div3"></h6> */}
                             <div>
-                                <div id="eqUnitInfoTable" className="AddListbatchtrHeight RemoveStriped">
+                                <div id="eqUnitInfoTable" className="AddListbatchtrHeight RemoveStriped consumptionDataEntryTable">
                                 </div>
                             </div>
                             <br />

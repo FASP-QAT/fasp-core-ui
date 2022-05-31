@@ -1504,9 +1504,10 @@ class ForcastMatrixOverTime extends Component {
                       </div>
 
                       <div className="row">
-                        <div className="col-md-12">
+                        <div className="col-md-12 mt-2">
                           {this.state.show && this.state.matricsList.length > 0 &&
-                            <Table responsive className="table-striped table-bordered text-center mt-2">
+                          <div className='fixTableHead table-responsive'>
+                            <Table  className="table-striped table-bordered text-center ">
 
                               <thead>
                                 <tr>
@@ -1540,7 +1541,8 @@ class ForcastMatrixOverTime extends Component {
 
                                 }
                               </tbody>
-                            </Table>}
+                            </Table>
+                            </div>}
 
                         </div>
                       </div></Col>
