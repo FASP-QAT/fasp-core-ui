@@ -3944,8 +3944,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                         <li><span className="legendcolor" style={{ backgroundColor: "black", border: "1px solid #000" }}></span> <span className="legendcommitversionText">{i18n.t('static.consumption.actual')}</span></li>
                                                     </ul>}
                                                 </div>
-                                                <div className="row  mt-lg-3">
-                                                    <div className="pl-lg-4 pr-lg-4 ModelingValidationTable">
+                                                <div className="row  mt-lg-3 mb-lg-3">
+                                                    <div className="pl-lg-4 pr-lg-4 ModelingValidationTable consumptionDataEntryTable">
                                                         <div id="tableDiv" className="jexcelremoveReadonlybackground" style={{ display: this.state.show && !this.state.loading ? "block" : "none" }}>
                                                         </div>
                                                     </div>

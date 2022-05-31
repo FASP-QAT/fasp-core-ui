@@ -5917,6 +5917,7 @@ font-style: italic!important;
   // overflow-y: auto;
   max-height: calc(100vh - 300px)!important;
   overflow: scroll;
+  border-top: 1px solid #c8ced3;
 }
 @media print {
   thead {display: table-row-group;}
@@ -6400,4 +6401,8 @@ top: calc(20em + 3px);
   border: 1px solid #fff;
   padding: 10px;
   border-radius: 5px;
+}
+.SupplierLeadTable .jexcel > thead {
+  position: sticky;
+  top: 0;
 }

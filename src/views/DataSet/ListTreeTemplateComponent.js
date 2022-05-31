@@ -513,7 +513,7 @@ export default class ListTreeTemplate extends Component {
                                 </FormGroup>
                             </div>
                         </Col>
-                        <div className="TreeTemplateTable">
+                        <div className="TreeTemplateTable consumptionDataEntryTable">
                             <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE_TEMPLATE') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
                             </div>
                         </div>

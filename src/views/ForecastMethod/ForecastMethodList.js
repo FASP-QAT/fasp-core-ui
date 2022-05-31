@@ -1031,7 +1031,9 @@ class forecastMethod extends Component {
                             {/* <h5 className="red" >{i18n.t('static.common.customWarningMessage')}</h5> */}
                             {/* <h5>{i18n.t('static.common.customWarningMessage')}</h5> */}
                             <h5>{i18n.t("static.placeholder.forecastMethod")}</h5>
+                            <div className="consumptionDataEntryTable">
                             <div id="paputableDiv" style={{ display: this.state.loading ? "none" : "block", marginTop: '-13px' }} className={(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_FORECAST_METHOD') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_FORECAST_METHOD')) ? "RowClickable" : "jexcelremoveReadonlybackground"}>
+                            </div>
                             </div>
                             <div style={{ display: this.state.loading ? "block" : "none" }}>
                                 <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
