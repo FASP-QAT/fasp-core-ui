@@ -650,9 +650,9 @@ class LoadDeleteDataSet extends Component {
                                 <ul className="legendcommitversion pl-0" style={{ display: 'inline-flex' }}>
                                     <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.loadProgram.oldVersion')}</span></li>
                                     <li><span className="greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.loadProgram.latestVersion')} </span></li>
-                                    <li><span className=" blacklegend legendcolor"></span> <span className="legendcommitversionText">Version is not loaded.</span></li>
+                                    <li><span className=" blacklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.loadDelDataset.versionNotLoaded')}.</span></li>
                                     {/* <li><span><img width="18" title="Clean up" src={cleanUp} className="CleanUpIcon"></img></span> <span className="legendDeleteCleanupText">Keep latest  version and delete older versions.</span></li> */}
-                                    <li><span className=""><i title="Delete" className="fa fa-trash DeleteIcon"></i></span> <span className="legendDeleteCleanupText">Delete the version</span></li>
+                                    <li><span className=""><i title="Delete" className="fa fa-trash DeleteIcon"></i></span> <span className="legendDeleteCleanupText">{i18n.t('static.loadDelDataset.deleteLocalVersion')}</span></li>
                                 </ul>
                                 <Col md="3 pl-0" id="realmDiv">
                                     <FormGroup>
@@ -731,7 +731,7 @@ class LoadDeleteDataSet extends Component {
                                                                                                         <span className="">
                                                                                                             <div className="checkbox m-0">
                                                                                                                 <input type="checkbox" data-program-id={item2.program.id} value={item4.versionId} className="versionCheckBox" name={"versionCheckBox".concat(item2.program.id)} id={"kf-v".concat(item.realmCountry.id).concat(item2.program.id).concat(item4.versionId)} />
-                                                                                                                <label id="Popover1" title={item4.notes} onClick={this.toggletooltip} className={this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == item4.versionId && Math.max.apply(Math, item2.versionList.map(function (o) { return o.versionId; })) == item4.versionId).length > 0 ? "greenColor" : this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == item4.versionId).length > 0 ? "redColor" : ""} htmlFor={"kf-v".concat(item.realmCountry.id).concat(item2.program.id).concat(item4.versionId)}>{i18n.t('static.program.version').concat(" ")}<b>{(item4.versionId)}</b>{(" ").concat(i18n.t('static.program.savedOn')).concat(" ")}<b>{(moment(item4.createdDate).format(DATE_FORMAT_CAP))}</b>{" for forecast period "}<b>{(moment(item4.forecastStartDate).format(DATE_FORMAT_CAP_WITHOUT_DATE))}</b>{" to "}<b>{(moment(item4.forecastStopDate).format(DATE_FORMAT_CAP_WITHOUT_DATE))}</b>{(" ").concat(i18n.t("static.program.savedBy")).concat(" ")}<b>{(item4.createdBy.username)}</b>{(" ").concat(i18n.t("static.program.as")).concat(" ")}<b>{getLabelText(item4.versionType.label)}</b></label>
+                                                                                                                <label id="Popover1" title={item4.notes} onClick={this.toggletooltip} className={this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == item4.versionId && Math.max.apply(Math, item2.versionList.map(function (o) { return o.versionId; })) == item4.versionId).length > 0 ? "greenColor" : this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == item4.versionId).length > 0 ? "redColor" : ""} htmlFor={"kf-v".concat(item.realmCountry.id).concat(item2.program.id).concat(item4.versionId)}>{i18n.t('static.program.version').concat(" ")}<b>{(item4.versionId)}</b>{(" ").concat(i18n.t('static.program.savedOn')).concat(" ")}<b>{(moment(item4.createdDate).format(DATE_FORMAT_CAP))}</b>{i18n.t('static.loadDelDataset.forForecastPeriod')}<b>{(moment(item4.forecastStartDate).format(DATE_FORMAT_CAP_WITHOUT_DATE))}</b>{" to "}<b>{(moment(item4.forecastStopDate).format(DATE_FORMAT_CAP_WITHOUT_DATE))}</b>{(" ").concat(i18n.t("static.program.savedBy")).concat(" ")}<b>{(item4.createdBy.username)}</b>{(" ").concat(i18n.t("static.program.as")).concat(" ")}<b>{getLabelText(item4.versionType.label)}</b></label>
                                                                                                                 {this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == item4.versionId).length > 0 && <i title="Delete" onClick={() => this.deleteLocalVersion(item2.program.id, parseInt(item4.versionId), this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == item4.versionId)[0].changed)} className="ml-1 fa fa-trash DeleteIcontree"></i>}
 
                                                                                                             </div>
@@ -804,7 +804,7 @@ class LoadDeleteDataSet extends Component {
 
     cancelClicked() {
         let id = AuthenticationService.displayDashboardBasedOnRole();
-        this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + "Load delete dataset action cancelled");
+        this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.loadDelDataset.loadDeleteDatasetSctionCancell'));
     }
 
     deleteClicked() {
@@ -938,7 +938,7 @@ class LoadDeleteDataSet extends Component {
     deleteLocalVersionUsingProgramId(programId) {
         confirmAlert({
             title: i18n.t('static.program.confirmsubmit'),
-            message: "Do you want to delete all the older version and keep latest version only.",
+            message: i18n.t('static.loadDelDataset.deleteAllOlderVersion'),
             buttons: [
                 {
                     label: i18n.t('static.program.yes'),
@@ -980,7 +980,7 @@ class LoadDeleteDataSet extends Component {
                                     transaction2.oncomplete = function (event) {
                                         this.setState({
                                             loading: false,
-                                            message: "Dataset deleted successfully",
+                                            message: i18n.t('static.loadDelDataset.datasetDeleteSuccessfully'),
                                             color: 'green'
                                         }, () => {
                                             this.hideFirstComponent()
@@ -1015,7 +1015,7 @@ class LoadDeleteDataSet extends Component {
         console.log(">>>", changed);
         confirmAlert({
             title: i18n.t('static.program.confirmsubmit'),
-            message: changed == 1 ? "Changes are not saved still do you want to delete this version." : "Delete this version",
+            message: changed == 1 ? i18n.t('static.loadDelDataset.changesNotSaved') : i18n.t('static.loadDelDataset.deleteThisLocalVersion'),
             buttons: [
                 {
                     label: i18n.t('static.program.yes'),
@@ -1166,7 +1166,7 @@ class LoadDeleteDataSet extends Component {
                 }
                 if (programCheckedCount == 0) {
                     this.setState({
-                        message: 'Select atleast one dataset to load',
+                        message: i18n.t('static.loadDelDataset.selectAtleastOneDataset'),
                         loading: false, color: "#BA0C2F"
                     },
                         () => {
@@ -1197,7 +1197,7 @@ class LoadDeleteDataSet extends Component {
                         // console.log("isExist------>2", datasetList);
                         // console.log("isExist------>3", isExists1);
                         if (checkboxesCheckedProgram.length > 0 && isExists1 == 1) {
-                            var cf = window.confirm("All the older modified/non modified versions including latest version will get deleted and new latest version will get loaded do you want to continue?")
+                            var cf = window.confirm(i18n.t('static.loadDelDataset.allOlderModifiedVersion'))
                             if (cf == true) {
                                 for (var cbcp = 0; cbcp < checkboxesCheckedProgram.length; cbcp++) {
                                     var datasetListFiltered = datasetList.filter(c => c.programId == checkboxesCheckedProgram[cbcp].programId);
@@ -1224,7 +1224,7 @@ class LoadDeleteDataSet extends Component {
                                 }
                             }
                             if (isExists) {
-                                var cf1 = window.confirm("Program with same version already exist do you want to override data.")
+                                var cf1 = window.confirm(i18n.t('static.loadDelDataset.programWithSameVersion'))
                                 if (cf1 == true) {
                                     continueToLoad = 1;
                                 } else {
@@ -1348,7 +1348,7 @@ class LoadDeleteDataSet extends Component {
                                                             this.getPrograms();
                                                             this.getLocalPrograms();
                                                             // this.props.history.push({ pathname: `/masterDataSync/green/` + 'Dataset loaded successfully', state: { "programIds": programIds } })
-                                                            this.props.history.push({ pathname: `/syncProgram/green/` + 'Dataset loaded successfully', state: { "programIds": programIds } })
+                                                            this.props.history.push({ pathname: `/syncProgram/green/` + i18n.t('static.loadDelDataset.datasetLoadedSussfully'), state: { "programIds": programIds } })
                                                         }.bind(this)
                                                     }.bind(this)
                                                 }.bind(this)

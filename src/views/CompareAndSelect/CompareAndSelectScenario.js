@@ -2282,7 +2282,7 @@ class CompareAndSelectScenario extends Component {
                                                 {/* <div className="col-md-12 pl-0 pr-0"> */}
                                                 <div className="row" style={{ display: this.state.show ? "block" : "none" }}>
                                                     <div className="col-md-12 pl-0 pr-0">
-                                                        <div id="tableDiv" className="jexcelremoveReadonlybackground" style={{ display: this.state.show && !this.state.loading ? "block" : "none" }}>
+                                                        <div id="tableDiv" className="jexcelremoveReadonlybackground consumptionDataEntryTable" style={{ display: this.state.show && !this.state.loading ? "block" : "none" }}>
                                                         </div>
                                                     </div>
                                                 </div>

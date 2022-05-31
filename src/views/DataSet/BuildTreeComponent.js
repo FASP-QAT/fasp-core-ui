@@ -3431,7 +3431,10 @@ export default class BuildTree extends Component {
         var endDate = this.state.currentCalculatorStopDate;
         var monthDifference = parseInt(moment(endDate).diff(startDate, 'months', true) + 1);
         var currentTargetChangePercentage = document.getElementById("currentTargetChangePercentage").value;
+        currentTargetChangePercentage = currentTargetChangePercentage != "" ? parseFloat(currentTargetChangePercentage) : ''
+        console.log("currentTargetChangePercentage---", parseFloat(currentTargetChangePercentage));
         var getValue = currentTargetChangePercentage != "" ? currentTargetChangePercentage.toString().replaceAll(",", "").match(/^-?\d+(?:\.\d{0,4})?/)[0] : "";
+        console.log("getValue---", getValue);
         var getEndValueFromPercentage = (this.state.currentCalculatorStartValue.toString().replaceAll(",", "") * getValue) / 100;
 
         console.log("***-----------------1-", this.state.currentCalculatorStartValue.toString().replaceAll(",", ""));
@@ -3455,6 +3458,7 @@ export default class BuildTree extends Component {
             percentForOneMonth = getValue / monthDifference;
 
         }
+        // console.log("percentForOneMonth---",percentForOneMonth);
         if (this.state.currentModelingType == 5) {
             var momValue = (parseFloat(getValue / monthDifference)).toFixed(4);
         }
@@ -3904,23 +3908,6 @@ export default class BuildTree extends Component {
                 var items = [];
                 if (y == null) {
                     // Sorting
-                    // if (obj.options.columnSorting == true) {
-                    //     // Line
-                    //     items.push({ type: 'line' });
-
-                    //     items.push({
-                    //         title: obj.options.text.orderAscending,
-                    //         onclick: function () {
-                    //             obj.orderBy(x, 0);
-                    //         }
-                    //     });
-                    //     items.push({
-                    //         title: obj.options.text.orderDescending,
-                    //         onclick: function () {
-                    //             obj.orderBy(x, 1);
-                    //         }
-                    //     });
-                    // }
                 } else {
                     // at start
                     if (obj.options.allowInsertRow == true) {
@@ -3947,46 +3934,45 @@ export default class BuildTree extends Component {
                     }
                     // Delete a row
                     if (obj.options.allowDeleteRow == true) {
-                        // region id
-                        // if (obj.getRowData(y)[9] == "" || obj.getRowData(y)[9] == 0) {
-                        items.push({
-                            title: i18n.t("static.common.deleterow"),
-                            onclick: function () {
-                                if (obj.getJson(null, false).length == 1) {
-                                    var data = [];
-                                    data[0] = ''
-                                    data[1] = moment(this.state.currentScenario.month).startOf('month').add(1, 'months').format("YYYY-MM-DD")
-                                    data[2] = this.state.maxMonth
-                                    data[3] = ''
-                                    data[4] = this.state.currentItemConfig.context.payload.nodeType.id == PERCENTAGE_NODE_ID || this.state.currentItemConfig.context.payload.nodeType.id == FU_NODE_ID || this.state.currentItemConfig.context.payload.nodeType.id == PU_NODE_ID ? 5 : '';
-                                    data[5] = ''
-                                    data[6] = ''
-                                    data[7] = ''
-                                    data[8] = cleanUp
-                                    data[9] = ''
-                                    data[10] = ''
-                                    data[11] = ''
-                                    data[12] = 0
-                                    obj.insertRow(data, 0, 1);
-                                    obj.deleteRow(parseInt(y) + 1);
-                                    var col = ("C").concat(parseInt(0) + 1);
-                                    obj.setStyle(col, "background-color", "transparent");
-                                    obj.setComments(col, "");
-                                    var col = ("F").concat(parseInt(0) + 1);
-                                    obj.setStyle(col, "background-color", "transparent");
-                                    obj.setComments(col, "");
-                                    this.setState({
-                                        lastRowDeleted: true,
-                                        scalingTotal: ""
-                                    })
-                                } else {
-                                    obj.deleteRow(parseInt(y));
-                                }
+                        if (obj.getRowData(y)[12] == 0) {
+                            items.push({
+                                title: i18n.t("static.common.deleterow"),
+                                onclick: function () {
+                                    if (obj.getJson(null, false).length == 1) {
+                                        var data = [];
+                                        data[0] = ''
+                                        data[1] = moment(this.state.currentScenario.month).startOf('month').add(1, 'months').format("YYYY-MM-DD")
+                                        data[2] = this.state.maxMonth
+                                        data[3] = ''
+                                        data[4] = this.state.currentItemConfig.context.payload.nodeType.id == PERCENTAGE_NODE_ID || this.state.currentItemConfig.context.payload.nodeType.id == FU_NODE_ID || this.state.currentItemConfig.context.payload.nodeType.id == PU_NODE_ID ? 5 : '';
+                                        data[5] = ''
+                                        data[6] = ''
+                                        data[7] = ''
+                                        data[8] = cleanUp
+                                        data[9] = ''
+                                        data[10] = ''
+                                        data[11] = ''
+                                        data[12] = 0
+                                        obj.insertRow(data, 0, 1);
+                                        obj.deleteRow(parseInt(y) + 1);
+                                        var col = ("C").concat(parseInt(0) + 1);
+                                        obj.setStyle(col, "background-color", "transparent");
+                                        obj.setComments(col, "");
+                                        var col = ("F").concat(parseInt(0) + 1);
+                                        obj.setStyle(col, "background-color", "transparent");
+                                        obj.setComments(col, "");
+                                        this.setState({
+                                            lastRowDeleted: true,
+                                            scalingTotal: ""
+                                        })
+                                    } else {
+                                        obj.deleteRow(parseInt(y));
+                                    }
 
 
-                            }.bind(this)
-                        });
-                        // }
+                                }.bind(this)
+                            });
+                        }
                     }
                 }
 
@@ -4036,7 +4022,7 @@ export default class BuildTree extends Component {
         if (y == 8) {
             var elInstance = this.state.modelingEl;
             var rowData = elInstance.getRowData(x);
-            if (rowData[4] != "" && rowData[4] != null) {
+            if (rowData[4] != "" && rowData[4] != null && rowData[1] != "" && rowData[1] != null && rowData[2] != "" && rowData[2] != null) {
                 this.setState({
                     currentRowIndex: '',
                     // showCalculatorFields: '',
@@ -4067,19 +4053,15 @@ export default class BuildTree extends Component {
                     });
                 })
 
-            } else {
+            } else if (rowData[4] == "" ||  rowData[4] == null) {
                 alert("Please select modeling type before proceeding.");
-                // confirmAlert({
-                //     message: "Please select modeling type before proceeding.",
-                //     buttons: [
-                //         {
-                //             label: i18n.t('static.report.ok'),
-                //             onClick: () => {
-                //             }
-                //         }
-                //     ]
-                // });
             }
+            else if (rowData[1] == "" || rowData[1] == null) {
+                alert("Please select start date before proceeding.");
+            }
+            else if (rowData[2] == "" || rowData[2] == null) {
+                alert("Please select end date before proceeding.");
+            } 
         }
     }.bind(this)
 
@@ -6846,6 +6828,13 @@ export default class BuildTree extends Component {
             else {
                 this.state.currentModelingType = 5
             }
+            if (!this.state.currentTargetChangeNumberEdit && this.state.currentModelingType != 2) {
+                console.log("inside if calculator radio button");
+                this.setState({
+                    currentTargetChangePercentageEdit: false,
+                    currentEndValueEdit: false
+                });
+            }
 
         }
 
@@ -6897,9 +6886,9 @@ export default class BuildTree extends Component {
                 label_sp: '',
                 label_pr: ''
             }
-            console.log("node unit label---",label);
+            console.log("node unit label---", label);
             currentItemConfig.context.payload.nodeUnit.label = label;
-            console.log("after node unit label---",currentItemConfig);
+            console.log("after node unit label---", currentItemConfig);
 
         }
         if (event.target.name === "percentageOfParent") {
@@ -7858,13 +7847,13 @@ export default class BuildTree extends Component {
                             display: true,
                             // labelString: this.state.currentItemConfig.context.payload.nodeUnit.label != null ? this.state.currentItemConfig.context.payload.nodeType.id > 3 ? getLabelText(this.state.currentItemConfig.parentItem.payload.nodeUnit.label, this.state.lang) : getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang) : '',
                             // labelString: this.state.currentItemConfig.context.payload.nodeUnit.label != null ? this.state.currentItemConfig.context.payload.nodeType.id > 3 ? getLabelText(this.state.currentItemConfig.parentItem.payload.nodeUnit.label, this.state.lang) : getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang) : '',
-                            labelString: this.state.currentItemConfig.context.payload.nodeType.id > 2 ? 
-                            this.state.currentItemConfig.context.payload.nodeUnit.id != "" ? 
-                            getLabelText(this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label, this.state.lang) 
-                            : "" 
-                            : this.state.currentItemConfig.context.payload.nodeUnit.label != null ? 
-                            getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang) 
-                            : "",
+                            labelString: this.state.currentItemConfig.context.payload.nodeType.id > 2 ?
+                                this.state.currentItemConfig.context.payload.nodeUnit.id != "" ?
+                                    getLabelText(this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label, this.state.lang)
+                                    : ""
+                                : this.state.currentItemConfig.context.payload.nodeUnit.label != null ?
+                                    getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang)
+                                    : "",
                             // labelString: "",
                             fontColor: 'black'
                         },
@@ -9263,7 +9252,7 @@ export default class BuildTree extends Component {
                             {this.state.showModelingJexcelNumber &&
                                 <>
                                     <span>{i18n.t('static.modelingTable.note')}</span>
-                                    <div className="calculatorimg calculatorTable">
+                                    <div className="calculatorimg calculatorTable consumptionDataEntryTable">
                                         <div id="modelingJexcel" className={"RowClickable ScalingTable"} style={{ display: this.state.modelingJexcelLoader ? "none" : "block" }}>
                                         </div>
                                         <div style={{ display: this.state.modelingJexcelLoader ? "block" : "none" }}>
@@ -9587,7 +9576,7 @@ export default class BuildTree extends Component {
 
                                 {/* <div className='row'> */}
                                 <div className="col-md-12 pl-lg-0 pr-lg-0 modelingTransferTable" style={{ display: 'inline-block' }}>
-                                    <div id="momJexcel" className="RowClickable" style={{ display: this.state.momJexcelLoader ? "none" : "block" }}>
+                                    <div id="momJexcel" className="RowClickable consumptionDataEntryTable" style={{ display: this.state.momJexcelLoader ? "none" : "block" }}>
                                     </div>
                                 </div>
                                 {/* </div> */}
@@ -9656,9 +9645,16 @@ export default class BuildTree extends Component {
                                         </FormGroup>
                                     </div>
                                 </div>
-                                <div className="pt-lg-2 pl-lg-0"><i>{i18n.t('static.tree.tableDisplays')} <b>{this.state.currentItemConfig.context.payload.nodeUnit.label != null ? getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang) : ''}</b> {i18n.t('static.tree.forNode')} <b>{this.state.currentItemConfig.context.payload.label != null ? getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) : ''}</b> {i18n.t('static.tree.asA%OfParent')} <b>{this.state.currentItemConfig.parentItem.payload.label != null ? getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang) : ''}</b></i></div>
+                                <div className="pt-lg-2 pl-lg-0"><i>{i18n.t('static.tree.tableDisplays')} <b>{
+                                    this.state.currentItemConfig.context.payload.nodeType.id > 2 ?
+                                        this.state.currentItemConfig.context.payload.nodeUnit.id != "" ?
+                                            this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentScenario.fuNode.forecastingUnit.unit.id != "" ? getLabelText(this.state.unitList.filter(c => c.unitId == this.state.currentScenario.fuNode.forecastingUnit.unit.id)[0].label, this.state.lang) : ""
+                                            : this.state.currentItemConfig.context.payload.nodeType.id == 5 ? this.state.currentScenario.puNode.planningUnit.unit.id != "" ? getLabelText(this.state.unitList.filter(c => c.unitId == this.state.currentScenario.puNode.planningUnit.unit.id)[0].label, this.state.lang) : ""
+                                                    : getLabelText(this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label, this.state.lang)
+                                            : ""
+                                        : ""}</b> {i18n.t('static.tree.forNode')} <b>{this.state.currentItemConfig.context.payload.label != null ? getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) : ''}</b> {i18n.t('static.tree.asA%OfParent')} <b>{this.state.currentItemConfig.parentItem.payload.label != null ? getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang) : ''}</b></i></div>
                                 {/* <div className="pt-lg-2 pl-lg-0"><i>Table displays <b>{getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang)}</b></div> */}
-                                <div className="col-md-12 pl-lg-0 pr-lg-0" style={{ display: 'inline-block' }}>
+                                <div className="col-md-12 pl-lg-0 pr-lg-0 consumptionDataEntryTable" style={{ display: 'inline-block' }}>
                                     <div id="momJexcelPer" className={"RowClickable perNodeData FiltermomjexcelPer"} style={{ display: this.state.momJexcelLoader ? "none" : "block" }}>
                                     </div>
                                 </div>
@@ -10308,6 +10304,7 @@ export default class BuildTree extends Component {
                                 if (getLevelUnit.length > 0) {
                                     levelUnitId = getLevelUnit[0].unit != null ? getLevelUnit[0].unit.id : "";
                                 }
+                                console.log("level unit id on add button click---",levelUnitId);
                                 // tempArray.push(nodeDataMap);
                                 this.setState({
                                     showMomDataPercent: false,

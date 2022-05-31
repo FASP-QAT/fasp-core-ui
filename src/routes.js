@@ -201,6 +201,7 @@ const ProgramOnboarding = React.lazy(() => import('./views/Program/ProgramOnboar
 const DeleteLocalPrograms = React.lazy(() => import('./views/Program/DeleteLocalProgramComponent'));
 const ShipmentList = React.lazy(() => import('./views/Shipment/ShipmentDetails'));
 const ForecastMetricsOverTime = React.lazy(() => import('./views/Report/ForecastMetricsOverTime'));
+const ConsumptionForecastErrorSupplyPlan = React.lazy(() => import('./views/Report/ConsumptionForecastErrorSupplyPlan'));
 const pipeline = React.lazy(() => import('./views/Pipeline/PipelineProgramImport'));
 const pipelineProgramSetup = React.lazy(() => import('./views/Pipeline/PipelineProgramSetup'));
 const StockStatusOverTime = React.lazy(() => import('./views/Report/StockStatusOverTime'));
@@ -505,6 +506,7 @@ const routes = [
   { path: '/report/stockStatus', name: i18n.t('static.dashboard.stockstatus'), component: StockStatusReport },
   { path: '/report/globalConsumption', name: i18n.t('static.dashboard.globalconsumption'), component: GlobalConsumptionReport },
   { path: '/report/forecastOverTheTime', name: i18n.t('static.report.forecasterrorovertime'), component: ForecastMetricsOverTime },
+  { path: '/report/consumptionForecastErrorSupplyPlan', name: i18n.t('static.report.forecasterrorovertime'), component: ConsumptionForecastErrorSupplyPlan },
   { path: '/report/stockStatusOverTime', name: i18n.t('static.dashboard.stockstatusovertime'), component: StockStatusOverTime },
   { path: '/report/forecastMetrics', name: i18n.t('static.dashboard.forecastmetrics'), component: ForecastMetrics },
 

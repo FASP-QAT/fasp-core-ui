@@ -2246,7 +2246,7 @@ class AccessControlComponent extends Component {
 
                             <Col xs="12" sm="12">
 
-                                <div id="paputableDiv" style={{ display: this.state.loading ? "none" : "block" }}>
+                                <div id="paputableDiv" className="consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
 
                                 </div>
                                 <div style={{ display: this.state.loading ? "block" : "none" }}>

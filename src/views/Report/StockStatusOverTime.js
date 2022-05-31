@@ -1765,10 +1765,11 @@ class StockStatusOverTime extends Component {
                                 <br></br>
                             </div>}</div>
 
-                        <div className="row" style={{ display: this.state.loading ? "none" : "block" }}>
+                        <div className="row mt-4" style={{ display: this.state.loading ? "none" : "block" }}>
                             <div className="col-md-12">
                                 {this.state.show && this.state.matricsList.length > 0 &&
-                                    <Table responsive className="table-striped table-bordered text-center mt-2">
+                                <div className='table-responsive fixTableHead'>
+                                    <Table className="table-striped table-bordered text-center">
 
                                         <thead>
                                             <tr>
@@ -1813,7 +1814,8 @@ class StockStatusOverTime extends Component {
 
 
                                         </tbody>
-                                    </Table>}
+                                    </Table>
+                                    </div>}
 
                             </div>
                         </div>
