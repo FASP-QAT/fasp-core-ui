@@ -1158,8 +1158,8 @@ export default class CostOfInventory extends Component {
                             </Form>
                         </div>
                         {/* </div> */}
-                        <div className="" style={{ display: this.state.loading ? "none" : "block" }}>
-                            <div id="tableDiv" className="jexcelremoveReadonlybackground">
+                        <div className="" >
+                            <div id="tableDiv" style={{ display: this.state.loading ? "none" : "block" }} className="jexcelremoveReadonlybackground">
                             </div>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>
