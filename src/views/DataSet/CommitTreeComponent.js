@@ -1182,9 +1182,10 @@ export default class CommitTreeComponent extends React.Component {
                             <span><b>4. {i18n.t('static.program.notes')}:</b></span><br />
 
                             <span>a. {i18n.t('static.forecastMethod.historicalData')}:</span>
-                            <div className="">
-                                {(datasetPlanningUnitNotes.length > 0 && datasetPlanningUnitNotes.filter(c => c.consuptionForecast.toString() == "true").length > 0) ? <div className="table-wrap table-responsive fixTableHead">
-                                    <Table className="table-bordered text-center mt-2 overflowhide main-table table-striped1" bordered size="sm" >
+                            <div className="mt-2">
+                                {(datasetPlanningUnitNotes.length > 0 && datasetPlanningUnitNotes.filter(c => c.consuptionForecast.toString() == "true").length > 0) ?
+                                 <div className="table-wrap table-responsive fixTableHead">
+                                    <Table className="table-bordered text-center overflowhide main-table table-striped1" bordered size="sm" >
                                         <thead>
                                             <tr>
                                                 <th style={{ width: '30%' }}><b>{i18n.t('static.dashboard.planningunitheader')}</b></th>
@@ -1213,9 +1214,9 @@ export default class CommitTreeComponent extends React.Component {
                             </div><br />
                             <span>c. {i18n.t('static.commitTree.treeNodes')}:</span>
                             {/* <div className="table-scroll"> */}
-                            <div className="">
+                            <div className="mt-2">
                                 {treeNodeList.length > 0 && treeNodeList.filter(c => (c.notes != null && c.notes != "") || (c.madelingNotes != null && c.madelingNotes != "")).length > 0 ? <div className="table-wrap table-responsive fixTableHead">
-                                    <Table className="table-bordered text-center mt-2 overflowhide main-table table-striped1" bordered size="sm" >
+                                    <Table className="table-bordered text-center overflowhide main-table table-striped1" bordered size="sm" >
                                         <thead>
                                             <tr>
                                                 <th><b>{i18n.t('static.forecastMethod.tree')}</b></th>
