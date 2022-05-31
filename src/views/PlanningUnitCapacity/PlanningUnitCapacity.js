@@ -1695,7 +1695,7 @@ class PlanningUnitCapacity extends Component {
                     <CardBody className="p-0">
 
                         <Col xs="12" sm="12">
-                            <div className="table-responsive" style={{ display: this.state.loading ? "none" : "block" }}>
+                            <div className="table-responsive consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
                                 <div id="paputableDiv" >
                                 </div>
                             </div>

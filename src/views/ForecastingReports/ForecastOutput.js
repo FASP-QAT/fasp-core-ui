@@ -3526,7 +3526,7 @@ class ForecastOutput extends Component {
                                             </FormGroup>
 
                                             <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon fa fa-sort-desc ml-1"></span>
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}
                                                     <i> (Forecast: {this.state.forecastPeriod})</i>
                                                 </Label>
                                                 <div className="controls edit">

@@ -2590,7 +2590,7 @@ class ShipmentSummery extends Component {
                                                     {this.state.shipmentDetailsList.length > 0 && <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyOrder')}</span></li>}
                                                 </ul>
                                             </FormGroup>
-                                            <div className="ShipmentSummeryReportMarginTop" id="mytable2">
+                                            <div className="ShipmentSummeryReportMarginTop consumptionDataEntryTable" id="mytable2">
                                                 <div id="shipmentDetailsListTableDiv" className={document.getElementById("versionId") != null && document.getElementById("versionId").value.includes('Local') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} >
                                                 </div>
                                             </div>

@@ -1304,7 +1304,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                 "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 4)[0],
                                 "jsonProperties": {
                                     confidenceLevel: this.state.confidenceLevelIdArima,
-                                    seasonality: this.state.seasonality,
+                                    seasonality: this.state.seasonality,                            
                                     p: this.state.p,
                                     d: this.state.d,
                                     q: this.state.q,
@@ -3748,7 +3748,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                             />
                                                             <FormFeedback>{errors.qId}</FormFeedback>
                                                         </div>
-                                                        <div className="tab-ml-1 ml-lg-5 ExtraCheckboxFieldWidth" style={{ marginTop: '38px' }}>
+                                                        <div className="tab-ml-1 ml-lg-5 ExtraCheckboxFieldWidth" style={{marginTop:'38px'}}>
                                                             <Input
                                                                 className="form-check-input checkboxMargin"
                                                                 type="checkbox"
@@ -3763,7 +3763,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                 check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
                                                                 <b>{i18n.t('static.extrapolation.seasonality')}</b>
                                                             </Label>
-                                                        </div>
+                                                        </div>                 
                                                     </div>
                                                 </div>
                                             </FormGroup>
@@ -3944,8 +3944,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                         <li><span className="legendcolor" style={{ backgroundColor: "black", border: "1px solid #000" }}></span> <span className="legendcommitversionText">{i18n.t('static.consumption.actual')}</span></li>
                                                     </ul>}
                                                 </div>
-                                                <div className="row  mt-lg-3">
-                                                    <div className="pl-lg-4 pr-lg-4 ModelingValidationTable">
+                                                <div className="row  mt-lg-3 mb-lg-3">
+                                                    <div className="pl-lg-4 pr-lg-4 ModelingValidationTable consumptionDataEntryTable">
                                                         <div id="tableDiv" className="jexcelremoveReadonlybackground" style={{ display: this.state.show && !this.state.loading ? "block" : "none" }}>
                                                         </div>
                                                     </div>

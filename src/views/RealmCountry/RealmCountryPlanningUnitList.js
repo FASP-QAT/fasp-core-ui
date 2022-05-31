@@ -1475,8 +1475,9 @@ export default class RealmCountryPlanningUnitList extends Component {
                             </div>
                         </Form>
 
-
+                        <div className='consumptionDataEntryTable'>
                         <div id="tableDiv" style={{ display: this.state.loading ? "none" : "block" }}>
+                        </div>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>
                             <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
