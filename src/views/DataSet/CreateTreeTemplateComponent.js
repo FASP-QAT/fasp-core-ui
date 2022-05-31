@@ -9343,6 +9343,34 @@ export default class CreateTreeTemplate extends Component {
                                                                 console.log("load---", items[i])
                                                                 // arr.push(items[i]);
                                                             }
+                                                            console.log("load---", items[i])
+                                                            // arr.push(items[i]);
+                                                        }
+                                                        this.setState({
+                                                            treeTemplate: response.data,
+                                                            items,
+                                                            message: i18n.t('static.message.addTreeTemplate'),
+                                                            color: 'green',
+                                                            loading: true,
+                                                            isChanged: false,
+                                                            isTemplateChanged: false
+                                                        }, () => {
+                                                            this.hideSecondComponent();
+                                                            this.calculateMOMData(1, 2);
+                                                        });
+                                                        // this.props.history.push(`/dataset/listTreeTemplate/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
+                                                    } else {
+                                                        this.setState({
+                                                            message: response.data.messageCode, loading: false
+                                                        },
+                                                            () => {
+                                                                this.hideSecondComponent();
+                                                            })
+                                                    }
+
+                                                }).catch(
+                                                    error => {
+                                                        if (error.message === "Network Error") {
                                                             this.setState({
                                                                 treeTemplate: response.data,
                                                                 items,
