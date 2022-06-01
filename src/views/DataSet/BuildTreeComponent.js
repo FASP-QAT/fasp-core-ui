@@ -535,8 +535,6 @@ export default class BuildTree extends Component {
         this.pickAMonth4 = React.createRef()
         this.pickAMonth5 = React.createRef()
         this.state = {
-            isTreeChanged: false,
-            isScenarioChanged: false,
             percentForOneMonth: '',
             popoverOpenStartValueModelingTool: false,
             showGuidanceModelingTransfer: false,
@@ -942,16 +940,8 @@ export default class BuildTree extends Component {
         this.qatCalculatedPUPerVisit = this.qatCalculatedPUPerVisit.bind(this);
         this.calculateParentValueFromMOM = this.calculateParentValueFromMOM.bind(this);
         this.getNodeTransferList = this.getNodeTransferList.bind(this);
-        this.modalCancelClicked = this.modalCancelClicked.bind(this);
     }
 
-    modalCancelClicked() {
-        // if (this.state.isChanged) {
-        //     alert("Unsubmitted Changes");
-        // } else {
-        this.setState({ openAddNodeModal: false, isChanged: false, cursorItem: 0, highlightItem: 0, activeTab1: new Array(3).fill('1') })
-        // }
-    }
     getMomValueForDateRange(startDate) {
         console.log("***MOM startDate---", startDate);
         var startValue = 0;
@@ -1833,9 +1823,7 @@ export default class BuildTree extends Component {
                                 loading: false,
                                 message: i18n.t("static.mt.dataUpdateSuccess"),
                                 color: "green",
-                                isChanged: false,
-                                isScenarioChanged: false,
-                                isTreeChanged: false
+                                isChanged: false
                             }, () => {
                                 for (let i = 0; i < items.length; i++) {
                                     var item = items[i];
@@ -6439,7 +6427,7 @@ export default class BuildTree extends Component {
     }
 
     componentDidUpdate = () => {
-        if (this.state.isChanged == true || this.state.isTreeChanged == true || this.state.isScenarioChanged == true) {
+        if (this.state.isChanged == true) {
             window.onbeforeunload = () => true
         } else {
             window.onbeforeunload = undefined
@@ -6548,7 +6536,7 @@ export default class BuildTree extends Component {
                 selectedScenario: scenarioId,
                 scenarioList: scenarioList.filter(x => x.active == true),
                 openAddScenarioModal: false,
-                isScenarioChanged: true
+                isChanged: true
             }, () => {
                 console.log("final tab list---", this.state.items);
                 if (type == 1) {
@@ -6740,7 +6728,7 @@ export default class BuildTree extends Component {
         }
 
 
-        this.setState({ curTreeObj, isTreeChanged: true }, () => {
+        this.setState({ curTreeObj, isChanged: true }, () => {
             console.log("curTreeObj---", curTreeObj);
         });
 
@@ -9171,7 +9159,7 @@ export default class BuildTree extends Component {
                                     {/* disabled={!isValid} */}
                                     <FormGroup className="pb-lg-3">
                                         {/* <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false, cursorItem: 0, highlightItem: 0 })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
-                                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.modalCancelClicked()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false, cursorItem: 0, highlightItem: 0 })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                         <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={() => this.resetNodeData()} ><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllNodeData(setTouched, errors)} disabled={isSubmitting}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                     </FormGroup>
@@ -10496,8 +10484,8 @@ export default class BuildTree extends Component {
         }
         return <div className="">
             <Prompt
-                when={this.state.isChanged == true || this.state.isTreeChanged == true || this.state.isScenarioChanged == true}
-                message={i18n.t("static.dataentry.confirmmsg") + this.state.isChanged + "-" + this.state.isTreeChanged + "-" + this.state.isScenarioChanged}
+                when={this.state.isChanged == true}
+                message={i18n.t("static.dataentry.confirmmsg")}
             />
             <AuthenticationServiceComponent history={this.props.history} />
 
@@ -10782,10 +10770,7 @@ export default class BuildTree extends Component {
                                                 }}
                                                 validate={validate(validationSchema)}
                                                 onSubmit={(values, { setSubmitting, setErrors }) => {
-                                                    this.setState({ isTreeChanged: true }, () => {
-                                                        this.saveTreeData(false);
-                                                    });
-
+                                                    this.saveTreeData(false);
                                                     // this.createOrUpdateTree();
                                                 }}
                                                 render={
@@ -11636,7 +11621,7 @@ export default class BuildTree extends Component {
                                         (this.state.currentItemConfig.context.payload.nodeType.id == 1 ? <i><img src={AggregationNode} className="AggregationNodeSize" /></i> : "")
                                     )))}
                         <b className="supplyplanformulas ScalingheadTitle">{this.state.currentItemConfig.context.payload.label.label_en}</b></div>}
-                    <Button size="md" onClick={() => this.modalCancelClicked()} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
+                    <Button size="md" onClick={() => this.setState({ openAddNodeModal: false, cursorItem: 0, highlightItem: 0, activeTab1: new Array(3).fill('1') })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
                 </ModalHeader>
                 <ModalBody>
                     <Row>
