@@ -291,71 +291,71 @@ class EditUserComponent extends Component {
 
 
     filterProgram() {
-        // let realmId = this.state.user.realm.realmId;
-        // if (realmId != 0 && realmId != null) {
-        //     const selProgram = this.state.programs.filter(c => c.realmCountry.realm.realmId == realmId && c.active.toString() == "true")
-        //     this.setState({
-        //         selProgram
-        //     });
-        // } else {
-        //     this.setState({
-        //         selProgram: this.state.programs
-        //     });
-        // }
+        let realmId = this.state.user.realm.realmId;
+        if (realmId != 0 && realmId != null) {
+            const selProgram = this.state.programs.filter(c => c.realmCountry.realm.realmId == realmId && c.active.toString() == "true")
+            this.setState({
+                selProgram
+            });
+        } else {
+            this.setState({
+                selProgram: this.state.programs
+            });
+        }
 
-        const selProgram = this.state.programs.filter(c => c.active.toString() == "true")
-        this.setState({
-            selProgram
-        });
+        // const selProgram = this.state.programs.filter(c => c.active.toString() == "true")
+        // this.setState({
+        //     selProgram
+        // });
     }
     filterHealthArea() {
-        // let realmId = this.state.user.realm.realmId;
-        // let selHealthArea;
-        // if (realmId != 0 && realmId != null) {
-        //     selHealthArea = this.state.healthAreas.filter(c => c.realm.realmId == realmId)
-        // } else {
-        //     selHealthArea = this.state.healthAreas
-        // }
+        let realmId = this.state.user.realm.realmId;
+        let selHealthArea;
+        if (realmId != 0 && realmId != null) {
+            selHealthArea = this.state.healthAreas.filter(c => c.realm.realmId == realmId)
+        } else {
+            selHealthArea = this.state.healthAreas
+        }
 
-        let selHealthArea = this.state.healthAreas
-        this.setState({
-            selHealthArea
-        });
+        // let selHealthArea = this.state.healthAreas
+        // this.setState({
+        //     selHealthArea
+        // });
     }
     filterOrganisation() {
         let realmId = this.state.user.realm.realmId;
-        // if (realmId != 0 && realmId != null) {
-        //     const selOrganisation = this.state.organisations.filter(c => c.realm.realmId == realmId && c.active.toString() == "true")
-        //     this.setState({
-        //         selOrganisation
-        //     });
-        // } else {
-        //     this.setState({
-        //         selOrganisation: this.state.organisations
-        //     });
-        // }
-        const selOrganisation = this.state.organisations.filter(c => c.active.toString() == "true")
-        this.setState({
-            selOrganisation
-        });
+        if (realmId != 0 && realmId != null) {
+            const selOrganisation = this.state.organisations.filter(c => c.realm.realmId == realmId && c.active.toString() == "true")
+            this.setState({
+                selOrganisation
+            });
+        } else {
+            this.setState({
+                selOrganisation: this.state.organisations
+            });
+        }
+        // const selOrganisation = this.state.organisations.filter(c => c.active.toString() == "true")
+        // this.setState({
+        //     selOrganisation
+        // });
     }
     filterData() {
         let realmId = this.state.user.realm.realmId;
-        // if (realmId != 0 && realmId != null) {
-        //     const selRealmCountry = this.state.realmCountryList.filter(c => c.realm.realmId == realmId && c.active.toString() == "true")
-        //     this.setState({
-        //         selRealmCountry
-        //     });
-        // } else {
-        //     this.setState({
-        //         selRealmCountry: this.state.realmCountryList
-        //     });
-        // }
+        if (realmId != 0 && realmId != null) {
+            const selRealmCountry = this.state.realmCountryList.filter(c => c.realm.realmId == realmId && c.active.toString() == "true")
+            this.setState({
+                selRealmCountry
+            });
+        } else {
+            this.setState({
+                selRealmCountry: this.state.realmCountryList
+            });
+        }
 
-        const selRealmCountry = this.state.realmCountryList.filter(c => c.active.toString() == "true")
-        this.setState({
-            selRealmCountry
-        });
+        // const selRealmCountry = this.state.realmCountryList.filter(c => c.active.toString() == "true")
+        // this.setState({
+        //     selRealmCountry
+        // });
     }
 
     getAccessControlData() {

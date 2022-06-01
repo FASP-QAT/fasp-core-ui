@@ -1769,20 +1769,20 @@ class ListUserComponent extends Component {
                                                                                         //     }.bind(this)
                                                                                         // });
 
-                                                                                        if (obj.options.allowInsertRow == true) {
-                                                                                            items.push({
-                                                                                                title: i18n.t('static.user.accessControlText'),
-                                                                                                onclick: function () {
-                                                                                                    // console.log("onclick------>", this.el.getValueFromCoords(0, y));
-                                                                                                    if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_ACCESS_CONTROL')) {
-                                                                                                        this.props.history.push({
-                                                                                                            pathname: `/user/accessControl/${this.el.getValueFromCoords(0, y)}`,
-                                                                                                        });
-                                                                                                    }
+                                                                                        // if (obj.options.allowInsertRow == true) {
+                                                                                        //     items.push({
+                                                                                        //         title: i18n.t('static.user.accessControlText'),
+                                                                                        //         onclick: function () {
+                                                                                        //             // console.log("onclick------>", this.el.getValueFromCoords(0, y));
+                                                                                        //             if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_ACCESS_CONTROL')) {
+                                                                                        //                 this.props.history.push({
+                                                                                        //                     pathname: `/user/accessControl/${this.el.getValueFromCoords(0, y)}`,
+                                                                                        //                 });
+                                                                                        //             }
 
-                                                                                                }.bind(this)
-                                                                                            });
-                                                                                        }
+                                                                                        //         }.bind(this)
+                                                                                        //     });
+                                                                                        // }
                                                                                     }
 
                                                                                     // Delete a row                                                                                    
