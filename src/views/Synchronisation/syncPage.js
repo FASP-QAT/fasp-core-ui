@@ -3723,6 +3723,7 @@ export default class syncPage extends Component {
               // ProgramService.checkIfCommitRequestExists((this.state.singleProgramId)).then(response1 => {
               // if (response1.status == 200) {
               // if (response1.data == false) {
+                if(programJson.shipmentList.filter(c=>c.erpFlag.toString()=="true").length==0){
               ProgramService.saveProgramData(programJson, this.state.comparedLatestVersion).then(response => {
                 if (response.status == 200) {
                   console.log(")))) Commit Request generated successfully");
@@ -3872,6 +3873,16 @@ export default class syncPage extends Component {
                     }
                   }
                 );
+            }else{
+              alert("An error occurred while processing the commit because it contains some linked shipments. Please use versions that do not have linked shipments.")
+              this.setState({
+                message: "An error occurred while processing the commit because it contains some linked shipments. Please use versions that do not have linked shipments.",
+                loading: false,
+                color: "red"
+              }, () => {
+                this.hideFirstComponent()
+              });
+            }
               //     } else {
               //       alert(i18n.t("static.commitVersion.requestAlreadyExists"));
               //       this.setState({
