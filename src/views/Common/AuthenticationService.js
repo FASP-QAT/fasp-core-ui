@@ -1405,7 +1405,7 @@ class AuthenticationService {
                         break;
 
                     case "/dataset/createTreeTemplate/:templateId":
-                        if (bfunction.includes("ROLE_BF_EDIT_TREE_TEMPLATE")) {
+                        if (bfunction.includes("ROLE_BF_EDIT_TREE_TEMPLATE") || bfunction.includes("ROLE_BF_ADD_TREE_TEMPLATE") || bfunction.includes("ROLE_BF_VIEW_TREE_TEMPLATES")) {
                             return true;
                         }
                         break;
