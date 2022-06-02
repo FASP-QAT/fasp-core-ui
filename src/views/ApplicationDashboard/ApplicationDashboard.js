@@ -1324,7 +1324,7 @@ class ApplicationDashboard extends Component {
 
                           </DropdownToggle>
                           <DropdownMenu right>
-                            <DropdownItem onClick={() => this.redirectToCrud("/program/listProgram")}>{i18n.t('static.list.listProgram')}</DropdownItem>
+                            <DropdownItem onClick={() => this.redirectToCrud(activeTab1==2?"/program/listProgram":"/dataSet/listDataSet")}>{i18n.t('static.list.listProgram')}</DropdownItem>
 
 
                           </DropdownMenu>
@@ -1333,7 +1333,7 @@ class ApplicationDashboard extends Component {
                     </div>
 
                     <div className="TextTittle ">{i18n.t('static.add.totalProgram')} </div>
-                    <div className="text-count">{this.state.dashboard.PROGRAM_COUNT}</div>
+                    <div className="text-count">{activeTab1==2?this.state.dashboard.PROGRAM_COUNT:this.state.dashboard.DATASET_COUNT}</div>
                     <div className="chart-wrapper mt-4 pb-2" >
 
                     </div>
