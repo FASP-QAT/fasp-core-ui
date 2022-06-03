@@ -2920,8 +2920,8 @@ export default class ManualTagging extends Component {
                 data[16] = manualTaggingList[j];
                 data[17] = linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2 : {}
                 data[18] = linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].roNo : ""
-                data[19] = linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].roNoPrimeLineNo : ""
-                data[20] = manualTaggingArray.filter(c => (c[18] == (linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].roNo : "")) && (c[19] == (linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].roNoPrimeLineNo : ""))).length > 0 ? 1 : 0;
+                data[19] = linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].roPrimeLineNo : ""
+                data[20] = manualTaggingArray.filter(c => (c[18] == (linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].roNo : "")) && (c[19] == (linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].roPrimeLineNo : ""))).length > 0 ? 1 : 0;
             }
             else {
                 // data[0] = manualTaggingList[j].erpOrderId
