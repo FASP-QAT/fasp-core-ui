@@ -1660,15 +1660,19 @@ export default class BuildTree extends Component {
             console.log("items before update 1234567---", items);
             if (parameterName == 'currentItemConfig') {
                 console.log("node id for update state 1----", value.context.id);
-                var findNodeIndex = items.findIndex(n => n.id == value.context.id);
-                console.log("findNodeIndex1---", findNodeIndex);
-                items[findNodeIndex] = value.context;
-                console.log("node id for update state 2----", value.context);
-                console.log("node id for update state 3----", items);
-                this.setState({ items }, () => {
-                    console.log("node id for update state 4----", this.state.items);
-                    this.saveTreeData(true);
-                })
+                if (value.context.id == "" || value.context.id == null) {
+                    this.onAddButtonClick(this.state.currentItemConfig);
+                } else {
+                    var findNodeIndex = items.findIndex(n => n.id == value.context.id);
+                    console.log("findNodeIndex1---", findNodeIndex);
+                    items[findNodeIndex] = value.context;
+                    console.log("node id for update state 2----", value.context);
+                    console.log("node id for update state 3----", items);
+                    this.setState({ items }, () => {
+                        console.log("node id for update state 4----", this.state.items);
+                        this.saveTreeData(true);
+                    })
+                }
             }
             if (parameterName == 'nodeId' && (value != null && value != 0)) {
                 var nodeDataMomList = this.state.nodeDataMomList;
@@ -3033,10 +3037,6 @@ export default class BuildTree extends Component {
                     const itemIndex1 = items.findIndex(o => o.id === this.state.currentItemConfig.context.id);
                     console.log("itemIndex1--->>>", itemIndex1);
                     if (itemIndex1 != -1) {
-                        // var result1 = tableJson.length == 1 ? new Map(Object.entries(tableJson[0])).get("12") : 0;
-                        // if (result1 == 1) {
-
-                        // } else {
                         for (var i = 0; i < tableJson.length; i++) {
                             var map1 = new Map(Object.entries(tableJson[i]));
                             console.log("10 map---" + map1.get("10"));
@@ -3085,10 +3085,8 @@ export default class BuildTree extends Component {
 
                             }
                         }
-                        // }
                         console.log("dataArr--->>>", dataArr);
                         item.payload = this.state.currentItemConfig.context.payload;
-                        // if (dataArr.length > 0) {
                         (item.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataModelingList = dataArr;
                         // }
                         if (this.state.lastRowDeleted == true) {
@@ -3124,21 +3122,23 @@ export default class BuildTree extends Component {
                             this.calculateMOMData(0, 0);
                         });
                     } else {
-                        this.setState({
-                            modelingJexcelLoader: false
-                        }, () => {
-                            // setTimeout(() => {
-                            alert("You are creating a new node.Please submit the node data first and then apply modeling/transfer.");
-                            // confirmAlert({
-                            //     message: "You are creating a new node.Please submit the node data first and then apply modeling/transfer.",
-                            //     buttons: [
-                            //         {
-                            //             label: i18n.t('static.report.ok')
-                            //         }
-                            //     ]
-                            // });
-                            // }, 0);
-                        });
+                        // this.setState({
+                        //     modelingJexcelLoader: false
+                        // }, () => {
+
+                        this.onAddButtonClick(this.state.currentItemConfig);
+                        // setTimeout(() => {
+                        // alert("You are creating a new node.Please submit the node data first and then apply modeling/transfer.");
+                        // confirmAlert({
+                        //     message: "You are creating a new node.Please submit the node data first and then apply modeling/transfer.",
+                        //     buttons: [
+                        //         {
+                        //             label: i18n.t('static.report.ok')
+                        //         }
+                        //     ]
+                        // });
+                        // }, 0);
+                        // });
                     }
                 } catch (err) {
                     console.log("scaling err---", err);
@@ -4053,7 +4053,7 @@ export default class BuildTree extends Component {
                     });
                 })
 
-            } else if (rowData[4] == "" ||  rowData[4] == null) {
+            } else if (rowData[4] == "" || rowData[4] == null) {
                 alert("Please select modeling type before proceeding.");
             }
             else if (rowData[1] == "" || rowData[1] == null) {
@@ -4061,7 +4061,7 @@ export default class BuildTree extends Component {
             }
             else if (rowData[2] == "" || rowData[2] == null) {
                 alert("Please select end date before proceeding.");
-            } 
+            }
         }
     }.bind(this)
 
@@ -9649,7 +9649,7 @@ export default class BuildTree extends Component {
                                     this.state.currentItemConfig.context.payload.nodeType.id > 2 ?
                                         this.state.currentItemConfig.context.payload.nodeUnit.id != "" ?
                                             this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentScenario.fuNode.forecastingUnit.unit.id != "" ? getLabelText(this.state.unitList.filter(c => c.unitId == this.state.currentScenario.fuNode.forecastingUnit.unit.id)[0].label, this.state.lang) : ""
-                                            : this.state.currentItemConfig.context.payload.nodeType.id == 5 ? this.state.currentScenario.puNode.planningUnit.unit.id != "" ? getLabelText(this.state.unitList.filter(c => c.unitId == this.state.currentScenario.puNode.planningUnit.unit.id)[0].label, this.state.lang) : ""
+                                                : this.state.currentItemConfig.context.payload.nodeType.id == 5 ? this.state.currentScenario.puNode.planningUnit.unit.id != "" ? getLabelText(this.state.unitList.filter(c => c.unitId == this.state.currentScenario.puNode.planningUnit.unit.id)[0].label, this.state.lang) : ""
                                                     : getLabelText(this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label, this.state.lang)
                                             : ""
                                         : ""}</b> {i18n.t('static.tree.forNode')} <b>{this.state.currentItemConfig.context.payload.label != null ? getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) : ''}</b> {i18n.t('static.tree.asA%OfParent')} <b>{this.state.currentItemConfig.parentItem.payload.label != null ? getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang) : ''}</b></i></div>
@@ -10304,7 +10304,7 @@ export default class BuildTree extends Component {
                                 if (getLevelUnit.length > 0) {
                                     levelUnitId = getLevelUnit[0].unit != null ? getLevelUnit[0].unit.id : "";
                                 }
-                                console.log("level unit id on add button click---",levelUnitId);
+                                console.log("level unit id on add button click---", levelUnitId);
                                 // tempArray.push(nodeDataMap);
                                 this.setState({
                                     showMomDataPercent: false,
