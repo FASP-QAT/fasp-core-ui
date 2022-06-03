@@ -3731,6 +3731,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                 expectedDeliveryDate: expectedDeliveryDate,
                                 receivedDate: receivedDate,
                                 index: shipmentDataList.length,
+                                tempShipmentId:map.get("2").toString().concat(shipmentDataList.length),
                                 batchInfoList: [],
                                 orderNo: map.get("8"),
                                 createdBy: {

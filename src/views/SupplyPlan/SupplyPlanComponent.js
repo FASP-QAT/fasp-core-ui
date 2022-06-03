@@ -2809,7 +2809,7 @@ export default class SupplyPlanComponent extends React.Component {
 
                         for (var n = 0; n < m.length; n++) {
                             var jsonList = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM-DD") == moment(m[n].startDate).format("YYYY-MM-DD"));
-                            console.log("jsonList@@@@@@@@@@@@",jsonList);
+                            console.log("jsonList@@@@@@@@@@@@", jsonList);
                             var prevMonthJsonList = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM-DD") == moment(m[n].startDate).subtract(1, 'months').format("YYYY-MM-DD"));
                             if (jsonList.length > 0) {
                                 openingBalanceArray.push({ isActual: prevMonthJsonList.length > 0 && prevMonthJsonList[0].regionCountForStock == prevMonthJsonList[0].regionCount ? 1 : 0, balance: jsonList[0].openingBalance });
@@ -4169,7 +4169,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         <li><span className="legendcolor" style={{ backgroundColor: "#cfcdc9" }}></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlanFormula.na')}</span></li>
                                     </ul>
                                 </FormGroup>
-                                {(this.state.programQPLDetails.filter(c => c.id == this.state.programId)).length > 0 && (this.state.programQPLDetails.filter(c => c.id == this.state.programId))[0].readonly == 1 && <h5 style={{ color: 'red' }}>{i18n.t('static.dataentry.readonly')}</h5>}
+                                {(this.state.programQPLDetails.filter(c => c.id == this.state.programId)).length > 0 && (this.state.programQPLDetails.filter(c => c.id == this.state.programId))[0].readonly == 1 && <h5 style={{ color: 'red' }}>{this.state.programQPLDetails.filter(c => c.id == this.state.programId)[0].doNotFollowLatestShipmentInfo == 1 ? i18n.t('static.dataEntry.doNotFollowLatestShipment') : i18n.t('static.dataentry.readonly')}</h5>}
                                 <Row>
                                     <Col xs="12" md="12" className="mb-4  mt-3">
                                         <Nav tabs>
