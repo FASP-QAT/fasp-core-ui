@@ -912,14 +912,14 @@ class ListUserComponent extends Component {
 
         return (
             <>
-                <TabPane tabId="1">
-                    <Card>
-                        <CardBody className="pl-lg-3 pr-lg-3 pt-lg-0">
+                <TabPane tabId="1" className='pb-lg-0'>
+                    {/* <Card> */}
+                        <CardBody className="pl-lg-1 pr-lg-1 pt-lg-0">
                             {/* <div id="tableDiv1" className="table-responsive consumptionDataEntryTable"> */}
                             <div id="tableDiv1" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USER') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
                             </div>
                         </CardBody>
-                        <CardFooter>
+                        {/* <CardFooter> */}
                             {/* <FormGroup>
                                 <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                 <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => { this.addRow1(); }}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>
@@ -927,18 +927,18 @@ class ListUserComponent extends Component {
                             </FormGroup> */}
 
 
-                        </CardFooter>
-                    </Card>
+                        {/* </CardFooter> */}
+                    {/* </Card> */}
                 </TabPane>
 
-                <TabPane tabId="2">
-                    <Card>
-                        <CardBody className="pl-lg-3 pr-lg-3 pt-lg-0">
+                <TabPane tabId="2" className='pb-lg-0'>
+                    {/* <Card> */}
+                        <CardBody className="pl-lg-1 pr-lg-1 pt-lg-0">
                             {/* <div id="tableDiv2" className="table-responsive consumptionDataEntryTable"> */}
                             <div id="tableDiv2" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USER') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
                             </div>
                         </CardBody>
-                        <CardFooter>
+                        {/* <CardFooter> */}
                             {/* <FormGroup>
                                 <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                 <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => { this.addRow2(); }}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>
@@ -946,8 +946,8 @@ class ListUserComponent extends Component {
                             </FormGroup> */}
 
 
-                        </CardFooter>
-                    </Card>
+                        {/* </CardFooter> */}
+                    {/* </Card> */}
                 </TabPane>
 
             </>
@@ -2104,9 +2104,9 @@ class ListUserComponent extends Component {
                             </div>
                         </div>
                     </div>
-                    <CardBody className="pb-lg-0 pt-lg-0">
+                    <CardBody className="pb-lg-3 pt-lg-0">
                         {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN') &&
-                            <Col md="3" className="pl-0">
+                            <Col md="3" className="pl-0 pb-lg-5">
                                 <FormGroup className="Selectdiv">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
                                     <div className="controls SelectGo">
@@ -2132,7 +2132,7 @@ class ListUserComponent extends Component {
                         {/* <div id="loader" className="center"></div> */}
 
 
-                        <Nav tabs>
+                        <Nav tabs className='pt-lg-0'>
                             <NavItem>
                                 <NavLink
                                     active={this.state.activeTab1[0] === '1'}
