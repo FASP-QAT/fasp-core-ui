@@ -1324,7 +1324,7 @@ class ApplicationDashboard extends Component {
 
                           </DropdownToggle>
                           <DropdownMenu right>
-                            <DropdownItem onClick={() => this.redirectToCrud("/program/listProgram")}>{i18n.t('static.list.listProgram')}</DropdownItem>
+                            <DropdownItem onClick={() => this.redirectToCrud(activeTab1==2?"/program/listProgram":"/dataSet/listDataSet")}>{i18n.t('static.list.listProgram')}</DropdownItem>
 
 
                           </DropdownMenu>
@@ -1333,7 +1333,7 @@ class ApplicationDashboard extends Component {
                     </div>
 
                     <div className="TextTittle ">{i18n.t('static.add.totalProgram')} </div>
-                    <div className="text-count">{this.state.dashboard.PROGRAM_COUNT}</div>
+                    <div className="text-count">{activeTab1==2?this.state.dashboard.PROGRAM_COUNT:this.state.dashboard.DATASET_COUNT}</div>
                     <div className="chart-wrapper mt-4 pb-2" >
 
                     </div>
@@ -1350,7 +1350,7 @@ class ApplicationDashboard extends Component {
                           <DropdownToggle caret className="p-0" color="transparent">
                           </DropdownToggle>
                           <DropdownMenu right>
-                            <DropdownItem onClick={() => this.redirectToCrud("/program/programOnboarding")}>{i18n.t('static.dashboard.setupprogram')}</DropdownItem>
+                            <DropdownItem onClick={() => this.redirectToCrud(activeTab1==2?"/program/programOnboarding":"/dataset/addDataSet")}>{i18n.t('static.dashboard.setupprogram')}</DropdownItem>
                           </DropdownMenu>
                         </Dropdown>
                       </ButtonGroup>
@@ -1362,7 +1362,7 @@ class ApplicationDashboard extends Component {
                   </CardBody>
                 </Card>
               </Col>
-              <Col xs="12" sm="6" lg="3">
+              {activeTab1==2 && <Col xs="12" sm="6" lg="3">
                 <Card className=" CardHeight">
                   <CardBody className="box-p">
                     <div class="h1 text-muted text-left mb-2  ">
@@ -1384,7 +1384,7 @@ class ApplicationDashboard extends Component {
                     </div>
                   </CardBody>
                 </Card>
-              </Col>
+              </Col>}
 
 
 
@@ -1420,7 +1420,7 @@ class ApplicationDashboard extends Component {
           }
 
 
-          {checkOnline === 'Online' && this.state.id != 2 && this.state.roleArray.includes('ROLE_SUPPLY_PLAN_REVIEWER') &&
+          {activeTab1==2 && checkOnline === 'Online' && this.state.id != 2 && this.state.roleArray.includes('ROLE_SUPPLY_PLAN_REVIEWER') &&
             <>
               <Col xs="12" sm="6" lg="3">
                 <Card className=" CardHeight">
