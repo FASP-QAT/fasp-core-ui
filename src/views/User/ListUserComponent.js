@@ -1623,7 +1623,7 @@ class ListUserComponent extends Component {
                                                                         let count = 0;
 
                                                                         for (var j = 0; j < userList.length; j++) {
-                                                                            console.log("userList---->2", userList.filter(c => c.userId == 663)[0].userAclList.map(a => a.realmCountryId).toString().trim().replaceAll(',', ';'));
+                                                                            // console.log("userList---->2", userList.filter(c => c.userId == 663)[0].userAclList.map(a => a.realmCountryId).toString().trim().replaceAll(',', ';'));
                                                                             data = [];
                                                                             data[0] = userList[j].userId
                                                                             data[1] = userList[j].userId
@@ -2138,7 +2138,7 @@ class ListUserComponent extends Component {
                                     active={this.state.activeTab1[0] === '1'}
                                     onClick={() => { this.toggleModal(0, '1'); }}
                                 >
-                                    {'Tab-1'}
+                                    {'User List'}
                                 </NavLink>
                             </NavItem>
                             <NavItem>
@@ -2146,7 +2146,7 @@ class ListUserComponent extends Component {
                                     active={this.state.activeTab1[0] === '2'}
                                     onClick={() => { this.toggleModal(0, '2'); }}
                                 >
-                                    {'Tab-2'}
+                                    {'Access Control List'}
                                 </NavLink>
                             </NavItem>
                         </Nav>
