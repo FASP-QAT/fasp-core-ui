@@ -2348,5 +2348,7 @@
     "static.procurementagenttype.codetext": "Procurement Agent Type display name is required",
     "static.procurementAgenTtype.procurementagenttypenametext": "Procurement Agent Type name is required",
     "static.procurementagenttype.procurementtypename": "Procurement Agent Type Name",
-    "static.procurementagenttype.procurementagenttypecode": "Procurement Agent Type display name"
+    "static.procurementagenttype.procurementagenttypecode": "Procurement Agent Type display name",
+    "static.procurementagent.procurementagenttypetext": "Procurement Agent Type is required",
+    "static.procurementagent.programtext": "Program is required"
 }

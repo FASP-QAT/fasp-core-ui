@@ -2346,5 +2346,7 @@
     "static.procurementagenttype.codetext": "O nome de exibição do tipo de agente de compras é obrigatório",
     "static.procurementAgenTtype.procurementagenttypenametext": "O nome do tipo de agente de aquisição é obrigatório",
     "static.procurementagenttype.procurementtypename": "Nome do tipo de agente de aquisição",
-    "static.procurementagenttype.procurementagenttypecode": "Nome de exibição do tipo de agente de compras"
+    "static.procurementagenttype.procurementagenttypecode": "Nome de exibição do tipo de agente de compras",
+    "static.procurementagent.procurementagenttypetext": "O tipo de agente de aquisição é obrigatório",
+    "static.procurementagent.programtext": "O programa é obrigatório"
 }

@@ -244,6 +244,7 @@ class AddProcurementAgentTypeComponent extends Component {
                                 enableReinitialize={true}
                                 initialValues={
                                     {
+                                        realmId: this.state.procurementAgentType.realm.id,
                                         procurementAgentTypeCode: this.state.procurementAgentType.procurementAgentTypeCode,
                                         procurementAgentTypeName: this.state.procurementAgentType.label.label_en,
                                     }}

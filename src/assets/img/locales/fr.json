@@ -2346,5 +2346,7 @@
     "static.procurementagenttype.codetext": "Le nom à afficher du type d`agent d`approvisionnement est requis",
     "static.procurementAgenTtype.procurementagenttypenametext": "Le nom du type d`agent d`approvisionnement est requis",
     "static.procurementagenttype.procurementtypename": "Nom du type d`agent d`approvisionnement",
-    "static.procurementagenttype.procurementagenttypecode": "Nom d'affichage du type d`agent d`approvisionnement"
+    "static.procurementagenttype.procurementagenttypecode": "Nom d'affichage du type d`agent d`approvisionnement",
+    "static.procurementagent.procurementagenttypetext": "Le type d`agent d`approvisionnement est requis",
+    "static.procurementagent.programtext": "Le programme est requis"
 }
