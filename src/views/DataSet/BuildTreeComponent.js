@@ -535,6 +535,7 @@ export default class BuildTree extends Component {
         this.pickAMonth4 = React.createRef()
         this.pickAMonth5 = React.createRef()
         this.state = {
+            isValidError: '',
             percentForOneMonth: '',
             popoverOpenStartValueModelingTool: false,
             showGuidanceModelingTransfer: false,
@@ -3130,7 +3131,16 @@ export default class BuildTree extends Component {
                             this.calculateMOMData(0, 0);
                         });
                     } else {
-                        this.onAddButtonClick(this.state.currentItemConfig, true, dataArr);
+                        if (this.state.isValidError) {
+                            this.onAddButtonClick(this.state.currentItemConfig, true, dataArr);
+                        } else {
+                            this.setState({
+                                modelingJexcelLoader: false
+                            }, () => {
+                                alert("Please fill all the required fields in Node Data Tab");
+                            });
+
+                        }
                     }
                     // } 
                     // else {
@@ -7154,8 +7164,7 @@ export default class BuildTree extends Component {
 
         console.log("anchal 1---", currentItemConfig)
         console.log("anchal 2---", this.state.selectedScenario)
-        var isValid = document.getElementById('isValid').value;
-        console.log("isValid---", isValid);
+
         this.setState({
             currentItemConfig,
             currentScenario: (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0],
@@ -7163,6 +7172,12 @@ export default class BuildTree extends Component {
         }, () => {
             console.log("after state update---", this.state.currentItemConfig);
             console.log("after state update current scenario---", this.state.currentScenario);
+            if (this.state.activeTab1[0] == '1') {
+                var isValid = document.getElementById('isValidError').value;
+                // console.log("isValid 1---", isValid);
+                console.log("isValid 2---", isValid != '{}');
+                this.setState({ isValidError: isValid != '{}' });
+            }
             if (flag) {
                 if (event.target.name === "planningUnitId") {
                     this.calculatePUPerVisit(false);
@@ -7267,7 +7282,7 @@ export default class BuildTree extends Component {
         }
         console.log("pu node add button clicked value after update---", newItem);
         console.log("pu node add button clicked value after update---", newItem.payload.nodeDataMap.length);
-        
+
         this.setState({
             items: [...items, newItem],
             cursorItem: nodeId,
@@ -8167,15 +8182,8 @@ export default class BuildTree extends Component {
                                                 <PopoverBody>{i18n.t('static.tooltip.NodeType')}</PopoverBody>
                                             </Popover>
                                         </div>
-
                                         <Input
-                                            type="text"
-                                            name="isValid"
-                                            id="isValid"
-                                            value={(isValid ? true : false)}
-                                        />
-                                        <Input
-                                            type="text"
+                                            type="hidden"
                                             name="isValidError"
                                             id="isValidError"
                                             value={JSON.stringify(errors)}

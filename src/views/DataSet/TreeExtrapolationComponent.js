@@ -447,6 +447,7 @@ export default class TreeExtrapolationComponent extends React.Component {
         })
     }
     buildExtrapolationMom() {
+        console.log("is valid result start---",this.props.items.isValidError);
         var movingAveragesData = [];
         var semiAveragesData = [];
         var linearRegressionData = [];
@@ -623,7 +624,12 @@ export default class TreeExtrapolationComponent extends React.Component {
             currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].dataValue = mom.length > 0 ? mom[0].calculatedValue : '0';
             currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].calculatedDataValue = mom.length > 0 ? mom[0].calculatedValue : '0';
             // }
-            this.props.updateState("currentItemConfig", currentItemConfig);
+            console.log("is valid result ---",this.props.items.isValidError);
+            if (this.props.items.isValidError) {
+                this.props.updateState("currentItemConfig", currentItemConfig);
+            } else {
+                alert("Please fill all the required fields in Node Data Tab");
+            }
 
         });
     }
@@ -2417,7 +2423,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                 )
             }, this);
         // console.log("extrapolationMethods---", extrapolationMethods);
-        
+
         const pickerLang = {
             months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
             from: 'From', to: 'To',
