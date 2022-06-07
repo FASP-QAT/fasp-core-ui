@@ -1392,8 +1392,8 @@ export default class ExpiredInventory extends Component {
                             </div>
                         </div>
                         {this.state.outPutList.length > 0 && <span style={{ float: "left" }}><b>{i18n.t("static.expiryReport.batchInfoNote")}</b></span>}
-                        <div className="consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
-                            <div id="tableDiv" className={document.getElementById("versionId") != null && document.getElementById("versionId").value.includes('Local') ? "jexcelremoveReadonlybackground RowClickableExpiredInventory" : "jexcelremoveReadonlybackground"}>
+                        <div className="table-responsive consumptionDataEntryTable">
+                            <div id="tableDiv" className={document.getElementById("versionId") != null && document.getElementById("versionId").value.includes('Local') ? "jexcelremoveReadonlybackground RowClickableExpiredInventory" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
                             </div>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>

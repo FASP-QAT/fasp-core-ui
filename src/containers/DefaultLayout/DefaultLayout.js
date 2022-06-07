@@ -976,19 +976,19 @@ class DefaultLayout extends Component {
   getNotificationCount() {
     if (localStorage.getItem("sessionType") === 'Online') {
       AuthenticationService.setupAxiosInterceptors();
-      ManualTaggingService.getNotificationCount()
-        .then(response => {
-          console.log("notification response===", response.data);
-          this.setState({
-            notificationCount: response.data
-          })
-        }).catch(
-          error => {
-            this.setState({
-              notificationCount: 0
-            })
-          }
-        );
+      // ManualTaggingService.getNotificationCount()
+      //   .then(response => {
+      //     console.log("notification response===", response.data);
+      //     this.setState({
+      //       notificationCount: response.data
+      //     })
+      //   }).catch(
+      //     error => {
+      //       this.setState({
+      //         notificationCount: 0
+      //       })
+      //     }
+      //   );
     }
   }
   getProgramData() {
@@ -2859,8 +2859,19 @@ class DefaultLayout extends Component {
                                   }
                                 }
                               },
+                              {
+                                name: i18n.t('static.report.forecasterrorovertime'),
+                                url: '/report/consumptionForecastErrorSupplyPlan',
+                                icon: 'fa fa-line-chart',
+                                attributes: {
+                                  hidden: ((this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT') && this.state.activeTab == 2) ? false : true),
+                                  onClick: e => {
+                                    this.refreshPage();
+                                  }
+                                }
+                              },
                               // {
-                              //   name: i18n.t('static.report.forecasterrorovertime'),
+                              //   name:'Forecast Error (Monthly) (New)',
                               //   url: '/report/consumptionForecastErrorSupplyPlan',
                               //   icon: 'fa fa-line-chart',
                               //   attributes: {
@@ -3926,8 +3937,19 @@ class DefaultLayout extends Component {
                                   }
                                 }
                               },
+                              {
+                                name: i18n.t('static.report.forecasterrorovertime'),
+                                url: '/report/consumptionForecastErrorSupplyPlan',
+                                icon: 'fa fa-line-chart',
+                                attributes: {
+                                  hidden: (this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT') && this.state.activeTab == 2 ? false : true),
+                                  onClick: e => {
+                                    this.refreshPage();
+                                  }
+                                }
+                              },
                               // {
-                              //   name: i18n.t('static.report.forecasterrorovertime'),
+                              //   name: 'Forecast Error (Monthly) (New)',
                               //   url: '/report/consumptionForecastErrorSupplyPlan',
                               //   icon: 'fa fa-line-chart',
                               //   attributes: {
