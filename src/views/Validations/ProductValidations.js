@@ -502,15 +502,16 @@ class ProductValidation extends Component {
                         if (finalData[i].nodeDataMap.puNode.sharePlanningUnit == "true") {
                             sharePu = (noOfMonthsInUsagePeriod / finalData[i].nodeDataMap.puNode.planningUnit.multiplier);
                         } else {
-                            sharePu = Math.round((noOfMonthsInUsagePeriod / finalData[i].nodeDataMap.puNode.planningUnit.multiplier));
+                            sharePu = this.round((noOfMonthsInUsagePeriod / finalData[i].nodeDataMap.puNode.planningUnit.multiplier));
                         }
                         usageTextPU = i18n.t('static.tree.forEach') + " " + selectedText + " " + i18n.t('static.tree.weNeed') + " " + sharePu + " " + planningUnit;
                     } else {
                         console.log("finalData[i].parentNodeNodeDataMap.fuNode.noOfForecastingUnitsPerPerson+++", finalData[i].parentNodeNodeDataMap.fuNode.noOfForecastingUnitsPerPerson);
                         console.log("noOfMonthsInUsagePeriod+++", noOfMonthsInUsagePeriod);
                         console.log("finalData[i].nodeDataMap.puNode.refillMonths+++", finalData[i].nodeDataMap.puNode.refillMonths);
-                        var puPerInterval = (((finalData[i].parentNodeNodeDataMap.fuNode.noOfForecastingUnitsPerPerson / noOfMonthsInUsagePeriod) / finalData[i].nodeDataMap.puNode.planningUnit.multiplier) / finalData[i].nodeDataMap.puNode.refillMonths);
+                        var puPerInterval = finalData[i].nodeDataMap.puNode.puPerVisit;
                         console.log("puPerInterval###", puPerInterval);
+
                         usageTextPU = i18n.t('static.tree.forEach') + " " + selectedText + " " + i18n.t('static.tree.weNeed') + " " + this.addCommas(this.round(puPerInterval)) + " " + planningUnit + " " + i18n.t('static.usageTemplate.every') + " " + finalData[i].nodeDataMap.puNode.refillMonths + " " + i18n.t('static.report.month');
                     }
                     var currency = this.state.currencyList.filter(c => c.id == this.state.currencyId)[0];
@@ -521,6 +522,9 @@ class ProductValidation extends Component {
                         price = Number(selectedPlanningUnit[0].price);
                     }
                     var qty = Number(finalData[i].nodeDataMap.puNode.puPerVisit);
+                    if(finalData[i].parentNodeNodeDataMap.fuNode.usageType.id == 2){
+                        qty=Number(qty)/Number(finalData[i].nodeDataMap.puNode.refillMonths)
+                    }
 
                     // if (finalData[i].parentNodeNodeDataMap.fuNode.usageType.id == 1) {
                     //     cost = (sharePu * price) / currency.conversionRateToUsd;
