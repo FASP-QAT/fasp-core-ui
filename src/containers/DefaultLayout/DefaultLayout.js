@@ -987,19 +987,19 @@ class DefaultLayout extends Component {
   getNotificationCount() {
     if (localStorage.getItem("sessionType") === 'Online') {
       AuthenticationService.setupAxiosInterceptors();
-      ManualTaggingService.getNotificationCount()
-        .then(response => {
-          console.log("notification response===", response.data);
-          this.setState({
-            notificationCount: response.data
-          })
-        }).catch(
-          error => {
-            this.setState({
-              notificationCount: 0
-            })
-          }
-        );
+      // ManualTaggingService.getNotificationCount()
+      //   .then(response => {
+      //     console.log("notification response===", response.data);
+      //     this.setState({
+      //       notificationCount: response.data
+      //     })
+      //   }).catch(
+      //     error => {
+      //       this.setState({
+      //         notificationCount: 0
+      //       })
+      //     }
+      //   );
     }
   }
   getProgramData() {
@@ -2883,7 +2883,7 @@ class DefaultLayout extends Component {
                                 }
                               },
                               {
-                                name:'Forecast Error (Monthly) (New)',
+                                name: i18n.t('static.report.forecasterrorovertime'),
                                 url: '/report/consumptionForecastErrorSupplyPlan',
                                 icon: 'fa fa-line-chart',
                                 attributes: {
@@ -3950,7 +3950,7 @@ class DefaultLayout extends Component {
                                 }
                               },
                               {
-                                name: 'Forecast Error (Monthly) (New)',
+                                name: i18n.t('static.report.forecasterrorovertime'),
                                 url: '/report/consumptionForecastErrorSupplyPlan',
                                 icon: 'fa fa-line-chart',
                                 attributes: {

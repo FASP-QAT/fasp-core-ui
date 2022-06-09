@@ -3336,7 +3336,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     }
                 }
 
-                if (rowData[22] == false) {
+                if (rowData[22] == false && rowData[0].toString()=="true") {
                     var validation = checkValidtion("number", "K", y, elInstance.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll("\,", ""), elInstance, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, 1, 0);
                     if (validation == false) {
                         valid = false;
