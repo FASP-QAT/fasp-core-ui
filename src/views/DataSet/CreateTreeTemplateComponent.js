@@ -2793,6 +2793,8 @@ export default class CreateTreeTemplate extends Component {
                 {
                     title: i18n.t('static.tree.manualChange'),
                     type: 'numeric',
+                    disabledMaskOnEdition: true,
+                    textEditor: true,
                     mask: '#,##0.0000%', decimal: '.'
 
                 },
@@ -2972,6 +2974,8 @@ export default class CreateTreeTemplate extends Component {
                     // 4
                     title: i18n.t('static.tree.seasonalityIndex'),
                     type: this.state.seasonality == true ? 'numeric' : 'hidden',
+                    disabledMaskOnEdition: true,
+                    textEditor: true,
                     mask: '#,##0.0000%', decimal: '.',
                 },
                 {
@@ -6617,11 +6621,12 @@ export default class CreateTreeTemplate extends Component {
                         var x = cell1.split('.');
                         var x1 = x[0];
                         var x2 = x.length > 1 ? '.' + x[1] : '';
+                        var x3 = x.length > 1 ? parseFloat(x1 + x2).toFixed(2) : x1 + x2;
                         var rgx = /(\d+)(\d{3})/;
-                        while (rgx.test(x1)) {
-                            x1 = x1.replace(rgx, '$1' + ',' + '$2');
-                        }
-                        return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
+                        // while (rgx.test(x1)) {
+                        //     x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                        // }
+                        return data.datasets[tooltipItem.datasetIndex].label + ' : ' + addCommas(x3);
                         // } else {
                         // let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
                         // return data.datasets[tooltipItem.datasetIndex].label + ' : ' + value + " %";
@@ -6777,14 +6782,15 @@ export default class CreateTreeTemplate extends Component {
                             var x = cell1.split('.');
                             var x1 = x[0];
                             var x2 = x.length > 1 ? '.' + x[1] : '';
+                            var x3 = x.length > 1 ? parseFloat(x1 + x2).toFixed(2) : x1 + x2;
                             var rgx = /(\d+)(\d{3})/;
-                            while (rgx.test(x1)) {
-                                x1 = x1.replace(rgx, '$1' + ',' + '$2');
-                            }
-                            return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
+                            // while (rgx.test(x1)) {
+                            //     x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                            // }
+                            return data.datasets[tooltipItem.datasetIndex].label + ' : ' + addCommas(x3);
                         } else {
                             let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
-                            return data.datasets[tooltipItem.datasetIndex].label + ' : ' + value + " %";
+                            return data.datasets[tooltipItem.datasetIndex].label + ' : ' + addCommas(parseFloat(value).toFixed(2)) + " %";
                         }
                     }
                 }
