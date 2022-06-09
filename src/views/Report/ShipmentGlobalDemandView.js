@@ -907,7 +907,7 @@ class ShipmentGlobalDemandView extends Component {
                                 procurementAgentList[k] = procurementAgentObj
                             }
 
-                            // console.log("procurementAgentList------>", procurementAgentList);
+                            console.log("procurementAgentList------>", procurementAgentList);
 
 
                             let data = [];

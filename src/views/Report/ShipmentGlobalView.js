@@ -56,7 +56,7 @@ import ProgramService from '../../api/ProgramService';
 import FundingSourceService from '../../api/FundingSourceService';
 import ProcurementAgentService from "../../api/ProcurementAgentService";
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import {MultiSelect} from 'react-multi-select-component';
+import { MultiSelect } from 'react-multi-select-component';
 // const { getToggledOptions } = utils;
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
@@ -732,6 +732,7 @@ class ShipmentGlobalView extends Component {
     //     })
     // }
     handleChangeProgram(programIds) {
+        this.getProcurementAgent(programIds);
         programIds = programIds.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
         })
@@ -938,7 +939,7 @@ class ShipmentGlobalView extends Component {
         this.getCountrys();
         this.getPrograms();
         this.getProductCategories();
-        this.getProcurementAgent();
+        // this.getProcurementAgent();
         this.getFundingSource();
         document.getElementById("procurementAgentDiv").style.display = "none";
 
@@ -955,6 +956,7 @@ class ShipmentGlobalView extends Component {
                     var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
                     return itemLabelA > itemLabelB ? 1 : -1;
                 });
+                this.getProcurementAgent(this.state.programValues);
                 this.setState({
                     programs: listArray, loading: false
                 })
@@ -1082,20 +1084,36 @@ class ShipmentGlobalView extends Component {
         // );
     }
 
-    getProcurementAgent = () => {
+    getProcurementAgent = (programIds) => {
 
         // AuthenticationService.setupAxiosInterceptors();
         ProcurementAgentService.getProcurementAgentListAll()
             .then(response => {
                 // console.log(JSON.stringify(response.data))
                 var listArray = response.data;
-                listArray.sort((a, b) => {
+                var listArray1 = [];
+                for (var k = 0; k < programIds.length; k++) {
+                    for (var i = 0; i < listArray.length; i++) {
+
+                        for (var j = 0; j < listArray[i].programList.length; j++) {
+                            if (listArray[i].programList[j].id === programIds[k].value) {
+                                listArray1.push(listArray[i]);
+                            }
+                        }
+                    }
+                }
+                let uniqueChars = listArray1.filter((c, index) => {
+                    return listArray1.indexOf(c) === index;
+                });
+
+                console.log("uniqueChars--->", uniqueChars);
+                uniqueChars.sort((a, b) => {
                     var itemLabelA = a.procurementAgentCode.toUpperCase(); // ignore upper and lowercase
                     var itemLabelB = b.procurementAgentCode.toUpperCase(); // ignore upper and lowercase                   
                     return itemLabelA > itemLabelB ? 1 : -1;
                 });
                 this.setState({
-                    procurementAgents: listArray, loading: false
+                    procurementAgents: uniqueChars, loading: false
                 })
             }).catch(
                 error => {
@@ -1680,7 +1698,9 @@ class ShipmentGlobalView extends Component {
         this.setState({
             programLst: [],
             programValues: [],
-            programLabels: []
+            programLabels: [],
+            procurementAgentValues: [],
+            procurementAgents: []
         }, () => {
             if (countryIds.length != 0) {
                 let programLst = [];
