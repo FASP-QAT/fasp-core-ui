@@ -33,6 +33,11 @@ const EditFundingSource = React.lazy(() => import('./views/FundingSource/EditFun
 const AddProcurementAgent = React.lazy(() => import('./views/ProcurementAgent/AddProcurementAgentComponent'));
 const ListProcurementAgent = React.lazy(() => import('./views/ProcurementAgent/ListProcurementAgentComponent'));
 const EditProcurementAgent = React.lazy(() => import('./views/ProcurementAgent/EditProcurementAgentComponent'));
+
+const AddProcurementAgentType = React.lazy(() => import('./views/ProcurementAgentType/AddProcurementAgentTypeComponent'));
+const ListProcurementAgentType = React.lazy(() => import('./views/ProcurementAgentType/ListProcurementAgentTypeComponent'));
+const EditProcurementAgentType = React.lazy(() => import('./views/ProcurementAgentType/EditProcurementAgentTypeComponent'));
+
 const AddTracerCategory = React.lazy(() => import('./views/TracerCategory/AddTracerCategoryComponent'));
 const ListTracerCategory = React.lazy(() => import('./views/TracerCategory/ListTracerCategoryComponent'));
 const EditTracerCategory = React.lazy(() => import('./views/TracerCategory/EditTracerCategoryComponent'));
@@ -368,6 +373,12 @@ const routes = [
   // { path: '/procurementAgent/listProcurementAgent/:message', component: ListProcurementAgent },
   { path: '/procurementAgent/listProcurementAgent/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.procurementagent') }), component: ListProcurementAgent },
   { path: '/procurementAgent/editProcurementAgent/:procurementAgentId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.procurementagentheader') }), component: EditProcurementAgent },
+
+  { path: '/procurementAgentType/addProcurementAgentType', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.procurementagentheadertype') }), component: AddProcurementAgentType },
+  { path: '/procurementAgent/listProcurementAgentType', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.procurementagenttype') }), component: ListProcurementAgentType },
+  // { path: '/procurementAgent/listProcurementAgent/:message', component: ListProcurementAgent },
+  { path: '/procurementAgent/listProcurementAgentType/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.procurementagenttype') }), component: ListProcurementAgentType },
+  { path: '/procurementAgent/editProcurementAgentType/:procurementAgentTypeId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.procurementagenttypeheader') }), component: EditProcurementAgentType },
 
   { path: '/tracerCategory/addTracerCategory', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.tracercategoryheader') }), component: AddTracerCategory },
   { path: '/tracerCategory/listTracerCategory', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.tracercategory') }), component: ListTracerCategory },
