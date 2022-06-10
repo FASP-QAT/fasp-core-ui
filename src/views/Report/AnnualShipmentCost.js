@@ -29,7 +29,7 @@ import {
 } from 'reactstrap';
 import ReportService from '../../api/ReportService';
 
-import {MultiSelect} from 'react-multi-select-component';
+import { MultiSelect } from 'react-multi-select-component';
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 const ref = React.createRef();
 const pickerLang = {
@@ -484,6 +484,7 @@ class AnnualShipmentCost extends Component {
                         }),
                         programId: localStorage.getItem("sesProgramIdReport")
                     }, () => {
+                        this.getProcurementAgentList()
                         this.filterVersion();
                     })
                 } else {
@@ -1223,19 +1224,28 @@ class AnnualShipmentCost extends Component {
     }
     getProcurementAgentList() {
         const { procurementAgents } = this.state
+        let programId = document.getElementById("programId").value;
         if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors();
 
             ProcurementAgentService.getProcurementAgentListAll()
                 .then(response => {
                     var listArray = response.data;
-                    listArray.sort((a, b) => {
+                    var listArrays = [];
+                    for (var i = 0; i < listArray.length; i++) {
+                        for (var j = 0; j < listArray[i].programList.length; j++) {
+                            if (listArray[i].programList[j].id == programId) {
+                                listArrays.push(listArray[i]);
+                            }
+                        }
+                    }
+                    listArrays.sort((a, b) => {
                         var itemLabelA = a.procurementAgentCode.toUpperCase(); // ignore upper and lowercase
                         var itemLabelB = b.procurementAgentCode.toUpperCase(); // ignore upper and lowercase                   
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                     this.setState({
-                        procurementAgents: listArray
+                        procurementAgents: listArrays
                     })
                 }).catch(
                     error => {
@@ -1408,7 +1418,7 @@ class AnnualShipmentCost extends Component {
     componentDidMount() {
         // AuthenticationService.setupAxiosInterceptors();
         this.getPrograms();
-        this.getProcurementAgentList()
+        // this.getProcurementAgentList()
         this.getFundingSourceList()
         this.getShipmentStatusList()
         // this.getProductCategories()
@@ -1420,6 +1430,7 @@ class AnnualShipmentCost extends Component {
             versionId: ''
         }, () => {
             localStorage.setItem("sesVersionIdReport", '');
+            this.getProcurementAgentList()
             this.filterVersion();
         })
 
@@ -1697,7 +1708,7 @@ class AnnualShipmentCost extends Component {
                                             </FormGroup> */}
 
 
-                                            <FormGroup className="col-md-3" >
+                                            {procurementAgents.length > 0 && <FormGroup className="col-md-3" >
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.procurementagent.procurementagent')}</Label>
                                                 <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                                                 <div className="controls">
@@ -1715,7 +1726,7 @@ class AnnualShipmentCost extends Component {
                                                     />
 
                                                 </div>
-                                            </FormGroup>
+                                            </FormGroup>}
                                             <FormGroup className="col-md-3" id="fundingSourceDiv">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.budget.fundingsource')}</Label>
                                                 <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>

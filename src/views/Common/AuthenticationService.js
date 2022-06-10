@@ -730,6 +730,23 @@ class AuthenticationService {
                             return true;
                         }
                         break;
+                    case "/procurementAgentType/addProcurementAgentType":
+                        if (bfunction.includes("ROLE_BF_ADD_PROCUREMENT_AGENT")) {
+                            return true;
+                        }
+                        break;
+                    case "/procurementAgentType/editProcurementAgentType/:procurementAgentTypeId":
+                        if (bfunction.includes("ROLE_BF_EDIT_PROCUREMENT_AGENT")) {
+                            return true;
+                        }
+                        break;
+                    case "/procurementAgentType/listProcurementAgentType":
+                    case "/procurementAgentType/listProcurementAgentType/:message":
+                    case "/procurementAgentType/listProcurementAgentType/:color/:message":
+                        if (bfunction.includes("ROLE_BF_LIST_PROCUREMENT_AGENT")) {
+                            return true;
+                        }
+                        break;
                     case "/budget/addBudget":
                         if (bfunction.includes("ROLE_BF_ADD_BUDGET")) {
                             return true;

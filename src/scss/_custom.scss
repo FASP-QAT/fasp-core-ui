@@ -6013,7 +6013,8 @@ font-style: italic!important;
   height: 13px;
 }
 .ExtraCheckboxFieldWidth{
-  width: 115px;
+  // width: 115px;
+  width: 129px;
 }
 .bold{
   font-weight: bold;
@@ -6415,4 +6416,23 @@ top: calc(20em + 3px);
 .SupplierLeadTable .jexcel > thead {
   position: sticky;
   top: 0;
+}
+  .jexcel > thead.resizable > tr > .arrow-up:not(.AsteriskTheadtrTd)::after {
+    content: ""!important;
+  }
+  @media screen and (max-width: 767px){
+  .month-picker > .rmp-container .rmp-popup.range {
+      height: 19rem!important;
+      transform: translate3d(0, 28rem, 0);
+  }
+}
+@media screen and (max-width: 767px){
+.month-picker > .rmp-container .rmp-popup {
+    box-sizing: border-box;
+    bottom: 0;
+    width: unset!important;
+    max-width: 100%;
+    height: 14.4rem;
+    transform: translate3d(0, 14.4rem, 0);
+}
 }

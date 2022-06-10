@@ -2357,5 +2357,13 @@
     "static.dataentry.conversionToPu": "Conversión a PU",
     "static.dataentry.conversionToFu": "Conversión a FU",
     "static.dataentry.dataEnteredInTableEx": "p.ej. Si ingreso 1,000 unidades, esto se convertirá en",
-    "static.common.planningUnits": "unidades de planificación"
+    "static.common.planningUnits": "unidades de planificación",
+    "static.dashboard.procurementagenttypeheader": "Tipo de agente de compras",
+    "static.dashboard.procurementagenttype": "Tipo de agente de compras",
+    "static.procurementagenttype.codetext": "El nombre para mostrar del tipo de agente de adquisiciones es obligatorio",
+    "static.procurementAgenTtype.procurementagenttypenametext": "El nombre del tipo de agente de compras es obligatorio",
+    "static.procurementagenttype.procurementtypename": "Nombre del tipo de agente de compras",
+    "static.procurementagenttype.procurementagenttypecode": "Nombre para mostrar del tipo de agente de compras",
+    "static.procurementagent.procurementagenttypetext": "Se requiere el tipo de agente de compras",
+    "static.procurementagent.programtext": "Se requiere programa"
 }

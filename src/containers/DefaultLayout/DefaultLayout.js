@@ -64,6 +64,11 @@ const EditFundingSource = React.lazy(() => import('../../views/FundingSource/Edi
 const AddProcurementAgent = React.lazy(() => import('../../views/ProcurementAgent/AddProcurementAgentComponent'));
 const ListProcurementAgent = React.lazy(() => import('../../views/ProcurementAgent/ListProcurementAgentComponent'));
 const EditProcurementAgent = React.lazy(() => import('../../views/ProcurementAgent/EditProcurementAgentComponent'));
+
+const AddProcurementAgentType = React.lazy(() => import('../../views/ProcurementAgentType/AddProcurementAgentTypeComponent'));
+const ListProcurementAgentType = React.lazy(() => import('../..//views/ProcurementAgentType/ListProcurementAgentTypeComponent'));
+const EditProcurementAgentType = React.lazy(() => import('../../views/ProcurementAgentType/EditProcurementAgentTypeComponent'));
+
 const AddTracerCategory = React.lazy(() => import('../../views/TracerCategory/AddTracerCategoryComponent'));
 const ListTracerCategory = React.lazy(() => import('../../views/TracerCategory/ListTracerCategoryComponent'));
 const EditTracerCategory = React.lazy(() => import('../../views/TracerCategory/EditTracerCategoryComponent'));
@@ -450,6 +455,12 @@ const routes = [
   // { path: '/procurementAgent/listProcurementAgent/:message', component: ListProcurementAgent },
   { path: '/procurementAgent/listProcurementAgent/:color/:message', name: 'static.breadcrum.list', entityname: 'static.dashboard.procurementagent', component: ListProcurementAgent },
   { path: '/procurementAgent/editProcurementAgent/:procurementAgentId', name: 'static.breadcrum.edit', entityname: 'static.dashboard.procurementagentheader', component: EditProcurementAgent },
+
+  { path: '/procurementAgentType/addProcurementAgentType', name: 'static.breadcrum.add', entityname: 'static.dashboard.procurementagenttypeheader', component: AddProcurementAgentType },
+  { path: '/procurementAgentType/listProcurementAgentType', exact: true, name: 'static.breadcrum.list', entityname: 'static.dashboard.procurementagenttype', component: ListProcurementAgentType },
+  // { path: '/procurementAgent/listProcurementAgent/:message', component: ListProcurementAgent },
+  { path: '/procurementAgentType/listProcurementAgentType/:color/:message', name: 'static.breadcrum.list', entityname: 'static.dashboard.procurementagenttype', component: ListProcurementAgentType },
+  { path: '/procurementAgentType/editProcurementAgentType/:procurementAgentTypeId', name: 'static.breadcrum.edit', entityname: 'static.dashboard.procurementagenttypeheader', component: EditProcurementAgentType },
 
   { path: '/tracerCategory/addTracerCategory', name: 'static.breadcrum.add', entityname: 'static.tracerCategoryHead.tracerCategory', component: AddTracerCategory },
   { path: '/tracerCategory/listTracerCategory', exact: true, name: 'static.breadcrum.list', entityname: 'static.tracerCategoryHead.tracerCategory', component: ListTracerCategory },
@@ -976,19 +987,19 @@ class DefaultLayout extends Component {
   getNotificationCount() {
     if (localStorage.getItem("sessionType") === 'Online') {
       AuthenticationService.setupAxiosInterceptors();
-      ManualTaggingService.getNotificationCount()
-        .then(response => {
-          console.log("notification response===", response.data);
-          this.setState({
-            notificationCount: response.data
-          })
-        }).catch(
-          error => {
-            this.setState({
-              notificationCount: 0
-            })
-          }
-        );
+      // ManualTaggingService.getNotificationCount()
+      //   .then(response => {
+      //     console.log("notification response===", response.data);
+      //     this.setState({
+      //       notificationCount: response.data
+      //     })
+      //   }).catch(
+      //     error => {
+      //       this.setState({
+      //         notificationCount: 0
+      //       })
+      //     }
+      //   );
     }
   }
   getProgramData() {
@@ -1557,6 +1568,18 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-object-group',
                             attributes: {
                               hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_ORGANIZATION_TYPE') ? false : true),
+                              onClick: e => {
+                                this.refreshPage();
+                              }
+                            }
+                          },
+                          {
+                            name: i18n.t('static.dashboard.procurementagentType'),
+                            url: '/procurementAgentType/listProcurementAgentType',
+                            icon: 'fa fa-user-circle-o',
+                            // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_PROCUREMENT_AGENT') && this.state.activeTab == 2 ? false : true) }
+                            attributes: {
+                              hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_PROCUREMENT_AGENT') && this.state.activeTab == 2 ? false : true),
                               onClick: e => {
                                 this.refreshPage();
                               }
@@ -2860,7 +2883,7 @@ class DefaultLayout extends Component {
                                 }
                               },
                               {
-                                name:'Forecast Error (Monthly) (New)',
+                                name: i18n.t('static.report.forecasterrorovertime'),
                                 url: '/report/consumptionForecastErrorSupplyPlan',
                                 icon: 'fa fa-line-chart',
                                 attributes: {
@@ -3927,7 +3950,7 @@ class DefaultLayout extends Component {
                                 }
                               },
                               {
-                                name: 'Forecast Error (Monthly) (New)',
+                                name: i18n.t('static.report.forecasterrorovertime'),
                                 url: '/report/consumptionForecastErrorSupplyPlan',
                                 icon: 'fa fa-line-chart',
                                 attributes: {
