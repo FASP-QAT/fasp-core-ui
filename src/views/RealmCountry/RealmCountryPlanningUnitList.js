@@ -652,7 +652,7 @@ export default class RealmCountryPlanningUnitList extends Component {
         if (planningUnits.length > 0) {
             for (var i = 0; i < planningUnits.length; i++) {
                 var paJson = {
-                    name: getLabelText(planningUnits[i].label, this.state.lang),
+                    name: getLabelText(planningUnits[i].label, this.state.lang) + " | " + parseInt(planningUnits[i].id),
                     id: parseInt(planningUnits[i].id)
                 }
                 planningUnitArr[i] = paJson
@@ -1476,8 +1476,8 @@ export default class RealmCountryPlanningUnitList extends Component {
                         </Form>
 
                         <div className='consumptionDataEntryTable'>
-                        <div id="tableDiv" style={{ display: this.state.loading ? "none" : "block" }}>
-                        </div>
+                            <div id="tableDiv" style={{ display: this.state.loading ? "none" : "block" }}>
+                            </div>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>
                             <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
