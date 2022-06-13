@@ -111,6 +111,8 @@ export default class syncPage extends Component {
     this.loadedFunctionForMergeInventory = this.loadedFunctionForMergeInventory.bind(this)
     this.loadedFunctionForMergeShipment = this.loadedFunctionForMergeShipment.bind(this)
     this.loadedFunctionForMergeProblemList = this.loadedFunctionForMergeProblemList.bind(this);
+    this.loadedFunctionForMergeShipmentLinked=this.loadedFunctionForMergeShipmentLinked.bind(this)
+    this.recursiveConflictsForShipmentLinking=this.recursiveConflictsForShipmentLinking.bind(this)
 
     this.synchronize = this.synchronize.bind(this);
 
@@ -2181,6 +2183,7 @@ export default class syncPage extends Component {
                                     var data = [];
                                     var mergedShipmentJexcel = [];
                                     for (var cd = 0; cd < mergedShipmentData.length; cd++) {
+                                      if(mergedShipmentData[cd].erpFlag.toString()=="false"){
                                       data = [];
                                       data[0] = mergedShipmentData[cd].shipmentId;
                                       data[1] = mergedShipmentData[cd].planningUnit.id;
@@ -2232,6 +2235,7 @@ export default class syncPage extends Component {
                                       data[32] = downloadedData;//Downloaded data
                                       data[33] = 4;
                                       mergedShipmentJexcel.push(data);
+                                    }
                                     }
 
                                     var options = {
@@ -2324,6 +2328,242 @@ export default class syncPage extends Component {
                                     this.setState({
                                       mergedShipmentJexcel: mergedShipmentJexcel,
                                     })
+
+                                                                        // Shipment Linked part
+                                                                        var latestProgramDataShipmentLinked = latestProgramData.shipmentLinkingList!=null?latestProgramData.shipmentLinkingList:[];
+                                                                        var oldProgramDataShipmentLinked = oldProgramData.shipmentLinkingList!=null?oldProgramData.shipmentLinkingList:[];
+                                                                        console.log("latestProgramDataShipmentLinked@@@@@@@@@@@@@",latestProgramDataShipmentLinked)
+                                                                        console.log("oldProgramDataShipmentLinked@@@@@@@@@@@@@",oldProgramDataShipmentLinked)
+                                                                        var downloadedProgramDataShipmentLinked = downloadedProgramData.shipmentLinkingList!=null?downloadedProgramData.shipmentLinkingList:[];
+                                    
+                                                                        // var modifiedShipmentIds = []
+                                                                        // latestProgramDataShipment.filter(c => c.versionId > oldProgramData.currentVersion.versionId || moment(c.lastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(oldProgramData.currentVersion.createdDate).format("YYYY-MM-DD HH:mm:ss")).map(item => { modifiedShipmentIds.push(item.shipmentId) });
+                                                                        // oldProgramDataShipment.filter(c => moment(c.lastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(oldProgramData.currentVersion.createdDate).format("YYYY-MM-DD HH:mm:ss")).map(item => modifiedShipmentIds.push(item.shipmentId));
+                                    
+                                                                        // var latestModifiedShipmentData = latestProgramDataShipment.filter(c => modifiedShipmentIds.includes(c.shipmentId));
+                                                                        // var oldModifiedShipmentData = oldProgramDataShipment.filter(c => c.shipmentId == 0 || modifiedShipmentIds.includes(c.shipmentId));
+                                    
+                                                                        // var mergedShipmentData = [];
+                                                                        // var existingShipmentId = [];
+                                                                        // for (var c = 0; c < oldModifiedShipmentData.length; c++) {
+                                                                        //   if (oldModifiedShipmentData[c].shipmentId != 0) {
+                                                                        //     if ((oldModifiedShipmentData[c].budget.id == "undefined" || oldModifiedShipmentData[c].budget.id == undefined) && oldModifiedShipmentData[c].active.toString() == "false") {
+                                                                        //       oldModifiedShipmentData[c].budget.id = '';
+                                                                        //     }
+                                                                        //     mergedShipmentData.push(oldModifiedShipmentData[c]);
+                                                                        //     existingShipmentId.push(oldModifiedShipmentData[c].shipmentId);
+                                                                        //   } else {
+                                                                        //     // If 0 check whether that exists in latest version or not
+                                                                        //     if (oldModifiedShipmentData[c].active.toString() == "true") {
+                                                                        //       mergedShipmentData.push(oldModifiedShipmentData[c]);
+                                                                        //     }
+                                                                        //   }
+                                                                        // }
+                                                                        // // Getting other entries of latest shipment data
+                                                                        // var latestOtherShipmentEntries = latestModifiedShipmentData.filter(c => !(existingShipmentId.includes(c.shipmentId)));
+                                                                        // mergedShipmentData = mergedShipmentData.concat(latestOtherShipmentEntries);
+                                                                        var data = [];
+                                                                        var mergedShipmentLinkedJexcel = [];
+                                                                        var mergedData=(latestProgramDataShipmentLinked.concat(oldProgramDataShipmentLinked).concat(downloadedProgramDataShipmentLinked));
+                                                                        var uniqueRoNoAndRoPrimeLineNo=[...new Set(mergedData.filter(c=>c.active.toString()=="true").map(ele => ele.roNo+"|"+ele.roPrimeLineNo))];
+
+                                                                        for (var cd = 0; cd < uniqueRoNoAndRoPrimeLineNo.length; cd++) {
+                                                                          data = [];
+                                                                          var latestProgramDataShipmentLinkedFiltered=latestProgramDataShipmentLinked.filter(c=>uniqueRoNoAndRoPrimeLineNo[cd]==(c.roNo+"|"+c.roPrimeLineNo))
+                                                                          var oldProgramDataShipmentLinkedFiltered=oldProgramDataShipmentLinked.filter(c=>uniqueRoNoAndRoPrimeLineNo[cd]==(c.roNo+"|"+c.roPrimeLineNo))
+                                                                          var downloadedProgramDataShipmentLinkedFiltered=downloadedProgramDataShipmentLinked.filter(c=>uniqueRoNoAndRoPrimeLineNo[cd]==(c.roNo+"|"+c.roPrimeLineNo))
+                                                                          var listFromAPI=[];
+                                                                          var listFromAPIFiltered=listFromAPI.filter(c=>uniqueRoNoAndRoPrimeLineNo[cd]==c.roNo+"|"+c.roPrimeLineNo);
+                                                                          console.log("latestProgramDataShipmentLinkedFiltered@@@@@@@@@@@@@",latestProgramDataShipmentLinkedFiltered)
+                                                                          console.log("oldProgramDataShipmentLinkedFiltered@@@@@@@@@@@@@",oldProgramDataShipmentLinkedFiltered)
+                                                                          data[0] = uniqueRoNoAndRoPrimeLineNo[cd].split("|")[0];
+                                                                          data[1] = uniqueRoNoAndRoPrimeLineNo[cd].split("|")[1];
+                                                                          data[2] = oldProgramDataShipmentLinkedFiltered.length>0?getLabelText(oldProgramData.label,this.state.lang):"";
+                                                                          data[3] = oldProgramDataShipmentLinkedFiltered.length>0?oldProgramDataShipmentLinkedFiltered[0].parentShipmentId:"";
+                                                                          data[4] = oldProgramDataShipmentLinkedFiltered.length>0?oldProgramDataShipmentLinkedFiltered[0].conversionFactor:"";
+                                                                          data[5] = listFromAPIFiltered.length>0?getLabelText(listFromAPIFiltered[0].label,this.state.lang):latestProgramDataShipmentLinkedFiltered.length>0?getLabelText(latestProgramData.label,this.state.lang):"";
+                                                                          data[6] = latestProgramDataShipmentLinkedFiltered.length>0?latestProgramDataShipmentLinkedFiltered[0].parentShipmentId:"";
+                                                                          data[7] = latestProgramDataShipmentLinkedFiltered.length>0?latestProgramDataShipmentLinkedFiltered[0].conversionFactor:"";
+                                                                          data[8] = oldProgramDataShipmentLinkedFiltered.length>0?oldProgramDataShipmentLinkedFiltered[0].shipmentLinkingId:"";
+                                                                          data[9] = latestProgramDataShipmentLinkedFiltered.length>0?latestProgramDataShipmentLinkedFiltered[0].shipmentLinkingId:"";
+                                                                          data[10]=downloadedProgramDataShipmentLinkedFiltered.length>0?downloadedProgramDataShipmentLinkedFiltered[0].shipmentLinkingId:"";
+                                                                          data[11]= 4;
+                                                                          data[12]=(oldProgramDataShipmentLinkedFiltered.length>0 && latestProgramDataShipmentLinkedFiltered.length==0) || (oldProgramDataShipmentLinkedFiltered.length==0 && latestProgramDataShipmentLinkedFiltered.length>0)?(oldProgramDataShipmentLinkedFiltered.length>0 && latestProgramDataShipmentLinkedFiltered.length==0)?oldProgramData.currentVersion.versionId:latestProgramData.currentVersion.versionId:"";
+                                                                          // data[8] = mergedShipmentData[cd].dataSource.id;
+                                                                          // data[9] = mergedShipmentData[cd].shipmentMode == "Air" ? 2 : 1;
+                                                                          // data[10] = mergedShipmentData[cd].suggestedQty;
+                                                                          // data[11] = mergedShipmentData[cd].shipmentQty;
+                                                                          // data[12] = mergedShipmentData[cd].currency.currencyId;
+                                                                          // data[13] = parseFloat(mergedShipmentData[cd].rate).toFixed(2);
+                                                                          // data[14] = parseFloat(mergedShipmentData[cd].rate).toFixed(2) * mergedShipmentData[cd].shipmentQty;
+                                                                          // data[15] = parseFloat(mergedShipmentData[cd].freightCost).toFixed(2);
+                                                                          // data[16] = mergedShipmentData[cd].plannedDate != "" && mergedShipmentData[cd].plannedDate != null ? moment(mergedShipmentData[cd].plannedDate).format(DATE_FORMAT_CAP) : "";
+                                                                          // data[17] = mergedShipmentData[cd].submittedDate != "" && mergedShipmentData[cd].submittedDate != null ? moment(mergedShipmentData[cd].submittedDate).format(DATE_FORMAT_CAP) : "";
+                                                                          // data[18] = mergedShipmentData[cd].approvedDate != "" && mergedShipmentData[cd].approvedDate != null ? moment(mergedShipmentData[cd].approvedDate).format(DATE_FORMAT_CAP) : "";
+                                                                          // data[19] = mergedShipmentData[cd].shippedDate != "" && mergedShipmentData[cd].shippedDate != null ? moment(mergedShipmentData[cd].shippedDate).format(DATE_FORMAT_CAP) : "";
+                                                                          // data[20] = mergedShipmentData[cd].arrivedDate != "" && mergedShipmentData[cd].arrivedDate != null ? moment(mergedShipmentData[cd].arrivedDate).format(DATE_FORMAT_CAP) : "";
+                                                                          // data[21] = mergedShipmentData[cd].receivedDate != "" && mergedShipmentData[cd].receivedDate != null ? moment(mergedShipmentData[cd].receivedDate).format(DATE_FORMAT_CAP) : "";
+                                                                          // data[22] = mergedShipmentData[cd].notes;
+                                                                          // data[23] = mergedShipmentData[cd].erpFlag;
+                                                                          // data[24] = mergedShipmentData[cd].emergencyOrder;
+                                                                          // data[25] = mergedShipmentData[cd].accountFlag;
+                                                                          // data[26] = mergedShipmentData[cd].active;
+                                                                          // data[27] = mergedShipmentData[cd].localProcurement;
+                                                                          // data[28] = JSON.stringify(mergedShipmentData[cd].batchInfoList != "" ? ((mergedShipmentData[cd].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.shipmentQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : "");
+                                                                          // data[29] = "";
+                                                                          // var oldDataList = oldProgramDataShipment.filter(c => c.shipmentId == mergedShipmentData[cd].shipmentId);
+                                                                          // var oldData = ""
+                                                                          // if (oldDataList.length > 0) {
+                                                                          //   oldData = [oldDataList[0].shipmentId, oldDataList[0].planningUnit.id, oldDataList[0].shipmentStatus.id, moment(oldDataList[0].expectedDeliveryDate).format(DATE_FORMAT_CAP), oldDataList[0].procurementAgent.id, oldDataList[0].fundingSource.id, oldDataList[0].budget.id, oldDataList[0].orderNo != "" && oldDataList[0].orderNo != null ? oldDataList[0].orderNo.toString().concat(oldDataList[0].primeLineNo != null ? "~" : "").concat(oldDataList[0].primeLineNo != null ? oldDataList[0].primeLineNo : "") : "", oldDataList[0].dataSource.id, oldDataList[0].shipmentMode == "Air" ? 2 : 1, oldDataList[0].suggestedQty, oldDataList[0].shipmentQty, oldDataList[0].currency.currencyId, parseFloat(oldDataList[0].rate).toFixed(2), parseFloat(oldDataList[0].rate).toFixed(2) * oldDataList[0].shipmentQty, parseFloat(oldDataList[0].freightCost).toFixed(2), oldDataList[0].plannedDate != "" && oldDataList[0].plannedDate != null ? moment(oldDataList[0].plannedDate).format(DATE_FORMAT_CAP) : "", oldDataList[0].submittedDate != "" && oldDataList[0].submittedDate != null ? moment(oldDataList[0].submittedDate).format(DATE_FORMAT_CAP) : "", oldDataList[0].approvedDate != "" && oldDataList[0].approvedDate != null ? moment(oldDataList[0].approvedDate).format(DATE_FORMAT_CAP) : "", oldDataList[0].shippedDate != "" && oldDataList[0].shippedDate != null ? moment(oldDataList[0].shippedDate).format(DATE_FORMAT_CAP) : "", oldDataList[0].arrivedDate != "" && oldDataList[0].arrivedDate != null ? moment(oldDataList[0].arrivedDate).format(DATE_FORMAT_CAP) : "", oldDataList[0].receivedDate != "" && oldDataList[0].receivedDate != null ? moment(oldDataList[0].receivedDate).format(DATE_FORMAT_CAP) : "", oldDataList[0].notes, oldDataList[0].erpFlag, oldDataList[0].emergencyOrder, oldDataList[0].accountFlag, oldDataList[0].active, oldDataList[0].localProcurement, JSON.stringify(oldDataList[0].batchInfoList != "" ? ((oldDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.shipmentQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
+                                                                          // }
+                                                                          // data[30] = oldData;//Old data
+                                                                          // var latestDataList = latestProgramDataShipment.filter(c => c.shipmentId == mergedShipmentData[cd].shipmentId);
+                                                                          // var latestData = ""
+                                                                          // if (latestDataList.length > 0) {
+                                                                          //   latestData = [latestDataList[0].shipmentId, latestDataList[0].planningUnit.id, latestDataList[0].shipmentStatus.id, moment(latestDataList[0].expectedDeliveryDate).format(DATE_FORMAT_CAP), latestDataList[0].procurementAgent.id, latestDataList[0].fundingSource.id, latestDataList[0].budget.id, latestDataList[0].orderNo != "" && latestDataList[0].orderNo != null ? latestDataList[0].orderNo.toString().concat(latestDataList[0].primeLineNo != null ? "~" : "").concat(latestDataList[0].primeLineNo != null ? latestDataList[0].primeLineNo : "") : "", latestDataList[0].dataSource.id, latestDataList[0].shipmentMode == "Air" ? 2 : 1, latestDataList[0].suggestedQty, latestDataList[0].shipmentQty, latestDataList[0].currency.currencyId, parseFloat(latestDataList[0].rate).toFixed(2), parseFloat(latestDataList[0].rate).toFixed(2) * latestDataList[0].shipmentQty, parseFloat(latestDataList[0].freightCost).toFixed(2), latestDataList[0].plannedDate != "" && latestDataList[0].plannedDate != null ? moment(latestDataList[0].plannedDate).format(DATE_FORMAT_CAP) : "", latestDataList[0].submittedDate != "" && latestDataList[0].submittedDate != null ? moment(latestDataList[0].submittedDate).format(DATE_FORMAT_CAP) : "", latestDataList[0].approvedDate != "" && latestDataList[0].approvedDate != null ? moment(latestDataList[0].approvedDate).format(DATE_FORMAT_CAP) : "", latestDataList[0].shippedDate != "" && latestDataList[0].shippedDate != null ? moment(latestDataList[0].shippedDate).format(DATE_FORMAT_CAP) : "", latestDataList[0].arrivedDate != "" && latestDataList[0].arrivedDate != null ? moment(latestDataList[0].arrivedDate).format(DATE_FORMAT_CAP) : "", latestDataList[0].receivedDate != "" && latestDataList[0].receivedDate != null ? moment(latestDataList[0].receivedDate).format(DATE_FORMAT_CAP) : "", latestDataList[0].notes, latestDataList[0].erpFlag, latestDataList[0].emergencyOrder, latestDataList[0].accountFlag, latestDataList[0].active, latestDataList[0].localProcurement, JSON.stringify(latestDataList[0].batchInfoList != "" ? ((latestDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.shipmentQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
+                                                                          // }
+                                                                          // data[31] = latestData;//Latest data
+                                                                          // var downloadedDataList = downloadedProgramDataShipment.filter(c => c.shipmentId == mergedShipmentData[cd].shipmentId);
+                                                                          // var downloadedData = "";
+                                                                          // if (downloadedDataList.length > 0) {
+                                                                          //   downloadedData = [downloadedDataList[0].shipmentId, downloadedDataList[0].planningUnit.id, downloadedDataList[0].shipmentStatus.id, moment(downloadedDataList[0].expectedDeliveryDate).format(DATE_FORMAT_CAP), downloadedDataList[0].procurementAgent.id, downloadedDataList[0].fundingSource.id, downloadedDataList[0].budget.id, downloadedDataList[0].orderNo != "" && downloadedDataList[0].orderNo != null ? downloadedDataList[0].orderNo.toString().concat(downloadedDataList[0].primeLineNo != null ? "~" : "").concat(downloadedDataList[0].primeLineNo != null ? downloadedDataList[0].primeLineNo : "") : "", downloadedDataList[0].dataSource.id, downloadedDataList[0].shipmentMode == "Air" ? 2 : 1, downloadedDataList[0].suggestedQty, downloadedDataList[0].shipmentQty, downloadedDataList[0].currency.currencyId, parseFloat(downloadedDataList[0].rate).toFixed(2), parseFloat(downloadedDataList[0].rate).toFixed(2) * downloadedDataList[0].shipmentQty, parseFloat(downloadedDataList[0].freightCost).toFixed(2), downloadedDataList[0].plannedDate != "" && downloadedDataList[0].plannedDate != null ? moment(downloadedDataList[0].plannedDate).format(DATE_FORMAT_CAP) : "", downloadedDataList[0].submittedDate != "" && downloadedDataList[0].submittedDate != null ? moment(downloadedDataList[0].submittedDate).format(DATE_FORMAT_CAP) : "", downloadedDataList[0].approvedDate != "" && downloadedDataList[0].approvedDate != null ? moment(downloadedDataList[0].approvedDate).format(DATE_FORMAT_CAP) : "", downloadedDataList[0].shippedDate != "" && downloadedDataList[0].shippedDate != null ? moment(downloadedDataList[0].shippedDate).format(DATE_FORMAT_CAP) : "", downloadedDataList[0].arrivedDate != "" && downloadedDataList[0].arrivedDate != null ? moment(downloadedDataList[0].arrivedDate).format(DATE_FORMAT_CAP) : "", downloadedDataList[0].receivedDate != "" && downloadedDataList[0].receivedDate != null ? moment(downloadedDataList[0].receivedDate).format(DATE_FORMAT_CAP) : "", downloadedDataList[0].notes, downloadedDataList[0].erpFlag, downloadedDataList[0].emergencyOrder, downloadedDataList[0].accountFlag, downloadedDataList[0].active, downloadedDataList[0].localProcurement, JSON.stringify(downloadedDataList[0].batchInfoList != "" ? ((downloadedDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.shipmentQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
+                                                                          // }
+                                                                          // data[32] = downloadedData;//Downloaded data
+                                                                          // data[33] = 4;
+                                                                          mergedShipmentLinkedJexcel.push(data);
+                                                                        }
+                                    
+                                                                        var options = {
+                                                                          data: mergedShipmentLinkedJexcel,
+                                                                          columnDrag: true,
+                                                                          nestedHeaders: [
+
+                                                                            [{
+                                                                                title: '',
+                                                                                rowspan: '1',
+                                                                            }, {
+                                                                                title: '',
+                                                                                rowspan: '1',
+                                                                            },
+                                                                            {
+                                                                                title: i18n.t('static.commit.local'),
+                                                                                colspan: '3',
+                                                                            },
+                                                                            {
+                                                                              title: i18n.t('static.commit.server'),
+                                                                              colspan: '3',
+                                                                          },
+                                                                            ],
+                                                            
+                                                                        ],
+                                                                          columns: [
+                                                                            { title: i18n.t('static.commit.erpNo'), type: 'text', width: 100 },
+                                                                            { title: i18n.t('static.commit.erpLineNo'), type: 'text', width: 200 },
+                                                                            { type: 'text', title: i18n.t('static.dashboard.programheader'), width: 100 },
+                                                                            { type: 'text', title: i18n.t('static.commit.shipmentId'), width: 100, },
+                                                                            { type: 'text', title: i18n.t('static.manualTagging.conversionFactor'),width: 120 },
+                                                                            { type: 'text', title: i18n.t('static.dashboard.programheader'), width: 100 },
+                                                                            { type: 'text', title: i18n.t('static.commit.shipmentId'), width: 100, },
+                                                                            { type: 'text', title: i18n.t('static.manualTagging.conversionFactor'),width: 120 },
+                                                                            // { type: 'dropdown', title: i18n.t('static.subfundingsource.fundingsource'), source: fundingSourceList, width: 120 },
+                                                                            // { type: 'dropdown', title: i18n.t('static.dashboard.budget'), source: budgetList, width: 120 },
+                                                                            // { type: 'text', title: i18n.t('static.supplyPlan.orderNoAndPrimeLineNo'), width: 150 },
+                                                                            // { type: 'dropdown', title: i18n.t('static.datasource.datasource'), source: dataSourceList, width: 150 },
+                                                                            // { type: 'dropdown', title: i18n.t("static.supplyPlan.shipmentMode"), source: [{ id: 1, name: i18n.t('static.supplyPlan.sea') }, { id: 2, name: i18n.t('static.supplyPlan.air') }], width: 100 },
+                                                                            // { type: 'numeric', title: i18n.t("static.shipment.suggestedQty"), width: 100, mask: '#,##' },
+                                                                            // { type: 'numeric', title: i18n.t("static.supplyPlan.adjustesOrderQty"), width: 100, mask: '#,##' },
+                                                                            // { type: 'dropdown', title: i18n.t('static.dashboard.currency'), source: currencyList, width: 120 },
+                                                                            // { type: 'numeric', title: i18n.t('static.supplyPlan.pricePerPlanningUnit'), width: 80, mask: '#,##.00', decimal: '.' },
+                                                                            // { type: 'numeric', title: i18n.t('static.shipment.productcost'), width: 80, mask: '#,##.00', decimal: '.' },
+                                                                            // { type: 'numeric', title: i18n.t('static.shipment.freightcost'), width: 80, mask: '#,##.00', decimal: '.' },
+                                                                            // { type: 'text', title: i18n.t('static.supplyPlan.plannedDate'), width: 100, },
+                                                                            // { type: 'text', title: i18n.t('static.supplyPlan.submittedDate'), width: 100, },
+                                                                            // { type: 'text', title: i18n.t('static.supplyPlan.approvedDate'), width: 100, },
+                                                                            // { type: 'text', title: i18n.t('static.supplyPlan.shippedDate'), width: 100, },
+                                                                            // { type: 'text', title: i18n.t('static.supplyPlan.arrivedDate'), width: 100, },
+                                                                            // { type: 'text', title: i18n.t('static.shipment.receiveddate'), width: 100, },
+                                                                            // { type: 'text', title: i18n.t('static.program.notes'), width: 200 },
+                                                                            // { type: 'checkbox', title: i18n.t('static.supplyPlan.erpFlag'), width: 80 },
+                                                                            // { type: 'checkbox', title: i18n.t('static.supplyPlan.emergencyOrder'), width: 80 },
+                                                                            // { type: 'checkbox', title: i18n.t('static.common.accountFlag'), width: 80 },
+                                                                            // { type: 'checkbox', title: i18n.t('static.common.active'), width: 80 },
+                                                                            // { type: 'checkbox', title: i18n.t('static.report.localprocurement'), width: 80 },
+                                                                            // { type: 'hidden', title: i18n.t('static.supplyPlan.batchInfo'), width: 0 },
+                                                                            // { type: 'text', title: i18n.t('static.supplyPlan.batchInfo'), width: 90 },
+                                                                            { type: 'hidden', title: 'Old Id' },
+                                                                            { type: 'hidden', title: 'latest Id' },
+                                                                            { type: 'hidden', title: 'download Id' },
+                                                                            { type: 'hidden', title: 'result of compare' },
+                                                                            { type: 'hidden', title: 'version Id' },
+                                                                          ],
+                                                                          pagination: localStorage.getItem("sesRecordCount"),
+                                                                          paginationOptions: JEXCEL_PAGINATION_OPTION,
+                                                                          search: true,
+                                                                          columnSorting: true,
+                                                                          tableOverflow: true,
+                                                                          wordWrap: true,
+                                                                          allowInsertColumn: false,
+                                                                          allowManualInsertColumn: false,
+                                                                          allowDeleteRow: false,
+                                                                          editable: false,
+                                                                          onload: this.loadedFunctionForMergeShipmentLinked,
+                                                                          filters: true,
+                                                                          license: JEXCEL_PRO_KEY,
+                                                                          text: {
+                                                                            showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                                                                            show: '',
+                                                                            entries: '',
+                                                                          },
+                                                                          contextMenu: function (obj, x, y, e) {
+                                                                            var items = [];
+                                                                            //Resolve conflicts
+                                                                            var rowData = obj.getRowData(y)
+                                                                            if (rowData[11].toString() == 1) {
+                                                                              items.push({
+                                                                                title: "Accept local changes",
+                                                                                onclick: function () {
+                                                                                  // this.setState({ loading: true })
+                                                                                  // this.toggleLargeShipment(rowData[30], rowData[31], y, 'shipment');
+                                                                                }.bind(this)
+                                                                              })
+                                                                              items.push({
+                                                                                title: "Accept server changes",
+                                                                                onclick: function () {
+                                                                                  // this.setState({ loading: true })
+                                                                                  // this.toggleLargeShipment(rowData[30], rowData[31], y, 'shipment');
+                                                                                }.bind(this)
+                                                                              })
+                                                                              if(rowData[3]==="" || rowData[6]===""){
+                                                                              items.push({
+                                                                                title: "Accept both",
+                                                                                onclick: function () {
+                                                                                  // this.setState({ loading: true })
+                                                                                  // this.toggleLargeShipment(rowData[30], rowData[31], y, 'shipment');
+                                                                                }.bind(this)
+                                                                              
+                                                                              })
+                                                                            }
+                                                                            } else {
+                                                                              return false;
+                                                                            }
+                                    
+                                                                            // if (rowData[0].toString() > 0) {
+                                                                            //   items.push({
+                                                                            //     title: "Show version history",
+                                                                            //     onclick: function () {
+                                                                            //       this.toggleVersionHistory(rowData[13]);
+                                                                            //     }.bind(this)
+                                                                            //   })
+                                                                            // }
+                                                                            return items;
+                                                                          }.bind(this)
+                                                                        };
+                                    
+                                                                        var mergedShipmentLinkedJexcel = jexcel(document.getElementById("mergedVersionShipmentLinked"), options);
+                                                                        this.el = mergedShipmentLinkedJexcel;
+                                                                        this.setState({
+                                                                          mergedShipmentLinkedJexcel: mergedShipmentLinkedJexcel,
+                                                                        })
                                     console.log("+++Shipment Jexcel completed", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
                                     this.setState({
                                       oldProgramDataConsumption: oldProgramDataConsumption,
@@ -2688,6 +2928,82 @@ export default class syncPage extends Component {
     elInstance.options.editable = false;
   }
 
+  recursiveConflictsForShipmentLinking(instance){
+    var elInstance = instance.jexcel;
+    var jsonData = elInstance.getJson();
+    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L']
+    elInstance.options.editable = true;
+    for (var c = 0; c < jsonData.length; c++) {
+      var checkIfSameParentShipmentIdExists=jsonData.filter((d,index)=>(d[3]===jsonData[c][6] && d[12]!=jsonData[c][12]) && c!=index).length;
+      if(jsonData[c][3]!=="" && jsonData[c][6]!=="" && jsonData[c][3]!==jsonData[c][6]){
+        this.setState({
+          conflictsCount: this.state.conflictsCount + 1
+        })
+        elInstance.setValueFromCoords(11, c, 5, true);
+        for (var j = 0; j < colArr.length; j++) {
+          var col = (colArr[j]).concat(parseInt(c) + 1);
+          elInstance.setStyle(col, "background-color", "transparent");
+          elInstance.setStyle(col, "background-color", "red");
+        }
+      }else{
+      if(checkIfSameParentShipmentIdExists>0){
+        this.setState({
+          conflictsCount: this.state.conflictsCount + 1
+        })
+        elInstance.setValueFromCoords(11, c, 1, true);
+        for (var j = 0; j < colArr.length; j++) {
+          var col = (colArr[j]).concat(parseInt(c) + 1);
+          elInstance.setStyle(col, "background-color", "transparent");
+          elInstance.setStyle(col, "background-color", "yellow");
+        }
+      }else{
+      if ((jsonData[c])[9]==="" && (jsonData[c])[8] ===0) {
+        elInstance.setValueFromCoords(11, c, 2, true);
+        for (var i = 0; i < colArr.length; i++) {
+          var col = (colArr[i]).concat(parseInt(c) + 1);
+          elInstance.setStyle(col, "background-color", "transparent");
+          elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
+          
+        }
+        this.setState({
+          isChanged: true
+        })
+      } else if ((jsonData[c])[8]==="" && (jsonData[c])[9] !=(jsonData[c])[10]) {
+        elInstance.setValueFromCoords(11, c, 3, true);
+        for (var i = 0; i < colArr.length; i++) {
+          var col = (colArr[i]).concat(parseInt(c) + 1);
+          elInstance.setStyle(col, "background-color", "transparent");
+          elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
+          
+        }
+        this.setState({
+          isChanged: true
+        })
+      }else if((jsonData[c])[9]==(jsonData[c])[8]){
+        var col = (colArr[j]).concat(parseInt(c) + 1);
+        elInstance.setStyle(col, "background-color", "transparent");
+      }else if((jsonData[c])[9]!=="" && (jsonData[c])[8]!=="" && (jsonData[c])[8]!==(jsonData[c])[9]){
+        this.setState({
+          conflictsCount: this.state.conflictsCount + 1
+        })
+        elInstance.setValueFromCoords(11, c, 1, true);
+        for (var j = 0; j < colArr.length; j++) {
+          var col = (colArr[j]).concat(parseInt(c) + 1);
+          elInstance.setStyle(col, "background-color", "transparent");
+          elInstance.setStyle(col, "background-color", "yellow");
+        }
+      }
+    }
+  }
+    }
+    elInstance.options.editable = false;
+  }
+
+  loadedFunctionForMergeShipmentLinked = function (instance) {
+    jExcelLoadedFunction(instance, 3);
+    this.recursiveConflictsForShipmentLinking(instance)
+  }
+
   loadedFunctionForMergeShipment = function (instance) {
     jExcelLoadedFunction(instance, 2);
     var elInstance = instance.jexcel;
@@ -2806,7 +3122,7 @@ export default class syncPage extends Component {
   }
 
   loadedFunctionForMergeProblemList = function (instance) {
-    jExcelLoadedFunction(instance, 3);
+    jExcelLoadedFunction(instance, 4);
     var elInstance = instance.jexcel;
     var jsonData = elInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T']
@@ -3021,6 +3337,17 @@ export default class syncPage extends Component {
           </Row>
         </TabPane>
         <TabPane tabId="4">
+          <Row>
+            <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
+              <Col md="12 pl-0" id="realmDiv">
+                <div className="table-responsive RemoveStriped">
+                  <div id="mergedVersionShipmentLinked" />
+                </div>
+              </Col>
+            </Col>
+          </Row>
+        </TabPane>
+        <TabPane tabId="5">
           <Row>
             <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
               <Col md="12 pl-0" id="realmDiv">
@@ -3260,11 +3587,18 @@ export default class syncPage extends Component {
                               {i18n.t('static.shipment.shipment')}
                             </NavLink>
                           </NavItem>
-
                           <NavItem>
                             <NavLink
                               active={this.state.activeTab[0] === '4'}
                               onClick={() => { this.toggle(0, '4'); }}
+                            >
+                              {i18n.t('static.commitVersion.linkedShipments')}
+                            </NavLink>
+                          </NavItem>
+                          <NavItem>
+                            <NavLink
+                              active={this.state.activeTab[0] === '5'}
+                              onClick={() => { this.toggle(0, '5'); }}
                             >
                               {i18n.t('static.dashboard.qatProblemList')}
                             </NavLink>

@@ -172,5 +172,10 @@ class MasterSyncService {
         });
     }
 
+    getNewShipmentSyncApi(json){
+        return axios.post(`${API_URL}/api/erpLinking/shipmentSync/`,json, {
+        });
+    }
+
 }
 export default new MasterSyncService()

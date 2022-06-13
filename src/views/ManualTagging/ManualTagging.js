@@ -1203,24 +1203,33 @@ export default class ManualTagging extends Component {
                         var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
                         var generalProgramJson = JSON.parse(generalProgramData);
                         var actionList = generalProgramJson.actionList;
-                        var linkedShipmentsList = generalProgramJson.linkedShipmentsList == null ? [] : generalProgramJson.linkedShipmentsList;
+                        var linkedShipmentsList = generalProgramJson.shipmentLinkingList == null ? [] : generalProgramJson.shipmentLinkingList;
                         if (actionList == undefined) {
                             actionList = []
                         }
                         var shipmentList = programJson.shipmentList;
                         var batchInfoList = programJson.batchInfoList;
                         var minDate = moment(Date.now()).format("YYYY-MM-DD");
+                        var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+                        var curUser = AuthenticationService.getLoggedInUserId();
+                        var username = AuthenticationService.getLoggedInUsername();
                         for (var ss = 0; ss < selectedShipment.length; ss++) {
                             var linkedShipmentsListIndex = linkedShipmentsList.findIndex(c => selectedShipment[ss][16].shipmentId > 0 ? selectedShipment[ss][16].shipmentId == c.childShipmentId : selectedShipment[ss][16].tempShipmentId == c.tempChildShipmentId);
                             var linkedShipmentsListFilter = linkedShipmentsList.filter(c => selectedShipment[ss][16].shipmentId > 0 ? selectedShipment[ss][16].shipmentId == c.childShipmentId : selectedShipment[ss][16].tempShipmentId == c.tempChildShipmentId);
-                            linkedShipmentsList.splice(linkedShipmentsListIndex, 1);
-                            var checkIfThereIsOnlyOneChildShipmentOrNot = linkedShipmentsList.filter(c => linkedShipmentsListFilter[0].parentShipmentId > 0 ? c.parentShipmentId == linkedShipmentsListFilter[0].parentShipmentId : c.tempParentShipmentId == linkedShipmentsListFilter[0].tempParentShipmentId);
+                            linkedShipmentsList[linkedShipmentsListIndex].active=false;
+                            linkedShipmentsList[linkedShipmentsListIndex].lastModifiedBy.userId=curUser;
+                            linkedShipmentsList[linkedShipmentsListIndex].lastModifiedBy.username=username;
+                            linkedShipmentsList[linkedShipmentsListIndex].lastModifiedDate=curDate;
+                            var checkIfThereIsOnlyOneChildShipmentOrNot = linkedShipmentsList.filter(c => (linkedShipmentsListFilter[0].parentShipmentId > 0 ? c.parentShipmentId == linkedShipmentsListFilter[0].parentShipmentId : c.tempParentShipmentId == linkedShipmentsListFilter[0].tempParentShipmentId) && c.active==true);
                             var activateParentShipment = false;
                             if (checkIfThereIsOnlyOneChildShipmentOrNot.length == 0) {
                                 activateParentShipment = true;
                             }
                             var shipmentIndex = shipmentList.findIndex(c => selectedShipment[ss][16].shipmentId > 0 ? c.shipmentId == selectedShipment[ss][16].shipmentId : c.tempShipmentId == selectedShipment[ss][16].tempShipmentId);
                             shipmentList[shipmentIndex].active = false;
+                            shipmentList[shipmentIndex].lastModifiedBy.userId=curUser;
+                            shipmentList[shipmentIndex].lastModifiedBy.username=username;
+                            shipmentList[shipmentIndex].lastModifiedDate=curDate;
                             if (moment(minDate).format("YYYY-MM-DD") > moment(shipmentList[shipmentIndex].expectedDeliveryDate).format("YYYY-MM-DD")) {
                                 minDate = moment(shipmentList[shipmentIndex].expectedDeliveryDate).format("YYYY-MM-DD");
                             }
@@ -1231,6 +1240,10 @@ export default class ManualTagging extends Component {
                                 var parentShipmentIndex = shipmentList.findIndex(c => linkedShipmentsListFilter[0].parentShipmentId > 0 ? c.shipmentId == linkedShipmentsListFilter[0].parentShipmentId : c.tempShipmentId == linkedShipmentsListFilter[0].tempParentShipmentId);
                                 shipmentList[parentShipmentIndex].active = true;
                                 shipmentList[parentShipmentIndex].erpFlag = false;
+                                shipmentList[parentShipmentIndex].lastModifiedBy.userId=curUser;
+                                shipmentList[parentShipmentIndex].lastModifiedBy.username=username;
+                                shipmentList[parentShipmentIndex].lastModifiedDate=curDate;
+
                                 if (moment(minDate).format("YYYY-MM-DD") > moment(shipmentList[parentShipmentIndex].expectedDeliveryDate).format("YYYY-MM-DD")) {
                                     minDate = moment(shipmentList[shipmentIndex].expectedDeliveryDate).format("YYYY-MM-DD");
                                 }
@@ -1253,7 +1266,7 @@ export default class ManualTagging extends Component {
                             planningUnitDataList.push({ planningUnitId: planningUnitId, planningUnitData: (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString() });
                         }
                         generalProgramJson.actionList = actionList;
-                        generalProgramJson.linkedShipmentsList = linkedShipmentsList;
+                        generalProgramJson.shipmentLinkingList = linkedShipmentsList;
                         console.log("General Program Json@@@@@@@@@@@@@@@@", generalProgramJson);
                         programDataJson.planningUnitDataList = planningUnitDataList;
 
@@ -1384,7 +1397,7 @@ export default class ManualTagging extends Component {
                                         var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
                                         var generalProgramJson = JSON.parse(generalProgramData);
                                         var actionList = generalProgramJson.actionList;
-                                        var linkedShipmentsList = generalProgramJson.linkedShipmentsList == null ? [] : generalProgramJson.linkedShipmentsList;
+                                        var linkedShipmentsList = generalProgramJson.shipmentLinkingList == null ? [] : generalProgramJson.shipmentLinkingList;
                                         if (actionList == undefined) {
                                             actionList = []
                                         }
@@ -1518,21 +1531,34 @@ export default class ManualTagging extends Component {
 
                                                     console.log("ShipmentQty@@@@@@@@@@@@@@@@", shipmentQty);
                                                     linkedShipmentsList.push({
-                                                        erpShipmentLinkingId: 0,
+                                                        shipmentLinkingId: 0,
                                                         versionId: this.state.versionId.toString().split(" ")[0],
+                                                        programId:this.state.programId,
                                                         procurementAgent: shipmentList[shipmentIndex].procurementAgent,
                                                         parentShipmentId: shipmentList[shipmentIndex].shipmentId,
                                                         tempParentShipmentId: shipmentList[shipmentIndex].shipmentId == 0 ? shipmentList[shipmentIndex].tempShipmentId : null,
                                                         childShipmentId: 0,
                                                         tempChildShipmentId: shipmentList[shipmentIndex].planningUnit.id.toString().concat(shipmentList.length),
-                                                        erpPlanningUnit: tableJson[y][15].erpPlanningUnit,
-                                                        roNo: tableJson[y][15].roNo,
-                                                        roPrimeLineNo: tableJson[y][15].roPrimeLineNo,
-                                                        knShipmentNo: tableJson[y][15].knShipmentNo,
-                                                        erpShipmentStatus: tableJson[y][15].erpShipmentStatus,
-                                                        orderNo: tableJson[y][15].orderNo,
-                                                        primeLineNo: tableJson[y][15].primeLineNo,
-                                                        conversionFactor: Number(tableJson[y][10])
+                                                        erpPlanningUnit: getUniqueOrderNoAndPrimeLineNoList[uq][15].erpPlanningUnit,
+                                                        roNo: getUniqueOrderNoAndPrimeLineNoList[uq][15].roNo,
+                                                        roPrimeLineNo: getUniqueOrderNoAndPrimeLineNoList[uq][15].roPrimeLineNo,
+                                                        knShipmentNo: getUniqueOrderNoAndPrimeLineNoList[uq][15].knShipmentNo,
+                                                        erpShipmentStatus: getUniqueOrderNoAndPrimeLineNoList[uq][15].erpShipmentStatus,
+                                                        orderNo: getUniqueOrderNoAndPrimeLineNoList[uq][15].orderNo,
+                                                        primeLineNo: getUniqueOrderNoAndPrimeLineNoList[uq][15].primeLineNo,
+                                                        conversionFactor: Number(getUniqueOrderNoAndPrimeLineNoList[uq][10]),
+                                                        qatPlanningUnitId:ppuObject.planningUnit.id,
+                                                        active:true,
+                                                        createdBy: {
+                                                            userId: curUser,
+                                                            username: username
+                                                        },
+                                                        createdDate: curDate,
+                                                        lastModifiedBy: {
+                                                            userId: curUser,
+                                                            username: username
+                                                        },
+                                                        lastModifiedDate: curDate,
                                                     })
                                                     shipmentList.push({
                                                         accountFlag: true,
@@ -1540,17 +1566,17 @@ export default class ManualTagging extends Component {
                                                         dataSource: shipmentList[shipmentIndex].dataSource,
                                                         erpFlag: true,
                                                         localProcurement: shipmentList[shipmentIndex].localProcurement,
-                                                        freightCost: tableJson[y][15].shippingCost,//Yeh
-                                                        notes: tableJson[y][12],
+                                                        freightCost: getUniqueOrderNoAndPrimeLineNoList[uq][15].shippingCost,//Yeh
+                                                        notes: getUniqueOrderNoAndPrimeLineNoList[uq][12],
                                                         planningUnit: shipmentList[shipmentIndex].planningUnit,
 
                                                         procurementAgent: shipmentList[shipmentIndex].procurementAgent,
-                                                        productCost: Number(tableJson[y][15].price) * Number(shipmentQty),//Final cost
+                                                        productCost: Number(getUniqueOrderNoAndPrimeLineNoList[uq][15].price) * Number(shipmentQty),//Final cost
                                                         shipmentQty: shipmentQty,
-                                                        rate: tableJson[y][15].price,//Price per planning unit
+                                                        rate: getUniqueOrderNoAndPrimeLineNoList[uq][15].price,//Price per planning unit
                                                         shipmentId: 0,
-                                                        shipmentMode: (tableJson[y][15].shipBy == "Land" || tableJson[y][15].shipBy == "Ship" ? "Sea" : tableJson[y][15].shipBy == "Air" ? "Air" : "Sea"),//Yeh
-                                                        shipmentStatus: tableJson[y][14],
+                                                        shipmentMode: (getUniqueOrderNoAndPrimeLineNoList[uq][15].shipBy == "Land" || getUniqueOrderNoAndPrimeLineNoList[uq][15].shipBy == "Ship" ? "Sea" : getUniqueOrderNoAndPrimeLineNoList[uq][15].shipBy == "Air" ? "Air" : "Sea"),//Yeh
+                                                        shipmentStatus: getUniqueOrderNoAndPrimeLineNoList[uq][14],
                                                         suggestedQty: 0,
                                                         budget: shipmentList[shipmentIndex].budget,
                                                         emergencyOrder: shipmentList[shipmentIndex].emergencyOrder,
@@ -1561,12 +1587,12 @@ export default class ManualTagging extends Component {
                                                         approvedDate: null,
                                                         shippedDate: null,
                                                         arrivedDate: null,
-                                                        expectedDeliveryDate: tableJson[y][4],
-                                                        receivedDate: tableJson[y][14].id == DELIVERED_SHIPMENT_STATUS ? tableJson[y][4] : null,
+                                                        expectedDeliveryDate: getUniqueOrderNoAndPrimeLineNoList[uq][4],
+                                                        receivedDate: getUniqueOrderNoAndPrimeLineNoList[uq][14].id == DELIVERED_SHIPMENT_STATUS ? getUniqueOrderNoAndPrimeLineNoList[uq][4] : null,
                                                         index: shipmentList.length,
                                                         batchInfoList: batchInfo,
-                                                        orderNo: tableJson[y][2].split("|")[0],
-                                                        primeLineNo: tableJson[y][2].split("|")[1],
+                                                        orderNo: getUniqueOrderNoAndPrimeLineNoList[uq][2].split("|")[0],
+                                                        primeLineNo: getUniqueOrderNoAndPrimeLineNoList[uq][2].split("|")[1],
                                                         parentShipmentId: shipmentList[shipmentIndex].shipmentId,
                                                         createdBy: {
                                                             userId: curUser,
@@ -1617,7 +1643,7 @@ export default class ManualTagging extends Component {
                                             planningUnitDataList.push({ planningUnitId: planningUnitId, planningUnitData: (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString() });
                                         }
                                         generalProgramJson.actionList = actionList;
-                                        generalProgramJson.linkedShipmentsList = linkedShipmentsList;
+                                        generalProgramJson.shipmentLinkingList = linkedShipmentsList;
                                         console.log("General Program Json@@@@@@@@@@@@@@@@", generalProgramJson);
                                         programDataJson.planningUnitDataList = planningUnitDataList;
 
@@ -1903,9 +1929,9 @@ export default class ManualTagging extends Component {
             var generalProgramDataBytes = CryptoJS.AES.decrypt(localProgramListFilter[0].programData.generalData, SECRET_KEY);
             var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
             var generalProgramJson = JSON.parse(generalProgramData);
-            var linkedShipmentsList = generalProgramJson.linkedShipmentsList != null ? generalProgramJson.linkedShipmentsList : [];
+            var linkedShipmentsList = generalProgramJson.shipmentLinkingList != null ? generalProgramJson.shipmentLinkingList : [];
 
-            linkedShipmentsList.filter(c => c.erpShipmentLinkingId == 0).map(c => {
+            linkedShipmentsList.filter(c => c.shipmentLinkingId == 0 && c.active==true).map(c => {
                 linkedRoNoAndRoPrimeLineNo.push(c.roNo + "|" + c.roPrimeLineNo)
             })
         } else if (this.state.active3) {
@@ -1915,9 +1941,9 @@ export default class ManualTagging extends Component {
                 var generalProgramDataBytes = CryptoJS.AES.decrypt(localProgramList[i].programData.generalData, SECRET_KEY);
                 var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
                 var generalProgramJson = JSON.parse(generalProgramData);
-                var linkedShipmentsList = generalProgramJson.linkedShipmentsList != null ? generalProgramJson.linkedShipmentsList : [];
+                var linkedShipmentsList = generalProgramJson.shipmentLinkingList != null ? generalProgramJson.shipmentLinkingList : [];
                 var linkedRoNoAndRoPrimeLineNo = [];
-                linkedShipmentsList.filter(c => c.erpShipmentLinkingId == 0).map(c => {
+                linkedShipmentsList.filter(c => c.shipmentLinkingId == 0 && c.active==true).map(c => {
                     linkedRoNoAndRoPrimeLineNo.push(c.roNo + "|" + c.roPrimeLineNo)
                 })
             }
@@ -2145,9 +2171,9 @@ export default class ManualTagging extends Component {
                 var generalProgramDataBytes = CryptoJS.AES.decrypt(localProgramList[i].programData.generalData, SECRET_KEY);
                 var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
                 var generalProgramJson = JSON.parse(generalProgramData);
-                var linkedShipmentsList = generalProgramJson.linkedShipmentsList != null ? generalProgramJson.linkedShipmentsList : [];
+                var linkedShipmentsList = generalProgramJson.shipmentLinkingList != null ? generalProgramJson.shipmentLinkingList : [];
                 var linkedRoNoAndRoPrimeLineNo = [];
-                linkedShipmentsList.filter(c => c.erpShipmentLinkingId == 0).map(c => {
+                linkedShipmentsList.filter(c => c.shipmentLinkingId == 0 && c.active==true).map(c => {
                     linkedRoNoAndRoPrimeLineNo.push(c.roNo + "|" + c.roPrimeLineNo)
                 })
             }
@@ -2362,7 +2388,7 @@ export default class ManualTagging extends Component {
                     var gprogramDataBytes = CryptoJS.AES.decrypt(localProgramListFilter[0].programData.generalData, SECRET_KEY);
                     var gprogramData = gprogramDataBytes.toString(CryptoJS.enc.Utf8);
                     var gprogramJson = JSON.parse(gprogramData);
-                    var linkedShipmentsList = gprogramJson.linkedShipmentsList != null ? gprogramJson.linkedShipmentsList : []
+                    var linkedShipmentsList = gprogramJson.shipmentLinkingList != null ? gprogramJson.shipmentLinkingList : []
                     for (var pu = 0; pu < planningUnitIds.length; pu++) {
                         var planningUnitData = planningUnitDataList.filter(c => c.planningUnitId == planningUnitIds[pu].value)[0];
                         var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
@@ -2376,6 +2402,8 @@ export default class ManualTagging extends Component {
                     } else if (this.state.active2) {
                         shipmentList = shipmentList.filter(c => c.erpFlag.toString() == "true" && c.active.toString() == "true" && c.accountFlag.toString() == "true" && c.procurementAgent.id == PSM_PROCUREMENT_AGENT_ID && SHIPMENT_ID_ARR_MANUAL_TAGGING.includes(c.shipmentStatus.id.toString()));
                     }
+                    console.log("OutList for tab2@@@@@@@@@@@@@@",shipmentList)
+                    console.log("linkedShipmentsList@@@@@@@@@@@@@@",linkedShipmentsList)
                     this.setState({
                         outputList: shipmentList,
                         linkedShipmentsListForTab2: linkedShipmentsList
@@ -2898,19 +2926,20 @@ export default class ManualTagging extends Component {
                 data[8] = manualTaggingList[j].notes
                 data[9] = manualTaggingList[j].shipmentId != 0 ? -1 : manualTaggingList[j].tempShipmentId;
             } else if (this.state.active2) {
-                let shipmentQty = manualTaggingList[j].shipmentQty;
-                let linkedShipmentsListForTab2 = this.state.versionId.toString().includes("Local") ? this.state.linkedShipmentsListForTab2.filter(c => manualTaggingList[j].shipmentId > 0 ? c.childShipmentId == manualTaggingList[j].shipmentId : c.tempChildShipmentId == manualTaggingList[j].tempShipmentId) : manualTaggingList[j];
+                let shipmentQty = !this.state.versionId.toString().includes("Local")?manualTaggingList[j].erpQty:manualTaggingList[j].shipmentQty;
+                let linkedShipmentsListForTab2 = this.state.versionId.toString().includes("Local") ? this.state.linkedShipmentsListForTab2.filter(c => manualTaggingList[j].shipmentId > 0 ? c.childShipmentId == manualTaggingList[j].shipmentId : c.tempChildShipmentId == manualTaggingList[j].tempShipmentId) : [manualTaggingList[j]];
+                console.log("linkedShipmentsListForTab2@@@@@@@@@@@",linkedShipmentsListForTab2)
                 data[0] = false;
                 data[1] = manualTaggingList[j].parentShipmentId
-                data[2] = manualTaggingList[j].shipmentId
+                data[2] = !this.state.versionId.toString().includes("Local")?manualTaggingList[j].childShipmentId:manualTaggingList[j].shipmentId
                 data[3] = linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].roNo + " | " + linkedShipmentsListForTab2[0].roPrimeLineNo : ""
                 data[4] = manualTaggingList[j].orderNo + " | " + manualTaggingList[j].primeLineNo
                 data[5] = linkedShipmentsListForTab2.length > 0 ? getLabelText(linkedShipmentsListForTab2[0].erpPlanningUnit.label, this.state.lang) : ""
-                data[6] = getLabelText(manualTaggingList[j].planningUnit.label, this.state.lang)
+                data[6] = !this.state.versionId.toString().includes("Local")?getLabelText(manualTaggingList[j].erpPlanningUnit.label, this.state.lang):getLabelText(manualTaggingList[j].planningUnit.label, this.state.lang)
                 data[7] = manualTaggingList[j].expectedDeliveryDate
                 data[8] = linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].erpShipmentStatus : ""
                 // data[7] = ""
-                data[9] = Math.round(manualTaggingList[j].shipmentQty)
+                data[9] = !this.state.versionId.toString().includes("Local")?Math.round(manualTaggingList[j].erpQty):Math.round(manualTaggingList[j].shipmentQty)
                 data[10] = (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? (manualTaggingList[j].conversionFactor) : 1)
                 data[11] = Math.round(shipmentQty * (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? manualTaggingList[j].conversionFactor : 1))
                 data[12] = manualTaggingList[j].notes

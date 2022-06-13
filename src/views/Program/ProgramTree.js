@@ -698,108 +698,26 @@ class Program extends Component {
                                                                                                 <input type="checkbox" name="programCheckBox" value={item2.program.id} id={"checkbox_".concat(item.realmCountry.id).concat(item2.program.id).concat(".0")} />
                                                                                                 {console.log("D------------>this.state.programList", this.state.programList, "Condition------->", this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == Math.max.apply(Math, item2.versionList.map(function (o) { return o.versionId; }))).length)}
                                                                                                 {/* <label className={this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == Math.max.apply(Math, item2.versionList.map(function (o) { return o.versionId; }))).length > 0 ? "greenColor" : this.state.programList.filter(c => c.programId == item2.program.id).length > 0 ? "redColor" : ""} htmlFor={"checkbox_".concat(item.realmCountry.id).concat(item2.program.id).concat(".0")}>{getLabelText(item2.program.label, this.state.lang)}<i className="ml-1 fa fa-eye"></i></label> */}
-                                                                                                <label className={this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == Math.max.apply(Math, item2.versionList.map(function (o) { return o.versionId; }))).length > 0 ? "greenColor" : this.state.programList.filter(c => c.programId == item2.program.id).length > 0 ? "redColor" : ""} htmlFor={"checkbox_".concat(item.realmCountry.id).concat(item2.program.id).concat(".0")}>{getLabelText(item2.program.label, this.state.lang) + ' - (' + item2.program.code +')'} <i className="ml-1 fa fa-eye"></i></label>
-                                                                                                
+                                                                                                <label className={this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == Math.max.apply(Math, item2.versionList.map(function (o) { return o.versionId; }))).length > 0 ? "greenColor" : this.state.programList.filter(c => c.programId == item2.program.id).length > 0 ? "redColor" : ""} htmlFor={"checkbox_".concat(item.realmCountry.id).concat(item2.program.id).concat(".0")}>{getLabelText(item2.program.label, this.state.lang) + ' - (' + item2.program.code +')'}<i className="ml-1 fa fa-eye"></i></label>
                                                                                             </div>
                                                                                         </span>
-                                                                                        
                                                                                     </span>
                                                                                     {/* {console.log("Item1------------>", item1), console.log("Item1------------>", item.realmCountry.id, "---------", "fpm".concat(item.realmCountry.id).concat(item1.id))} */}
                                                                                     <input type="checkbox" defaultChecked id={"fpm".concat(item.realmCountry.id).concat(item2.program.id)} />
-                                                                                    <label className="arrow_label" htmlFor={"fpm".concat(item.realmCountry.id).concat(item2.program.id)}>
-                                                                                        <span>
-                                                                                        <FormGroup style={{marginTop:'-2px'}} style={{display:'none'}}>
-                                                        {/* <Label className="P-absltRadio">{i18n.t('static.realm.default')}  </Label> */}
-                                                        <FormGroup check inline style={{marginLeft:'-50px'}}>
-                                                            <Input
-                                                                className="form-check-input"
-                                                                type="radio"
-                                                                id="active1"
-                                                                name="defaultRealm"
-                                                                value={true}
-                                                                // checked={this.state.realm.defaultRealm === true}
-                                                                // onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            />
-                                                            <Label
-                                                                className="form-check-label"
-                                                                check htmlFor="inline-radio1">
-                                                                {i18n.t('static.realm.yes')}
-                                                            </Label>
-                                                        </FormGroup>
-                                                        <FormGroup check inline>
-                                                            <Input
-                                                                className="form-check-input"
-                                                                type="radio"
-                                                                id="active2"
-                                                                name="defaultRealm"
-                                                                value={false}
-                                                                // checked={this.state.realm.defaultRealm === false}
-                                                                // onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            />
-                                                            <Label
-                                                                className="form-check-label"
-                                                                check htmlFor="inline-radio2">
-                                                                {i18n.t('static.realm.no')}
-                                                            </Label>
-                                                        </FormGroup>
-                                                    </FormGroup>
-                                                                                        </span>
-                                                                                        </label>
-                                                                                  
-                                                                                
+                                                                                    <label className="arrow_label" htmlFor={"fpm".concat(item.realmCountry.id).concat(item2.program.id)}></label>
                                                                                     <ul>
                                                                                         {
                                                                                             this.state.prgList.filter(c => c.program.id == item2.program.id).map(item3 => (
                                                                                                 (item3.versionList).map((item4, count) => (
                                                                                                     <>
                                                                                                         <li><span className="tree_label">
-                                                                                                          <span className="">
-                                                                                                          <div className="m-0">
-                                                                                                                {/* <div className="checkbox m-0"> */}
+                                                                                                            <span className="">
+                                                                                                                <div className="checkbox m-0">
                                                                                                                     <input type="checkbox" data-program-id={item2.program.id} value={item4.versionId} className="versionCheckBox" name={"versionCheckBox".concat(item2.program.id)} id={"kf-v".concat(item.realmCountry.id).concat(item2.program.id).concat(item4.versionId)} />
-                                                                                                                    <label htmlFor={"kf-v".concat(item.realmCountry.id).concat(item2.program.id).concat(item4.versionId)}>{i18n.t('static.program.version').concat(" ")}<b>{(item4.versionId)}</b>{(" ").concat(i18n.t('static.program.savedOn')).concat(" ")}<b>{(moment(item4.createdDate).format(DATE_FORMAT_CAP))}</b>{(" ").concat(i18n.t("static.program.savedBy")).concat(" ")}<b>{(item4.createdBy.username)}</b>{(" ").concat(i18n.t("static.program.as")).concat(" ")}<b>{getLabelText(item4.versionType.label)}</b>
-                                                                                                                    </label>
-                                                                                                                    <span style={{display:'inline-flex'}}>
-                                                                                                                <FormGroup style={{marginTop:'-2px'}}>
-                                                        {/* <Label className="P-absltRadio">{i18n.t('static.realm.default')}  </Label> */}
-                                                        <FormGroup check inline style={{marginLeft:'-37px'}}>
-                                                            <Input
-                                                                className="form-check-input"
-                                                                type="radio"
-                                                                id="active1"
-                                                                name="defaultRealm"
-                                                                value={true}
-                                                                // checked={this.state.realm.defaultRealm === true}
-                                                                // onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            />
-                                                            <Label
-                                                                className="form-check-label"
-                                                                check htmlFor="inline-radio1">
-                                                                {i18n.t('static.realm.yes')}
-                                                            </Label>
-                                                        </FormGroup>
-                                                        <FormGroup check inline>
-                                                            <Input
-                                                                className="form-check-input"
-                                                                type="radio"
-                                                                id="active2"
-                                                                name="defaultRealm"
-                                                                value={false}
-                                                                // checked={this.state.realm.defaultRealm === false}
-                                                                // onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            />
-                                                            <Label
-                                                                className="form-check-label"
-                                                                check htmlFor="inline-radio2">
-                                                                {i18n.t('static.realm.no')}
-                                                            </Label>
-                                                        </FormGroup>
-                                                    </FormGroup>
-                                                                                                                </span>
+                                                                                                                    <label htmlFor={"kf-v".concat(item.realmCountry.id).concat(item2.program.id).concat(item4.versionId)}>{i18n.t('static.program.version').concat(" ")}<b>{(item4.versionId)}</b>{(" ").concat(i18n.t('static.program.savedOn')).concat(" ")}<b>{(moment(item4.createdDate).format(DATE_FORMAT_CAP))}</b>{(" ").concat(i18n.t("static.program.savedBy")).concat(" ")}<b>{(item4.createdBy.username)}</b>{(" ").concat(i18n.t("static.program.as")).concat(" ")}<b>{getLabelText(item4.versionType.label)}</b></label>
                                                                                                                 </div>
-                                                                                              
                                                                                                             </span>
-                                                                                                    </span>
+                                                                                                        </span>
                                                                                                         </li>
 
                                                                                                         {count == item3.versionList.length - 1 && item3.maxPages != item3.currentPage && <div style={{ color: '#205493', cursor: 'pointer' }} onClick={() => this.getMoreVersions(item2.program.id, parseInt(item3.versionList.length / 5))}>{i18n.t('static.program.seemoreprogram')}</div>}
@@ -811,7 +729,6 @@ class Program extends Component {
 
                                                                                     </ul>
                                                                                     {/* <ul>
-
                                                                                                 {
                                                                                                     this.state.prgList.filter(c => c.programId == item2.programId).map(item3 => (
                                                                                                         (item3.versionList).map(item4 => (
