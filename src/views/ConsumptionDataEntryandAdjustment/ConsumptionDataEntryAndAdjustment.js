@@ -1474,7 +1474,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               var datasetJson = JSON.parse(datasetData);
               console.log("datasetJson@@@@@@@@@@@@@@", datasetJson);
               var consumptionList = datasetJson.actualConsumptionList;
-              var planningUnitList = datasetJson.planningUnitList.filter(c => c.consuptionForecast);
+              var planningUnitList = datasetJson.planningUnitList.filter(c => c.consuptionForecast && c.active);
               planningUnitList.sort((a, b) => {
                 var itemLabelA = (this.state.showInPlanningUnit ? getLabelText(a.planningUnit.label, this.state.lang) : a.consumptionDataType == 1 ? getLabelText(a.planningUnit.forecastingUnit.label, this.state.lang) : a.consumptionDataType == 2 ? getLabelText(a.planningUnit.label, this.state.lang) : getLabelText(a.otherUnit.label, this.state.lang)).toUpperCase(); // ignore upper and lowercase
                 var itemLabelB = (this.state.showInPlanningUnit ? getLabelText(b.planningUnit.label, this.state.lang) : b.consumptionDataType == 1 ? getLabelText(b.planningUnit.forecastingUnit.label, this.state.lang) : b.consumptionDataType == 2 ? getLabelText(b.planningUnit.label, this.state.lang) : getLabelText(b.otherUnit.label, this.state.lang)).toUpperCase(); // ignore upper and lowercase                   
