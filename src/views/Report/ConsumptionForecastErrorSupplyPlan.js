@@ -1367,9 +1367,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         datacsv.push([(('Error*').replaceAll(',', ' ')).replaceAll(' ', '%20')])
         this.state.monthArray.map((item1, count) => {
             var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
-            totalError += Number(data[0].errorPerc);
+            totalError += Number((data[0].errorPerc==null || data[0].errorPerc=='infinity')?'':parseFloat(data[0].errorPerc));
             countError += 1;
-            datacsv.push(Number(data[0].errorPerc).toFixed(2))
+            datacsv.push(Number(data[0].errorPerc==null || data[0].errorPerc=='infinity')?'':parseFloat(data[0].errorPerc).toFixed(2))
         })
         datacsv.push(Number(totalError / countError).toFixed(2));
         // datacsv.push(this.state.showInPlanningUnit ? Math.round(totalPU) : Math.round(total));
@@ -1619,7 +1619,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                 var datavalue = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
                 totalError += Number(datavalue[0].errorPerc);
                 countError += 1;
-                A.push((Number(datavalue[0].errorPerc).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
+                A.push(((datavalue[0].errorPerc==null || datavalue[0].errorPerc=='infinity')?'':Number(parseFloat(datavalue[0].errorPerc)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
             })
             A.push((Number(totalError / countError).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
         }
@@ -2321,7 +2321,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                                     var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
                                                                     totalError += Number(data[0].errorPerc);
                                                                     countError += 1;
-                                                                    return (<td><NumberFormat displayType={'text'} thousandSeparator={true} />{parseFloat(data[0].errorPerc).toFixed(2)}</td>)
+                                                                    return (<td><NumberFormat displayType={'text'} thousandSeparator={true} />{(data[0].errorPerc==null || data[0].errorPerc=='infinity')?'':parseFloat(data[0].errorPerc).toFixed(2)}</td>)
 
                                                                 })}
                                                                 <td className="sticky-col first-col clone hoverTd" align="left">{(Number(totalError / countError).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
