@@ -650,7 +650,7 @@ export default class ProgramList extends Component {
                 <Card>
                 <div className="Card-header-reporticon pb-0">
                   <span className="compareAndSelect-rarrow">  <i className="cui-arrow-right icons " > </i></span>
-                   <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')} <a href="/#/program/downloadProgram" className="supplyplanformulas">{i18n.t('static.dashboard.downloadprogram')}</a> {i18n.t('static.tree.or')} <a href="/#/dataset/versionSettings" className='supplyplanformulas'>{i18n.t('static.UpdateversionSettings.UpdateversionSettings')}</a></span>
+                   <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')} <a href="/#/dataset/loadDeleteDataSet" className="supplyplanformulas">{i18n.t('static.dashboard.downloadprogram')}</a> {i18n.t('static.tree.or')} <a href="/#/dataset/versionSettings" className='supplyplanformulas'>{i18n.t('static.UpdateversionSettings.UpdateversionSettings')}</a></span>
                </div>
                     <div className="Card-header-addicon">
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '} */}
