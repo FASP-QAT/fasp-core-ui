@@ -94,6 +94,7 @@ export const JEXCEL_DECIMAL_NO_REGEX = /^\d{0,10}(\.\d{1,2})?$/
 export const JEXCEL_DECIMAL_NO_REGEX_NEW = /^\d{0,10}(\.\d{1,6})?$/
 export const JEXCEL_DECIMAL_NO_REGEX_LONG = /^\d{0,15}(\.\d{1,2})?$/
 export const JEXCEL_DECIMAL_NO_REGEX_LONG_4_DECIMAL = /^\d{0,15}(\.\d{1,4})?$/
+export const JEXCEL_DECIMAL_NO_REGEX_LONG_2_DECIMAL = /^\d{0,10}(\.\d{1,2})?$/
 export const JEXCEL_DECIMAL_CATELOG_PRICE = /^\d{0,10}(\.\d{1,4})?$/
 export const JEXCEL_DECIMAL_MONTHLY_CHANGE = /^.?\d{0,10}(\.\d{1,2})?$/
 export const JEXCEL_DECIMAL_MONTHLY_CHANGE_4_DECIMAL = /^.?\d{0,10}(\.\d{1,4})?$/

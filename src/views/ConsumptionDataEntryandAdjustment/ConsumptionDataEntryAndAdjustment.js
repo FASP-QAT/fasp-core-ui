@@ -7,7 +7,7 @@ import {
   CardFooter, Button, Col, Form, InputGroup, Modal, ModalHeader, ModalBody, ModalFooter, FormFeedback
 } from 'reactstrap';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, DATE_FORMAT_CAP_WITHOUT_DATE, DATE_FORMAT_CAP, TITLE_FONT, JEXCEL_DECIMAL_CATELOG_PRICE, SPECIAL_CHARECTER_WITH_NUM, TBD_PROCUREMENT_AGENT_ID } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, DATE_FORMAT_CAP_WITHOUT_DATE, DATE_FORMAT_CAP, TITLE_FONT, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_DECIMAL_NO_REGEX_LONG_2_DECIMAL, SPECIAL_CHARECTER_WITH_NUM, TBD_PROCUREMENT_AGENT_ID } from '../../Constants.js'
 import getLabelText from '../../CommonComponent/getLabelText'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import i18n from '../../i18n';
@@ -445,6 +445,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     var reportRateStart = 3;
     var stockDayStart = 4;
     var adjustedConsumption = 6;
+    var reg = JEXCEL_DECIMAL_NO_REGEX_LONG_2_DECIMAL;
 
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN']
     var regionList = this.state.regionList;
@@ -479,6 +480,11 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         // elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
         elInstance.setComments(col, "Please enter a positive number");
 
+      } else if (!(reg.test(value))) {
+        var col = (colArr[x]).concat(parseInt(y) + 1);
+        elInstance.setStyle(col, "background-color", "transparent");
+        elInstance.setStyle(col, "background-color", "yellow");
+        this.el.setComments(col, i18n.t('static.common.positiveIntegerWithLength'));
       } else {
         var col = (colArr[x]).concat(parseInt(y) + 1);
         var cell = elInstance.getCell((colArr[x]).concat(parseInt(y) + 2))
@@ -501,8 +507,12 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         elInstance.setStyle(col, "background-color", "yellow");
         // elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
         elInstance.setComments(col, "Please enter any positive number upto 100");
-      }
-      else {
+      } else if (!(reg.test(value))) {
+        var col = (colArr[x]).concat(parseInt(y) + 1);
+        elInstance.setStyle(col, "background-color", "transparent");
+        elInstance.setStyle(col, "background-color", "yellow");
+        this.el.setComments(col, i18n.t('static.common.positiveIntegerWithLength'));
+      } else {
         var col = (colArr[x]).concat(parseInt(y) + 1);
         elInstance.setStyle(col, "background-color", "transparent");
         elInstance.setComments(col, "");
@@ -519,6 +529,11 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         elInstance.setStyle(col, "background-color", "yellow");
         // elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
         elInstance.setComments(col, "Please enter positive value lesser than number of days.");
+      } else if (!(reg.test(value))) {
+        var col = (colArr[x]).concat(parseInt(y) + 1);
+        elInstance.setStyle(col, "background-color", "transparent");
+        elInstance.setStyle(col, "background-color", "yellow");
+        this.el.setComments(col, i18n.t('static.common.positiveIntegerWithLength'));
       } else {
         var col = (colArr[x]).concat(parseInt(y) + 1);
         elInstance.setStyle(col, "background-color", "transparent");
@@ -539,6 +554,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     var stockDayStart = 4;
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN']
     var regionList = this.state.regionList;
+    var reg = JEXCEL_DECIMAL_NO_REGEX_LONG_2_DECIMAL;
 
     for (var i = 0; i < regionList.length; i++) {
       possibleActualConsumptionY.push(actualConsumptionStart.toString());
@@ -562,6 +578,12 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             // elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
             elInstance.setComments(col, "Please enter a positive number)");
             valid = false;
+          } else if (!(reg.test(value))) {
+            var col = (colArr[x]).concat(parseInt(y) + 1);
+            elInstance.setStyle(col, "background-color", "transparent");
+            elInstance.setStyle(col, "background-color", "yellow");
+            this.el.setComments(col, i18n.t('static.common.positiveIntegerWithLength'));
+            valid = false;
           } else {
             var col = (colArr[x]).concat(parseInt(y) + 1);
             elInstance.setStyle(col, "background-color", "transparent");
@@ -580,6 +602,12 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             elInstance.setStyle(col, "background-color", "yellow");
             //elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
             elInstance.setComments(col, "Please enter any positive number upto 100");
+            valid = false;
+          } else if (!(reg.test(value))) {
+            var col = (colArr[x]).concat(parseInt(y) + 1);
+            elInstance.setStyle(col, "background-color", "transparent");
+            elInstance.setStyle(col, "background-color", "yellow");
+            this.el.setComments(col, i18n.t('static.common.positiveIntegerWithLength'));
             valid = false;
           }
           else {
@@ -601,6 +629,12 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             elInstance.setStyle(col, "background-color", "yellow");
             // elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
             elInstance.setComments(col, "Please enter positive value lesser than number of days.");
+            valid = false;
+          } else if (!(reg.test(value))) {
+            var col = (colArr[x]).concat(parseInt(y) + 1);
+            elInstance.setStyle(col, "background-color", "transparent");
+            elInstance.setStyle(col, "background-color", "yellow");
+            this.el.setComments(col, i18n.t('static.common.positiveIntegerWithLength'));
             valid = false;
           } else {
             var col = (colArr[x]).concat(parseInt(y) + 1);
