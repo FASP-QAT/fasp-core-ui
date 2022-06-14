@@ -535,6 +535,8 @@ export default class BuildTree extends Component {
         this.pickAMonth4 = React.createRef()
         this.pickAMonth5 = React.createRef()
         this.state = {
+            isScenarioChanged:false,
+            isTreeDataChanged : false,
             percentForOneMonth: '',
             popoverOpenStartValueModelingTool: false,
             showGuidanceModelingTransfer: false,
@@ -1823,7 +1825,9 @@ export default class BuildTree extends Component {
                                 loading: false,
                                 message: i18n.t("static.mt.dataUpdateSuccess"),
                                 color: "green",
-                                isChanged: false
+                                isChanged: false,
+                                isTreeDataChanged: false,
+                                isScenarioChanged:false
                             }, () => {
                                 for (let i = 0; i < items.length; i++) {
                                     var item = items[i];
@@ -4998,7 +5002,7 @@ export default class BuildTree extends Component {
         this.setState({
             regionValues: regionIds.map(ele => ele),
             regionLabels: regionIds.map(ele => ele.label),
-            isChanged: true
+            isTreeDataChanged: true
         }, () => {
             console.log("regionValues---", this.state.regionValues);
             console.log("regionLabels---", this.state.regionLabels);
@@ -6431,7 +6435,7 @@ export default class BuildTree extends Component {
     }
 
     componentDidUpdate = () => {
-        if (this.state.isChanged == true) {
+        if (this.state.isChanged == true || this.state.isTreeDataChanged == true || this.state.isScenarioChanged == true) {
             window.onbeforeunload = () => true
         } else {
             window.onbeforeunload = undefined
@@ -6540,7 +6544,7 @@ export default class BuildTree extends Component {
                 selectedScenario: scenarioId,
                 scenarioList: scenarioList.filter(x => x.active == true),
                 openAddScenarioModal: false,
-                isChanged: true
+                isScenarioChanged: true
             }, () => {
                 console.log("final tab list---", this.state.items);
                 if (type == 1) {
@@ -6696,6 +6700,7 @@ export default class BuildTree extends Component {
         }
         // scenario.id = 1;
         this.setState({
+            idScenarioChanged : true,
             scenario
         });
     }
@@ -6732,7 +6737,7 @@ export default class BuildTree extends Component {
         }
 
 
-        this.setState({ curTreeObj, isChanged: true }, () => {
+        this.setState({ curTreeObj, isTreeDataChanged: true }, () => {
             console.log("curTreeObj---", curTreeObj);
         });
 
@@ -9168,7 +9173,7 @@ export default class BuildTree extends Component {
                                     {/* disabled={!isValid} */}
                                     <FormGroup className="pb-lg-3">
                                         {/* <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false, cursorItem: 0, highlightItem: 0 })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
-                                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false, cursorItem: 0, highlightItem: 0 })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false, cursorItem: 0, isChanged: false, highlightItem: 0 })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                         <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={() => this.resetNodeData()} ><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllNodeData(setTouched, errors)} disabled={isSubmitting}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                     </FormGroup>
@@ -10493,7 +10498,7 @@ export default class BuildTree extends Component {
         }
         return <div className="">
             <Prompt
-                when={this.state.isChanged == true}
+                when={this.state.isChanged == true || this.state.isTreeDataChanged == true || this.state.isScenarioChanged == true}
                 message={i18n.t("static.dataentry.confirmmsg")}
             />
             <AuthenticationServiceComponent history={this.props.history} />
@@ -11630,7 +11635,7 @@ export default class BuildTree extends Component {
                                         (this.state.currentItemConfig.context.payload.nodeType.id == 1 ? <i><img src={AggregationNode} className="AggregationNodeSize" /></i> : "")
                                     )))}
                         <b className="supplyplanformulas ScalingheadTitle">{this.state.currentItemConfig.context.payload.label.label_en}</b></div>}
-                    <Button size="md" onClick={() => this.setState({ openAddNodeModal: false, cursorItem: 0, highlightItem: 0, activeTab1: new Array(3).fill('1') })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
+                    <Button size="md" onClick={() => this.setState({ openAddNodeModal: false, cursorItem: 0, isChanged: false, highlightItem: 0, activeTab1: new Array(3).fill('1') })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
                 </ModalHeader>
                 <ModalBody>
                     <Row>

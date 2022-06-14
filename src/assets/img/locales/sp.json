@@ -442,6 +442,7 @@
     "static.supplyPlan.orderNo": "No. de pedido",
     "static.program.validseafreighttext": "Ingresar el porcentaje de flete marítimo / terrestre",
     "static.loadDelDataset.deleteThisLocalVersion": "Eliminar esta versión local",
+    "static.budget.duplicateDisplayName": "Ya existe una combinación de nombre de presupuesto y nombre para mostrar",
     "static.common.jan": "Ene",
     "static.common.startdateCompare": "La fecha de inicio debe ser anterior a la fecha de finalización",
     "static.common.description": "Descripción",

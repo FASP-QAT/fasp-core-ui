@@ -1281,9 +1281,10 @@ class AccessControlComponent extends Component {
 
         if (selProgram.length > 0) {
             for (var i = 0; i < selProgram.length; i++) {
+                var name = selProgram[i].programCode + " (" + (selProgram[i].programTypeId == 1 ? "SP" : selProgram[i].programTypeId == 2 ? "FC" : "") + ")";
                 var paJson = {
                     // name: getLabelText(selProgram[i].label, this.state.lang),
-                    name: selProgram[i].programCode,
+                    name: name,
                     id: parseInt(selProgram[i].programId),
                     active: selProgram[i].active
                 }
@@ -1780,7 +1781,7 @@ class AccessControlComponent extends Component {
                                                         DatasetService.getDatasetList()
                                                             .then(response1 => {
                                                                 if (response1.status == "200") {
-                                                                    
+
                                                                     var listArray = [...response.data, ...response1.data]
                                                                     listArray.sort((a, b) => {
                                                                         var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
