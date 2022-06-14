@@ -241,5 +241,10 @@ class ProgramService {
         );
     }
 
+    getProgramManagerListByProgramId(programId) {
+        return axios.get(`${API_URL}/api/user/programId/${programId}`, {}
+        );
+    }
+
 }
 export default new ProgramService()

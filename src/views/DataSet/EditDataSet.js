@@ -240,7 +240,8 @@ export default class EditProgram extends Component {
             })
 
             // AuthenticationService.setupAxiosInterceptors();
-            ProgramService.getProgramManagerList(response.data.realmCountry.realm.realmId)
+            // ProgramService.getProgramManagerList(response.data.realmCountry.realm.realmId)
+            ProgramService.getProgramManagerListByProgramId(this.props.match.params.dataSetId)
                 .then(response => {
                     console.log("realm list---", response.data);
                     if (response.status == 200) {
