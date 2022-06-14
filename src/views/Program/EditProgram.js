@@ -308,7 +308,9 @@ export default class EditProgram extends Component {
             //     regionArray: this.state.program.regionArray
             // }
             // AuthenticationService.setupAxiosInterceptors();
-            ProgramService.getProgramManagerList(response.data.realmCountry.realm.realmId)
+            
+            // ProgramService.getProgramManagerList(response.data.realmCountry.realm.realmId)
+            ProgramService.getProgramManagerListByProgramId(this.props.match.params.programId)
                 .then(response => {
                     console.log("realm list---", response.data);
                     if (response.status == 200) {
