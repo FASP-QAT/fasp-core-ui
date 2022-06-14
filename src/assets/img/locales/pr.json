@@ -442,6 +442,7 @@
     "static.supplyPlan.orderNo": "Nº do embarque. ",
     "static.program.validseafreighttext": "Insira o custo de frete marítimo / terrestre (%)",
     "static.loadDelDataset.deleteThisLocalVersion": "Excluir esta versão local",
+    "static.budget.duplicateDisplayName": "A combinação do nome do orçamento e do nome de exibição já existe",
     "static.common.jan": "jan.",
     "static.common.startdateCompare": "A data de início deve ser antes da data de término",
     "static.common.description": "Descrição",

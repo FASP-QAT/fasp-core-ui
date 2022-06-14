@@ -442,6 +442,7 @@
     "static.supplyPlan.orderNo": "Shipment No.",
     "static.program.validseafreighttext": "Enter sea/land freight percentage",
     "static.loadDelDataset.deleteThisLocalVersion": "Delete this local version",
+    "static.budget.duplicateDisplayName": "Combination of budget name and display name already exists",
     "static.common.jan": "Jan",
     "static.common.startdateCompare": "Start date should be before end date",
     "static.common.description": " Description",
