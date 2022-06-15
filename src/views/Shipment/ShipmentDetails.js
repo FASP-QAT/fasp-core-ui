@@ -1064,10 +1064,10 @@ export default class ShipmentDetails extends React.Component {
                             </ul>
                         </div>
 
-                        <div className="shipmentconsumptionSearchMarginTop" style={{ display: this.state.loading ? "none" : "block" }}>
+                        <div className="shipmentconsumptionSearchMarginTop" >
                             <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state} updateState={this.updateState} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} hideFourthComponent={this.hideFourthComponent} hideFifthComponent={this.hideFifthComponent} shipmentPage="shipmentDataEntry" useLocalData={1} openBatchPopUp={this.openBatchPopUp} />
                             <div className="table-responsive shipmentDataEntryTable" id="shipmentsDetailsTableDiv">
-                                <div id="shipmentsDetailsTable" className="jexcelremoveReadonlybackground" />
+                                <div id="shipmentsDetailsTable" className="jexcelremoveReadonlybackground" style={{ display: this.state.loading ? "none" : "block" }}/>
                             </div>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>
