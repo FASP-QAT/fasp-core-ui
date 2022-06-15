@@ -442,6 +442,7 @@
     "static.supplyPlan.orderNo": "N° d`expédition",
     "static.program.validseafreighttext": "Entrez le pourcentage de fret maritime / terrestre",
     "static.loadDelDataset.deleteThisLocalVersion": "Supprimer cette version locale",
+    "static.budget.duplicateDisplayName": "La combinaison du nom du budget et du nom à afficher existe déjà",
     "static.common.jan": "Jan",
     "static.common.startdateCompare": "La date de début doit être antérieure à la date de fin",
     "static.common.description": "Description",

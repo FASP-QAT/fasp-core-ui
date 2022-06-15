@@ -707,6 +707,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 data[3] = papuList[j].multiplier
                 data[4] = papuList[j].forecastingUnit.id
                 data[5] = planningUnitObj != undefined ? planningUnitObj.forecastingUnit.tracerCategory.id : ""
+                // data[5] = papuList[j].forecastingUnit.tracerCategory.id
+
 
                 // let selectedForecastProgram = this.state.datasetList.filter(c => c.programId == document.getElementById("forecastProgramId").value && c.versionId == this.state.forecastProgramVersionId)[0];
                 // let filteredForecastingUnit = selectedForecastProgram.filteredForecastingUnit;
@@ -1092,7 +1094,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 //multiplier
                 var col = ("J").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(9, y);
-                var reg = /^\d{1,6}(\.\d{1,6})?$/;
+                var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
@@ -1102,7 +1104,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     if (!(reg.test(value))) {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t('static.usagePeriod.conversionFactorTestString'));
+                        this.el.setComments(col, i18n.t('static.planningUnitSetting.max10Digit4AfterDecimal'));
                     } else {
                         if (isNaN(Number.parseInt(value)) || value <= 0) {
                             this.el.setStyle(col, "background-color", "transparent");
