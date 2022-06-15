@@ -3140,7 +3140,7 @@ export default class BuildTree extends Component {
                             this.calculateMOMData(0, 0);
                         });
                     } else {
-                        console.log("this.state.isValidError---", this.state.isValidError)
+                        // console.log("this.state.isValidError---", this.state.isValidError)
                         if (this.state.isValidError.toString() == "false") {
                             console.log("inside if form submit");
                             this.onAddButtonClick(this.state.currentItemConfig, true, dataArr);
@@ -6652,7 +6652,7 @@ export default class BuildTree extends Component {
         }, () => {
 
             var isValid = document.getElementById('isValidError').value;
-            console.log("isValid 1---", isValid);
+            // console.log("isValid 1---", isValid);
             this.setState({ isValidError: isValid});
 
             if (tab == 3) {
@@ -8206,7 +8206,7 @@ export default class BuildTree extends Component {
                                             </Popover>
                                         </div>
                                         <Input
-                                            type="text"
+                                            type="hidden"
                                             name="isValidError"
                                             id="isValidError"
                                             value={JSON.stringify(errors) != '{}'}
