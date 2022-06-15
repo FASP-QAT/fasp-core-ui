@@ -28,7 +28,7 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
 import { DatePicker } from 'antd';
 import 'antd/dist/antd.css';
-import MultiSelect from "react-multi-select-component";
+import { MultiSelect } from "react-multi-select-component";
 import SupplyPlanFormulas from "../SupplyPlan/SupplyPlanFormulas";
 import { isSiteOnline } from "../../CommonComponent/JavascriptCommonFunctions";
 import TracerCategoryService from '../../api/TracerCategoryService';
@@ -1844,7 +1844,7 @@ export default class StockStatusMatrix extends React.Component {
                   </div>
                 </FormGroup>
                 <FormGroup className="col-md-3">
-                  <Label htmlFor="appendedInputButton">{i18n.t('static.report.version*')}</Label>
+                  <Label htmlFor="appendedInputButton">{i18n.t('static.report.versionFinal*')}</Label>
                   <div className="controls ">
                     <InputGroup>
                       <Input

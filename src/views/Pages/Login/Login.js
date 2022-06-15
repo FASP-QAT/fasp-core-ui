@@ -282,7 +282,7 @@ class Login extends Component {
   incorrectPassmessageHide() {
     // console.log("-----------------incorrectPassmessageHide---------------");
     // setTimeout(function () { document.getElementById('div1').style.display = 'none'; }, 8000);
-    setTimeout(function () { document.getElementById('div2').style.display = 'none'; }, 8000);
+    setTimeout(function () { document.getElementById('div2').style.display = 'none'; }, 30000);
     var incorrectPassword = document.getElementById('div2');
     incorrectPassword.style.color = '#BA0C2F';
     this.setState({
@@ -300,7 +300,7 @@ class Login extends Component {
 
   logoutMessagehide() {
     // console.log("-----------logoutMessagehide---------------");
-    setTimeout(function () { document.getElementById('div1').style.display = 'none'; }, 8000);
+    setTimeout(function () { document.getElementById('div1').style.display = 'none'; }, 30000);
     var logoutMessage = document.getElementById('div1');
     var htmlContent = logoutMessage.innerHTML;
     // console.log("htnl content....... ", htmlContent);
@@ -331,7 +331,7 @@ class Login extends Component {
   }
   render() {
     return (
-      <div className="main-content flex-row align-items-center">
+      <div className="main-content flex-row align-items-center bg-height">
 
         <div className="Login-component" style={{ backgroundImage: "url(" + InnerBgImg + ")" }}>
           <Container className="container-login">

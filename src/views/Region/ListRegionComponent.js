@@ -345,7 +345,7 @@ import { getStyle } from '@coreui/coreui-pro/dist/js/coreui-utilities';
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import ReportService from '../../api/ReportService';
-import MultiSelect from 'react-multi-select-component';
+import {MultiSelect} from 'react-multi-select-component';
 import { JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants';
 
 
@@ -530,7 +530,7 @@ class RegionListComponent extends Component {
         document.getElementById('div2').style.display = 'block';
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
 
     handleChange(countrysId) {

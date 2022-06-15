@@ -40,7 +40,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, DATE_FORMAT_CAP } from '../../Constants.js'
 import moment, { version } from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
@@ -143,7 +143,7 @@ class ForcastMatrixOverTime extends Component {
     document.getElementById('div2').style.display = 'block';
     setTimeout(function () {
       document.getElementById('div2').style.display = 'none';
-    }, 8000);
+    }, 30000);
   }
 
   formatter = value => {
@@ -164,6 +164,10 @@ class ForcastMatrixOverTime extends Component {
   }
   dateFormatter = value => {
     return moment(value).format('MMM YY')
+  }
+
+  dateFormatterCSV = value => {
+    return moment(value).format(DATE_FORMAT_CAP)
   }
   makeText = m => {
     if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
@@ -204,7 +208,7 @@ class ForcastMatrixOverTime extends Component {
     csvRow.push('')
     csvRow.push('"' + (i18n.t('static.program.program') + ': ' + (document.getElementById("programId").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
     csvRow.push('')
-    csvRow.push('"' + (i18n.t('static.report.version*') + ' : ' + (document.getElementById("versionId").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
+    csvRow.push('"' + (i18n.t('static.report.versionFinal*') + ' : ' + (document.getElementById("versionId").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
     csvRow.push('')
     csvRow.push('"' + (i18n.t('static.planningunit.planningunit') + ' : ' + (document.getElementById("planningUnitId").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
     csvRow.push('')
@@ -218,7 +222,7 @@ class ForcastMatrixOverTime extends Component {
 
 
     for (var item = 0; item < re.length; item++) {
-      A.push(this.addDoubleQuoteToRowContent([this.dateFormatter(re[item].month).replaceAll(' ', '%20'), re[item].forecastedConsumption == null ? '' : re[item].forecastedConsumption, re[item].actualConsumption == null ? '' : re[item].actualConsumption, re[item].message == null ? this.PercentageFormatter(re[item].forecastError) : (i18n.t(re[item].message)).replaceAll(' ', '%20')]))
+      A.push(this.addDoubleQuoteToRowContent([this.dateFormatterCSV(re[item].month).replaceAll(' ', '%20'), re[item].forecastedConsumption == null ? '' : re[item].forecastedConsumption, re[item].actualConsumption == null ? '' : re[item].actualConsumption, re[item].message == null ? this.PercentageFormatter(re[item].forecastError) : (i18n.t(re[item].message)).replaceAll(' ', '%20')]))
     }
     for (var i = 0; i < A.length; i++) {
       csvRow.push(A[i].join(","))
@@ -282,7 +286,7 @@ class ForcastMatrixOverTime extends Component {
           doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
             align: 'left'
           })
-          doc.text(i18n.t('static.report.version*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
+          doc.text(i18n.t('static.report.versionFinal*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
             align: 'left'
           })
           doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 170, {
@@ -1437,7 +1441,7 @@ class ForcastMatrixOverTime extends Component {
 
                             </FormGroup>*/}
                           <FormGroup className="col-md-3">
-                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.version*')}</Label>
+                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.versionFinal*')}</Label>
                             <div className="controls">
                               <InputGroup>
                                 <Input

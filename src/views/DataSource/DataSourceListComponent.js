@@ -553,7 +553,7 @@ export default class DataSourceListComponent extends Component {
     hideFirstComponent() {
         this.timeout = setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
     componentWillUnmount() {
         clearTimeout(this.timeout);
@@ -563,7 +563,7 @@ export default class DataSourceListComponent extends Component {
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
 
     filterData() {
@@ -652,7 +652,7 @@ export default class DataSourceListComponent extends Component {
             data[2] = getLabelText(dataSourceList[j].dataSourceType.label, this.state.lang)
             data[3] = getLabelText(dataSourceList[j].label, this.state.lang)
             // data[4] = getLabelText(dataSourceList[j].program.label, this.state.lang)
-            data[4] = dataSourceList[j].program.code;
+            data[4] = dataSourceList[j].program!=null?dataSourceList[j].program.code:null;
             data[5] = dataSourceList[j].lastModifiedBy.username;
             data[6] = (dataSourceList[j].lastModifiedDate ? moment(dataSourceList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
             data[7] = dataSourceList[j].active;

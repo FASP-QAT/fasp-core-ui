@@ -40,7 +40,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, polling, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, polling, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, DATE_FORMAT_CAP } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
@@ -341,7 +341,7 @@ class Consumption extends Component {
     csvRow.push('')
     csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
     csvRow.push('')
-    csvRow.push('"' + (i18n.t('static.report.version*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+    csvRow.push('"' + (i18n.t('static.report.versionFinal*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
     csvRow.push('')
     csvRow.push('"' + (i18n.t('static.planningunit.planningunit') + ' : ' + (document.getElementById("planningUnitId").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
     csvRow.push('')
@@ -367,7 +367,7 @@ class Consumption extends Component {
       row1.push(i18n.t('static.report.forecasted'));
       row2.push(i18n.t('static.report.actual'));
       for (let i = 0; i < consumptionArray.length; i++) {
-        head.push((moment(consumptionArray[i].transDate, 'yyyy-MM-dd').format('MMM YYYY')).replaceAll(' ', '%20'));
+        head.push((moment(consumptionArray[i].transDate, 'yyyy-MM-dd').format(DATE_FORMAT_CAP)).replaceAll(' ', '%20'));
         row1.push(consumptionArray[i].forecastedConsumption == null ? '' : consumptionArray[i].forecastedConsumption);
         row2.push(consumptionArray[i].actualConsumption == null ? '' : consumptionArray[i].actualConsumption);
       }
@@ -377,7 +377,7 @@ class Consumption extends Component {
       row1.push(i18n.t('static.report.forecasted'));
       row2.push(i18n.t('static.report.actual'));
       for (let i = 0; i < consumptionArray.length; i++) {
-        head.push(((moment(consumptionArray[i].transDate, 'yyyy-MM-dd').format('MMM YYYY'))).replaceAll(' ', '%20'));
+        head.push(((moment(consumptionArray[i].transDate, 'yyyy-MM-dd').format(DATE_FORMAT_CAP))).replaceAll(' ', '%20'));
         row1.push(consumptionArray[i].forecastedConsumption == null ? '' : consumptionArray[i].forecastedConsumption);
         row2.push(consumptionArray[i].actualConsumption == null ? '' : consumptionArray[i].actualConsumption);
       }
@@ -443,7 +443,7 @@ class Consumption extends Component {
           doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
             align: 'left'
           })
-          doc.text(i18n.t('static.report.version*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
+          doc.text(i18n.t('static.report.versionFinal*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
             align: 'left'
           })
           doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
@@ -1610,7 +1610,7 @@ class Consumption extends Component {
                       </FormGroup>
 
                       <FormGroup className="col-md-3">
-                        <Label htmlFor="appendedInputButton">{i18n.t('static.report.version*')}</Label>
+                        <Label htmlFor="appendedInputButton">{i18n.t('static.report.versionFinal*')}</Label>
                         <div className="controls">
                           <InputGroup>
                             <Input

@@ -27,7 +27,7 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 import { LOGO } from '../../CommonComponent/Logo.js';
 import ReportService from '../../api/ReportService';
-import MultiSelect from 'react-multi-select-component';
+import { MultiSelect } from 'react-multi-select-component';
 import jexcel from 'jexcel-pro';
 import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
@@ -564,7 +564,7 @@ class StockAdjustmentComponent extends Component {
         csvRow.push('')
         csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.report.version*').replaceAll(' ', '%20') + '  :  ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.report.versionFinal*').replaceAll(' ', '%20') + '  :  ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         this.state.planningUnitLabels.map(ele =>
             csvRow.push('"' + (i18n.t('static.planningunit.planningunit') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
@@ -579,7 +579,7 @@ class StockAdjustmentComponent extends Component {
 
 
         var A = [this.addDoubleQuoteToRowContent(headers)]
-        this.state.data.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.dataSource.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.planningUnit.id, (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (new moment(ele.inventoryDate).format('MMM YYYY')).replaceAll(' ', '%20'), ele.stockAdjustemntQty, ele.lastModifiedBy.username, new moment(ele.lastModifiedDate).format(`${DATE_FORMAT_CAP}`), ele.notes != null ? (ele.notes).replaceAll(' ', '%20') : ''])));
+        this.state.data.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.dataSource.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.planningUnit.id, (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (new moment(ele.inventoryDate).format(DATE_FORMAT_CAP)).replaceAll(' ', '%20'), ele.stockAdjustemntQty, ele.lastModifiedBy.username, new moment(ele.lastModifiedDate).format(`${DATE_FORMAT_CAP}`), ele.notes != null ? (ele.notes).replaceAll(' ', '%20') : ''])));
         for (var i = 0; i < A.length; i++) {
             // console.log(A[i])
             csvRow.push(A[i].join(","))
@@ -640,7 +640,7 @@ class StockAdjustmentComponent extends Component {
                         align: 'left'
                     })
 
-                    doc.text(i18n.t('static.report.version*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
+                    doc.text(i18n.t('static.report.versionFinal*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
                         align: 'left'
                     })
                     var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
@@ -871,7 +871,7 @@ class StockAdjustmentComponent extends Component {
                                 var generalProgramDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
                                 var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
                                 var generalProgramJson = JSON.parse(generalProgramData);
-                                
+
                                 var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
                                 console.log(startDate, endDate)
                                 var data = []
@@ -1312,7 +1312,7 @@ class StockAdjustmentComponent extends Component {
                                     </div>
                                 </FormGroup>
                                 <FormGroup className="col-md-3">
-                                    <Label htmlFor="appendedInputButton">{i18n.t('static.report.version*')}</Label>
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.report.versionFinal*')}</Label>
                                     <div className="controls ">
                                         <InputGroup>
                                             <Input

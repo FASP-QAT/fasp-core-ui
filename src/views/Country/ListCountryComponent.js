@@ -340,6 +340,13 @@ import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions.js
 
 
 const entityname = i18n.t('static.country.countryMaster');
+
+const sortArray = (sourceArray) => {
+    // const sortByName = (a, b) => getLabelText(a.label, this.state.lang).localeCompare(getLabelText(b.label, this.state.lang), 'en', { numeric: true });
+    const sortByName = (a, b) => a.label.label_en.localeCompare(b.label.label_en, 'en', { numeric: true });
+    return sourceArray.sort(sortByName);
+};
+
 export default class CountryListComponent extends Component {
 
     constructor(props) {
@@ -362,7 +369,7 @@ export default class CountryListComponent extends Component {
     hideFirstComponent() {
         this.timeout = setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
     componentWillUnmount() {
         clearTimeout(this.timeout);
@@ -371,7 +378,7 @@ export default class CountryListComponent extends Component {
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
 
     filterData() {
@@ -540,9 +547,14 @@ export default class CountryListComponent extends Component {
                 //     countryList: response.data,
                 //     selCountry: response.data, loading: false
                 // })
+                var listArray = response.data;
+
+                if (listArray.length > 0) {
+                    sortArray(listArray);
+                }
                 this.setState({
-                    countryList: response.data,
-                    selCountry: response.data
+                    countryList: listArray,
+                    selCountry: listArray
                 },
                     () => {
                         this.buildJExcel();

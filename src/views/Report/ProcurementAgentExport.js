@@ -30,7 +30,7 @@ import ReportService from '../../api/ReportService';
 import ProcurementAgentService from "../../api/ProcurementAgentService";
 import { Online, Offline } from "react-detect-offline";
 import FundingSourceService from '../../api/FundingSourceService';
-import MultiSelect from 'react-multi-select-component';
+import {MultiSelect} from 'react-multi-select-component';
 import jexcel from 'jexcel-pro';
 import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
@@ -746,7 +746,7 @@ class ProcurementAgentExport extends Component {
 
         csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.report.version*') + '  :  ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.report.versionFinal*') + '  :  ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         this.state.planningUnitValues.map(ele =>
             csvRow.push('"' + (i18n.t('static.planningunit.planningunit') + ' : ' + (ele.label).toString()).replaceAll(' ', '%20') + '"'))
@@ -856,7 +856,7 @@ class ProcurementAgentExport extends Component {
                         align: 'left'
                     })
                     poslen = poslen + 20
-                    doc.text(i18n.t('static.report.version*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, poslen, {
+                    doc.text(i18n.t('static.report.versionFinal*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, poslen, {
                         align: 'left'
                     })
                     poslen = poslen + 20
@@ -2633,7 +2633,7 @@ class ProcurementAgentExport extends Component {
                                 </FormGroup>
 
                                 <FormGroup className="col-md-3">
-                                    <Label htmlFor="appendedInputButton">{i18n.t('static.report.version*')}</Label>
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.report.versionFinal*')}</Label>
                                     <div className="controls">
                                         <InputGroup>
                                             <Input

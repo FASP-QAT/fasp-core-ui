@@ -31,5 +31,20 @@ class ForecastingUnitService {
         return axios.get(`${API_URL}/api/forecastingUnit/realmId/${json}`, {}
         );
     }
+
+    getForcastingUnitListByTracerCategoryId(tracerCategoryId) {
+        return axios.get(`${API_URL}/api/forecastingUnit/tracerCategory/${tracerCategoryId}`, {}
+        );
+    }
+
+    getForecastingUnitByTracerCategoriesId(json) {
+        return axios.post(`${API_URL}/api/forecastingUnit/tracerCategorys`, json, {}
+        );
+    }
+
+    getForecastingUnitListByProgramVersionIdForSelectedForecastMap(programId, versionId) {
+        return axios.get(`${API_URL}/api/forecastingUnit/programId/${programId}/versionId/${versionId}`, {}
+        );
+    }
 }
 export default new ForecastingUnitService();

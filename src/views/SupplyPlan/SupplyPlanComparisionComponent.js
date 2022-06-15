@@ -127,13 +127,13 @@ export default class SupplyPlanComponent extends React.Component {
 
     leftClicked() {
         var monthCount = (this.props.items.monthCount) - NO_OF_MONTHS_ON_LEFT_CLICKED;
-        this.props.updateState("monthCount",monthCount);
+        this.props.updateState("monthCount", monthCount);
         this.formSubmit(monthCount)
     }
 
     rightClicked() {
         var monthCount = (this.props.items.monthCount) + NO_OF_MONTHS_ON_RIGHT_CLICKED;
-        this.props.updateState("monthCount",monthCount);
+        this.props.updateState("monthCount", monthCount);
         this.formSubmit(monthCount)
     }
 
@@ -243,7 +243,7 @@ export default class SupplyPlanComponent extends React.Component {
         csvRow.push('')
 
         const header = [...[""], ... (this.state.monthsArray.map(item => (
-            item.monthName.concat(" ").concat(item.monthYear)
+            ("\'").concat(item.monthName).concat(" ").concat(item.monthYear)
         ))
         )]
         var A = [header]
@@ -502,18 +502,18 @@ export default class SupplyPlanComponent extends React.Component {
                     align: 'left'
                 })
                 var splitTitle = doc.splitTextToSize(ele.notes.replace(/[\r\n]+/gm, " "), doc.internal.pageSize.width * 3 / 4);
-                    doc.text(doc.internal.pageSize.width / 5.7, y, splitTitle);
-                    for (var i = 0; i < splitTitle.length; i++) {
-                        if (y > doc.internal.pageSize.height - 100) {
-                            doc.addPage();
-                            y = 80;
-                        } else {
-                            y = y + 3
-                        }
+                doc.text(doc.internal.pageSize.width / 5.7, y, splitTitle);
+                for (var i = 0; i < splitTitle.length; i++) {
+                    if (y > doc.internal.pageSize.height - 100) {
+                        doc.addPage();
+                        y = 80;
+                    } else {
+                        y = y + 3
                     }
-                    if (splitTitle.length > 1) {
-                        y = y + (5 * (splitTitle.length - 1));
-                    }
+                }
+                if (splitTitle.length > 1) {
+                    y = y + (5 * (splitTitle.length - 1));
+                }
             }
         })
 
@@ -540,18 +540,18 @@ export default class SupplyPlanComponent extends React.Component {
                     align: 'left'
                 })
                 var splitTitle = doc.splitTextToSize(ele.notes.replace(/[\r\n]+/gm, " "), doc.internal.pageSize.width * 3 / 4);
-                    doc.text(doc.internal.pageSize.width / 5.7, y, splitTitle);
-                    for (var i = 0; i < splitTitle.length; i++) {
-                        if (y > doc.internal.pageSize.height - 100) {
-                            doc.addPage();
-                            y = 80;
-                        } else {
-                            y = y + 3
-                        }
+                doc.text(doc.internal.pageSize.width / 5.7, y, splitTitle);
+                for (var i = 0; i < splitTitle.length; i++) {
+                    if (y > doc.internal.pageSize.height - 100) {
+                        doc.addPage();
+                        y = 80;
+                    } else {
+                        y = y + 3
                     }
-                    if (splitTitle.length > 1) {
-                        y = y + (5 * (splitTitle.length - 1));
-                    }
+                }
+                if (splitTitle.length > 1) {
+                    y = y + (5 * (splitTitle.length - 1));
+                }
             }
         })
 
@@ -578,18 +578,18 @@ export default class SupplyPlanComponent extends React.Component {
                     align: 'left'
                 })
                 var splitTitle = doc.splitTextToSize(ele.notes.replace(/[\r\n]+/gm, " "), doc.internal.pageSize.width * 3 / 4);
-                    doc.text(doc.internal.pageSize.width / 5.7, y, splitTitle);
-                    for (var i = 0; i < splitTitle.length; i++) {
-                        if (y > doc.internal.pageSize.height - 100) {
-                            doc.addPage();
-                            y = 80;
-                        } else {
-                            y = y + 3
-                        }
+                doc.text(doc.internal.pageSize.width / 5.7, y, splitTitle);
+                for (var i = 0; i < splitTitle.length; i++) {
+                    if (y > doc.internal.pageSize.height - 100) {
+                        doc.addPage();
+                        y = 80;
+                    } else {
+                        y = y + 3
                     }
-                    if (splitTitle.length > 1) {
-                        y = y + (5 * (splitTitle.length - 1));
-                    }
+                }
+                if (splitTitle.length > 1) {
+                    y = y + (5 * (splitTitle.length - 1));
+                }
 
             }
         }
@@ -605,6 +605,7 @@ export default class SupplyPlanComponent extends React.Component {
 
 
     componentDidMount() {
+        console.log("@@@@@@#################in component did mount@@@@@@@@@")
         var fields = document.getElementsByClassName("totalShipments1");
         for (var i = 0; i < fields.length; i++) {
             fields[i].style.display = "none";
@@ -645,7 +646,7 @@ export default class SupplyPlanComponent extends React.Component {
             getRequest.onsuccess = function (event) {
                 var myResult = [];
                 myResult = getRequest.result;
-                console.log("MyResult+++",myResult)
+                console.log("MyResult+++", myResult)
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 for (var i = 0; i < myResult.length; i++) {
@@ -667,7 +668,7 @@ export default class SupplyPlanComponent extends React.Component {
                 this.setState({
                     programList: proList,
                     loading: false,
-                    programQPLDetails:getRequest.result
+                    programQPLDetails: getRequest.result
                 })
                 this.getPlanningUnitList();
             }.bind(this);
@@ -708,7 +709,8 @@ export default class SupplyPlanComponent extends React.Component {
                     var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
                     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                     var programJson = JSON.parse(programData);
-                    var planningUnitDataList=programRequest.result.programData.planningUnitDataList;
+                    var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
+                    console.log("List@@@@@@@@@@@",planningUnitDataList)
                     for (var i = 0; i < programJson.regionList.length; i++) {
                         var regionJson = {
                             // name: // programJson.regionList[i].regionId,
@@ -777,7 +779,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 var dataSourceResult = [];
                                 dataSourceResult = dataSourceRequest.result;
                                 for (var k = 0; k < dataSourceResult.length; k++) {
-                                    if (dataSourceResult[k].program.id == programJson.programId || dataSourceResult[k].program.id == 0 && dataSourceResult[k].active == true) {
+                                    if (dataSourceResult[k].program == null || dataSourceResult[k].program.id == programJson.programId || dataSourceResult[k].program.id == 0 && dataSourceResult[k].active == true) {
                                         if (dataSourceResult[k].realm.id == programJson.realmCountry.realm.realmId) {
                                             dataSourceListAll.push(dataSourceResult[k]);
 
@@ -790,15 +792,15 @@ export default class SupplyPlanComponent extends React.Component {
                                     planningUnitListAll: myResult,
                                     regionList: regionList,
                                     generalProgramJson: programJson,
-                                    planningUnitDataList:planningUnitDataList,
+                                    planningUnitDataList: planningUnitDataList,
                                     dataSourceListAll: dataSourceListAll,
                                     planningUnitListForConsumption: planningUnitListForConsumption,
                                     loading: false,
                                     programId: document.getElementById("programId").value
-                                },()=>{
+                                }, () => {
                                     this.formSubmit(this.props.items.monthCount)
                                 })
-                                
+
                             }.bind(this);
                         }.bind(this);
                     }.bind(this);
@@ -816,7 +818,7 @@ export default class SupplyPlanComponent extends React.Component {
         var month = [];
         var curDate = currentDate.subtract(MONTHS_IN_PAST_FOR_SUPPLY_PLAN, 'months');
         this.setState({ startDate: { year: parseInt(moment(curDate).format('YYYY')), month: parseInt(moment(curDate).format('M')) } })
-        this.props.updateState("startDate",{ year: parseInt(moment(curDate).format('YYYY')), month: parseInt(moment(curDate).format('M')) } );
+        this.props.updateState("startDate", { year: parseInt(moment(curDate).format('YYYY')), month: parseInt(moment(curDate).format('M')) });
         localStorage.setItem("sesStartDate", JSON.stringify({ year: parseInt(moment(curDate).format('YYYY')), month: parseInt(moment(curDate).format('M')) }));
         month.push({ startDate: curDate.startOf('month').format('YYYY-MM-DD'), endDate: curDate.endOf('month').format('YYYY-MM-DD'), month: (curDate.format('MMM YY')), monthName: i18n.t("static.common." + (curDate.format('MMM')).toLowerCase()), monthYear: curDate.format('YY') })
         for (var i = 1; i < TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN; i++) {
@@ -839,9 +841,9 @@ export default class SupplyPlanComponent extends React.Component {
         var planningUnitId = document.getElementById("planningUnitId").value;
         var planningUnitName = this.props.items.planningUnitName;
         var planningUnitId = document.getElementById("planningUnitId").value;
-        console.log("this.state.planningUnitDataList+++",this.state.planningUnitDataList);
-        var planningUnitDataFilter=this.state.planningUnitDataList.filter(c=>c.planningUnitId==planningUnitId);
-        var programJsonForPlanningUnit={};
+        console.log("this.state.planningUnitDataList+++", this.state.planningUnitDataList);
+        var planningUnitDataFilter = this.state.planningUnitDataList.filter(c => c.planningUnitId == planningUnitId);
+        var programJsonForPlanningUnit = {};
         if (planningUnitDataFilter.length > 0) {
             var planningUnitData = planningUnitDataFilter[0]
             var programDataBytesForPlanningUnit = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
@@ -914,9 +916,9 @@ export default class SupplyPlanComponent extends React.Component {
             //     var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
             //     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
             var programJson = programJsonForPlanningUnit;
-            var generalProgramJson=this.state.generalProgramJson;
-            var invList = (programJson.inventoryList).filter(c => c.planningUnit.id == planningUnitId && (moment(c.inventoryDate) >= moment(m[0].startDate) && moment(c.inventoryDate) <= moment(m[17].endDate)) &&  c.active.toString() == "true")
-            var conList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && (moment(c.consumptionDate) >= moment(m[0].startDate) && moment(c.consumptionDate) <= moment(m[17].endDate))  && c.active.toString() == "true")
+            var generalProgramJson = this.state.generalProgramJson;
+            var invList = (programJson.inventoryList).filter(c => c.planningUnit.id == planningUnitId && (moment(c.inventoryDate) >= moment(m[0].startDate) && moment(c.inventoryDate) <= moment(m[17].endDate)) && c.active.toString() == "true")
+            var conList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && (moment(c.consumptionDate) >= moment(m[0].startDate) && moment(c.consumptionDate) <= moment(m[17].endDate)) && c.active.toString() == "true")
             var shiList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag == true && (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? (c.receivedDate >= m[0].startDate && c.receivedDate <= m[17].endDate) : (c.expectedDeliveryDate >= m[0].startDate && c.expectedDeliveryDate <= m[17].endDate)))
             this.setState({
                 allShipmentsList: programJson.shipmentList
@@ -968,7 +970,7 @@ export default class SupplyPlanComponent extends React.Component {
                     inList: invList,
                     coList: conList,
                     shList: shiList,
-                    programJson:programJsonForPlanningUnit
+                    programJson: programJsonForPlanningUnit
                 })
 
                 var shipmentStatusTransaction = db1.transaction(['shipmentStatus'], 'readwrite');
@@ -2336,9 +2338,17 @@ export default class SupplyPlanComponent extends React.Component {
                                             {
                                                 this.state.consumptionTotalData.map((item1, count) => {
                                                     if (item1.consumptionType == 1) {
-                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Consumption', '', '', '', '', '', '', count)} style={{ color: item1.textColor }}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.consumptionQty} /></td>)
+                                                        if (item1.consumptionQty != null) {
+                                                            return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Consumption', '', '', '', '', '', '', count)} style={{ color: item1.textColor }}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.consumptionQty} /></td>)
+                                                        } else {
+                                                            return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Consumption', '', '', '', '', '', '', count)} style={{ color: item1.textColor }}>{""}</td>)
+                                                        }
                                                     } else {
-                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Consumption', '', '', '', '', '', '', count)} style={{ color: item1.textColor }}><i><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.consumptionQty} /></i></td>)
+                                                        if (item1.consumptionQty != null) {
+                                                            return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Consumption', '', '', '', '', '', '', count)} style={{ color: item1.textColor }}><i><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.consumptionQty} /></i></td>)
+                                                        } else {
+                                                            return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Consumption', '', '', '', '', '', '', count)} style={{ color: item1.textColor }}><i>{""}</i></td>)
+                                                        }
                                                     }
                                                 })
                                             }
@@ -2542,7 +2552,11 @@ export default class SupplyPlanComponent extends React.Component {
                                             <td align="left" className="sticky-col first-col clone"><b>+/- {i18n.t('static.supplyPlan.adjustments')}</b></td>
                                             {
                                                 this.state.inventoryTotalData.map((item1, count) => {
-                                                    return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>)
+                                                    if (item1 != null) {
+                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>)
+                                                    } else {
+                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}>{""}</td>)
+                                                    }
                                                 })
                                             }
                                         </tr>
@@ -2612,9 +2626,13 @@ export default class SupplyPlanComponent extends React.Component {
                                             <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone">{i18n.t('static.supplyPlan.unmetDemandStr')}</td>
                                             {
-                                                this.state.unmetDemand.map(item1 => (
-                                                    <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
-                                                ))
+                                                this.state.unmetDemand.map(item1 => {
+                                                    if (item1 != null) {
+                                                        return (<td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>)
+                                                    } else {
+                                                        return (<td align="right">{""}</td>)
+                                                    }
+                                                })
                                             }
                                         </tr>
                                     </tbody>

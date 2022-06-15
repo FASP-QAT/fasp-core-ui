@@ -508,35 +508,35 @@ export default class ShipmentDetails extends React.Component {
         document.getElementById('div1').style.display = 'block';
         this.state.timeout = setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
 
     hideSecondComponent() {
         document.getElementById('div2').style.display = 'block';
         this.state.timeout = setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
 
     hideThirdComponent() {
         document.getElementById('div3').style.display = 'block';
         this.state.timeout = setTimeout(function () {
             document.getElementById('div3').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
 
     hideFourthComponent() {
         document.getElementById('div4').style.display = 'block';
         this.state.timeout = setTimeout(function () {
             document.getElementById('div4').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
 
     hideFifthComponent() {
         document.getElementById('div5').style.display = 'block';
         this.state.timeout = setTimeout(function () {
             document.getElementById('div5').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
 
     componentWillUnmount() {

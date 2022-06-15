@@ -42,7 +42,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import RealmCountryService from '../../api/RealmCountryService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, DATE_FORMAT_CAP } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
@@ -55,7 +55,7 @@ import ReportService from '../../api/ReportService';
 import ProgramService from '../../api/ProgramService';
 import 'chartjs-plugin-annotation';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import MultiSelect from "react-multi-select-component";
+import {MultiSelect} from "react-multi-select-component";
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 // const { getToggledOptions } = utils;
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
@@ -269,7 +269,7 @@ class GlobalConsumption extends Component {
     re = this.state.consumptions
 
     for (var item = 0; item < re.length; item++) {
-      A.push([this.addDoubleQuoteToRowContent([getLabelText(re[item].realmCountry.label), re[item].consumptionDateString, re[item].planningUnitQty])])
+      A.push([this.addDoubleQuoteToRowContent([getLabelText(re[item].realmCountry.label), moment(re[item].consumptionDateString).format(DATE_FORMAT_CAP), re[item].planningUnitQty])])
     }
     for (var i = 0; i < A.length; i++) {
       csvRow.push(A[i].join(","))

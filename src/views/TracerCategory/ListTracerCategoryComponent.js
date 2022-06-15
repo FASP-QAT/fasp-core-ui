@@ -536,7 +536,7 @@ class ListTracerCategoryComponent extends Component {
     hideFirstComponent() {
         this.timeout = setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
     componentWillUnmount() {
         clearTimeout(this.timeout);
@@ -546,7 +546,7 @@ class ListTracerCategoryComponent extends Component {
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
     addNewTracerCategory() {
         this.props.history.push("/tracerCategory/addTracerCategory");
