@@ -626,7 +626,7 @@ export default class TreeExtrapolationComponent extends React.Component {
             currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].calculatedDataValue = mom.length > 0 ? mom[0].calculatedValue : '0';
             // }
             console.log("is valid result ---",this.props.items.isValidError);
-            if (this.props.items.isValidError) {
+            if (this.props.items.isValidError.toString() == "false") {
                 this.props.updateState("currentItemConfig", currentItemConfig);
             } else {
                 alert("Please fill all the required fields in Node Data Tab");
