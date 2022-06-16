@@ -945,9 +945,9 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                 </FormGroup>
                 {/* <h5 className="red">{i18n.t('static.importFromQATSupplyPlan.allValuesBelowAreInSupplyPlanningUnits.')}</h5> */}
                 {/* <p><span className="legendcolor" style={{ backgroundColor: "yellow" }}></span> <span className="legendcommitversionText">abccsvsvsn vrsvw</span></p> */}
-                <div className="table-responsive" style={{ display: this.props.items.loading ? "none" : "block" }} >
+                <div className="table-responsive">
 
-                    <div id="mapImport">
+                    <div id="mapImport" style={{ display: this.props.items.loading ? "none" : "block" }}>
                     </div>
                 </div>
                 <div style={{ display: this.props.items.loading ? "block" : "none" }}>
