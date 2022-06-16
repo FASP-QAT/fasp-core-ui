@@ -3103,42 +3103,52 @@ export default class BuildTree extends Component {
                     }
                     console.log("dataArr--->>>", dataArr);
                     if (itemIndex1 != -1) {
-                        item.payload = this.state.currentItemConfig.context.payload;
-                        (item.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataModelingList = dataArr;
-                        // }
-                        if (this.state.lastRowDeleted == true) {
-                            (item.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataModelingList = [];
+                        if (this.state.isValidError.toString() == "false") {
+                            item.payload = this.state.currentItemConfig.context.payload;
+                            (item.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataModelingList = dataArr;
+                            // }
+                            if (this.state.lastRowDeleted == true) {
+                                (item.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataModelingList = [];
+                            }
+                            console.log("item---", item);
+
+                            items[itemIndex1] = item;
+                            console.log("items---", items);
+
+                            let { curTreeObj } = this.state;
+                            let { treeData } = this.state;
+                            let { dataSetObj } = this.state;
+                            console.log("save tree data items 1>>>", items);
+                            curTreeObj.tree.flatList = items;
+                            var findTreeIndex = treeData.findIndex(n => n.treeId == curTreeObj.treeId);
+                            treeData[findTreeIndex] = curTreeObj;
+                            var programData = dataSetObj.programData;
+                            programData.treeList = treeData;
+                            console.log("dataSetDecrypt>>>", programData);
+                            dataSetObj.programData = programData;
+
+                            console.log("encpyDataSet>>>", dataSetObj)
+                            this.setState({
+                                dataSetObj,
+                                items,
+                                scalingList: dataArr,
+                                lastRowDeleted: false,
+                                modelingChanged: false,
+                                // openAddNodeModal: false,
+                                activeTab1: new Array(2).fill('2')
+                            }, () => {
+                                console.log("save tree data items 2>>>", this.state.items);
+                                this.calculateMOMData(0, 0);
+                            });
+                        } else {
+                            console.log("inside else form submit");
+                            this.setState({
+                                modelingJexcelLoader: false
+                            }, () => {
+                                alert("Please fill all the required fields in Node Data Tab");
+                            });
+
                         }
-                        console.log("item---", item);
-
-                        items[itemIndex1] = item;
-                        console.log("items---", items);
-
-                        let { curTreeObj } = this.state;
-                        let { treeData } = this.state;
-                        let { dataSetObj } = this.state;
-                        console.log("save tree data items 1>>>", items);
-                        curTreeObj.tree.flatList = items;
-                        var findTreeIndex = treeData.findIndex(n => n.treeId == curTreeObj.treeId);
-                        treeData[findTreeIndex] = curTreeObj;
-                        var programData = dataSetObj.programData;
-                        programData.treeList = treeData;
-                        console.log("dataSetDecrypt>>>", programData);
-                        dataSetObj.programData = programData;
-
-                        console.log("encpyDataSet>>>", dataSetObj)
-                        this.setState({
-                            dataSetObj,
-                            items,
-                            scalingList: dataArr,
-                            lastRowDeleted: false,
-                            modelingChanged: false,
-                            // openAddNodeModal: false,
-                            activeTab1: new Array(2).fill('2')
-                        }, () => {
-                            console.log("save tree data items 2>>>", this.state.items);
-                            this.calculateMOMData(0, 0);
-                        });
                     } else {
                         // console.log("this.state.isValidError---", this.state.isValidError)
                         if (this.state.isValidError.toString() == "false") {
@@ -6653,7 +6663,7 @@ export default class BuildTree extends Component {
 
             var isValid = document.getElementById('isValidError').value;
             // console.log("isValid 1---", isValid);
-            this.setState({ isValidError: isValid});
+            this.setState({ isValidError: isValid });
 
             if (tab == 3) {
                 // this.refs.extrapolationChild.buildJexcel();
