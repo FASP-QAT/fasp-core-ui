@@ -64,6 +64,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             dataList: [],
             consumptionAdjForStockOutId: 0,
             show: false,
+            loading: true,
             rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 }
@@ -2306,7 +2307,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                         <thead>
                                                             <tr>
                                                                 <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th>
-                                                                <th className="sticky-col first-col clone"></th>
+                                                                <th className="dataentryTdWidth sticky-col first-col clone"></th>
                                                                 {this.state.monthArray.map((item, count) => {
                                                                     return (<th>{moment(item.date).format(DATE_FORMAT_CAP_WITHOUT_DATE)}</th>)
                                                                 })}
@@ -2316,7 +2317,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                         <tbody>
                                                             <tr className="hoverTd">
                                                                 <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                                                <td className="sticky-col first-col clone hoverTd" align="left">Error*</td>
+                                                                <td className="sticky-col first-col clone hoverTd" align="left"><b>Error*</b></td>
                                                                 {this.state.monthArray.map((item1, count) => {
                                                                     var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
                                                                     totalError += Number(data[0].errorPerc);
@@ -2330,7 +2331,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                                 <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordion(0)}>
                                                                     {this.state.consumptionUnitShowArr.includes(0) ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
                                                                 </td>
-                                                                <td className="sticky-col first-col clone hoverTd" align="left">Forecast</td>
+                                                                <td className="sticky-col first-col clone hoverTd" align="left"><b>Forecast</b></td>
                                                                 {this.state.monthArray.map((item1, count) => {
                                                                     var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
                                                                     totalForcaste += Number(data[0].forecastQty);
@@ -2359,7 +2360,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                                 <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordion(1)}>
                                                                     {this.state.consumptionUnitShowArr.includes(1) ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
                                                                 </td>
-                                                                <td className="sticky-col first-col clone hoverTd" align="left">Actual</td>
+                                                                <td className="sticky-col first-col clone hoverTd" align="left"><b>Actual</b></td>
                                                                 {this.state.monthArray.map((item1, count) => {
                                                                     var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
                                                                     // actualQty/(noOfDays - dayOfStockOut) * noOfDays
@@ -2389,7 +2390,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                                 <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordion(2)}>
                                                                     {this.state.consumptionUnitShowArr.includes(2) ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
                                                                 </td>
-                                                                <td className="sticky-col first-col clone hoverTd" align="left">Difference</td>
+                                                                <td className="sticky-col first-col clone hoverTd" align="left"><b>Difference</b></td>
                                                                 {this.state.monthArray.map((item1, count) => {
                                                                     var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
                                                                     return (<td><NumberFormat displayType={'text'} thousandSeparator={true} />{(Number(data[0].actualQty - data[0].forecastQty).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>)
