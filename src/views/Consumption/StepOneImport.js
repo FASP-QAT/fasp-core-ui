@@ -221,7 +221,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             var col = ("J").concat(parseInt(y) + 1);
             value = this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             // var reg = DECIMAL_NO_REGEX;
-            var reg = /^\d{1,6}(\.\d{1,6})?$/;
+            var reg = JEXCEL_DECIMAL_CATELOG_PRICE
             if (ForecastPlanningUnitId != -1) {
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");

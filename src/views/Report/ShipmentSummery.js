@@ -2591,7 +2591,7 @@ class ShipmentSummery extends Component {
                                                 </ul>
                                             </FormGroup>
                                             <div className="ShipmentSummeryReportMarginTop consumptionDataEntryTable" id="mytable2">
-                                                <div id="shipmentDetailsListTableDiv" className={document.getElementById("versionId") != null && document.getElementById("versionId").value.includes('Local') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} >
+                                                <div id="shipmentDetailsListTableDiv" style={{ display: this.props.items.loading ? "none" : "block" }} className={document.getElementById("versionId") != null && document.getElementById("versionId").value.includes('Local') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} >
                                                 </div>
                                             </div>
                                         </div>
