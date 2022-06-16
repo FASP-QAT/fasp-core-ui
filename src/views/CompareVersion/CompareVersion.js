@@ -738,7 +738,7 @@ class CompareVersion extends Component {
                                     <>
                                         <CompareVersionTable ref="compareVersionTable" datasetData={this.state.datasetData} datasetData1={this.state.datasetData1} datasetData2={this.state.datasetData} page="compareVersion" versionLabel={"V" + document.getElementById("versionId").selectedOptions[0].text} versionLabel1={"V" + document.getElementById("versionId1").selectedOptions[0].text} updateState={this.updateState} />
                                         <div className="table-responsive consumptionDataEntryTable ForecastSummaryTable">
-                                            <div id="tableDiv" className="compareVersion" />
+                                            <div id="tableDiv" className="compareVersion" style={{ display: this.state.loading ? "block" : "none" }}/>
                                         </div>
                                     </>
                                 }
