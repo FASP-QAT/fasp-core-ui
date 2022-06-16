@@ -2367,5 +2367,6 @@
     "static.procurementagent.programtext": "Program is required",
     "static.tooltip.NodeTitle": "The node title will show up on the Tree View",
     "static.tooltip.scenario": "Choose scenario for which the data below applies",
-    "static.tooltip.LagInMonthFUNode":"Use this feature for phased product usage. For example, if the lag is 2, the product usage will begin 2 months after the parent node dates."
+    "static.tooltip.LagInMonthFUNode":"Use this feature for phased product usage. For example, if the lag is 2, the product usage will begin 2 months after the parent node dates.",
+    "static.tree.createOrSelect" : "Create or Select"
 }
