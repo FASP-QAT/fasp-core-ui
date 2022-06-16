@@ -230,7 +230,8 @@ export default class SyncMasterData extends Component {
             var generalData = generalDataBytes.toString(CryptoJS.enc.Utf8);
             var generalJson = JSON.parse(generalData);
             console.log("GeneralJson@@@@@@@@@@@@@@", generalJson)
-            var linkedShipmentsList = generalJson.shipmentLinkingList != null ? generalJson.shipmentLinkingList : [];
+            var programQPLListFilter=programQPLDetailsList.filter(c=>c.id==programList[pl].id);
+            var linkedShipmentsList = generalJson.shipmentLinkingList != null && programQPLListFilter[0].doNotFollowLatestShipmentInfo==0 ? generalJson.shipmentLinkingList : [];
             var listOfRoNoAndRoPrimeLineNo = [];
             for (var lsl = 0; lsl < linkedShipmentsList.length; lsl++) {
                 if (listOfRoNoAndRoPrimeLineNo.findIndex(c => c.roNo == linkedShipmentsList[lsl].roNo && c.roPrimeLineNo == linkedShipmentsList[lsl].roPrimeLineNo) == -1) {
@@ -241,9 +242,11 @@ export default class SyncMasterData extends Component {
                 }
             }
             var lastSyncDate=date;
+            if (this.props.location.state != undefined) {
             if (this.props.location.state.programIds.includes(programList[pl].programId)) {
                 lastSyncDate=moment(generalJson.currentVersion.createdDate).format("YYYY-MM-DD HH:mm:ss")
             }
+        }
             jsonForNewShipmentSync.push({
                 roAndRoPrimeLineNoList: listOfRoNoAndRoPrimeLineNo,
                 programId: programList[pl].programId,

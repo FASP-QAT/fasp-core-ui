@@ -155,6 +155,7 @@ export default class ManualTagging extends Component {
 
     versionChange(event) {
         var versionId = event.target.value;
+        localStorage.setItem("sesVersionIdReport", versionId);
         this.setState({
             versionId: versionId,
             hasSelectAll: true
@@ -729,6 +730,7 @@ export default class ManualTagging extends Component {
                 active3: false,
                 tempNotes: ''
             }, () => {
+                console.log("localStorage.getItem@@@@@@@@@@@@@@@@@", localStorage.getItem("sesProgramIdReport"));
                 if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
                     this.setState({
                         programId: localStorage.getItem("sesProgramIdReport")
@@ -839,7 +841,11 @@ export default class ManualTagging extends Component {
 
             });
         }
-        this.state.languageEl.destroy();
+        try {
+            this.state.languageEl.destroy();
+        } catch (e) {
+
+        }
         // this.buildJExcel();
     }
 
@@ -987,16 +993,31 @@ export default class ManualTagging extends Component {
             );
     }
     programChange(event) {
+        var programId = event.target.value;
         this.setState({
             planningUnits: [],
             planningUnitValues: [],
             planningUnitLabels: [],
-            programId: event.target.value,
+            versionId: -1,
+            versionList: [],
+            programId: programId,
             hasSelectAll: true
         }
             , () => {
                 // this.getPlanningUnitList();
-                this.getVersionList();
+                if (programId != "" && programId != -1) {
+                    this.getVersionList();
+                } else {
+                    this.setState({
+                        outputList: []
+                    }, () => {
+                        try {
+                            this.state.languageEl.destroy();
+                        } catch (e) {
+
+                        }
+                    })
+                }
             }
         )
     }
@@ -1043,8 +1064,29 @@ export default class ManualTagging extends Component {
             versionList: versionList,
             loading: false
         }, () => {
+            if (localStorage.getItem("sesVersionIdReport") != '' && localStorage.getItem("sesVersionIdReport") != undefined && versionList.filter(c=>c.versionId==localStorage.getItem("sesVersionIdReport")).length>0) {
+                var event = {
+                    target: {
+                        value: localStorage.getItem("sesVersionIdReport")
+                    }
+                };
+                this.versionChange(event)
+
+            }else{
+            this.getPlanningUnitList()
+            }
             if (this.state.versionId.toString() != -1) {
-                this.getPlanningUnitList()
+                
+            } else {
+                this.setState({
+                    outputList: []
+                }, () => {
+                    try {
+                        this.state.languageEl.destroy();
+                    } catch (e) {
+
+                    }
+                })
             }
         })
         //     }.bind(this)
@@ -1214,22 +1256,22 @@ export default class ManualTagging extends Component {
                         var curUser = AuthenticationService.getLoggedInUserId();
                         var username = AuthenticationService.getLoggedInUsername();
                         for (var ss = 0; ss < selectedShipment.length; ss++) {
-                            var linkedShipmentsListIndex = linkedShipmentsList.findIndex(c => selectedShipment[ss][16].shipmentId > 0 ? selectedShipment[ss][16].shipmentId == c.childShipmentId : selectedShipment[ss][16].tempShipmentId == c.tempChildShipmentId);
-                            var linkedShipmentsListFilter = linkedShipmentsList.filter(c => selectedShipment[ss][16].shipmentId > 0 ? selectedShipment[ss][16].shipmentId == c.childShipmentId : selectedShipment[ss][16].tempShipmentId == c.tempChildShipmentId);
-                            linkedShipmentsList[linkedShipmentsListIndex].active=false;
-                            linkedShipmentsList[linkedShipmentsListIndex].lastModifiedBy.userId=curUser;
-                            linkedShipmentsList[linkedShipmentsListIndex].lastModifiedBy.username=username;
-                            linkedShipmentsList[linkedShipmentsListIndex].lastModifiedDate=curDate;
-                            var checkIfThereIsOnlyOneChildShipmentOrNot = linkedShipmentsList.filter(c => (linkedShipmentsListFilter[0].parentShipmentId > 0 ? c.parentShipmentId == linkedShipmentsListFilter[0].parentShipmentId : c.tempParentShipmentId == linkedShipmentsListFilter[0].tempParentShipmentId) && c.active==true);
+                            var linkedShipmentsListIndex = linkedShipmentsList.findIndex(c => (selectedShipment[ss][16].shipmentId > 0 ? selectedShipment[ss][16].shipmentId == c.childShipmentId : selectedShipment[ss][16].tempShipmentId == c.tempChildShipmentId) && c.active.toString()=="true");
+                            var linkedShipmentsListFilter = linkedShipmentsList.filter(c => (selectedShipment[ss][16].shipmentId > 0 ? selectedShipment[ss][16].shipmentId == c.childShipmentId : selectedShipment[ss][16].tempShipmentId == c.tempChildShipmentId) && c.active.toString()=="true");
+                            linkedShipmentsList[linkedShipmentsListIndex].active = false;
+                            linkedShipmentsList[linkedShipmentsListIndex].lastModifiedBy.userId = curUser;
+                            linkedShipmentsList[linkedShipmentsListIndex].lastModifiedBy.username = username;
+                            linkedShipmentsList[linkedShipmentsListIndex].lastModifiedDate = curDate;
+                            var checkIfThereIsOnlyOneChildShipmentOrNot = linkedShipmentsList.filter(c => (linkedShipmentsListFilter[0].parentShipmentId > 0 ? c.parentShipmentId == linkedShipmentsListFilter[0].parentShipmentId : c.tempParentShipmentId == linkedShipmentsListFilter[0].tempParentShipmentId) && c.active == true);
                             var activateParentShipment = false;
                             if (checkIfThereIsOnlyOneChildShipmentOrNot.length == 0) {
                                 activateParentShipment = true;
                             }
                             var shipmentIndex = shipmentList.findIndex(c => selectedShipment[ss][16].shipmentId > 0 ? c.shipmentId == selectedShipment[ss][16].shipmentId : c.tempShipmentId == selectedShipment[ss][16].tempShipmentId);
                             shipmentList[shipmentIndex].active = false;
-                            shipmentList[shipmentIndex].lastModifiedBy.userId=curUser;
-                            shipmentList[shipmentIndex].lastModifiedBy.username=username;
-                            shipmentList[shipmentIndex].lastModifiedDate=curDate;
+                            shipmentList[shipmentIndex].lastModifiedBy.userId = curUser;
+                            shipmentList[shipmentIndex].lastModifiedBy.username = username;
+                            shipmentList[shipmentIndex].lastModifiedDate = curDate;
                             if (moment(minDate).format("YYYY-MM-DD") > moment(shipmentList[shipmentIndex].expectedDeliveryDate).format("YYYY-MM-DD")) {
                                 minDate = moment(shipmentList[shipmentIndex].expectedDeliveryDate).format("YYYY-MM-DD");
                             }
@@ -1240,9 +1282,9 @@ export default class ManualTagging extends Component {
                                 var parentShipmentIndex = shipmentList.findIndex(c => linkedShipmentsListFilter[0].parentShipmentId > 0 ? c.shipmentId == linkedShipmentsListFilter[0].parentShipmentId : c.tempShipmentId == linkedShipmentsListFilter[0].tempParentShipmentId);
                                 shipmentList[parentShipmentIndex].active = true;
                                 shipmentList[parentShipmentIndex].erpFlag = false;
-                                shipmentList[parentShipmentIndex].lastModifiedBy.userId=curUser;
-                                shipmentList[parentShipmentIndex].lastModifiedBy.username=username;
-                                shipmentList[parentShipmentIndex].lastModifiedDate=curDate;
+                                shipmentList[parentShipmentIndex].lastModifiedBy.userId = curUser;
+                                shipmentList[parentShipmentIndex].lastModifiedBy.username = username;
+                                shipmentList[parentShipmentIndex].lastModifiedDate = curDate;
 
                                 if (moment(minDate).format("YYYY-MM-DD") > moment(shipmentList[parentShipmentIndex].expectedDeliveryDate).format("YYYY-MM-DD")) {
                                     minDate = moment(shipmentList[shipmentIndex].expectedDeliveryDate).format("YYYY-MM-DD");
@@ -1533,7 +1575,7 @@ export default class ManualTagging extends Component {
                                                     linkedShipmentsList.push({
                                                         shipmentLinkingId: 0,
                                                         versionId: this.state.versionId.toString().split(" ")[0],
-                                                        programId:this.state.programId,
+                                                        programId: this.state.programId,
                                                         procurementAgent: shipmentList[shipmentIndex].procurementAgent,
                                                         parentShipmentId: shipmentList[shipmentIndex].shipmentId,
                                                         tempParentShipmentId: shipmentList[shipmentIndex].shipmentId == 0 ? shipmentList[shipmentIndex].tempShipmentId : null,
@@ -1547,8 +1589,8 @@ export default class ManualTagging extends Component {
                                                         orderNo: getUniqueOrderNoAndPrimeLineNoList[uq][15].orderNo,
                                                         primeLineNo: getUniqueOrderNoAndPrimeLineNoList[uq][15].primeLineNo,
                                                         conversionFactor: Number(getUniqueOrderNoAndPrimeLineNoList[uq][10]),
-                                                        qatPlanningUnitId:ppuObject.planningUnit.id,
-                                                        active:true,
+                                                        qatPlanningUnitId: ppuObject.planningUnit.id,
+                                                        active: true,
                                                         createdBy: {
                                                             userId: curUser,
                                                             username: username
@@ -1931,7 +1973,7 @@ export default class ManualTagging extends Component {
             var generalProgramJson = JSON.parse(generalProgramData);
             var linkedShipmentsList = generalProgramJson.shipmentLinkingList != null ? generalProgramJson.shipmentLinkingList : [];
 
-            linkedShipmentsList.filter(c => c.shipmentLinkingId == 0 && c.active==true).map(c => {
+            linkedShipmentsList.filter(c => c.shipmentLinkingId == 0 && c.active == true).map(c => {
                 linkedRoNoAndRoPrimeLineNo.push(c.roNo + "|" + c.roPrimeLineNo)
             })
         } else if (this.state.active3) {
@@ -1943,7 +1985,7 @@ export default class ManualTagging extends Component {
                 var generalProgramJson = JSON.parse(generalProgramData);
                 var linkedShipmentsList = generalProgramJson.shipmentLinkingList != null ? generalProgramJson.shipmentLinkingList : [];
                 var linkedRoNoAndRoPrimeLineNo = [];
-                linkedShipmentsList.filter(c => c.shipmentLinkingId == 0 && c.active==true).map(c => {
+                linkedShipmentsList.filter(c => c.shipmentLinkingId == 0 && c.active == true).map(c => {
                     linkedRoNoAndRoPrimeLineNo.push(c.roNo + "|" + c.roPrimeLineNo)
                 })
             }
@@ -2173,7 +2215,7 @@ export default class ManualTagging extends Component {
                 var generalProgramJson = JSON.parse(generalProgramData);
                 var linkedShipmentsList = generalProgramJson.shipmentLinkingList != null ? generalProgramJson.shipmentLinkingList : [];
                 var linkedRoNoAndRoPrimeLineNo = [];
-                linkedShipmentsList.filter(c => c.shipmentLinkingId == 0 && c.active==true).map(c => {
+                linkedShipmentsList.filter(c => c.shipmentLinkingId == 0 && c.active == true).map(c => {
                     linkedRoNoAndRoPrimeLineNo.push(c.roNo + "|" + c.roPrimeLineNo)
                 })
             }
@@ -2402,8 +2444,8 @@ export default class ManualTagging extends Component {
                     } else if (this.state.active2) {
                         shipmentList = shipmentList.filter(c => c.erpFlag.toString() == "true" && c.active.toString() == "true" && c.accountFlag.toString() == "true" && c.procurementAgent.id == PSM_PROCUREMENT_AGENT_ID && SHIPMENT_ID_ARR_MANUAL_TAGGING.includes(c.shipmentStatus.id.toString()));
                     }
-                    console.log("OutList for tab2@@@@@@@@@@@@@@",shipmentList)
-                    console.log("linkedShipmentsList@@@@@@@@@@@@@@",linkedShipmentsList)
+                    console.log("OutList for tab2@@@@@@@@@@@@@@", shipmentList)
+                    console.log("linkedShipmentsList@@@@@@@@@@@@@@", linkedShipmentsList)
                     this.setState({
                         outputList: shipmentList,
                         linkedShipmentsListForTab2: linkedShipmentsList
@@ -2420,7 +2462,11 @@ export default class ManualTagging extends Component {
                 this.setState({
                     outputList: []
                 }, () => {
-                    this.state.languageEl.destroy();
+                    try {
+                        this.state.languageEl.destroy();
+                    } catch (e) {
+
+                    }
                 })
             }
             // else if (programId == -1) {
@@ -2591,12 +2637,30 @@ export default class ManualTagging extends Component {
                             loading: false,
                             programId: response.data[0].programId
                         }, () => {
-                            this.getPlanningUnitList();
+                            if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
+                                this.setState({
+                                    programId: localStorage.getItem("sesProgramIdReport")
+                                }, () => {
+                                    this.getVersionList()
+                                });
+                            } else if (this.state.programId != null && this.state.programId != "" && this.state.programId != -1) {
+                                this.getVersionList();
+                            }
                         })
                     } else {
                         this.setState({
                             programs: listArray,
                             loading: false
+                        },()=>{
+                            if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
+                                this.setState({
+                                    programId: localStorage.getItem("sesProgramIdReport")
+                                }, () => {
+                                    this.getVersionList()
+                                });
+                            } else if (this.state.programId != null && this.state.programId != "" && this.state.programId != -1) {
+                                this.getVersionList();
+                            }
                         })
                     }
 
@@ -2926,20 +2990,20 @@ export default class ManualTagging extends Component {
                 data[8] = manualTaggingList[j].notes
                 data[9] = manualTaggingList[j].shipmentId != 0 ? -1 : manualTaggingList[j].tempShipmentId;
             } else if (this.state.active2) {
-                let shipmentQty = !this.state.versionId.toString().includes("Local")?manualTaggingList[j].erpQty:manualTaggingList[j].shipmentQty;
+                let shipmentQty = !this.state.versionId.toString().includes("Local") ? manualTaggingList[j].erpQty : manualTaggingList[j].shipmentQty;
                 let linkedShipmentsListForTab2 = this.state.versionId.toString().includes("Local") ? this.state.linkedShipmentsListForTab2.filter(c => manualTaggingList[j].shipmentId > 0 ? c.childShipmentId == manualTaggingList[j].shipmentId : c.tempChildShipmentId == manualTaggingList[j].tempShipmentId) : [manualTaggingList[j]];
-                console.log("linkedShipmentsListForTab2@@@@@@@@@@@",linkedShipmentsListForTab2)
+                console.log("linkedShipmentsListForTab2@@@@@@@@@@@", linkedShipmentsListForTab2)
                 data[0] = false;
                 data[1] = manualTaggingList[j].parentShipmentId
-                data[2] = !this.state.versionId.toString().includes("Local")?manualTaggingList[j].childShipmentId:manualTaggingList[j].shipmentId
+                data[2] = !this.state.versionId.toString().includes("Local") ? manualTaggingList[j].childShipmentId : manualTaggingList[j].shipmentId
                 data[3] = linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].roNo + " | " + linkedShipmentsListForTab2[0].roPrimeLineNo : ""
                 data[4] = manualTaggingList[j].orderNo + " | " + manualTaggingList[j].primeLineNo
                 data[5] = linkedShipmentsListForTab2.length > 0 ? getLabelText(linkedShipmentsListForTab2[0].erpPlanningUnit.label, this.state.lang) : ""
-                data[6] = !this.state.versionId.toString().includes("Local")?getLabelText(manualTaggingList[j].erpPlanningUnit.label, this.state.lang):getLabelText(manualTaggingList[j].planningUnit.label, this.state.lang)
+                data[6] = !this.state.versionId.toString().includes("Local") ? getLabelText(manualTaggingList[j].erpPlanningUnit.label, this.state.lang) : getLabelText(manualTaggingList[j].planningUnit.label, this.state.lang)
                 data[7] = manualTaggingList[j].expectedDeliveryDate
                 data[8] = linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].erpShipmentStatus : ""
                 // data[7] = ""
-                data[9] = !this.state.versionId.toString().includes("Local")?Math.round(manualTaggingList[j].erpQty):Math.round(manualTaggingList[j].shipmentQty)
+                data[9] = !this.state.versionId.toString().includes("Local") ? Math.round(manualTaggingList[j].erpQty) : Math.round(manualTaggingList[j].shipmentQty)
                 data[10] = (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? (manualTaggingList[j].conversionFactor) : 1)
                 data[11] = Math.round(shipmentQty * (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? manualTaggingList[j].conversionFactor : 1))
                 data[12] = manualTaggingList[j].notes
@@ -3484,7 +3548,6 @@ export default class ManualTagging extends Component {
     componentDidMount() {
         this.setState({ active1: true }, () => {
             this.hideFirstComponent();
-            this.getProgramList();
             this.getLocalProgramList();
         });
 
@@ -3515,17 +3578,19 @@ export default class ManualTagging extends Component {
                     var datasetOs2 = datasetTransaction2.objectStore('programQPLDetails');
                     var getRequest2 = datasetOs2.getAll();
                     getRequest2.onsuccess = function (event) {
-                        var programQPLDetails = getRequest2.result;
-                        var programList = getRequest1.result;
-
                         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                         var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                        var programQPLDetails = getRequest2.result.filter(c => c.userId == userId);
+                        var programList = getRequest1.result;
+
+
                         var myResult = getRequest.result.filter(c => c.userId == userId);
                         this.setState({
                             localProgramList: myResult,
                             programObjectStoreList: programList,
                             programQPLDetailsList: programQPLDetails
                         }, () => {
+                            this.getProgramList();
                             if (parameter == 1) {
                                 this.filterErpData();
                             }
@@ -3539,6 +3604,7 @@ export default class ManualTagging extends Component {
     getPlanningUnitList() {
         var programId = (this.state.active3 ? this.state.programId1.toString().split("_")[0] : this.state.programId);
         var versionId = this.state.versionId.toString();
+        console.log("Condition@@@@@@@@@@@@@", programId != -1 && programId != null && programId != "" && (this.state.active3 || ((this.state.active1 || this.state.active2) && versionId != "-1")));
         if (programId != -1 && programId != null && programId != "" && (this.state.active3 || ((this.state.active1 || this.state.active2) && versionId != "-1"))) {
             // if (!versionId.includes("Local")) {
             ProgramService.getProgramPlaningUnitListByProgramId(programId)
@@ -3648,7 +3714,11 @@ export default class ManualTagging extends Component {
             this.setState({
                 outputList: []
             }, () => {
-                this.state.languageEl.destroy();
+                try {
+                    this.state.languageEl.destroy();
+                } catch (e) {
+
+                }
             })
         }
         // this.filterData();

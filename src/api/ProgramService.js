@@ -241,5 +241,10 @@ class ProgramService {
         );
     }
 
+    checkIfLinkingExistsWithOtherProgram(json){
+        return axios.post(`${API_URL}/api/erpLinking/otherProgramCheck`, json, {}
+        );
+    }
+
 }
 export default new ProgramService()

@@ -82,7 +82,9 @@ export default class syncPage extends Component {
       versionType: 1,
       openCount: 0,
       progressPer: 0,
-      notes: ''
+      notes: '',
+      deletedRowsListLocal:[],
+      deletedRowsListServer:[]
     }
     this.toggle = this.toggle.bind(this);
     this.getDataForCompare = this.getDataForCompare.bind(this);
@@ -1124,6 +1126,86 @@ export default class syncPage extends Component {
       }
       shipmentData = shipmentData.concat(oldProgramDataShipment.filter(c => c.shipmentId == 0 && c.active.toString() == "true"));
 
+      var shipmentLinkedJson=this.state.mergedShipmentLinkedJexcel.getJson();
+      var linkedShipmentListLocal=this.state.oldProgramData.shipmentLinkingList!=null?this.state.oldProgramData.shipmentLinkingList:[];
+      var shipmentLinkingIdFromLocal=[...new Set(linkedShipmentListLocal.map(ele => ele.shipmentLinkingId))].filter(c=>c!==0);
+      var linkedShipmentListServer=this.state.latestProgramData.shipmentLinkingList!=null?this.state.latestProgramData.shipmentLinkingList.filter(c=>!shipmentLinkingIdFromLocal.includes(c=>c.shipmentLinkingId)):[];
+      var mergedList=linkedShipmentListLocal.concat(linkedShipmentListServer);
+      for(var s=0;s<shipmentLinkedJson.length;s++){
+        //Accept server version
+        if(shipmentLinkedJson[s][11]==3){
+          // linkedShipmentList.push(shipmentLinkedJson[s][20]);
+          var index=mergedList.findIndex(c=>c.shipmentLinkingId==shipmentLinkedJson[s][20].shipmentLinkingId);
+          mergedList[index]=shipmentLinkedJson[s][20];
+        }
+      }
+      //Perform delinking for server shipments and local shipments
+      var linkedShipmentsList=mergedList;
+      var deletedRowsListLocal=this.state.deletedRowsListLocal;
+      var deletedRowsListServer=this.state.deletedRowsListServer;
+      var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+      var curUser = AuthenticationService.getLoggedInUserId();
+      var username = AuthenticationService.getLoggedInUsername();
+      for(var dr=0;dr<deletedRowsListLocal.length;dr++){
+        var linkedShipmentsListIndex = linkedShipmentsList.findIndex(c => (deletedRowsListLocal[dr].childShipmentId > 0 ? deletedRowsListLocal[dr].childShipmentId == c.childShipmentId : deletedRowsListLocal[dr].tempChildShipmentId == c.tempChildShipmentId) && c.active.toString()=="true");
+        var linkedShipmentsListFilter = linkedShipmentsList.filter(c => deletedRowsListLocal[dr].childShipmentId > 0 ? deletedRowsListLocal[dr].childShipmentId == c.childShipmentId : deletedRowsListLocal[dr].tempChildShipmentId == c.tempChildShipmentId);
+        linkedShipmentsList[linkedShipmentsListIndex].active = false;
+        linkedShipmentsList[linkedShipmentsListIndex].lastModifiedBy.userId = curUser;
+        linkedShipmentsList[linkedShipmentsListIndex].lastModifiedBy.username = username;
+        linkedShipmentsList[linkedShipmentsListIndex].lastModifiedDate = curDate;
+        var checkIfThereIsOnlyOneChildShipmentOrNot = linkedShipmentsList.filter(c => (linkedShipmentsListFilter[0].parentShipmentId > 0 ? c.parentShipmentId == linkedShipmentsListFilter[0].parentShipmentId : c.tempParentShipmentId == linkedShipmentsListFilter[0].tempParentShipmentId) && c.active == true);
+        var activateParentShipment = false;
+        if (checkIfThereIsOnlyOneChildShipmentOrNot.length == 0) {
+          activateParentShipment = true;
+        }
+        var shipmentIndex = shipmentData.findIndex(c => deletedRowsListLocal[dr].childShipmentId > 0 ? c.shipmentId == deletedRowsListLocal[dr].childShipmentId : c.tempShipmentId == deletedRowsListLocal[dr].tempChildShipmentId);
+        shipmentData[shipmentIndex].active = false;
+        shipmentData[shipmentIndex].lastModifiedBy.userId = curUser;
+        shipmentData[shipmentIndex].lastModifiedBy.username = username;
+        shipmentData[shipmentIndex].lastModifiedDate = curDate;
+        
+                            
+                            if (activateParentShipment) {
+                                var parentShipmentIndex = shipmentData.findIndex(c => linkedShipmentsListFilter[0].parentShipmentId > 0 ? c.shipmentId == linkedShipmentsListFilter[0].parentShipmentId : c.tempShipmentId == linkedShipmentsListFilter[0].tempParentShipmentId);
+                                shipmentData[parentShipmentIndex].active = true;
+                                shipmentData[parentShipmentIndex].erpFlag = false;
+                                shipmentData[parentShipmentIndex].lastModifiedBy.userId = curUser;
+                                shipmentData[parentShipmentIndex].lastModifiedBy.username = username;
+                                shipmentData[parentShipmentIndex].lastModifiedDate = curDate;
+                            }
+      }
+
+      for(var dr=0;dr<deletedRowsListServer.length;dr++){
+        var linkedShipmentsListIndex = linkedShipmentsList.findIndex(c => (deletedRowsListServer[dr].childShipmentId > 0 ? deletedRowsListServer[dr].childShipmentId == c.childShipmentId : deletedRowsListServer[dr].tempChildShipmentId == c.tempChildShipmentId) && c.active.toString()=="true");
+        var linkedShipmentsListFilter = linkedShipmentsList.filter(c => deletedRowsListServer[dr].childShipmentId > 0 ? deletedRowsListServer[dr].childShipmentId == c.childShipmentId : deletedRowsListServer[dr].tempChildShipmentId == c.tempChildShipmentId);
+        linkedShipmentsList[linkedShipmentsListIndex].active = false;
+        linkedShipmentsList[linkedShipmentsListIndex].lastModifiedBy.userId = curUser;
+        linkedShipmentsList[linkedShipmentsListIndex].lastModifiedBy.username = username;
+        linkedShipmentsList[linkedShipmentsListIndex].lastModifiedDate = curDate;
+        var checkIfThereIsOnlyOneChildShipmentOrNot = linkedShipmentsList.filter(c => (linkedShipmentsListFilter[0].parentShipmentId > 0 ? c.parentShipmentId == linkedShipmentsListFilter[0].parentShipmentId : c.tempParentShipmentId == linkedShipmentsListFilter[0].tempParentShipmentId) && c.active == true);
+        var activateParentShipment = false;
+        if (checkIfThereIsOnlyOneChildShipmentOrNot.length == 0) {
+          activateParentShipment = true;
+        }
+        console.log("@@@@@@@@@@@@@@@@deletedRowsListServer[dr].childShipmentId",deletedRowsListServer[dr].childShipmentId);
+        var shipmentIndex = shipmentData.findIndex(c => deletedRowsListServer[dr].childShipmentId > 0 ? c.shipmentId == deletedRowsListServer[dr].childShipmentId : c.tempShipmentId == deletedRowsListServer[dr].tempChildShipmentId);
+        console.log("@@@@@@@@@@@@@@@@index",shipmentIndex);
+        shipmentData[shipmentIndex].active = false;
+        shipmentData[shipmentIndex].lastModifiedBy.userId = curUser;
+        shipmentData[shipmentIndex].lastModifiedBy.username = username;
+        shipmentData[shipmentIndex].lastModifiedDate = curDate;
+        
+                            if (activateParentShipment) {
+                                var parentShipmentIndex = shipmentData.findIndex(c => linkedShipmentsListFilter[0].parentShipmentId > 0 ? c.shipmentId == linkedShipmentsListFilter[0].parentShipmentId : c.tempShipmentId == linkedShipmentsListFilter[0].tempParentShipmentId);
+                                shipmentData[parentShipmentIndex].active = true;
+                                shipmentData[parentShipmentIndex].erpFlag = false;
+                                shipmentData[parentShipmentIndex].lastModifiedBy.userId = curUser;
+                                shipmentData[parentShipmentIndex].lastModifiedBy.username = username;
+                                shipmentData[parentShipmentIndex].lastModifiedDate = curDate;
+
+                            }
+      }
+
       var uniquePlanningUnitsInShipment = [];
       shipmentJson.map(c => uniquePlanningUnitsInShipment = uniquePlanningUnitsInShipment.concat(parseInt(c[1])));
       console.log("uniquePlanningUnitsInConsumption+++", uniquePlanningUnitsInConsumption);
@@ -1136,11 +1218,24 @@ export default class syncPage extends Component {
         });
       })
 
+      var uniquePlanningUnitsInShipmentLinking = [];
+      mergedList.map(c => uniquePlanningUnitsInShipmentLinking = uniquePlanningUnitsInShipmentLinking.concat(c.qatPlanningUnitId));
+
+      uniquePlanningUnitsInShipmentLinking.map(c => {
+        actionList.push({
+          planningUnitId: c,
+          type: SHIPMENT_MODIFIED,
+          date: moment(Date.now()).startOf('month').format("YYYY-MM-DD")
+        });
+      })
+      console.log("shipmentList@@@@@@@@@@@@@",shipmentData);
+      console.log("shipmentLinkingList@@@@@@@@@@@@@",linkedShipmentsList);
 
       programJson.consumptionList = consumptionData;
       programJson.inventoryList = inventoryData;
       programJson.shipmentList = shipmentData;
       programJson.actionList = actionList;
+      programJson.shipmentLinkingList= linkedShipmentsList;
 
       var planningUnitDataListFromState = this.state.planningUnitDataList;
       var updatedJson = [];
@@ -1770,6 +1865,23 @@ export default class syncPage extends Component {
                                       comparedLatestVersion: latestProgramData.currentVersion.versionId,
                                       singleProgramId: latestProgramData.programId
                                     })
+                                    var listOfRoAndRoPrimeLineNo=[];
+                                    var shipmentLinkingListForAPI=programJson.shipmentLinkingList;
+                                    for(var l=0;l<shipmentLinkingListForAPI.length;l++){
+                                      listOfRoAndRoPrimeLineNo.push(
+                                        {
+                                          "roNo": shipmentLinkingListForAPI[l].roNo,
+                                          "roPrimeLineNo": shipmentLinkingListForAPI[l].roPrimeLineNo,
+                                      }
+                                      )
+                                    }
+                                    var json={
+                                      programId:programJson.programId,
+                                      roAndRoPrimeLineNoList:listOfRoAndRoPrimeLineNo
+                                    }
+                                    ProgramService.checkIfLinkingExistsWithOtherProgram(json)
+            .then(responseLinking => {
+              if (responseLinking.status == 200) {
                                     var oldProgramData = programJson;
                                     var downloadedProgramData = response.data.length > 1 ? response.data[1] : response.data[0];
                                     var regionList = [];
@@ -2365,14 +2477,14 @@ export default class syncPage extends Component {
                                                                         var data = [];
                                                                         var mergedShipmentLinkedJexcel = [];
                                                                         var mergedData=(latestProgramDataShipmentLinked.concat(oldProgramDataShipmentLinked).concat(downloadedProgramDataShipmentLinked));
-                                                                        var uniqueRoNoAndRoPrimeLineNo=[...new Set(mergedData.filter(c=>c.active.toString()=="true").map(ele => ele.roNo+"|"+ele.roPrimeLineNo))];
+                                                                        var uniqueRoNoAndRoPrimeLineNo=[...new Set(mergedData.map(ele => ele.roNo+"|"+ele.roPrimeLineNo))];
 
                                                                         for (var cd = 0; cd < uniqueRoNoAndRoPrimeLineNo.length; cd++) {
                                                                           data = [];
                                                                           var latestProgramDataShipmentLinkedFiltered=latestProgramDataShipmentLinked.filter(c=>uniqueRoNoAndRoPrimeLineNo[cd]==(c.roNo+"|"+c.roPrimeLineNo))
                                                                           var oldProgramDataShipmentLinkedFiltered=oldProgramDataShipmentLinked.filter(c=>uniqueRoNoAndRoPrimeLineNo[cd]==(c.roNo+"|"+c.roPrimeLineNo))
                                                                           var downloadedProgramDataShipmentLinkedFiltered=downloadedProgramDataShipmentLinked.filter(c=>uniqueRoNoAndRoPrimeLineNo[cd]==(c.roNo+"|"+c.roPrimeLineNo))
-                                                                          var listFromAPI=[];
+                                                                          var listFromAPI=responseLinking.data;
                                                                           var listFromAPIFiltered=listFromAPI.filter(c=>uniqueRoNoAndRoPrimeLineNo[cd]==c.roNo+"|"+c.roPrimeLineNo);
                                                                           console.log("latestProgramDataShipmentLinkedFiltered@@@@@@@@@@@@@",latestProgramDataShipmentLinkedFiltered)
                                                                           console.log("oldProgramDataShipmentLinkedFiltered@@@@@@@@@@@@@",oldProgramDataShipmentLinkedFiltered)
@@ -2381,14 +2493,22 @@ export default class syncPage extends Component {
                                                                           data[2] = oldProgramDataShipmentLinkedFiltered.length>0?getLabelText(oldProgramData.label,this.state.lang):"";
                                                                           data[3] = oldProgramDataShipmentLinkedFiltered.length>0?oldProgramDataShipmentLinkedFiltered[0].parentShipmentId:"";
                                                                           data[4] = oldProgramDataShipmentLinkedFiltered.length>0?oldProgramDataShipmentLinkedFiltered[0].conversionFactor:"";
-                                                                          data[5] = listFromAPIFiltered.length>0?getLabelText(listFromAPIFiltered[0].label,this.state.lang):latestProgramDataShipmentLinkedFiltered.length>0?getLabelText(latestProgramData.label,this.state.lang):"";
-                                                                          data[6] = latestProgramDataShipmentLinkedFiltered.length>0?latestProgramDataShipmentLinkedFiltered[0].parentShipmentId:"";
-                                                                          data[7] = latestProgramDataShipmentLinkedFiltered.length>0?latestProgramDataShipmentLinkedFiltered[0].conversionFactor:"";
-                                                                          data[8] = oldProgramDataShipmentLinkedFiltered.length>0?oldProgramDataShipmentLinkedFiltered[0].shipmentLinkingId:"";
-                                                                          data[9] = latestProgramDataShipmentLinkedFiltered.length>0?latestProgramDataShipmentLinkedFiltered[0].shipmentLinkingId:"";
-                                                                          data[10]=downloadedProgramDataShipmentLinkedFiltered.length>0?downloadedProgramDataShipmentLinkedFiltered[0].shipmentLinkingId:"";
-                                                                          data[11]= 4;
-                                                                          data[12]=(oldProgramDataShipmentLinkedFiltered.length>0 && latestProgramDataShipmentLinkedFiltered.length==0) || (oldProgramDataShipmentLinkedFiltered.length==0 && latestProgramDataShipmentLinkedFiltered.length>0)?(oldProgramDataShipmentLinkedFiltered.length>0 && latestProgramDataShipmentLinkedFiltered.length==0)?oldProgramData.currentVersion.versionId:latestProgramData.currentVersion.versionId:"";
+                                                                          data[5] = oldProgramDataShipmentLinkedFiltered.length>0?oldProgramDataShipmentLinkedFiltered[0].active:"";
+                                                                          data[6] = listFromAPIFiltered.length>0?getLabelText(listFromAPIFiltered[0].program.label,this.state.lang):latestProgramDataShipmentLinkedFiltered.length>0?getLabelText(latestProgramData.label,this.state.lang):"";
+                                                                          data[7] = listFromAPIFiltered.length>0?listFromAPIFiltered[0].shipmentId:latestProgramDataShipmentLinkedFiltered.length>0?latestProgramDataShipmentLinkedFiltered[0].parentShipmentId:"";
+                                                                          data[8] = listFromAPIFiltered.length>0?listFromAPIFiltered[0].conversionFactor:latestProgramDataShipmentLinkedFiltered.length>0?latestProgramDataShipmentLinkedFiltered[0].conversionFactor:"";
+                                                                          data[9] = listFromAPIFiltered.length>0?listFromAPIFiltered[0].conversionFactor:latestProgramDataShipmentLinkedFiltered.length>0?latestProgramDataShipmentLinkedFiltered[0].active:"";
+                                                                          data[10] = oldProgramDataShipmentLinkedFiltered.length>0?oldProgramDataShipmentLinkedFiltered[0].shipmentLinkingId:"";
+                                                                          data[11] = latestProgramDataShipmentLinkedFiltered.length>0?latestProgramDataShipmentLinkedFiltered[0].shipmentLinkingId:"";
+                                                                          data[12]=downloadedProgramDataShipmentLinkedFiltered.length>0?downloadedProgramDataShipmentLinkedFiltered[0].shipmentLinkingId:"";
+                                                                          data[13]= 4;
+                                                                          data[14]=(oldProgramDataShipmentLinkedFiltered.length>0 && latestProgramDataShipmentLinkedFiltered.length==0) || (oldProgramDataShipmentLinkedFiltered.length==0 && latestProgramDataShipmentLinkedFiltered.length>0)?(oldProgramDataShipmentLinkedFiltered.length>0 && latestProgramDataShipmentLinkedFiltered.length==0)?oldProgramData.currentVersion.versionId:latestProgramData.currentVersion.versionId:"";
+                                                                          data[15]=cd;
+                                                                          data[16]=oldProgramData.currentVersion.versionId;
+                                                                          data[17]=latestProgramData.currentVersion.versionId;
+                                                                          data[18]=[];
+                                                                          data[19] = oldProgramDataShipmentLinkedFiltered.length>0?oldProgramDataShipmentLinkedFiltered[0]:{};
+                                                                          data[20] = latestProgramDataShipmentLinkedFiltered.length>0?latestProgramDataShipmentLinkedFiltered[0]:{};
                                                                           // data[8] = mergedShipmentData[cd].dataSource.id;
                                                                           // data[9] = mergedShipmentData[cd].shipmentMode == "Air" ? 2 : 1;
                                                                           // data[10] = mergedShipmentData[cd].suggestedQty;
@@ -2447,11 +2567,11 @@ export default class syncPage extends Component {
                                                                             },
                                                                             {
                                                                                 title: i18n.t('static.commit.local'),
-                                                                                colspan: '3',
+                                                                                colspan: '4',
                                                                             },
                                                                             {
                                                                               title: i18n.t('static.commit.server'),
-                                                                              colspan: '3',
+                                                                              colspan: '4',
                                                                           },
                                                                             ],
                                                             
@@ -2462,9 +2582,11 @@ export default class syncPage extends Component {
                                                                             { type: 'text', title: i18n.t('static.dashboard.programheader'), width: 100 },
                                                                             { type: 'text', title: i18n.t('static.commit.shipmentId'), width: 100, },
                                                                             { type: 'text', title: i18n.t('static.manualTagging.conversionFactor'),width: 120 },
+                                                                            { type: 'text', title: i18n.t('static.common.active'),width: 120 },
                                                                             { type: 'text', title: i18n.t('static.dashboard.programheader'), width: 100 },
                                                                             { type: 'text', title: i18n.t('static.commit.shipmentId'), width: 100, },
                                                                             { type: 'text', title: i18n.t('static.manualTagging.conversionFactor'),width: 120 },
+                                                                            { type: 'text', title: i18n.t('static.common.active'),width: 120 },
                                                                             // { type: 'dropdown', title: i18n.t('static.subfundingsource.fundingsource'), source: fundingSourceList, width: 120 },
                                                                             // { type: 'dropdown', title: i18n.t('static.dashboard.budget'), source: budgetList, width: 120 },
                                                                             // { type: 'text', title: i18n.t('static.supplyPlan.orderNoAndPrimeLineNo'), width: 150 },
@@ -2495,6 +2617,12 @@ export default class syncPage extends Component {
                                                                             { type: 'hidden', title: 'download Id' },
                                                                             { type: 'hidden', title: 'result of compare' },
                                                                             { type: 'hidden', title: 'version Id' },
+                                                                            { type: 'hidden', title: 'index' },
+                                                                            { type: 'hidden', title: 'index' },
+                                                                            { type: 'hidden', title: 'index' },
+                                                                            { type: 'hidden', title: 'index' },
+                                                                            { type: 'hidden', title: 'index' },
+                                                                            { type: 'hidden', title: 'index' },
                                                                           ],
                                                                           pagination: localStorage.getItem("sesRecordCount"),
                                                                           paginationOptions: JEXCEL_PAGINATION_OPTION,
@@ -2517,34 +2645,113 @@ export default class syncPage extends Component {
                                                                           contextMenu: function (obj, x, y, e) {
                                                                             var items = [];
                                                                             //Resolve conflicts
-                                                                            var rowData = obj.getRowData(y)
-                                                                            if (rowData[11].toString() == 1) {
+                                                                            var rowData = obj.getRowData(y);
+                                                                            console.log("y@@@@@@@@@@@@@@@@@@@@@",y);
+                                                                            console.log("13--@@@@@@@@@@@@@@@@@@@@@",rowData[13].toString() == 1);
+                                                                            if (rowData[13].toString() == 1) {
                                                                               items.push({
                                                                                 title: "Accept local changes",
                                                                                 onclick: function () {
-                                                                                  // this.setState({ loading: true })
-                                                                                  // this.toggleLargeShipment(rowData[30], rowData[31], y, 'shipment');
+                                                                                  var getServerParentShipmentId=obj.getValueFromCoords(7, y);
+                                                                                  var getLocalParentShipmentId=obj.getValueFromCoords(3, y);
+                                                                                  var rowNumber=obj.getJson(null,false).filter(c=>getServerParentShipmentId!==""?c[3]===getServerParentShipmentId || c[7]===getServerParentShipmentId:c[3]===getLocalParentShipmentId || c[7]===getLocalParentShipmentId);
+                                                                                  for(var rn=0;rn<rowNumber.length;rn++){
+                                                                                    obj.options.editable = true;
+                                                                                    obj.options.allowDeleteRow=true;
+                                                                                    var deletedRowsListServer=this.state.deletedRowsListServer;
+                                                                                    if(rowNumber[rn][7]!=="" && rowNumber[rn][3]===""){
+                                                                                      obj.deleteRow(parseInt(rowNumber[rn][15]))
+                                                                                      deletedRowsListServer.push(rowNumber[rn][20])
+                                                                                    }else if(rowNumber[rn][7]!=="" && rowNumber[rn][3]!==""){
+                                                                                      obj.setValueFromCoords(6,rowNumber[rn][15],'',true)
+                                                                                      obj.setValueFromCoords(7,rowNumber[rn][15],'',true)
+                                                                                      obj.setValueFromCoords(8,rowNumber[rn][15],'',true)
+                                                                                      obj.setValueFromCoords(9,rowNumber[rn][15],'',true)
+                                                                                      obj.setValueFromCoords(11,rowNumber[rn][15],'',true)
+                                                                                      obj.setValueFromCoords(14,rowNumber[rn][15],rowNumber[rn][16],true)
+                                                                                      deletedRowsListServer.push(rowNumber[rn][20])
+                                                                                    }
+                                                                                    obj.options.allowDeleteRow=false;
+                                                                                    obj.options.editable = false;
+                                                                                    this.setState({
+                                                                                      conflictsCount: this.state.conflictsCount - 1,
+                                                                                      deletedRowsListServer:deletedRowsListServer
+                                                                                    }, () => {
+                                                                                      if (this.state.conflictsCount == 0) {
+                                                                                        this.generateDataAfterResolveConflictsForQPL();
+                                                                                      }
+                                                                                    })
+                                                                                  }
+                                                                                  this.recursiveConflictsForShipmentLinking(obj)
                                                                                 }.bind(this)
                                                                               })
                                                                               items.push({
                                                                                 title: "Accept server changes",
                                                                                 onclick: function () {
-                                                                                  // this.setState({ loading: true })
-                                                                                  // this.toggleLargeShipment(rowData[30], rowData[31], y, 'shipment');
+                                                                                  var getServerParentShipmentId=obj.getValueFromCoords(7, y);
+                                                                                  var getLocalParentShipmentId=obj.getValueFromCoords(3, y);
+                                                                                  var rowNumber=obj.getJson(null,false).filter(c=>getServerParentShipmentId!==""?c[3]===getServerParentShipmentId || c[7]===getServerParentShipmentId:c[3]===getLocalParentShipmentId || c[7]===getLocalParentShipmentId);
+                                                                                  for(var rn=0;rn<rowNumber.length;rn++){
+                                                                                    obj.options.editable = true;
+                                                                                    obj.options.allowDeleteRow=true;
+                                                                                    var deletedRowsListLocal=this.state.deletedRowsListLocal;
+                                                                                    if(rowNumber[rn][3]!=="" && rowNumber[rn][7]===""){
+                                                                                      obj.deleteRow(parseInt(rowNumber[rn][15]))
+                                                                                      deletedRowsListLocal.push(rowNumber[rn][19])
+                                                                                    }else if(rowNumber[rn][7]!=="" && rowNumber[rn][3]!==""){
+                                                                                      obj.setValueFromCoords(2,rowNumber[rn][15],'',true)
+                                                                                      obj.setValueFromCoords(3,rowNumber[rn][15],'',true)
+                                                                                      obj.setValueFromCoords(4,rowNumber[rn][15],'',true)
+                                                                                      obj.setValueFromCoords(5,rowNumber[rn][15],'',true)
+                                                                                      obj.setValueFromCoords(10,rowNumber[rn][15],'',true)
+                                                                                      obj.setValueFromCoords(14,rowNumber[rn][15],rowNumber[rn][17],true)
+                                                                                      deletedRowsListLocal.push(rowNumber[rn][19])
+                                                                                    }
+                                                                                    obj.options.allowDeleteRow=false;
+                                                                                    obj.options.editable = false;
+                                                                                    this.setState({
+                                                                                      conflictsCount: this.state.conflictsCount - 1,
+                                                                                      deletedRowsListLocal:deletedRowsListLocal
+                                                                                    }, () => {
+                                                                                      if (this.state.conflictsCount == 0) {
+                                                                                        this.generateDataAfterResolveConflictsForQPL();
+                                                                                      }
+                                                                                    })
+                                                                                  }
+                                                                                  this.recursiveConflictsForShipmentLinking(obj)
                                                                                 }.bind(this)
                                                                               })
-                                                                              if(rowData[3]==="" || rowData[6]===""){
+                                                                              if(rowData[3]==="" || rowData[7]===""){
                                                                               items.push({
                                                                                 title: "Accept both",
                                                                                 onclick: function () {
                                                                                   // this.setState({ loading: true })
                                                                                   // this.toggleLargeShipment(rowData[30], rowData[31], y, 'shipment');
+                                                                                  // obj.setValueFromCoords(12,y,this.state.programId.split("_")[1],true);
+                                                                                  var getServerParentShipmentId=obj.getValueFromCoords(7, y);
+                                                                                  var getLocalParentShipmentId=obj.getValueFromCoords(3, y);
+                                                                                  var rowNumber=obj.getJson(null,false).filter(c=>getServerParentShipmentId!==""?c[3]===getServerParentShipmentId || c[7]===getServerParentShipmentId:c[3]===getLocalParentShipmentId || c[7]===getLocalParentShipmentId);
+                                                                                  var shipmentIdSetThatWhoseConflictsAreResolved=[...new Set(rowNumber.map(ele => ele[15]))];
+                                                                                  for(var rn=0;rn<rowNumber.length;rn++){
+                                                                                    obj.options.editable = true;
+                                                                                    obj.setValueFromCoords(18,rowNumber[rn][15],rowNumber[rn][18].concat(shipmentIdSetThatWhoseConflictsAreResolved),true);
+                                                                                    obj.options.editable = false;
+                                                                                    this.setState({
+                                                                                      conflictsCount: this.state.conflictsCount - 1
+                                                                                    }, () => {
+                                                                                      if (this.state.conflictsCount == 0) {
+                                                                                        this.generateDataAfterResolveConflictsForQPL();
+                                                                                      }
+                                                                                    })
+                                                                                  }
+                                                                                  this.recursiveConflictsForShipmentLinking(obj)
+
                                                                                 }.bind(this)
                                                                               
                                                                               })
                                                                             }
                                                                             } else {
-                                                                              return false;
+                                                                              return [];
                                                                             }
                                     
                                                                             // if (rowData[0].toString() > 0) {
@@ -2555,6 +2762,7 @@ export default class syncPage extends Component {
                                                                             //     }.bind(this)
                                                                             //   })
                                                                             // }
+                                                                            console.log("items@@@@@@@@@@@@@@@@@@@@@",items);
                                                                             return items;
                                                                           }.bind(this)
                                                                         };
@@ -2584,6 +2792,8 @@ export default class syncPage extends Component {
                                         this.generateDataAfterResolveConflictsForQPL();
                                       }
                                     })
+                                  }
+                                })
                                   }.bind(this)
                                 }.bind(this)
                               }.bind(this)
@@ -2929,36 +3139,37 @@ export default class syncPage extends Component {
   }
 
   recursiveConflictsForShipmentLinking(instance){
-    var elInstance = instance.jexcel;
+    console.log("In resolve conflicts@@@@@@@@@@@@")
+    var elInstance = instance;
     var jsonData = elInstance.getJson();
-    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L']
+    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L','M','N','O','P','Q','R','S']
     elInstance.options.editable = true;
     for (var c = 0; c < jsonData.length; c++) {
-      var checkIfSameParentShipmentIdExists=jsonData.filter((d,index)=>(d[3]===jsonData[c][6] && d[12]!=jsonData[c][12]) && c!=index).length;
-      if(jsonData[c][3]!=="" && jsonData[c][6]!=="" && jsonData[c][3]!==jsonData[c][6]){
+      if(jsonData[c][2]!=="" && jsonData[c][6]!=="" && jsonData[c][2]!==jsonData[c][6]){
         this.setState({
           conflictsCount: this.state.conflictsCount + 1
         })
-        elInstance.setValueFromCoords(11, c, 5, true);
+        elInstance.setValueFromCoords(13, c, 6, true);
         for (var j = 0; j < colArr.length; j++) {
           var col = (colArr[j]).concat(parseInt(c) + 1);
           elInstance.setStyle(col, "background-color", "transparent");
           elInstance.setStyle(col, "background-color", "red");
         }
       }else{
+        var checkIfSameParentShipmentIdExists=jsonData.filter((d,index)=>(((jsonData[c][3]!=="" && jsonData[c][3]===d[7]) || (jsonData[c][7]!=="" && jsonData[c][7]===d[3])) && !jsonData[c][18].includes(index) && c!=index)).length;
       if(checkIfSameParentShipmentIdExists>0){
         this.setState({
           conflictsCount: this.state.conflictsCount + 1
         })
-        elInstance.setValueFromCoords(11, c, 1, true);
+        elInstance.setValueFromCoords(13, c, 1, true);
         for (var j = 0; j < colArr.length; j++) {
           var col = (colArr[j]).concat(parseInt(c) + 1);
           elInstance.setStyle(col, "background-color", "transparent");
           elInstance.setStyle(col, "background-color", "yellow");
         }
       }else{
-      if ((jsonData[c])[9]==="" && (jsonData[c])[8] ===0) {
-        elInstance.setValueFromCoords(11, c, 2, true);
+      if ((jsonData[c])[11]==="" && (jsonData[c])[10] ===0) {
+        elInstance.setValueFromCoords(13, c, 2, true);
         for (var i = 0; i < colArr.length; i++) {
           var col = (colArr[i]).concat(parseInt(c) + 1);
           elInstance.setStyle(col, "background-color", "transparent");
@@ -2968,8 +3179,9 @@ export default class syncPage extends Component {
         this.setState({
           isChanged: true
         })
-      } else if ((jsonData[c])[8]==="" && (jsonData[c])[9] !=(jsonData[c])[10]) {
-        elInstance.setValueFromCoords(11, c, 3, true);
+      } else if ((jsonData[c])[10]==="" && (jsonData[c])[11] !=(jsonData[c])[12]) {
+        console.log("In else if")
+        elInstance.setValueFromCoords(13, c, 3, true);
         for (var i = 0; i < colArr.length; i++) {
           var col = (colArr[i]).concat(parseInt(c) + 1);
           elInstance.setStyle(col, "background-color", "transparent");
@@ -2979,14 +3191,16 @@ export default class syncPage extends Component {
         this.setState({
           isChanged: true
         })
-      }else if((jsonData[c])[9]==(jsonData[c])[8]){
+      }else if((jsonData[c])[11]==(jsonData[c])[10]){
+        for (var j = 0; j < colArr.length; j++) {
         var col = (colArr[j]).concat(parseInt(c) + 1);
         elInstance.setStyle(col, "background-color", "transparent");
-      }else if((jsonData[c])[9]!=="" && (jsonData[c])[8]!=="" && (jsonData[c])[8]!==(jsonData[c])[9]){
+        }
+      }else if((jsonData[c])[11]!=="" && (jsonData[c])[10]!=="" && (jsonData[c])[10]!==(jsonData[c])[11]){
         this.setState({
           conflictsCount: this.state.conflictsCount + 1
         })
-        elInstance.setValueFromCoords(11, c, 1, true);
+        elInstance.setValueFromCoords(13, c, 1, true);
         for (var j = 0; j < colArr.length; j++) {
           var col = (colArr[j]).concat(parseInt(c) + 1);
           elInstance.setStyle(col, "background-color", "transparent");
@@ -3001,7 +3215,7 @@ export default class syncPage extends Component {
 
   loadedFunctionForMergeShipmentLinked = function (instance) {
     jExcelLoadedFunction(instance, 3);
-    this.recursiveConflictsForShipmentLinking(instance)
+    this.recursiveConflictsForShipmentLinking(instance.jexcel)
   }
 
   loadedFunctionForMergeShipment = function (instance) {
@@ -4641,7 +4855,8 @@ export default class syncPage extends Component {
                           openCount: 0,
                           addressedCount: 0,
                           programModified: 0,
-                          readonly: 0
+                          readonly: 0,
+                          doNotFollowLatestShipmentInfo:0
                         };
                         programIds.push(json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId);
                         var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);
