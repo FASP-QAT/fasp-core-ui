@@ -846,6 +846,7 @@ class usageTemplate extends Component {
                 data[18] = 0;
                 data[19] = (papuList[j].program == null ? -1 : papuList[j].program.id)
                 data[20] = papuList[j].notes
+                data[21] = papuList[j].active
 
                 papuDataArr[count] = data;
                 count++;
@@ -880,6 +881,7 @@ class usageTemplate extends Component {
             data[18] = 1;
             data[19] = 0;
             data[20] = "";
+            data[20] = 0;
             papuDataArr[0] = data;
         }
 
@@ -1036,7 +1038,13 @@ class usageTemplate extends Component {
                     type: 'hidden',
                     // width: 400 //20 U
                 },
-
+                {
+                    title: i18n.t('static.checkbox.active'),
+                    type: 'checkbox',
+                    width: '130',
+                    readOnly: false
+                    // readOnly: true //21 V
+                },
 
             ],
             // nestedHeaders: [
@@ -2270,7 +2278,7 @@ class usageTemplate extends Component {
                         usageFrequencyCount: this.el.getValue(`L${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                         repeatUsagePeriod: { usagePeriodId: (parseInt(map1.get("14")) == -1 ? null : parseInt(map1.get("14"))) },
                         repeatCount: this.el.getValue(`N${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                        active: true,
+                        active: map1.get("21"),
                         notes: map1.get("20")
                         // capacityCbm: map1.get("2").replace(",", ""),
                         // capacityCbm: map1.get("2").replace(/,/g, ""),
@@ -2996,7 +3004,9 @@ class usageTemplate extends Component {
         // if (x != 24) {
         //     this.el.setValueFromCoords(24, y, 1, true);
         // }
-        if (x == 10 || x == 11 || x == 12) {
+        console.log("LOG---------->2", x);
+
+        if (x == 10 || x == 11 || x == 12 || x == 21) {
             this.el.setValueFromCoords(17, y, 1, true);
         }
 
