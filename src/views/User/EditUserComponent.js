@@ -142,6 +142,7 @@ class EditUserComponent extends Component {
             loading: true,
             rows: [],
             loading1: true,
+            programListForFilter: [],
         }
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
@@ -662,6 +663,7 @@ class EditUserComponent extends Component {
 
         //Country
         if (x == 1) {
+            this.el.setValueFromCoords(4, y, '', true);
             var col = ("B").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -716,6 +718,26 @@ class EditUserComponent extends Component {
 
     }.bind(this);
 
+    filterProgramByCountryId = function (instance, cell, c, r, source) {
+
+        var mylist = [];
+        var value = (instance.jexcel.getJson(null, false)[r])[1];
+        console.log("mylist--------->3.2", value);
+
+        // const { selProgram } = this.state;
+
+        var proList = [];
+        if (value != -1) {
+            console.log("mylist--------->3.11");
+            proList = this.state.programListForFilter.filter(c => c.realmCountryId == value);
+
+        } else {
+            console.log("mylist--------->3.22");
+            proList = this.state.programListForFilter;
+        }
+        return proList;
+
+    }.bind(this)
 
     buildJexcel() {
         const { selProgram } = this.state;
@@ -733,10 +755,14 @@ class EditUserComponent extends Component {
                     // name: getLabelText(selProgram[i].label, this.state.lang),
                     name: selProgram[i].programCode,
                     id: parseInt(selProgram[i].programId),
-                    active: selProgram[i].active
+                    active: selProgram[i].active,
+                    realmCountryId: selProgram[i].realmCountry.realmCountryId,
                 }
                 programList[i] = paJson
             }
+            this.setState({
+                programListForFilter: programList
+            })
             var paJson = {
                 // name: "All",
                 name: "All",
@@ -876,6 +902,7 @@ class EditUserComponent extends Component {
                     title: i18n.t('static.dashboard.programheader'),
                     type: 'autocomplete',
                     source: programList,//4E
+                    filter: this.filterProgramByCountryId,
                     // filter: this.filterProgram
 
                 },

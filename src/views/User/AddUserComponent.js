@@ -167,6 +167,7 @@ class AddUserComponent extends Component {
             validateRealm: '',
             isValid: false,
             loading1: true,
+            programListForFilter: [],
         }
         this.cancelClicked = this.cancelClicked.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
@@ -454,10 +455,12 @@ class AddUserComponent extends Component {
                                             ProgramService.getProgramList()
                                                 .then(response => {
                                                     if (response.status == "200") {
+                                                        console.log("CountryList------->1", response.data);
 
                                                         DatasetService.getDatasetList()
                                                             .then(response1 => {
                                                                 if (response1.status == "200") {
+                                                                    console.log("CountryList------->2", response1.data);
 
                                                                     var listArray = [...response.data, ...response1.data]
                                                                     listArray.sort((a, b) => {
@@ -715,6 +718,7 @@ class AddUserComponent extends Component {
 
         //Country
         if (x == 1) {
+            this.el.setValueFromCoords(4, y, '', true);
             var col = ("B").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -769,6 +773,27 @@ class AddUserComponent extends Component {
 
     }.bind(this);
 
+    filterProgramByCountryId = function (instance, cell, c, r, source) {
+
+        var mylist = [];
+        var value = (instance.jexcel.getJson(null, false)[r])[1];
+        console.log("mylist--------->3.2", value);
+
+        // const { selProgram } = this.state;
+
+
+        var proList = [];
+        if (value != -1) {
+            console.log("mylist--------->3.11");
+            proList = this.state.programListForFilter.filter(c => c.realmCountryId == value);
+
+        } else {
+            console.log("mylist--------->3.22");
+            proList = this.state.programListForFilter;
+        }
+        return proList;
+
+    }.bind(this)
 
     buildJexcel() {
         const { selProgram } = this.state;
@@ -786,7 +811,8 @@ class AddUserComponent extends Component {
                     // name: getLabelText(selProgram[i].label, this.state.lang),
                     name: selProgram[i].programCode,
                     id: parseInt(selProgram[i].programId),
-                    active: selProgram[i].active
+                    active: selProgram[i].active,
+                    realmCountryId: selProgram[i].realmCountry.realmCountryId,
                 }
                 programList[i] = paJson
             }
@@ -798,6 +824,9 @@ class AddUserComponent extends Component {
             }
             programList.unshift(paJson);
         }
+        this.setState({
+            programListForFilter: programList
+        })
 
         if (selRealmCountry.length > 0) {
             for (var i = 0; i < selRealmCountry.length; i++) {
@@ -929,6 +958,7 @@ class AddUserComponent extends Component {
                     title: i18n.t('static.dashboard.programheader'),
                     type: 'autocomplete',
                     source: programList,
+                    filter: this.filterProgramByCountryId,
                     // filter: this.filterProgram
 
                 },
