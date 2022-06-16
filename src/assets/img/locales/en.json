@@ -879,7 +879,7 @@
     "static.organisationType.organisationTypeValue": "Select Organization Type",
     "static.forecastReport.unitPrice": "Unit Price",
     "static.common.onlinepasswordtext": "You must be online to update the password",
-    "static.tooltip.UsageType": "Continuous usage product will be used for an indeterminate amount of time Discrete usage product will be used for a finite period as defined by the user",
+    "static.tooltip.UsageType": "Continuous usage: product will be used for an indeterminate amount of time. Discrete usage: product will be used for a finite period, as defined by the user.",
     "static.quantimed.quantimedImportCosumptionPeriod": "Select consumption date range to import",
     "static.procurementAgentPlanningUnit.weightText": "Enter Weight",
     "static.problemList.medium": "Medium",
@@ -2364,5 +2364,8 @@
     "static.procurementagenttype.procurementtypename": "Procurement Agent Type Name",
     "static.procurementagenttype.procurementagenttypecode": "Procurement Agent Type display name",
     "static.procurementagent.procurementagenttypetext": "Procurement Agent Type is required",
-    "static.procurementagent.programtext": "Program is required"
+    "static.procurementagent.programtext": "Program is required",
+    "static.tooltip.NodeTitle": "The node title will show up on the Tree View",
+    "static.tooltip.scenario": "Choose scenario for which the data below applies",
+    "static.tooltip.LagInMonthFUNode":"Use this feature for phased product usage. For example, if the lag is 2, the product usage will begin 2 months after the parent node dates."
 }

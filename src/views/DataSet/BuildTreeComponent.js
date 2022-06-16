@@ -3140,9 +3140,12 @@ export default class BuildTree extends Component {
                             this.calculateMOMData(0, 0);
                         });
                     } else {
-                        if (this.state.isValidError) {
+                        // console.log("this.state.isValidError---", this.state.isValidError)
+                        if (this.state.isValidError.toString() == "false") {
+                            console.log("inside if form submit");
                             this.onAddButtonClick(this.state.currentItemConfig, true, dataArr);
                         } else {
+                            console.log("inside else form submit");
                             this.setState({
                                 modelingJexcelLoader: false
                             }, () => {
@@ -6647,6 +6650,11 @@ export default class BuildTree extends Component {
             activeTab1: newArray,
             showCalculatorFields: false
         }, () => {
+
+            var isValid = document.getElementById('isValidError').value;
+            // console.log("isValid 1---", isValid);
+            this.setState({ isValidError: isValid});
+
             if (tab == 3) {
                 // this.refs.extrapolationChild.buildJexcel();
                 if (this.state.modelingEl != "") {
@@ -6663,7 +6671,7 @@ export default class BuildTree extends Component {
                 this.refs.extrapolationChild.getExtrapolationMethodList();
             }
             if (tab == 2) {
-                console.log("***>>>", this.state.currentItemConfig);
+                // console.log("***$$$$ ", document.getElementById('isValidError').value);
                 if (this.state.currentItemConfig.context.payload.nodeType.id != 1) {
                     var curDate = (moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD'));
                     var month = this.state.currentScenario.month;
@@ -7182,12 +7190,12 @@ export default class BuildTree extends Component {
         }, () => {
             console.log("after state update---", this.state.currentItemConfig);
             console.log("after state update current scenario---", this.state.currentScenario);
-            if (this.state.activeTab1[0] == '1') {
-                var isValid = document.getElementById('isValidError').value;
-                // console.log("isValid 1---", isValid);
-                console.log("isValid 2---", isValid != '{}');
-                this.setState({ isValidError: isValid != '{}' });
-            }
+            // if (this.state.activeTab1[0] == '1') {
+            //     var isValid = document.getElementById('isValidError').value;
+            //     console.log("isValid 1---", isValid);
+            //     console.log("isValid 2---", isValid != '{}');
+            //     this.setState({ isValidError: isValid != '{}' });
+            // }
             if (flag) {
                 if (event.target.name === "planningUnitId") {
                     this.calculatePUPerVisit(false);
@@ -8201,7 +8209,7 @@ export default class BuildTree extends Component {
                                             type="hidden"
                                             name="isValidError"
                                             id="isValidError"
-                                            value={JSON.stringify(errors)}
+                                            value={JSON.stringify(errors) != '{}'}
                                         />
                                         {/* {errors} */}
                                         <FormGroup className={"col-md-6"}>
@@ -10375,6 +10383,7 @@ export default class BuildTree extends Component {
                                 console.log("level unit id on add button click---", levelUnitId);
                                 // tempArray.push(nodeDataMap);
                                 this.setState({
+                                    isValidError: true,
                                     showMomDataPercent: false,
                                     showMomData: false,
                                     viewMonthlyData: true,
