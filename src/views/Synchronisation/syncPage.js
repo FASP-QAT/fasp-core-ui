@@ -1128,9 +1128,13 @@ export default class syncPage extends Component {
 
       var shipmentLinkedJson=this.state.mergedShipmentLinkedJexcel.getJson();
       var linkedShipmentListLocal=this.state.oldProgramData.shipmentLinkingList!=null?this.state.oldProgramData.shipmentLinkingList:[];
+      console.log("linkedShipmentListLocal@@@@@@@@@@@@@@@@@@",linkedShipmentListLocal)
       var shipmentLinkingIdFromLocal=[...new Set(linkedShipmentListLocal.map(ele => ele.shipmentLinkingId))].filter(c=>c!==0);
-      var linkedShipmentListServer=this.state.latestProgramData.shipmentLinkingList!=null?this.state.latestProgramData.shipmentLinkingList.filter(c=>!shipmentLinkingIdFromLocal.includes(c=>c.shipmentLinkingId)):[];
+      console.log("shipmentLinkingIdFromLocal@@@@@@@@@@@@@@@@@@",shipmentLinkingIdFromLocal)
+      var linkedShipmentListServer=this.state.latestProgramData.shipmentLinkingList!=null?this.state.latestProgramData.shipmentLinkingList.filter(c=>!shipmentLinkingIdFromLocal.includes(c.shipmentLinkingId)):[];
+      console.log("linkedShipmentListServer@@@@@@@@@@@@@@@@@@",linkedShipmentListServer)
       var mergedList=linkedShipmentListLocal.concat(linkedShipmentListServer);
+      console.log("mergedList@@@@@@@@@@@@@@@@@@",mergedList)
       for(var s=0;s<shipmentLinkedJson.length;s++){
         //Accept server version
         if(shipmentLinkedJson[s][11]==3){
@@ -1188,6 +1192,7 @@ export default class syncPage extends Component {
           activateParentShipment = true;
         }
         console.log("@@@@@@@@@@@@@@@@deletedRowsListServer[dr].childShipmentId",deletedRowsListServer[dr].childShipmentId);
+        console.log("@@@@@@@@@@@@@@@@ShipmentData",shipmentData)
         var shipmentIndex = shipmentData.findIndex(c => deletedRowsListServer[dr].childShipmentId > 0 ? c.shipmentId == deletedRowsListServer[dr].childShipmentId : c.tempShipmentId == deletedRowsListServer[dr].tempChildShipmentId);
         console.log("@@@@@@@@@@@@@@@@index",shipmentIndex);
         shipmentData[shipmentIndex].active = false;
@@ -2295,7 +2300,7 @@ export default class syncPage extends Component {
                                     var data = [];
                                     var mergedShipmentJexcel = [];
                                     for (var cd = 0; cd < mergedShipmentData.length; cd++) {
-                                      if(mergedShipmentData[cd].erpFlag.toString()=="false"){
+                                      // if(mergedShipmentData[cd].erpFlag.toString()=="false"){
                                       data = [];
                                       data[0] = mergedShipmentData[cd].shipmentId;
                                       data[1] = mergedShipmentData[cd].planningUnit.id;
@@ -2347,7 +2352,7 @@ export default class syncPage extends Component {
                                       data[32] = downloadedData;//Downloaded data
                                       data[33] = 4;
                                       mergedShipmentJexcel.push(data);
-                                    }
+                                    // }
                                     }
 
                                     var options = {
@@ -2509,6 +2514,7 @@ export default class syncPage extends Component {
                                                                           data[18]=[];
                                                                           data[19] = oldProgramDataShipmentLinkedFiltered.length>0?oldProgramDataShipmentLinkedFiltered[0]:{};
                                                                           data[20] = latestProgramDataShipmentLinkedFiltered.length>0?latestProgramDataShipmentLinkedFiltered[0]:{};
+                                                                          data[21] = downloadedProgramDataShipmentLinkedFiltered.length>0?downloadedProgramDataShipmentLinkedFiltered[0].active:""
                                                                           // data[8] = mergedShipmentData[cd].dataSource.id;
                                                                           // data[9] = mergedShipmentData[cd].shipmentMode == "Air" ? 2 : 1;
                                                                           // data[10] = mergedShipmentData[cd].suggestedQty;
@@ -2617,6 +2623,7 @@ export default class syncPage extends Component {
                                                                             { type: 'hidden', title: 'download Id' },
                                                                             { type: 'hidden', title: 'result of compare' },
                                                                             { type: 'hidden', title: 'version Id' },
+                                                                            { type: 'hidden', title: 'index' },
                                                                             { type: 'hidden', title: 'index' },
                                                                             { type: 'hidden', title: 'index' },
                                                                             { type: 'hidden', title: 'index' },
@@ -3156,7 +3163,7 @@ export default class syncPage extends Component {
           elInstance.setStyle(col, "background-color", "red");
         }
       }else{
-        var checkIfSameParentShipmentIdExists=jsonData.filter((d,index)=>(((jsonData[c][3]!=="" && jsonData[c][3]===d[7]) || (jsonData[c][7]!=="" && jsonData[c][7]===d[3])) && !jsonData[c][18].includes(index) && c!=index)).length;
+        var checkIfSameParentShipmentIdExists=jsonData.filter((d,index)=>(((jsonData[c][3]!=="" && jsonData[c][3]===d[7] && jsonData[c][17]!==d[16]) || (jsonData[c][7]!=="" && jsonData[c][7]===d[3]) && jsonData[c][17]!==d[16]) && !jsonData[c][18].includes(index) && c!=index)).length;
       if(checkIfSameParentShipmentIdExists>0){
         this.setState({
           conflictsCount: this.state.conflictsCount + 1
@@ -3192,10 +3199,31 @@ export default class syncPage extends Component {
           isChanged: true
         })
       }else if((jsonData[c])[11]==(jsonData[c])[10]){
+        if((jsonData[c])[5]!=(jsonData[c])[9]){
+          if((jsonData[c])[5]==(jsonData[c])[21]){
+            elInstance.setValueFromCoords(13, c, 3, true);
+              var col = (colArr[9]).concat(parseInt(c) + 1);
+              elInstance.setStyle(col, "background-color", "transparent");
+              elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
+            this.setState({
+              isChanged: true
+            })  
+
+          }else if((jsonData[c])[9]==(jsonData[c])[21]){
+            elInstance.setValueFromCoords(13, c, 3, true);
+              var col = (colArr[5]).concat(parseInt(c) + 1);
+              elInstance.setStyle(col, "background-color", "transparent");
+              elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
+            this.setState({
+              isChanged: true
+            })  
+          }
+        }else{
         for (var j = 0; j < colArr.length; j++) {
         var col = (colArr[j]).concat(parseInt(c) + 1);
         elInstance.setStyle(col, "background-color", "transparent");
         }
+      }
       }else if((jsonData[c])[11]!=="" && (jsonData[c])[10]!=="" && (jsonData[c])[10]!==(jsonData[c])[11]){
         this.setState({
           conflictsCount: this.state.conflictsCount + 1

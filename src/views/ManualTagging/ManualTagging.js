@@ -2215,6 +2215,7 @@ export default class ManualTagging extends Component {
                 var generalProgramJson = JSON.parse(generalProgramData);
                 var linkedShipmentsList = generalProgramJson.shipmentLinkingList != null ? generalProgramJson.shipmentLinkingList : [];
                 var linkedRoNoAndRoPrimeLineNo = [];
+                console.log("linkedShipmentsList@@@@@@@@@@@@@@@",linkedShipmentsList);
                 linkedShipmentsList.filter(c => c.shipmentLinkingId == 0 && c.active == true).map(c => {
                     linkedRoNoAndRoPrimeLineNo.push(c.roNo + "|" + c.roPrimeLineNo)
                 })
@@ -2223,6 +2224,7 @@ export default class ManualTagging extends Component {
             ManualTaggingService.getShipmentListForTab3(json)
                 .then(response => {
                     var outputList = response.data;
+                    console.log("output list@@@@@@@@@@@@@@@",outputList)
                     var filterOnLinkedData = outputList.filter(c => !linkedRoNoAndRoPrimeLineNo.includes(c.roNo + "|" + c.roPrimeLineNo));
                     let resultTrue = Object.values(filterOnLinkedData.reduce((a, { roNo, roPrimeLineNo, knShipmentNo, erpQty, orderNo, primeLineNo, erpShipmentStatus, expectedDeliveryDate, batchNo, expiryDate, erpPlanningUnit, price, shippingCost, shipBy, qatEquivalentShipmentStatus, parentShipmentId, childShipmentId, notes, qatPlanningUnit }) => {
                         if (!a[roNo + "|" + roPrimeLineNo + "|" + knShipmentNo])
@@ -3457,8 +3459,10 @@ export default class ManualTagging extends Component {
     }
 
     selected = function (instance, cell, x, y, value) {
-
-        if ((x == 0 && value != 0) || (y == 0)) {
+        console.log("x$$$$$$$$$$$$$$$$",x);
+        console.log("y$$$$$$$$$$$$$$$$",y);
+        console.log("value$$$$$$$$$$$$$$$$",value);
+        if ((x == 0 && value != 0) || (y == 0 && value!=0)) {
             // console.log("HEADER SELECTION--------------------------");
         } else {
             var outputListAfterSearch = [];

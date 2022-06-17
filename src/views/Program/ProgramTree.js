@@ -885,7 +885,7 @@ class Program extends Component {
                 ProgramService.getAllProgramData(checkboxesChecked)
                     .then(response => {
                         // console.log("ProgramThenCount", programThenCount)
-                        // console.log("Response data", response.data)
+                        console.log("Response data", response.data)
                         var json = response.data;
                         var updatedJson = [];
                         for (var r = 0; r < json.length; r++) {
