@@ -2622,6 +2622,8 @@ export default class SupplyPlanComponent extends React.Component {
     }
 
     formSubmit(value, monthCount) {
+        console.log("&&&&&&&&&&&&&&&&&MonthCount in form submit",monthCount);
+        console.log("&&&&&&&&&&&&&&&&&value in form submit",value);
         // this.setState({
         //     showTotalShipment: false,
         //     showManualShipment: false,
@@ -2644,6 +2646,7 @@ export default class SupplyPlanComponent extends React.Component {
             })
         }
         var m = this.getMonthArray(moment(Date.now()).add(monthCount, 'months').utcOffset('-0500'));
+        console.log("&&&&&&&&&&&&&&&&&m",m);
         var planningUnitId = value != "" && value != undefined ? value.value : 0;
         var planningUnitName = "";
         if (planningUnitId != 0) {
@@ -3657,7 +3660,9 @@ export default class SupplyPlanComponent extends React.Component {
     }
 
     leftClicked() {
+        console.log("&&&&&&&&&&&&&&&&&MonthCount from state",this.state.monthCount);
         var monthCount = (this.state.monthCount) - NO_OF_MONTHS_ON_LEFT_CLICKED;
+        console.log("&&&&&&&&&&&&&&&&&MonthCount after subtract",monthCount);
         this.setState({
             monthCount: monthCount
         })
