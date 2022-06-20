@@ -1631,8 +1631,10 @@ class AuthenticationService {
         localStorage.setItem('sesBudFs', "");
         localStorage.setItem('sesBudStatus', "");
         localStorage.setItem('sesForecastProgramIds', "");
-        var currentDate = moment(Date.now()).utcOffset('-0500')
+        var currentDate = moment(Date.now()).utcOffset('-0500');
+        console.log("&&&&&&&&&&&&&&&&&Current Date in authetication service",currentDate);
         var curDate = moment(currentDate).startOf('month').subtract(MONTHS_IN_PAST_FOR_SUPPLY_PLAN, 'months').format("YYYY-MM-DD");
+        console.log("&&&&&&&&&&&&&&&&&Current Date after subtraction in authetication service",curDate);
         localStorage.setItem('sesStartDate', JSON.stringify({ year: parseInt(moment(curDate).format("YYYY")), month: parseInt(moment(curDate).format("M")) }))
     }
 
