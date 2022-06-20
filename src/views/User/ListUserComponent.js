@@ -914,39 +914,39 @@ class ListUserComponent extends Component {
             <>
                 <TabPane tabId="1" className='pb-lg-0'>
                     {/* <Card> */}
-                        <CardBody className="pl-lg-1 pr-lg-1 pt-lg-0">
-                            {/* <div id="tableDiv1" className="table-responsive consumptionDataEntryTable"> */}
-                            <div id="tableDiv1" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USER') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
-                            </div>
-                        </CardBody>
-                        {/* <CardFooter> */}
-                            {/* <FormGroup>
+                    <CardBody className="pl-lg-1 pr-lg-1 pt-lg-0">
+                        {/* <div id="tableDiv1" className="table-responsive consumptionDataEntryTable"> */}
+                        <div id="tableDiv1" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USER') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
+                        </div>
+                    </CardBody>
+                    {/* <CardFooter> */}
+                    {/* <FormGroup>
                                 <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                 <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => { this.addRow1(); }}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>
                                 &nbsp;
                             </FormGroup> */}
 
 
-                        {/* </CardFooter> */}
+                    {/* </CardFooter> */}
                     {/* </Card> */}
                 </TabPane>
 
                 <TabPane tabId="2" className='pb-lg-0'>
                     {/* <Card> */}
-                        <CardBody className="pl-lg-1 pr-lg-1 pt-lg-0">
-                            {/* <div id="tableDiv2" className="table-responsive consumptionDataEntryTable"> */}
-                            <div id="tableDiv2" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USER') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
-                            </div>
-                        </CardBody>
-                        {/* <CardFooter> */}
-                            {/* <FormGroup>
+                    <CardBody className="pl-lg-1 pr-lg-1 pt-lg-0">
+                        {/* <div id="tableDiv2" className="table-responsive consumptionDataEntryTable"> */}
+                        <div id="tableDiv2" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USER') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
+                        </div>
+                    </CardBody>
+                    {/* <CardFooter> */}
+                    {/* <FormGroup>
                                 <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                 <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => { this.addRow2(); }}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>
                                 &nbsp;
                             </FormGroup> */}
 
 
-                        {/* </CardFooter> */}
+                    {/* </CardFooter> */}
                     {/* </Card> */}
                 </TabPane>
 
