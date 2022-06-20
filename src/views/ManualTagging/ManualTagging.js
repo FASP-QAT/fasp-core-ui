@@ -154,6 +154,9 @@ export default class ManualTagging extends Component {
     }
 
     versionChange(event) {
+        this.setState({
+            loading:true
+        })
         var versionId = event.target.value;
         localStorage.setItem("sesVersionIdReport", versionId);
         this.setState({
@@ -164,7 +167,8 @@ export default class ManualTagging extends Component {
                 this.getPlanningUnitList()
             } else {
                 this.setState({
-                    planningUnits: []
+                    planningUnits: [],
+                    loading:false
                 })
             }
         })
@@ -275,8 +279,8 @@ export default class ManualTagging extends Component {
         var localProgramList = this.state.programQPLDetailsList.filter(c => setOfProgramIds.includes(c.programId) && !c.doNotFollowLatestShipmentInfo)
         if (localProgramList.length == 1) {
             this.setState({
-                loading: false,
-                loading1: false,
+                // loading: false,
+                // loading1: false,
                 programId1: localProgramList[0].id,
                 countryWisePrograms: localProgramList
             }, () => {
@@ -688,6 +692,7 @@ export default class ManualTagging extends Component {
     dataChangeCheckbox(event) {
         this.setState({
             selectedShipment: [],
+            originalQty:0,
             checkboxValue: (event.target.checked ? true : false)
         })
     }
@@ -1990,7 +1995,7 @@ export default class ManualTagging extends Component {
                 })
             }
         }
-        var shipmentPlanningUnitId = this.state.active1 ? this.state.selectedRowPlanningUnit : (this.state.active3 ? ((this.state.active4 || this.state.active5) && !this.state.checkboxValue ? document.getElementById("planningUnitId1").value : (this.state.active4 || this.state.active5) && this.state.checkboxValue ? this.state.selectedShipment[0].planningUnit.id : 0) : 0)
+        var shipmentPlanningUnitId = this.state.active1 ? this.state.selectedRowPlanningUnit : (this.state.active3 ? ((this.state.active4 || this.state.active5) && !this.state.checkboxValue ? document.getElementById("planningUnitId1").value : (this.state.active4 || this.state.active5) && this.state.checkboxValue ? this.state.selectedShipment.length>0?this.state.selectedShipment[0].planningUnit.id:0 : 0) : 0)
         if ((roNoOrderNo != "" && roNoOrderNo != "0") || (erpPlanningUnitId != 0)) {
             // roNoOrderNo, programId, erpPlanningUnitId, (this.state.active1 ? 1 : (this.state.active2 ? 2 : 3)), (this.state.active2 ? this.state.parentShipmentId : 0)
             var json = {
@@ -3467,6 +3472,9 @@ export default class ManualTagging extends Component {
         if ((x == 0 && value != 0) || (y == 0 && value!=0)) {
             // console.log("HEADER SELECTION--------------------------");
         } else {
+            this.setState({
+                loading:true
+            })
             var outputListAfterSearch = [];
             let row;
             let json;
@@ -3636,6 +3644,7 @@ export default class ManualTagging extends Component {
 
                         this.setState({
                             message: response.data.messageCode,
+                            loading:false,
                             color: '#BA0C2F'
                         },
                             () => {
