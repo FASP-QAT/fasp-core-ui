@@ -65,6 +65,7 @@ class AddprogramPlanningUnit extends Component {
         // this.disableRow = this.disableRow.bind(this);
         // this.updateRow = this.updateRow.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
         this.addRowInJexcel = this.addRowInJexcel.bind(this);
         this.changed = this.changed.bind(this);
@@ -72,6 +73,7 @@ class AddprogramPlanningUnit extends Component {
         this.buildJexcel = this.buildJexcel.bind(this);
         this.onPaste = this.onPaste.bind(this);
         this.oneditionend = this.oneditionend.bind(this);
+        this.setProgramId = this.setProgramId.bind(this);
     }
 
     dropdownFilter = function (instance, cell, c, r, source) {
@@ -103,7 +105,7 @@ class AddprogramPlanningUnit extends Component {
 
         for (var k = 0; k < puList.length; k++) {
             var planningUnitJson = {
-                name: puList[k].label.label_en,
+                name: puList[k].label.label_en + ' | ' + puList[k].planningUnitId,
                 id: puList[k].planningUnitId
             }
             mylist.push(planningUnitJson);
@@ -114,10 +116,18 @@ class AddprogramPlanningUnit extends Component {
         document.getElementById('div2').style.display = 'block';
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
-        }, 8000);
+        }, 30000);
+    }
+
+    hideFirstComponent() {
+        document.getElementById('div1').style.display = 'block';
+        setTimeout(function () {
+            document.getElementById('div1').style.display = 'none';
+        }, 30000);
     }
 
     componentDidMount() {
+        this.hideFirstComponent();
         ProgramService.getProgramList()
             .then(response => {
                 if (response.status == 200) {
@@ -129,7 +139,7 @@ class AddprogramPlanningUnit extends Component {
                 else {
 
                     this.setState({
-                        message: response.data.messageCode, loading: false, color: 'red'
+                        message: response.data.messageCode, loading: false, color: '#BA0C2F'
                     },
                         () => {
                             this.hideSecondComponent();
@@ -142,7 +152,7 @@ class AddprogramPlanningUnit extends Component {
                     if (error.message === "Network Error") {
                         this.setState({
                             message: 'static.unkownError',
-                            loading: false, color: 'red'
+                            loading: false, color: '#BA0C2F'
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
@@ -158,19 +168,19 @@ class AddprogramPlanningUnit extends Component {
                             case 406:
                                 this.setState({
                                     message: error.response.data.messageCode,
-                                    loading: false, color: 'red'
+                                    loading: false, color: '#BA0C2F'
                                 });
                                 break;
                             case 412:
                                 this.setState({
                                     message: error.response.data.messageCode,
-                                    loading: false, color: 'red'
+                                    loading: false, color: '#BA0C2F'
                                 });
                                 break;
                             default:
                                 this.setState({
                                     message: 'static.unkownError',
-                                    loading: false, color: 'red'
+                                    loading: false, color: '#BA0C2F'
                                 });
                                 break;
                         }
@@ -178,13 +188,39 @@ class AddprogramPlanningUnit extends Component {
                 }
             );
         // this.buildJexcel();
+        if (this.props.match.params.programId != null) {
+            let programId = this.props.match.params.programId;
+            this.setState({
+                programId: programId,
+                loading: true
+            },
+                () => {
+                    if (programId != 0 && programId != '' && programId != null) {
+                        console.log("CONSOLE-------->1", programId);
+                        this.buildJexcel();
+                    }
+                })
+        }
+
+    }
+
+    setProgramId() {
+        var programId = document.getElementById("programId").value;
+        this.setState({
+            programId: programId,
+        },
+            () => {
+                this.buildJexcel();
+            })
     }
 
     buildJexcel() {
         var list = [];
         var productCategoryListNew = [];
         var programObj;
-        var programId = document.getElementById("programId").value;
+        // var programId = document.getElementById("programId").value;
+        let programId = this.state.programId;
+        console.log("CONSOLE-------->2", programId);
         this.setState({
             programId: programId,
             loading: true
@@ -239,13 +275,14 @@ class AddprogramPlanningUnit extends Component {
                                 // PlanningUnitService.getAllPlanningUnitList()
                                 PlanningUnitService.getActivePlanningUnitList()
                                     .then(response => {
+                                        console.log("PlanningUnitResponse------->", response.data);
                                         if (response.status == 200) {
                                             this.setState({
                                                 planningUnitList: response.data
                                             });
                                             for (var k = 0; k < (response.data).length; k++) {
                                                 var planningUnitJson = {
-                                                    name: response.data[k].label.label_en,
+                                                    name: response.data[k].label.label_en + ' | ' + response.data[k].planningUnitId,
                                                     id: response.data[k].planningUnitId,
                                                     active: response.data[k].active
                                                 }
@@ -258,7 +295,11 @@ class AddprogramPlanningUnit extends Component {
                                                 .then(response => {
                                                     if (response.status == 200) {
                                                         // alert("hi");
-                                                        let myReasponse = response.data;
+                                                        let myReasponse = response.data.sort((a, b) => {
+                                                            var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                                                            var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                                                            return itemLabelA > itemLabelB ? 1 : -1;
+                                                        });
                                                         var productDataArr = []
                                                         // if (myReasponse.length > 0) {
                                                         this.setState({ rows: myReasponse });
@@ -382,7 +423,8 @@ class AddprogramPlanningUnit extends Component {
                                                                 },
                                                                 {
                                                                     title: 'Id',
-                                                                    type: 'hidden'
+                                                                    type: 'hidden',
+                                                                    readOnly: true
                                                                 },
                                                                 {
                                                                     title: 'Active',
@@ -524,7 +566,7 @@ class AddprogramPlanningUnit extends Component {
                                                                             title: i18n.t('static.common.insertNewRowBefore'),
                                                                             onclick: function () {
                                                                                 var data = [];
-                                                                                data[0] = 0;
+                                                                                data[0] = -1;
                                                                                 data[1] = "";
                                                                                 data[2] = "";
                                                                                 data[3] = "";
@@ -547,7 +589,7 @@ class AddprogramPlanningUnit extends Component {
                                                                             title: i18n.t('static.common.insertNewRowAfter'),
                                                                             onclick: function () {
                                                                                 var data = [];
-                                                                                data[0] = 0;
+                                                                                data[0] = -1;
                                                                                 data[1] = "";
                                                                                 data[2] = "";
                                                                                 data[3] = "";
@@ -600,6 +642,31 @@ class AddprogramPlanningUnit extends Component {
                                                                         //     }
                                                                         // }
                                                                     }
+
+                                                                    //wr
+                                                                    if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_COUNTRY_SPECIFIC_PRICES')) {
+                                                                        let cordsValue = `${this.el.getValueFromCoords(9, y)}`;
+                                                                        // console.log("CHECK--------->", cordsValue);
+                                                                        // if (cordsValue.length != 0) {
+                                                                        //     console.log("CHECK--------->not empty", cordsValue);
+                                                                        // } else {
+                                                                        //     console.log("CHECK--------->empty", cordsValue);
+                                                                        // }
+                                                                        if (obj.options.allowInsertRow == true) {
+                                                                            if (cordsValue.length != 0) {
+                                                                                items.push({
+                                                                                    title: i18n.t('static.countrySpecificPrices.addCountrySpecificPrices'),
+                                                                                    onclick: function () {
+                                                                                        // console.log("onclick------>", this.el.getValueFromCoords(0, y));                      
+                                                                                        this.props.history.push({
+                                                                                            pathname: `/programProduct/addCountrySpecificPrice/${this.el.getValueFromCoords(9, y)}/${programId}`,
+                                                                                        });
+
+                                                                                    }.bind(this)
+                                                                                });
+                                                                            }
+                                                                        }
+                                                                    }
                                                                 }
 
                                                                 // Line
@@ -625,7 +692,7 @@ class AddprogramPlanningUnit extends Component {
                                                         // }
                                                     } else {
                                                         this.setState({
-                                                            message: response.data.messageCode, loading: false, color: 'red'
+                                                            message: response.data.messageCode, loading: false, color: '#BA0C2F'
                                                         })
                                                     }
                                                 }).catch(
@@ -633,7 +700,7 @@ class AddprogramPlanningUnit extends Component {
                                                         if (error.message === "Network Error") {
                                                             this.setState({
                                                                 message: 'static.unkownError',
-                                                                loading: false, color: 'red'
+                                                                loading: false, color: '#BA0C2F'
                                                             });
                                                         } else {
                                                             switch (error.response ? error.response.status : "") {
@@ -649,19 +716,19 @@ class AddprogramPlanningUnit extends Component {
                                                                 case 406:
                                                                     this.setState({
                                                                         message: error.response.data.messageCode,
-                                                                        loading: false, color: 'red'
+                                                                        loading: false, color: '#BA0C2F'
                                                                     });
                                                                     break;
                                                                 case 412:
                                                                     this.setState({
                                                                         message: error.response.data.messageCode,
-                                                                        loading: false, color: 'red'
+                                                                        loading: false, color: '#BA0C2F'
                                                                     });
                                                                     break;
                                                                 default:
                                                                     this.setState({
                                                                         message: 'static.unkownError',
-                                                                        loading: false, color: 'red'
+                                                                        loading: false, color: '#BA0C2F'
                                                                     });
                                                                     break;
                                                             }
@@ -677,7 +744,7 @@ class AddprogramPlanningUnit extends Component {
                                             if (error.message === "Network Error") {
                                                 this.setState({
                                                     message: 'static.unkownError',
-                                                    loading: false, color: 'red'
+                                                    loading: false, color: '#BA0C2F'
                                                 });
                                             } else {
                                                 switch (error.response ? error.response.status : "") {
@@ -693,19 +760,19 @@ class AddprogramPlanningUnit extends Component {
                                                     case 406:
                                                         this.setState({
                                                             message: error.response.data.messageCode,
-                                                            loading: false, color: 'red'
+                                                            loading: false, color: '#BA0C2F'
                                                         });
                                                         break;
                                                     case 412:
                                                         this.setState({
                                                             message: error.response.data.messageCode,
-                                                            loading: false, color: 'red'
+                                                            loading: false, color: '#BA0C2F'
                                                         });
                                                         break;
                                                     default:
                                                         this.setState({
                                                             message: 'static.unkownError',
-                                                            loading: false, color: 'red'
+                                                            loading: false, color: '#BA0C2F'
                                                         });
                                                         break;
                                                 }
@@ -716,7 +783,7 @@ class AddprogramPlanningUnit extends Component {
                                 productCategoryListNew = []
                                 this.setState({
                                     message: response.data.messageCode,
-                                    loading: false, color: 'red'
+                                    loading: false, color: '#BA0C2F'
                                 })
                             }
                         }).catch(
@@ -724,7 +791,7 @@ class AddprogramPlanningUnit extends Component {
                                 if (error.message === "Network Error") {
                                     this.setState({
                                         message: 'static.unkownError',
-                                        loading: false, color: 'red'
+                                        loading: false, color: '#BA0C2F'
                                     });
                                 } else {
                                     switch (error.response ? error.response.status : "") {
@@ -740,19 +807,19 @@ class AddprogramPlanningUnit extends Component {
                                         case 406:
                                             this.setState({
                                                 message: error.response.data.messageCode,
-                                                loading: false, color: 'red'
+                                                loading: false, color: '#BA0C2F'
                                             });
                                             break;
                                         case 412:
                                             this.setState({
                                                 message: error.response.data.messageCode,
-                                                loading: false, color: 'red'
+                                                loading: false, color: '#BA0C2F'
                                             });
                                             break;
                                         default:
                                             this.setState({
                                                 message: 'static.unkownError',
-                                                loading: false, color: 'red'
+                                                loading: false, color: '#BA0C2F'
                                             });
                                             break;
                                     }
@@ -763,7 +830,7 @@ class AddprogramPlanningUnit extends Component {
                     productCategoryListNew = []
                     this.setState({
                         message: response.data.messageCode,
-                        loading: false, color: 'red'
+                        loading: false, color: '#BA0C2F'
                     })
                 }
 
@@ -772,7 +839,7 @@ class AddprogramPlanningUnit extends Component {
                     if (error.message === "Network Error") {
                         this.setState({
                             message: 'static.unkownError',
-                            loading: false, color: 'red'
+                            loading: false, color: '#BA0C2F'
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
@@ -788,19 +855,19 @@ class AddprogramPlanningUnit extends Component {
                             case 406:
                                 this.setState({
                                     message: error.response.data.messageCode,
-                                    loading: false, color: 'red'
+                                    loading: false, color: '#BA0C2F'
                                 });
                                 break;
                             case 412:
                                 this.setState({
                                     message: error.response.data.messageCode,
-                                    loading: false, color: 'red'
+                                    loading: false, color: '#BA0C2F'
                                 });
                                 break;
                             default:
                                 this.setState({
                                     message: 'static.unkownError',
-                                    loading: false, color: 'red'
+                                    loading: false, color: '#BA0C2F'
                                 });
                                 break;
                         }
@@ -1437,7 +1504,7 @@ class AddprogramPlanningUnit extends Component {
                         // this.props.history.push(`/programProduct/addProgramProduct/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                     } else {
                         this.setState({
-                            message: response.data.messageCode, loading: false, color: 'red'
+                            message: response.data.messageCode, loading: false, color: '#BA0C2F'
                         },
                             () => {
                                 this.hideSecondComponent();
@@ -1449,7 +1516,7 @@ class AddprogramPlanningUnit extends Component {
                         if (error.message === "Network Error") {
                             this.setState({
                                 message: 'static.unkownError',
-                                loading: false, color: 'red'
+                                loading: false, color: '#BA0C2F'
                             });
                         } else {
                             switch (error.response ? error.response.status : "") {
@@ -1465,7 +1532,7 @@ class AddprogramPlanningUnit extends Component {
                                 case 406:
                                     this.setState({
                                         message: error.response.data.messageCode,
-                                        loading: false, color: 'red'
+                                        loading: false, color: '#BA0C2F'
                                     },
                                         () => {
                                             this.hideSecondComponent();
@@ -1474,7 +1541,7 @@ class AddprogramPlanningUnit extends Component {
                                 case 412:
                                     this.setState({
                                         message: error.response.data.messageCode,
-                                        loading: false, color: 'red'
+                                        loading: false, color: '#BA0C2F'
                                     },
                                         () => {
                                             this.hideSecondComponent();
@@ -1483,7 +1550,7 @@ class AddprogramPlanningUnit extends Component {
                                 default:
                                     this.setState({
                                         message: 'static.unkownError',
-                                        loading: false, color: 'red'
+                                        loading: false, color: '#BA0C2F'
                                     },
                                         () => {
                                             this.hideSecondComponent();
@@ -1521,7 +1588,8 @@ class AddprogramPlanningUnit extends Component {
             && programs.map((item, i) => {
                 return (
                     <option key={i} value={item.programId}>
-                        {getLabelText(item.label, this.state.lang)}
+                        {/* {getLabelText(item.label, this.state.lang)} */}
+                        {item.programCode}
                     </option>
                 )
             }, this);
@@ -1533,7 +1601,7 @@ class AddprogramPlanningUnit extends Component {
                 <h5 style={{ color: this.state.color }} id="div2">{this.state.message}</h5>
 
                 <div style={{ flexBasis: 'auto' }}>
-                    <Card style={{ display: this.state.loading ? "none" : "block" }}>
+                    <Card>
                         {/* <CardHeader>
                                 <strong>{i18n.t('static.program.mapPlanningUnit')}</strong>
                             </CardHeader> */}
@@ -1558,7 +1626,8 @@ class AddprogramPlanningUnit extends Component {
                                                 name="programId"
                                                 id="programId"
                                                 bsSize="sm"
-                                                onChange={this.buildJexcel}
+                                                onChange={this.setProgramId}
+                                                value={this.state.programId}
                                             >
                                                 <option value="0">{i18n.t('static.common.select')}</option>
                                                 {programList}
@@ -1572,8 +1641,19 @@ class AddprogramPlanningUnit extends Component {
                             </div> */}
                             <div >
                                 <h4 className="red">{this.props.message}</h4>
-                                <div className="table-responsive" >
+                                <div className="table-responsive consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
                                     <div id="mapPlanningUnit" className="RowheightForaddprogaddRow">
+                                    </div>
+                                </div>
+                                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                        <div class="align-items-center">
+                                            <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
+
+                                            <div class="spinner-border blue ml-4" role="status">
+
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -1588,20 +1668,10 @@ class AddprogramPlanningUnit extends Component {
                                 &nbsp;
                                 {this.state.isValidData && this.state.programId != 0 && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.addRowInJexcel}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>}
                                 &nbsp;
-                                </FormGroup>
+                            </FormGroup>
                         </CardFooter>
                     </Card>
-                    <div style={{ display: this.state.loading ? "block" : "none" }}>
-                        <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                            <div class="align-items-center">
-                                <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
 
-                                <div class="spinner-border blue ml-4" role="status">
-
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
 
             </div>

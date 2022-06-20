@@ -402,7 +402,7 @@ export default class PlanningUnitCapacityList extends Component {
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             contextMenu: function (obj, x, y, e) {
-                return [];
+                return false;
             }.bind(this),
             license: JEXCEL_PRO_KEY,
         };
@@ -551,7 +551,7 @@ export default class PlanningUnitCapacityList extends Component {
             && planningUnits.map((item, i) => {
                 return (
                     <option key={i} value={item.planningUnitId}>
-                        {getLabelText(item.label, this.state.lang)}
+                        {getLabelText(item.label, this.state.lang) + ' | ' + item.planningUnitId}
                     </option>
                 )
             }, this);
@@ -593,7 +593,7 @@ export default class PlanningUnitCapacityList extends Component {
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
-                <Card style={{ display: this.state.loading ? "none" : "block" }}>
+                <Card>
                     <div className="Card-header-addicon">
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.capacitylist')}</strong> */}
                         <div className="card-header-actions">
@@ -624,22 +624,26 @@ export default class PlanningUnitCapacityList extends Component {
                                 </div>
                             </FormGroup>
                         </Col>
-                        {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className="jexcelremoveReadonlybackground">
+                        {/* <div id="loader" className="center"></div> */}
+                        <div className='consumptionDataEntryTable'>
+                        <div id="tableDiv" className="jexcelremoveReadonlybackground" style={{ display: this.state.loading ? "none" : "block" }}>
+                        </div>
+                        </div>
+                        <div style={{ display: this.state.loading ? "block" : "none" }}>
+                            <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                <div class="align-items-center">
+                                    <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                    <div class="spinner-border blue ml-4" role="status">
+
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                     </CardBody>
                 </Card>
-                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div class="align-items-center">
-                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-                            <div class="spinner-border blue ml-4" role="status">
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         );
     }

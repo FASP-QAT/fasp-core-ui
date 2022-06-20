@@ -27,7 +27,7 @@ import MonthBox from '../../CommonComponent/MonthBox.js'
 import ProgramService from '../../api/ProgramService';
 import ReportService from '../../api/ReportService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, ON_HOLD_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, DRAFT_SHIPMENT_STATUS, INDEXED_DB_VERSION, INDEXED_DB_NAME, polling } from '../../Constants.js'
+import { SECRET_KEY, ON_HOLD_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, DRAFT_SHIPMENT_STATUS, INDEXED_DB_VERSION, INDEXED_DB_NAME, polling, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
@@ -90,7 +90,7 @@ const chartData = {
     datasets: [{
         label: 'Planned',
         data: [0, 0, 0, 0],
-        backgroundColor: 'red',
+        backgroundColor: '#BA0C2F',
         borderWidth: 0
     },
     {
@@ -144,7 +144,9 @@ class AggregateShipmentByProduct extends Component {
         this.toggle = this.toggle.bind(this);
         this.onRadioBtnClick = this.onRadioBtnClick.bind(this);
         var dt = new Date();
-        dt.setMonth(dt.getMonth() - 10);
+        dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
+        var dt1 = new Date();
+        dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
         this.state = {
             sortType: 'asc',
             dropdownOpen: false,
@@ -164,9 +166,10 @@ class AggregateShipmentByProduct extends Component {
             show: false,
             message: '',
             outPutList: [],
-            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
-            maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
+            // rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
+            minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 1 },
+            maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() + 1 },
 
 
 
@@ -203,13 +206,13 @@ class AggregateShipmentByProduct extends Component {
     exportCSV(columns) {
 
         var csvRow = [];
-        csvRow.push('"'+(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20')+'"')
+        csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
         csvRow.push('')
-        csvRow.push('"'+(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20')+'"')
+        csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         // csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("planningUnitId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
         csvRow.push('')
         this.state.planningUnitLabels.map(ele =>
-            csvRow.push('"'+(i18n.t('static.planningunit.planningunit') + ' : ' + ele.toString()).replaceAll(' ', '%20')+'"'))
+            csvRow.push('"' + (i18n.t('static.planningunit.planningunit') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
         csvRow.push('')
         csvRow.push('')
 
@@ -275,7 +278,7 @@ class AggregateShipmentByProduct extends Component {
                 doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
                     align: 'center'
                 })
-                doc.text('Copyright © 2020 '+i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+                doc.text('Copyright © 2020 ' + i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
                     align: 'center'
                 })
 
@@ -777,7 +780,7 @@ class AggregateShipmentByProduct extends Component {
                         var proList = []
                         console.log(myResult)
                         for (var i = 0; i < myResult.length; i++) {
-                            if (myResult[i].program.id == programId && myResult[i].active==true) {
+                            if (myResult[i].program.id == programId && myResult[i].active == true) {
 
                                 proList[i] = myResult[i]
                             }
@@ -1184,7 +1187,8 @@ class AggregateShipmentByProduct extends Component {
             && versions.map((item, i) => {
                 return (
                     <option key={i} value={item.versionId}>
-                        {item.versionId}
+                        {/* {item.versionId} */}
+                        {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)}
                     </option>
                 )
             }, this);
@@ -1528,7 +1532,7 @@ class AggregateShipmentByProduct extends Component {
                                             </FormGroup>
 
                                             <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.versionFinal*')}</Label>
                                                 <div className="controls ">
                                                     <InputGroup>
                                                         <Input
@@ -1585,14 +1589,14 @@ class AggregateShipmentByProduct extends Component {
 
                                 <Col md="12 pl-0">
                                     <div className="row">
-                                            {/* {
+                                        {/* {
                                                 this.state.consumptions.length > 0
                                                 && */}
-                                            {/* <div className="col-md-12 p-0">
+                                        {/* <div className="col-md-12 p-0">
                                                 <div className="col-md-12">
                                                     <div className="chart-wrapper chart-graph-report pl-5 ml-3" style={{ marginLeft: '50px' }}> */}
-                                            {/* <Bar id="cool-canvas" data={bar} options={options} /> */}
-                                            {/* <Bar id="cool-canvas" data={chartData} options={options} />
+                                        {/* <Bar id="cool-canvas" data={bar} options={options} /> */}
+                                        {/* <Bar id="cool-canvas" data={chartData} options={options} />
                                                         <div>
 
                                                         </div>
@@ -1605,11 +1609,11 @@ class AggregateShipmentByProduct extends Component {
 
                                                 </div>
                                             </div> */}
-                                            {/* } */}
+                                        {/* } */}
 
 
 
-                                            {/* {
+                                        {/* {
                                                 this.state.offlineConsumptionList.length > 0
                                                 &&
                                                 <div className="col-md-12 p-0">
@@ -1617,14 +1621,14 @@ class AggregateShipmentByProduct extends Component {
                                                         <div className="chart-wrapper chart-graph-report">
                                                             {/* <Bar id="cool-canvas" data={bar} options={options} /> */}
 
-                                            {/* </div> */}
-                                            {/* </div> */}
-                                            {/* <div className="col-md-12"> */}
-                                            {/* <button className="mr-1 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}> */}
-                                            {/* {this.state.show ? 'Hide Data' : 'Show Data'} */}
-                                            {/* </button> */}
-                                            {/* </div> */}
-                                            {/* </div>} */}
+                                        {/* </div> */}
+                                        {/* </div> */}
+                                        {/* <div className="col-md-12"> */}
+                                        {/* <button className="mr-1 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}> */}
+                                        {/* {this.state.show ? 'Hide Data' : 'Show Data'} */}
+                                        {/* </button> */}
+                                        {/* </div> */}
+                                        {/* </div>} */}
 
                                     </div>
                                     {/* <div className="row">

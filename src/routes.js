@@ -16,10 +16,15 @@ const AddOrganisation = React.lazy(() => import('./views/Organisation/AddOrganis
 const OrganisationList = React.lazy(() => import('./views/Organisation/OrganisationList'));
 const EditOrganisation = React.lazy(() => import('./views/Organisation/EditOrganisation'));
 
+const AddOrganisationType = React.lazy(() => import('./views/OrganisationType/AddOrganisationType'));
+const OrganisationTypeList = React.lazy(() => import('./views/OrganisationType/OrganisationTypeList'));
+const EditOrganisationType = React.lazy(() => import('./views/OrganisationType/EditOrganisationType'));
+
 const AddSubFundingSource = React.lazy(() => import('./views/SubFundingSource/AddSubFundingSourceComponent'));
 const ListSubFundingSource = React.lazy(() => import('./views/SubFundingSource/ListSubFundingSourceComponent'));
 const EditSubFundingSource = React.lazy(() => import('./views/SubFundingSource/EditSubFundingSourceComponent'));
 const ApplicationDashboard = React.lazy(() => import('./views/ApplicationDashboard'));
+const ShipmentLinkingNotifications = React.lazy(() => import('./views/ManualTagging/ShipmentLinkingNotifications'));
 const RealmDashboard = React.lazy(() => import('./views/RealmDashboard'));
 const ProgramDashboard = React.lazy(() => import('./views/ProgramDashboard'));
 const AddFundingSource = React.lazy(() => import('./views/FundingSource/AddFundingSourceComponent'));
@@ -196,6 +201,7 @@ const ProgramOnboarding = React.lazy(() => import('./views/Program/ProgramOnboar
 const DeleteLocalPrograms = React.lazy(() => import('./views/Program/DeleteLocalProgramComponent'));
 const ShipmentList = React.lazy(() => import('./views/Shipment/ShipmentDetails'));
 const ForecastMetricsOverTime = React.lazy(() => import('./views/Report/ForecastMetricsOverTime'));
+const ConsumptionForecastErrorSupplyPlan = React.lazy(() => import('./views/Report/ConsumptionForecastErrorSupplyPlan'));
 const pipeline = React.lazy(() => import('./views/Pipeline/PipelineProgramImport'));
 const pipelineProgramSetup = React.lazy(() => import('./views/Pipeline/PipelineProgramSetup'));
 const StockStatusOverTime = React.lazy(() => import('./views/Report/StockStatusOverTime'));
@@ -229,6 +235,21 @@ const StockAdjustment = React.lazy(() => import('./views/Report/StockAdjustment'
 const StockStatusReportAcrossPlanningUnits = React.lazy(() => import('./views/Report/StockStatusAcrossPlanningUnits'));
 const ExpiredInventory = React.lazy(() => import('./views/Report/ExpiredInventory'));
 const Budgets = React.lazy(() => import('./views/Report/Budgets'));
+
+const UsagePeriodList = React.lazy(() => import('./views/UsagePeriod/UsagePeriodList'));
+const ModelingTypeList = React.lazy(() => import('./views/ModelingType/ModelingTypeList'));
+const ForecastMethodList = React.lazy(() => import('./views/ForecastMethod/ForecastMethodList'));
+const EquivalancyUnitList = React.lazy(() => import('./views/EquivalancyUnit/EquivalancyUnitList'));
+const UsageTemplateList = React.lazy(() => import('./views/UsageTemplate/UsageTemplateList'));
+
+const AddDataSet = React.lazy(() => import('./views/DataSet/AddDataSet'));
+const DataSetList = React.lazy(() => import('./views/DataSet/DataSetList'));
+const EditDataSet = React.lazy(() => import('./views/DataSet/EditDataSet'));
+const ListTree = React.lazy(() => import('./views/DataSet/ListTreeComponent'));
+
+const ImportFromQATSupplyPlan = React.lazy(() => import('./views/Consumption/ImportFromQATSupplyPlan'));
+const ImportIntoQATSupplyPlan = React.lazy(() => import('./views/Consumption/ImportIntoQATSupplyPlan'));
+const PlanningUnitSetting = React.lazy(() => import('./views/PlanningUnitSetting/PlanningUnitSetting'));
 
 // const EditProblem = React.lazy(() => import('./views/Problem/EditProblem'));
 
@@ -312,6 +333,12 @@ const routes = [
   { path: '/organisation/listOrganisation', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.organisation.organisation') }), component: OrganisationList },
   { path: '/organisation/editOrganisation/:organisationId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.organisation.organisationheader') }), component: EditOrganisation },
 
+  { path: '/organisationType/addOrganisationType', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.organisationType.organisationType') }), component: AddOrganisationType },
+  // { path: '/organisationType/listOrganisationType/:message', component: OrganisationTypeList },
+  { path: '/organisationType/listOrganisationType/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.organisationType.organisationType') }), component: OrganisationTypeList },
+  { path: '/organisationType/listOrganisationType', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.organisationType.organisationType') }), component: OrganisationTypeList },
+  { path: '/organisationType/editOrganisationType/:organisationTypeId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.organisationType.organisationType') }), component: EditOrganisationType },
+
   { path: '/fundingSource/addFundingSource', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.fundingsourceheader') }), component: AddFundingSource },
   { path: '/fundingSource/listFundingSource', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.fundingsource') }), component: ListFundingSource },
   { path: '/fundingSource/editFundingSource/:fundingSourceId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.fundingsourceheader') }), component: EditFundingSource },
@@ -328,6 +355,7 @@ const routes = [
   // { path: '/ApplicationDashboard/:message', component: ApplicationDashboard },
   { path: '/ApplicationDashboard/:color/:message', exact: true, name: i18n.t('static.dashboard.applicationdashboard'), component: ApplicationDashboard },
 
+  { path: '/shipmentLinkingNotification', exact: true, name: i18n.t('static.mt.shipmentLinkingNotification'), component: ShipmentLinkingNotifications },
   { path: '/RealmDashboard', name: i18n.t('static.dashboard.realmdashboard'), component: RealmDashboard },
   { path: '/ProgramDashboard', name: i18n.t('static.dashboard.programdashboard'), component: ProgramDashboard },
   { path: '/dashboard', exact: true, name: i18n.t('static.common.dashboard'), component: Dashboard },
@@ -478,6 +506,7 @@ const routes = [
   { path: '/report/stockStatus', name: i18n.t('static.dashboard.stockstatus'), component: StockStatusReport },
   { path: '/report/globalConsumption', name: i18n.t('static.dashboard.globalconsumption'), component: GlobalConsumptionReport },
   { path: '/report/forecastOverTheTime', name: i18n.t('static.report.forecasterrorovertime'), component: ForecastMetricsOverTime },
+  { path: '/report/consumptionForecastErrorSupplyPlan', name: i18n.t('static.report.forecasterrorovertime'), component: ConsumptionForecastErrorSupplyPlan },
   { path: '/report/stockStatusOverTime', name: i18n.t('static.dashboard.stockstatusovertime'), component: StockStatusOverTime },
   { path: '/report/forecastMetrics', name: i18n.t('static.dashboard.forecastmetrics'), component: ForecastMetrics },
 
@@ -574,5 +603,36 @@ const routes = [
   { path: '/report/stockAdjustment', name: i18n.t('static.report.stockAdjustment'), component: StockAdjustment },
   // { path: '/report/expiredInventory', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.report.expiredInventory'), component: ExpiredInventory },
   { path: '/report/expiredInventory', name: i18n.t('static.report.expiredInventory'), component: ExpiredInventory },
+
+  { path: '/usagePeriod/listUsagePeriod/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.usagePeriod.usagePeriod') }), component: UsagePeriodList },
+  { path: '/usagePeriod/listUsagePeriod', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.usagePeriod.usagePeriod') }), component: UsagePeriodList },
+
+  { path: '/forecastMethod/listForecastMethod/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.forecastMethod.forecastMethod') }), component: ForecastMethodList },
+  { path: '/forecastMethod/listForecastMethod', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.forecastMethod.forecastMethod') }), component: ForecastMethodList },
+
+  { path: '/modelingTypeType/listModelingType/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.modelingType.modelingType') }), component: ModelingTypeList },
+  { path: '/modelingTypeType/listModelingType', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.modelingType.modelingType') }), component: ModelingTypeList },
+
+  { path: '/equivalancyUnit/listEquivalancyUnit/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.equivalancyUnit.equivalancyUnits') }), component: EquivalancyUnitList },
+  { path: '/equivalancyUnit/listEquivalancyUnit', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.equivalancyUnit.equivalancyUnits') }), component: EquivalancyUnitList },
+
+  { path: '/usageTemplate/listUsageTemplate/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.usageTemplate.usageTemplate') }), component: UsageTemplateList },
+  { path: '/usageTemplate/listUsageTemplate', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.usageTemplate.usageTemplate') }), component: UsageTemplateList },
+
+  { path: '/dataset/addDataSet', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dataset.manageProgram') }), component: AddDataSet },
+  { path: '/dataset/listDataSet', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dataset.manageProgram') }), component: DataSetList },
+  { path: '/dataset/listDataSet/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dataset.manageProgram') }), component: DataSetList },
+  { path: '/dataset/editDataSet/:dataSetId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dataset.manageProgram') }), component: EditDataSet },
+  { path: '/dataset/listTree/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.common.listtree') }), component: ListTree },
+  { path: '/dataset/listTree', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.common.listtree') }), component: ListTree },
+
+  { path: '/importFromQATSupplyPlan/listImportFromQATSupplyPlan/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.importFromQATSupplyPlan.importFromQATSupplyPlan') }), component: ImportFromQATSupplyPlan },
+  { path: '/importFromQATSupplyPlan/listImportFromQATSupplyPlan', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.importFromQATSupplyPlan.importFromQATSupplyPlan') }), component: ImportFromQATSupplyPlan },
+
+  { path: '/importIntoQATSupplyPlan/listImportIntoQATSupplyPlan/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.importIntoQATSupplyPlan.importIntoQATSupplyPlan') }), component: ImportIntoQATSupplyPlan },
+  { path: '/importIntoQATSupplyPlan/listImportIntoQATSupplyPlan', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.importIntoQATSupplyPlan.importIntoQATSupplyPlan') }), component: ImportIntoQATSupplyPlan },
+
+  { path: '/planningUnitSetting/listPlanningUnitSetting/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.planningUnitSetting.planningUnitSetting') }), component: PlanningUnitSetting },
+  { path: '/planningUnitSetting/listPlanningUnitSetting', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.planningUnitSetting.planningUnitSetting') }), component: PlanningUnitSetting },
 ];
 export default routes;

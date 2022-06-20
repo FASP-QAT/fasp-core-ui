@@ -215,7 +215,7 @@ export default class PipelineProgramFundingSource extends Component {
                                         pagination: localStorage.getItem("sesRecordCount"),
                                         filters: true,
                                         contextMenu: function (obj, x, y, e) {
-                                            return [];
+                                            return false;
                                         }.bind(this),
                                         search: true,
                                         columnSorting: true,
@@ -351,7 +351,7 @@ export default class PipelineProgramFundingSource extends Component {
             <>
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h4 className="red">{this.props.message}</h4>
-                <div className="table-responsive" style={{ display: this.state.loading ? "none" : "block" }} >
+                <div className="table-responsive consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }} >
 
                     <div id="mapFundingSource">
                     </div>

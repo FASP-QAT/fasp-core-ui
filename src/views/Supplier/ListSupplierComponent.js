@@ -350,7 +350,7 @@ class SupplierListComponent extends Component {
     hideFirstComponent() {
         this.timeout = setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
     componentWillUnmount() {
         clearTimeout(this.timeout);
@@ -360,10 +360,10 @@ class SupplierListComponent extends Component {
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
     editSupplier(supplier) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_SUPPLIER')) {
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_SUPPLIER')) {
             this.props.history.push({
                 pathname: `/supplier/editSupplier/${supplier.supplierId}`,
                 // state: { supplier }
@@ -377,7 +377,7 @@ class SupplierListComponent extends Component {
         if ((x == 0 && value != 0) || (y == 0)) {
             // console.log("HEADER SELECTION--------------------------");
         } else {
-            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_SUPPLIER')) {
+            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_SUPPLIER')) {
                 this.props.history.push({
                     pathname: `/supplier/editSupplier/${this.el.getValueFromCoords(0, x)}`,
                     // state: { currency: currency }
@@ -497,7 +497,7 @@ class SupplierListComponent extends Component {
             filters: true,
             license: JEXCEL_PRO_KEY,
             contextMenu: function (obj, x, y, e) {
-                return [];
+                return false;
             }.bind(this),
         };
         var supplierEl = jexcel(document.getElementById("tableDiv"), options);
@@ -645,18 +645,18 @@ class SupplierListComponent extends Component {
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
-                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
-                <Card style={{ display: this.state.loading ? "none" : "block" }}>
+                <h5 className="red" id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+                <Card>
                     <div className="Card-header-addicon">
 
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '} */}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_SUPPLIER') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addSupplier}><i className="fa fa-plus-square"></i></a>}
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_SUPPLIER') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addSupplier}><i className="fa fa-plus-square"></i></a>}
                             </div>
                         </div>
                     </div>
-                    <CardBody className="pb-lg-0">
+                    <CardBody className="pb-lg-0 pt-lg-0">
                         {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN') &&
                             <Col md="3 pl-0">
                                 <FormGroup className="Selectdiv mt-md-2 mb-md-0 ">
@@ -681,21 +681,24 @@ class SupplierListComponent extends Component {
                                 </FormGroup>
                             </Col>
                         }
-                        <div id="tableDiv" className="jexcelremoveReadonlybackground">
+                        <div className='consumptionDataEntryTable'>
+                        <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_SUPPLIER') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
+                        </div>
+                        </div>
+                        <div style={{ display: this.state.loading ? "block" : "none" }}>
+                            <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                <div class="align-items-center">
+                                    <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                    <div class="spinner-border blue ml-4" role="status">
+
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </CardBody>
                 </Card>
-                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div class="align-items-center">
-                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-                            <div class="spinner-border blue ml-4" role="status">
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         );
     }

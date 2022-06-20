@@ -82,7 +82,7 @@ export default class QunatimedImportStepTwo extends Component {
         document.getElementById('div1').style.display = 'block';
         this.state.timeout = setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
 
     touchAllTwo(setTouched, errors) {
@@ -395,7 +395,7 @@ export default class QunatimedImportStepTwo extends Component {
             this.setState({
                 supplyPlanError: i18n.t('static.program.errortext'),
                 loading: false,
-                color: "red"
+                color: "#BA0C2F"
             })
             this.hideFirstComponent()
         }.bind(this);
@@ -410,7 +410,7 @@ export default class QunatimedImportStepTwo extends Component {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext'),
                     loading: false,
-                    color: "red"
+                    color: "#BA0C2F"
                 })
                 this.hideFirstComponent()
             }.bind(this);
@@ -430,7 +430,7 @@ export default class QunatimedImportStepTwo extends Component {
                     this.setState({
                         supplyPlanError: i18n.t('static.program.errortext'),
                         loading: false,
-                        color: "red"
+                        color: "#BA0C2F"
                     })
                     this.hideFirstComponent()
                 }.bind(this);
@@ -546,7 +546,7 @@ export default class QunatimedImportStepTwo extends Component {
                                 { type: 'text', readOnly: true },
                                 { type: 'dropdown', source: programPlanningUnitsArr, autocomplete: true },
                                 { type: 'hidden' },
-                                { type: 'numeric', mask: '#,##.##', decimal: '.', readOnly: true },
+                                { type: 'numeric', mask: '#,##.00', decimal: '.', readOnly: true },
                             ],
                             text: {
                                 // showingPage: 'Showing {0} to {1} of {1}',
@@ -603,7 +603,7 @@ export default class QunatimedImportStepTwo extends Component {
                     {/* <Card> */}
                     <CardBody className="pl-0 pr-0 pt-lg-0">
                         {/* <Col xs="12" sm="12"> */}
-                        <div className="table-responsive">
+                        <div className="table-responsive consumptionDataEntryTable">
                             <div id="paputableDiv" >
                             </div>
                         </div>

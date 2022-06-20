@@ -345,7 +345,7 @@ import { getStyle } from '@coreui/coreui-pro/dist/js/coreui-utilities';
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import ReportService from '../../api/ReportService';
-import MultiSelect from 'react-multi-select-component';
+import {MultiSelect} from 'react-multi-select-component';
 import { JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants';
 
 
@@ -530,7 +530,7 @@ class RegionListComponent extends Component {
         document.getElementById('div2').style.display = 'block';
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
 
     handleChange(countrysId) {
@@ -629,7 +629,7 @@ class RegionListComponent extends Component {
             allowInsertColumn: false,
             allowManualInsertColumn: false,
             allowDeleteRow: false,
-            onselection: this.selected,
+            // onselection: this.selected,
             oneditionend: this.onedit,
             copyCompatibility: true,
             allowExport: false,
@@ -638,7 +638,7 @@ class RegionListComponent extends Component {
             filters: true,
             license: JEXCEL_PRO_KEY,
             contextMenu: function (obj, x, y, e) {
-                return [];
+                return false;
             }.bind(this),
 
         };
@@ -746,33 +746,33 @@ class RegionListComponent extends Component {
             // state: { region }
         });
     }
-    selected = function (instance, cell, x, y, value) {
+    // selected = function (instance, cell, x, y, value) {
 
-        if ((x == 0 && value != 0) || (y == 0)) {
-            // console.log("HEADER SELECTION--------------------------");
-        } else {
-            // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
-            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_LANGUAGE')) {
-                this.props.history.push({
-                    pathname: `/region/editRegion/${this.el.getValueFromCoords(0, x)}`,
-                });
-            }
-        }
-    }.bind(this);
-    selected = function (instance, cell, x, y, value) {
-        if ((x == 0 && value != 0) || (y == 0)) {
-            // console.log("HEADER SELECTION--------------------------");
-        } else {
-            if (this.state.selSource.length != 0) {
-                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_ROLE')) {
-                    this.props.history.push({
-                        pathname: `/region/editRegion/${this.el.getValueFromCoords(0, x)}`,
-                        // state: { role }
-                    });
-                }
-            }
-        }
-    }.bind(this);
+    //     if ((x == 0 && value != 0) || (y == 0)) {
+    //         // console.log("HEADER SELECTION--------------------------");
+    //     } else {
+    //         // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
+    //         if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_LANGUAGE')) {
+    //             this.props.history.push({
+    //                 pathname: `/region/editRegion/${this.el.getValueFromCoords(0, x)}`,
+    //             });
+    //         }
+    //     }
+    // }.bind(this);
+    // selected = function (instance, cell, x, y, value) {
+    //     if ((x == 0 && value != 0) || (y == 0)) {
+    //         // console.log("HEADER SELECTION--------------------------");
+    //     } else {
+    //         if (this.state.selSource.length != 0) {
+    //             if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_ROLE')) {
+    //                 this.props.history.push({
+    //                     pathname: `/region/editRegion/${this.el.getValueFromCoords(0, x)}`,
+    //                     // state: { role }
+    //                 });
+    //             }
+    //         }
+    //     }
+    // }.bind(this);
     addRegion(region) {
         this.props.history.push({
             pathname: "/region/addRegion"
@@ -956,7 +956,7 @@ class RegionListComponent extends Component {
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 className="red" id="div2">{i18n.t(this.state.message, { entityname })}</h5>
-                <Card style={{ display: this.state.loading ? "none" : "block" }}>
+                <Card>
                     <div className="Card-header-reporticon">
                         {this.state.selRegion.length > 0 &&
                             <div className="card-header-actions">
@@ -1011,24 +1011,24 @@ class RegionListComponent extends Component {
                                     </div>
                                 </Form>
 
-                                <div className="werehousecapacitySearchposition">
-                                    <div id="tableDiv" className="jexcelremoveReadonlybackground"> </div>
+                                <div className="werehousecapacitySearchposition" >
+                                    <div id="tableDiv" style={{ display: this.state.loading ? "none" : "block" }} className="jexcelremoveReadonlybackground"> </div>
+                                </div>
+                                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                        <div class="align-items-center">
+                                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                            <div class="spinner-border blue ml-4" role="status">
+
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </CardBody>
                 </Card>
-                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div class="align-items-center">
-                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
-                            <div class="spinner-border blue ml-4" role="status">
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         );
     }

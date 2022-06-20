@@ -507,7 +507,7 @@ import FundingSourceService from '../../api/FundingSourceService';
 import moment from 'moment';
 import ProgramService from "../../api/ProgramService";
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
+import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_SM } from '../../Constants.js';
 import jexcel from 'jexcel-pro';
 import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
@@ -527,6 +527,10 @@ class ListBudgetComponent extends Component {
       fundingSourceList: [],
       loading: true,
       programs: [],
+      programId: localStorage.getItem("sesBudPro") != "" ? localStorage.getItem("sesBudPro") : 0,
+      fundingSourceId: localStorage.getItem("sesBudFs") != "" ? localStorage.getItem("sesBudFs") : 0,
+      statusId: localStorage.getItem("sesBudStatus") != "" ? localStorage.getItem("sesBudStatus") : "true",
+
     }
 
     this.editBudget = this.editBudget.bind(this);
@@ -539,12 +543,42 @@ class ListBudgetComponent extends Component {
     this.hideFirstComponent = this.hideFirstComponent.bind(this);
     this.hideSecondComponent = this.hideSecondComponent.bind(this);
     this.buildJExcel = this.buildJExcel.bind(this);
+    this.programChanged = this.programChanged.bind(this);
+    this.fundingSourceChanged = this.fundingSourceChanged.bind(this);
+    this.statusChanged = this.statusChanged.bind(this);
+  }
+
+  programChanged(event) {
+    localStorage.setItem("sesBudPro", event.target.value);
+    this.setState({
+      programId: event.target.value
+    }, () => {
+      this.filterData();
+    })
+  }
+
+  fundingSourceChanged(event) {
+    localStorage.setItem("sesBudFs", event.target.value);
+    this.setState({
+      fundingSourceId: event.target.value
+    }, () => {
+      this.filterData();
+    })
+  }
+
+  statusChanged(event) {
+    localStorage.setItem("sesBudStatus", event.target.value);
+    this.setState({
+      statusId: event.target.value
+    }, () => {
+      this.filterData();
+    })
   }
 
   hideFirstComponent() {
     this.timeout = setTimeout(function () {
       document.getElementById('div1').style.display = 'none';
-    }, 8000);
+    }, 30000);
   }
   componentWillUnmount() {
     clearTimeout(this.timeout);
@@ -554,15 +588,15 @@ class ListBudgetComponent extends Component {
   hideSecondComponent() {
     setTimeout(function () {
       document.getElementById('div2').style.display = 'none';
-    }, 8000);
+    }, 30000);
   }
 
 
 
   filterData() {
-    let fundingSourceId = document.getElementById("fundingSourceId").value;
-    let programId = document.getElementById("programId").value;
-    var selStatus = document.getElementById("active").value;
+    let fundingSourceId = this.state.fundingSourceId;
+    let programId = this.state.programId;
+    var selStatus = this.state.statusId;
     let tempSelStatus = (selStatus == "true" ? true : false)
 
     if (fundingSourceId != 0 && programId != 0 && selStatus != "") {
@@ -665,7 +699,7 @@ class ListBudgetComponent extends Component {
     }
   }
   editBudget(budget) {
-    if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_BUDGET')) {
+    if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_BUDGET')) {
       var budgetId = budget.budgetId
       this.props.history.push({
         pathname: `/budget/editBudget/${budgetId}`,
@@ -690,7 +724,8 @@ class ListBudgetComponent extends Component {
     for (var j = 0; j < budgetList.length; j++) {
       data = [];
       data[0] = budgetList[j].budgetId
-      data[1] = getLabelText(budgetList[j].program.label, this.state.lang)
+      // data[1] = getLabelText(budgetList[j].program.label, this.state.lang)
+      data[1] = budgetList[j].program.code
       data[2] = getLabelText(budgetList[j].label, this.state.lang)
       data[3] = budgetList[j].budgetCode;
       data[4] = getLabelText(budgetList[j].fundingSource.label, this.state.lang)
@@ -701,13 +736,13 @@ class ListBudgetComponent extends Component {
       // data[6] = budgetList[j].currency.currencyCode + " " + ((budgetList[j].usedUsdAmt).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
       // data[7] = budgetList[j].currency.currencyCode + " " + ((budgetList[j].budgetAmt - budgetList[j].usedUsdAmt).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
       data[5] = budgetList[j].currency.currencyCode;
-      data[6] = budgetList[j].budgetAmt;
+      data[6] = parseFloat(budgetList[j].budgetAmt).toFixed(2);
       data[7] = (budgetList[j].usedUsdAmt).toFixed(2);
       data[8] = (budgetList[j].budgetAmt - budgetList[j].usedUsdAmt).toFixed(2);
-      data[9] = (budgetList[j].startDate ? moment(budgetList[j].startDate).format(`${DATE_FORMAT_CAP}`) : null);
-      data[10] = (budgetList[j].stopDate ? moment(budgetList[j].stopDate).format(`${DATE_FORMAT_CAP}`) : null);
+      data[9] = (budgetList[j].startDate ? moment(budgetList[j].startDate).format(`YYYY-MM-DD HH:mm:ss`) : null);
+      data[10] = (budgetList[j].stopDate ? moment(budgetList[j].stopDate).format(`YYYY-MM-DD HH:mm:ss`) : null);
       data[11] = budgetList[j].lastModifiedBy.username;
-      data[12] = (budgetList[j].lastModifiedDate ? moment(budgetList[j].lastModifiedDate).format(`${DATE_FORMAT_CAP}`) : null)
+      data[12] = (budgetList[j].lastModifiedDate ? moment(budgetList[j].lastModifiedDate).format(`YYYY-MM-DD HH:mm:ss`) : null)
       // data[9] = (budgetList[j].active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'));
       // data[10] = budgetList[j].budgetAmt;
       // data[11] = budgetList[j].usedUsdAmt;
@@ -789,12 +824,14 @@ class ListBudgetComponent extends Component {
         },
         {
           title: i18n.t('static.common.startdate'),
-          type: 'text',
+          options: { format: JEXCEL_DATE_FORMAT_SM },
+          type: 'calendar'
           // readOnly: true
         },
         {
           title: i18n.t('static.common.stopdate'),
-          type: 'text',
+          options: { format: JEXCEL_DATE_FORMAT_SM },
+          type: 'calendar'
           // readOnly: true
         },
         {
@@ -804,7 +841,8 @@ class ListBudgetComponent extends Component {
         },
         {
           title: i18n.t('static.common.lastModifiedDate'),
-          type: 'text',
+          options: { format: JEXCEL_DATE_FORMAT_SM },
+          type: 'calendar'
           // readOnly: true
         },
         {
@@ -882,7 +920,7 @@ class ListBudgetComponent extends Component {
       paginationOptions: JEXCEL_PAGINATION_OPTION,
       position: 'top',
       contextMenu: function (obj, x, y, e) {
-        return [];
+        return false;
       }.bind(this),
     };
     var languageEl = jexcel(document.getElementById("tableDiv"), options);
@@ -899,7 +937,7 @@ class ListBudgetComponent extends Component {
     } else {
       // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
       if (this.state.selBudget.length != 0) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_BUDGET')) {
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_BUDGET')) {
           this.props.history.push({
             pathname: `/budget/editBudget/${this.el.getValueFromCoords(0, x)}`,
           });
@@ -1188,7 +1226,8 @@ class ListBudgetComponent extends Component {
       && programs.map((item, i) => {
         return (
           <option key={i} value={item.programId}>
-            {getLabelText(item.label, this.state.lang)}
+            {/* {getLabelText(item.label, this.state.lang)} */}
+            {item.programCode}
           </option>
         )
       }, this);
@@ -1333,13 +1372,13 @@ class ListBudgetComponent extends Component {
       <div className="animated">
         <AuthenticationServiceComponent history={this.props.history} />
         <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
-        <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
-        <Card style={{ display: this.state.loading ? "none" : "block" }}>
+        <h5 className="red" id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+        <Card>
           <div className="Card-header-addicon">
             {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}{' '}</strong> */}
             <div className="card-header-actions">
               <div className="card-header-action">
-                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_BUDGET') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addBudget}><i className="fa fa-plus-square"></i></a>}
+                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_BUDGET') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addBudget}><i className="fa fa-plus-square"></i></a>}
               </div>
             </div>
           </div>
@@ -1356,7 +1395,8 @@ class ListBudgetComponent extends Component {
                         name="programId"
                         id="programId"
                         bsSize="sm"
-                        onChange={this.filterData}
+                        value={this.state.programId}
+                        onChange={(e) => this.programChanged(e)}
                       >
                         <option value="0">{i18n.t('static.common.all')}</option>
                         {programList}
@@ -1374,7 +1414,8 @@ class ListBudgetComponent extends Component {
                         name="fundingSourceId"
                         id="fundingSourceId"
                         bsSize="sm"
-                        onChange={this.filterData}
+                        value={this.state.fundingSourceId}
+                        onChange={(e) => this.fundingSourceChanged(e)}
                       >
                         <option value="0">{i18n.t('static.common.all')}</option>
                         {fundingSources}
@@ -1391,7 +1432,8 @@ class ListBudgetComponent extends Component {
                         name="active"
                         id="active"
                         bsSize="sm"
-                        onChange={this.filterData}
+                        value={this.state.statusId}
+                        onChange={(e) => this.statusChanged(e)}
                       >
                         <option value="">{i18n.t('static.common.all')}</option>
                         <option value="true" selected>{i18n.t('static.common.active')}</option>
@@ -1426,24 +1468,27 @@ class ListBudgetComponent extends Component {
               </FormGroup>
             </Col> */}
 
-            {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className="jexcelremoveReadonlybackground">
+            {/* <div id="loader" className="center"></div> */}
+            <div className='consumptionDataEntryTable'>
+            <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_BUDGET') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
             </div>
-            <h5 style={{ color: 'red' }}>{i18n.t('static.budget.redRow')}</h5>
+            </div>
+            <div style={{ display: this.state.loading ? "block" : "none" }}>
+              <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                <div class="align-items-center">
+                  <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                  <div class="spinner-border blue ml-4" role="status">
+
+                  </div>
+                </div>
+              </div>
+            </div>
+            <h5 style={{ color: '#BA0C2F' }}>{i18n.t('static.budget.redRow')}</h5>
 
 
           </CardBody>
         </Card>
-        <div style={{ display: this.state.loading ? "block" : "none" }}>
-          <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-            <div class="align-items-center">
-              <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
-              <div class="spinner-border blue ml-4" role="status">
-
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     )
   }

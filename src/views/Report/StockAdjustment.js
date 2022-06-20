@@ -18,7 +18,7 @@ import Picker from 'react-month-picker';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, DATE_FORMAT_CAP, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_SM } from '../../Constants.js'
+import { SECRET_KEY, DATE_FORMAT_CAP, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_SM, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import ProductService from '../../api/ProductService';
 import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
@@ -27,7 +27,7 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 import { LOGO } from '../../CommonComponent/Logo.js';
 import ReportService from '../../api/ReportService';
-import MultiSelect from 'react-multi-select-component';
+import { MultiSelect } from 'react-multi-select-component';
 import jexcel from 'jexcel-pro';
 import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
@@ -45,7 +45,9 @@ class StockAdjustmentComponent extends Component {
     constructor(props) {
         super(props);
         var dt = new Date();
-        dt.setMonth(dt.getMonth() - 10);
+        dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
+        var dt1 = new Date();
+        dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
         this.state = {
             regionList: [],
             message: '',
@@ -58,9 +60,10 @@ class StockAdjustmentComponent extends Component {
             planningUnitLabels: [],
             data: [],
             lang: localStorage.getItem('lang'),
-            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
-            maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
+            // rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
+            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
+            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
             loading: true,
             programId: '',
             versionId: ''
@@ -188,7 +191,7 @@ class StockAdjustmentComponent extends Component {
                     if (myResult[i].userId == userId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
                         // console.log(programNameLabel)
 
@@ -304,7 +307,7 @@ class StockAdjustmentComponent extends Component {
                     if (myResult[i].userId == userId && myResult[i].programId == programId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = databytes.toString(CryptoJS.enc.Utf8)
                         var version = JSON.parse(programData).currentVersion
 
@@ -317,21 +320,40 @@ class StockAdjustmentComponent extends Component {
                 }
 
                 // console.log(verList)
-
+                let versionList = verList.filter(function (x, i, a) {
+                    return a.indexOf(x) === i;
+                })
+                versionList.reverse();
                 if (localStorage.getItem("sesVersionIdReport") != '' && localStorage.getItem("sesVersionIdReport") != undefined) {
-                    this.setState({
-                        versions: verList.filter(function (x, i, a) {
-                            return a.indexOf(x) === i;
-                        }),
-                        versionId: localStorage.getItem("sesVersionIdReport")
-                    }, () => {
-                        this.getPlanningUnit();
-                    })
+                    // this.setState({
+                    //     versions: versionList,
+                    //     versionId: localStorage.getItem("sesVersionIdReport")
+                    // }, () => {
+                    //     this.getPlanningUnit();
+                    // })
+
+                    let versionVar = versionList.filter(c => c.versionId == localStorage.getItem("sesVersionIdReport"));
+                    if (versionVar.length != 0) {
+                        this.setState({
+                            versions: versionList,
+                            versionId: localStorage.getItem("sesVersionIdReport")
+                        }, () => {
+                            this.getPlanningUnit();
+                        })
+                    } else {
+                        this.setState({
+                            versions: versionList,
+                            versionId: versionList[0].versionId
+                        }, () => {
+                            this.getPlanningUnit();
+                        })
+                    }
                 } else {
                     this.setState({
-                        versions: verList.filter(function (x, i, a) {
-                            return a.indexOf(x) === i;
-                        })
+                        versions: versionList,
+                        versionId: versionList[0].versionId
+                    }, () => {
+                        this.getPlanningUnit();
                     })
                 }
 
@@ -542,7 +564,7 @@ class StockAdjustmentComponent extends Component {
         csvRow.push('')
         csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.report.version').replaceAll(' ', '%20') + '  :  ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.report.versionFinal*').replaceAll(' ', '%20') + '  :  ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         this.state.planningUnitLabels.map(ele =>
             csvRow.push('"' + (i18n.t('static.planningunit.planningunit') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
@@ -557,7 +579,7 @@ class StockAdjustmentComponent extends Component {
 
 
         var A = [this.addDoubleQuoteToRowContent(headers)]
-        this.state.data.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.dataSource.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.planningUnit.id, (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (new moment(ele.inventoryDate).format('MMM YYYY')).replaceAll(' ', '%20'), ele.stockAdjustemntQty, ele.lastModifiedBy.username, new moment(ele.lastModifiedDate).format(`${DATE_FORMAT_CAP}`), ele.notes != null ? (ele.notes).replaceAll(' ', '%20') : ''])));
+        this.state.data.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.dataSource.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.planningUnit.id, (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (new moment(ele.inventoryDate).format(DATE_FORMAT_CAP)).replaceAll(' ', '%20'), ele.stockAdjustemntQty, ele.lastModifiedBy.username, new moment(ele.lastModifiedDate).format(`${DATE_FORMAT_CAP}`), ele.notes != null ? (ele.notes).replaceAll(' ', '%20') : ''])));
         for (var i = 0; i < A.length; i++) {
             // console.log(A[i])
             csvRow.push(A[i].join(","))
@@ -618,7 +640,7 @@ class StockAdjustmentComponent extends Component {
                         align: 'left'
                     })
 
-                    doc.text(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
+                    doc.text(i18n.t('static.report.versionFinal*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
                         align: 'left'
                     })
                     var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
@@ -761,7 +783,7 @@ class StockAdjustmentComponent extends Component {
             filters: true,
             license: JEXCEL_PRO_KEY,
             contextMenu: function (obj, x, y, e) {
-                return [];
+                return false;
             }.bind(this),
         };
         var languageEl = jexcel(document.getElementById("tableDiv"), options);
@@ -827,40 +849,78 @@ class StockAdjustmentComponent extends Component {
                     }.bind(this);
                     programRequest.onsuccess = function (e) {
 
-                        console.log("2----", programRequest)
-                        var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                        var programJson = JSON.parse(programData);
-                        console.log(programJson)
-                        console.log(startDate, endDate)
-                        var data = []
-                        planningUnitIds.map(planningUnitId => {
-                            var inventoryList = ((programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && (c.inventoryDate >= startDate && c.inventoryDate <= endDate) && (c.adjustmentQty != 0 && c.adjustmentQty != null)));
-                            console.log(inventoryList)
+                        var dataSourceTransaction = db1.transaction(['dataSource'], 'readwrite');
+                        var dataSourceOs = dataSourceTransaction.objectStore('dataSource');
+                        var dataSourceRequest = dataSourceOs.getAll();
+                        dataSourceRequest.onerror = function (event) {
+                        }.bind(this);
+                        dataSourceRequest.onsuccess = function (event) {
+                            var dataSourceResult = [];
+                            dataSourceResult = dataSourceRequest.result;
 
-                            inventoryList.map(ele => {
+                            var puTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+                            var puOs = puTransaction.objectStore('programPlanningUnit');
+                            var puRequest = puOs.getAll();
+                            puRequest.onerror = function (event) {
+                            }.bind(this);
+                            puRequest.onsuccess = function (e) {
+                                var puResult = [];
+                                puResult = puRequest.result;
 
-                                var json = {
-                                    program: programJson,
-                                    // inventoryDate: moment(ele.inventoryDate).format('MMM YYYY'),
-                                    inventoryDate: ele.inventoryDate,
-                                    planningUnit: ele.planningUnit,
-                                    stockAdjustemntQty: ele.adjustmentQty,
-                                    lastModifiedBy: programJson.currentVersion.lastModifiedBy,
-                                    lastModifiedDate: programJson.currentVersion.lastModifiedDate,
-                                    notes: ele.notes,
-                                    dataSource: ele.dataSource
-                                }
-                                data.push(json)
-                            })
-                        })
-                        console.log("inventory List--------->", data);;
-                        this.setState({
-                            data: data
-                            , message: ''
-                        }, () => {
-                            this.buildJExcel();
-                        });
+                                console.log("2----", programRequest);
+                                var generalProgramDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
+                                var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
+                                var generalProgramJson = JSON.parse(generalProgramData);
+
+                                var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
+                                console.log(startDate, endDate)
+                                var data = []
+                                planningUnitIds.map(planningUnitId => {
+                                    var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == planningUnitId);
+                                    var programJson = {}
+                                    if (planningUnitDataIndex != -1) {
+                                        var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == planningUnitId))[0];
+                                        var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                                        programJson = JSON.parse(programData);
+                                    } else {
+                                        programJson = {
+                                            consumptionList: [],
+                                            inventoryList: [],
+                                            shipmentList: [],
+                                            batchInfoList: [],
+                                            supplyPlan: []
+                                        }
+                                    }
+                                    var inventoryList = ((programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && (c.inventoryDate >= startDate && c.inventoryDate <= endDate) && (c.adjustmentQty != 0 && c.adjustmentQty != null)));
+                                    console.log(inventoryList)
+
+                                    inventoryList.map(ele => {
+                                        var dataSource = dataSourceResult.filter(c => c.dataSourceId == ele.dataSource.id);
+                                        var planningUnit = puResult.filter(c => c.planningUnit.id == ele.planningUnit.id);
+                                        var json = {
+                                            program: programJson,
+                                            // inventoryDate: moment(ele.inventoryDate).format('MMM YYYY'),
+                                            inventoryDate: ele.inventoryDate,
+                                            planningUnit: planningUnit.length > 0 ? planningUnit[0].planningUnit : ele.planningUnit,
+                                            stockAdjustemntQty: ele.adjustmentQty,
+                                            lastModifiedBy: generalProgramJson.currentVersion.lastModifiedBy,
+                                            lastModifiedDate: generalProgramJson.currentVersion.lastModifiedDate,
+                                            notes: ele.notes,
+                                            dataSource: dataSource.length > 0 ? dataSource[0] : ele.dataSource
+                                        }
+                                        data.push(json)
+                                    })
+                                })
+                                console.log("inventory List--------->", data);;
+                                this.setState({
+                                    data: data
+                                    , message: ''
+                                }, () => {
+                                    this.buildJExcel();
+                                });
+                            }.bind(this)
+                        }.bind(this)
                     }.bind(this)
                 }.bind(this)
             } else {
@@ -989,19 +1049,43 @@ class StockAdjustmentComponent extends Component {
 
     setProgramId(event) {
         this.setState({
-            programId: event.target.value
+            programId: event.target.value,
+            versionId: ''
         }, () => {
+            localStorage.setItem("sesVersionIdReport", '');
             this.filterVersion();
         })
 
     }
 
     setVersionId(event) {
-        this.setState({
-            versionId: event.target.value
-        }, () => {
-            this.getPlanningUnit();
-        })
+        // this.setState({
+        //     versionId: event.target.value
+        // }, () => {
+        //     if (this.state.data.length != 0) {
+        //         console.log("************1");
+        //         localStorage.setItem("sesVersionIdReport", this.state.versionId);
+        //         this.fetchData();
+        //     } else {
+        //         console.log("************3", this.state.data);
+        //         console.log("************2");
+        //         this.getPlanningUnit();
+        //     }
+        // })
+        if (this.state.versionId != '' || this.state.versionId != undefined) {
+            this.setState({
+                versionId: event.target.value
+            }, () => {
+                localStorage.setItem("sesVersionIdReport", this.state.versionId);
+                this.fetchData();
+            })
+        } else {
+            this.setState({
+                versionId: event.target.value
+            }, () => {
+                this.getPlanningUnit();
+            })
+        }
 
     }
 
@@ -1025,7 +1109,7 @@ class StockAdjustmentComponent extends Component {
             && versions.map((item, i) => {
                 return (
                     <option key={i} value={item.versionId}>
-                        {item.versionId}
+                        {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)}
                     </option>
                 )
             }, this);
@@ -1163,7 +1247,7 @@ class StockAdjustmentComponent extends Component {
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h5>{i18n.t(this.props.match.params.message)}</h5>
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
-                <Card style={{ display: this.state.loading ? "none" : "block" }}>
+                <Card>
                     <div className="Card-header-reporticon">
                         {/* <i className="icon-menu"></i><strong>Stock Adjustment Report</strong>{' '} */}
                         {this.state.data.length > 0 &&
@@ -1216,7 +1300,8 @@ class StockAdjustmentComponent extends Component {
                                                     && programs.map((item, i) => {
                                                         return (
                                                             <option key={i} value={item.programId}>
-                                                                {getLabelText(item.label, this.state.lang)}
+                                                                {/* {getLabelText(item.label, this.state.lang)} */}
+                                                                {(item.programCode)}
                                                             </option>
                                                         )
                                                     }, this)}
@@ -1227,7 +1312,7 @@ class StockAdjustmentComponent extends Component {
                                     </div>
                                 </FormGroup>
                                 <FormGroup className="col-md-3">
-                                    <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.report.versionFinal*')}</Label>
                                     <div className="controls ">
                                         <InputGroup>
                                             <Input
@@ -1258,6 +1343,7 @@ class StockAdjustmentComponent extends Component {
                                             value={this.state.planningUnitValues}
                                             onChange={(e) => { this.handlePlanningUnitChange(e) }}
                                             options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
+                                            disabled={this.state.loading}
                                         />
 
                                     </div>
@@ -1266,24 +1352,24 @@ class StockAdjustmentComponent extends Component {
                         </div>
 
 
-                        <div id="tableDiv" className="jexcelremoveReadonlybackground">
+                        <div id="tableDiv" className="jexcelremoveReadonlybackground consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
+                        </div>
+                        <div style={{ display: this.state.loading ? "block" : "none" }}>
+                            <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                <div className="align-items-center">
+                                    <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                    <div className="spinner-border blue ml-4" role="status">
+
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
 
 
                     </CardBody>
                 </Card>
-                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div className="align-items-center">
-                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
-                            <div className="spinner-border blue ml-4" role="status">
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div >
         );
     }

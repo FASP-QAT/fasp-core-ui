@@ -42,7 +42,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import RealmCountryService from '../../api/RealmCountryService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, DATE_FORMAT_CAP } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
@@ -55,7 +55,7 @@ import ReportService from '../../api/ReportService';
 import ProgramService from '../../api/ProgramService';
 import 'chartjs-plugin-annotation';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import MultiSelect from "react-multi-select-component";
+import {MultiSelect} from "react-multi-select-component";
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 // const { getToggledOptions } = utils;
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
@@ -184,7 +184,9 @@ class GlobalConsumption extends Component {
     this.toggledata = this.toggledata.bind(this);
     this.onRadioBtnClick = this.onRadioBtnClick.bind(this);
     var dt = new Date();
-    dt.setMonth(dt.getMonth() - 10);
+    dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
+    var dt1 = new Date();
+    dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
     this.state = {
       dropdownOpen: false,
       radioSelected: 2,
@@ -202,9 +204,10 @@ class GlobalConsumption extends Component {
       programs: [],
       realmList: [],
       message: '',
-      rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-      minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
-      maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
+      // rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+      rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
+      minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
+      maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
       loading: true,
       programLst: []
 
@@ -266,7 +269,7 @@ class GlobalConsumption extends Component {
     re = this.state.consumptions
 
     for (var item = 0; item < re.length; item++) {
-      A.push([this.addDoubleQuoteToRowContent([getLabelText(re[item].realmCountry.label), re[item].consumptionDateString, re[item].planningUnitQty])])
+      A.push([this.addDoubleQuoteToRowContent([getLabelText(re[item].realmCountry.label), moment(re[item].consumptionDateString).format(DATE_FORMAT_CAP), re[item].planningUnitQty])])
     }
     for (var i = 0; i < A.length; i++) {
       csvRow.push(A[i].join(","))
@@ -606,7 +609,8 @@ class GlobalConsumption extends Component {
                 "realmCountry": countryConsumption[j].country,
                 "consumptionDate": tempConsumptionData[i].transDate,
                 "planningUnitQty": this.roundN((countryConsumption[j].actualConsumption == 0 ? (countryConsumption[j].forecastedConsumption / 1000000) : (countryConsumption[j].actualConsumption / 1000000))),
-                "consumptionDateString": moment(tempConsumptionData[i].transDate, 'YYYY-MM-dd').format('MMM YY')
+                "consumptionDateString": moment(tempConsumptionData[i].transDate, 'YYYY-MM-dd').format('MMM YY'),
+                "consumptionDateString1": moment(tempConsumptionData[i].transDate, 'yyyy-MM-dd')
               }
               console.log("json--->", json);
               consumptions.push(json);
@@ -1073,6 +1077,35 @@ class GlobalConsumption extends Component {
     }
     return color;
   }
+
+  dateFormatterLanguage = value => {
+    if (moment(value).format('MM') === '01') {
+      return (i18n.t('static.month.jan') + ' ' + moment(value).format('YY'))
+    } else if (moment(value).format('MM') === '02') {
+      return (i18n.t('static.month.feb') + ' ' + moment(value).format('YY'))
+    } else if (moment(value).format('MM') === '03') {
+      return (i18n.t('static.month.mar') + ' ' + moment(value).format('YY'))
+    } else if (moment(value).format('MM') === '04') {
+      return (i18n.t('static.month.apr') + ' ' + moment(value).format('YY'))
+    } else if (moment(value).format('MM') === '05') {
+      return (i18n.t('static.month.may') + ' ' + moment(value).format('YY'))
+    } else if (moment(value).format('MM') === '06') {
+      return (i18n.t('static.month.jun') + ' ' + moment(value).format('YY'))
+    } else if (moment(value).format('MM') === '07') {
+      return (i18n.t('static.month.jul') + ' ' + moment(value).format('YY'))
+    } else if (moment(value).format('MM') === '08') {
+      return (i18n.t('static.month.aug') + ' ' + moment(value).format('YY'))
+    } else if (moment(value).format('MM') === '09') {
+      return (i18n.t('static.month.sep') + ' ' + moment(value).format('YY'))
+    } else if (moment(value).format('MM') === '10') {
+      return (i18n.t('static.month.oct') + ' ' + moment(value).format('YY'))
+    } else if (moment(value).format('MM') === '11') {
+      return (i18n.t('static.month.nov') + ' ' + moment(value).format('YY'))
+    } else {
+      return (i18n.t('static.month.dec') + ' ' + moment(value).format('YY'))
+    }
+  }
+
   render() {
     const { planningUnits } = this.state;
     let planningUnitList = [];
@@ -1090,7 +1123,8 @@ class GlobalConsumption extends Component {
       && programLst.map((item, i) => {
         return (
 
-          { label: getLabelText(item.label, this.state.lang), value: item.programId }
+          // { label: getLabelText(item.label, this.state.lang), value: item.programId }
+          { label: item.programCode, value: item.programId }
 
         )
       }, this);
@@ -1113,18 +1147,26 @@ class GlobalConsumption extends Component {
 
 
     const backgroundColor = [
-      '#002f6c',
-      '#118b70',
-      '#EDB944',
-      '#20a8d8',
-      '#d1e3f5',
-      '#212721',
-      '#4dbd74',
-      '#f86c6b',
-      '#F48521',
-      '#ED5626',
-      '#cfcdc9',
-      '#004876', '#0063a0', '#007ecc', '#0093ee', '#82caf8', '#c8e6f4'
+      // '#002f6c',
+      // '#118b70',
+      // '#EDB944',
+      // '#20a8d8',
+      // '#d1e3f5',
+      // '#212721',
+      // '#4dbd74',
+      // '#f86c6b',
+      // '#F48521',
+      // '#ED5626',
+      // '#cfcdc9',
+      // '#004876', '#0063a0', '#007ecc', '#0093ee', '#82caf8', '#c8e6f4'
+
+      '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+      '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
+      '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+      '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+      '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
+      '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+      '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
     ]
 
     let localCountryList = [...new Set(this.state.consumptions.map(ele => (getLabelText(ele.realmCountry.label, this.state.lang))))];
@@ -1160,7 +1202,8 @@ class GlobalConsumption extends Component {
     console.log("consumptionSummerydata---", consumptionSummerydata);
 
     const bar = {
-      labels: [...new Set(this.state.consumptions.map(ele => (ele.consumptionDateString)))],
+      // labels: [...new Set(this.state.consumptions.map(ele => (ele.consumptionDateString)))],
+      labels: [...new Set(this.state.consumptions.map(ele => (this.dateFormatterLanguage(ele.consumptionDateString1))))],
       datasets: consumptionSummerydata.map((item, index) => ({ stack: 1, label: localCountryList[index], data: item, backgroundColor: backgroundColor[index] })),
     };
 
@@ -1182,7 +1225,7 @@ class GlobalConsumption extends Component {
         <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
         <h5 className="red">{i18n.t(this.state.message)}</h5>
 
-        <Card style={{ display: this.state.loading ? "none" : "block" }}>
+        <Card>
           <div className="Card-header-reporticon">
             {/* <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.globalconsumption')}</strong> */}
             {this.state.consumptions.length > 0 && <div className="card-header-actions">
@@ -1251,10 +1294,11 @@ class GlobalConsumption extends Component {
                           value={this.state.countryValues}
                           onChange={(e) => { this.handleChange(e) }}
                           options={countryList && countryList.length > 0 ? countryList : []}
+                          disabled={this.state.loading}
                         />
                         {!!this.props.error &&
                           this.props.touched && (
-                            <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
+                            <div style={{ color: '#BA0C2F', marginTop: '.5rem' }}>{this.props.error}</div>
                           )}
                       </div>
 
@@ -1273,10 +1317,11 @@ class GlobalConsumption extends Component {
                         value={this.state.programValues}
                         onChange={(e) => { this.handleChangeProgram(e) }}
                         options={programList && programList.length > 0 ? programList : []}
+                        disabled={this.state.loading}
                       />
                       {!!this.props.error &&
                         this.props.touched && (
-                          <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
+                          <div style={{ color: '#BA0C2F', marginTop: '.5rem' }}>{this.props.error}</div>
                         )}
 
                     </FormGroup>
@@ -1295,6 +1340,7 @@ class GlobalConsumption extends Component {
                           value={this.state.planningUnitValues}
                           onChange={(e) => { this.handlePlanningUnitChange(e) }}
                           options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
+                          disabled={this.state.loading}
                         />
 
                       </div>
@@ -1341,7 +1387,7 @@ class GlobalConsumption extends Component {
                   </div>
                 </div>
               </Form>
-              <Col md="12 pl-0">
+              <Col md="12 pl-0" style={{ display: this.state.loading ? "none" : "block" }}>
                 <div className="globalviwe-scroll">
                   <div className="row">
 
@@ -1368,7 +1414,7 @@ class GlobalConsumption extends Component {
                       {this.state.show && this.state.consumptions.length > 0 &&
                         <div className="table-responsive ">
 
-                          <Table responsive className="table-striped  table-fixed table-hover table-bordered text-center mt-2">
+                          <Table responsive className="table-striped  table-fixed table-bordered text-center mt-2">
 
                             <thead>
                               <tr>
@@ -1407,22 +1453,21 @@ class GlobalConsumption extends Component {
                   </div>
                 </div>
               </Col>
+              <div style={{ display: this.state.loading ? "block" : "none" }}>
+                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                  <div class="align-items-center">
+                    <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
+                    <div class="spinner-border blue ml-4" role="status">
+
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
 
           </CardBody>
         </Card>
-        <div style={{ display: this.state.loading ? "block" : "none" }}>
-          <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-            <div class="align-items-center">
-              <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
-              <div class="spinner-border blue ml-4" role="status">
-
-              </div>
-            </div>
-          </div>
-        </div>
 
       </div>
     );

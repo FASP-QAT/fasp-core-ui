@@ -42,7 +42,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import RealmCountryService from '../../api/RealmCountryService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY } from '../../Constants.js'
+import { SECRET_KEY, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, DATE_FORMAT_CAP } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
@@ -56,7 +56,7 @@ import ProgramService from '../../api/ProgramService';
 import FundingSourceService from '../../api/FundingSourceService';
 import ProcurementAgentService from "../../api/ProcurementAgentService";
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import MultiSelect from 'react-multi-select-component';
+import {MultiSelect} from 'react-multi-select-component';
 // const { getToggledOptions } = utils;
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
@@ -305,18 +305,25 @@ const chartData1 = {
     ]
 };
 const backgroundColor = [
-    '#002f6c',
-    '#212721',
-    '#20a8d8',
-    '#4dbd74',
-    '#f86c6b',
-    '#d1e3f5',
-    '#118b70',
-    '#EDB944',
-    '#F48521',
-    '#ED5626',
-    '#cfcdc9',
-    '#004876', '#0063a0', '#007ecc', '#0093ee', '#82caf8', '#c8e6f4'
+    // '#002f6c',
+    // '#212721',
+    // '#20a8d8',
+    // '#4dbd74',
+    // '#f86c6b',
+    // '#d1e3f5',
+    // '#118b70',
+    // '#EDB944',
+    // '#F48521',
+    // '#ED5626',
+    // '#cfcdc9',
+    // '#004876', '#0063a0', '#007ecc', '#0093ee', '#82caf8', '#c8e6f4'
+    '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+    '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
+    '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+    '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+    '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
+    '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+    '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
 ]
 // var bar_chart = new Chart(bar_ctx, {
 //     type: 'bar',
@@ -351,7 +358,9 @@ class ShipmentGlobalView extends Component {
         this.toggledata = this.toggledata.bind(this);
         this.onRadioBtnClick = this.onRadioBtnClick.bind(this);
         var dt = new Date();
-        dt.setMonth(dt.getMonth() - 10);
+        dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
+        var dt1 = new Date();
+        dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
         this.state = {
             labels: ['GF', 'Govt', 'Local', 'PSM'],
             datasets: [{
@@ -394,9 +403,10 @@ class ShipmentGlobalView extends Component {
             table1Body: [],
             table1Headers: [],
             viewby: 1,
-            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
-            maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
+            // rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
+            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
+            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
             loading: true,
             programLst: []
 
@@ -492,7 +502,7 @@ class ShipmentGlobalView extends Component {
             var B = [this.addDoubleQuoteToRowContent([(i18n.t('static.dashboard.months').replaceAll(',', ' ')).replaceAll(' ', '%20'), (i18n.t('static.program.realmcountry').replaceAll(',', ' ')).replaceAll(' ', '%20'), (i18n.t('static.supplyPlan.amountInUSD').replaceAll(',', ' ')).replaceAll(' ', '%20'), (tempLabel.replaceAll(',', ' ')).replaceAll(' ', '%20'), (i18n.t('static.common.status').replaceAll(',', ' ')).replaceAll(' ', '%20')])];
             re = this.state.shipmentList;
             for (var item = 0; item < re.length; item++) {
-                B.push([this.addDoubleQuoteToRowContent([(moment(re[item].transDate, 'YYYY-MM-dd').format('MMM YYYY').replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(re[item].country.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), re[item].amount, (getLabelText(re[item].fundingSourceProcurementAgent.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(re[item].shipmentStatus.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20')])])
+                B.push([this.addDoubleQuoteToRowContent([(moment(re[item].transDate, 'YYYY-MM-dd').format(DATE_FORMAT_CAP).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(re[item].country.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), re[item].amount, (getLabelText(re[item].fundingSourceProcurementAgent.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(re[item].shipmentStatus.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20')])])
             }
             for (var i = 0; i < B.length; i++) {
                 csvRow.push(B[i].join(","))
@@ -1704,6 +1714,34 @@ class ShipmentGlobalView extends Component {
         })
     }
 
+    dateFormatterLanguage = value => {
+        if (moment(value).format('MM') === '01') {
+            return (i18n.t('static.month.jan') + ' ' + moment(value).format('YY'))
+        } else if (moment(value).format('MM') === '02') {
+            return (i18n.t('static.month.feb') + ' ' + moment(value).format('YY'))
+        } else if (moment(value).format('MM') === '03') {
+            return (i18n.t('static.month.mar') + ' ' + moment(value).format('YY'))
+        } else if (moment(value).format('MM') === '04') {
+            return (i18n.t('static.month.apr') + ' ' + moment(value).format('YY'))
+        } else if (moment(value).format('MM') === '05') {
+            return (i18n.t('static.month.may') + ' ' + moment(value).format('YY'))
+        } else if (moment(value).format('MM') === '06') {
+            return (i18n.t('static.month.jun') + ' ' + moment(value).format('YY'))
+        } else if (moment(value).format('MM') === '07') {
+            return (i18n.t('static.month.jul') + ' ' + moment(value).format('YY'))
+        } else if (moment(value).format('MM') === '08') {
+            return (i18n.t('static.month.aug') + ' ' + moment(value).format('YY'))
+        } else if (moment(value).format('MM') === '09') {
+            return (i18n.t('static.month.sep') + ' ' + moment(value).format('YY'))
+        } else if (moment(value).format('MM') === '10') {
+            return (i18n.t('static.month.oct') + ' ' + moment(value).format('YY'))
+        } else if (moment(value).format('MM') === '11') {
+            return (i18n.t('static.month.nov') + ' ' + moment(value).format('YY'))
+        } else {
+            return (i18n.t('static.month.dec') + ' ' + moment(value).format('YY'))
+        }
+    }
+
     render() {
         const { planningUnits } = this.state;
         let planningUnitList = [];
@@ -1763,7 +1801,8 @@ class ShipmentGlobalView extends Component {
             && programLst.map((item, i) => {
                 return (
 
-                    { label: getLabelText(item.label, this.state.lang), value: item.programId }
+                    // { label: getLabelText(item.label, this.state.lang), value: item.programId }
+                    { label: (item.programCode), value: item.programId }
 
                 )
             }, this);
@@ -1788,13 +1827,15 @@ class ShipmentGlobalView extends Component {
             datasets: [{
                 label: i18n.t('static.shipment.orderedShipment'),
                 data: this.state.countryShipmentSplitList.map(ele => (ele.orderedShipmentAmt)),
-                backgroundColor: '#6a82a8',
+                // backgroundColor: '#6a82a8',
+                backgroundColor: '#0067B9',
                 borderWidth: 0
             },
             {
                 label: i18n.t('static.shipment.plannedShipment'),
                 data: this.state.countryShipmentSplitList.map(ele => (ele.plannedShipmentAmt)),
-                backgroundColor: '#dee7f8',
+                // backgroundColor: '#dee7f8',
+                backgroundColor: '#A7C6ED',
                 borderWidth: 0,
             }
             ]
@@ -1850,7 +1891,8 @@ class ShipmentGlobalView extends Component {
 
 
 
-            labels: [...new Set(this.state.dateSplitList.map(ele => (moment(ele.transDate, 'YYYY-MM-dd').format('MMM YYYY'))))],
+            // labels: [...new Set(this.state.dateSplitList.map(ele => (moment(ele.transDate, 'YYYY-MM-dd').format('MMM YYYY'))))],
+            labels: [...new Set(this.state.dateSplitList.map(ele => (this.dateFormatterLanguage(moment(ele.transDate, 'YYYY-MM-dd')))))],
             datasets: dataSet
 
         }
@@ -1864,7 +1906,7 @@ class ShipmentGlobalView extends Component {
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
 
-                <Card style={{ display: this.state.loading ? "none" : "block" }}>
+                <Card>
                     <div className="Card-header-reporticon">
 
                         {(this.state.shipmentList.length > 0 || this.state.dateSplitList.length > 0 || this.state.countrySplitList.length > 0 || this.state.countryShipmentSplitList.length > 0) &&
@@ -1934,10 +1976,11 @@ class ShipmentGlobalView extends Component {
                                                 value={this.state.countryValues}
                                                 onChange={(e) => { this.handleChange(e) }}
                                                 options={countryList && countryList.length > 0 ? countryList : []}
+                                                disabled={this.state.loading}
                                             />
                                             {!!this.props.error &&
                                                 this.props.touched && (
-                                                    <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
+                                                    <div style={{ color: '#BA0C2F', marginTop: '.5rem' }}>{this.props.error}</div>
                                                 )}
 
                                         </FormGroup>
@@ -1953,10 +1996,11 @@ class ShipmentGlobalView extends Component {
                                                 value={this.state.programValues}
                                                 onChange={(e) => { this.handleChangeProgram(e) }}
                                                 options={programList && programList.length > 0 ? programList : []}
+                                                disabled={this.state.loading}
                                             />
                                             {!!this.props.error &&
                                                 this.props.touched && (
-                                                    <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
+                                                    <div style={{ color: '#BA0C2F', marginTop: '.5rem' }}>{this.props.error}</div>
                                                 )}
 
                                         </FormGroup>
@@ -2063,6 +2107,7 @@ class ShipmentGlobalView extends Component {
                                                     value={this.state.fundingSourceValues}
                                                     onChange={(e) => { this.handleFundingSourceChange(e) }}
                                                     options={fundingSourceList && fundingSourceList.length > 0 ? fundingSourceList : []}
+                                                    disabled={this.state.loading}
                                                 />
 
                                             </div>
@@ -2108,142 +2153,145 @@ class ShipmentGlobalView extends Component {
                                     </div>
                                 </div>
                             </Form>
-                            <Col md="12 pl-0">
-                                <div className="row grid-divider">
-                                    {/* <div className="col-md-6 p-0 grapg-margin " > */}
-                                    {this.state.countryShipmentSplitList.length > 0 &&
-                                        <div className="col-md-6">
-                                            <div className="chart-wrapper chart-graph-report">
-                                                {/* <Bar id="cool-canvas" data={bar} options={options} /> */}
-                                                <Bar id="cool-canvas1" data={bar} options={options} />
+                            <div style={{ display: this.state.loading ? "none" : "block" }}>
+                                <Col md="12 pl-0">
+                                    <div className="row grid-divider">
+                                        {/* <div className="col-md-6 p-0 grapg-margin " > */}
+                                        {this.state.countryShipmentSplitList.length > 0 &&
+                                            <div className="col-md-6">
+                                                <div className="chart-wrapper chart-graph-report">
+                                                    {/* <Bar id="cool-canvas" data={bar} options={options} /> */}
+                                                    <Bar id="cool-canvas1" data={bar} options={options} />
+                                                </div>
                                             </div>
-                                        </div>
-                                    }
-                                    {/* </div> */}
-                                    {/* <div className="col-md-6 p-0 grapg-margin " > */}
-                                    {this.state.dateSplitList.length > 0 &&
-                                        <div className="col-md-6">
-                                            <div className="chart-wrapper chart-graph-report">
-                                                {console.log(bar1)/* <Bar id="cool-canvas" data={bar} options={options} /> */}
-                                                <Bar id="cool-canvas2" data={bar1} options={this.state.viewby == 1 ? options1 : options2} />
+                                        }
+                                        {/* </div> */}
+                                        {/* <div className="col-md-6 p-0 grapg-margin " > */}
+                                        {this.state.dateSplitList.length > 0 &&
+                                            <div className="col-md-6">
+                                                <div className="chart-wrapper chart-graph-report">
+                                                    {console.log(bar1)/* <Bar id="cool-canvas" data={bar} options={options} /> */}
+                                                    <Bar id="cool-canvas2" data={bar1} options={this.state.viewby == 1 ? options1 : options2} />
+                                                </div>
                                             </div>
-                                        </div>
-                                    }
-                                    {/* </div> */}
-                                    {/* <Col md="12 pl-0"> */}
-                                    {/* <div className="chart-wrapper">
+                                        }
+                                        {/* </div> */}
+                                        {/* <Col md="12 pl-0"> */}
+                                        {/* <div className="chart-wrapper">
                                         <Bar id="cool-canvas" data={chartData} options={options} />
                                     </div> */}
-                                    {/* </Col> */}
-                                </div>
-                            </Col>
-                            <Col md="12 pl-0">
-                                <div className="globalviwe-scroll">
+                                        {/* </Col> */}
+                                    </div>
+                                </Col>
+                                <Col md="12 pl-0">
+                                    <div className="globalviwe-scroll">
 
-                                    <div className="row">
-                                        <div className="col-md-12">
+                                        <div className="row">
+                                            <div className="col-md-12">
 
-                                            {/* table1 */}
-                                            {this.state.table1Body.length > 0 &&
-                                                <div className="table-responsive ">
-                                                    <Table id="mytable1" responsive className="table-striped  table-fixed table-hover table-bordered text-center mt-2">
+                                                {/* table1 */}
+                                                {this.state.table1Body.length > 0 &&
+                                                    <div className="table-responsive ">
+                                                        <Table id="mytable1" responsive className="table-striped  table-fixed table-bordered text-center mt-2">
 
-                                                        <thead>
-                                                            <tr>
+                                                            <thead>
+                                                                <tr>
+                                                                    {
+                                                                        this.state.table1Headers.map((item, idx) =>
+                                                                            <th id="addr0" key={idx} className="text-center" style={{ width: '350px' }}>
+                                                                                {this.state.table1Headers[idx]}
+                                                                            </th>
+                                                                        )
+                                                                    }
+                                                                </tr>
+                                                            </thead>
+
+                                                            <tbody>
+
                                                                 {
-                                                                    this.state.table1Headers.map((item, idx) =>
-                                                                        <th id="addr0" key={idx} className="text-center" style={{ width: '350px' }}>
-                                                                            {this.state.table1Headers[idx]}
-                                                                        </th>
-                                                                    )
-                                                                }
-                                                            </tr>
-                                                        </thead>
+                                                                    this.state.table1Body.map((item, idx) =>
+                                                                        <tr id="addr0" key={idx} >
+                                                                            <td>{getLabelText(this.state.table1Body[idx].country.label, this.state.lang)}</td>
 
-                                                        <tbody>
+                                                                            {
+                                                                                this.state.table1Body[idx].amount.map((item, idx1) =>
+                                                                                    <td id="addr1" key={idx1}>
+                                                                                        {this.state.table1Body[idx].amount[idx1].toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}
+                                                                                    </td>
+                                                                                )
+                                                                            }
 
-                                                            {
-                                                                this.state.table1Body.map((item, idx) =>
-                                                                    <tr id="addr0" key={idx} >
-                                                                        <td>{getLabelText(this.state.table1Body[idx].country.label, this.state.lang)}</td>
+                                                                        </tr>
+                                                                    )}
+                                                            </tbody>
+                                                        </Table>
+                                                    </div>
+                                                }
 
-                                                                        {
-                                                                            this.state.table1Body[idx].amount.map((item, idx1) =>
-                                                                                <td id="addr1" key={idx1}>
-                                                                                    {this.state.table1Body[idx].amount[idx1].toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}
-                                                                                </td>
-                                                                            )
-                                                                        }
+                                                {/* table2 */}
 
-                                                                    </tr>
-                                                                )}
-                                                        </tbody>
-                                                    </Table>
-                                                </div>
-                                            }
+                                                {this.state.shipmentList.length > 0 &&
+                                                    <div className="table-responsive ">
+                                                        <Table id="mytable2" responsive className="table-striped  table-fixed table-bordered text-center mt-2">
 
-                                            {/* table2 */}
+                                                            <thead>
+                                                                <tr>
+                                                                    <th className="text-center" style={{ width: '350px' }}> {i18n.t('static.dashboard.months')} </th>
+                                                                    <th className="text-center " style={{ width: '350px' }}> {i18n.t('static.program.realmcountry')} </th>
+                                                                    <th className="text-center" style={{ width: '350px' }}>{i18n.t('static.supplyPlan.amountInUSD')}</th>
+                                                                    {
+                                                                        this.state.viewby == 1 &&
+                                                                        <th className="text-center" style={{ width: '350px' }}>{i18n.t('static.budget.fundingsource')}</th>
+                                                                    }
+                                                                    {
+                                                                        this.state.viewby != 1 &&
+                                                                        <th className="text-center" style={{ width: '350px' }}>{i18n.t('static.procurementagent.procurementagent')}</th>
+                                                                    }
 
-                                            {this.state.shipmentList.length > 0 &&
-                                                <div className="table-responsive ">
-                                                    <Table id="mytable2" responsive className="table-striped  table-fixed table-hover table-bordered text-center mt-2">
+                                                                    <th className="text-center" style={{ width: '350px' }}>{i18n.t('static.common.status')}</th>
+                                                                </tr>
+                                                            </thead>
 
-                                                        <thead>
-                                                            <tr>
-                                                                <th className="text-center" style={{ width: '350px' }}> {i18n.t('static.dashboard.months')} </th>
-                                                                <th className="text-center " style={{ width: '350px' }}> {i18n.t('static.program.realmcountry')} </th>
-                                                                <th className="text-center" style={{ width: '350px' }}>{i18n.t('static.supplyPlan.amountInUSD')}</th>
+                                                            <tbody>
                                                                 {
-                                                                    this.state.viewby == 1 &&
-                                                                    <th className="text-center" style={{ width: '350px' }}>{i18n.t('static.budget.fundingsource')}</th>
-                                                                }
-                                                                {
-                                                                    this.state.viewby != 1 &&
-                                                                    <th className="text-center" style={{ width: '350px' }}>{i18n.t('static.procurementagent.procurementagent')}</th>
-                                                                }
+                                                                    this.state.shipmentList.map((item, idx) =>
+                                                                        <tr id="addr0" key={idx} >
+                                                                            <td>{moment(this.state.shipmentList[idx].transDate, 'YYYY-MM-dd').format('MMM YYYY')}</td>
+                                                                            <td>{getLabelText(this.state.shipmentList[idx].country.label, this.state.lang)}</td>
+                                                                            <td>{this.state.shipmentList[idx].amount.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                                            <td>{getLabelText(this.state.shipmentList[idx].fundingSourceProcurementAgent.label, this.state.lang)}</td>
+                                                                            <td>{getLabelText(this.state.shipmentList[idx].shipmentStatus.label, this.state.lang)}</td>
+                                                                        </tr>
+                                                                    )}
 
-                                                                <th className="text-center" style={{ width: '350px' }}>{i18n.t('static.common.status')}</th>
-                                                            </tr>
-                                                        </thead>
+                                                            </tbody>
+                                                        </Table>
+                                                    </div>
+                                                }
 
-                                                        <tbody>
-                                                            {
-                                                                this.state.shipmentList.map((item, idx) =>
-                                                                    <tr id="addr0" key={idx} >
-                                                                        <td>{moment(this.state.shipmentList[idx].transDate, 'YYYY-MM-dd').format('MMM YYYY')}</td>
-                                                                        <td>{getLabelText(this.state.shipmentList[idx].country.label, this.state.lang)}</td>
-                                                                        <td>{this.state.shipmentList[idx].amount.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
-                                                                        <td>{getLabelText(this.state.shipmentList[idx].fundingSourceProcurementAgent.label, this.state.lang)}</td>
-                                                                        <td>{getLabelText(this.state.shipmentList[idx].shipmentStatus.label, this.state.lang)}</td>
-                                                                    </tr>
-                                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </Col>
+                            </div>
+                            <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                    <div class="align-items-center">
+                                        <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-                                                        </tbody>
-                                                    </Table>
-                                                </div>
-                                            }
+                                        <div class="spinner-border blue ml-4" role="status">
 
                                         </div>
                                     </div>
                                 </div>
-                            </Col>
+                            </div>
 
                         </div>
 
                     </CardBody>
                 </Card>
-                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div class="align-items-center">
-                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-                            <div class="spinner-border blue ml-4" role="status">
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            </div >
         );
     }
 }

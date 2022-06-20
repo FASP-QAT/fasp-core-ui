@@ -322,7 +322,7 @@ class ListRoleComponent extends Component {
             filters: true,
             license: JEXCEL_PRO_KEY,
             contextMenu: function (obj, x, y, e) {
-                return [];
+                return false;
             }.bind(this),
         };
         var roleEl = jexcel(document.getElementById("tableDiv"), options);
@@ -334,7 +334,7 @@ class ListRoleComponent extends Component {
     hideFirstComponent() {
         this.timeout = setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
     componentWillUnmount() {
         clearTimeout(this.timeout);
@@ -343,14 +343,14 @@ class ListRoleComponent extends Component {
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
 
     addNewRole() {
         this.props.history.push("/role/addRole");
     }
     editRole(role) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_ROLE')) {
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_ROLE')) {
             this.props.history.push({
                 pathname: `/role/editRole/${role.roleId}`,
                 // state: { role }
@@ -363,7 +363,7 @@ class ListRoleComponent extends Component {
             // console.log("HEADER SELECTION--------------------------");
         } else {
             if (this.state.selSource.length != 0) {
-                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_ROLE')) {
+                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_ROLE')) {
                     this.props.history.push({
                         pathname: `/role/editRole/${this.el.getValueFromCoords(0, x)}`,
                         // state: { role }
@@ -440,20 +440,6 @@ class ListRoleComponent extends Component {
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
     }
-    selected = function (instance, cell, x, y, value) {
-
-        if ((x == 0 && value != 0) || (y == 0)) {
-            // console.log("HEADER SELECTION--------------------------");
-        } else {
-            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_ROLE')) {
-                this.props.history.push({
-                    pathname: `/role/editRole/${this.el.getValueFromCoords(0, x)}`,
-                    // state: { role }
-                });
-            }
-        }
-    }.bind(this);
-
 
 
     showRoleLabel(cell, row) {
@@ -477,34 +463,36 @@ class ListRoleComponent extends Component {
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
-                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
-                <Card style={{ display: this.state.loading ? "none" : "block" }}>
+                <h5 className="red" id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+                <Card>
                     <div className="Card-header-addicon">
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '} */}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_ROLE') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewRole}><i className="fa fa-plus-square"></i></a>}
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_ROLE') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewRole}><i className="fa fa-plus-square"></i></a>}
                                 {/* <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewRole}><i className="fa fa-plus-square"></i></a> */}
                             </div>
                         </div>
                     </div>
                     <CardBody className="pb-md-0">
                         <div className="">
-                            <div id="tableDiv" className="jexcelremoveReadonlybackground"> </div>
+                            <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_ROLE') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
+                            </div>
+                            <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                    <div class="align-items-center">
+                                        <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                        <div class="spinner-border blue ml-4" role="status">
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </CardBody>
                 </Card>
-                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div class="align-items-center">
-                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-                            <div class="spinner-border blue ml-4" role="status">
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         );
     }

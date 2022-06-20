@@ -6,7 +6,7 @@ import {
 import i18n from '../../i18n'
 import getLabelText from '../../CommonComponent/getLabelText';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import MultiSelect from "react-multi-select-component";
+import {MultiSelect} from "react-multi-select-component";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME } from '../../Constants.js'
 import CryptoJS from 'crypto-js'
@@ -54,7 +54,16 @@ class DeleteLocalProgramComponent extends Component {
 
   confirmDeleteLocalProgram = () => {
     let programIds = this.state.programValues.length == 0 ? [] : this.state.programValues.map(ele => (ele.value).toString());
-    if (this.state.programValues.length > 0) {
+    var showAlert=false;
+    var programValues=this.state.programValues;
+    var proList=this.state.programs;
+    for(var pv=0;pv<programValues.length;pv++){
+      var index=proList.findIndex(c=>c.value==programValues[pv].value && c.programModified==1);
+      if(index!=-1){
+        showAlert=true;
+      }
+    }
+    if (this.state.programValues.length > 0 && showAlert) {
       confirmAlert({
         message: i18n.t('static.program.confirmDelete'),
         buttons: [
@@ -72,7 +81,12 @@ class DeleteLocalProgramComponent extends Component {
           }
         ]
       });
-    } else {
+    } else if(this.state.programValues.length > 0 && !showAlert){
+      this.setState({ loading: true })
+      this.deleteLocalProgramFromProgramData(programIds);
+      this.deleteLocalProgramFromDownloadedProgramData(programIds);
+      this.deleteLocalProgramFromProgramQPLDetails(programIds);
+    }else {
       this.setState({ message: i18n.t('static.common.selectProgram') });
     }
   }
@@ -96,7 +110,7 @@ class DeleteLocalProgramComponent extends Component {
       openRequest.onerror = function (event) {
         this.setState({
           message: i18n.t('static.program.errortext'),
-          color: 'red',
+          color: '#BA0C2F',
           loading: false
         })
         // this.hideFirstComponent()
@@ -110,7 +124,7 @@ class DeleteLocalProgramComponent extends Component {
         getRequest.onerror = function (event) {
           this.setState({
             message: i18n.t('static.program.errortext'),
-            color: 'red',
+            color: '#BA0C2F',
             loading: false
           })
           // this.hideFirstComponent()
@@ -142,7 +156,7 @@ class DeleteLocalProgramComponent extends Component {
       openRequest.onerror = function (event) {
         this.setState({
           message: i18n.t('static.program.errortext'),
-          color: 'red',
+          color: '#BA0C2F',
           loading: false
         })
         // this.hideFirstComponent()
@@ -156,7 +170,7 @@ class DeleteLocalProgramComponent extends Component {
         getRequest.onerror = function (event) {
           this.setState({
             message: i18n.t('static.program.errortext'),
-            color: 'red',
+            color: '#BA0C2F',
             loading: false
           })
           // this.hideFirstComponent()
@@ -189,7 +203,7 @@ class DeleteLocalProgramComponent extends Component {
       openRequest.onerror = function (event) {
         this.setState({
           message: i18n.t('static.program.errortext'),
-          color: 'red',
+          color: '#BA0C2F',
           loading: false
         })
         // this.hideFirstComponent()
@@ -203,7 +217,7 @@ class DeleteLocalProgramComponent extends Component {
         getRequest.onerror = function (event) {
           this.setState({
             message: i18n.t('static.program.errortext'),
-            color: 'red',
+            color: '#BA0C2F',
             loading: false
           })
           // this.hideFirstComponent()
@@ -235,7 +249,7 @@ class DeleteLocalProgramComponent extends Component {
     openRequest.onerror = function (event) {
       this.setState({
         message: i18n.t('static.program.errortext'),
-        color: 'red',
+        color: '#BA0C2F',
         loading: false
       })
       // this.hideFirstComponent()
@@ -250,7 +264,7 @@ class DeleteLocalProgramComponent extends Component {
       getRequest.onerror = function (event) {
         this.setState({
           message: i18n.t('static.program.errortext'),
-          color: 'red',
+          color: '#BA0C2F',
           loading: false
         })
         // this.hideFirstComponent()
@@ -269,7 +283,8 @@ class DeleteLocalProgramComponent extends Component {
             // var programJson1 = JSON.parse(programData);
             var programJson = {
               label: myResult[i].programCode + "~v" + myResult[i].version,
-              value: myResult[i].id
+              value: myResult[i].id,
+              programModified:myResult[i].programModified
             }
             proList.push(programJson);
             var programJson1 = {

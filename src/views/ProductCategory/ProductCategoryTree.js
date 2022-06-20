@@ -99,7 +99,7 @@ export default class ProductCategoryTree extends Component {
         document.getElementById('div2').style.display = 'block';
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
 
     componentDidMount() {
@@ -193,7 +193,7 @@ export default class ProductCategoryTree extends Component {
         if (realmId == 0) {
             this.setState({
                 message: i18n.t('static.common.realmtext'),
-                color: 'red',
+                color: '#BA0C2F',
                 productCategoryList: []
             });
             this.hideSecondComponent();
@@ -344,7 +344,7 @@ export default class ProductCategoryTree extends Component {
         } else {//duplicate found
             this.setState({
                 message: i18n.t('static.productCategoryTree.duplicateProductCategoryTree'),
-                color: 'red'
+                color: '#BA0C2F'
             })
             this.hideSecondComponent();
         }
@@ -797,7 +797,7 @@ export default class ProductCategoryTree extends Component {
                                                         buttons: [
                                                             <div>
 
-                                                                <a style={{ color: 'red' }} href="javascript:void();" title="Disable Product Category" onClick={(event) => this.disableNode(rowInfo)} ><i className="fa fa-times"></i></a>
+                                                                <a style={{ color: '#BA0C2F' }} href="javascript:void();" title="Disable Product Category" onClick={(event) => this.disableNode(rowInfo)} ><i className="fa fa-times"></i></a>
                                                             </div>,
                                                         ],
                                                         style: {

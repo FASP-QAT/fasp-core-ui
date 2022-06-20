@@ -127,7 +127,7 @@ export default class EditHealthAreaComponent extends Component {
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
 
 
@@ -420,7 +420,7 @@ export default class EditHealthAreaComponent extends Component {
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
-                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+                <h5 className="red" id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -512,7 +512,7 @@ export default class EditHealthAreaComponent extends Component {
                                         setFieldTouched
                                     }) => (
                                             <Form onSubmit={handleSubmit} noValidate name='healthAreaForm' autocomplete="off">
-                                                <CardBody className="pb-0">
+                                                <CardBody className="pb-0" style={{ display: this.state.loading ? "none" : "block" }}>
                                                     <FormGroup>
                                                         <Label htmlFor="select">{i18n.t('static.healtharea.realm')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
@@ -626,6 +626,17 @@ export default class EditHealthAreaComponent extends Component {
                                                     </FormGroup>
 
                                                 </CardBody>
+                                                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                                        <div class="align-items-center">
+                                                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                                            <div class="spinner-border blue ml-4" role="status">
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
 
                                                 <CardFooter>
                                                     <FormGroup>

@@ -11,7 +11,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
-import { LABEL_REGEX } from '../../Constants.js';
+import { SPECIAL_CHARECTER_WITH_NUM, LABEL_REGEX, SPECIAL_CHARECTER_WITH_NUM_NODOUBLESPACE } from '../../Constants.js';
 import { ALPHABET_NUMBER_REGEX, SPACE_REGEX } from '../../Constants.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import classNames from 'classnames';
@@ -20,7 +20,8 @@ let initialValues = {
     username: "",
     realmId: [],
     emailId: "",
-    phoneNumber: "",
+    // phoneNumber: "",
+    orgAndCountry: "",
     languageId: [],
     roleId: []
 }
@@ -84,19 +85,24 @@ const validationSchema = function (values) {
         //     .matches(/^[0-9]*$/, i18n.t('static.user.validnumber'))
         //     .required(i18n.t('static.user.validphone')),
 
-        needPhoneValidation: Yup.boolean(),
-        phoneNumber: Yup.string()
-            .when("needPhoneValidation", {
-                is: val => {
-                    return document.getElementById("needPhoneValidation").value === "true";
+        // needPhoneValidation: Yup.boolean(),
+        // phoneNumber: Yup.string()
+        //     .when("needPhoneValidation", {
+        //         is: val => {
+        //             return document.getElementById("needPhoneValidation").value === "true";
 
-                },
-                then: Yup.string().min(6, i18n.t('static.user.validphonemindigit'))
-                    .max(15, i18n.t('static.user.validphonemaxdigit'))
-                    .matches(/^[0-9]*$/, i18n.t('static.user.validnumber'))
-                    .required(i18n.t('static.user.validphone')),
-                otherwise: Yup.string().notRequired()
-            }),
+        //         },
+        //         then: Yup.string().min(6, i18n.t('static.user.validphonemindigit'))
+        //             .max(15, i18n.t('static.user.validphonemaxdigit'))
+        //             .matches(/^[0-9]*$/, i18n.t('static.user.validnumber'))
+        //             .required(i18n.t('static.user.validphone')),
+        //         otherwise: Yup.string().notRequired()
+        //     }),
+
+        orgAndCountry: Yup.string()
+            .matches(SPECIAL_CHARECTER_WITH_NUM_NODOUBLESPACE, i18n.t('static.validNoDoubleSpace.string'))
+            .required(i18n.t('static.user.org&CountryText')),
+
     })
 }
 
@@ -140,7 +146,8 @@ class AddUserComponent extends Component {
                 roles: [],
                 username: '',
                 emailId: '',
-                phoneNumber: '',
+                // phoneNumber: '',
+                orgAndCountry: '',
             },
             loading: true,
             roleId: '',
@@ -159,7 +166,7 @@ class AddUserComponent extends Component {
         document.getElementById('div2').style.display = 'block';
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
     realmChange() {
         let { user } = this.state;
@@ -198,8 +205,12 @@ class AddUserComponent extends Component {
         if (event.target.name == "emailId") {
             user.emailId = event.target.value;
         }
-        if (event.target.name == "phoneNumber") {
-            user.phoneNumber = event.target.value;
+        // if (event.target.name == "phoneNumber") {
+        //     user.phoneNumber = event.target.value;
+        // }
+
+        if (event.target.name == "orgAndCountry") {
+            user.orgAndCountry = event.target.value;
         }
 
         if (event.target.name == "realmId") {
@@ -286,7 +297,8 @@ class AddUserComponent extends Component {
             username: true,
             realmId: true,
             emailId: true,
-            phoneNumber: true,
+            // phoneNumber: true,
+            orgAndCountry: true,
             languageId: true,
             roleId: true
         }
@@ -310,7 +322,7 @@ class AddUserComponent extends Component {
 
     componentDidMount() {
         // AuthenticationService.setupAxiosInterceptors();
-        LanguageService.getLanguageList()
+        LanguageService.getLanguageListActive()
             .then(response => {
                 if (response.status == 200) {
                     var listArray = response.data;
@@ -542,9 +554,9 @@ class AddUserComponent extends Component {
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
-                <h5 style={{ color: "red" }} id="div2">
+                <h5 className="red" id="div2">
                     {i18n.t(this.state.message, { entityname })}</h5>
-                <Row style={{ display: this.state.loading ? "none" : "block" }}>
+                <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             {/* <CardHeader>
@@ -633,7 +645,7 @@ class AddUserComponent extends Component {
                                         setFieldTouched
                                     }) => (
                                             <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='userForm' autocomplete="off">
-                                                <CardBody className="pt-2 pb-0">
+                                                <CardBody className="pt-2 pb-0" style={{ display: this.state.loading ? "none" : "block" }}>
                                                     <Input
                                                         type="hidden"
                                                         name="showRealm"
@@ -645,12 +657,12 @@ class AddUserComponent extends Component {
                                                         id="roleValid"
                                                     />
 
-                                                    <Input
+                                                    {/* <Input
                                                         type="hidden"
                                                         name="needPhoneValidation"
                                                         id="needPhoneValidation"
                                                         value={(this.state.user.phoneNumber === '' ? false : true)}
-                                                    />
+                                                    /> */}
 
                                                     <FormGroup>
                                                         <Label htmlFor="realmId">{i18n.t('static.realm.realm')}<span class="red Reqasterisk">*</span></Label>
@@ -706,7 +718,7 @@ class AddUserComponent extends Component {
                                                         />
                                                         <FormFeedback className="red">{errors.emailId}</FormFeedback>
                                                     </FormGroup>
-                                                    <FormGroup>
+                                                    {/* <FormGroup>
                                                         <Label for="phoneNumber">{i18n.t('static.user.phoneNumber')}</Label>
                                                         <Input type="text"
                                                             autocomplete="off"
@@ -720,7 +732,24 @@ class AddUserComponent extends Component {
                                                             required
                                                             value={this.state.user.phoneNumber}
                                                         /><FormFeedback className="red">{errors.phoneNumber}</FormFeedback>
+                                                    </FormGroup> */}
+                                                    <FormGroup>
+                                                        <Label for="orgAndCountry">{i18n.t('static.user.orgAndCountry')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Input type="text"
+                                                            autocomplete="off"
+                                                            name="orgAndCountry"
+                                                            id="orgAndCountry"
+                                                            bsSize="sm"
+                                                            valid={!errors.orgAndCountry && this.state.user.orgAndCountry != ''}
+                                                            invalid={touched.orgAndCountry && !!errors.orgAndCountry}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            maxLength={100}
+                                                            required
+                                                            value={this.state.user.orgAndCountry}
+                                                        /><FormFeedback className="red">{errors.orgAndCountry}</FormFeedback>
                                                     </FormGroup>
+
                                                     <FormGroup className="Selectcontrol-bdrNone">
                                                         <Label htmlFor="roleId">{i18n.t('static.role.role')}<span class="red Reqasterisk">*</span></Label>
                                                         <Select
@@ -765,6 +794,17 @@ class AddUserComponent extends Component {
                                                         <FormFeedback>{errors.languageId}</FormFeedback>
                                                     </FormGroup>
                                                 </CardBody>
+                                                <Row style={{ display: this.state.loading ? "block" : "none" }}>
+                                                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                                        <div class="align-items-center">
+                                                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                                            <div class="spinner-border blue ml-4" role="status">
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </Row>
                                                 <CardFooter>
                                                     <FormGroup>
                                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
@@ -779,17 +819,7 @@ class AddUserComponent extends Component {
                         </Card>
                     </Col>
                 </Row>
-                <Row style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div class="align-items-center">
-                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-                            <div class="spinner-border blue ml-4" role="status">
-
-                            </div>
-                        </div>
-                    </div>
-                </Row>
             </div>
         );
     }
@@ -801,8 +831,12 @@ class AddUserComponent extends Component {
     resetClicked() {
         let { user } = this.state;
         user.username = '';
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN')) {
+            user.realm.realmId = '';
+        }
         user.emailId = '';
-        user.phoneNumber = '';
+        // user.phoneNumber = '';
+        user.orgAndCountry = '';
         user.realm.realmId = '';
         user.language.languageId = '';
         this.state.roleId = '';

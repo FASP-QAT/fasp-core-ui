@@ -16,7 +16,7 @@ import ProcurementAgentService from '../../api/ProcurementAgentService';
 import FundingSourceService from '../../api/FundingSourceService';
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { SECRET_KEY, DATE_FORMAT_CAP, INDEXED_DB_VERSION, INDEXED_DB_NAME } from '../../Constants.js';
+import { SECRET_KEY, DATE_FORMAT_CAP, INDEXED_DB_VERSION, INDEXED_DB_NAME, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH } from '../../Constants.js';
 import CryptoJS from 'crypto-js';
 import {
     Card,
@@ -29,7 +29,7 @@ import {
 } from 'reactstrap';
 import ReportService from '../../api/ReportService';
 
-import MultiSelect from 'react-multi-select-component';
+import {MultiSelect} from 'react-multi-select-component';
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 const ref = React.createRef();
 const pickerLang = {
@@ -40,7 +40,9 @@ class AnnualShipmentCost extends Component {
     constructor(props) {
         super(props);
         var dt = new Date();
-        dt.setMonth(dt.getMonth() - 10);
+        dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
+        var dt1 = new Date();
+        dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
         this.state = {
             matricsList: [],
             dropdownOpen: false,
@@ -64,9 +66,10 @@ class AnnualShipmentCost extends Component {
             fundingSourceValues: [],
             fundingSourceLabels: [],
             lang: localStorage.getItem('lang'),
-            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
-            maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
+            // rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
+            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
+            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
             outPutList: [],
             message: '',
             programId: '',
@@ -158,12 +161,13 @@ class AnnualShipmentCost extends Component {
                         programRequest.onsuccess = function (e) {
                             // this.setState({ loading: true })
                             console.log("2----", programRequest)
-                            var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                            // var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                            // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
 
-                            var programJson = JSON.parse(programData);
-                            console.log("3----", programJson);
+                            // var programJson = JSON.parse(programData);
+                            // console.log("3----", programJson);
 
+                            var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
                             var papuTransaction = db1.transaction(['procurementAgent'], 'readwrite');
                             var papuOs = papuTransaction.objectStore('procurementAgent');
                             var papuRequest = papuOs.getAll();
@@ -192,11 +196,29 @@ class AnnualShipmentCost extends Component {
                                     var fsResult = [];
                                     fsResult = fsRequest.result;
                                     var outPutList = [];
-                                    var shipmentList = [];
-                                    shipmentList = programJson.shipmentList;
-                                    shipmentList=shipmentList.filter(c => (c.active == true || c.active == "true") && (c.accountFlag == true || c.accountFlag == "true"));
                                     this.state.planningUnitValues.map(p => {
-                                        var planningUnitId = p.value
+                                        console.log("P+++++++++++", p);
+                                        var planningUnitId = p.value;
+                                        var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == planningUnitId);
+                                        var programJson = {}
+                                        if (planningUnitDataIndex != -1) {
+                                            var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == planningUnitId))[0];
+                                            var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                                            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                                            programJson = JSON.parse(programData);
+                                        } else {
+                                            programJson = {
+                                                consumptionList: [],
+                                                inventoryList: [],
+                                                shipmentList: [],
+                                                batchInfoList: [],
+                                                supplyPlan: []
+                                            }
+                                        }
+                                        var shipmentList = [];
+                                        shipmentList = programJson.shipmentList;
+                                        shipmentList = shipmentList.filter(c => (c.active == true || c.active == "true") && (c.accountFlag == true || c.accountFlag == "true"));
+                                        var planningUnitLabel = p.label;
                                         var list = shipmentList.filter(c => c.planningUnit.id == planningUnitId)
 
                                         if (reportbaseValue == 1) {
@@ -249,7 +271,7 @@ class AnnualShipmentCost extends Component {
                                                         'fundingsource': fundingSource.fundingSourceCode,
                                                         'procurementAgent': procurementAgent.procurementAgentCode,
                                                         'PLANNING_UNIT_ID': planningUnitId,
-                                                        'planningUnit': list[0].planningUnit.label.label_en
+                                                        'planningUnit': planningUnitLabel
 
                                                     };
                                                     var monthstartfrom = this.state.rangeValue.from.month
@@ -330,7 +352,7 @@ class AnnualShipmentCost extends Component {
                                     loading: false
                                 })
                                 if (error.message === "Network Error") {
-                                    this.setState({ message: error.message,loading: false });
+                                    this.setState({ message: error.message, loading: false });
                                 } else {
                                     switch (error.response ? error.response.status : "") {
                                         case 500:
@@ -338,10 +360,10 @@ class AnnualShipmentCost extends Component {
                                         case 404:
                                         case 406:
                                         case 412:
-                                            this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),loading: false });
+                                            this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }), loading: false });
                                             break;
                                         default:
-                                            this.setState({ message: 'static.unkownError',loading: false });
+                                            this.setState({ message: 'static.unkownError', loading: false });
                                             break;
                                     }
                                 }
@@ -435,7 +457,7 @@ class AnnualShipmentCost extends Component {
                     if (myResult[i].userId == userId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
                         console.log(programNameLabel)
 
@@ -552,7 +574,7 @@ class AnnualShipmentCost extends Component {
 
                     doc.text(doc.internal.pageSize.width / 8, 80, splittext)
                     var y = 80 + splittext.length * 10
-                    splittext = doc.splitTextToSize(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8);
+                    splittext = doc.splitTextToSize(i18n.t('static.report.versionFinal*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8);
 
                     doc.text(doc.internal.pageSize.width / 8, y, splittext)
                     y = y + splittext.length * 10
@@ -597,7 +619,8 @@ class AnnualShipmentCost extends Component {
 
         const marginLeft = 10;
         const doc = new jsPDF(orientation, unit, size, true);
-        var ystart = 160 + doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4).length * 10
+        var ystart = 200 + doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4).length * 10
+        ystart = ystart + 10;
         doc.setFontSize(9);
         doc.setTextColor("#002f6c");
         doc.setFont('helvetica', 'bold')
@@ -939,7 +962,7 @@ class AnnualShipmentCost extends Component {
                     if (myResult[i].userId == userId && myResult[i].programId == programId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = databytes.toString(CryptoJS.enc.Utf8)
                         var version = JSON.parse(programData).currentVersion
 
@@ -952,21 +975,35 @@ class AnnualShipmentCost extends Component {
                 }
 
                 console.log(verList)
+                let versionList = verList.filter(function (x, i, a) {
+                    return a.indexOf(x) === i;
+                });
+                versionList.reverse();
 
                 if (localStorage.getItem("sesVersionIdReport") != '' && localStorage.getItem("sesVersionIdReport") != undefined) {
-                    this.setState({
-                        versions: verList.filter(function (x, i, a) {
-                            return a.indexOf(x) === i;
-                        }),
-                        versionId: localStorage.getItem("sesVersionIdReport")
-                    }, () => {
-                        this.getPlanningUnit();
-                    })
+
+                    let versionVar = versionList.filter(c => c.versionId == localStorage.getItem("sesVersionIdReport"));
+                    if (versionVar != '' && versionVar != undefined) {
+                        this.setState({
+                            versions: versionList,
+                            versionId: localStorage.getItem("sesVersionIdReport")
+                        }, () => {
+                            this.getPlanningUnit();
+                        })
+                    } else {
+                        this.setState({
+                            versions: versionList,
+                            versionId: versionList[0].versionId
+                        }, () => {
+                            this.getPlanningUnit();
+                        })
+                    }
                 } else {
                     this.setState({
-                        versions: verList.filter(function (x, i, a) {
-                            return a.indexOf(x) === i;
-                        })
+                        versions: versionList,
+                        versionId: versionList[0].versionId
+                    }, () => {
+                        this.getPlanningUnit();
                     })
                 }
 
@@ -1037,8 +1074,14 @@ class AnnualShipmentCost extends Component {
                     //let productCategoryId = document.getElementById("productCategoryId").value;
                     ProgramService.getActiveProgramPlaningUnitListByProgramId(programId).then(response => {
                         console.log('**' + JSON.stringify(response.data))
+                        var listArray = response.data;
+                        listArray.sort((a, b) => {
+                            var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                            var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        });
                         this.setState({
-                            planningUnits: response.data, message: ''
+                            planningUnits: listArray, message: ''
                         }, () => {
                             this.fetchData();
                         })
@@ -1373,19 +1416,40 @@ class AnnualShipmentCost extends Component {
 
     setProgramId(event) {
         this.setState({
-            programId: event.target.value
+            programId: event.target.value,
+            versionId: ''
         }, () => {
+            localStorage.setItem("sesVersionIdReport", '');
             this.filterVersion();
         })
 
     }
 
     setVersionId(event) {
-        this.setState({
-            versionId: event.target.value
-        }, () => {
-            this.getPlanningUnit();
-        })
+        // this.setState({
+        //     versionId: event.target.value
+        // }, () => {
+        //     if (this.state.outPutList.length != 0) {
+        //         localStorage.setItem("sesVersionIdReport", this.state.versionId);
+        //         this.fetchData();
+        //     } else {
+        //         this.getPlanningUnit();
+        //     }
+        // })
+        if (this.state.versionId != '' || this.state.versionId != undefined) {
+            this.setState({
+                versionId: event.target.value
+            }, () => {
+                localStorage.setItem("sesVersionIdReport", this.state.versionId);
+                this.fetchData();
+            })
+        } else {
+            this.setState({
+                versionId: event.target.value
+            }, () => {
+                this.getPlanningUnit();
+            })
+        }
 
     }
 
@@ -1395,7 +1459,7 @@ class AnnualShipmentCost extends Component {
             && versions.map((item, i) => {
                 return (
                     <option key={i} value={item.versionId}>
-                        {item.versionId}
+                        {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)}
                     </option>
                 )
             }, this);
@@ -1405,7 +1469,8 @@ class AnnualShipmentCost extends Component {
             && programs.map((item, i) => {
                 return (
                     <option key={i} value={item.programId}>
-                        {getLabelText(item.label, this.state.lang)}
+                        {/* {getLabelText(item.label, this.state.lang)} */}
+                        {(item.programCode)}
                     </option>
                 )
             }, this)
@@ -1481,7 +1546,7 @@ class AnnualShipmentCost extends Component {
                 {/* <h5>{i18n.t(this.props.match.params.message)}</h5> */}
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
 
-                <Card style={{ display: this.state.loading ? "none" : "block" }}>
+                <Card>
                     <div className="Card-header-reporticon">
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.report.annualshipmentcost')}</strong> */}
                         <div className="card-header-actions">
@@ -1578,7 +1643,7 @@ class AnnualShipmentCost extends Component {
                                         </FormGroup> */}
 
                                             <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.versionFinal*')}</Label>
                                                 <div className="controls ">
                                                     <InputGroup>
                                                         <Input
@@ -1608,6 +1673,7 @@ class AnnualShipmentCost extends Component {
                                                         value={this.state.planningUnitValues}
                                                         onChange={(e) => { this.handlePlanningUnitChange(e) }}
                                                         options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
+                                                        disabled={this.state.loading}
                                                     />     </div></FormGroup>
                                             {/* <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
@@ -1645,6 +1711,7 @@ class AnnualShipmentCost extends Component {
                                                             && procurementAgents.map((item, i) => {
                                                                 return ({ label: item.procurementAgentCode, value: item.procurementAgentId })
                                                             }, this)}
+                                                        disabled={this.state.loading}
                                                     />
 
                                                 </div>
@@ -1665,6 +1732,7 @@ class AnnualShipmentCost extends Component {
                                                                     { label: item.fundingSourceCode, value: item.fundingSourceId }
                                                                 )
                                                             }, this)}
+                                                        disabled={this.state.loading}
                                                     />
 
                                                 </div>
@@ -1687,6 +1755,7 @@ class AnnualShipmentCost extends Component {
                                                                     { label: getLabelText(item.label, this.state.lang), value: item.shipmentStatusId }
                                                                 )
                                                             }, this)}
+                                                        disabled={this.state.loading}
                                                     /></div>
 
                                             </FormGroup>
@@ -1697,7 +1766,7 @@ class AnnualShipmentCost extends Component {
                                 </Form>
                                 <Col md="12 pl-0">
 
-                                    <div className="row">
+                                    <div className="row" style={{ display: this.state.loading ? "none" : "block" }}>
                                         <div className="col-md-12 p-0" id="div_id">
                                             {this.state.outPutList.length > 0 &&
                                                 // {true &&
@@ -1708,6 +1777,17 @@ class AnnualShipmentCost extends Component {
 
                                         </div>
                                     </div>
+                                    <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                        <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                            <div class="align-items-center">
+                                                <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                                <div class="spinner-border blue ml-4" role="status">
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </Col>
 
 
@@ -1716,17 +1796,6 @@ class AnnualShipmentCost extends Component {
                         </div>
                     </CardBody>
                 </Card>
-                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div class="align-items-center">
-                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
-                            <div class="spinner-border blue ml-4" role="status">
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         );
     }

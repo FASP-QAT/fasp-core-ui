@@ -10,7 +10,7 @@ class DashboardService {
 
     realmLevelDashboard(realmId) {
         realmId = 1;
-        return axios.get(`${API_URL}/api/realmLevelDashboard/${realmId}`,{
+        return axios.get(`${API_URL}/api/realmLevelDashboard`, {
         });
     }
 
@@ -20,13 +20,18 @@ class DashboardService {
     }
     realmLevelDashboardUserList(realmId) {
         realmId = 1;
-        console.log("realmId---"+realmId);
-        return axios.get(`${API_URL}/api/realmLevelDashboardUserList/${realmId}`, {
+        // console.log("realmId---"+realmId);
+        return axios.get(`${API_URL}/api/realmLevelDashboardUserList`, {
         });
     }
 
     openIssues() {
         return axios.get(`${API_URL}/api/ticket/openIssues/`, {
+        });
+    }
+
+    supplyPlanReviewerLevelDashboard() {
+        return axios.get(`${API_URL}/api/supplyPlanReviewerLevelDashboard/`, {
         });
     }
 }

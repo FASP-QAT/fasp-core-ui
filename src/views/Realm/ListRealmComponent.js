@@ -326,7 +326,7 @@ export default class ReactListComponent extends Component {
     hideFirstComponent() {
         this.timeout = setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
     componentWillUnmount() {
         clearTimeout(this.timeout);
@@ -334,7 +334,7 @@ export default class ReactListComponent extends Component {
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
     componentDidMount() {
         // AuthenticationService.setupAxiosInterceptors();
@@ -359,9 +359,14 @@ export default class ReactListComponent extends Component {
                             data[3] = realmList[j].minMosMinGaurdrail;
                             data[4] = realmList[j].minMosMaxGaurdrail;
                             data[5] = realmList[j].maxMosMaxGaurdrail;
-                            data[6] = realmList[j].lastModifiedBy.username;
-                            data[7] = (realmList[j].lastModifiedDate ? moment(realmList[j].lastModifiedDate).format("YYYY-MM-DD") : null)
-                            data[8] = realmList[j].active;
+
+                            data[6] = realmList[j].minQplTolerance;
+                            data[7] = realmList[j].minQplToleranceCutOff;
+                            data[8] = realmList[j].maxQplTolerance;
+
+                            data[9] = realmList[j].lastModifiedBy.username;
+                            data[10] = (realmList[j].lastModifiedDate ? moment(realmList[j].lastModifiedDate).format("YYYY-MM-DD") : null)
+                            data[11] = realmList[j].active;
 
                             realmArray[count] = data;
                             count++;
@@ -408,6 +413,21 @@ export default class ReactListComponent extends Component {
                                 },
                                 {
                                     title: i18n.t('static.realm.maxMosMaxGaurdraillabel'),
+                                    type: 'numeric', mask: '#,##.00', decimal: '.',
+                                    readOnly: true
+                                },
+                                {
+                                    title: i18n.t('static.realm.minQplTolerance'),
+                                    type: 'numeric', mask: '#,##.00', decimal: '.',
+                                    readOnly: true
+                                },
+                                {
+                                    title: i18n.t('static.realm.minQplToleranceCutOff'),
+                                    type: 'numeric', mask: '#,##.00', decimal: '.',
+                                    readOnly: true
+                                },
+                                {
+                                    title: i18n.t('static.realm.maxQplTolerance'),
                                     type: 'numeric', mask: '#,##.00', decimal: '.',
                                     readOnly: true
                                 },
@@ -463,7 +483,7 @@ export default class ReactListComponent extends Component {
                                             title: i18n.t('static.realm.mapRealmCountry'),
                                             onclick: function () {
                                                 // console.log("onclick------>", this.el.getValueFromCoords(0, y));
-                                                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_REALM_COUNTRY')) {
+                                                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_REALM_COUNTRY')) {
                                                     this.props.history.push({
                                                         pathname: `/realmCountry/RealmCountry/${this.el.getValueFromCoords(0, y)}`,
                                                         // state: { realm: row }
@@ -575,7 +595,7 @@ export default class ReactListComponent extends Component {
     }
     RealmCountry(event, row) {
         event.stopPropagation();
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_REALM_COUNTRY')) {
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_REALM_COUNTRY')) {
             console.log(JSON.stringify(row))
             this.props.history.push({
                 pathname: `/realmCountry/RealmCountry/${row.realmId}`,
@@ -605,8 +625,8 @@ export default class ReactListComponent extends Component {
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
-                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
-                <Card style={{ display: this.state.loading ? "none" : "block" }}>
+                <h5 className="red" id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+                <Card>
                     <div className="Card-header-addicon">
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '} */}
 
@@ -617,23 +637,25 @@ export default class ReactListComponent extends Component {
                         </div>
                     </div>
                     <CardBody className=" pt-md-1 pb-md-1 table-responsive">
-                        {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className="jexcelremoveReadonlybackground">
+                        <div className='consumptionDataEntryTable'>
+                        {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_REALM') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
+                        </div>
+                        </div>
+                        <div style={{ display: this.state.loading ? "block" : "none" }}>
+                            <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                <div class="align-items-center">
+                                    <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                    <div class="spinner-border blue ml-4" role="status">
+
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                     </CardBody>
                 </Card>
 
-                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div class="align-items-center">
-                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
-                            <div class="spinner-border blue ml-4" role="status">
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         );
     }

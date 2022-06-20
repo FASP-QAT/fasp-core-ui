@@ -73,7 +73,7 @@ export default class PlanningUnitListNegativeInventory extends Component {
                     onload: this.loaded,
                     filters: true,
                     contextMenu: function (obj, x, y, e) {
-                        return [];
+                        return false;
                     }.bind(this),
 
                     license: JEXCEL_PRO_KEY,
@@ -135,7 +135,7 @@ export default class PlanningUnitListNegativeInventory extends Component {
                         <strong>Planning Unit List</strong>
                     </CardHeader> */}
                     <CardBody className="pt-lg-0">
-                        <div className="table-responsive" >
+                        <div className="table-responsive consumptionDataEntryTable" >
                             <div id="planningUnitList">
                             </div>
                         </div>

@@ -17,10 +17,10 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import RealmCountryService from '../../api/RealmCountryService';
 import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
-import MultiSelect from "react-multi-select-component";
+import {MultiSelect} from "react-multi-select-component";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, FIRST_DATA_ENTRY_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION } from '../../Constants.js'
+import { SECRET_KEY, FIRST_DATA_ENTRY_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, DATE_FORMAT_CAP } from '../../Constants.js'
 import ReportService from '../../api/ReportService';
 import moment from "moment";
 import {
@@ -49,6 +49,7 @@ const options = {
                 ticks: {
                     beginAtZero: true,
                     fontColor: 'black',
+                    max: 50,
                     callback: function (value) {
                         var cell1 = value
                         cell1 += '';
@@ -122,7 +123,9 @@ class StockStatusOverTime extends Component {
     constructor(props) {
         super(props);
         var dt = new Date();
-        dt.setMonth(dt.getMonth() - 10);
+        dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
+        var dt1 = new Date();
+        dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
         this.state = {
             matricsList: [],
             dropdownOpen: false,
@@ -141,14 +144,15 @@ class StockStatusOverTime extends Component {
             planningUnitlines: [],
             lineData: [],
             lineDates: [],
-            monthsInPastForAmc: 0,
+            monthsInPastForAmc: "",
             monthsInFutureForAmc: 0,
             planningUnitMatrix: {
                 date: []
             },
-            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
-            maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
+            // rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
+            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
+            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
             loading: true,
             programId: '',
             versionId: ''
@@ -174,10 +178,41 @@ class StockStatusOverTime extends Component {
         return Number(Math.round(num * Math.pow(10, 1)) / Math.pow(10, 1)).toFixed(1);
     }
     formatAmc = value => {
-        return Number(Math.round(value * Math.pow(10, 0)) / Math.pow(10, 0));
+        if (value != null) {
+            return Number(Math.round(value * Math.pow(10, 0)) / Math.pow(10, 0));
+        } else {
+            return null;
+        }
     }
     dateFormatter = value => {
         return moment(value).format('MMM YY')
+    }
+    dateFormatterLanguage = value => {
+        if (moment(value).format('MM') === '01') {
+            return (i18n.t('static.month.jan') + ' ' + moment(value).format('YY'))
+        } else if (moment(value).format('MM') === '02') {
+            return (i18n.t('static.month.feb') + ' ' + moment(value).format('YY'))
+        } else if (moment(value).format('MM') === '03') {
+            return (i18n.t('static.month.mar') + ' ' + moment(value).format('YY'))
+        } else if (moment(value).format('MM') === '04') {
+            return (i18n.t('static.month.apr') + ' ' + moment(value).format('YY'))
+        } else if (moment(value).format('MM') === '05') {
+            return (i18n.t('static.month.may') + ' ' + moment(value).format('YY'))
+        } else if (moment(value).format('MM') === '06') {
+            return (i18n.t('static.month.jun') + ' ' + moment(value).format('YY'))
+        } else if (moment(value).format('MM') === '07') {
+            return (i18n.t('static.month.jul') + ' ' + moment(value).format('YY'))
+        } else if (moment(value).format('MM') === '08') {
+            return (i18n.t('static.month.aug') + ' ' + moment(value).format('YY'))
+        } else if (moment(value).format('MM') === '09') {
+            return (i18n.t('static.month.sep') + ' ' + moment(value).format('YY'))
+        } else if (moment(value).format('MM') === '10') {
+            return (i18n.t('static.month.oct') + ' ' + moment(value).format('YY'))
+        } else if (moment(value).format('MM') === '11') {
+            return (i18n.t('static.month.nov') + ' ' + moment(value).format('YY'))
+        } else {
+            return (i18n.t('static.month.dec') + ' ' + moment(value).format('YY'))
+        }
     }
     formatter = value => {
         if (value != null) {
@@ -440,7 +475,7 @@ class StockStatusOverTime extends Component {
                     if (myResult[i].userId == userId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
                         console.log(programNameLabel)
 
@@ -499,7 +534,7 @@ class StockStatusOverTime extends Component {
             console.log(program)
             if (program.length == 1) {
                 this.setState({
-                    monthsInPastForAmc: 0,
+                    monthsInPastForAmc: "",
                     monthsInFutureForAmc: 0
                 }, () => { this.fetchData() })
 
@@ -603,7 +638,7 @@ class StockStatusOverTime extends Component {
                     if (myResult[i].userId == userId && myResult[i].programId == programId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = databytes.toString(CryptoJS.enc.Utf8)
                         var version = JSON.parse(programData).currentVersion
 
@@ -616,20 +651,34 @@ class StockStatusOverTime extends Component {
                 }
 
                 console.log(verList)
+                let versionList = verList.filter(function (x, i, a) {
+                    return a.indexOf(x) === i;
+                })
+                versionList.reverse();
                 if (localStorage.getItem("sesVersionIdReport") != '' && localStorage.getItem("sesVersionIdReport") != undefined) {
-                    this.setState({
-                        versions: verList.filter(function (x, i, a) {
-                            return a.indexOf(x) === i;
-                        }),
-                        versionId: localStorage.getItem("sesVersionIdReport")
-                    }, () => {
-                        this.getPlanningUnit();
-                    })
+
+                    let versionVar = versionList.filter(c => c.versionId == localStorage.getItem("sesVersionIdReport"));
+                    if (versionVar != '' && versionVar != undefined) {
+                        this.setState({
+                            versions: versionList,
+                            versionId: localStorage.getItem("sesVersionIdReport")
+                        }, () => {
+                            this.getPlanningUnit();
+                        })
+                    } else {
+                        this.setState({
+                            versions: versionList,
+                            versionId: versionList[0].versionId
+                        }, () => {
+                            this.getPlanningUnit();
+                        })
+                    }
                 } else {
                     this.setState({
-                        versions: verList.filter(function (x, i, a) {
-                            return a.indexOf(x) === i;
-                        })
+                        versions: versionList,
+                        versionId: versionList[0].versionId
+                    }, () => {
+                        this.getPlanningUnit();
                     })
                 }
 
@@ -707,8 +756,15 @@ class StockStatusOverTime extends Component {
 
                     ProgramService.getActiveProgramPlaningUnitListByProgramId(programId).then(response => {
                         console.log('**' + JSON.stringify(response.data))
+                        var listArray = response.data;
+                        listArray.sort((a, b) => {
+                            var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                            var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        });
                         this.setState({
-                            planningUnits: response.data, message: ''
+                            planningUnits: listArray,
+                            message: ''
                         }, () => {
                             this.fetchData();
                         })
@@ -755,29 +811,6 @@ class StockStatusOverTime extends Component {
                             }
                         }
                     );
-                    // .catch(
-                    //     error => {
-                    //         this.setState({
-                    //             planningUnits: [],
-                    //         })
-                    //         if (error.message === "Network Error") {
-                    //             this.setState({ message: error.message });
-                    //         } else {
-                    //             switch (error.response ? error.response.status : "") {
-                    //                 case 500:
-                    //                 case 401:
-                    //                 case 404:
-                    //                 case 406:
-                    //                 case 412:
-                    //                     this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
-                    //                     break;
-                    //                 default:
-                    //                     this.setState({ message: 'static.unkownError' });
-                    //                     break;
-                    //             }
-                    //         }
-                    //     }
-                    // );
                 }
             }
         });
@@ -786,8 +819,10 @@ class StockStatusOverTime extends Component {
 
     setProgramId(event) {
         this.setState({
-            programId: event.target.value
+            programId: event.target.value,
+            versionId: ''
         }, () => {
+            localStorage.setItem("sesVersionIdReport", '');
             this.filterVersion();
             this.updateMonthsforAMCCalculations()
         })
@@ -795,11 +830,32 @@ class StockStatusOverTime extends Component {
     }
 
     setVersionId(event) {
-        this.setState({
-            versionId: event.target.value
-        }, () => {
-            this.getPlanningUnit();
-        })
+        // this.setState({
+        //     versionId: event.target.value
+        // }, () => {
+        //     if (this.state.matricsList.length != 0) {
+        //         localStorage.setItem("sesVersionIdReport", this.state.versionId);
+        //         this.fetchData();
+        //     } else {
+        //         this.getPlanningUnit();
+        //     }
+
+        // })
+
+        if (this.state.versionId != '' || this.state.versionId != undefined) {
+            this.setState({
+                versionId: event.target.value
+            }, () => {
+                localStorage.setItem("sesVersionIdReport", this.state.versionId);
+                this.fetchData();
+            })
+        } else {
+            this.setState({
+                versionId: event.target.value
+            }, () => {
+                this.getPlanningUnit();
+            })
+        }
 
     }
 
@@ -820,7 +876,7 @@ class StockStatusOverTime extends Component {
         let monthsInFutureForAmc = this.state.monthsInFutureForAmc
         let monthsInPastForAmc = this.state.monthsInPastForAmc
         console.log(monthsInFutureForAmc, monthsInPastForAmc)
-        if (planningUnitIds.length > 0 && versionId != 0 && programId > 0 && monthsInFutureForAmc != undefined && monthsInPastForAmc != undefined && monthsInFutureForAmc != 0 && monthsInPastForAmc != 0) {
+        if (planningUnitIds.length > 0 && versionId != 0 && programId > 0 && monthsInFutureForAmc != undefined && monthsInPastForAmc != undefined && monthsInFutureForAmc != 0 && monthsInPastForAmc != "") {
             if (versionId.includes('Local')) {
                 this.setState({ loading: true })
                 let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
@@ -853,11 +909,27 @@ class StockStatusOverTime extends Component {
                         })
                     }.bind(this);
                     programRequest.onsuccess = function (event) {
-                        var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                        var programJson = JSON.parse(programData);
-                        console.log(programJson)
+                        // var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                        // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                        // var programJson = JSON.parse(programData);
+                        var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
                         planningUnitIds.map(planningUnitId => {
+                            var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == planningUnitId);
+                            var programJson = {}
+                            if (planningUnitDataIndex != -1) {
+                                var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == planningUnitId))[0];
+                                var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                                programJson = JSON.parse(programData);
+                            } else {
+                                programJson = {
+                                    consumptionList: [],
+                                    inventoryList: [],
+                                    shipmentList: [],
+                                    batchInfoList: [],
+                                    supplyPlan: []
+                                }
+                            }
                             var pu = (this.state.planningUnits.filter(c => c.planningUnit.id == planningUnitId))[0]
                             var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && c.active == true);
                             var monthstartfrom = this.state.rangeValue.from.month
@@ -952,6 +1024,8 @@ class StockStatusOverTime extends Component {
                                             amcCalcualted = (sumOfConsumptions) / countAMC;
                                             console.log('amcCalcualted', amcCalcualted, ' endingBalance', endingBalance)
                                             mos = endingBalance < 0 ? 0 / amcCalcualted : endingBalance / amcCalcualted
+                                        } else if (countAMC == 0) {
+                                            amcCalcualted = null;
                                         }
 
 
@@ -971,7 +1045,7 @@ class StockStatusOverTime extends Component {
                                             "consumptionQty": list[0].consumptionQty,
                                             "amc": amcCalcualted,
                                             "amcMonthCount": countAMC,
-                                            "mos": this.roundN(mos)
+                                            "mos": mos != null ? this.roundN(mos) : null
                                         }
                                         data.push(json)
                                         console.log(data)
@@ -982,7 +1056,7 @@ class StockStatusOverTime extends Component {
                                             "planningUnit": pu.planningUnit,
                                             "stock": 0,
                                             "consumptionQty": 0,
-                                            "amc": 0,
+                                            "amc": null,
                                             "amcMonthCount": 0,
                                             "mos": null
                                         }
@@ -1024,7 +1098,7 @@ class StockStatusOverTime extends Component {
                     "programId": programId,
                     "versionId": versionId,
                     "planningUnitIds": planningUnitIds,
-                    "mosPast": document.getElementById("monthsInPastForAmc").selectedOptions[0].value == 0 ? null : document.getElementById("monthsInPastForAmc").selectedOptions[0].value,
+                    "mosPast": document.getElementById("monthsInPastForAmc").selectedOptions[0].value == "" ? null : document.getElementById("monthsInPastForAmc").selectedOptions[0].value,
                     "mosFuture": document.getElementById("monthsInFutureForAmc").selectedOptions[0].value == 0 ? null : document.getElementById("monthsInFutureForAmc").selectedOptions[0].value,
                     "startDate": startDate,
                     "stopDate": stopDate
@@ -1068,6 +1142,7 @@ class StockStatusOverTime extends Component {
                         // lineDates = response.data[0].map(ele => (ele.dt))
                         // planningUnitlines = response.data.map(ele1 => [...new Set(ele1.map(ele => (getLabelText(ele.program.label, this.state.lang) + '-' + getLabelText(ele.planningUnit.label, this.state.lang))))])
 
+                        console.log("RESP-------->", response.data);
                         this.setState({
                             matricsList: response.data,
                             message: '', loading: false
@@ -1152,7 +1227,7 @@ class StockStatusOverTime extends Component {
         } else if (planningUnitIds.length == 0) {
             this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), matricsList: [] });
 
-        } else if (monthsInPastForAmc == undefined || monthsInPastForAmc == 0) {
+        } else if (monthsInPastForAmc == undefined || monthsInPastForAmc == "") {
             this.setState({ message: i18n.t('static.realm.monthInPastForAmcText'), matricsList: [] });
 
         } else {
@@ -1173,7 +1248,7 @@ class StockStatusOverTime extends Component {
         csvRow.push('')
         csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.report.versionFinal*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         this.state.planningUnitValues.map(ele =>
             csvRow.push('"' + (i18n.t('static.planningunit.planningunit') + ' : ' + (ele.label).toString()).replaceAll(' ', '%20') + '"'))
@@ -1188,7 +1263,7 @@ class StockStatusOverTime extends Component {
         var A = [this.addDoubleQuoteToRowContent([i18n.t('static.common.month'), ((i18n.t('static.report.qatPID')).replaceAll(',', '%20')).replaceAll(' ', '%20'), ((i18n.t('static.planningunit.planningunit')).replaceAll(',', '%20')).replaceAll(' ', '%20'), i18n.t('static.report.stock'), ((i18n.t('static.report.consupmtionqty')).replaceAll(',', '%20')).replaceAll(' ', '%20'), i18n.t('static.report.amc'), ((i18n.t('static.report.noofmonth')).replaceAll(',', '%20')).replaceAll(' ', '%20'), i18n.t('static.report.mos')])]
 
 
-        this.state.matricsList.map(elt => A.push(this.addDoubleQuoteToRowContent([this.dateFormatter(elt.dt).replaceAll(' ', '%20'), elt.planningUnit.id, ((getLabelText(elt.planningUnit.label, this.state.lang)).replaceAll(',', '%20')).replaceAll(' ', '%20'), elt.stock == null ? '' : elt.stock, elt.consumptionQty == null ? '' : elt.consumptionQty, this.formatAmc(elt.amc), elt.amcMonthCount, this.roundN(elt.mos)])));
+        this.state.matricsList.map(elt => A.push(this.addDoubleQuoteToRowContent([moment(elt.dt).format(DATE_FORMAT_CAP).replaceAll(' ', '%20'), elt.planningUnit.id, ((getLabelText(elt.planningUnit.label, this.state.lang)).replaceAll(',', '%20')).replaceAll(' ', '%20'), elt.stock == null ? '' : elt.stock, elt.consumptionQty == null ? '' : elt.consumptionQty, elt.amc != null ? this.formatAmc(elt.amc) : "", elt.amcMonthCount, elt.mos != null ? this.roundN(elt.mos) : i18n.t("static.supplyPlanFormula.na")])));
 
 
         for (var i = 0; i < A.length; i++) {
@@ -1264,7 +1339,7 @@ class StockStatusOverTime extends Component {
                     doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
                         align: 'left'
                     })
-                    doc.text(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
+                    doc.text(i18n.t('static.report.versionFinal*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
                         align: 'left'
                     })
                     doc.text(i18n.t('static.report.mospast') + ' : ' + document.getElementById("monthsInPastForAmc").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
@@ -1319,7 +1394,7 @@ class StockStatusOverTime extends Component {
         const headers = [[i18n.t('static.common.month'), i18n.t('static.report.qatPID'), i18n.t('static.planningunit.planningunit'), i18n.t('static.report.stock'), i18n.t('static.report.consupmtionqty'), i18n.t('static.report.amc'), i18n.t('static.report.noofmonth'), i18n.t('static.report.mos')]];
 
         const data = [];
-        this.state.matricsList.map(elt => data.push([this.dateFormatter(elt.dt), elt.planningUnit.id, getLabelText(elt.planningUnit.label, this.state.lang), this.formatter(elt.stock), this.formatter(elt.consumptionQty), this.formatter(this.formatAmc(elt.amc)), elt.amcMonthCount, this.roundN(elt.mos)]));
+        this.state.matricsList.map(elt => data.push([this.dateFormatter(elt.dt), elt.planningUnit.id, getLabelText(elt.planningUnit.label, this.state.lang), this.formatter(elt.stock), this.formatter(elt.consumptionQty), this.formatter(this.formatAmc(elt.amc)), elt.amcMonthCount, elt.mos != null ? this.roundN(elt.mos) : i18n.t("static.supplyPlanFormula.na")]));
         doc.addPage()
         startYtable = 80
         let content = {
@@ -1360,7 +1435,8 @@ class StockStatusOverTime extends Component {
             && programs.map((item, i) => {
                 return (
                     <option key={i} value={item.programId}>
-                        {getLabelText(item.label, this.state.lang)}
+                        {/* {getLabelText(item.label, this.state.lang)} */}
+                        {item.programCode}
                     </option>
                 )
             }, this);
@@ -1369,7 +1445,8 @@ class StockStatusOverTime extends Component {
             && versions.map((item, i) => {
                 return (
                     <option key={i} value={item.versionId}>
-                        {item.versionId}
+                        {/* {item.versionId} */}
+                        {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)}
                     </option>
                 )
             }, this);
@@ -1384,26 +1461,39 @@ class StockStatusOverTime extends Component {
             return color;
         }
         console.log(this.state.matricsList)
+        // const backgroundColor = [
+        //     '#4dbd74',
+        //     '#c8ced3',
+        //     '#000',
+        //     '#ffc107',
+        //     '#f86c6b',
+        //     '#205493',
+        //     '#20a8d8',
+        //     '#a6c4ec',
+        //     '#ca3828',
+        //     '#388b70',
+        //     '#f4862a',
+        //     '#ed5626',
+        //     '#4dbd74',
+        //     '#ffc107',
+        //     '#f86c6b'
+        // ]
         const backgroundColor = [
-            '#4dbd74',
-            '#c8ced3',
-            '#000',
-            '#ffc107',
-            '#f86c6b',
-            '#205493',
-            '#20a8d8',
-            '#a6c4ec',
-            '#ca3828',
-            '#388b70',
-            '#f4862a',
-            '#ed5626',
-            '#4dbd74',
-            '#ffc107',
-            '#f86c6b'
+            '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+            '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
+            '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+            '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+            '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
+            '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+            '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
         ]
         console.log(this.state.matricsList)
-        var v = this.state.planningUnitValues.map(pu => this.state.matricsList.filter(c => c.planningUnit.id == pu.value).map(ele => (this.roundN(ele.mos) > 48 ? 48 : this.roundN(ele.mos))))
-        var dts = Array.from(new Set(this.state.matricsList.map(ele => (this.dateFormatter(ele.dt)))))
+
+        // var v = this.state.planningUnitValues.map(pu => this.state.matricsList.filter(c => c.planningUnit.id == pu.value).map(ele => (this.roundN(ele.mos) > 48 ? 48 : this.roundN(ele.mos))))
+        var v = this.state.planningUnitValues.map(pu => this.state.matricsList.filter(c => c.planningUnit.id == pu.value).map(ele => (ele.mos != null ? this.roundN(ele.mos) : i18n.t("static.supplyPlanFormula.na"))))
+        var dts = Array.from(new Set(this.state.matricsList.map(ele => (this.dateFormatterLanguage(ele.dt)))))
+        // var dts = Array.from(new Set(this.state.matricsList.map(ele => (this.dateFormatter(ele.dt)))))
+
         console.log(dts)
         const bar = {
             labels: dts,
@@ -1466,7 +1556,7 @@ class StockStatusOverTime extends Component {
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
                 <SupplyPlanFormulas ref="formulaeChild" />
-                <Card style={{ display: this.state.loading ? "none" : "block" }}>
+                <Card>
                     <div className="Card-header-reporticon">
                         <div className="card-header-actions">
                             <a className="card-header-action">
@@ -1541,7 +1631,7 @@ class StockStatusOverTime extends Component {
                                         </FormGroup>
 
                                         <FormGroup className="col-md-3">
-                                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.versionFinal*')}</Label>
                                             <div className="controls">
                                                 <InputGroup>
                                                     <Input
@@ -1573,6 +1663,7 @@ class StockStatusOverTime extends Component {
                                                     value={this.state.planningUnitValues}
                                                     onChange={(e) => { this.handlePlanningUnitChange(e) }}
                                                     labelledBy={i18n.t('static.common.select')}
+                                                    disabled={this.state.loading}
                                                 />
                                                 {/* </InputGroup> */}
                                                 {/* <ReactMultiSelectCheckboxes
@@ -1602,7 +1693,8 @@ class StockStatusOverTime extends Component {
                                                         value={this.state.monthsInPastForAmc}
                                                         onChange={(e) => { this.changeMonthsForamc(e) }}
                                                     >
-                                                        <option value="0">-</option>
+                                                        <option value="">-</option>
+                                                        <option value="0">{0}</option>
                                                         <option value="1">{1}</option>
                                                         <option value="2">{2}</option>
                                                         <option value="3">{3}</option>
@@ -1662,6 +1754,7 @@ class StockStatusOverTime extends Component {
 
                                     </div>
                                 </div>
+                                <div className="col-md-12 pt-1"> <span><b>{i18n.t('static.stockStatusOverTime.noteBelowGraph')}</b></span></div>
                                 <div className="col-md-12">
                                     <button className="mr-1 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
                                         {this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
@@ -1672,10 +1765,11 @@ class StockStatusOverTime extends Component {
                                 <br></br>
                             </div>}</div>
 
-                        <div className="row">
+                        <div className="row mt-4" style={{ display: this.state.loading ? "none" : "block" }}>
                             <div className="col-md-12">
                                 {this.state.show && this.state.matricsList.length > 0 &&
-                                    <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
+                                <div className='table-responsive fixTableHead'>
+                                    <Table className="table-striped table-bordered text-center">
 
                                         <thead>
                                             <tr>
@@ -1713,29 +1807,31 @@ class StockStatusOverTime extends Component {
                                                             {this.formatter(item.amcMonthCount)}
                                                         </td>
                                                         <td>
-                                                            {this.roundN(item.mos)}
+                                                            {item.mos != null ? this.roundN(item.mos) : i18n.t("static.supplyPlanFormula.na")}
                                                         </td>
 
                                                     </tr>)}
 
 
                                         </tbody>
-                                    </Table>}
+                                    </Table>
+                                    </div>}
 
+                            </div>
+                        </div>
+                        <div style={{ display: this.state.loading ? "block" : "none" }}>
+                            <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                <div class="align-items-center">
+                                    <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                    <div class="spinner-border blue ml-4" role="status">
+
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </CardBody></Card>
-                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div class="align-items-center">
-                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-                            <div class="spinner-border blue ml-4" role="status">
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
             </div>
 

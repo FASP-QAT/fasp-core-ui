@@ -315,7 +315,7 @@ class RealmDashboard extends Component {
 
   render() {
     const { activeIndex } = this.state;
-    const checkOnline = localStorage.getItem('typeOfSession');
+    const checkOnline = localStorage.getItem('sessionType');
     const slides = this.state.users.map((item) => {
 
       return (

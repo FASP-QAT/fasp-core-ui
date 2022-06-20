@@ -103,7 +103,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
         document.getElementById('div2').style.display = 'block';
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
     capitalize(event) {
         if (event.target.name === "skuCode") {
@@ -1037,8 +1037,8 @@ export default class AddProcurementAgentProcurementUnit extends Component {
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
-                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>
-                <div style={{ display: this.state.loading ? "none" : "block" }}>
+                <h5 className="red" id="div2">{i18n.t(this.state.message)}</h5>
+                <div>
 
                     <Card  >
 
@@ -1048,10 +1048,21 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                         <CardBody className="p-0">
                             <Col xs="12" sm="12">
                                 <h4 className="red">{this.props.message}</h4>
-                                <div className="table-responsive" >
+                                <div className="table-responsive consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
                                     <div id="mapPlanningUnit">
                                     </div>
                                 </div>
+                                <Row style={{ display: this.state.loading ? "block" : "none" }}>
+                                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                        <div class="align-items-center">
+                                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                            <div class="spinner-border blue ml-4" role="status">
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </Row>
                             </Col>
                         </CardBody>
                         <CardFooter>
@@ -1071,17 +1082,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                     </Card>
 
                 </div>
-                <Row style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div class="align-items-center">
-                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-                            <div class="spinner-border blue ml-4" role="status">
-
-                            </div>
-                        </div>
-                    </div>
-                </Row>
             </div>
 
         );

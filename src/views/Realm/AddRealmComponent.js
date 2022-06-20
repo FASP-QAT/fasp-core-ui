@@ -15,7 +15,10 @@ const initialValues = {
     label: '',
     minMosMinGaurdrail: '',
     minMosMaxGaurdrail: '',
-    maxMosMaxGaurdrail: ''
+    maxMosMaxGaurdrail: '',
+    minQplTolerance: '',
+    minQplToleranceCutOff: '',
+    maxQplTolerance: ''
 }
 
 const validationSchema = function (values) {
@@ -47,6 +50,25 @@ const validationSchema = function (values) {
             .integer(i18n.t('static.realm.decimalNotAllow'))
             // .matches(/^[0-9]*$/, i18n.t('static.user.validnumber'))
             .required(i18n.t('static.realm.maxMosMaxGaurdrail')),
+
+        minQplTolerance: Yup.number()
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
+            .integer(i18n.t('static.realm.decimalNotAllow'))
+            .required(i18n.t('static.validated.minQplTolerance'))
+            .min(0, i18n.t('static.program.validvaluetext')),
+        minQplToleranceCutOff: Yup.number()
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
+            .integer(i18n.t('static.realm.decimalNotAllow'))
+            .required(i18n.t('static.validated.minQplToleranceCutOff'))
+            .min(0, i18n.t('static.program.validvaluetext')),
+        maxQplTolerance: Yup.number()
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
+            .integer(i18n.t('static.realm.decimalNotAllow'))
+            .required(i18n.t('static.validated.maxQplTolerance'))
+            .min(0, i18n.t('static.program.validvaluetext')),
         // .min(0, i18n.t('static.program.validvaluetext')),
         /*monthInPastForAmc: Yup.number()
             .required(i18n.t('static.realm.monthInPastForAmcText')).min(0, i18n.t('static.program.validvaluetext')),
@@ -99,7 +121,10 @@ export default class AddRealmComponent extends Component {
                 defaultRealm: true,
                 minMosMinGaurdrail: '',
                 minMosMaxGaurdrail: '',
-                maxMosMaxGaurdrail: ''
+                maxMosMaxGaurdrail: '',
+                minQplTolerance: '',
+                minQplToleranceCutOff: '',
+                maxQplTolerance: ''
             },
             message: ''
         }
@@ -127,6 +152,15 @@ export default class AddRealmComponent extends Component {
         if (event.target.name === "maxMosMaxGaurdrail") {
             realm.maxMosMaxGaurdrail = event.target.value
         }
+        if (event.target.name === "minQplTolerance") {
+            realm.minQplTolerance = event.target.value
+        }
+        if (event.target.name === "minQplToleranceCutOff") {
+            realm.minQplToleranceCutOff = event.target.value
+        }
+        if (event.target.name === "maxQplTolerance") {
+            realm.maxQplTolerance = event.target.value
+        }
         /*  if (event.target.name === "monthInPastForAmc") {
               realm.monthInPastForAmc = event.target.value
           }
@@ -152,7 +186,10 @@ export default class AddRealmComponent extends Component {
             label: true,
             minMosMinGaurdrail: true,
             minMosMaxGaurdrail: true,
-            maxMosMaxGaurdrail: true
+            maxMosMaxGaurdrail: true,
+            minQplTolerance: true,
+            minQplToleranceCutOff: true,
+            maxQplTolerance: true
         }
         )
         this.validateForm(errors)
@@ -178,7 +215,7 @@ export default class AddRealmComponent extends Component {
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
     Capitalize(str) {
         let { realm } = this.state
@@ -191,8 +228,8 @@ export default class AddRealmComponent extends Component {
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
-                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
-                <Row style={{ display: this.state.loading ? "none" : "block" }}>
+                <h5 className="red" id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+                <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             {/* <CardHeader>
@@ -277,7 +314,7 @@ export default class AddRealmComponent extends Component {
                                         handleReset
                                     }) => (
                                             <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='realmForm' autocomplete="off">
-                                                <CardBody>
+                                                <CardBody style={{ display: this.state.loading ? "none" : "block" }}>
 
                                                     <FormGroup>
                                                         <Label for="label">{i18n.t('static.realm.realmName')}<span class="red Reqasterisk">*</span></Label>
@@ -350,6 +387,51 @@ export default class AddRealmComponent extends Component {
                                                             value={this.state.realm.maxMosMaxGaurdrail}
                                                             required />
                                                         <FormFeedback className="red">{errors.maxMosMaxGaurdrail}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label for="minQplTolerance">{i18n.t('static.realm.minQplTolerance')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Input type="number"
+                                                            // min="0"
+                                                            name="minQplTolerance"
+                                                            id="minQplTolerance"
+                                                            bsSize="sm"
+                                                            valid={!errors.minQplTolerance && this.state.realm.minQplTolerance != ''}
+                                                            invalid={touched.minQplTolerance && !!errors.minQplTolerance}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.realm.minQplTolerance}
+                                                            required />
+                                                        <FormFeedback className="red">{errors.minQplTolerance}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label for="minQplToleranceCutOff">{i18n.t('static.realm.minQplToleranceCutOff')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Input type="number"
+                                                            // min="0"
+                                                            name="minQplToleranceCutOff"
+                                                            id="minQplToleranceCutOff"
+                                                            bsSize="sm"
+                                                            valid={!errors.minQplToleranceCutOff && this.state.realm.minQplToleranceCutOff != ''}
+                                                            invalid={touched.minQplToleranceCutOff && !!errors.minQplToleranceCutOff}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.realm.minQplToleranceCutOff}
+                                                            required />
+                                                        <FormFeedback className="red">{errors.minQplToleranceCutOff}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label for="maxQplTolerance">{i18n.t('static.realm.maxQplTolerance')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Input type="number"
+                                                            // min="0"
+                                                            name="maxQplTolerance"
+                                                            id="maxQplTolerance"
+                                                            bsSize="sm"
+                                                            valid={!errors.maxQplTolerance && this.state.realm.maxQplTolerance != ''}
+                                                            invalid={touched.maxQplTolerance && !!errors.maxQplTolerance}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.realm.maxQplTolerance}
+                                                            required />
+                                                        <FormFeedback className="red">{errors.maxQplTolerance}</FormFeedback>
                                                     </FormGroup>
                                                     {/*  <FormGroup>
                                                         <Label for="monthInPastForAmc">{i18n.t('static.realm.monthInPastForAmc')}</Label>
@@ -429,10 +511,21 @@ export default class AddRealmComponent extends Component {
                                                         </FormGroup>
                                                     </FormGroup>
                                                 </CardBody>
+                                                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                                        <div class="align-items-center">
+                                                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                                            <div class="spinner-border blue ml-4" role="status">
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
 
                                                 <CardFooter>
                                                     <FormGroup>
-                                                        <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                         <Button type="reset" color="warning" size="md" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                         &nbsp;
@@ -445,17 +538,7 @@ export default class AddRealmComponent extends Component {
                         </Card>
                     </Col>
                 </Row>
-                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div class="align-items-center">
-                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-                            <div class="spinner-border blue ml-4" role="status">
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         );
     }
@@ -472,6 +555,9 @@ export default class AddRealmComponent extends Component {
         realm.minMosMinGaurdrail = ''
         realm.minMosMaxGaurdrail = ''
         realm.maxMosMaxGaurdrail = ''
+        realm.minQplTolerance = ''
+        realm.minQplToleranceCutOff = ''
+        realm.maxQplTolerance = ''
         realm.defaultRealm = true
         this.setState(
             {

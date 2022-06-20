@@ -40,7 +40,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, DATE_FORMAT_CAP } from '../../Constants.js'
 import moment, { version } from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
@@ -101,7 +101,9 @@ class ForcastMatrixOverTime extends Component {
     this.toggle = this.toggle.bind(this);
     this.onRadioBtnClick = this.onRadioBtnClick.bind(this);
     var dt = new Date();
-    dt.setMonth(dt.getMonth() - 10);
+    dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
+    var dt1 = new Date();
+    dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
     this.state = {
       loading: true,
       matricsList: [],
@@ -115,9 +117,10 @@ class ForcastMatrixOverTime extends Component {
       countries: [],
       show: false,
       singleValue2: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
-      rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-      minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
-      maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
+      // rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+      rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
+      minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
+      maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
       programId: '',
       versionId: '',
       planningUnitLabel: ''
@@ -140,7 +143,7 @@ class ForcastMatrixOverTime extends Component {
     document.getElementById('div2').style.display = 'block';
     setTimeout(function () {
       document.getElementById('div2').style.display = 'none';
-    }, 8000);
+    }, 30000);
   }
 
   formatter = value => {
@@ -161,6 +164,10 @@ class ForcastMatrixOverTime extends Component {
   }
   dateFormatter = value => {
     return moment(value).format('MMM YY')
+  }
+
+  dateFormatterCSV = value => {
+    return moment(value).format(DATE_FORMAT_CAP)
   }
   makeText = m => {
     if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
@@ -201,7 +208,7 @@ class ForcastMatrixOverTime extends Component {
     csvRow.push('')
     csvRow.push('"' + (i18n.t('static.program.program') + ': ' + (document.getElementById("programId").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
     csvRow.push('')
-    csvRow.push('"' + (i18n.t('static.report.version') + ' : ' + (document.getElementById("versionId").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
+    csvRow.push('"' + (i18n.t('static.report.versionFinal*') + ' : ' + (document.getElementById("versionId").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
     csvRow.push('')
     csvRow.push('"' + (i18n.t('static.planningunit.planningunit') + ' : ' + (document.getElementById("planningUnitId").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
     csvRow.push('')
@@ -215,7 +222,7 @@ class ForcastMatrixOverTime extends Component {
 
 
     for (var item = 0; item < re.length; item++) {
-      A.push(this.addDoubleQuoteToRowContent([this.dateFormatter(re[item].month).replaceAll(' ', '%20'), re[item].forecastedConsumption == null ? '' : re[item].forecastedConsumption, re[item].actualConsumption == null ? '' : re[item].actualConsumption, re[item].message == null ? this.PercentageFormatter(re[item].forecastError) : (i18n.t(re[item].message)).replaceAll(' ', '%20')]))
+      A.push(this.addDoubleQuoteToRowContent([this.dateFormatterCSV(re[item].month).replaceAll(' ', '%20'), re[item].forecastedConsumption == null ? '' : re[item].forecastedConsumption, re[item].actualConsumption == null ? '' : re[item].actualConsumption, re[item].message == null ? this.PercentageFormatter(re[item].forecastError) : (i18n.t(re[item].message)).replaceAll(' ', '%20')]))
     }
     for (var i = 0; i < A.length; i++) {
       csvRow.push(A[i].join(","))
@@ -279,7 +286,7 @@ class ForcastMatrixOverTime extends Component {
           doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
             align: 'left'
           })
-          doc.text(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
+          doc.text(i18n.t('static.report.versionFinal*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
             align: 'left'
           })
           doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 170, {
@@ -443,7 +450,7 @@ class ForcastMatrixOverTime extends Component {
           if (myResult[i].userId == userId) {
             var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
             var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-            var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+            var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
             var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
             console.log(programNameLabel)
 
@@ -562,7 +569,7 @@ class ForcastMatrixOverTime extends Component {
           if (myResult[i].userId == userId && myResult[i].programId == programId) {
             var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
             var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-            var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+            var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
             var programData = databytes.toString(CryptoJS.enc.Utf8)
             var version = JSON.parse(programData).currentVersion
 
@@ -574,22 +581,38 @@ class ForcastMatrixOverTime extends Component {
 
         }
 
-        console.log(verList)
+        console.log(verList);
+        let versionList = verList.filter(function (x, i, a) {
+          return a.indexOf(x) === i;
+        });
+        versionList.reverse();
 
         if (localStorage.getItem("sesVersionIdReport") != '' && localStorage.getItem("sesVersionIdReport") != undefined) {
-          this.setState({
-            versions: verList.filter(function (x, i, a) {
-              return a.indexOf(x) === i;
-            }),
-            versionId: localStorage.getItem("sesVersionIdReport")
-          }, () => {
-            this.getPlanningUnit();
-          })
+
+          let versionVar = versionList.filter(c => c.versionId == localStorage.getItem("sesVersionIdReport"));
+          if (versionVar != '' && versionVar != undefined) {
+            this.setState({
+              versions: versionList,
+              versionId: localStorage.getItem("sesVersionIdReport")
+            }, () => {
+              this.getPlanningUnit();
+            })
+          } else {
+            this.setState({
+              versions: versionList,
+              versionId: versionList[0].versionId
+            }, () => {
+              this.getPlanningUnit();
+            })
+          }
+
+
         } else {
           this.setState({
-            versions: verList.filter(function (x, i, a) {
-              return a.indexOf(x) === i;
-            })
+            versions: versionList,
+            versionId: versionList[0].versionId
+          }, () => {
+            this.getPlanningUnit();
           })
         }
 
@@ -663,8 +686,15 @@ class ForcastMatrixOverTime extends Component {
 
           ProgramService.getActiveProgramPlaningUnitListByProgramId(programId).then(response => {
             console.log('**' + JSON.stringify(response.data))
+            var listArray = response.data;
+            listArray.sort((a, b) => {
+              var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+              var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+              return itemLabelA > itemLabelB ? 1 : -1;
+            });
             this.setState({
-              planningUnits: response.data, message: ''
+              planningUnits: listArray,
+              message: ''
             }, () => {
               this.fetchData();
             })
@@ -749,8 +779,10 @@ class ForcastMatrixOverTime extends Component {
 
   setProgramId(event) {
     this.setState({
-      programId: event.target.value
+      programId: event.target.value,
+      versionId: ''
     }, () => {
+      localStorage.setItem("sesVersionIdReport", '');
       this.filterVersion();
     })
   }
@@ -759,7 +791,12 @@ class ForcastMatrixOverTime extends Component {
     this.setState({
       versionId: event.target.value
     }, () => {
-      this.getPlanningUnit();
+      if (this.state.matricsList.length != 0) {
+        localStorage.setItem("sesVersionIdReport", this.state.versionId);
+        this.fetchData();
+      } else {
+        this.getPlanningUnit();
+      }
     })
   }
 
@@ -807,10 +844,27 @@ class ForcastMatrixOverTime extends Component {
           }.bind(this);
           programRequest.onsuccess = function (event) {
             // this.setState({ loading: true })
-            var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-            var programJson = JSON.parse(programData);
-            console.log('programJson', programJson)
+            // var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+            // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+            // var programJson = JSON.parse(programData);
+            // console.log('programJson', programJson)
+            var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
+            var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == planningUnitId);
+            var programJson = {}
+            if (planningUnitDataIndex != -1) {
+              var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == planningUnitId))[0];
+              var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+              var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+              programJson = JSON.parse(programData);
+            } else {
+              programJson = {
+                consumptionList: [],
+                inventoryList: [],
+                shipmentList: [],
+                batchInfoList: [],
+                supplyPlan: []
+              }
+            }
             var pu = (this.state.planningUnits.filter(c => c.planningUnit.id == planningUnitId))[0]
 
             var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && c.active == true);
@@ -826,7 +880,7 @@ class ForcastMatrixOverTime extends Component {
                 var absvalue = 0;
                 var currentActualconsumption = null;
                 var currentForcastConsumption = null;
-                for (var i = month, j = 0; j <= monthInCalc; i-- , j++) {
+                for (var i = month, j = 0; j <= monthInCalc; i--, j++) {
                   if (i == 0) {
                     i = 12;
                     year = year - 1
@@ -834,30 +888,30 @@ class ForcastMatrixOverTime extends Component {
                   var dt = year + "-" + String(i).padStart(2, '0') + "-01"
                   var conlist = consumptionList.filter(c => c.consumptionDate === dt)
                   console.log(dt, conlist)
-                  var actconsumption = 0;
-                  var forConsumption = 0;
+                  var actconsumption = null;
+                  var forConsumption = null;
                   if (conlist.length == 2) {
                     montcnt = montcnt + 1
                   }
                   for (var l = 0; l < conlist.length; l++) {
                     if (conlist[l].actualFlag.toString() == 'true') {
-                      actconsumption = actconsumption + Math.round(Number(conlist[l].consumptionQty))
+                      actconsumption = (actconsumption == null ? 0 : actconsumption) + Math.round(Number(conlist[l].consumptionQty))
                     } else {
-                      forConsumption = forConsumption + Math.round(Number(conlist[l].consumptionQty))
+                      forConsumption = (forConsumption == null ? 0 : forConsumption) + Math.round(Number(conlist[l].consumptionQty))
                     }
                   }
                   actualconsumption = actualconsumption + actconsumption
                   forcastConsumption = forcastConsumption + forConsumption
                   if (j == 0) {
                     console.log(currentActualconsumption, ' ', actconsumption)
-                    if (currentActualconsumption == null && actconsumption > 0) {
+                    if (currentActualconsumption == null && actconsumption != null) {
                       currentActualconsumption = actconsumption
                     } else if (currentActualconsumption != null) {
                       currentActualconsumption = currentActualconsumption + actconsumption
                     }
-                    currentForcastConsumption = currentForcastConsumption + forConsumption
+                    currentForcastConsumption = forConsumption == null ? null : currentForcastConsumption + forConsumption
                   }
-                  if (actconsumption > 0 && forConsumption > 0)
+                  if (actconsumption != null && forConsumption != null)
                     absvalue = absvalue + (Math.abs(actconsumption - forConsumption))
 
 
@@ -870,8 +924,8 @@ class ForcastMatrixOverTime extends Component {
                   month: new Date(from, month - 1),
                   actualConsumption: currentActualconsumption,
                   forecastedConsumption: currentForcastConsumption,
-                  forecastError: currentActualconsumption > 0 && actualconsumption > 0 ? (((absvalue * 100) / actualconsumption)) : '',
-                  message: montcnt == 0 ? "static.reports.forecastMetrics.noConsumptionAcrossPeriod" : currentActualconsumption == null || currentForcastConsumption == null ? "static.reports.forecastMetrics.noConsumption" : (actualconsumption == null || actualconsumption == 0) ? "static.reports.forecastMetrics.totalConsumptionIs0" : null
+                  forecastError: currentActualconsumption != null && actualconsumption != null ? (((absvalue * 100) / actualconsumption)) : '',
+                  message: montcnt == 0 ? "static.reports.forecastMetrics.noConsumptionAcrossPeriod" : currentActualconsumption == null || currentForcastConsumption == null ? "static.reports.forecastMetrics.noConsumption" : (actualconsumption == null) ? "static.reports.forecastMetrics.totalConsumptionIs0" : null
                 }
                 data.push(json)
                 console.log("Json------------->", json);
@@ -1042,6 +1096,34 @@ class ForcastMatrixOverTime extends Component {
   }
   loading = () => <div className="animated fadeIn pt-1 text-center">{i18n.t('static.common.loading')}</div>
 
+  dateFormatterLanguage = value => {
+    if (moment(value).format('MM') === '01') {
+      return (i18n.t('static.month.jan') + ' ' + moment(value).format('YY'))
+    } else if (moment(value).format('MM') === '02') {
+      return (i18n.t('static.month.feb') + ' ' + moment(value).format('YY'))
+    } else if (moment(value).format('MM') === '03') {
+      return (i18n.t('static.month.mar') + ' ' + moment(value).format('YY'))
+    } else if (moment(value).format('MM') === '04') {
+      return (i18n.t('static.month.apr') + ' ' + moment(value).format('YY'))
+    } else if (moment(value).format('MM') === '05') {
+      return (i18n.t('static.month.may') + ' ' + moment(value).format('YY'))
+    } else if (moment(value).format('MM') === '06') {
+      return (i18n.t('static.month.jun') + ' ' + moment(value).format('YY'))
+    } else if (moment(value).format('MM') === '07') {
+      return (i18n.t('static.month.jul') + ' ' + moment(value).format('YY'))
+    } else if (moment(value).format('MM') === '08') {
+      return (i18n.t('static.month.aug') + ' ' + moment(value).format('YY'))
+    } else if (moment(value).format('MM') === '09') {
+      return (i18n.t('static.month.sep') + ' ' + moment(value).format('YY'))
+    } else if (moment(value).format('MM') === '10') {
+      return (i18n.t('static.month.oct') + ' ' + moment(value).format('YY'))
+    } else if (moment(value).format('MM') === '11') {
+      return (i18n.t('static.month.nov') + ' ' + moment(value).format('YY'))
+    } else {
+      return (i18n.t('static.month.dec') + ' ' + moment(value).format('YY'))
+    }
+  }
+
   render() {
     const { planningUnits } = this.state;
     let planningUnitList = planningUnits.length > 0
@@ -1066,7 +1148,7 @@ class ForcastMatrixOverTime extends Component {
       && versions.map((item, i) => {
         return (
           <option key={i} value={item.versionId}>
-            {item.versionId}
+            {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)}
           </option>
         )
       }, this);
@@ -1183,7 +1265,8 @@ class ForcastMatrixOverTime extends Component {
 
     const bar = {
 
-      labels: this.state.matricsList.map((item, index) => (this.dateFormatter(item.month))),
+      // labels: this.state.matricsList.map((item, index) => (this.dateFormatter(item.month))),
+      labels: this.state.matricsList.map((item, index) => (this.dateFormatterLanguage(item.month))),
       datasets: [
         {
           type: "line",
@@ -1225,7 +1308,7 @@ class ForcastMatrixOverTime extends Component {
         <SupplyPlanFormulas ref="formulaeChild" />
         <Row>
           <Col lg="12">
-            <Card style={{ display: this.state.loading ? "none" : "block" }}>
+            <Card>
               <div className="Card-header-reporticon pb-2">
                 <div className="card-header-actions">
                   <a className="card-header-action">
@@ -1307,7 +1390,8 @@ class ForcastMatrixOverTime extends Component {
                                     && programs.map((item, i) => {
                                       return (
                                         <option key={i} value={item.programId}>
-                                          {getLabelText(item.label, this.state.lang)}
+                                          {/* {getLabelText(item.label, this.state.lang)} */}
+                                          {(item.programCode)}
                                         </option>
                                       )
                                     }, this)}
@@ -1357,7 +1441,7 @@ class ForcastMatrixOverTime extends Component {
 
                             </FormGroup>*/}
                           <FormGroup className="col-md-3">
-                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
+                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.versionFinal*')}</Label>
                             <div className="controls">
                               <InputGroup>
                                 <Input
@@ -1399,7 +1483,7 @@ class ForcastMatrixOverTime extends Component {
                         </div>
                       </div>
                     </Form>
-                    <Col md="12 pl-0">
+                    <Col md="12 pl-0" style={{ display: this.state.loading ? "none" : "block" }}>
                       <div className="row">
                         {
                           this.state.matricsList.length > 0
@@ -1420,9 +1504,10 @@ class ForcastMatrixOverTime extends Component {
                       </div>
 
                       <div className="row">
-                        <div className="col-md-12">
+                        <div className="col-md-12 mt-2">
                           {this.state.show && this.state.matricsList.length > 0 &&
-                            <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
+                          <div className='fixTableHead table-responsive'>
+                            <Table  className="table-striped table-bordered text-center ">
 
                               <thead>
                                 <tr>
@@ -1456,27 +1541,27 @@ class ForcastMatrixOverTime extends Component {
 
                                 }
                               </tbody>
-                            </Table>}
+                            </Table>
+                            </div>}
 
                         </div>
                       </div></Col>
+                    <div style={{ display: this.state.loading ? "block" : "none" }}>
+                      <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                          <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
+                          <div class="spinner-border blue ml-4" role="status">
+
+                          </div>
+                        </div>
+                      </div>
+                    </div>
 
 
                   </div>
                 </div></CardBody>
             </Card>
-            <div style={{ display: this.state.loading ? "block" : "none" }}>
-              <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                <div class="align-items-center">
-                  <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
-                  <div class="spinner-border blue ml-4" role="status">
-
-                  </div>
-                </div>
-              </div>
-            </div>
           </Col>
         </Row>
 

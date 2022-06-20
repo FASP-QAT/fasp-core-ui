@@ -523,7 +523,7 @@ export default class ShipmentDelinking extends Component {
     hideFirstComponent() {
         this.timeout = setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
     componentWillUnmount() {
         clearTimeout(this.timeout);
@@ -532,7 +532,7 @@ export default class ShipmentDelinking extends Component {
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
 
     buildJExcel() {
@@ -640,7 +640,7 @@ export default class ShipmentDelinking extends Component {
             filters: true,
             license: JEXCEL_PRO_KEY,
             contextMenu: function (obj, x, y, e) {
-                return [];
+                return false;
             }.bind(this),
             // contextMenu: function (obj, x, y, e) {
             //     var items = [];
@@ -826,7 +826,7 @@ export default class ShipmentDelinking extends Component {
             this.setState({
                 outputList: [],
                 message: i18n.t('static.program.validselectprogramtext'),
-                color: 'red'
+                color: '#BA0C2F'
             }, () => {
                 this.el = jexcel(document.getElementById("tableDiv"), '');
                 this.el.destroy();
@@ -836,7 +836,7 @@ export default class ShipmentDelinking extends Component {
             this.setState({
                 outputList: [],
                 message: i18n.t('static.procurementUnit.validPlanningUnitText'),
-                color: 'red'
+                color: '#BA0C2F'
             }, () => {
                 this.el = jexcel(document.getElementById("tableDiv"), '');
                 this.el.destroy();
@@ -882,7 +882,7 @@ export default class ShipmentDelinking extends Component {
                 else {
 
                     this.setState({
-                        message: response.data.messageCode, loading: false, color: 'red'
+                        message: response.data.messageCode, loading: false, color: '#BA0C2F'
                     },
                         () => {
                             this.hideSecondComponent();
@@ -953,7 +953,7 @@ export default class ShipmentDelinking extends Component {
                     else {
 
                         this.setState({
-                            message: response.data.messageCode, color: 'red'
+                            message: response.data.messageCode, color: '#BA0C2F'
                         },
                             () => {
                                 this.hideSecondComponent();
@@ -1244,7 +1244,7 @@ export default class ShipmentDelinking extends Component {
                                                         id="notesTxt"
                                                         bsSize="sm"
                                                         autocomplete="off"
-                                                        maxLength={600}
+                                                        // maxLength={600}
                                                     >
                                                     </Input>
                                                 </InputGroup>
@@ -1252,7 +1252,7 @@ export default class ShipmentDelinking extends Component {
                                         </FormGroup>
 
                                     }
-                                    <h5 style={{ color: 'red', marginLeft: '16px', marginTop: '-12px' }}>{i18n.t(this.state.enterNotes)}</h5>
+                                    <h5 style={{ color: '#BA0C2F', marginLeft: '16px', marginTop: '-12px' }}>{i18n.t(this.state.enterNotes)}</h5>
 
                                 </Col>
 

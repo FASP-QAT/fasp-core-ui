@@ -47,12 +47,47 @@ class PlanningUnitService {
         return axios.post(`${API_URL}/api/planningUnit/programs`, json, {}
         );
     }
-    getPlanningUnitByTracerCategory(planningUnitId, procurementAgentId,term) {
+    getPlanningUnitByTracerCategory(planningUnitId, procurementAgentId, term) {
         return axios.get(`${API_URL}/api/getPlanningUnitByTracerCategory/planningUnitId/${planningUnitId}/${procurementAgentId}/${term}`, {}
         );
     }
     getActivePlanningUnitByProductCategoryId(json) {
         return axios.get(`${API_URL}/api/planningUnit/productCategory/${json}/active`, {}
+        );
+    }
+
+    getActivePlanningUnitByProductCategoryIds(json) {
+        return axios.post(`${API_URL}/api/planningUnit/productCategoryList/active`, json, {}
+        );
+    }
+
+    getActivePlanningUnitByRealmCountryId(realmCountryId) {
+        return axios.get(`${API_URL}/api/planningUnit/realmCountry/${realmCountryId}`, {}
+        );
+    }
+
+    getActivePlanningUnitListByFUId(forecastingUnitId) {
+        return axios.get(`${API_URL}/api/planningUnit/forecastingUnit/${forecastingUnitId}`, {}
+        );
+    }
+
+    getPlanningUnitByProgramIdsAndTracerCategorieIds(json) {
+        return axios.post(`${API_URL}/api/planningUnit/tracerCategory/program/`, json, {}
+        );
+    }
+
+    getProcurementAgentPlanningUnitByPlanningUnitIds(json) {
+        return axios.post(`${API_URL}/api/procurementAgent/planningUnits`, json, {}
+        );
+    }
+
+    getPlanningUnitByTracerCategoryIds(json) {
+        return axios.post(`${API_URL}/api/planningUnit/tracerCategorys`, json, {}
+        );
+    }
+
+    getPlanningUnitListByProgramVersionIdForSelectedForecastMap(programId,versionId) {
+        return axios.get(`${API_URL}/api/planningUnit/programId/${programId}/versionId/${versionId}`, {}
         );
     }
 }

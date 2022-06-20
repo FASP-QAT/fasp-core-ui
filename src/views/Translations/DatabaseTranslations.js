@@ -13,6 +13,7 @@ import LabelsService from '../../api/LabelService.js';
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from "../../Constants";
+import getLabelText from "../../CommonComponent/getLabelText";
 
 const entityname = i18n.t('static.label.databaseTranslations');
 export default class DatabaseTranslations extends React.Component {
@@ -24,7 +25,8 @@ export default class DatabaseTranslations extends React.Component {
             changedFlag: [],
             labelList: [],
             rowId: 1,
-            loading: true
+            loading: true,
+            lang: localStorage.getItem('lang'),
         }
         this.saveData = this.saveData.bind(this)
         this.cancelClicked = this.cancelClicked.bind(this);
@@ -33,7 +35,7 @@ export default class DatabaseTranslations extends React.Component {
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
 
     componentDidMount() {
@@ -41,16 +43,18 @@ export default class DatabaseTranslations extends React.Component {
         LabelsService.getDatabaseLabelsList().then(response => {
             if (response.status == 200) {
                 var json = response.data;
+                console.log("Json@@@@@@@@@@@@",json)
                 var data = [];
                 var label = [];
                 for (var i = 0; i < json.length; i++) {
                     data = [];
                     data[0] = json[i].labelId;// A
                     data[1] = `${i18n.t(json[i].labelFor)}`;//B
-                    data[2] = json[i].label_en;//C
-                    data[3] = json[i].label_fr;//D
-                    data[4] = json[i].label_pr;//E
-                    data[5] = json[i].label_sp;//F
+                    data[2] = json[i].relatedTo!=null?getLabelText(json[i].relatedTo,this.state.lang):""
+                    data[3] = json[i].label_en;//C
+                    data[4] = json[i].label_fr;//D
+                    data[5] = json[i].label_pr;//E
+                    data[6] = json[i].label_sp;//F
                     label[i] = data;
                 }
                 var options = {
@@ -58,6 +62,7 @@ export default class DatabaseTranslations extends React.Component {
                     colHeaders: [
                         `${i18n.t('static.translation.labelId')}`,
                         `${i18n.t('static.translation.labelFor')}`,
+                        `${i18n.t('static.databaseTranslations.relatedTo')}`,
                         `${i18n.t('static.translation.english')}`,
                         `${i18n.t('static.translation.french')}`,
                         `${i18n.t('static.translation.pourtegese')}`,
@@ -66,6 +71,7 @@ export default class DatabaseTranslations extends React.Component {
                     colWidths: [80, 80, 80, 80, 80],
                     columns: [
                         { type: 'hidden' },
+                        { type: 'text', readOnly: true },
                         { type: 'text', readOnly: true }
                     ],
                     pagination: localStorage.getItem("sesRecordCount"),
@@ -91,7 +97,7 @@ export default class DatabaseTranslations extends React.Component {
                     filters: true,
                     license: JEXCEL_PRO_KEY,
                     contextMenu: function (obj, x, y, e) {
-                        return [];
+                        return false;
                     }.bind(this),
                     // tableHeight: '500px',
                 };
@@ -109,6 +115,7 @@ export default class DatabaseTranslations extends React.Component {
             }
         }).catch(
             error => {
+                console.log("Error@@@@@@@@",error)
                 if (error.message === "Network Error") {
                     this.setState({
                         message: 'static.unkownError',
@@ -153,7 +160,7 @@ export default class DatabaseTranslations extends React.Component {
         jExcelLoadedFunction(instance);
         var asterisk = document.getElementsByClassName("resizable")[0];
         var tr = asterisk.firstChild;
-        tr.children[3].classList.add('AsteriskTheadtrTd');
+        tr.children[4].classList.add('AsteriskTheadtrTd');
     }
 
     saveData = function () {
@@ -162,10 +169,10 @@ export default class DatabaseTranslations extends React.Component {
         var mapOfLastRow = new Map(Object.entries(tableJson))
         var jsonOfLastRow = {
             labelId: mapOfLastRow.get("0"),
-            label_en: mapOfLastRow.get("2"),
-            label_sp: mapOfLastRow.get("5"),
-            label_fr: mapOfLastRow.get("3"),
-            label_pr: mapOfLastRow.get("4")
+            label_en: mapOfLastRow.get("3"),
+            label_sp: mapOfLastRow.get("6"),
+            label_fr: mapOfLastRow.get("4"),
+            label_pr: mapOfLastRow.get("5")
         }
         labelList[this.state.rowId] = (JSON.stringify(jsonOfLastRow));
         this.setState({
@@ -188,6 +195,7 @@ export default class DatabaseTranslations extends React.Component {
                 }
             }).catch(
                 error => {
+                    console.log("Error@@@@@@@@@",error)
                     if (error.message === "Network Error") {
                         this.setState({
                             message: 'static.unkownError',
@@ -235,8 +243,8 @@ export default class DatabaseTranslations extends React.Component {
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
-                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
-                <Row style={{ display: this.state.loading ? "none" : "block" }}>
+                <h5 className="red" id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+                <Row>
 
                     <Col xs="12" sm="12">
                         <Card>
@@ -245,7 +253,19 @@ export default class DatabaseTranslations extends React.Component {
                             </CardHeader> */}
                             <CardBody className="table-responsive pt-md-1 pb-md-1">
                                 {/* <div id="loader" className="center"></div> */}
-                                <div id="databaseTranslationTable"></div>
+                                <div id="databaseTranslationTable" className="consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
+                                </div>
+                                <Row style={{ display: this.state.loading ? "block" : "none" }}>
+                                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                        <div class="align-items-center">
+                                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                            <div class="spinner-border blue ml-4" role="status">
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </Row>
                             </CardBody>
                             <CardFooter>
                                 <FormGroup>
@@ -257,17 +277,7 @@ export default class DatabaseTranslations extends React.Component {
                         </Card>
                     </Col>
                 </Row>
-                <Row style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div class="align-items-center">
-                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-                            <div class="spinner-border blue ml-4" role="status">
-
-                            </div>
-                        </div>
-                    </div>
-                </Row>
             </div>
         )
     }
@@ -278,7 +288,7 @@ export default class DatabaseTranslations extends React.Component {
     }
 
     changed = function (instance, cell, x, y, value) {
-        if (x == 2) {
+        if (x == 3) {
             var col = ("C").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setComments(col, `${i18n.t('static.label.fieldRequired')}`);
@@ -288,13 +298,13 @@ export default class DatabaseTranslations extends React.Component {
                 this.el.setComments(col, "");
                 this.el.setStyle(col, "background-color", "transparent");
             }
-        } else if (x == 3) {
+        } else if (x == 4) {
             var col = ("D").concat(parseInt(y) + 1);
             this.el.setStyle(col, "background-color", "transparent");
-        } else if (x == 4) {
+        } else if (x == 5) {
             var col = ("E").concat(parseInt(y) + 1);
             this.el.setStyle(col, "background-color", "transparent");
-        } else if (x == 5) {
+        } else if (x == 6) {
             var col = ("F").concat(parseInt(y) + 1);
             this.el.setStyle(col, "background-color", "transparent");
         }
@@ -304,10 +314,10 @@ export default class DatabaseTranslations extends React.Component {
         var map = new Map(Object.entries(tableJson))
         var json = {
             labelId: map.get("0"),
-            label_en: map.get("2"),
-            label_sp: map.get("5"),
-            label_fr: map.get("3"),
-            label_pr: map.get("4")
+            label_en: map.get("3"),
+            label_sp: map.get("6"),
+            label_fr: map.get("4"),
+            label_pr: map.get("5")
         }
         labelList[y] = (JSON.stringify(json));
         this.setState({

@@ -369,7 +369,7 @@ export default class BudgetTicketComponent extends Component {
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
 
     submitHandler = event => {
@@ -460,7 +460,7 @@ export default class BudgetTicketComponent extends Component {
 
         return (
             <div className="col-md-12">
-                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>
+                <h5 className="red" id="div2">{i18n.t(this.state.message)}</h5>
                 <h4>{i18n.t('static.dashboard.budget')}</h4>
                 <br></br>
                 <div style={{ display: this.state.loading ? "none" : "block" }}>

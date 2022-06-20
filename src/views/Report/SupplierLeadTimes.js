@@ -28,7 +28,7 @@ import BootstrapTable from 'react-bootstrap-table-next';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator';
-import MultiSelect from 'react-multi-select-component';
+import {MultiSelect} from 'react-multi-select-component';
 import jexcel from 'jexcel-pro';
 import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
@@ -233,7 +233,7 @@ class SupplierLeadTimes extends Component {
             filters: true,
             license: JEXCEL_PRO_KEY,
             contextMenu: function (obj, x, y, e) {
-                return [];
+                return false;
             }.bind(this),
         };
         var languageEl = jexcel(document.getElementById("tableDiv"), options);
@@ -691,7 +691,7 @@ class SupplierLeadTimes extends Component {
                     if (myResult[i].userId == userId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
                         console.log(programNameLabel)
 
@@ -798,7 +798,7 @@ class SupplierLeadTimes extends Component {
                     if (myResult[i].userId == userId && myResult[i].programId == programId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = databytes.toString(CryptoJS.enc.Utf8)
                         var version = JSON.parse(programData).currentVersion
 
@@ -1737,7 +1737,7 @@ class SupplierLeadTimes extends Component {
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
 
-                <Card style={{ display: this.state.loading ? "none" : "block" }}>
+                <Card>
                     <div className="Card-header-reporticon">
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.supplierLeadTimes')}</strong> */}
                         {/* <i className="icon-menu"></i><strong>Procurement Agent Lead Times</strong> */}
@@ -1794,7 +1794,8 @@ class SupplierLeadTimes extends Component {
                                                     && programs.map((item, i) => {
                                                         return (
                                                             <option key={i} value={item.programId}>
-                                                                {getLabelText(item.label, this.state.lang)}
+                                                                {/* {getLabelText(item.label, this.state.lang)} */}
+                                                                {(item.programCode)}
                                                             </option>
                                                         )
                                                     }, this)}
@@ -1814,6 +1815,7 @@ class SupplierLeadTimes extends Component {
                                             value={this.state.planningUnitValues}
                                             onChange={(e) => { this.handlePlanningUnitChange(e) }}
                                             options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
+                                            disabled={this.state.loading}
                                         />
 
                                     </div>
@@ -1830,14 +1832,26 @@ class SupplierLeadTimes extends Component {
                                             value={this.state.procurementAgenttValues}
                                             onChange={(e) => { this.handleProcurementAgentChange(e) }}
                                             options={procurementAgentList && procurementAgentList.length > 0 ? procurementAgentList : []}
+                                            disabled={this.state.loading}
                                         />
                                     </div>
                                 </FormGroup>
                             </div>
                         </div>
                         {/* </Form> */}
-                        <div className="ReportSearchMarginTop">
-                            <div id="tableDiv" className="jexcelremoveReadonlybackground">
+                        <div className="ReportSearchMarginTop SupplierLeadTable" style={{ display: this.state.loading ? "none" : "block" }}>
+                            <div id="tableDiv" className="jexcelremoveReadonlybackground consumptionDataEntryTable">
+                            </div>
+                        </div>
+                        <div style={{ display: this.state.loading ? "block" : "none" }}>
+                            <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                <div class="align-items-center">
+                                    <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                    <div class="spinner-border blue ml-4" role="status">
+
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -1846,17 +1860,6 @@ class SupplierLeadTimes extends Component {
 
                     </CardBody>
                 </Card>
-                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div class="align-items-center">
-                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
-                            <div class="spinner-border blue ml-4" role="status">
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
             </div>
         );

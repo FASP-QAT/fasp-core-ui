@@ -24,7 +24,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import RealmCountryService from '../../api/RealmCountryService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, polling } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, polling, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
@@ -38,7 +38,7 @@ import ProgramService from '../../api/ProgramService';
 import FundingSourceService from '../../api/FundingSourceService';
 import ShipmentStatusService from '../../api/ShipmentStatusService';
 import { Online, Offline } from "react-detect-offline";
-import MultiSelect from 'react-multi-select-component';
+import {MultiSelect} from 'react-multi-select-component';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { Multiselect } from 'multiselect-react-dropdown';
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
@@ -262,7 +262,9 @@ class ShipmentGlobalDemandView extends Component {
         this.toggledata = this.toggledata.bind(this);
         this.onRadioBtnClick = this.onRadioBtnClick.bind(this);
         var dt = new Date();
-        dt.setMonth(dt.getMonth() - 10);
+        dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
+        var dt1 = new Date();
+        dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
         this.state = {
             labels: ['PSM', 'GF', 'Local', 'Govt'],
             datasets: [{
@@ -302,9 +304,10 @@ class ShipmentGlobalDemandView extends Component {
             table1Headers: [],
             show: false,
             message: '',
-            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
-            maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
+            // rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
+            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
+            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
             loading: true,
             programLst: []
         };
@@ -1969,8 +1972,14 @@ class ShipmentGlobalDemandView extends Component {
                                 // (response.data).sort(function (a, b) {
                                 //     return getLabelText(a.label, this.state.lang).localeCompare(getLabelText(b.label, this.state.lang)); //using String.prototype.localCompare()
                                 // });
+                                var listArray = response.data;
+                                listArray.sort((a, b) => {
+                                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                                    return itemLabelA > itemLabelB ? 1 : -1;
+                                });
                                 this.setState({
-                                    planningUnits: response.data,
+                                    planningUnits: listArray,
                                 }, () => {
                                     this.fetchData()
                                 });
@@ -2119,7 +2128,8 @@ class ShipmentGlobalDemandView extends Component {
             && programLst.map((item, i) => {
                 return (
 
-                    { label: getLabelText(item.label, this.state.lang), value: item.programId }
+                    // { label: getLabelText(item.label, this.state.lang), value: item.programId }
+                    { label: (item.programCode), value: item.programId }
 
                 )
             }, this);
@@ -2234,14 +2244,14 @@ class ShipmentGlobalDemandView extends Component {
             datasets: [{
                 label: i18n.t('static.shipment.orderedShipment'),
                 data: this.state.planningUnitSplit.map(ele => (ele.orderedShipmentQty)),
-                backgroundColor: '#6a82a8',
+                backgroundColor: '#0067B9',
                 borderWidth: 0
 
             },
             {
                 label: i18n.t('static.shipment.plannedShipment'),
                 data: this.state.planningUnitSplit.map(ele => (ele.plannedShipmentQty)),
-                backgroundColor: '#dee7f8',
+                backgroundColor: '#A7C6ED',
                 borderWidth: 0,
             }
             ]
@@ -2251,13 +2261,22 @@ class ShipmentGlobalDemandView extends Component {
             labels: [...new Set(this.state.fundingSourceSplit.map(ele => ele.fundingSource.code))],
             datasets: [{
                 data: this.state.fundingSourceSplit.map(ele => (ele.amount)),
-                backgroundColor: ['#4dbd74', '#f86c6b', '#8aa9e6', '#EDB944', '#20a8d8',
-                    '#042e6a',
-                    '#59cacc', '#118b70',
-                    '#EDB944',
-                    '#F48521',
-                    '#ED5626',
-                    '#3fe488'],
+                // backgroundColor: ['#4dbd74', '#f86c6b', '#8aa9e6', '#EDB944', '#20a8d8',
+                //     '#042e6a',
+                //     '#59cacc', '#118b70',
+                //     '#EDB944',
+                //     '#F48521',
+                //     '#ED5626',
+                //     '#3fe488'],
+                backgroundColor: [
+                    '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+                    '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
+                    '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+                    '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+                    '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
+                    '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+                    '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+                ],
                 legend: {
                     position: 'bottom'
                 }
@@ -2276,7 +2295,7 @@ class ShipmentGlobalDemandView extends Component {
             return '?'
         }
 
-        const checkOnline = localStorage.getItem('typeOfSession');
+        const checkOnline = localStorage.getItem('sessionType');
 
         return (
             <div className="animated fadeIn" >
@@ -2284,7 +2303,7 @@ class ShipmentGlobalDemandView extends Component {
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
 
-                <Card style={{ display: this.state.loading ? "none" : "block" }}>
+                <Card>
                     <div className="Card-header-reporticon">
                         {(this.state.fundingSourceSplit.length > 0 || this.state.planningUnitSplit.length > 0 || this.state.procurementAgentSplit.length > 0) &&
                             <div className="card-header-actions">
@@ -2351,6 +2370,7 @@ class ShipmentGlobalDemandView extends Component {
                                                     value={this.state.countryValues}
                                                     onChange={(e) => { this.handleChange(e) }}
                                                     options={countryList && countryList.length > 0 ? countryList : []}
+                                                    disabled={this.state.loading}
                                                 />
                                             </div>
 
@@ -2367,6 +2387,7 @@ class ShipmentGlobalDemandView extends Component {
                                                     value={this.state.programValues}
                                                     onChange={(e) => { this.handleChangeProgram(e) }}
                                                     options={programList && programList.length > 0 ? programList : []}
+                                                    disabled={this.state.loading}
                                                 />
                                             </div>
 
@@ -2459,6 +2480,7 @@ class ShipmentGlobalDemandView extends Component {
                                                     value={this.state.planningUnitValues}
                                                     onChange={(e) => { this.handlePlanningUnitChange(e) }}
                                                     options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
+                                                    disabled={this.state.loading}
                                                 // options={fundingSourceList && fundingSourceList.length > 0 ? fundingSourceList : []}
                                                 />
 
@@ -2491,6 +2513,7 @@ class ShipmentGlobalDemandView extends Component {
                                                     value={this.state.fundingSourceValues}
                                                     onChange={(e) => { this.handleFundingSourceChange(e) }}
                                                     options={fundingSourceList && fundingSourceList.length > 0 ? fundingSourceList : []}
+                                                    disabled={this.state.loading}
                                                 />
                                             </div>
                                         </FormGroup>
@@ -2507,6 +2530,7 @@ class ShipmentGlobalDemandView extends Component {
                                                     value={this.state.shipmentStatusValues}
                                                     onChange={(e) => { this.handleShipmentStatusChange(e) }}
                                                     options={shipmentStatusList && shipmentStatusList.length > 0 ? shipmentStatusList : []}
+                                                    disabled={this.state.loading}
                                                 />
                                             </div>
                                         </FormGroup>
@@ -2553,39 +2577,40 @@ class ShipmentGlobalDemandView extends Component {
                                     {/* </Col> */}
                                 </div>
                             </Form>
-                            <Col md="12 pl-0  ">
-                                <div className="row grid-divider ">
+                            <div style={{ display: this.state.loading ? "none" : "block" }}>
+                                <Col md="12 pl-0  ">
+                                    <div className="row grid-divider ">
+                                        {
+                                            this.state.planningUnitSplit.length > 0 &&
+                                            <Col md="8 pl-0">
+                                                <div className="chart-wrapper shipmentOverviewgraphheight" >
+                                                    <HorizontalBar id="cool-canvas1" data={chartData} options={options} />
+                                                </div>
+                                            </Col>
+                                        }
+                                        {
+                                            this.state.fundingSourceSplit.length > 0 &&
+                                            <Col md="4 pl-0">
+                                                <div className="chart-wrapper">
+                                                    <Pie id="cool-canvas2" data={chartDataForPie} options={optionsPie}
+                                                    /><br />
+                                                </div>
+                                                <h5 className="red text-center">{i18n.t('static.report.fundingSourceUsdAmount')}</h5>
+                                            </Col>
+                                        }
+                                    </div>
+
+
+                                </Col>
+                                <Col md="12 pl-0" style={{ position: "absolute", opacity: "0.0", }}>
                                     {
                                         this.state.planningUnitSplit.length > 0 &&
-                                        <Col md="8 pl-0">
-                                            <div className="chart-wrapper shipmentOverviewgraphheight" >
-                                                <HorizontalBar id="cool-canvas1" data={chartData} options={options} />
-                                            </div>
-                                        </Col>
+                                        <div className="chart-wrapper shipmentOverviewgraphheight">
+                                            <HorizontalBar id="cool-canvas11" data={chartData} options={options1} />
+                                        </div>
                                     }
-                                    {
-                                        this.state.fundingSourceSplit.length > 0 &&
-                                        <Col md="4 pl-0">
-                                            <div className="chart-wrapper">
-                                                <Pie id="cool-canvas2" data={chartDataForPie} options={optionsPie}
-                                                /><br />
-                                            </div>
-                                            <h5 className="red text-center">{i18n.t('static.report.fundingSourceUsdAmount')}</h5>
-                                        </Col>
-                                    }
-                                </div>
-
-
-                            </Col>
-                            <Col md="12 pl-0" style={{ position: "absolute", opacity: "0.0", }}>
-                                {
-                                    this.state.planningUnitSplit.length > 0 &&
-                                    <div className="chart-wrapper shipmentOverviewgraphheight">
-                                        <HorizontalBar id="cool-canvas11" data={chartData} options={options1} />
-                                    </div>
-                                }
-                            </Col>
-                            {/* {
+                                </Col>
+                                {/* {
                                 this.state.procurementAgentSplit.length > 0 &&
                                 <Col md="12 pl-0">
                                     <div className="col-md-12 p-0">
@@ -2598,79 +2623,82 @@ class ShipmentGlobalDemandView extends Component {
                                 </Col>
                             } */}
 
-                            <Col md="12 pl-0 pb-lg-1">
-                                <div className="globalviwe-scroll">
-                                    <div className="row">
-                                        <div className="col-md-12">
-                                            {this.state.procurementAgentSplit.length > 0 &&
-                                                <div className="table-responsive ">
-                                                    <Table id="mytable1" responsive className="table-striped  table-fixed table-hover table-bordered text-center mt-2">
+                                <Col md="12 pl-0 pb-lg-1">
+                                    <div className="globalviwe-scroll">
+                                        <div className="row">
+                                            <div className="col-md-12">
+                                                {this.state.procurementAgentSplit.length > 0 &&
+                                                    <div className="table-responsive ">
+                                                        <Table id="mytable1" responsive className="table-striped  table-fixed table-bordered text-center mt-2">
 
-                                                        <thead>
-                                                            <tr>
-                                                                <th rowSpan={2}>{i18n.t('static.dashboard.planningunitheader')}</th>
-                                                                <th colSpan={this.state.table1Headers.length} align='center'>{i18n.t('static.report.procurementAgentName')}</th>
-                                                                <th rowSpan={2}>{i18n.t('static.report.totalUnit')}</th>
-                                                            </tr>
-                                                            <tr>
+                                                            <thead>
+                                                                <tr>
+                                                                    <th rowSpan={2}>{i18n.t('static.dashboard.planningunitheader')}</th>
+                                                                    <th colSpan={this.state.table1Headers.length} align='center'>{i18n.t('static.report.procurementAgentName')}</th>
+                                                                    <th rowSpan={2}>{i18n.t('static.report.totalUnit')}</th>
+                                                                </tr>
+                                                                <tr>
+                                                                    {
+                                                                        this.state.table1Headers.map((item, idx) =>
+                                                                            <th id="addr0" key={idx} className="text-center" style={{ width: '100px' }}>
+                                                                                {this.state.table1Headers[idx]}
+                                                                            </th>
+                                                                        )
+                                                                    }
+                                                                </tr>
+                                                            </thead>
+
+                                                            <tbody>
+
                                                                 {
-                                                                    this.state.table1Headers.map((item, idx) =>
-                                                                        <th id="addr0" key={idx} className="text-center" style={{ width: '100px' }}>
-                                                                            {this.state.table1Headers[idx]}
-                                                                        </th>
-                                                                    )
-                                                                }
-                                                            </tr>
-                                                        </thead>
-
-                                                        <tbody>
-
-                                                            {
-                                                                this.state.procurementAgentSplit.map((item, idx) =>
-                                                                    <tr id="addr0" key={idx} >
-                                                                        <td>{getLabelText(this.state.procurementAgentSplit[idx].planningUnit.label, this.state.lang)}</td>
-                                                                        {
-                                                                            Object.values(this.state.procurementAgentSplit[idx].procurementAgentQty).map((item, idx1) =>
-                                                                                <td id="addr1" key={idx1}>
-                                                                                    {item.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}
-                                                                                </td>
-                                                                            )
-                                                                        }
-                                                                        <td>{this.state.procurementAgentSplit[idx].total.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                                    this.state.procurementAgentSplit.map((item, idx) =>
+                                                                        <tr id="addr0" key={idx} >
+                                                                            <td>{getLabelText(this.state.procurementAgentSplit[idx].planningUnit.label, this.state.lang)}</td>
+                                                                            {
+                                                                                Object.values(this.state.procurementAgentSplit[idx].procurementAgentQty).map((item, idx1) =>
+                                                                                    <td id="addr1" key={idx1}>
+                                                                                        {item.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}
+                                                                                    </td>
+                                                                                )
+                                                                            }
+                                                                            <td>{this.state.procurementAgentSplit[idx].total.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
 
 
-                                                                    </tr>
-                                                                )}
+                                                                        </tr>
+                                                                    )}
 
-                                                        </tbody>
-                                                    </Table>
+                                                            </tbody>
+                                                        </Table>
 
-                                                </div>
+                                                    </div>
 
 
 
-                                            }
+                                                }
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </Col>
+                            </div>
+                            <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                    <div class="align-items-center">
+                                        <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                        <div class="spinner-border blue ml-4" role="status">
 
                                         </div>
                                     </div>
                                 </div>
-                            </Col>
+                            </div>
+
 
                         </div>
 
                     </CardBody>
                 </Card>
-                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div class="align-items-center">
-                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-                            <div class="spinner-border blue ml-4" role="status">
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
             </div >
         );

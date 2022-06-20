@@ -12,7 +12,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import { LABEL_REGEX } from '../../Constants.js';
+import { LABEL_REGEX, SPECIAL_CHARECTER_WITH_NUM, SPECIAL_CHARECTER_WITH_NUM_NODOUBLESPACE } from '../../Constants.js';
 import { ALPHABET_NUMBER_REGEX, SPACE_REGEX } from '../../Constants.js';
 import classNames from 'classnames';
 
@@ -20,7 +20,8 @@ const initialValues = {
     username: "",
     realmId: [],
     emailId: "",
-    phoneNumber: "",
+    // phoneNumber: "",
+    orgAndCountry: "",
     languageId: []
 }
 const entityname = i18n.t('static.user.user')
@@ -44,19 +45,22 @@ const validationSchema = function (values) {
         //     .matches(/^[0-9]*$/, i18n.t('static.user.validnumber'))
         //     .required(i18n.t('static.user.validphone')),
 
-        needPhoneValidation: Yup.boolean(),
-        phoneNumber: Yup.string()
-            .when("needPhoneValidation", {
-                is: val => {
-                    return document.getElementById("needPhoneValidation").value === "true";
+        // needPhoneValidation: Yup.boolean(),
+        // phoneNumber: Yup.string()
+        //     .when("needPhoneValidation", {
+        //         is: val => {
+        //             return document.getElementById("needPhoneValidation").value === "true";
 
-                },
-                then: Yup.string().min(6, i18n.t('static.user.validphonemindigit'))
-                    .max(15, i18n.t('static.user.validphonemaxdigit'))
-                    .matches(/^[0-9]*$/, i18n.t('static.user.validnumber'))
-                    .required(i18n.t('static.user.validphone')),
-                otherwise: Yup.string().notRequired()
-            }),
+        //         },
+        //         then: Yup.string().min(6, i18n.t('static.user.validphonemindigit'))
+        //             .max(15, i18n.t('static.user.validphonemaxdigit'))
+        //             .matches(/^[0-9]*$/, i18n.t('static.user.validnumber'))
+        //             .required(i18n.t('static.user.validphone')),
+        //         otherwise: Yup.string().notRequired()
+        //     }),
+
+        // orgAndCountry: Yup.string()
+        //     .required(i18n.t('static.user.validusername')),
 
         roleId: Yup.string()
             .test('roleValid', i18n.t('static.common.roleinvalidtext'),
@@ -67,6 +71,10 @@ const validationSchema = function (values) {
                     }
                 })
             .required(i18n.t('static.user.validrole')),
+
+        orgAndCountry: Yup.string()
+            .matches(SPECIAL_CHARECTER_WITH_NUM_NODOUBLESPACE, i18n.t('static.validNoDoubleSpace.string'))
+            .required(i18n.t('static.user.org&CountryText')),
     })
 }
 
@@ -114,7 +122,8 @@ class EditUserComponent extends Component {
                 roles: [],
                 username: '',
                 emailId: '',
-                phoneNumber: '',
+                // phoneNumber: '',
+                orgAndCountry: '',
                 roleList: []
             },
             message: '',
@@ -133,7 +142,7 @@ class EditUserComponent extends Component {
         document.getElementById('div2').style.display = 'block';
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
 
     changeLoading(loading) {
@@ -148,9 +157,13 @@ class EditUserComponent extends Component {
         if (event.target.name == "emailId") {
             user.emailId = event.target.value;
         }
-        if (event.target.name == "phoneNumber") {
-            user.phoneNumber = event.target.value;
+        // if (event.target.name == "phoneNumber") {
+        //     user.phoneNumber = event.target.value;
+        // }
+        if (event.target.name == "orgAndCountry") {
+            user.orgAndCountry = event.target.value;
         }
+
         if (event.target.name == "roleId") {
             user.roles = Array.from(event.target.selectedOptions, (item) => item.value);
         }
@@ -175,7 +188,8 @@ class EditUserComponent extends Component {
             username: true,
             realmId: true,
             emailId: true,
-            phoneNumber: true,
+            // phoneNumber: true,
+            orgAndCountry: true,
             languageId: true,
             roleId: true
         }
@@ -322,7 +336,7 @@ class EditUserComponent extends Component {
             }
         );
 
-        LanguageService.getLanguageList()
+        LanguageService.getLanguageListActive()
             .then(response => {
                 if (response.status == 200) {
                     var listArray = response.data;
@@ -534,8 +548,8 @@ class EditUserComponent extends Component {
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
-                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
-                <Row style={{ display: this.state.loading ? "none" : "block" }}>
+                <h5 className="red" id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+                <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             {/* <CardHeader>
@@ -547,7 +561,8 @@ class EditUserComponent extends Component {
                                     username: this.state.user.username,
                                     realmId: this.state.user.realm.realmId,
                                     emailId: this.state.user.emailId,
-                                    phoneNumber: (this.state.user.phoneNumber == null ? '' : this.state.user.phoneNumber),
+                                    // phoneNumber: (this.state.user.phoneNumber == null ? '' : this.state.user.phoneNumber),
+                                    orgAndCountry: this.state.user.orgAndCountry,
                                     roles: this.state.user.roleList,
                                     languageId: this.state.user.language.languageId,
                                     roleId: this.state.user.roleList
@@ -632,18 +647,18 @@ class EditUserComponent extends Component {
                                         setFieldTouched
                                     }) => (
                                             <Form onSubmit={handleSubmit} noValidate name='userForm' autocomplete="off">
-                                                <CardBody className="pt-2 pb-0">
+                                                <CardBody className="pt-2 pb-0" style={{ display: this.state.loading ? "none" : "block" }}>
                                                     <Input
                                                         type="hidden"
                                                         name="roleValid"
                                                         id="roleValid"
                                                     />
-                                                    <Input
+                                                    {/* <Input
                                                         type="hidden"
                                                         name="needPhoneValidation"
                                                         id="needPhoneValidation"
                                                         value={((this.state.user.phoneNumber === '' || this.state.user.phoneNumber == null) ? false : true)}
-                                                    />
+                                                    /> */}
                                                     <FormGroup>
                                                         <Label htmlFor="realmId">{i18n.t('static.realm.realm')}<span class="red Reqasterisk">*</span></Label><Input
                                                             type="text"
@@ -688,7 +703,7 @@ class EditUserComponent extends Component {
                                                         />
                                                         <FormFeedback className="red">{errors.emailId}</FormFeedback>
                                                     </FormGroup>
-                                                    <FormGroup>
+                                                    {/* <FormGroup>
                                                         <Label for="phoneNumber">{i18n.t('static.user.phoneNumber')}</Label>
                                                         <Input type="text"
                                                             name="phoneNumber"
@@ -703,7 +718,24 @@ class EditUserComponent extends Component {
                                                             value={this.state.user.phoneNumber}
                                                         />
                                                         <FormFeedback className="red">{errors.phoneNumber}</FormFeedback>
+                                                    </FormGroup> */}
+                                                    <FormGroup>
+                                                        <Label for="orgAndCountry">{i18n.t('static.user.orgAndCountry')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Input type="text"
+                                                            name="orgAndCountry"
+                                                            id="orgAndCountry"
+                                                            bsSize="sm"
+                                                            valid={!errors.orgAndCountry}
+                                                            invalid={(touched.orgAndCountry && !!errors.orgAndCountry) || !!errors.orgAndCountry}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            maxLength={100}
+                                                            required
+                                                            value={this.state.user.orgAndCountry}
+                                                        /> <FormFeedback className="red">{errors.orgAndCountry}</FormFeedback>
                                                     </FormGroup>
+
+
                                                     <FormGroup className="Selectcontrol-bdrNone">
                                                         <Label htmlFor="roleId">{i18n.t('static.role.role')}<span class="red Reqasterisk">*</span></Label>
                                                         <Select
@@ -797,6 +829,17 @@ class EditUserComponent extends Component {
                                                         </FormGroup>
                                                     </FormGroup>
                                                 </CardBody>
+                                                <Row style={{ display: this.state.loading ? "block" : "none" }}>
+                                                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                                        <div class="align-items-center">
+                                                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                                            <div class="spinner-border blue ml-4" role="status">
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </Row>
                                                 <CardFooter>
                                                     <FormGroup>
                                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
@@ -811,17 +854,7 @@ class EditUserComponent extends Component {
                         </Card>
                     </Col>
                 </Row>
-                <Row style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div class="align-items-center">
-                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-                            <div class="spinner-border blue ml-4" role="status">
-
-                            </div>
-                        </div>
-                    </div>
-                </Row>
             </div>
         );
     }

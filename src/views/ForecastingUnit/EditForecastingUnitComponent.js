@@ -23,7 +23,8 @@ const validationSchema = function (values) {
             .required(i18n.t('static.forecastingunit.forecastingunittext')),
         genericLabel: Yup.string()
             // .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
-            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
+            // .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
+            .matches(/^$|^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
     })
 }
 
@@ -126,7 +127,7 @@ export default class EditForecastingUnitComponent extends Component {
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
 
     changeMessage(message) {
@@ -267,8 +268,8 @@ export default class EditForecastingUnitComponent extends Component {
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
-                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
-                <Row style={{ display: this.state.loading ? "none" : "block" }}>
+                <h5 className="red" id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+                <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             {/* <CardHeader>
@@ -355,7 +356,7 @@ export default class EditForecastingUnitComponent extends Component {
                                         setTouched
                                     }) => (
                                             <Form onSubmit={handleSubmit} noValidate name='forecastingUnitForm' autocomplete="off">
-                                                <CardBody className="pb-0">
+                                                <CardBody className="pb-0" style={{ display: this.state.loading ? "none" : "block" }}>
                                                     <FormGroup>
                                                         <Label htmlFor="realmId">{i18n.t('static.realm.realm')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
@@ -471,6 +472,17 @@ export default class EditForecastingUnitComponent extends Component {
                                                         </FormGroup>
                                                     </FormGroup>
                                                 </CardBody>
+                                                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                                        <div class="align-items-center">
+                                                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                                            <div class="spinner-border blue ml-4" role="status">
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                                 <CardFooter>
                                                     <FormGroup>
                                                         <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}>{i18n.t('static.common.cancel')}</Button>
@@ -489,17 +501,7 @@ export default class EditForecastingUnitComponent extends Component {
                         </Card>
                     </Col>
                 </Row>
-                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div class="align-items-center">
-                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-                            <div class="spinner-border blue ml-4" role="status">
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
                 <div>
                     <h6>{i18n.t(this.state.message, { entityname })}</h6>
                     <h6>{i18n.t(this.props.match.params.message, { entityname })}</h6>

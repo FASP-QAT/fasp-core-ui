@@ -19,13 +19,13 @@ import FundingSourceService from '../../api/FundingSourceService';
 import moment from 'moment';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 
-import MultiSelect from 'react-multi-select-component';
+import {MultiSelect} from 'react-multi-select-component';
 
 import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, DATE_FORMAT_CAP, INDEXED_DB_VERSION, INDEXED_DB_NAME } from '../../Constants.js'
+import { SECRET_KEY, DATE_FORMAT_CAP, INDEXED_DB_VERSION, INDEXED_DB_NAME, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import ReportService from '../../api/ReportService';
 import pdfIcon from '../../assets/img/pdf.png';
@@ -65,7 +65,9 @@ const chartoptions =
         xAxes: [{
             scaleLabel: {
                 display: true,
-                labelString: i18n.t('static.supplyPlan.amountInUSD') + '' + i18n.t('static.report.inmillions'),
+                // labelString: i18n.t('static.supplyPlan.amountInUSD') + '' + i18n.t('static.report.inmillions'),
+                labelString: i18n.t('static.supplyPlan.amountInUSD'),
+                // + '' + i18n.t('static.report.inmillions'),
                 fontColor: 'black',
                 fontStyle: "normal",
                 fontSize: "12"
@@ -73,16 +75,20 @@ const chartoptions =
             ticks: {
                 fontColor: 'black',
                 callback: function (value) {
-                    var cell1 = value
-                    cell1 += '';
-                    var x = cell1.split('.');
-                    var x1 = x[0];
-                    var x2 = x.length > 1 ? '.' + x[1] : '';
-                    var rgx = /(\d+)(\d{3})/;
-                    while (rgx.test(x1)) {
-                        x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                    // var cell1 = value
+                    // cell1 += '';
+                    // var x = cell1.split('.');
+                    // var x1 = x[0];
+                    // var x2 = x.length > 1 ? '.' + x[1] : '';
+                    // var rgx = /(\d+)(\d{3})/;
+                    // while (rgx.test(x1)) {
+                    //     x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                    // }
+                    // return x1 + x2;
+                    if (value != null) {
+                        return Math.floor(value).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
                     }
-                    return x1 + x2;
+
 
                 }
             }
@@ -90,6 +96,8 @@ const chartoptions =
     },
 
     tooltips: {
+        mode: 'index',
+        intersect: false,
         enabled: false,
         custom: CustomTooltips,
         callbacks: {
@@ -98,18 +106,23 @@ const chartoptions =
                 let label = data.labels[tooltipItem.index];
                 let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
 
-                var cell1 = value
-                cell1 += '';
-                var x = cell1.split('.');
-                var x1 = x[0];
-                var x2 = x.length > 1 ? '.' + x[1] : '';
-                var rgx = /(\d+)(\d{3})/;
-                while (rgx.test(x1)) {
-                    x1 = x1.replace(rgx, '$1' + ',' + '$2');
-                }
-                return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
+                // var cell1 = value
+                // cell1 += '';
+                // var x = cell1.split('.');
+                // var x1 = x[0];
+                // var x2 = x.length > 1 ? '.' + x[1] : '';
+                // var rgx = /(\d+)(\d{3})/;
+                // while (rgx.test(x1)) {
+                //     x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                // }
+                // return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
+                return data.datasets[tooltipItem.datasetIndex].label + ' : ' + Math.floor(value).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
             }
         }
+    },
+    hover: {
+        mode: 'index',
+        intersect: false
     },
     maintainAspectRatio: false,
     legend: {
@@ -127,7 +140,9 @@ class Budgets extends Component {
     constructor(props) {
         super(props);
         var dt = new Date();
-        dt.setMonth(dt.getMonth() - 10);
+        dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
+        var dt1 = new Date();
+        dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
         this.state = {
             budgetList: [],
             lang: localStorage.getItem('lang'),
@@ -139,9 +154,10 @@ class Budgets extends Component {
             versions: [],
             show: false,
             loading: true,
-            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
-            maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
+            // rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
+            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
+            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
             fundingSourceValues: [],
             fundingSourceLabels: [],
             fundingSources: [],
@@ -291,27 +307,15 @@ class Budgets extends Component {
     hideFirstComponent() {
         setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
 
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
-    formatter = value => {
 
-        var cell1 = value
-        cell1 += '';
-        var x = cell1.split('.');
-        var x1 = x[0];
-        var x2 = x.length > 1 ? '.' + x[1] : '';
-        var rgx = /(\d+)(\d{3})/;
-        while (rgx.test(x1)) {
-            x1 = x1.replace(rgx, '$1' + ',' + '$2');
-        }
-        return x1 + x2;
-    }
     addDoubleQuoteToRowContent = (arr) => {
         return arr.map(ele => '"' + ele + '"')
     }
@@ -320,7 +324,7 @@ class Budgets extends Component {
         var csvRow = [];
         csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
         csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
-        csvRow.push('"' + (i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('ststatic.report.versionFinal*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         this.state.fundingSourceLabels.map(ele =>
             csvRow.push('"' + (i18n.t('static.budget.fundingsource') + ' : ' + (ele.toString())).replaceAll(' ', '%20') + '"'))
 
@@ -334,7 +338,8 @@ class Budgets extends Component {
         columns.map((item, idx) => { headers[idx] = (item.text).replaceAll(' ', '%20') });
 
         var A = [this.addDoubleQuoteToRowContent(headers)]
-        this.state.selBudget.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.budget.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), "\'" + ((ele.budget.code.replaceAll(',', ' ')).replaceAll(' ', '%20')) + "\'", (ele.fundingSource.code.replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.currency.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), this.roundN(ele.budgetAmt), this.roundN(ele.plannedBudgetAmt), this.roundN(ele.orderedBudgetAmt), this.roundN((ele.budgetAmt - (ele.plannedBudgetAmt + ele.orderedBudgetAmt))), this.formatDate(ele.startDate), this.formatDate(ele.stopDate)])));
+        // this.state.selBudget.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.budget.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), "\'" + ((ele.budget.code.replaceAll(',', ' ')).replaceAll(' ', '%20')) + "\'", (ele.fundingSource.code.replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.currency.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), this.roundN(ele.budgetAmt), this.roundN(ele.plannedBudgetAmt), this.roundN(ele.orderedBudgetAmt), this.roundN((ele.budgetAmt - (ele.plannedBudgetAmt + ele.orderedBudgetAmt))), this.formatDate(ele.startDate), this.formatDate(ele.stopDate)])));
+        this.state.selBudget.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.budget.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), "\'" + ((ele.budget.code.replaceAll(',', ' ')).replaceAll(' ', '%20')) + "\'", (ele.fundingSource.code.replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.currency.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), Math.floor(ele.budgetAmt), Math.floor(ele.plannedBudgetAmt), Math.floor(ele.orderedBudgetAmt), Math.floor((ele.budgetAmt - (ele.plannedBudgetAmt + ele.orderedBudgetAmt))), this.formatDate(ele.startDate), this.formatDate(ele.stopDate)])));
 
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
@@ -390,7 +395,7 @@ class Budgets extends Component {
                     doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
                         align: 'left'
                     })
-                    doc.text(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
+                    doc.text(i18n.t('static.report.versionFinal*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
                         align: 'left'
                     })
                     var fundingSourceText = doc.splitTextToSize((i18n.t('static.budget.fundingsource') + ' : ' + this.state.fundingSourceLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
@@ -421,7 +426,8 @@ class Budgets extends Component {
         doc.addImage(canvasImg, 'png', 50, 200, 750, 260, 'CANVAS');
 
         const headers = columns.map((item, idx) => (item.text));
-        const data = this.state.selBudget.map(ele => [getLabelText(ele.budget.label), ele.budget.code, ele.fundingSource.code, getLabelText(ele.currency.label), this.formatter(this.roundN(ele.budgetAmt)), this.formatter(this.roundN(ele.plannedBudgetAmt)), this.formatter(this.roundN(ele.orderedBudgetAmt)), this.formatter(this.roundN(ele.budgetAmt - (ele.plannedBudgetAmt + ele.orderedBudgetAmt))), this.formatDate(ele.startDate), this.formatDate(ele.stopDate)]);
+        // const data = this.state.selBudget.map(ele => [getLabelText(ele.budget.label), ele.budget.code, ele.fundingSource.code, getLabelText(ele.currency.label), this.formatter(this.roundN(ele.budgetAmt)), this.formatter(this.roundN(ele.plannedBudgetAmt)), this.formatter(this.roundN(ele.orderedBudgetAmt)), this.formatter(this.roundN(ele.budgetAmt - (ele.plannedBudgetAmt + ele.orderedBudgetAmt))), this.formatDate(ele.startDate), this.formatDate(ele.stopDate)]);
+        const data = this.state.selBudget.map(ele => [getLabelText(ele.budget.label), ele.budget.code, ele.fundingSource.code, getLabelText(ele.currency.label), this.formatterValue(ele.budgetAmt), this.formatterValue(ele.plannedBudgetAmt), this.formatterValue(ele.orderedBudgetAmt), this.formatterValue(ele.budgetAmt - (ele.plannedBudgetAmt + ele.orderedBudgetAmt)), this.formatDate(ele.startDate), this.formatDate(ele.stopDate)]);
 
         let content = {
             margin: { top: 80, bottom: 50 },
@@ -513,13 +519,23 @@ class Budgets extends Component {
                             })
                         }.bind(this);
                         programRequest.onsuccess = function (event) {
-                            var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                            var programJson = JSON.parse(programData);
+                            // var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                            // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                            // var programJson = JSON.parse(programData);
+                            var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
+                            var shipmentList = [];
+                            for (var pu = 0; pu < planningUnitDataList.length; pu++) {
+                                var planningUnitData = planningUnitDataList[pu];
+                                var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                                var programJson = JSON.parse(programData);
+                                var sList = programJson.shipmentList;
+                                shipmentList = shipmentList.concat(sList);
+                            }
                             console.log("B** program json ---", programJson);
                             for (var l = 0; l < budgetList.length; l++) {
-                                var shipmentList = programJson.shipmentList.filter(c => (c.active == true || c.active == "true") && (c.accountFlag == true || c.accountFlag == "true"));
-                                var shipmentList = shipmentList.filter(s => s.budget.id == budgetList[l].budgetId);
+                                shipmentList = programJson.shipmentList.filter(c => (c.active == true || c.active == "true") && (c.accountFlag == true || c.accountFlag == "true"));
+                                shipmentList = shipmentList.filter(s => s.budget.id == budgetList[l].budgetId);
                                 console.log("B** shipment list ---", shipmentList);
                                 var plannedShipmentbudget = 0;
                                 (shipmentList.filter(s => (s.shipmentStatus.id == 1 || s.shipmentStatus.id == 2 || s.shipmentStatus.id == 3 || s.shipmentStatus.id == 9))).map(ele => {
@@ -541,11 +557,13 @@ class Budgets extends Component {
                                     program: { id: budgetList[l].program.id, label: budgetList[l].program.label, code: programJson.programCode },
                                     fundingSource: { id: budgetList[l].fundingSource.fundingSourceId, label: budgetList[l].fundingSource.label, code: budgetList[l].fundingSource.fundingSourceCode },
                                     currency: budgetList[l].currency,
-                                    plannedBudgetAmt: (plannedShipmentbudget / budgetList[l].currency.conversionRateToUsd) / 1000000,
-                                    orderedBudgetAmt: (OrderedShipmentbudget / budgetList[l].currency.conversionRateToUsd) / 1000000,
+                                    // plannedBudgetAmt: (plannedShipmentbudget / budgetList[l].currency.conversionRateToUsd) / 1000000,
+                                    // orderedBudgetAmt: (OrderedShipmentbudget / budgetList[l].currency.conversionRateToUsd) / 1000000,
+                                    plannedBudgetAmt: (plannedShipmentbudget / budgetList[l].currency.conversionRateToUsd),
+                                    orderedBudgetAmt: (OrderedShipmentbudget / budgetList[l].currency.conversionRateToUsd),
                                     startDate: budgetList[l].startDate,
                                     stopDate: budgetList[l].stopDate,
-                                    budgetAmt: budgetList[l].budgetAmt / 1000000
+                                    budgetAmt: budgetList[l].budgetAmt
 
                                 }
 
@@ -553,6 +571,29 @@ class Budgets extends Component {
                                 console.log("B** json ---", json);
                             }
                             console.log("B** data ---", data);
+
+                            data.sort(function (a, b) {
+                                var keyA = new Date(a.startDate),
+                                    keyB = new Date(b.startDate);
+                                // Compare the 2 dates
+                                if (keyA < keyB) return -1;
+                                if (keyA > keyB) return 1;
+                                return 0;
+                            });
+                            data.sort(function (a, b) {
+                                var keyA1 = new Date(a.startDate),
+                                    keyA11 = new Date(a.stopDate),
+                                    keyB1 = new Date(b.startDate),
+                                    keyB11 = new Date(b.stopDate);
+                                // Compare the 2 dates
+                                if (keyA1.getTime() === keyB1.getTime()) {
+                                    if (keyA11 < keyB11) return -1;
+                                    if (keyA11 > keyB11) return 1;
+                                }
+                                return 0;
+                            });
+
+                            console.log("data---->", data);
                             this.setState({
                                 selBudget: data,
                                 message: '',
@@ -573,7 +614,7 @@ class Budgets extends Component {
                 // AuthenticationService.setupAxiosInterceptors();
                 ReportService.budgetReport(inputjson)
                     .then(response => {
-                        console.log(JSON.stringify(response.data));
+                        console.log("BudgetData--------", response.data);
                         this.setState({
                             selBudget: response.data, message: '', loading: false
                         })
@@ -773,7 +814,7 @@ class Budgets extends Component {
                     if (myResult[i].userId == userId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
                         console.log(programNameLabel)
 
@@ -894,7 +935,7 @@ class Budgets extends Component {
                     if (myResult[i].userId == userId && myResult[i].programId == programId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = databytes.toString(CryptoJS.enc.Utf8)
                         var version = JSON.parse(programData).currentVersion
 
@@ -907,20 +948,35 @@ class Budgets extends Component {
                 }
 
                 console.log(verList)
+                let versionList = verList.filter(function (x, i, a) {
+                    return a.indexOf(x) === i;
+                });
+                versionList.reverse();
+
                 if (localStorage.getItem("sesVersionIdReport") != '' && localStorage.getItem("sesVersionIdReport") != undefined) {
-                    this.setState({
-                        versions: verList.filter(function (x, i, a) {
-                            return a.indexOf(x) === i;
-                        }),
-                        versionId: localStorage.getItem("sesVersionIdReport")
-                    }, () => {
-                        this.filterData();
-                    })
+
+                    let versionVar = versionList.filter(c => c.versionId == localStorage.getItem("sesVersionIdReport"));
+                    if (versionVar != '' && versionVar != undefined) {
+                        this.setState({
+                            versions: versionList,
+                            versionId: localStorage.getItem("sesVersionIdReport")
+                        }, () => {
+                            this.filterData();
+                        })
+                    } else {
+                        this.setState({
+                            versions: versionList,
+                            versionId: versionList[0].versionId
+                        }, () => {
+                            this.filterData();
+                        })
+                    }
                 } else {
                     this.setState({
-                        versions: verList.filter(function (x, i, a) {
-                            return a.indexOf(x) === i;
-                        })
+                        versions: versionList,
+                        versionId: versionList[0].versionId
+                    }, () => {
+                        this.filterData();
                     })
                 }
 
@@ -942,8 +998,10 @@ class Budgets extends Component {
 
     setProgramId(event) {
         this.setState({
-            programId: event.target.value
+            programId: event.target.value,
+            versionId: ''
         }, () => {
+            localStorage.setItem("sesVersionIdReport", '');
             this.filterVersion();
             this.filterData()
         })
@@ -1002,6 +1060,30 @@ class Budgets extends Component {
         // return currencyCode + "    " + x1 + x2;
         return x1 + x2
     }
+
+    formatter = value => {
+        if (value != null) {
+            var cell1 = parseFloat(value).toFixed(2)
+            cell1 += '';
+            var x = cell1.split('.');
+            var x1 = x[0];
+            var x2 = x.length > 1 ? '.' + x[1] : '';
+            var rgx = /(\d+)(\d{3})/;
+            while (rgx.test(x1)) {
+                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+            }
+            return x1 + x2;
+        } else {
+            return ''
+        }
+    }
+
+    formatterValue = value => {
+        if (value != null) {
+            return Math.floor(value).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+        }
+    }
+
     handleChangeProgram = (programIds) => {
 
         this.setState({
@@ -1022,7 +1104,8 @@ class Budgets extends Component {
             && programs.map((item, i) => {
                 return (
                     <option key={i} value={item.programId}>
-                        {getLabelText(item.label, this.state.lang)}
+                        {/* {getLabelText(item.label, this.state.lang)} */}
+                        {(item.programCode)}
                     </option>
                 )
             }, this);
@@ -1031,7 +1114,7 @@ class Budgets extends Component {
             && versions.map((item, i) => {
                 return (
                     <option key={i} value={item.versionId}>
-                        {item.versionId}
+                        {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)}
                     </option>
                 )
             }, this);
@@ -1047,10 +1130,13 @@ class Budgets extends Component {
         let data3 = []
         for (var i = 0; i < budgets.length; i++) {
             console.log(this.state.selBudget.filter(c => c.budget.id = budgets[i].id))
-            data1 = (this.state.selBudget.filter(c => c.budget.id = budgets[i].id).map(ele => this.roundN(ele.orderedBudgetAmt)))
-            data2 = (this.state.selBudget.filter(c => c.budget.id = budgets[i].id).map(ele => this.roundN(ele.plannedBudgetAmt)))
+            // data1 = (this.state.selBudget.filter(c => c.budget.id = budgets[i].id).map(ele => this.roundN(ele.orderedBudgetAmt)))
+            // data2 = (this.state.selBudget.filter(c => c.budget.id = budgets[i].id).map(ele => this.roundN(ele.plannedBudgetAmt)))
+            // data3 = (this.state.selBudget.filter(c => c.budget.id = budgets[i].id).map(ele => this.roundN(ele.budgetAmt - (ele.orderedBudgetAmt + ele.plannedBudgetAmt))))
 
-            data3 = (this.state.selBudget.filter(c => c.budget.id = budgets[i].id).map(ele => this.roundN(ele.budgetAmt - (ele.orderedBudgetAmt + ele.plannedBudgetAmt))))
+            data1 = (this.state.selBudget.filter(c => c.budget.id = budgets[i].id).map(ele => Math.floor(ele.orderedBudgetAmt)))
+            data2 = (this.state.selBudget.filter(c => c.budget.id = budgets[i].id).map(ele => Math.floor(ele.plannedBudgetAmt)))
+            data3 = (this.state.selBudget.filter(c => c.budget.id = budgets[i].id).map(ele => Math.floor(ele.budgetAmt - (ele.orderedBudgetAmt + ele.plannedBudgetAmt))))
         }
 
         const bar = {
@@ -1170,43 +1256,59 @@ class Budgets extends Component {
             },
             {
                 dataField: 'budgetAmt',
-                text: i18n.t('static.budget.budgetamount') + i18n.t('static.report.inmillions'),
+                text: i18n.t('static.budget.budgetamount'),
+                // + i18n.t('static.report.inmillions'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
                 style: { align: 'center', width: '100px' },
-                formatter: this.roundN
+                // formatter: this.roundN
+                // formatter: this.formatter
+                formatter: this.formatterValue,
             },
             {
                 dataField: 'plannedBudgetAmt',
-                text: i18n.t('static.report.plannedBudgetAmt') + i18n.t('static.report.inmillions'),
+                text: i18n.t('static.report.plannedBudgetAmt'),
+                // + i18n.t('static.report.inmillions'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
                 style: { align: 'center', width: '100px' },
-                formatter: this.roundN,
+                // formatter: this.roundN,
+                // formatter: this.formatter,
+                formatter: this.formatterValue,
                 headerTitle: (cell, row, rowIndex, colIndex) => i18n.t('static.report.plannedbudgetStatus')
             }
             ,
             {
                 dataField: 'orderedBudgetAmt',
-                text: i18n.t('static.report.orderedBudgetAmt') + i18n.t('static.report.inmillions'),
+                text: i18n.t('static.report.orderedBudgetAmt'),
+                // + i18n.t('static.report.inmillions'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
                 style: { align: 'center', width: '100px' },
-                formatter: this.roundN,
+                // formatter: this.roundN,
+                // formatter: this.formatter,
+                formatter: this.formatterValue,
                 headerTitle: (cell, row, rowIndex, colIndex) => i18n.t('static.report.OrderedbudgetStatus')
             },
             {
                 dataField: 'orderedBudgetAmt',
-                text: i18n.t('static.report.remainingBudgetAmt') + i18n.t('static.report.inmillions'),
+                text: i18n.t('static.report.remainingBudgetAmt'),
+                // + i18n.t('static.report.inmillions'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
                 style: { align: 'center', width: '100px' },
+                // formatter: (cell, row) => {
+                //     return this.roundN(row.budgetAmt - (row.plannedBudgetAmt + row.orderedBudgetAmt), row)
+                // }
+                // formatter: (cell, row) => {
+                //     return (row.budgetAmt - (row.plannedBudgetAmt + row.orderedBudgetAmt)).toFixed(2).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+                // }
                 formatter: (cell, row) => {
-                    return this.roundN(row.budgetAmt - (row.plannedBudgetAmt + row.orderedBudgetAmt), row)
+                    return Math.floor((row.budgetAmt - (row.plannedBudgetAmt + row.orderedBudgetAmt))).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
                 }
             },
 
@@ -1259,7 +1361,7 @@ class Budgets extends Component {
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
-                <Card style={{ display: this.state.loading ? "none" : "block" }}>
+                <Card>
                     <div className="Card-header-reporticon">
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}{' '}</strong> */}
                         <div className="card-header-actions">
@@ -1318,7 +1420,7 @@ class Budgets extends Component {
                                     </div>
                                 </FormGroup>
                                 <FormGroup className="col-md-3">
-                                    <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.report.versionFinal*')}</Label>
                                     <div className="controls ">
                                         <InputGroup>
                                             <Input
@@ -1353,6 +1455,7 @@ class Budgets extends Component {
                                                         { label: item.fundingSourceCode, value: item.fundingSourceId }
                                                     )
                                                 }, this)}
+                                            disabled={this.state.loading}
                                         />
 
                                     </div>
@@ -1361,74 +1464,78 @@ class Budgets extends Component {
 
                             </div>
                         </Col>
-                        <Col md="12 pl-0">
-                            <div className="row">
-                                {
-                                    this.state.selBudget.length > 0
-                                    &&
-                                    <div className="col-md-12 p-0">
-                                        <div className="col-md-12">
-                                            <div className="chart-wrapper chart-graph-report">
-                                                <HorizontalBar id="cool-canvas" data={bar} options={chartoptions} />
-
-                                            </div>
-                                        </div>
-                                        <div className="col-md-12">
-                                            <button className="mr-1 mb-2 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
-                                                {this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
-                                            </button>
-
-                                        </div>
-                                    </div>}
-
-
-                            </div>
-
-
-
-                            {this.state.show && this.state.selBudget.length > 0 &&
-                                <ToolkitProvider
-                                    keyField="budgetId"
-                                    data={this.state.selBudget}
-                                    columns={columns}
-                                    search={{ searchFormatted: true }}
-                                    hover
-                                    filter={filterFactory()}
-                                >
+                        <div style={{ display: this.state.loading ? "none" : "block" }}>
+                            <Col md="12 pl-0">
+                                <div className="row">
                                     {
-                                        props => (
-                                            <div>
-                                                <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
-                                                    {/*<SearchBar {...props.searchProps} />
-                                                        <ClearSearchButton {...props.searchProps} />*/}
+                                        this.state.selBudget.length > 0
+                                        &&
+                                        <div className="col-md-12 p-0">
+                                            <div className="col-md-12">
+                                                <div className="chart-wrapper chart-graph-report">
+                                                    <HorizontalBar id="cool-canvas" data={bar} options={chartoptions} />
+
                                                 </div>
-                                                <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
-                                                    // pagination={paginationFactory(options)}
-                                                    rowEvents={{
-                                                        onClick: (e, row, rowIndex) => {
-                                                        }
-                                                    }}
-                                                    {...props.baseProps}
-                                                />
                                             </div>
-                                        )
-                                    }
-                                </ToolkitProvider>}
-                        </Col>
-                    </CardBody>
-                </Card>
-                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div className="align-items-center">
-                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+                                            <div className="col-md-12">
+                                                <button className="mr-1 mb-2 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
+                                                    {this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
+                                                </button>
 
-                            <div className="spinner-border blue ml-4" role="status">
+                                            </div>
+                                        </div>}
 
+
+                                </div>
+
+
+
+                                {this.state.show && this.state.selBudget.length > 0 &&
+                                    <ToolkitProvider
+                                        keyField="budgetId"
+                                        data={this.state.selBudget}
+                                        columns={columns}
+                                        search={{ searchFormatted: true }}
+                                        hover
+                                        filter={filterFactory()}
+                                    >
+                                        {
+                                            props => (
+                                                <div>
+                                                    <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
+                                                        {/*<SearchBar {...props.searchProps} />
+                                                        <ClearSearchButton {...props.searchProps} />*/}
+                                                    </div>
+                                                    <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                                        // pagination={paginationFactory(options)}
+                                                        rowEvents={{
+                                                            onClick: (e, row, rowIndex) => {
+                                                                console.log("***row", row);
+                                                                window.open(window.location.origin + `/#/report/shipmentSummery/${row.budget.id}/${row.budget.code}`);
+                                                            }
+                                                        }}
+                                                        {...props.baseProps}
+                                                    />
+                                                </div>
+                                            )
+                                        }
+                                    </ToolkitProvider>}
+                            </Col>
+                        </div>
+                        <div style={{ display: this.state.loading ? "block" : "none" }}>
+                            <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                <div className="align-items-center">
+                                    <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                    <div className="spinner-border blue ml-4" role="status">
+
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </div>
+                    </CardBody>
+                </Card>
+            </div >
         )
     }
 }

@@ -574,7 +574,7 @@ export default class ForecastingUnitListComponent extends Component {
             data[3] = getLabelText(forecastingUnitList[j].tracerCategory.label, this.state.lang)
             data[4] = getLabelText(forecastingUnitList[j].unit.label, this.state.lang)
             data[5] = getLabelText(forecastingUnitList[j].genericLabel, this.state.lang)
-            data[6] = getLabelText(forecastingUnitList[j].label, this.state.lang)
+            data[6] = getLabelText(forecastingUnitList[j].label, this.state.lang) + " | " + forecastingUnitList[j].forecastingUnitId
             data[7] = forecastingUnitList[j].lastModifiedBy.username;
             data[8] = (forecastingUnitList[j].lastModifiedDate ? moment(forecastingUnitList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
             data[9] = forecastingUnitList[j].active;
@@ -595,12 +595,12 @@ export default class ForecastingUnitListComponent extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [150, 60, 100, 60, 60, 60, 100, 60],
+            colWidths: [60, 150, 60, 100, 60, 60, 60, 100, 60],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: 'forecastingUnitId',
-                    type: 'hidden',
+                    title: i18n.t('static.forecastingUnit.forecastingUnitId'),
+                    type: 'text',
                     readOnly: true
                 },
                 {
@@ -679,7 +679,7 @@ export default class ForecastingUnitListComponent extends Component {
             filters: true,
             license: JEXCEL_PRO_KEY,
             contextMenu: function (obj, x, y, e) {
-                return [];
+                return false;
             }.bind(this),
         };
         var forecastingUnitListEl = jexcel(document.getElementById("tableDiv"), options);
@@ -691,7 +691,7 @@ export default class ForecastingUnitListComponent extends Component {
     hideFirstComponent() {
         this.timeout = setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
     componentWillUnmount() {
         clearTimeout(this.timeout);
@@ -701,7 +701,7 @@ export default class ForecastingUnitListComponent extends Component {
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
 
 
@@ -1195,7 +1195,7 @@ export default class ForecastingUnitListComponent extends Component {
     }
 
     editForecastingUnit(forecastingUnit) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_FORECASTING_UNIT')) {
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_FORECASTING_UNIT')) {
             this.props.history.push({
                 pathname: `/forecastingUnit/editForecastingUnit/${forecastingUnit.forecastingUnitId}`,
                 // state: { forecastingUnit: forecastingUnit }
@@ -1207,7 +1207,7 @@ export default class ForecastingUnitListComponent extends Component {
             // console.log("HEADER SELECTION--------------------------");
         } else {
             if (this.state.selSource.length != 0) {
-                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_FORECASTING_UNIT')) {
+                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_FORECASTING_UNIT')) {
                     this.props.history.push({
                         pathname: `/forecastingUnit/editForecastingUnit/${this.el.getValueFromCoords(0, x)}`,
                         // state: { role }
@@ -1269,18 +1269,18 @@ export default class ForecastingUnitListComponent extends Component {
                     this.setState({ loading: loading })
                 }} />
                 <h5 className={this.props.match.params.color} id="div1"><strong></strong>{i18n.t(this.props.match.params.message, { entityname })}</h5>
-                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
-                <Card style={{ display: this.state.loading ? "none" : "block" }}>
+                <h5 className="red" id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+                <Card>
                     <div className="Card-header-addicon">
                         {/* <i className="icon-menu"></i><strong> {i18n.t('static.common.listEntity', { entityname })}</strong> */}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_FORECASTING_UNIT') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewForecastingUnit}><i className="fa fa-plus-square"></i></a>}
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_FORECASTING_UNIT') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewForecastingUnit}><i className="fa fa-plus-square"></i></a>}
                             </div>
                         </div>
 
                     </div>
-                    <CardBody className="pb-lg-5">
+                    <CardBody className="pb-lg-5 pt-lg-0">
 
                         <Col md="9 pl-0">
                             <div className="d-md-flex  Selectdiv2">
@@ -1350,20 +1350,24 @@ export default class ForecastingUnitListComponent extends Component {
 
                         </Col>
                         {/* <div className="SearchMarginTopLarge"> */}
-                        <div id="tableDiv" className="jexcelremoveReadonlybackground"> </div>
+                        <div className='consumptionDataEntryTable'>
+                        <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_FORECASTING_UNIT') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
+                        </div>
+                        </div>
+                        <div style={{ display: this.state.loading ? "block" : "none" }}>
+                            <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                <div class="align-items-center">
+                                    <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+                                    <div class="spinner-border blue ml-4" role="status">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         {/* </div> */}
 
                     </CardBody>
                 </Card>
-                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div class="align-items-center">
-                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-                            <div class="spinner-border blue ml-4" role="status">
-                            </div>
-                        </div>
-                    </div>
-                </div>
+
             </div>
         );
     }

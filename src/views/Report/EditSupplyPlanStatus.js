@@ -6,6 +6,7 @@ import { Bar } from 'react-chartjs-2';
 import NumberFormat from 'react-number-format';
 import { Button, Card, CardBody, CardFooter, Col, Form, FormFeedback, FormGroup, Input, InputGroup, Label, Modal, ModalBody, ModalFooter, ModalHeader, Nav, NavItem, NavLink, Row, TabContent, Table, TabPane } from 'reactstrap';
 import * as Yup from 'yup';
+// import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, DATE_FORMAT_CAP,JEXCEL_PAGINATION_OPTION } from '../../Constants.js'
 import jexcel from 'jexcel-pro';
 import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
@@ -14,7 +15,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { contrast } from '../../CommonComponent/JavascriptCommonFunctions';
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { APPROVED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, CANCELLED_SHIPMENT_STATUS, DATE_FORMAT_CAP, DELIVERED_SHIPMENT_STATUS, INDEXED_DB_NAME, INDEXED_DB_VERSION, MONTHS_IN_PAST_FOR_SUPPLY_PLAN, NO_OF_MONTHS_ON_LEFT_CLICKED, NO_OF_MONTHS_ON_RIGHT_CLICKED, ON_HOLD_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SHIPMENT_DATA_SOURCE_TYPE, SHIPPED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, TBD_PROCUREMENT_AGENT_ID, TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN, JEXCEL_PRO_KEY, NO_OF_MONTHS_ON_LEFT_CLICKED_REGION, NO_OF_MONTHS_ON_RIGHT_CLICKED_REGION } from '../../Constants.js';
+import { JEXCEL_PAGINATION_OPTION, SECRET_KEY, APPROVED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, CANCELLED_SHIPMENT_STATUS, DATE_FORMAT_CAP, DELIVERED_SHIPMENT_STATUS, INDEXED_DB_NAME, INDEXED_DB_VERSION, MONTHS_IN_PAST_FOR_SUPPLY_PLAN, NO_OF_MONTHS_ON_LEFT_CLICKED, NO_OF_MONTHS_ON_RIGHT_CLICKED, ON_HOLD_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SHIPMENT_DATA_SOURCE_TYPE, SHIPPED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, TBD_PROCUREMENT_AGENT_ID, TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN, JEXCEL_PRO_KEY, NO_OF_MONTHS_ON_LEFT_CLICKED_REGION, NO_OF_MONTHS_ON_RIGHT_CLICKED_REGION, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DATE_FORMAT, JEXCEL_DATE_FORMAT_SM } from '../../Constants.js';
 import i18n from '../../i18n';
 import ConsumptionInSupplyPlanComponent from "../SupplyPlan/ConsumptionInSupplyPlan";
 import InventoryInSupplyPlanComponent from "../SupplyPlan/InventoryInSupplyPlan";
@@ -25,13 +26,21 @@ import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import BootstrapTable from 'react-bootstrap-table-next';
 import paginationFactory from 'react-bootstrap-table2-paginator';
-import { JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
+// import { JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
 import { Link } from 'react-router-dom';
 // import { NavLink } from 'react-router-dom';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import AuthenticationService from '../Common/AuthenticationService';
-import MultiSelect from 'react-multi-select-component';
+import {MultiSelect} from 'react-multi-select-component';
 import ProblemListFormulas from '../Report/ProblemListFormulas.js'
+import DataSourceService from '../../api/DataSourceService';
+import RealmCountryService from '../../api/RealmCountryService';
+import FundingSourceService from '../../api/FundingSourceService';
+import ShipmentStatusService from '../../api/ShipmentStatusService';
+import CurrencyService from '../../api/CurrencyService';
+import BudgetService from '../../api/BudgetService';
+import ProcurementAgentService from '../../api/ProcurementAgentService';
+import CryptoJS from 'crypto-js'
 
 const entityname = i18n.t('static.program.program');
 
@@ -92,6 +101,7 @@ class EditSupplyPlanStatus extends Component {
             data: [],
             problemStatusList: [],
             problemEl: '',
+            problemTransEl: '',
             problemList: [],
             monthsArray: [],
             programList: [],
@@ -162,7 +172,10 @@ class EditSupplyPlanStatus extends Component {
             showConsumption: 0,
             consumptionStartDateClicked: moment(Date.now()).startOf('month').format("YYYY-MM-DD"),
             inventoryStartDateClicked: moment(Date.now()).startOf('month').format("YYYY-MM-DD"),
+            batchInfoInInventoryPopUp: [],
             problemCategoryList: [],
+            ledgerForBatch: [],
+            showBatchSaveButton: false,
 
             program: {
                 programId: this.props.match.params.programId,
@@ -205,7 +218,9 @@ class EditSupplyPlanStatus extends Component {
             editable: false,
             problemStatusValues: [{ label: "Open", value: 1 }, { label: "Addressed", value: 3 }],
             problemCategoryList: [],
-            problemReportChanged: 0
+            problemReportChanged: 0,
+            problemReviewedList: [{ name: i18n.t("static.program.yes"), id: 1 }, { name: i18n.t("static.program.no"), id: 0 }],
+            problemReviewedValues: [{ label: i18n.t("static.program.no"), value: 0 }]
         }
         this.formSubmit = this.formSubmit.bind(this);
         this.consumptionDetailsClicked = this.consumptionDetailsClicked.bind(this);
@@ -218,6 +233,9 @@ class EditSupplyPlanStatus extends Component {
         this.toggleTransView = this.toggleTransView.bind(this);
         this.updateState = this.updateState.bind(this);
         this.handleProblemStatusChange = this.handleProblemStatusChange.bind(this);
+        this.handleProblemReviewedChange = this.handleProblemReviewedChange.bind(this);
+        this.buildProblemTransJexcel = this.buildProblemTransJexcel.bind(this);
+        this.loaded1 = this.loaded1.bind(this);
     }
 
     updateState(parameterName, value) {
@@ -232,9 +250,43 @@ class EditSupplyPlanStatus extends Component {
             problemReportChanged: 1
         })
         var elInstance = this.state.problemEl;
-        var rowData = elInstance.getRowData(y);
-        if (x != 22 && rowData[22] != 1) {
-            elInstance.setValueFromCoords(22, y, 1, true);
+        // var problemListDate = moment(Date.now()).subtract(12, 'months').endOf('month').format("YYYY-MM-DD");
+        let problemList = this.state.problemList;
+        var rowData1 = elInstance.getRowData(y);
+        problemList = problemList.filter(c => c.problemReportId == rowData1[0]);
+        // console.log("problemList in changed method ***", problemList);
+        if (x == 10) {
+            if (problemList[0].problemStatus.id != value) {
+                // console.log("in if 1***");
+                elInstance.setValueFromCoords(20, y, true, true);
+            }
+            if (problemList[0].problemStatus.id == value) {
+                elInstance.setValueFromCoords(20, y, false, true);
+                // console.log("in if 2***");
+            }
+        }
+
+        if (x == 10 || x == 20) {
+            var rowData = elInstance.getRowData(y);
+            // console.log("problemStatus on server ***", problemList[0].problemStatus.id);
+            // console.log("current problem status ***", rowData[10]);
+            // console.log("problemStatus on server ***", problemList[0].reviewed);
+            // console.log("current problem status ***", rowData[20]);
+            // console.log("condition1***", problemList[0].problemStatus.id != rowData[10]);
+            // console.log("condition2***", problemList[0].reviewed.toString() != rowData[20].toString());
+            if ((problemList[0].problemStatus.id != rowData[10]) || (problemList[0].reviewed.toString() != rowData[20].toString())) {
+                // console.log("in if***");
+                elInstance.setValueFromCoords(22, y, 1, true);
+            } else {
+                // console.log("in else***");
+                elInstance.setValueFromCoords(22, y, 0, true);
+            }
+        }
+
+        if (x == 20) {
+            if (value.toString() == "false") {
+                elInstance.setValueFromCoords(21, y, "", true);
+            }
         }
     }
     hideFirstComponent() {
@@ -308,11 +360,12 @@ class EditSupplyPlanStatus extends Component {
             shipmentDatesError: '',
             showShipments: 0,
             showInventory: 0,
-            showConsumption: 0
+            showConsumption: 0,
+            batchInfoInInventoryPopUp: [],
 
         })
         if (supplyPlanType == 'Consumption') {
-            var monthCountConsumption = count - 2;
+            var monthCountConsumption = count != undefined ? this.state.monthCount + count - 2 : this.state.monthCount;
             this.setState({
                 consumption: !this.state.consumption,
                 monthCountConsumption: monthCountConsumption,
@@ -330,7 +383,7 @@ class EditSupplyPlanStatus extends Component {
             });
             this.shipmentsDetailsClicked(shipmentType, startDate, endDate);
         } else if (supplyPlanType == 'Adjustments') {
-            var monthCountAdjustments = count - 2;
+            var monthCountAdjustments = count != undefined ? this.state.monthCount + count - 2 : this.state.monthCount;
             this.setState({
                 adjustments: !this.state.adjustments,
                 monthCountAdjustments: monthCountAdjustments,
@@ -345,12 +398,14 @@ class EditSupplyPlanStatus extends Component {
                     expiredStockModal: !this.state.expiredStockModal,
                     expiredStockDetails: details[0].details,
                     expiredStockDetailsTotal: details[0].qty,
-                    loading: false
+                    loading: false,
+                    ledgerForBatch: []
                 })
             } else {
                 this.setState({
                     expiredStockModal: !this.state.expiredStockModal,
-                    loading: false
+                    loading: false,
+                    ledgerForBatch: []
                 })
             }
         }
@@ -358,7 +413,18 @@ class EditSupplyPlanStatus extends Component {
 
     toggleTransView(problemTransList) {
         console.log("====>", problemTransList);
-        this.setState({ transView: !this.state.transView, problemTransList: problemTransList })
+        this.setState({ transView: !this.state.transView, problemTransList: problemTransList }, () => {
+            this.test();
+        })
+    }
+
+    test() {
+        console.log("In test+++");
+        this.setState({
+            test: 1
+        }, () => {
+            this.buildProblemTransJexcel();
+        })
     }
     toggleTransModal() {
         this.setState({ transView: !this.state.transView })
@@ -427,7 +493,7 @@ class EditSupplyPlanStatus extends Component {
             this.setState({
                 supplyPlanError: i18n.t('static.program.errortext'),
                 loading: false,
-                color: "red"
+                color: "#BA0C2F"
             })
             this.hideFirstComponent()
         }.bind(this);
@@ -440,7 +506,7 @@ class EditSupplyPlanStatus extends Component {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext'),
                     loading: false,
-                    color: "red"
+                    color: "#BA0C2F"
                 })
                 this.hideFirstComponent()
             }.bind(this);
@@ -448,48 +514,104 @@ class EditSupplyPlanStatus extends Component {
                 // var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                 // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                 var programJson = this.state.program;
+                // var programQPLDetails = [];
+                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                // programQPLDetails.push({
+                //     id: programJson.programId,
+                //     programId: programJson.programId,
+                //     version: programJson.currentVersion.versionId,
+                //     userId: userId,
+                //     programCode: programJson.programCode,
+                //     openCount: 0,
+                //     addressedCount: 0,
+                //     programModified: 0,
+                //     readonly: 0
+                // })
                 var batchInfoList = programJson.batchInfoList;
+                DataSourceService.getAllDataSourceList().then(response => {
+                    var dataSourceList = [];
+                    response.data.map(c => {
+                        dataSourceList.push({
+                            name: getLabelText(c.label, this.state.lang),
+                            id: c.dataSourceId,
+                            dataSourceTypeId: c.dataSourceType.id,
+                            active: c.active,
+                            label: c.label
+                        })
+                    })
+                    this.setState({
+                        dataSourceList: dataSourceList,
+                        // programQPLDetails:programQPLDetails,
+                        // programId:programJson.programId
+                    })
+
+                    RealmCountryService.getRealmCountryPlanningUnitByProgramId([this.props.match.params.programId]).then(response1 => {
+                        var rcpuList = [];
+                        response1.data.map(c => {
+                            rcpuList.push({
+                                name: getLabelText(c.label, this.state.lang),
+                                id: c.realmCountryPlanningUnitId,
+                                multiplier: c.multiplier,
+                                active: c.active,
+                                label: c.label
+                            })
+                        })
+                        this.setState({
+                            realmCountryPlanningUnitList: rcpuList
+                        })
+                        console.log("++++Rcpu:List", rcpuList)
 
 
-                var batchList = [];
-                var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == planningUnitId && c.active.toString() == "true" && c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS);
-                console.log("Shipment list=============>", shipmentList);
-                for (var sl = 0; sl < shipmentList.length; sl++) {
-                    var bdl = shipmentList[sl].batchInfoList;
-                    for (var bd = 0; bd < bdl.length; bd++) {
-                        var index = batchList.findIndex(c => c.batchNo == bdl[bd].batch.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
-                        if (index == -1) {
-                            var batchDetailsToPush = batchInfoList.filter(c => c.batchNo == bdl[bd].batch.batchNo && c.planningUnitId == planningUnitId && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
-                            if (batchDetailsToPush.length > 0) {
-                                batchList.push(batchDetailsToPush[0]);
+                        var batchList = [];
+                        var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == planningUnitId && c.active.toString() == "true" && c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS);
+                        console.log("Shipment list=============>", shipmentList);
+                        for (var sl = 0; sl < shipmentList.length; sl++) {
+                            var bdl = shipmentList[sl].batchInfoList;
+                            for (var bd = 0; bd < bdl.length; bd++) {
+                                var index = batchList.findIndex(c => c.batchNo == bdl[bd].batch.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
+                                if (index == -1) {
+                                    var batchDetailsToPush = batchInfoList.filter(c => c.batchNo == bdl[bd].batch.batchNo && c.planningUnitId == planningUnitId && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
+                                    if (batchDetailsToPush.length > 0) {
+                                        batchList.push(batchDetailsToPush[0]);
+                                    }
+                                }
                             }
                         }
-                    }
-                }
-                console.log("Btach List============>", batchList);
-                var consumptionListUnFiltered = (programJson.consumptionList);
-                var consumptionList = consumptionListUnFiltered.filter(con =>
-                    con.planningUnit.id == planningUnitId
-                    && con.region.id == region
-                    && ((con.consumptionDate >= startDate && con.consumptionDate <= endDate)));
-                this.setState({
-                    programJsonAfterConsumptionClicked: programJson,
-                    consumptionListUnFiltered: consumptionListUnFiltered,
-                    batchInfoList: batchList,
-                    programJson: programJson,
-                    consumptionList: consumptionList,
-                    showConsumption: 1,
-                    consumptionMonth: month,
-                    consumptionStartDate: startDate,
-                    consumptionRegion: region
-                })
-                this.refs.consumptionChild.showConsumptionData();
+                        console.log("Btach List============>", batchList);
+                        var consumptionListUnFiltered = (programJson.consumptionList);
+                        var consumptionList = consumptionListUnFiltered.filter(con =>
+                            con.planningUnit.id == planningUnitId
+                            && con.region.id == region
+                            && ((con.consumptionDate >= startDate && con.consumptionDate <= endDate)));
+                        this.setState({
+                            programJsonAfterConsumptionClicked: programJson,
+                            consumptionListUnFiltered: consumptionListUnFiltered,
+                            batchInfoList: batchList,
+                            programJson: programJson,
+                            generalProgramJson: programJson,
+                            consumptionList: consumptionList,
+                            showConsumption: 1,
+                            consumptionMonth: month,
+                            consumptionStartDate: startDate,
+                            consumptionRegion: region
+                        }, () => {
+                            if (this.refs.consumptionChild != undefined) {
+                                this.refs.consumptionChild.showConsumptionData();
+                            } else {
+                                this.setState({
+                                    loading: false
+                                })
+                            }
+                        })
+                    }).catch(error => { console.log("Error+++", error) });
+                }).catch(error => { console.log("Error+++", error) });
             }.bind(this)
         }.bind(this)
     }
 
     adjustmentsDetailsClicked(region, month, endDate, inventoryType) {
-        this.setState({ inventoryStartDateClicked: moment(endDate).startOf('month').format("YYYY-MM-DD") })
+        this.setState({ loading: true, inventoryStartDateClicked: moment(endDate).startOf('month').format("YYYY-MM-DD") })
         var elInstance = this.state.inventoryBatchInfoTableEl;
         if (elInstance != undefined && elInstance != "") {
             elInstance.destroy();
@@ -503,7 +625,7 @@ class EditSupplyPlanStatus extends Component {
             this.setState({
                 supplyPlanError: i18n.t('static.program.errortext'),
                 loading: false,
-                color: "red"
+                color: "#BA0C2F"
             })
             this.hideFirstComponent()
         }.bind(this);
@@ -516,54 +638,111 @@ class EditSupplyPlanStatus extends Component {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext'),
                     loading: false,
-                    color: "red"
+                    color: "#BA0C2F"
                 })
                 this.hideFirstComponent()
             }.bind(this);
             programRequest.onsuccess = function (event) {
                 // var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                 // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                // var programQPLDetails=[];
                 var programJson = this.state.program;
                 var batchInfoList = programJson.batchInfoList;
+                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                // programQPLDetails.push({
+                //     id: programJson.programId,
+                //     programId: programJson.programId,
+                //     version: programJson.currentVersion.versionId,
+                //     userId: userId,
+                //     programCode: programJson.programCode,
+                //     openCount: 0,
+                //     addressedCount: 0,
+                //     programModified: 0,
+                //     readonly: 0
+                // })
 
-                var batchList = [];
-                var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == planningUnitId && c.active.toString() == "true" && c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS);
+                DataSourceService.getAllDataSourceList().then(response => {
+                    var dataSourceList = [];
+                    response.data.map(c => {
+                        dataSourceList.push({
+                            name: getLabelText(c.label, this.state.lang),
+                            id: c.dataSourceId,
+                            dataSourceTypeId: c.dataSourceType.id,
+                            active: c.active,
+                            label: c.label
+                        })
+                    })
+                    this.setState({
+                        dataSourceList: dataSourceList,
+                        // programQPLDetails:programQPLDetails
+                    })
 
-                for (var sl = 0; sl < shipmentList.length; sl++) {
-                    var bdl = shipmentList[sl].batchInfoList;
-                    for (var bd = 0; bd < bdl.length; bd++) {
-                        var index = batchList.findIndex(c => c.batchNo == bdl[bd].batch.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
-                        if (index == -1) {
-                            var batchDetailsToPush = batchInfoList.filter(c => c.batchNo == bdl[bd].batch.batchNo && c.planningUnitId == planningUnitId && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
-                            if (batchDetailsToPush.length > 0) {
-                                batchList.push(batchDetailsToPush[0]);
+                    RealmCountryService.getRealmCountryPlanningUnitByProgramId([this.props.match.params.programId]).then(response1 => {
+                        var rcpuList = [];
+                        response1.data.map(c => {
+                            rcpuList.push({
+                                name: getLabelText(c.label, this.state.lang),
+                                id: c.realmCountryPlanningUnitId,
+                                multiplier: c.multiplier,
+                                active: c.active,
+                                label: c.label
+                            })
+                        })
+                        this.setState({
+                            realmCountryPlanningUnitList: rcpuList
+                        })
+                        console.log("++++Rcpu:List", rcpuList)
+
+                        var batchList = [];
+                        var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == planningUnitId && c.active.toString() == "true" && c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS);
+
+                        for (var sl = 0; sl < shipmentList.length; sl++) {
+                            var bdl = shipmentList[sl].batchInfoList;
+                            for (var bd = 0; bd < bdl.length; bd++) {
+                                var index = batchList.findIndex(c => c.batchNo == bdl[bd].batch.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
+                                if (index == -1) {
+                                    var batchDetailsToPush = batchInfoList.filter(c => c.batchNo == bdl[bd].batch.batchNo && c.planningUnitId == planningUnitId && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
+                                    if (batchDetailsToPush.length > 0) {
+                                        batchList.push(batchDetailsToPush[0]);
+                                    }
+                                }
                             }
                         }
-                    }
-                }
-                var inventoryListUnFiltered = (programJson.inventoryList);
-                var inventoryList = (programJson.inventoryList).filter(c =>
-                    c.planningUnit.id == planningUnitId &&
-                    c.region != null && c.region.id != 0 &&
-                    c.region.id == region &&
-                    moment(c.inventoryDate).format("MMM YY") == month);
-                if (inventoryType == 1) {
-                    inventoryList = inventoryList.filter(c => c.actualQty !== "" && c.actualQty != undefined && c.actualQty != null);
-                } else {
-                    inventoryList = inventoryList.filter(c => c.adjustmentQty !== "" && c.adjustmentQty != undefined && c.adjustmentQty != null);
-                }
-                this.setState({
-                    batchInfoList: batchList,
-                    programJson: programJson,
-                    inventoryListUnFiltered: inventoryListUnFiltered,
-                    inventoryList: inventoryList,
-                    showInventory: 1,
-                    inventoryType: inventoryType,
-                    inventoryMonth: month,
-                    inventoryEndDate: endDate,
-                    inventoryRegion: region
-                })
-                this.refs.inventoryChild.showInventoryData();
+                        var inventoryListUnFiltered = (programJson.inventoryList);
+                        var inventoryList = (programJson.inventoryList).filter(c =>
+                            c.planningUnit.id == planningUnitId &&
+                            c.region != null && c.region.id != 0 &&
+                            c.region.id == region &&
+                            moment(c.inventoryDate).format("MMM YY") == month);
+                        if (inventoryType == 1) {
+                            inventoryList = inventoryList.filter(c => c.actualQty !== "" && c.actualQty != undefined && c.actualQty != null);
+                        } else {
+                            inventoryList = inventoryList.filter(c => c.adjustmentQty !== "" && c.adjustmentQty != undefined && c.adjustmentQty != null);
+                        }
+                        this.setState({
+                            batchInfoList: batchList,
+                            programJson: programJson,
+                            generalProgramJson: programJson,
+                            inventoryListUnFiltered: inventoryListUnFiltered,
+                            inventoryList: inventoryList,
+                            showInventory: 1,
+                            inventoryType: inventoryType,
+                            inventoryMonth: month,
+                            inventoryEndDate: endDate,
+                            inventoryRegion: region,
+
+                        }, () => {
+                            if (this.refs.inventoryChild != undefined) {
+                                this.refs.inventoryChild.showInventoryData();
+                            } else {
+                                this.setState({
+                                    loading: false
+                                })
+                            }
+                        })
+                    }).catch(error => { console.log("Error+++", error) });
+                }).catch(error => { console.log("Error+++", error) });
             }.bind(this)
         }.bind(this)
     }
@@ -573,7 +752,7 @@ class EditSupplyPlanStatus extends Component {
     }
 
     shipmentsDetailsClicked = (supplyPlanType, startDate, endDate) => {
-        // this.setState({ loading: true })
+        this.setState({ loading: true })
         var programId = document.getElementById("programId").value;
         var db1;
         getDatabase();
@@ -582,7 +761,7 @@ class EditSupplyPlanStatus extends Component {
             this.setState({
                 supplyPlanError: i18n.t('static.program.errortext'),
                 loading: false,
-                color: "red"
+                color: "#BA0C2F"
             })
             this.hideFirstComponent()
         }.bind(this);
@@ -595,46 +774,167 @@ class EditSupplyPlanStatus extends Component {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext'),
                     loading: false,
-                    color: "red"
+                    color: "#BA0C2F"
                 })
                 this.hideFirstComponent()
             }.bind(this);
             programRequest.onsuccess = function (event) {
                 // var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                 // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                // var programQPLDetails=[];
                 var programJson = this.state.program;
                 var shipmentListUnFiltered = programJson.shipmentList;
+                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                // programQPLDetails.push({
+                //     id: programJson.programId,
+                //     programId: programJson.programId,
+                //     version: programJson.currentVersion.versionId,
+                //     userId: userId,
+                //     programCode: programJson.programCode,
+                //     openCount: 0,
+                //     addressedCount: 0,
+                //     programModified: 0,
+                //     readonly: 0
+                // })
                 this.setState({
-                    shipmentListUnFiltered: shipmentListUnFiltered
+                    shipmentListUnFiltered: shipmentListUnFiltered,
+                    // programQPLDetails:programQPLDetails
                 })
                 var shipmentList = programJson.shipmentList.filter(c => c.active.toString() == "true");
-                // var tableEditableBasedOnSupplyPlan = true;
-                if (supplyPlanType == 'deliveredShipments') {
-                    shipmentList = shipmentList.filter(c => (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? c.receivedDate >= startDate && c.receivedDate <= endDate : c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate) && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS));
-                } else if (supplyPlanType == 'shippedShipments') {
-                    shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || c.shipmentStatus.id == ARRIVED_SHIPMENT_STATUS));
-                } else if (supplyPlanType == 'orderedShipments') {
-                    shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS));
-                } else if (supplyPlanType == 'plannedShipments') {
-                    shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS));
-                } else if (supplyPlanType == 'deliveredErpShipments') {
-                    shipmentList = shipmentList.filter(c => (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? c.receivedDate >= startDate && c.receivedDate <= endDate : c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate) && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS));
-                } else if (supplyPlanType == 'shippedErpShipments') {
-                    shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || c.shipmentStatus.id == ARRIVED_SHIPMENT_STATUS));
-                } else if (supplyPlanType == 'orderedErpShipments') {
-                    shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS));
-                } else if (supplyPlanType == 'plannedErpShipments') {
-                    shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS));
-                } else {
-                    shipmentList = []
-                }
-                this.setState({
-                    showShipments: 1,
-                    shipmentList: shipmentList,
-                    shipmentListUnFiltered: shipmentListUnFiltered,
-                    programJson: programJson
-                })
-                this.refs.shipmentChild.showShipmentData();
+
+                DataSourceService.getAllDataSourceList().then(response => {
+                    var dataSourceList = [];
+                    response.data.map(c => {
+                        dataSourceList.push({
+                            name: getLabelText(c.label, this.state.lang),
+                            id: c.dataSourceId,
+                            dataSourceTypeId: c.dataSourceType.id,
+                            active: c.active,
+                            label: c.label
+                        })
+                    })
+                    this.setState({
+                        dataSourceList: dataSourceList
+                    })
+
+                    ShipmentStatusService.getShipmentStatusListActive().then(response1 => {
+                        var shipmentStatusList = [];
+                        response1.data.map(c => {
+                            shipmentStatusList.push({
+                                name: getLabelText(c.label, this.state.lang),
+                                id: c.shipmentStatusId,
+                                active: c.active,
+                                label: c.label
+                            })
+                        })
+                        this.setState({
+                            shipmentStatusList: shipmentStatusList
+                        })
+
+                        ProcurementAgentService.getProcurementAgentListAll().then(response2 => {
+                            var paList = [];
+                            response2.data.map(c => {
+                                paList.push({
+                                    name: c.procurementAgentCode,
+                                    id: c.procurementAgentId,
+                                    active: c.active,
+                                    label: c.label
+                                })
+                            })
+                            this.setState({
+                                procurementAgentList: paList
+                            })
+
+                            FundingSourceService.getFundingSourceListAll().then(response3 => {
+                                var fsList = [];
+                                response3.data.map(c => {
+                                    fsList.push({
+                                        name: c.fundingSourceCode,
+                                        id: c.fundingSourceId,
+                                        active: c.active,
+                                        label: c.label
+                                    })
+                                })
+                                this.setState({
+                                    fundingSourceList: fsList
+                                })
+
+                                BudgetService.getBudgetList().then(response4 => {
+                                    var bList = [];
+                                    response4.data.map(c => {
+                                        bList.push({
+                                            name: c.budgetCode,
+                                            id: c.budgetId,
+                                            fundingSource: c.fundingSource,
+                                            currency: c.currency,
+                                            budgetAmt: c.budgetAmt,
+                                            active: c.active,
+                                            programId: c.program.id,
+                                            label: c.label,
+                                            startDate: c.startDate,
+                                            stopDate: c.stopDate
+                                        })
+                                    })
+                                    this.setState({
+                                        budgetList: bList
+                                    })
+
+                                    CurrencyService.getCurrencyList().then(response5 => {
+                                        var cList = [];
+                                        response5.data.map(c => {
+                                            cList.push({
+                                                name: getLabelText(c.label, this.state.lang),
+                                                id: c.currencyId,
+                                                active: c.active,
+                                                label: c.label
+                                            })
+                                        })
+                                        this.setState({
+                                            currencyList: cList
+                                        })
+
+                                        // var tableEditableBasedOnSupplyPlan = true;
+                                        if (supplyPlanType == 'deliveredShipments') {
+                                            shipmentList = shipmentList.filter(c => (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? c.receivedDate >= startDate && c.receivedDate <= endDate : c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate) && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS));
+                                        } else if (supplyPlanType == 'shippedShipments') {
+                                            shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || c.shipmentStatus.id == ARRIVED_SHIPMENT_STATUS));
+                                        } else if (supplyPlanType == 'orderedShipments') {
+                                            shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS));
+                                        } else if (supplyPlanType == 'plannedShipments') {
+                                            shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS));
+                                        } else if (supplyPlanType == 'deliveredErpShipments') {
+                                            shipmentList = shipmentList.filter(c => (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? c.receivedDate >= startDate && c.receivedDate <= endDate : c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate) && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS));
+                                        } else if (supplyPlanType == 'shippedErpShipments') {
+                                            shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || c.shipmentStatus.id == ARRIVED_SHIPMENT_STATUS));
+                                        } else if (supplyPlanType == 'orderedErpShipments') {
+                                            shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS));
+                                        } else if (supplyPlanType == 'plannedErpShipments') {
+                                            shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS));
+                                        } else {
+                                            shipmentList = []
+                                        }
+                                        this.setState({
+                                            showShipments: 1,
+                                            shipmentList: shipmentList,
+                                            shipmentListUnFiltered: shipmentListUnFiltered,
+                                            programJson: programJson,
+                                            generalProgramJson: programJson,
+                                        }, () => {
+                                            if (this.refs.shipmentChild != undefined) {
+                                                this.refs.shipmentChild.showShipmentData();
+                                            } else {
+                                                this.setState({
+                                                    loading: false
+                                                })
+                                            }
+                                        })
+                                    }).catch(error => { console.log("Error+++", error) });
+                                }).catch(error => { console.log("Error+++", error) });
+                            }).catch(error => { console.log("Error+++", error) });
+                        }).catch(error => { console.log("Error+++", error) });
+                    }).catch(error => { console.log("Error+++", error) });
+                }).catch(error => { console.log("Error+++", error) });
             }.bind(this)
         }.bind(this)
     }
@@ -705,7 +1005,7 @@ class EditSupplyPlanStatus extends Component {
         this.setState({
             expiredStockModal: !this.state.expiredStockModal,
             message: i18n.t('static.actionCancelled'),
-            color: 'red',
+            color: '#BA0C2F',
         })
         this.hideFirstComponent()
     }
@@ -718,7 +1018,7 @@ class EditSupplyPlanStatus extends Component {
         this.setState({
             loading: false,
             message: i18n.t('static.actionCancelled'),
-            color: 'red',
+            color: '#BA0C2F',
             consumptionError: '',
             inventoryError: '',
             shipmentError: '',
@@ -759,7 +1059,8 @@ class EditSupplyPlanStatus extends Component {
             qtyCalculatorValidationError: "",
             showShipments: 0,
             showInventory: 0,
-            showConsumption: 0
+            showConsumption: 0,
+            batchInfoInInventoryPopUp: [],
 
         },
             () => {
@@ -898,7 +1199,7 @@ class EditSupplyPlanStatus extends Component {
             this.setState({
                 supplyPlanError: i18n.t('static.program.errortext'),
                 loading: false,
-                color: "red"
+                color: "#BA0C2F"
             })
             this.hideFirstComponent()
         }.bind(this);
@@ -912,7 +1213,7 @@ class EditSupplyPlanStatus extends Component {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext'),
                     loading: false,
-                    color: "red"
+                    color: "#BA0C2F"
                 })
                 this.hideFirstComponent()
             }.bind(this);
@@ -963,7 +1264,7 @@ class EditSupplyPlanStatus extends Component {
                     this.setState({
                         supplyPlanError: i18n.t('static.program.errortext'),
                         loading: false,
-                        color: "red"
+                        color: "#BA0C2F"
                     })
                 }.bind(this);
                 shipmentStatusRequest.onsuccess = function (event) {
@@ -976,7 +1277,7 @@ class EditSupplyPlanStatus extends Component {
                         this.setState({
                             supplyPlanError: i18n.t('static.program.errortext'),
                             loading: false,
-                            color: "red"
+                            color: "#BA0C2F"
                         })
                     }.bind(this);
                     papuRequest.onsuccess = function (event) {
@@ -987,12 +1288,19 @@ class EditSupplyPlanStatus extends Component {
                         if (programJson.supplyPlan != undefined) {
                             supplyPlanData = (programJson.supplyPlan).filter(c => c.planningUnitId == planningUnitId);
                         }
+                        this.setState({
+                            supplyPlanDataForAllTransDate: supplyPlanData,
+                            allShipmentsList: programJson.shipmentList
+                        })
                         // if (supplyPlanData.length > 0) {
                         var lastClosingBalance = 0;
+                        var lastBatchDetails = [];
+                        var lastIsActualClosingBalance = 0;
                         for (var n = 0; n < m.length; n++) {
                             var jsonList = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM-DD") == moment(m[n].startDate).format("YYYY-MM-DD"));
+                            var prevMonthJsonList = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM-DD") == moment(m[n].startDate).subtract(1, 'months').format("YYYY-MM-DD"));
                             if (jsonList.length > 0) {
-                                openingBalanceArray.push(jsonList[0].openingBalance);
+                                openingBalanceArray.push({ isActual: prevMonthJsonList.length > 0 && prevMonthJsonList[0].regionCountForStock == prevMonthJsonList[0].regionCount ? 1 : 0, balance: jsonList[0].openingBalance });
                                 consumptionTotalData.push({ consumptionQty: jsonList[0].consumptionQty, consumptionType: jsonList[0].actualFlag, textColor: jsonList[0].actualFlag == 1 ? "#000000" : "rgb(170, 85, 161)" });
                                 shipmentsTotalData.push(jsonList[0].shipmentTotalQty);
                                 manualShipmentsTotalData.push(jsonList[0].manualTotalQty);
@@ -1016,6 +1324,10 @@ class EditSupplyPlanStatus extends Component {
                                 var paColor2 = "";
                                 var paColor3 = "";
                                 var paColor4 = "";
+                                var paColor1Array = [];
+                                var paColor2Array = [];
+                                var paColor3Array = [];
+                                var paColor4Array = [];
                                 if (shipmentDetails != "" && shipmentDetails != undefined) {
                                     for (var i = 0; i < shipmentDetails.length; i++) {
                                         if (shipmentDetails[i].shipmentStatus.id == DELIVERED_SHIPMENT_STATUS) {
@@ -1047,6 +1359,9 @@ class EditSupplyPlanStatus extends Component {
                                                 isLocalProcurementAgent1 = true;
                                             }
                                             sd1.push(shipmentDetail);
+                                            if (paColor1Array.indexOf(paColor1) === -1) {
+                                                paColor1Array.push(paColor1);
+                                            }
                                         } else if (shipmentDetails[i].shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == ARRIVED_SHIPMENT_STATUS) {
                                             if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
@@ -1076,7 +1391,12 @@ class EditSupplyPlanStatus extends Component {
                                                 isLocalProcurementAgent2 = true;
                                             }
                                             sd2.push(shipmentDetail);
+
+                                            if (paColor2Array.indexOf(paColor2) === -1) {
+                                                paColor2Array.push(paColor2);
+                                            }
                                         } else if (shipmentDetails[i].shipmentStatus.id == APPROVED_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS) {
+
                                             if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
@@ -1105,7 +1425,12 @@ class EditSupplyPlanStatus extends Component {
                                                 isLocalProcurementAgent3 = true;
                                             }
                                             sd3.push(shipmentDetail);
+
+                                            if (paColor3Array.indexOf(paColor3) === -1) {
+                                                paColor3Array.push(paColor3);
+                                            }
                                         } else if (shipmentDetails[i].shipmentStatus.id == PLANNED_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS) {
+
                                             if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
@@ -1134,13 +1459,16 @@ class EditSupplyPlanStatus extends Component {
                                                 isLocalProcurementAgent4 = true;
                                             }
                                             sd4.push(shipmentDetail);
+                                            if (paColor4Array.indexOf(paColor4) === -1) {
+                                                paColor4Array.push(paColor4);
+                                            }
                                         }
                                     }
                                 }
 
                                 if ((shipmentDetails.filter(c => c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS)).length > 0) {
                                     var colour = paColor1;
-                                    if (sd1.length > 1) {
+                                    if (paColor1Array.length > 1) {
                                         colour = "#d9ead3";
                                     }
                                     deliveredShipmentsTotalData.push({ qty: jsonList[0].receivedShipmentsTotalData, month: m[n], shipmentDetail: sd1, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder1, isLocalProcurementAgent: isLocalProcurementAgent1 });
@@ -1150,7 +1478,7 @@ class EditSupplyPlanStatus extends Component {
 
                                 if ((shipmentDetails.filter(c => c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || c.shipmentStatus.id == ARRIVED_SHIPMENT_STATUS)).length > 0) {
                                     var colour = paColor2;
-                                    if (sd2.length > 1) {
+                                    if (paColor2Array.length > 1) {
                                         colour = "#d9ead3";
                                     }
                                     shippedShipmentsTotalData.push({ qty: jsonList[0].shippedShipmentsTotalData, month: m[n], shipmentDetail: sd2, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder2, isLocalProcurementAgent: isLocalProcurementAgent2 });
@@ -1160,7 +1488,7 @@ class EditSupplyPlanStatus extends Component {
 
                                 if ((shipmentDetails.filter(c => c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS)).length > 0) {
                                     var colour = paColor3;
-                                    if (sd3.length > 1) {
+                                    if (paColor3Array.length > 1) {
                                         colour = "#d9ead3";
                                     }
                                     orderedShipmentsTotalData.push({ qty: parseInt(jsonList[0].submittedShipmentsTotalData) + parseInt(jsonList[0].approvedShipmentsTotalData), month: m[n], shipmentDetail: sd3, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder3, isLocalProcurementAgent: isLocalProcurementAgent3 });
@@ -1170,7 +1498,7 @@ class EditSupplyPlanStatus extends Component {
 
                                 if ((shipmentDetails.filter(c => c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS)).length > 0) {
                                     var colour = paColor4;
-                                    if (sd4.length > 1) {
+                                    if (paColor4Array.length > 1) {
                                         colour = "#d9ead3";
                                     }
                                     plannedShipmentsTotalData.push({ qty: parseInt(jsonList[0].onholdShipmentsTotalData) + parseInt(jsonList[0].plannedShipmentsTotalData), month: m[n], shipmentDetail: sd4, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder4, isLocalProcurementAgent: isLocalProcurementAgent4 });
@@ -1198,6 +1526,10 @@ class EditSupplyPlanStatus extends Component {
                                 var paColor2 = "";
                                 var paColor3 = "";
                                 var paColor4 = "";
+                                var paColor1Array = [];
+                                var paColor2Array = [];
+                                var paColor3Array = [];
+                                var paColor4Array = [];
                                 if (shipmentDetails != "" && shipmentDetails != undefined) {
                                     for (var i = 0; i < shipmentDetails.length; i++) {
                                         if (shipmentDetails[i].shipmentStatus.id == DELIVERED_SHIPMENT_STATUS) {
@@ -1229,6 +1561,9 @@ class EditSupplyPlanStatus extends Component {
                                                 isLocalProcurementAgent1 = true;
                                             }
                                             sd1.push(shipmentDetail);
+                                            if (paColor1Array.indexOf(paColor1) === -1) {
+                                                paColor1Array.push(paColor1);
+                                            }
                                         } else if (shipmentDetails[i].shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == ARRIVED_SHIPMENT_STATUS) {
                                             if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
@@ -1258,7 +1593,12 @@ class EditSupplyPlanStatus extends Component {
                                                 isLocalProcurementAgent2 = true;
                                             }
                                             sd2.push(shipmentDetail);
+
+                                            if (paColor2Array.indexOf(paColor2) === -1) {
+                                                paColor2Array.push(paColor2);
+                                            }
                                         } else if (shipmentDetails[i].shipmentStatus.id == APPROVED_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS) {
+
                                             if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
@@ -1287,6 +1627,9 @@ class EditSupplyPlanStatus extends Component {
                                                 isLocalProcurementAgent3 = true;
                                             }
                                             sd3.push(shipmentDetail);
+                                            if (paColor3Array.indexOf(paColor3) === -1) {
+                                                paColor3Array.push(paColor3);
+                                            }
                                         } else if (shipmentDetails[i].shipmentStatus.id == PLANNED_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS) {
                                             if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
@@ -1316,13 +1659,16 @@ class EditSupplyPlanStatus extends Component {
                                                 isLocalProcurementAgent4 = true;
                                             }
                                             sd4.push(shipmentDetail);
+                                            if (paColor4Array.indexOf(paColor4) === -1) {
+                                                paColor4Array.push(paColor4);
+                                            }
                                         }
                                     }
                                 }
 
                                 if ((shipmentDetails.filter(c => c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS)).length > 0) {
                                     var colour = paColor1;
-                                    if (sd1.length > 1) {
+                                    if (paColor1Array.length > 1) {
                                         colour = "#d9ead3";
                                     }
                                     deliveredErpShipmentsTotalData.push({ qty: jsonList[0].receivedErpShipmentsTotalData, month: m[n], shipmentDetail: sd1, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder1, isLocalProcurementAgent: isLocalProcurementAgent1 });
@@ -1332,7 +1678,7 @@ class EditSupplyPlanStatus extends Component {
 
                                 if ((shipmentDetails.filter(c => c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || c.shipmentStatus.id == ARRIVED_SHIPMENT_STATUS)).length > 0) {
                                     var colour = paColor2;
-                                    if (sd2.length > 1) {
+                                    if (paColor2Array.length > 1) {
                                         colour = "#d9ead3";
                                     }
                                     shippedErpShipmentsTotalData.push({ qty: jsonList[0].shippedErpShipmentsTotalData, month: m[n], shipmentDetail: sd2, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder2, isLocalProcurementAgent: isLocalProcurementAgent2 });
@@ -1342,7 +1688,7 @@ class EditSupplyPlanStatus extends Component {
 
                                 if ((shipmentDetails.filter(c => c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS)).length > 0) {
                                     var colour = paColor3;
-                                    if (sd3.length > 1) {
+                                    if (paColor3Array.length > 1) {
                                         colour = "#d9ead3";
                                     }
                                     orderedErpShipmentsTotalData.push({ qty: parseInt(jsonList[0].approvedErpShipmentsTotalData) + parseInt(jsonList[0].submittedErpShipmentsTotalData), month: m[n], shipmentDetail: sd3, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder3, isLocalProcurementAgent: isLocalProcurementAgent3 });
@@ -1352,7 +1698,7 @@ class EditSupplyPlanStatus extends Component {
 
                                 if ((shipmentDetails.filter(c => c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS)).length > 0) {
                                     var colour = paColor4;
-                                    if (sd4.length > 1) {
+                                    if (paColor4Array.length > 1) {
                                         colour = "#d9ead3";
                                     }
                                     plannedErpShipmentsTotalData.push({ qty: parseInt(jsonList[0].onholdErpShipmentsTotalData) + parseInt(jsonList[0].plannedErpShipmentsTotalData), month: m[n], shipmentDetail: sd4, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder4, isLocalProcurementAgent: isLocalProcurementAgent4 });
@@ -1362,16 +1708,19 @@ class EditSupplyPlanStatus extends Component {
                                 console.log("deliveredShipmentsTotalData", deliveredShipmentsTotalData);
 
                                 inventoryTotalData.push(jsonList[0].adjustmentQty == 0 ? jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : "" : jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : jsonList[0].adjustmentQty);
-                                totalExpiredStockArr.push({ qty: jsonList[0].expiredStock, details: jsonList[0].batchDetails, month: m[n] });
-                                monthsOfStockArray.push(parseFloat(jsonList[0].mos).toFixed(1));
-                                amcTotalData.push(Math.round(parseFloat(jsonList[0].amc)))
+                                totalExpiredStockArr.push({ qty: jsonList[0].expiredStock, details: jsonList[0].batchDetails.filter(c => moment(c.expiryDate).format("YYYY-MM-DD") >= m[n].startDate && moment(c.expiryDate).format("YYYY-MM-DD") <= m[n].endDate), month: m[n] });
+                                monthsOfStockArray.push(jsonList[0].mos != null ? parseFloat(jsonList[0].mos).toFixed(1) : jsonList[0].mos);
+                                amcTotalData.push(jsonList[0].amc != null ? Math.round(Number(jsonList[0].amc)) : "");
                                 minStockMoS.push(jsonList[0].minStockMoS)
                                 maxStockMoS.push(jsonList[0].maxStockMoS)
                                 unmetDemand.push(jsonList[0].unmetDemand == 0 ? "" : jsonList[0].unmetDemand);
-                                closingBalanceArray.push(jsonList[0].closingBalance)
+                                closingBalanceArray.push({ isActual: jsonList[0].regionCountForStock == jsonList[0].regionCount ? 1 : 0, balance: jsonList[0].closingBalance, batchInfoList: jsonList[0].batchDetails })
+                                // closingBalanceArray.push(jsonList[0].closingBalance)
 
 
-                                lastClosingBalance = jsonList[0].closingBalance
+                                lastClosingBalance = jsonList[0].closingBalance;
+                                lastBatchDetails = jsonList[0].batchDetails;
+                                lastIsActualClosingBalance = jsonList[0].regionCountForStock == jsonList[0].regionCount ? 1 : 0;
 
                                 // suggestedShipmentsTotalData.push(jsonList[0].suggestedShipmentsTotalData);
                                 // consumptionArrayForRegion = consumptionArrayForRegion.concat(jsonList[0].consumptionArrayForRegion);
@@ -1379,47 +1728,60 @@ class EditSupplyPlanStatus extends Component {
                                 var sstd = {}
                                 var currentMonth = moment(Date.now()).utcOffset('-0500').startOf('month').format("YYYY-MM-DD");
                                 var compare = (m[n].startDate >= currentMonth);
-                                var stockInHand = jsonList[0].closingBalance;
-                                var amc = Math.round(parseFloat(jsonList[0].amc));
-                                if (compare && parseInt(stockInHand) <= parseInt(amc * parseInt(minStockMoSQty))) {
-                                    var suggestedOrd = Number((amc * Number(maxStockMoSQty)) - Number(jsonList[0].closingBalance) + Number(jsonList[0].unmetDemand));
-                                    if (suggestedOrd <= 0) {
-                                        var addLeadTimes = parseFloat(programJson.plannedToSubmittedLeadTime) + parseFloat(programJson.submittedToApprovedLeadTime) +
-                                            parseFloat(programJson.approvedToShippedLeadTime) + parseFloat(programJson.shippedToArrivedBySeaLeadTime) +
-                                            parseFloat(programJson.arrivedToDeliveredLeadTime);
-                                        var expectedDeliveryDate = moment(m[n].startDate).subtract(parseInt(addLeadTimes * 30), 'days').format("YYYY-MM-DD");
-                                        var isEmergencyOrder = 0;
-                                        if (expectedDeliveryDate >= currentMonth) {
-                                            isEmergencyOrder = 0;
+                                // var stockInHand = jsonList[0].closingBalance;
+                                var amc = Math.round(Number(jsonList[0].amc));
+                                var spd1 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).format("YYYY-MM"));
+                                var spd2 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).add(1, 'months').format("YYYY-MM"));
+                                var spd3 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).add(2, 'months').format("YYYY-MM"));
+                                var mosForMonth1 = spd1.length > 0 ? spd1[0].mos : 0;
+                                var mosForMonth2 = spd2.length > 0 ? spd2[0].mos : 0;
+                                var mosForMonth3 = spd3.length > 0 ? spd3[0].mos : 0;
+
+                                var suggestShipment = false;
+                                var useMax = false;
+                                if (compare) {
+                                    if (Number(amc) == 0) {
+                                        suggestShipment = false;
+                                    } else if (Number(mosForMonth1) != 0 && Number(mosForMonth1) < Number(minStockMoSQty) && (Number(mosForMonth2) > Number(minStockMoSQty) || Number(mosForMonth3) > Number(minStockMoSQty))) {
+                                        suggestShipment = false;
+                                    } else if (Number(mosForMonth1) != 0 && Number(mosForMonth1) < Number(minStockMoSQty) && Number(mosForMonth2) < Number(minStockMoSQty) && Number(mosForMonth3) < Number(minStockMoSQty)) {
+                                        suggestShipment = true;
+                                        useMax = true;
+                                    } else if (Number(mosForMonth1) == 0) {
+                                        suggestShipment = true;
+                                        if (Number(mosForMonth2) < Number(minStockMoSQty) && Number(mosForMonth3) < Number(minStockMoSQty)) {
+                                            useMax = true;
                                         } else {
-                                            isEmergencyOrder = 1;
+                                            useMax = false;
                                         }
-                                        sstd = { "suggestedOrderQty": "", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder };
-                                    } else {
-                                        var addLeadTimes = parseFloat(programJson.plannedToSubmittedLeadTime) + parseFloat(programJson.submittedToApprovedLeadTime) +
-                                            parseFloat(programJson.approvedToShippedLeadTime) + parseFloat(programJson.shippedToArrivedBySeaLeadTime) +
-                                            parseFloat(programJson.arrivedToDeliveredLeadTime);
-                                        var expectedDeliveryDate = moment(m[n].startDate).subtract(parseInt(addLeadTimes * 30), 'days').format("YYYY-MM-DD");
-                                        var isEmergencyOrder = 0;
-                                        if (expectedDeliveryDate >= currentMonth) {
-                                            isEmergencyOrder = 0;
-                                        } else {
-                                            isEmergencyOrder = 1;
-                                        }
-                                        sstd = { "suggestedOrderQty": suggestedOrd, "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder };
                                     }
                                 } else {
-                                    var addLeadTimes = parseFloat(programJson.plannedToSubmittedLeadTime) + parseFloat(programJson.submittedToApprovedLeadTime) +
-                                        parseFloat(programJson.approvedToShippedLeadTime) + parseFloat(programJson.shippedToArrivedBySeaLeadTime) +
-                                        parseFloat(programJson.arrivedToDeliveredLeadTime);
-                                    var expectedDeliveryDate = moment(m[n].startDate).subtract(parseInt(addLeadTimes * 30), 'days').format("YYYY-MM-DD");
-                                    var isEmergencyOrder = 0;
-                                    if (expectedDeliveryDate >= currentMonth) {
-                                        isEmergencyOrder = 0;
+                                    suggestShipment = false;
+                                }
+                                var addLeadTimes = parseFloat(programJson.plannedToSubmittedLeadTime) + parseFloat(programJson.submittedToApprovedLeadTime) +
+                                    parseFloat(programJson.approvedToShippedLeadTime) + parseFloat(programJson.shippedToArrivedBySeaLeadTime) +
+                                    parseFloat(programJson.arrivedToDeliveredLeadTime);
+                                var expectedDeliveryDate = moment(m[n].startDate).subtract(Number(addLeadTimes * 30), 'days').format("YYYY-MM-DD");
+                                var isEmergencyOrder = 0;
+                                if (expectedDeliveryDate >= currentMonth) {
+                                    isEmergencyOrder = 0;
+                                } else {
+                                    isEmergencyOrder = 1;
+                                }
+                                if (suggestShipment) {
+                                    var suggestedOrd = 0;
+                                    if (useMax) {
+                                        suggestedOrd = Number((amc * Number(maxStockMoSQty)) - Number(jsonList[0].closingBalance) + Number(jsonList[0].unmetDemand));
                                     } else {
-                                        isEmergencyOrder = 1;
+                                        suggestedOrd = Number((amc * Number(minStockMoSQty)) - Number(jsonList[0].closingBalance) + Number(jsonList[0].unmetDemand));
                                     }
-                                    sstd = { "suggestedOrderQty": "", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder };
+                                    if (suggestedOrd <= 0) {
+                                        sstd = { "suggestedOrderQty": "", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) };
+                                    } else {
+                                        sstd = { "suggestedOrderQty": suggestedOrd, "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) + Number(suggestedOrd) };
+                                    }
+                                } else {
+                                    sstd = { "suggestedOrderQty": "", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) };
                                 }
                                 suggestedShipmentsTotalData.push(sstd);
 
@@ -1497,20 +1859,20 @@ class EditSupplyPlanStatus extends Component {
                                     lastActualConsumptionDate.push({ lastActualConsumptionDate: conmax, region: regionListFiltered[r].id });
                                 }
                                 var json = {
-                                    month: m[n].month,
+                                    month: m[n].monthName.concat(" ").concat(m[n].monthYear),
                                     consumption: jsonList[0].consumptionQty,
                                     stock: jsonList[0].closingBalance,
                                     planned: parseInt(plannedShipmentsTotalData[n] != "" ? plannedShipmentsTotalData[n].qty : 0) + parseInt(plannedErpShipmentsTotalData[n] != "" ? plannedErpShipmentsTotalData[n].qty : 0),
                                     delivered: parseInt(deliveredShipmentsTotalData[n] != "" ? deliveredShipmentsTotalData[n].qty : 0) + parseInt(deliveredErpShipmentsTotalData[n] != "" ? deliveredErpShipmentsTotalData[n].qty : 0),
                                     shipped: parseInt(shippedShipmentsTotalData[n] != "" ? shippedShipmentsTotalData[n].qty : 0) + parseInt(shippedErpShipmentsTotalData[n] != "" ? shippedErpShipmentsTotalData[n].qty : 0),
                                     ordered: parseInt(orderedShipmentsTotalData[n] != "" ? orderedShipmentsTotalData[n].qty : 0) + parseInt(orderedErpShipmentsTotalData[n] != "" ? orderedErpShipmentsTotalData[n].qty : 0),
-                                    mos: parseFloat(jsonList[0].mos).toFixed(2),
+                                    mos: jsonList[0].mos != null ? parseFloat(jsonList[0].mos).toFixed(2) : jsonList[0].mos,
                                     minMos: minStockMoSQty,
                                     maxMos: maxStockMoSQty
                                 }
                                 jsonArrForGraph.push(json);
                             } else {
-                                openingBalanceArray.push(lastClosingBalance);
+                                openingBalanceArray.push({ isActual: lastIsActualClosingBalance, balance: lastClosingBalance });
                                 consumptionTotalData.push({ consumptionQty: "", consumptionType: "", textColor: "" });
                                 shipmentsTotalData.push(0);
                                 suggestedShipmentsTotalData.push({ "suggestedOrderQty": "", "month": moment(m[n].startDate).format("YYYY-MM-DD"), "isEmergencyOrder": 0 });
@@ -1526,12 +1888,12 @@ class EditSupplyPlanStatus extends Component {
                                 plannedErpShipmentsTotalData.push("");
                                 inventoryTotalData.push("");
                                 totalExpiredStockArr.push({ qty: 0, details: [], month: m[n] });
-                                monthsOfStockArray.push("")
+                                monthsOfStockArray.push(null)
                                 amcTotalData.push("");
                                 minStockMoS.push(minStockMoSQty);
                                 maxStockMoS.push(maxStockMoSQty)
                                 unmetDemand.push("");
-                                closingBalanceArray.push(lastClosingBalance);
+                                closingBalanceArray.push({ isActual: 0, balance: lastClosingBalance, batchInfoList: lastBatchDetails });
                                 for (var i = 0; i < this.state.regionListFiltered.length; i++) {
                                     consumptionArrayForRegion.push({ "regionId": regionListFiltered[i].id, "qty": "", "actualFlag": "", "month": m[n] })
                                     inventoryArrayForRegion.push({ "regionId": regionListFiltered[i].id, "adjustmentsQty": "", "actualQty": "", "finalInventory": lastClosingBalance, "autoAdjustments": "", "projectedInventory": lastClosingBalance, "month": m[n] });
@@ -1541,7 +1903,7 @@ class EditSupplyPlanStatus extends Component {
                                 lastActualConsumptionDate.push("");
 
                                 var json = {
-                                    month: m[n].month,
+                                    month: m[n].monthName.concat(" ").concat(m[n].monthYear),
                                     consumption: null,
                                     stock: lastClosingBalance,
                                     planned: 0,
@@ -1629,11 +1991,16 @@ class EditSupplyPlanStatus extends Component {
         ProgramService.getActiveProgramPlaningUnitListByProgramId(programId).then(response => {
             console.log('**' + JSON.stringify(response.data))
             this.setState({
-                planningUnits: response.data, message: ''
+                planningUnits: (response.data).sort(function (a, b) {
+                    a = getLabelText(a.planningUnit.label, this.state.lang).toLowerCase();
+                    b = getLabelText(b.planningUnit.label, this.state.lang).toLowerCase();
+                    return a < b ? -1 : a > b ? 1 : 0;
+                }.bind(this)), message: ''
             })
         })
             .catch(
                 error => {
+                    console.log("Error+++", error)
                     this.setState({
                         planningUnits: [],
                     })
@@ -1749,8 +2116,25 @@ class EditSupplyPlanStatus extends Component {
 
                     }
                 });
+                var programQPLDetails = [];
+                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                programQPLDetails.push({
+                    id: program.programId,
+                    programId: program.programId,
+                    version: program.currentVersion.versionId,
+                    userId: userId,
+                    programCode: program.programCode,
+                    openCount: 0,
+                    addressedCount: 0,
+                    programModified: 0,
+                    readonly: 0
+                })
+
                 this.setState({
                     program,
+                    programQPLDetails: programQPLDetails,
+                    programId: program.programId,
                     regionList: regionList,
                     data: response.data.problemReportList,
                     editable: program.currentVersion.versionType.id == 2 && program.currentVersion.versionStatus.id == 1 && hasRole ? true : false
@@ -1945,6 +2329,7 @@ class EditSupplyPlanStatus extends Component {
             };
             problemStatusRequest.onsuccess = function (e) {
                 var myResult = [];
+                var problemStatusJson = [];
                 myResult = problemStatusRequest.result;
                 var proList = []
                 for (var i = 0; i < myResult.length; i++) {
@@ -1953,9 +2338,16 @@ class EditSupplyPlanStatus extends Component {
                         id: myResult[i].id
                     }
                     proList[i] = Json
+
+                    if (myResult[i].id == 1 || myResult[i].id == 3) {
+                        problemStatusJson.push({ label: getLabelText(myResult[i].label, lan), value: myResult[i].id });
+                    }
                 }
+
+
                 this.setState({
-                    problemStatusList: proList
+                    problemStatusList: proList,
+                    problemStatusValues: problemStatusJson
                 })
 
                 var problemCategoryTransaction = db1.transaction(['problemCategory'], 'readwrite');
@@ -2001,7 +2393,7 @@ class EditSupplyPlanStatus extends Component {
         const chartOptions = {
             title: {
                 display: true,
-                text: this.state.planningUnitName != "" && this.state.planningUnitName != undefined && this.state.planningUnitName != null ? entityname + " - " + this.state.planningUnitName : entityname
+                text: this.state.planningUnitName != "" && this.state.planningUnitName != undefined && this.state.planningUnitName != null ? (this.state.program.programCode + "~v" + this.state.program.currentVersion.versionId + " - " + this.state.planningUnitName) : entityname
             },
             scales: {
                 yAxes: [{
@@ -2054,7 +2446,16 @@ class EditSupplyPlanStatus extends Component {
             tooltips: {
                 callbacks: {
                     label: function (tooltipItems, data) {
-                        return (tooltipItems.yLabel.toLocaleString());
+                        if (tooltipItems.datasetIndex == 0) {
+                            var details = this.state.expiredStockArr[tooltipItems.index].details;
+                            var infoToShow = [];
+                            details.map(c => {
+                                infoToShow.push(c.batchNo + " - " + c.expiredQty.toLocaleString());
+                            });
+                            return (infoToShow.join(' | '));
+                        } else {
+                            return (tooltipItems.yLabel.toLocaleString());
+                        }
                     }
                 },
                 enabled: false,
@@ -2073,6 +2474,7 @@ class EditSupplyPlanStatus extends Component {
         }
 
         const { planningUnits } = this.state;
+
         let planningUnitList = planningUnits.length > 0
             && planningUnits.map((item, i) => {
                 return (
@@ -2097,12 +2499,34 @@ class EditSupplyPlanStatus extends Component {
 
             }, this);
 
+        const { problemReviewedList } = this.state;
+        let problemReviewed = problemReviewedList.length > 0
+            && problemReviewedList.map((item, i) => {
+                return ({ label: item.name, value: item.id })
+            }, this);
+
         let bar = {}
         if (this.state.jsonArrForGraph.length > 0)
             bar = {
 
                 labels: [...new Set(this.state.jsonArrForGraph.map(ele => (ele.month)))],
                 datasets: [
+                    {
+                        label: i18n.t('static.supplyplan.exipredStock'),
+                        yAxisID: 'A',
+                        type: 'line',
+                        stack: 7,
+                        data: this.state.expiredStockArr.map((item, index) => (item.qty > 0 ? item.qty : null)),
+                        fill: false,
+                        borderColor: 'rgb(75, 192, 192)',
+                        tension: 0.1,
+                        showLine: false,
+                        pointStyle: 'triangle',
+                        pointBackgroundColor: '#ED8944',
+                        pointBorderColor: '#212721',
+                        pointRadius: 10
+
+                    },
                     {
                         label: i18n.t('static.supplyPlan.planned'),
                         stack: 1,
@@ -2163,6 +2587,7 @@ class EditSupplyPlanStatus extends Component {
                         },
                         lineTension: 0,
                         pointStyle: 'line',
+                        pointRadius: 0,
                         showInLegend: true,
                         data: this.state.jsonArrForGraph.map((item, index) => (item.stock))
                     }, {
@@ -2179,6 +2604,7 @@ class EditSupplyPlanStatus extends Component {
                         },
                         lineTension: 0,
                         pointStyle: 'line',
+                        pointRadius: 0,
                         showInLegend: true,
                         data: this.state.jsonArrForGraph.map((item, index) => (item.consumption))
                     },
@@ -2196,6 +2622,7 @@ class EditSupplyPlanStatus extends Component {
                         },
                         lineTension: 0,
                         pointStyle: 'line',
+                        pointRadius: 0,
                         showInLegend: true,
                         data: this.state.jsonArrForGraph.map((item, index) => (item.mos))
                     },
@@ -2215,6 +2642,7 @@ class EditSupplyPlanStatus extends Component {
                         },
                         showInLegend: true,
                         pointStyle: 'line',
+                        pointRadius: 0,
                         yValueFormatString: "$#,##0",
                         lineTension: 0,
                         data: this.state.jsonArrForGraph.map((item, index) => (item.minMos))
@@ -2235,6 +2663,7 @@ class EditSupplyPlanStatus extends Component {
                         },
                         lineTension: 0,
                         pointStyle: 'line',
+                        pointRadius: 0,
                         showInLegend: true,
                         yValueFormatString: "$#,##0",
                         data: this.state.jsonArrForGraph.map((item, index) => (item.maxMos))
@@ -2292,7 +2721,7 @@ class EditSupplyPlanStatus extends Component {
                                     <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px' }} style={{ display: this.state.display }}>
                                         <ul className="legendcommitversion list-group">
                                             <li><span className="lightgreylegend "></span> <span className="legendcommitversionText"> {i18n.t("static.supplyPlan.minMonthsOfStock")} : {this.state.minMonthsOfStock}</span></li>
-                                            <li><span className="lightgreenlegend "></span> <span className="legendcommitversionText">{i18n.t("static.report.reorderFrequencyInMonths")} : {this.state.reorderFrequency}</span></li>
+                                            <li><span className="lightgreenlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.reorderInterval")} : {this.state.reorderFrequency}</span></li>
                                             <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.report.mospast")} : {this.state.monthsInPastForAMC}</span></li>
                                             <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.report.mosfuture")} : {this.state.monthsInFutureForAMC}</span></li>
                                             <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.shelfLife")} : {this.state.shelfLife}</span></li>
@@ -2317,8 +2746,26 @@ class EditSupplyPlanStatus extends Component {
                                             </InputGroup>
                                         </div>
                                     </FormGroup>
-                                    <FormGroup className="col-md-12 mt-2 pl-0" style={{ display: this.state.display }}>
+                                    <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px' }} style={{ display: this.state.display }}>
                                         <ul className="legendcommitversion list-group">
+                                            <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.planningUnitSettings")} : </b></span></li>
+                                            <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.amcPastOrFuture")} : {this.state.monthsInPastForAMC}/{this.state.monthsInFutureForAMC}</span></li>
+                                            <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.report.shelfLife")} : {this.state.shelfLife}</span></li>
+                                            <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.minStockMos")} : {this.state.minStockMoSQty}</span></li>
+                                            <li><span className="lightgreenlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.reorderInterval")} : {this.state.reorderFrequency}</span></li>
+                                            <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.maxStockMos")} : {this.state.maxStockMoSQty}</span></li>
+                                        </ul>
+                                    </FormGroup>
+                                    <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px' }} style={{ display: this.state.display }}>
+                                        <ul className="legendcommitversion list-group">
+                                            <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.consumption")} : </b></span></li>
+                                            <li><span className="purplelegend legendcolor"></span> <span className="legendcommitversionText" style={{ color: "rgb(170, 85, 161)" }}><i>{i18n.t('static.supplyPlan.forecastedConsumption')}</i></span></li>
+                                            <li><span className=" blacklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.actualConsumption')} </span></li>
+                                        </ul>
+                                    </FormGroup>
+                                    <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px' }} style={{ display: this.state.display }}>
+                                        <ul className="legendcommitversion list-group">
+                                            <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.dashboard.shipments")} : </b></span></li>
                                             {
                                                 this.state.paColors.map(item1 => (
                                                     <li><span className="legendcolor" style={{ backgroundColor: item1.color }}></span> <span className="legendcommitversionText">{item1.text}</span></li>
@@ -2326,23 +2773,20 @@ class EditSupplyPlanStatus extends Component {
                                             }
                                             <li><span className="lightgreylegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.tbd')}</span></li>
                                             <li><span className="lightgreenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.multipleShipments')}</span></li>
-
-                                            <li><span className="purplelegend legendcolor"></span> <span className="legendcommitversionText" style={{ color: "rgb(170, 85, 161)" }}><i>{i18n.t('static.supplyPlan.forecastedConsumption')}</i></span></li>
-                                            <li><span className=" blacklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.actualConsumption')} </span></li>
-                                            <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.stockOut')} </span></li>
                                             <li><span className="legend-localprocurment legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.report.localprocurement')}</span></li>
                                             <li><span className="legend-emergencyComment legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyOrder')}</span></li>
-
                                         </ul>
                                     </FormGroup>
-                                    <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px' }} style={{ display: this.state.display }}>
+                                    <FormGroup className="col-md-12 mt-2 pl-0  mt-3" style={{ display: this.state.display }}>
                                         <ul className="legendcommitversion list-group">
-                                            <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.amcPast")} : {this.state.monthsInPastForAMC}</span></li>
-                                            <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.amcFuture")} : {this.state.monthsInFutureForAMC}</span></li>
-                                            <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.report.shelfLife")} : {this.state.shelfLife}</span></li>
-                                            <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.minStockMos")} : {this.state.minStockMoSQty}</span></li>
-                                            <li><span className="lightgreenlegend "></span> <span className="legendcommitversionText">{i18n.t("static.report.reorderFrequencyInMonths")} : {this.state.reorderFrequency}</span></li>
-                                            <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.maxStockMos")} : {this.state.maxStockMoSQty}</span></li>
+                                            <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.stockBalance")}/{i18n.t("static.report.mos")} : </b></span></li>
+                                            <li><span className="legendcolor"></span> <span className="legendcommitversionText"><b>{i18n.t('static.supplyPlan.actualBalance')}</b></span></li>
+                                            <li><span className="legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.projectedBalance')}</span></li>
+                                            <li><span className="legendcolor" style={{ backgroundColor: "#BA0C2F" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.stockout')}</span></li>
+                                            <li><span className="legendcolor" style={{ backgroundColor: "#f48521" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.lowstock')}</span></li>
+                                            <li><span className="legendcolor" style={{ backgroundColor: "#118b70" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.okaystock')}</span></li>
+                                            <li><span className="legendcolor" style={{ backgroundColor: "#edb944" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.overstock')}</span></li>
+                                            <li><span className="legendcolor" style={{ backgroundColor: "#cfcdc9" }}></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlanFormula.na')}</span></li>
                                         </ul>
                                     </FormGroup>
 
@@ -2365,7 +2809,7 @@ class EditSupplyPlanStatus extends Component {
                                                 <Table className="table-bordered text-center mt-2 overflowhide" bordered size="sm" options={this.options}>
                                                     <thead>
                                                         <tr>
-                                                            <th className="BorderNoneSupplyPlan"></th>
+                                                            <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th>
                                                             <th className="supplyplanTdWidth sticky-col first-col clone"></th>
                                                             {
                                                                 this.state.monthsArray.map(item => {
@@ -2382,29 +2826,37 @@ class EditSupplyPlanStatus extends Component {
                                                     <tbody>
 
                                                         <tr bgcolor='#d9d9d9'>
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone"><b>{i18n.t('static.supplyPlan.openingBalance')}</b></td>
                                                             {
                                                                 this.state.openingBalanceArray.map(item1 => (
-                                                                    <td align="right"><b><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></b></td>
+                                                                    <td align="right">{item1.isActual == 1 ? <b><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} /></b> : <NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} />}</td>
                                                                 ))
                                                             }
                                                         </tr>
                                                         <tr>
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone"><b>- {i18n.t('static.supplyPlan.consumption')}</b></td>
                                                             {
                                                                 this.state.consumptionTotalData.map((item1, count) => {
                                                                     if (item1.consumptionType == 1) {
-                                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Consumption', '', '', '', '', '', '', count)} style={{ color: item1.textColor }}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.consumptionQty} /></td>)
+                                                                        if (item1.consumptionQty != null) {
+                                                                            return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Consumption', '', '', '', '', '', '', count)} style={{ color: item1.textColor }}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.consumptionQty} /></td>)
+                                                                        } else {
+                                                                            return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Consumption', '', '', '', '', '', '', count)} style={{ color: item1.textColor }}>{""}</td>)
+                                                                        }
                                                                     } else {
-                                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Consumption', '', '', '', '', '', '', count)} style={{ color: item1.textColor }}><i><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.consumptionQty} /></i></td>)
+                                                                        if (item1.consumptionQty != null) {
+                                                                            return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Consumption', '', '', '', '', '', '', count)} style={{ color: item1.textColor }}><i><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.consumptionQty} /></i></td>)
+                                                                        } else {
+                                                                            return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Consumption', '', '', '', '', '', '', count)} style={{ color: item1.textColor }}><i>{""}</i></td>)
+                                                                        }
                                                                     }
                                                                 })
                                                             }
                                                         </tr>
                                                         <tr>
-                                                            <td className="BorderNoneSupplyPlan" onClick={() => this.toggleAccordionTotalShipments()}>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordionTotalShipments()}>
                                                                 {this.state.showTotalShipment ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
                                                             </td>
                                                             <td align="left" className="sticky-col first-col clone" ><b>+ {i18n.t('static.dashboard.shipments')}</b></td>
@@ -2416,7 +2868,7 @@ class EditSupplyPlanStatus extends Component {
                                                         </tr>
 
                                                         <tr className="totalShipments">
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;{i18n.t('static.supplyPlan.suggestedShipments')}</td>
                                                             {
                                                                 this.state.suggestedShipmentsTotalData.map(item1 => {
@@ -2434,7 +2886,7 @@ class EditSupplyPlanStatus extends Component {
                                                         </tr>
 
                                                         <tr className="totalShipments">
-                                                            <td className="BorderNoneSupplyPlan" onClick={() => this.toggleAccordionManualShipments()}>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordionManualShipments()}>
                                                                 {this.state.showManualShipment ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
                                                             </td>
                                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;{i18n.t('static.supplyPlan.manualEntryShipments')}</td>
@@ -2446,7 +2898,7 @@ class EditSupplyPlanStatus extends Component {
                                                         </tr>
 
                                                         <tr className="manualShipments">
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.delivered')}</td>
 
                                                             {
@@ -2466,7 +2918,7 @@ class EditSupplyPlanStatus extends Component {
                                                         </tr>
 
                                                         <tr className="manualShipments">
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.shipped')}</td>
                                                             {
                                                                 this.state.shippedShipmentsTotalData.map(item1 => {
@@ -2484,7 +2936,7 @@ class EditSupplyPlanStatus extends Component {
                                                         </tr>
 
                                                         <tr className="manualShipments">
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.submitted')}</td>
                                                             {
                                                                 this.state.orderedShipmentsTotalData.map(item1 => {
@@ -2501,7 +2953,7 @@ class EditSupplyPlanStatus extends Component {
                                                             }
                                                         </tr>
                                                         <tr className="manualShipments">
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.planned')}</td>
                                                             {
                                                                 this.state.plannedShipmentsTotalData.map(item1 => {
@@ -2518,7 +2970,7 @@ class EditSupplyPlanStatus extends Component {
                                                             }
                                                         </tr>
                                                         <tr className="totalShipments">
-                                                            <td className="BorderNoneSupplyPlan" onClick={() => this.toggleAccordionErpShipments()}>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordionErpShipments()}>
                                                                 {this.state.showErpShipment ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
                                                             </td>
                                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;{i18n.t('static.supplyPlan.erpShipments')}</td>
@@ -2529,7 +2981,7 @@ class EditSupplyPlanStatus extends Component {
                                                             }
                                                         </tr>
                                                         <tr className="erpShipments">
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.delivered')}</td>
                                                             {
                                                                 this.state.deliveredErpShipmentsTotalData.map(item1 => {
@@ -2547,7 +2999,7 @@ class EditSupplyPlanStatus extends Component {
                                                         </tr>
 
                                                         <tr className="erpShipments">
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.shipped')}</td>
                                                             {
                                                                 this.state.shippedErpShipmentsTotalData.map(item1 => {
@@ -2564,7 +3016,7 @@ class EditSupplyPlanStatus extends Component {
                                                             }
                                                         </tr>
                                                         <tr className="erpShipments">
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.submitted')}</td>
                                                             {
                                                                 this.state.orderedErpShipmentsTotalData.map(item1 => {
@@ -2581,7 +3033,7 @@ class EditSupplyPlanStatus extends Component {
                                                             }
                                                         </tr>
                                                         <tr className="erpShipments">
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.planned')}</td>
                                                             {
                                                                 this.state.plannedErpShipmentsTotalData.map(item1 => {
@@ -2598,16 +3050,20 @@ class EditSupplyPlanStatus extends Component {
                                                             }
                                                         </tr>
                                                         <tr>
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone"><b>+/- {i18n.t('static.supplyPlan.adjustments')}</b></td>
                                                             {
                                                                 this.state.inventoryTotalData.map((item1, count) => {
-                                                                    return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>)
+                                                                    if (item1 != null) {
+                                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>)
+                                                                    } else {
+                                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}>{""}</td>)
+                                                                    }
                                                                 })
                                                             }
                                                         </tr>
                                                         <tr>
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone"><b>- {i18n.t('static.supplyplan.exipredStock')}</b></td>
                                                             {
                                                                 this.state.expiredStockArr.map(item1 => {
@@ -2624,25 +3080,25 @@ class EditSupplyPlanStatus extends Component {
                                                             }
                                                         </tr>
                                                         <tr bgcolor='#d9d9d9'>
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone"><b>{i18n.t('static.supplyPlan.endingBalance')}</b></td>
                                                             {
                                                                 this.state.closingBalanceArray.map((item1, count) => {
-                                                                    return (<td align="right" bgcolor={item1 == 0 ? 'red' : ''} className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}>{item1 == 0 ? <b><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></b> : <NumberFormat displayType={'text'} thousandSeparator={true} value={item1} />}</td>)
+                                                                    return (<td align="right" bgcolor={item1.balance == 0 ? '#BA0C2F' : ''} className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}>{item1.isActual == 1 ? <b><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} /></b> : <NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} />}</td>)
                                                                 })
                                                             }
                                                         </tr>
                                                         <tr>
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone"><b>{i18n.t('static.supplyPlan.monthsOfStock')}</b></td>
                                                             {
                                                                 this.state.monthsOfStockArray.map(item1 => (
-                                                                    <td align="right" style={{ color: item1 == 0 ? "red" : "" }}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
+                                                                    <td align="right" style={{ backgroundColor: item1 == null ? "#cfcdc9" : item1 == 0 ? "#BA0C2F" : item1 < this.state.minStockMoSQty ? "#f48521" : item1 > this.state.maxStockMoSQty ? "#edb944" : "#118b70" }}>{item1 != null ? <NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /> : i18n.t('static.supplyPlanFormula.na')}</td>
                                                                 ))
                                                             }
                                                         </tr>
                                                         <tr>
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone" title={i18n.t('static.supplyplan.amcmessage')}>{i18n.t('static.supplyPlan.amc')}</td>
                                                             {
                                                                 this.state.amcTotalData.map(item1 => (
@@ -2651,7 +3107,7 @@ class EditSupplyPlanStatus extends Component {
                                                             }
                                                         </tr>
                                                         {/* <tr>
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone">{i18n.t('static.supplyPlan.minStockMos')}</td>
                                                             {
                                                                 this.state.minStockMoS.map(item1 => (
@@ -2660,7 +3116,7 @@ class EditSupplyPlanStatus extends Component {
                                                             }
                                                         </tr>
                                                         <tr>
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone">{i18n.t('static.supplyPlan.maxStockMos')}</td>
                                                             {
                                                                 this.state.maxStockMoS.map(item1 => (
@@ -2669,37 +3125,38 @@ class EditSupplyPlanStatus extends Component {
                                                             }
                                                         </tr> */}
                                                         <tr>
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone">{i18n.t('static.supplyPlan.unmetDemandStr')}</td>
                                                             {
-                                                                this.state.unmetDemand.map(item1 => (
-                                                                    <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
-                                                                ))
+                                                                this.state.unmetDemand.map(item1 => {
+                                                                    if (item1 != null) {
+                                                                        return (<td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>)
+                                                                    } else {
+                                                                        return (<td align="right">{""}</td>)
+                                                                    }
+                                                                })
                                                             }
                                                         </tr>
                                                     </tbody>
                                                 </Table>
+                                            </div>
 
-                                                {
-                                                    this.state.jsonArrForGraph.length > 0
-                                                    &&
-                                                    <div className="" >
+                                            {
+                                                this.state.jsonArrForGraph.length > 0
+                                                &&
+                                                <div className="" >
 
-                                                        <div className="graphwidth">
-                                                            <div className="col-md-12">
-                                                                <div className="chart-wrapper chart-graph-report">
-                                                                    <Bar id="cool-canvas1" data={bar} options={chartOptions} />
-                                                                </div>
+                                                    <div className="graphwidth">
+                                                        <div className="col-md-12">
+                                                            <div className="chart-wrapper chart-graph-report">
+                                                                <Bar id="cool-canvas1" data={bar} options={chartOptions} />
                                                             </div>
                                                         </div>
-                                                        <div className="offset-4 col-md-8"> <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>
-                                                    </div>}
-                                            </div>
+                                                    </div>
+                                                    <div className="offset-4 col-md-8"> <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>
+                                                </div>}
                                         </div>
                                     </div>
-
-
-
                                     {/* {
                         this.state.jsonArrForGraph.length > 0
                         &&
@@ -2780,6 +3237,20 @@ class EditSupplyPlanStatus extends Component {
                                 </div>
                             </FormGroup>
                             <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
+                                <Label htmlFor="appendedInputButton">{i18n.t('static.problemReport.reviewed')}</Label>
+                                {/* <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span> */}
+                                <div className="controls problemListSelectField">
+                                    <MultiSelect
+                                        name="reviewedStatusId"
+                                        id="reviewedStatusId"
+                                        options={problemReviewed && problemReviewed.length > 0 ? problemReviewed : []}
+                                        value={this.state.problemReviewedValues}
+                                        onChange={(e) => { this.handleProblemReviewedChange(e) }}
+                                        labelledBy={i18n.t('static.common.select')}
+                                    />
+                                </div>
+                            </FormGroup>
+                            {/* <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
                                 <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlanReview.review')}</Label>
                                 <div className="controls SelectField">
                                     <InputGroup>
@@ -2788,14 +3259,13 @@ class EditSupplyPlanStatus extends Component {
                                             name="reviewedStatusId" id="reviewedStatusId"
                                             onChange={this.fetchData}
                                         >
-                                            {/* <option value="0">Please select</option> */}
                                             <option value="0">No</option>
                                             <option value="1">Yes</option>
 
                                         </Input>
                                     </InputGroup>
                                 </div>
-                            </FormGroup>
+                            </FormGroup> */}
                         </div>
                     </Col>
                     <br />
@@ -2843,11 +3313,44 @@ class EditSupplyPlanStatus extends Component {
             })
         }
     }
+    handleProblemReviewedChange = (event) => {
+        var cont = false;
+        if (this.state.problemReportChanged == 1) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
+
+            }
+        } else {
+            cont = true;
+        }
+        if (cont == true) {
+            console.log('***', event)
+            var problemReviewedIds = event
+            problemReviewedIds = problemReviewedIds.sort(function (a, b) {
+                return parseInt(a.value) - parseInt(b.value);
+            })
+            this.setState({
+                problemReviewedValues: problemReviewedIds.map(ele => ele),
+                problemReviewedLabels: problemReviewedIds.map(ele => ele.label),
+                problemReportChanged: 0
+            }, () => {
+                console.log("problemReviewedValues===>", this.state.problemReviewedValues);
+                this.fetchData()
+            })
+        }
+    }
 
     getNote(row, lang) {
         var transList = row.problemTransList.filter(c => c.reviewed == false);
-        var listLength = transList.length;
-        return transList[listLength - 1].notes;
+        if (transList.length == 0) {
+            console.log("this problem report id do not have trans+++", row.problemReportId);
+            return ""
+        } else {
+            var listLength = transList.length;
+            return transList[listLength - 1].notes;
+        }
     }
 
     fetchData() {
@@ -2878,7 +3381,8 @@ class EditSupplyPlanStatus extends Component {
             // let problemStatusId = ;
             let problemStatusIds = this.state.problemStatusValues.map(ele => (ele.value));
             console.log("D-------------->Problem status Ids ------------------>", problemStatusIds)
-            let reviewedStatusId = document.getElementById('reviewedStatusId').value;
+            // let reviewedStatusId = document.getElementById('reviewedStatusId').value;
+            let reviewedStatusId = this.state.problemReviewedValues.map(ele => (ele.value));
             var problemReportList = this.state.data;
             var problemReportFilterList = problemReportList;
             let problemTypeId = document.getElementById('problemTypeId').value;
@@ -2887,12 +3391,13 @@ class EditSupplyPlanStatus extends Component {
             if (problemStatusIds != []) {
                 var myStartDate = moment(Date.now()).subtract(6, 'months').startOf('month').format("YYYY-MM-DD");
                 problemReportFilterList = problemReportFilterList.filter(c => (c.problemStatus.id == 4 ? moment(c.createdDate).format("YYYY-MM-DD") >= myStartDate : true) && problemStatusIds.includes(c.problemStatus.id));
-                if (reviewedStatusId != -1) {
-                    if (reviewedStatusId == 0) {
-                        problemReportFilterList = problemReportFilterList.filter(c => c.reviewed == false);
-                    } else {
-                        problemReportFilterList = problemReportFilterList.filter(c => c.reviewed == true);
-                    }
+                if (reviewedStatusId != []) {
+                    problemReportFilterList = problemReportFilterList.filter(c => reviewedStatusId.includes(c.reviewed == true ? 1 : 0));
+                    // if (reviewedStatusId == 0) {
+                    //     problemReportFilterList = problemReportFilterList.filter(c => c.reviewed == false);
+                    // } else {
+                    //     problemReportFilterList = problemReportFilterList.filter(c => c.reviewed == true);
+                    // }
                 }
                 if (problemTypeId != -1) {
                     problemReportFilterList = problemReportFilterList.filter(c => (c.problemType.id == problemTypeId));
@@ -2982,10 +3487,93 @@ class EditSupplyPlanStatus extends Component {
         return mylist;
     }.bind(this)
 
+    buildProblemTransJexcel() {
+        console.log("In jexcel+++", this.state.problemTransList);
+        var currentTrans = this.state.problemTransList.sort((function (a, b) {
+            a = a.createdDate
+            b = b.createdDate
+            return a > b ? -1 : a < b ? 1 : 0;
+        }));
+
+        let dataArray = [];
+        let count = 0;
+        for (var j = 0; j < currentTrans.length; j++) {
+            data = [];
+            data[0] = currentTrans[j].problemStatus.label.label_en;
+            data[1] = currentTrans[j].notes;
+            data[2] = currentTrans[j].createdBy.username;
+            data[3] = currentTrans[j].createdDate;
+            dataArray[count] = data;
+            count++;
+        }
+        this.el = jexcel(document.getElementById("problemTransDiv"), '');
+        this.el.destroy();
+        var json = [];
+        var data = dataArray;
+
+        var options = {
+            data: data,
+            columnDrag: true,
+            columns: [
+                {
+                    title: i18n.t('static.report.problemStatus'),
+                    type: 'text',
+
+                },
+                {
+                    title: i18n.t('static.program.notes'),
+                    type: 'text',
+
+                },
+                {
+                    title: i18n.t('static.report.lastmodifiedby'),
+                    type: 'text',
+
+                },
+                {
+                    title: i18n.t('static.report.lastmodifieddate'),
+                    type: 'calendar',
+                    format: JEXCEL_DATE_FORMAT_SM
+
+                },
+
+            ],
+            onload: this.loaded1,
+            pagination: localStorage.getItem("sesRecordCount"),
+            search: true,
+            columnSorting: true,
+            tableOverflow: true,
+            wordWrap: true,
+            allowInsertColumn: false,
+            allowManualInsertColumn: false,
+            allowDeleteRow: false,
+            copyCompatibility: true,
+            allowExport: false,
+            paginationOptions: JEXCEL_PAGINATION_OPTION,
+            position: 'top',
+            filters: true,
+            parseFormulas: true,
+            license: JEXCEL_PRO_KEY,
+            text: {
+                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')} `,
+                show: '',
+                entries: '',
+            },
+        };
+        var problemTransEl = jexcel(document.getElementById("problemTransDiv"), options);
+        this.el = problemTransEl;
+        this.setState({
+            problemTransEl: problemTransEl
+        })
+    }
+    loaded1 = function (instance, cell, x, y, value) {
+        jExcelLoadedFunction(instance, 1);
+    }
+
     buildJExcel() {
-        var problemListDate = moment(Date.now()).subtract(12, 'months').endOf('month').format("YYYY-MM-DD");
+        // var problemListDate = moment(Date.now()).subtract(12, 'months').endOf('month').format("YYYY-MM-DD");
         let problemList = this.state.problemList;
-        problemList = problemList.filter(c => moment(c.createdDate).format("YYYY-MM-DD") > problemListDate);
+        problemList = problemList;
         console.log("problemList---->", problemList);
         let problemArray = [];
         let count = 0;
@@ -2996,10 +3584,10 @@ class EditSupplyPlanStatus extends Component {
             data[1] = problemList[j].problemActionIndex
             data[2] = problemList[j].program.code
             data[3] = problemList[j].versionId
-            data[4] = (problemList[j].region.label != null) ? (getLabelText(problemList[j].region.label, this.state.lang)) : ''
+            data[4] = (problemList[j].region != null) ? (getLabelText(problemList[j].region.label, this.state.lang)) : ''
             data[5] = getLabelText(problemList[j].planningUnit.label, this.state.lang)
             data[6] = (problemList[j].dt != null) ? (moment(problemList[j].dt).format('MMM-YY')) : ''
-            data[7] = moment(problemList[j].createdDate).format('MMM-YY')
+            data[7] = problemList[j].problemCategory.id
             data[8] = getProblemDesc(problemList[j], this.state.lang)
             data[9] = getSuggestion(problemList[j], this.state.lang)
             data[10] = problemList[j].problemStatus.id
@@ -3081,10 +3669,11 @@ class EditSupplyPlanStatus extends Component {
                     width: 0
                 },
                 {
-                    title: i18n.t('static.report.createdDate'),
-                    type: 'hidden',
-                    readOnly: true,
-                    width: 0
+                    title: i18n.t("static.problemActionReport.problemCategory"),
+                    type: 'dropdown',
+                    width: 80,
+                    source: this.state.problemCategoryList,
+                    readOnly: true
                 },
                 {
                     title: i18n.t('static.report.problemDescription'),
@@ -3162,7 +3751,7 @@ class EditSupplyPlanStatus extends Component {
                     title: i18n.t('static.supplyPlanReview.review'),
                     type: 'checkbox',
                     width: 80,
-                    readOnly:!this.state.editable
+                    readOnly: !this.state.editable
                 },
                 {
                     title: i18n.t('static.supplyPlanReview.reviewNotes'),
@@ -3186,14 +3775,24 @@ class EditSupplyPlanStatus extends Component {
             updateTable: function (el, cell, x, y, source, value, id) {
                 var elInstance = el.jexcel;
                 if (this.state.editable) {
-                    var rowData = elInstance.getRowData(y)[12];
-                    if (rowData == 4) {
+                    var rowData = elInstance.getRowData(y);
+                    if (rowData[12] == 4) {
                         var cell = elInstance.getCell(("S").concat(parseInt(y) + 1))
                         cell.classList.add('readonly');
                         var cell = elInstance.getCell(("T").concat(parseInt(y) + 1))
                         cell.classList.add('readonly');
                         var cell = elInstance.getCell(("K").concat(parseInt(y) + 1))
                         cell.classList.add('readonly');
+                    }
+                    if (this.state.editable) {
+                        if (rowData[20].toString() == "true") {
+                            var cell = elInstance.getCell(("V").concat(parseInt(y) + 1))
+                            cell.classList.remove('readonly');
+                        } else {
+                            var cell = elInstance.getCell(("V").concat(parseInt(y) + 1))
+                            cell.classList.add('readonly');
+                            // elInstance.setValueFromCoords(x, y, "", true);
+                        }
                     }
                 }
 
@@ -3206,16 +3805,16 @@ class EditSupplyPlanStatus extends Component {
                 var criticalityId = rowData[16];
                 var problemStatusId = rowData[12];
                 if (criticalityId == 3) {
-                    console.log("In if");
+                    // console.log("In if");
                     var cell = elInstance.getCell(("T").concat(parseInt(y) + 1))
-                    console.log("cell classlist------------------>", cell.classList);
+                    // console.log("cell classlist------------------>", cell.classList);
                     cell.classList.add('highCriticality');
                 } else if (criticalityId == 2) {
-                    console.log("In if 1");
+                    // console.log("In if 1");
                     var cell = elInstance.getCell(("T").concat(parseInt(y) + 1))
                     cell.classList.add('mediumCriticality');
                 } else if (criticalityId == 1) {
-                    console.log("In if 2");
+                    // console.log("In if 2");
                     var cell = elInstance.getCell(("T").concat(parseInt(y) + 1))
                     cell.classList.add('lowCriticality');
                     // }
@@ -3293,7 +3892,14 @@ class EditSupplyPlanStatus extends Component {
             regionIdArray[i] = regionId[i].value;
         }
         program.regionArray = regionIdArray;
-        this.setState({ program: program });
+
+
+
+        this.setState({
+            program: program,
+            // programQPLDetails:programQPLDetails, 
+            // programId:program.programId
+        });
     }
 
     touchAll(setTouched, errors) {
@@ -3337,6 +3943,7 @@ class EditSupplyPlanStatus extends Component {
                 {i18n.t('static.common.result', { from, to, size })}
             </span>
         );
+
 
         const columns = [
             {
@@ -3430,27 +4037,27 @@ class EditSupplyPlanStatus extends Component {
                                 render={
                                     ({
                                     }) => (
-                                            <Form name='simpleForm'>
-                                                <Col md="12 pl-0">
-                                                    <div className="row">
-                                                        <FormGroup className="col-md-3">
-                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
-                                                            <div className="controls">
-                                                                <InputGroup>
-                                                                    <Input type="text"
-                                                                        name="programId"
-                                                                        id="programId"
-                                                                        bsSize="sm"
-                                                                        value={this.state.program.label.label_en}
-                                                                        disabled />
-                                                                </InputGroup>
-                                                            </div>
-                                                        </FormGroup>
-                                                    </div>
-                                                </Col>
-                                            </Form>
+                                        <Form name='simpleForm'>
+                                            <Col md="12 pl-0">
+                                                <div className="row">
+                                                    <FormGroup className="col-md-3">
+                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
+                                                        <div className="controls">
+                                                            <InputGroup>
+                                                                <Input type="text"
+                                                                    name="programId"
+                                                                    id="programId"
+                                                                    bsSize="sm"
+                                                                    value={this.state.program.label.label_en}
+                                                                    disabled />
+                                                            </InputGroup>
+                                                        </div>
+                                                    </FormGroup>
+                                                </div>
+                                            </Col>
+                                        </Form>
 
-                                        )} />
+                                    )} />
 
                             {/* </CardBody> */}
                             <Row>
@@ -3553,7 +4160,7 @@ class EditSupplyPlanStatus extends Component {
                                             </tr>
                                         </tfoot>
                                     </Table>
-                                    {this.state.showConsumption == 1 && <ConsumptionInSupplyPlanComponent ref="consumptionChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} consumptionPage="supplyPlanCompare" />}
+                                    {this.state.showConsumption == 1 && <ConsumptionInSupplyPlanComponent ref="consumptionChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} consumptionPage="supplyPlanCompare" useLocalData={0} />}
                                     <div className="table-responsive mt-3">
                                         <div id="consumptionTable" />
                                     </div>
@@ -3563,6 +4170,7 @@ class EditSupplyPlanStatus extends Component {
                                     </div>
 
                                     <div id="showConsumptionBatchInfoButtonsDiv" style={{ display: 'none' }}>
+                                        <span>{i18n.t("static.dataEntry.missingBatchNote")}</span>
                                         <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceledConsumption()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                     </div>
                                     <div className="pt-4"></div>
@@ -3722,7 +4330,7 @@ class EditSupplyPlanStatus extends Component {
                                                     this.state.closingBalanceArray.map((item, count) => {
                                                         if (count < 7) {
                                                             return (
-                                                                <td colSpan="2"><NumberFormat displayType={'text'} thousandSeparator={true} value={item} /></td>
+                                                                <td colSpan="2" className={item.balance != 0 ? "hoverTd" : ""} onClick={() => item.balance != 0 ? this.setState({ batchInfoInInventoryPopUp: item.batchInfoList }) : ""}><NumberFormat displayType={'text'} thousandSeparator={true} value={item.balance} /></td>
                                                             )
                                                         }
                                                     })
@@ -3730,7 +4338,34 @@ class EditSupplyPlanStatus extends Component {
                                             </tr>
                                         </tbody>
                                     </Table>
-                                    {this.state.showInventory == 1 && <InventoryInSupplyPlanComponent ref="inventoryChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} inventoryPage="supplyPlanCompare" hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} adjustmentsDetailsClicked={this.adjustmentsDetailsClicked} />}
+                                    {this.state.batchInfoInInventoryPopUp.filter(c => c.qty > 0).length > 0 &&
+                                        <>
+                                            <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
+                                                <thead>
+                                                    <tr>
+                                                        <th>{i18n.t("static.supplyPlan.batchId")}</th>
+                                                        <th>{i18n.t('static.report.createdDate')}</th>
+                                                        <th>{i18n.t('static.inventory.expireDate')}</th>
+                                                        <th>{i18n.t('static.supplyPlan.qatGenerated')}</th>
+                                                        <th>{i18n.t("static.report.qty")}</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {this.state.batchInfoInInventoryPopUp.filter(c => c.qty > 0).map(item => (
+                                                        <tr>
+                                                            <td>{item.batchNo}</td>
+                                                            <td>{moment(item.createdDate).format(DATE_FORMAT_CAP)}</td>
+                                                            <td>{moment(item.expiryDate).format(DATE_FORMAT_CAP)}</td>
+                                                            <td>{(item.autoGenerated) ? i18n.t("static.program.yes") : i18n.t("static.program.no")}</td>
+                                                            <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.qty} /></td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </Table><br />
+                                            <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.setState({ batchInfoInInventoryPopUp: [] })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button><br />
+                                        </>
+                                    }
+                                    {this.state.showInventory == 1 && <InventoryInSupplyPlanComponent ref="inventoryChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} inventoryPage="supplyPlanCompare" hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} adjustmentsDetailsClicked={this.adjustmentsDetailsClicked} useLocalData={0} />}
                                     <div className="table-responsive mt-3">
                                         <div id="adjustmentsTable" className="table-responsive " />
                                     </div>
@@ -3740,6 +4375,7 @@ class EditSupplyPlanStatus extends Component {
                                     </div>
 
                                     <div id="showInventoryBatchInfoButtonsDiv" style={{ display: 'none' }}>
+                                        <span>{i18n.t("static.dataEntry.missingBatchNote")}</span>
                                         <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceledInventory()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                     </div>
                                     <div className="pt-4"></div>
@@ -3781,7 +4417,7 @@ class EditSupplyPlanStatus extends Component {
                             </ModalHeader>
                             <div style={{ display: this.state.loading ? "none" : "block" }}>
                                 <ModalBody>
-                                    {this.state.showShipments && <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} hideFourthComponent={this.hideFourthComponent} hideFifthComponent={this.hideFifthComponent} shipmentPage="supplyPlanCompare" />}
+                                    {this.state.showShipments == 1 && <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} hideFourthComponent={this.hideFourthComponent} hideFifthComponent={this.hideFifthComponent} shipmentPage="supplyPlanCompare" useLocalData={0} />}
                                     <h6 className="red" id="div2">{this.state.noFundsBudgetError || this.state.shipmentBatchError || this.state.shipmentError}</h6>
                                     <div className="table-responsive">
                                         <div id="shipmentsDetailsTable" />
@@ -3812,7 +4448,7 @@ class EditSupplyPlanStatus extends Component {
                                         <div id="shipmentBatchInfoTable" className="AddListbatchtrHeight"></div>
                                     </div>
                                     <div id="showShipmentBatchInfoButtonsDiv" style={{ display: 'none' }}>
-                                        <Button size="md" color="danger" className="float-right mr-1 " onClick={() => this.actionCanceledShipments('shipmentBatch')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                        <Button size="md" color="danger" id="shipmentDetailsPopCancelButton" className="float-right mr-1 " onClick={() => this.actionCanceledShipments('shipmentBatch')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                     </div>
                                     <div className="pt-4"></div>
                                 </ModalBody>
@@ -3841,6 +4477,7 @@ class EditSupplyPlanStatus extends Component {
                             </ModalHeader>
                             <div style={{ display: this.state.loading ? "none" : "block" }}>
                                 <ModalBody>
+                                    <span style={{ float: "right" }}><b>{i18n.t("static.supplyPlan.batchInfoNote")}</b></span>
                                     <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
                                         <thead>
                                             <tr>
@@ -3855,11 +4492,11 @@ class EditSupplyPlanStatus extends Component {
                                             {
                                                 this.state.expiredStockDetails.map(item => (
                                                     <tr>
-                                                        <td>{item.batchNo}</td>
+                                                        <td className="hoverTd" onClick={() => this.showShipmentWithBatch(item.batchNo, item.expiryDate)}>{item.batchNo}</td>
                                                         <td>{moment(item.createdDate).format(DATE_FORMAT_CAP)}</td>
                                                         <td>{moment(item.expiryDate).format(DATE_FORMAT_CAP)}</td>
                                                         <td>{(item.autoGenerated) ? i18n.t("static.program.yes") : i18n.t("static.program.no")}</td>
-                                                        <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.expiredQty} /></td>
+                                                        <td className="hoverTd" onClick={() => this.showBatchLedgerClicked(item.batchNo, item.createdDate, item.expiryDate)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item.expiredQty} /></td>
                                                     </tr>
                                                 )
                                                 )
@@ -3872,6 +4509,51 @@ class EditSupplyPlanStatus extends Component {
                                             </tr>
                                         </tfoot>
                                     </Table>
+                                    {this.state.ledgerForBatch.length > 0 &&
+                                        <>
+                                            <br></br>
+                                            {i18n.t("static.inventory.batchNumber") + " : " + this.state.ledgerForBatch[0].batchNo}
+                                            <br></br>
+                                            {i18n.t("static.batchLedger.note")}
+                                            <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
+                                                <thead>
+                                                    <tr>
+                                                        <th style={{ width: "60px" }} rowSpan="2" align="center">{i18n.t("static.common.month")}</th>
+                                                        <th rowSpan="2" align="center">{i18n.t("static.supplyPlan.openingBalance")}</th>
+                                                        <th colSpan="3" align="center">{i18n.t("static.supplyPlan.userEnteredBatches")}</th>
+                                                        <th rowSpan="2" align="center">{i18n.t("static.supplyPlan.autoAllocated") + " (+/-)"}</th>
+                                                        <th rowSpan="2" align="center">{i18n.t("static.report.closingbalance")}</th>
+                                                    </tr>
+                                                    <tr>
+                                                        <th align="center">{i18n.t("static.supplyPlan.consumption") + " (-)"}</th>
+                                                        <th align="center">{i18n.t("static.inventoryType.adjustment") + " (+/-)"}</th>
+                                                        <th align="center">{i18n.t("static.shipment.shipment") + " (+)"}</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {
+                                                        ((moment(this.state.ledgerForBatch[this.state.ledgerForBatch.length - 1].expiryDate).format("YYYY-MM") == moment(this.state.ledgerForBatch[this.state.ledgerForBatch.length - 1].transDate).format("YYYY-MM")) ? this.state.ledgerForBatch.slice(0, -1) : this.state.ledgerForBatch).map(item => (
+                                                            <tr>
+                                                                <td>{moment(item.transDate).format(DATE_FORMAT_CAP_WITHOUT_DATE)}</td>
+                                                                <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.openingBalance} /></td>
+                                                                <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.consumptionQty} /></td>
+                                                                <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.adjustmentQty} /></td>
+                                                                <td>{item.shipmentQty == 0 ? null : <NumberFormat displayType={'text'} thousandSeparator={true} value={item.shipmentQty} />}</td>
+                                                                <td><NumberFormat displayType={'text'} thousandSeparator={true} value={0 - Number(item.unallocatedQty)} /></td>
+                                                                {item.stockQty != null && Number(item.stockQty) > 0 ? <td><b><NumberFormat displayType={'text'} thousandSeparator={true} value={item.qty} /></b></td> : <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.qty} /></td>}
+                                                            </tr>
+                                                        ))
+                                                    }
+                                                </tbody>
+                                                <tfoot>
+                                                    <tr>
+                                                        <td align="right" colSpan="6"><b>{i18n.t("static.supplyPlan.expiry")}</b></td>
+                                                        <td><b><NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.ledgerForBatch[this.state.ledgerForBatch.length - 1].expiredQty} /></b></td>
+                                                    </tr>
+                                                </tfoot>
+                                            </Table>
+                                        </>
+                                    }
                                 </ModalBody>
                                 <ModalFooter>
                                     <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceledExpiredStock()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
@@ -3895,8 +4577,15 @@ class EditSupplyPlanStatus extends Component {
                             <ModalHeader toggle={() => this.toggleTransModal()} className="modalHeaderSupplyPlan">
                                 <strong>{i18n.t('static.problemContext.transDetails')}</strong>
                             </ModalHeader>
+
                             <ModalBody>
-                                <ToolkitProvider
+                                <br></br>
+                                <br></br>
+                                <div className="table-responsive RemoveStriped qat-problemListSearch">
+                                    <div id="problemTransDiv" className="" />
+                                </div>
+
+                                {/* <ToolkitProvider
                                     keyField="problemReportId"
                                     data={this.state.problemTransList}
                                     columns={columns}
@@ -3908,7 +4597,7 @@ class EditSupplyPlanStatus extends Component {
                                         props => (
                                             <div className="col-md-12 bg-white pb-1 mb-2">
                                                 <ul class="navbar-nav"><li class="nav-item pl-0"><a aria-current="page" class="nav-link active" >
-                                                    {/* <b>{i18n.t('static.report.problemTransDetails')}</b> */}
+                                                  
                                                 </a></li></ul>
                                                 <div className="TableCust">
                                                     <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
@@ -3931,7 +4620,8 @@ class EditSupplyPlanStatus extends Component {
                                             </div>
                                         )
                                     }
-                                </ToolkitProvider>
+                                </ToolkitProvider> */}
+
                             </ModalBody>
                             {/* <ModalFooter>
                             </ModalFooter> */}
@@ -3948,6 +4638,7 @@ class EditSupplyPlanStatus extends Component {
                             }}
                             validate={validate(validationSchema)}
                             onSubmit={(values, { setSubmitting, setErrors }) => {
+                                document.getElementById("submitButton").disabled = true;
                                 var elInstance = this.state.problemEl;
                                 var json = elInstance.getJson();
                                 // console.log("problemList===>", json);
@@ -4034,6 +4725,7 @@ class EditSupplyPlanStatus extends Component {
                                             }
                                         );
                                 } else {
+                                    document.getElementById("submitButton").disabled = false;
                                     alert("To approve a supply plan – Reviewed must all be checked.");
                                 }
 
@@ -4050,12 +4742,12 @@ class EditSupplyPlanStatus extends Component {
                                     isValid,
                                     setTouched
                                 }) => (
-                                        <Form onSubmit={handleSubmit} noValidate name='supplyplanForm'>
-                                            <CardBody className="pt-lg-0">
-                                                <Col md="12 pl-0">
-                                                    <div className="row">
+                                    <Form onSubmit={handleSubmit} noValidate name='supplyplanForm'>
+                                        <CardBody className="pt-lg-0">
+                                            <Col md="12 pl-0">
+                                                <div className="row">
 
-                                                        {/*  <FormGroup className="tab-ml-1">
+                                                    {/*  <FormGroup className="tab-ml-1">
                                                         <Label for="programName">{i18n.t('static.program.program')}<span className="red Reqasterisk">*</span> </Label>
                                                         <Input type="text"
                                                             name="programId"
@@ -4070,68 +4762,68 @@ class EditSupplyPlanStatus extends Component {
                                                             disabled />
                                                         <FormFeedback className="red">{errors.programId}</FormFeedback>
                                                     </FormGroup> */}
-                                                        <FormGroup className="col-md-3">
+                                                    <FormGroup className="col-md-3">
 
-                                                            <Label htmlFor="versionNotes">{i18n.t('static.program.notes')}</Label>
+                                                        <Label htmlFor="versionNotes">{i18n.t('static.program.notes')}</Label>
 
-                                                            <Input
-                                                                type="textarea"
-                                                                maxLength={600}
-                                                                name="versionNotes"
-                                                                id="versionNotes"
-                                                                value={this.state.program.currentVersion.notes}
-                                                                bsSize="sm"
-                                                                valid={!errors.versionNotes}
-                                                                invalid={touched.versionNotes && !!errors.versionNotes || this.state.program.currentVersion.versionStatus.id == 3 ? this.state.program.currentVersion.notes == '' : false}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                onBlur={handleBlur}
-                                                                readOnly={!this.state.editable}
-                                                                required
-                                                            />
-                                                            <FormFeedback className="red">{errors.versionNotes}</FormFeedback>
-
-                                                        </FormGroup>
-
-                                                        <FormGroup className="col-md-3">
-                                                            <Label htmlFor="versionStatusId">{i18n.t('static.common.status')}<span className="red Reqasterisk">*</span> </Label>
-                                                            <Input
-                                                                type="select"
-                                                                name="versionStatusId"
-                                                                id="versionStatusId"
-                                                                bsSize="sm"
-                                                                valid={!errors.versionStatusId}
-                                                                invalid={touched.versionStatusId && !!errors.versionStatusId}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                onBlur={handleBlur}
-                                                                value={this.state.program.currentVersion.versionStatus.id}
-                                                                disabled={!this.state.editable}
-                                                                required
-                                                            >
-                                                                <option value="">{i18n.t('static.common.select')}</option>
-                                                                {statusList}
-                                                            </Input>
-                                                            <FormFeedback className="red">{errors.versionStatusId}</FormFeedback>
-                                                        </FormGroup>
                                                         <Input
-                                                            type="hidden"
-                                                            name="needNotesValidation"
-                                                            id="needNotesValidation"
-                                                            value={(this.state.program.currentVersion.versionStatus.id == 3 ? true : false)}
+                                                            type="textarea"
+                                                            maxLength={65535}
+                                                            name="versionNotes"
+                                                            id="versionNotes"
+                                                            value={this.state.program.currentVersion.notes}
+                                                            bsSize="sm"
+                                                            valid={!errors.versionNotes}
+                                                            invalid={touched.versionNotes && !!errors.versionNotes || this.state.program.currentVersion.versionStatus.id == 3 ? this.state.program.currentVersion.notes == '' : false}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            readOnly={!this.state.editable}
+                                                            required
                                                         />
-                                                    </div>
-                                                </Col>
-                                            </CardBody>
-                                            <CardFooter>
-                                                <FormGroup>
-                                                    {this.state.editable && <Button type="submit" size="md" color="success" className="float-left mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>}
-                                                    {this.state.editable && <Button type="button" size="md" color="warning" className="float-left mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i>{i18n.t('static.common.reset')}</Button>}
-                                                    <Button type="button" size="md" color="danger" className="float-left mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <FormFeedback className="red">{errors.versionNotes}</FormFeedback>
 
-                                                    &nbsp;
-                                             </FormGroup>
-                                            </CardFooter>
-                                        </Form>
-                                    )} />
+                                                    </FormGroup>
+
+                                                    <FormGroup className="col-md-3">
+                                                        <Label htmlFor="versionStatusId">{i18n.t('static.common.status')}<span className="red Reqasterisk">*</span> </Label>
+                                                        <Input
+                                                            type="select"
+                                                            name="versionStatusId"
+                                                            id="versionStatusId"
+                                                            bsSize="sm"
+                                                            valid={!errors.versionStatusId}
+                                                            invalid={touched.versionStatusId && !!errors.versionStatusId}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.program.currentVersion.versionStatus.id}
+                                                            disabled={!this.state.editable}
+                                                            required
+                                                        >
+                                                            <option value="">{i18n.t('static.common.select')}</option>
+                                                            {statusList}
+                                                        </Input>
+                                                        <FormFeedback className="red">{errors.versionStatusId}</FormFeedback>
+                                                    </FormGroup>
+                                                    <Input
+                                                        type="hidden"
+                                                        name="needNotesValidation"
+                                                        id="needNotesValidation"
+                                                        value={(this.state.program.currentVersion.versionStatus.id == 3 ? true : false)}
+                                                    />
+                                                </div>
+                                            </Col>
+                                        </CardBody>
+                                        <CardFooter>
+                                            <FormGroup>
+                                                {this.state.editable && <Button type="submit" size="md" color="success" id="submitButton" className="float-left mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>}
+                                                {this.state.editable && <Button type="button" size="md" color="warning" className="float-left mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i>{i18n.t('static.common.reset')}</Button>}
+                                                <Button type="button" size="md" color="danger" className="float-left mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+
+                                                &nbsp;
+                                            </FormGroup>
+                                        </CardFooter>
+                                    </Form>
+                                )} />
                     </Card>
 
                 </Col>
@@ -4140,6 +4832,68 @@ class EditSupplyPlanStatus extends Component {
         );
 
     }
+
+    showBatchLedgerClicked(batchNo, createdDate, expiryDate) {
+        this.setState({ loading: true })
+        var supplyPlanForAllDate = this.state.supplyPlanDataForAllTransDate.filter(c => moment(c.transDate).format("YYYY-MM") >= moment(createdDate).format("YYYY-MM") && moment(c.transDate).format("YYYY-MM") <= moment(expiryDate).format("YYYY-MM"));
+        var allBatchLedger = [];
+        supplyPlanForAllDate.map(c =>
+            c.batchDetails.map(bd => {
+                var batchInfo = bd;
+                batchInfo.transDate = c.transDate;
+                allBatchLedger.push(batchInfo);
+            }));
+        var ledgerForBatch = allBatchLedger.filter(c => c.batchNo == batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(expiryDate).format("YYYY-MM"));
+        this.setState({
+            ledgerForBatch: ledgerForBatch,
+            loading: false
+        })
+        console.log("ledgerForBatch+++", ledgerForBatch)
+    }
+
+    showShipmentWithBatch(batchNo, expiryDate) {
+        var shipmentList = this.state.allShipmentsList;
+        shipmentList.map((sl, count) => {
+            var batchInfoList = sl.batchInfoList;
+            var bi = batchInfoList.filter(c => c.batch.batchNo == batchNo && moment(c.batch.expiryDate).format("YYYY-MM") == moment(expiryDate).format("YYYY-MM"));
+            if (bi.length > 0) {
+                var shipmentStatus = sl.shipmentStatus.id;
+                var index = count;
+                this.setState({
+                    indexOfShipmentContainingBatch: index
+                })
+                var date = "";
+                if (shipmentStatus == DELIVERED_SHIPMENT_STATUS && sl.receivedDate != "" && sl.receivedDate != null && sl.receivedDate != undefined && sl.receivedDate != "Invalid date") {
+                    date = moment(sl.receivedDate).format("YYYY-MM-DD");
+                } else {
+                    date = moment(sl.expectedDeliveryDate).format("YYYY-MM-DD");
+                }
+                // Open toggleLarge
+                var supplyPlanType = "";
+                if (shipmentStatus == DELIVERED_SHIPMENT_STATUS && sl.erpFlag == false) {
+                    supplyPlanType = 'deliveredShipments'
+                } else if ((shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS) && sl.erpFlag == false) {
+                    supplyPlanType = 'shippedShipments'
+                } else if ((shipmentStatus == APPROVED_SHIPMENT_STATUS || shipmentStatus == SUBMITTED_SHIPMENT_STATUS) && sl.erpFlag == false) {
+                    supplyPlanType = 'orderedShipments'
+                } else if ((shipmentStatus.id == PLANNED_SHIPMENT_STATUS || shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS) && sl.erpFlag == false) {
+                    supplyPlanType = 'plannedShipments'
+                } else if (shipmentStatus == DELIVERED_SHIPMENT_STATUS && sl.erpFlag == true) {
+                    supplyPlanType = 'deliveredErpShipments'
+                } else if ((shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS) && sl.erpFlag == true) {
+                    supplyPlanType = 'shippedErpShipments'
+                } else if ((shipmentStatus == APPROVED_SHIPMENT_STATUS || shipmentStatus == SUBMITTED_SHIPMENT_STATUS) && sl.erpFlag == true) {
+                    supplyPlanType = 'orderedErpShipments'
+                } else if ((shipmentStatus.id == PLANNED_SHIPMENT_STATUS || shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS) && sl.erpFlag == true) {
+                    supplyPlanType = 'plannedErpShipments'
+                }
+                if (supplyPlanType != "") {
+                    this.toggleLarge('shipments', '', '', moment(date).startOf('month').format("YYYY-MM-DD"), moment(date).endOf('month').format("YYYY-MM-DD"), ``, supplyPlanType);
+                }
+            }
+        })
+    }
+
     cancelClicked = () => {
         this.props.history.push(`/report/supplyPlanVersionAndReview/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }

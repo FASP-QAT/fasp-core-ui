@@ -56,7 +56,7 @@ import ReportService from '../../api/ReportService';
 import ProgramService from '../../api/ProgramService';
 import 'chartjs-plugin-annotation';
 import TracerCategoryService from '../../api/TracerCategoryService';
-import MultiSelect from 'react-multi-select-component';
+import {MultiSelect} from 'react-multi-select-component';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 // const { getToggledOptions } = utils;
 const Widget04 = lazy(() => import('../Widgets/Widget04'));
@@ -74,10 +74,12 @@ const pickerLang = {
 }
 let dendoLabels = [{ label: "Today", pointStyle: "triangle" }]
 
-const legendcolor = [{ text: i18n.t('static.report.stockout'), color: "#ed5626", value: 0 },
+const legendcolor = [{ text: i18n.t('static.report.stockout'), color: "#BA0C2F", value: 0 },
 { text: i18n.t('static.report.lowstock'), color: "#f48521", value: 1 },
 { text: i18n.t('static.report.okaystock'), color: "#118b70", value: 2 },
-{ text: i18n.t('static.report.overstock'), color: "#edb944", value: 3 }];
+{ text: i18n.t('static.report.overstock'), color: "#edb944", value: 3 },
+{ text: i18n.t('static.supplyPlanFormula.na'), color: "#cfcdc9", value: 4 }
+];
 
 // const legendcolor = [{ text: i18n.t('static.report.overstock'), color: "#edb944", value: 3 },
 // { text: i18n.t('static.report.stockout'), color: "#ed5626", value: 0 },
@@ -188,8 +190,8 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
       selData: [],
       tracerCategories: [],
       singleValue2: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
-      minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
-      maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
+      minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
+      maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
       loading: true,
       programLstFiltered: []
 
@@ -333,7 +335,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
 
     for (var item = 0; item < re.length; item++) {
       re[item].programData.map(p =>
-        A.push([this.addDoubleQuoteToRowContent([re[item].planningUnit.id, (getLabelText(re[item].planningUnit.label, this.state.lang).replaceAll(',', '%20')).replaceAll(' ', '%20'), (getLabelText(p.program.label, this.state.lang).replaceAll(',', '%20')).replaceAll(' ', '%20'), this.round(p.amc), this.round(p.finalClosingBalance), this.roundN(p.mos), p.minMos, p.maxMos])])
+        A.push([this.addDoubleQuoteToRowContent([re[item].planningUnit.id, (getLabelText(re[item].planningUnit.label, this.state.lang).replaceAll(',', '%20')).replaceAll(' ', '%20'), (getLabelText(p.program.label, this.state.lang).replaceAll(',', '%20')).replaceAll(' ', '%20'), this.round(p.amc), this.round(p.finalClosingBalance), p.mos != null ? this.roundN(p.mos) : i18n.t("static.supplyPlanFormula.na"), p.minMos, p.maxMos])])
       )
     }
     for (var i = 0; i < A.length; i++) {
@@ -366,7 +368,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
 
   cellstyleWithData = (item) => {
     console.log(item)
-    if (this.roundN(item.mos) == 0) {
+    if (item.mos != null && this.roundN(item.mos) == 0) {
       return { backgroundColor: legendcolor[0].color }
     } else if (this.roundN(item.mos) != 0 && this.roundN(item.mos) != null && this.roundN(item.mos) < item.minMos) {
       return { backgroundColor: legendcolor[1].color }
@@ -374,6 +376,8 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
       return { backgroundColor: legendcolor[2].color }
     } else if (this.roundN(item.mos) > item.maxMos) {
       return { backgroundColor: legendcolor[3].color }
+    } else if (item.mos == null) {
+      return { backgroundColor: legendcolor[4].color }
     }
   }
 
@@ -453,7 +457,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
 
     const headers = [[i18n.t('static.report.qatPID'), i18n.t('static.planningunit.planningunit'), i18n.t('static.program.programMaster'), i18n.t('static.supplyPlan.amc'), i18n.t('static.supplyPlan.endingBalance'), i18n.t('static.supplyPlan.monthsOfStock'), i18n.t('static.supplyPlan.minStock'), i18n.t('static.supplyPlan.maxStock')]]
     var data = [];
-    this.state.data.map(elt => elt.programData.map(p => data.push([elt.planningUnit.id, getLabelText(elt.planningUnit.label, this.state.lang), getLabelText(p.program.label, this.state.lang), this.formatter(this.round(p.amc)), this.formatter(this.round(p.finalClosingBalance)), this.formatter(this.roundN(p.mos)), p.minMos, p.maxMos])));
+    this.state.data.map(elt => elt.programData.map(p => data.push([elt.planningUnit.id, getLabelText(elt.planningUnit.label, this.state.lang), getLabelText(p.program.label, this.state.lang), this.formatter(this.round(p.amc)), this.formatter(this.round(p.finalClosingBalance)), p.mos != null ? this.formatter(this.roundN(p.mos)) : i18n.t("static.supplyPlanFormula.na"), p.minMos, p.maxMos])));
     var height = doc.internal.pageSize.height;
     var startY = 150 + (this.state.countryValues.length * 2) + this.state.tracerCategoryLabels.length * 3
     let content = {
@@ -832,6 +836,10 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
               console.log('in 3')
               filterProgramData.push(ele)
             }
+          } else if (stockStatusId == 4) {
+            if (ele.mos == null) {
+              filterProgramData.push(ele)
+            }
           }
         })
         if (filterProgramData.length > 0) {
@@ -1153,7 +1161,8 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
       && programLstFiltered.map((item, i) => {
         return (
 
-          { label: getLabelText(item.label, this.state.lang), value: item.programId }
+          // { label: getLabelText(item.label, this.state.lang), value: item.programId }
+          { label: item.programCode, value: item.programId }
 
         )
       }, this);
@@ -1164,7 +1173,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
         <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
         <h5 className="red">{i18n.t(this.state.message)}</h5>
 
-        <Card style={{ display: this.state.loading ? "none" : "block" }}>
+        <Card>
           <div className="Card-header-reporticon">
             {/* <i className="icon-menu"></i><strong>{i18n.t('static.report.StockStatusAccrossPlanningUnitGlobalView')}</strong> */}
             {this.state.data.length > 0 && <div className="card-header-actions">
@@ -1227,10 +1236,11 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
                           value={this.state.countryValues}
                           onChange={(e) => { this.handleChange(e) }}
                           options={countryList && countryList.length > 0 ? countryList : []}
+                          disabled={this.state.loading}
                         />
                         {!!this.props.error &&
                           this.props.touched && (
-                            <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
+                            <div style={{ color: '#BA0C2F', marginTop: '.5rem' }}>{this.props.error}</div>
                           )}
                       </div>
                     </FormGroup>
@@ -1247,10 +1257,11 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
                         value={this.state.programValues}
                         onChange={(e) => { this.handleChangeProgram(e) }}
                         options={programList && programList.length > 0 ? programList : []}
+                        disabled={this.state.loading}
                       />
                       {!!this.props.error &&
                         this.props.touched && (
-                          <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
+                          <div style={{ color: '#BA0C2F', marginTop: '.5rem' }}>{this.props.error}</div>
                         )}
 
                     </FormGroup>
@@ -1267,6 +1278,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
                           bsSize="sm"
                           value={this.state.tracerCategoryValues}
                           onChange={(e) => { this.handleTracerCategoryChange(e) }}
+                          disabled={this.state.loading}
                           options=
                           {tracerCategories.length > 0 ?
                             tracerCategories.map((item, i) => {
@@ -1338,7 +1350,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
                   <div className="row">
 
                   </div>
-                  <div className="row">
+                  <div className="row" style={{ display: this.state.loading ? "none" : "block" }}>
                     <div className="col-md-12">
                       <div className="table-responsive ">
 
@@ -1361,7 +1373,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
                                     this.state.programLst.map(ele1 => {
                                       return (this.state.data.filter(c => c.planningUnit.id == ele.id)).map(
                                         item => {
-                                          return (item.programData.filter(c => c.program.code === ele1).length == 0 ? <td></td> : <td className="text-center" style={this.cellstyleWithData(item.programData.filter(c => c.program.code == ele1)[0])}>{this.roundN(item.programData.filter(c => c.program.code == ele1)[0].mos)}</td>)
+                                          return (item.programData.filter(c => c.program.code === ele1).length == 0 ? <td></td> : <td className="text-center" style={this.cellstyleWithData(item.programData.filter(c => c.program.code == ele1)[0])}>{item.programData.filter(c => c.program.code == ele1)[0].mos != null ? this.roundN(item.programData.filter(c => c.program.code == ele1)[0].mos) : i18n.t("static.supplyPlanFormula.na")}</td>)
                                         }
 
                                       )
@@ -1380,6 +1392,18 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
 
                     </div>
                   </div>
+                  <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                      <div class="align-items-center">
+                        <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                        <div class="spinner-border blue ml-4" role="status">
+
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
                 </div>
               </Col>
 
@@ -1387,17 +1411,6 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
 
           </CardBody>
         </Card>
-        <div style={{ display: this.state.loading ? "block" : "none" }}>
-          <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-            <div class="align-items-center">
-              <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
-              <div class="spinner-border blue ml-4" role="status">
-
-              </div>
-            </div>
-          </div>
-        </div>
 
       </div>
     );

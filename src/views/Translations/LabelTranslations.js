@@ -10,6 +10,7 @@ import {
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import LabelsService from '../../api/LabelService.js';
+import LanguageService from '../../api/LanguageService';
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from "../../Constants";
@@ -36,80 +37,142 @@ export default class DatabaseTranslations extends React.Component {
         document.getElementById('div2').style.display = 'block';
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
 
     componentDidMount() {
         // AuthenticationService.setupAxiosInterceptors();
-        LabelsService.getStaticLabelsList().then(response => {
-            if (response.status == 200) {
-                var json = response.data;
-                var data = [];
-                var label = [];
-                for (var i = 0; i < json.length; i++) {
-                    data = [];
-                    data[0] = json[i].labelId;// A
-                    data[1] = json[i].labelCode;// A
-                    data[2] = json[i].label_en;//B
-                    data[3] = json[i].label_fr;//C
-                    data[4] = json[i].label_pr;//D
-                    data[5] = json[i].label_sp;//E
-                    label[i] = data;
-                }
-                var options = {
-                    data: label,
-                    colHeaders: [
-                        `${i18n.t('static.translation.labelId')}`,
-                        `${i18n.t('static.translation.labelCode')}`,
-                        `${i18n.t('static.translation.english')}`,
-                        `${i18n.t('static.translation.french')}`,
-                        `${i18n.t('static.translation.pourtegese')}`,
-                        `${i18n.t('static.translation.spanish')}`
-                    ],
-                    colWidths: [80, 80, 80, 80, 80],
-                    columns: [
-                        { type: 'hidden' },
-                        { type: 'text', readOnly: true },
-                        { type: 'text' },
-                        { type: 'text' },
-                        { type: 'text' },
-                        { type: 'text' },
-                    ],
-                    text: {
-                        // showingPage: 'Showing {0} to {1} of {1}',
-                        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                        show: '',
-                        entries: '',
-                    },
-                    pagination: localStorage.getItem("sesRecordCount"),
-                    search: true,
-                    columnSorting: true,
-                    tableOverflow: true,
-                    wordWrap: true,
-                    paginationOptions: JEXCEL_PAGINATION_OPTION,
-                    allowInsertColumn: false,
-                    allowManualInsertColumn: false,
-                    onchange: this.changed,
-                    oneditionstart: this.editStart,
-                    allowDeleteRow: false,
-                    tableOverflow: false,
-                    onload: this.loaded,
-                    filters: true,
-                    license: JEXCEL_PRO_KEY,
-                    contextMenu: function (obj, x, y, e) {
-                        return [];
-                    }.bind(this),
-                    // tableHeight: '500px',
-                };
-                this.el = jexcel(document.getElementById("labelTranslationTable"), options);
-                this.setState({
-                    loading: false
-                })
+        LanguageService.getLanguageListActive().then(languageResponse => {
+            if (languageResponse.status == 200) {
+                LabelsService.getStaticLabelsList().then(response => {
+                    if (response.status == 200) {
+                        var json = response.data;
+                        var languageList = languageResponse.data;
+                        this.setState({
+                            labelList: json,
+                            languageList: languageList
+                        })
+                        console.log("json+++", json);
+                        console.log("LanguageList+++", languageList);
+                        var data = [];
+                        var label = [];
+                        for (var i = 0; i < json.length; i++) {
+                            data = [];
+                            data[0] = json[i].staticLabelId;// A
+                            data[1] = json[i].labelCode;// A
+                            data[2] = 0;
+                            var k = 3;
+                            for (var j = 0; j < languageList.length; j++) {
+                                var languageDetails = json[i].staticLabelLanguages.filter(c => c.languageId == languageList[j].languageId);
+                                if (languageDetails.length > 0) {
+                                    data[k + j] = languageDetails[0].labelText;
+                                } else {
+                                    data[k + j] = "";
+                                }
+                            }
+                            label[i] = data;
+                        }
+                        var colHeadersArray = [];
+                        colHeadersArray.push({ type: 'hidden', title: `${i18n.t('static.translation.labelId')}` })
+                        colHeadersArray.push({ type: 'text', readOnly: true, title: `${i18n.t('static.translation.labelId')}` })
+                        colHeadersArray.push({ type: 'hidden', title: `${i18n.t('static.translation.isModified')}` })
+                        for (var l = 0; l < languageList.length; l++) {
+                            colHeadersArray.push({ type: 'text', title: languageList[l].label.label_en })
+                        }
+                        var options = {
+                            data: label,
+                            colWidths: [80, 80, 80, 80, 80],
+                            columns: colHeadersArray,
+                            text: {
+                                // showingPage: 'Showing {0} to {1} of {1}',
+                                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                                show: '',
+                                entries: '',
+                            },
+                            pagination: localStorage.getItem("sesRecordCount"),
+                            search: true,
+                            columnSorting: true,
+                            tableOverflow: true,
+                            wordWrap: true,
+                            paginationOptions: JEXCEL_PAGINATION_OPTION,
+                            allowInsertColumn: false,
+                            allowManualInsertColumn: false,
+                            onchange: this.changed,
+                            oneditionstart: this.editStart,
+                            allowDeleteRow: false,
+                            tableOverflow: false,
+                            onload: this.loaded,
+                            filters: true,
+                            license: JEXCEL_PRO_KEY,
+                            contextMenu: function (obj, x, y, e) {
+                                return false;
+                            }.bind(this),
+                            // tableHeight: '500px',
+                        };
+                        this.el = jexcel(document.getElementById("labelTranslationTable"), options);
+                        this.setState({
+                            loading: false
+                        })
+                    } else {
+                        this.setState({
+                            message: response.data.messageCode,
+                            loading: false,
+                            color: '#BA0C2F'
+                        },
+                            () => {
+                                this.hideSecondComponent();
+                            })
+                    }
+                }).catch(
+                    error => {
+                        console.log("Error+++", error)
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false,
+                                color: '#BA0C2F'
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false,
+                                        color: '#BA0C2F'
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false,
+                                        color: '#BA0C2F'
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false,
+                                        color: '#BA0C2F'
+                                    });
+                                    break;
+                            }
+                        }
+                    }
+                );
             } else {
                 this.setState({
-                    message: response.data.messageCode,
+                    message: languageResponse.data.messageCode,
                     loading: false,
-                    color: 'red'
+                    color: '#BA0C2F'
                 },
                     () => {
                         this.hideSecondComponent();
@@ -117,11 +180,12 @@ export default class DatabaseTranslations extends React.Component {
             }
         }).catch(
             error => {
+                console.log("Error1+++", error)
                 if (error.message === "Network Error") {
                     this.setState({
                         message: 'static.unkownError',
                         loading: false,
-                        color: 'red'
+                        color: '#BA0C2F'
                     });
                 } else {
                     switch (error.response ? error.response.status : "") {
@@ -138,21 +202,21 @@ export default class DatabaseTranslations extends React.Component {
                             this.setState({
                                 message: error.response.data.messageCode,
                                 loading: false,
-                                color: 'red'
+                                color: '#BA0C2F'
                             });
                             break;
                         case 412:
                             this.setState({
                                 message: error.response.data.messageCode,
                                 loading: false,
-                                color: 'red'
+                                color: '#BA0C2F'
                             });
                             break;
                         default:
                             this.setState({
                                 message: 'static.unkownError',
                                 loading: false,
-                                color: 'red'
+                                color: '#BA0C2F'
                             });
                             break;
                     }
@@ -170,27 +234,33 @@ export default class DatabaseTranslations extends React.Component {
     }
 
     saveData = function () {
-        var labelList = this.state.labelList;
-        var tableJson = this.el.getRowData(this.state.rowId);
-        var mapOfLastRow = new Map(Object.entries(tableJson))
-        var jsonOfLastRow = {
-            labelId: mapOfLastRow.get("0"),
-            label_en: mapOfLastRow.get("2"),
-            label_sp: mapOfLastRow.get("5"),
-            label_fr: mapOfLastRow.get("3"),
-            label_pr: mapOfLastRow.get("4"),
-        }
-        labelList[this.state.rowId] = (JSON.stringify(jsonOfLastRow));
         this.setState({
-            labelList: labelList
+            loading: true
         })
+        var labelList = this.state.labelList;
+        var languageList = this.state.languageList;
+        var tableJson = this.el.getJson(null, false);
+        var listToUpdate = [];
+        for (var j = 0; j < tableJson.length; j++) {
+            if ((tableJson[j])[2] == 1) {
+                console.log("changed------------------");
+                var staticLabelJsonIndex = labelList.findIndex(c => c.staticLabelId == (tableJson[j])[0]);
+                var staticLabelLanguagesList = [];
+                var k = 3;
+                for (var l = 0; l < languageList.length; l++) {
+                    var staticLabelLanguageJson = {
+                        labelText: (tableJson[j])[k + l],
+                        languageId: languageList[l].languageId
+                    }
+                    staticLabelLanguagesList.push(staticLabelLanguageJson)
+                }
+                labelList[staticLabelJsonIndex].staticLabelLanguages = staticLabelLanguagesList;
+                listToUpdate.push(labelList[staticLabelJsonIndex]);
+            }
+        }
         if (JSON.stringify(this.el.getComments()).length == 2 || this.el.getComments() == null) {
             // AuthenticationService.setupAxiosInterceptors();
-            var json = this.state.labelList;
-            this.setState({
-                loading: true
-            })
-            LabelsService.saveStaticLabels(json).then(response => {
+            LabelsService.saveStaticLabels(listToUpdate).then(response => {
                 if (response.status == 200) {
                     let id = AuthenticationService.displayDashboardBasedOnRole();
                     // this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t(response.data.messageCode))
@@ -206,7 +276,7 @@ export default class DatabaseTranslations extends React.Component {
                     this.setState({
                         message: response.data.messageCode,
                         loading: false,
-                        color: 'red'
+                        color: '#BA0C2F'
                     },
                         () => {
                             this.hideSecondComponent();
@@ -218,7 +288,7 @@ export default class DatabaseTranslations extends React.Component {
                         this.setState({
                             message: 'static.unkownError',
                             loading: false,
-                            color: 'red'
+                            color: '#BA0C2F'
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
@@ -235,21 +305,21 @@ export default class DatabaseTranslations extends React.Component {
                                 this.setState({
                                     message: error.response.data.messageCode,
                                     loading: false,
-                                    color: 'red'
+                                    color: '#BA0C2F'
                                 });
                                 break;
                             case 412:
                                 this.setState({
                                     message: error.response.data.messageCode,
                                     loading: false,
-                                    color: 'red'
+                                    color: '#BA0C2F'
                                 });
                                 break;
                             default:
                                 this.setState({
                                     message: 'static.unkownError',
                                     loading: false,
-                                    color: 'red'
+                                    color: '#BA0C2F'
                                 });
                                 break;
                         }
@@ -267,7 +337,7 @@ export default class DatabaseTranslations extends React.Component {
                 <AuthenticationServiceComponent history={this.props.history} />
                 {/* <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5> */}
                 <h5 style={{ color: this.state.color }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
-                <Row style={{ display: this.state.loading ? "none" : "block" }}>
+                <Row>
                     <Col xs="12" sm="12">
                         <Card>
                             {/* <CardHeader>
@@ -276,7 +346,18 @@ export default class DatabaseTranslations extends React.Component {
                             </CardHeader> */}
                             <CardBody className="table-responsive pt-md-1 pb-md-1">
                                 {/* <div id="loader" className="center"></div> */}
-                                <div id="labelTranslationTable"></div>
+                                <div id="labelTranslationTable" style={{ display: this.state.loading ? "none" : "block" }}></div>
+                                <Row style={{ display: this.state.loading ? "block" : "none" }}>
+                                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                        <div class="align-items-center">
+                                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                            <div class="spinner-border blue ml-4" role="status">
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </Row>
                             </CardBody>
                             <CardFooter>
                                 <FormGroup>
@@ -288,17 +369,7 @@ export default class DatabaseTranslations extends React.Component {
                         </Card>
                     </Col>
                 </Row>
-                <Row style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div class="align-items-center">
-                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-                            <div class="spinner-border blue ml-4" role="status">
-
-                            </div>
-                        </div>
-                    </div>
-                </Row>
             </div>
         )
     }
@@ -309,6 +380,7 @@ export default class DatabaseTranslations extends React.Component {
     }
 
     changed = function (instance, cell, x, y, value) {
+        console.log("changed function called----------------");
         if (x == 2) {
             var col = ("C").concat(parseInt(y) + 1);
             if (value == "") {
@@ -319,38 +391,16 @@ export default class DatabaseTranslations extends React.Component {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
             }
-        } else if (x == 3) {
-            var col = ("D").concat(parseInt(y) + 1);
-            this.el.setStyle(col, "background-color", "transparent");
-        } else if (x == 4) {
-            var col = ("E").concat(parseInt(y) + 1);
-            this.el.setStyle(col, "background-color", "transparent");
-        } else if (x == 5) {
-            var col = ("F").concat(parseInt(y) + 1);
-            this.el.setStyle(col, "background-color", "transparent");
         }
-
-        var labelList = this.state.labelList;
-        var tableJson = this.el.getRowData(y);
-        var map = new Map(Object.entries(tableJson))
-        var json = {
-            labelId: map.get("0"),
-            label_en: map.get("2"),
-            label_sp: map.get("5"),
-            label_fr: map.get("3"),
-            label_pr: map.get("4"),
-            languageId: map.get("6")
+         
+         if (x != 2) {
+            this.el.setValueFromCoords(2, y, 1, true);
         }
-        labelList[y] = (JSON.stringify(json));
-        this.setState({
-            labelList: labelList
-        })
     }.bind(this)
 
     editStart = function (instance, cell, x, y, value) {
-        this.setState({
-            rowId: y
-        })
+        var elInstance = instance.jexcel;
+        elInstance.setValueFromCoords(2, y, 1, true);
     }.bind(this)
 }
 

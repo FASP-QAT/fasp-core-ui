@@ -74,6 +74,7 @@ class Login extends Component {
       message: '',
       loading: false,
       apiVersion: '',
+      apiVersionForDisplay:'',
       dropdownOpen: new Array(19).fill(false),
       icon: AuthenticationService.getIconAndStaticLabel("icon"),
       staticLabel: AuthenticationService.getIconAndStaticLabel("label"),
@@ -96,7 +97,7 @@ class Login extends Component {
     openRequest.onerror = function (event) {
       this.setState({
         message: i18n.t('static.program.errortext'),
-        color: 'red'
+        color: '#BA0C2F'
       })
     }.bind(this);
     openRequest.onsuccess = function (e) {
@@ -109,7 +110,7 @@ class Login extends Component {
       getRequest1.onerror = function (event) {
         this.setState({
           message: i18n.t('static.program.errortext'),
-          color: 'red',
+          color: '#BA0C2F',
           loading: false
         })
       }.bind(this);
@@ -131,7 +132,7 @@ class Login extends Component {
     openRequest.onerror = function (event) {
       this.setState({
         message: i18n.t('static.program.errortext'),
-        color: 'red'
+        color: '#BA0C2F'
       })
     }.bind(this);
 
@@ -242,19 +243,7 @@ class Login extends Component {
     // console.log("--------Going to call version api-----------")
     AuthenticationService.clearUserDetails()
     if (isSiteOnline()) {
-      LoginService.getApiVersion()
-        .then(response => {
-          // console.log("--------version api success----------->", response)
-          if (response != null && response != "") {
-            this.setState({
-              apiVersion: response.data.app.version
 
-            })
-            // console.log("response---", response.data.app.version)
-          }
-        }).catch(error => {
-          // console.log("--------version api error----------->", error)
-        })
     } else {
       console.log("############## Offline so can't fetch version #####################");
     }
@@ -262,6 +251,40 @@ class Login extends Component {
     console.log("timeout going to change language")
     this.getLanguageList();
     i18n.changeLanguage(AuthenticationService.getDefaultUserLanguage())
+    this.checkIfApiIsActive()
+  }
+
+  checkIfApiIsActive() {
+    var apiVersionForDisplay = "";
+    if (!isSiteOnline()) {
+      apiVersionForDisplay = "Offline"
+      setTimeout(function () {
+        this.checkIfApiIsActive();
+      }.bind(this), 10000);
+    } else {
+      LoginService.getApiVersion()
+        .then(response => {
+          // console.log("--------version api success----------->", response)
+          if (response != null && response != "") {
+            this.setState({
+              apiVersionForDisplay: response.data.app.version,
+              apiVersion:response.data.app.version,
+
+            },()=>{
+              setTimeout(function () {
+                this.checkIfApiIsActive();
+              }.bind(this), 10000);
+            })
+            // console.log("response---", response.data.app.version)
+          }
+        }).catch(error => {
+          // console.log("--------version api error----------->", error)
+        })
+    }
+    this.setState({
+      apiVersionForDisplay: apiVersionForDisplay
+    })
+
   }
 
   forgotPassword() {
@@ -282,9 +305,9 @@ class Login extends Component {
   incorrectPassmessageHide() {
     // console.log("-----------------incorrectPassmessageHide---------------");
     // setTimeout(function () { document.getElementById('div1').style.display = 'none'; }, 8000);
-    setTimeout(function () { document.getElementById('div2').style.display = 'none'; }, 8000);
+    setTimeout(function () { document.getElementById('div2').style.display = 'none'; }, 30000);
     var incorrectPassword = document.getElementById('div2');
-    incorrectPassword.style.color = 'red';
+    incorrectPassword.style.color = '#BA0C2F';
     this.setState({
       message: ''
     },
@@ -300,15 +323,15 @@ class Login extends Component {
 
   logoutMessagehide() {
     // console.log("-----------logoutMessagehide---------------");
-    setTimeout(function () { document.getElementById('div1').style.display = 'none'; }, 8000);
+    setTimeout(function () { document.getElementById('div1').style.display = 'none'; }, 30000);
     var logoutMessage = document.getElementById('div1');
     var htmlContent = logoutMessage.innerHTML;
     // console.log("htnl content....... ", htmlContent);
     if (htmlContent.includes('Cancelled') || htmlContent.includes('cancelled') || htmlContent.includes('sessionChange') || htmlContent.includes('change your session') || htmlContent.includes('expire') || htmlContent.includes('exceeded the maximum')) {
-      logoutMessage.style.color = 'red';
+      logoutMessage.style.color = '#BA0C2F';
     }
     else if (htmlContent.includes('Access Denied')) {
-      logoutMessage.style.color = 'red';
+      logoutMessage.style.color = '#BA0C2F';
     }
     else {
       logoutMessage.style.color = 'green';
@@ -331,7 +354,7 @@ class Login extends Component {
   }
   render() {
     return (
-      <div className="main-content flex-row align-items-center">
+      <div className="main-content flex-row align-items-center bg-height">
 
         <div className="Login-component" style={{ backgroundImage: "url(" + InnerBgImg + ")" }}>
           <Container className="container-login">
@@ -392,7 +415,7 @@ class Login extends Component {
                                 var decoded = jwt_decode(response.data.token);
                                 // console.log("decoded token---", decoded);
 
-                                let keysToRemove = ["token-" + decoded.userId, "user-" + decoded.userId, "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "lastLoggedInUsersLanguage"];
+                                let keysToRemove = ["token-" + decoded.userId, "user-" + decoded.userId, "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "lastLoggedInUsersLanguage","sessionType"];
                                 keysToRemove.forEach(k => localStorage.removeItem(k))
                                 decoded.user.syncExpiresOn = moment().format("YYYY-MM-DD HH:mm:ss");
                                 decoded.user.apiVersion = this.state.apiVersion;
@@ -400,6 +423,7 @@ class Login extends Component {
                                 localStorage.setItem('token-' + decoded.userId, CryptoJS.AES.encrypt((response.data.token).toString(), `${SECRET_KEY}`));
                                 // localStorage.setItem('user-' + decoded.userId, CryptoJS.AES.encrypt(JSON.stringify(decoded.user), `${SECRET_KEY}`));
                                 localStorage.setItem('typeOfSession', "Online");
+                                localStorage.setItem('sessionType', "Online");
                                 localStorage.setItem('lastActionTaken', CryptoJS.AES.encrypt((moment(new Date()).format("YYYY-MM-DD HH:mm:ss")).toString(), `${SECRET_KEY}`));
                                 localStorage.setItem('curUser', CryptoJS.AES.encrypt((decoded.userId).toString(), `${SECRET_KEY}`));
                                 localStorage.setItem('lang', decoded.user.language.languageCode);
@@ -411,7 +435,7 @@ class Login extends Component {
 
                                 AuthenticationService.setupAxiosInterceptors();
                                 if (decoded.user.agreementAccepted) {
-                                  this.props.history.push(`/masterDataSync`)
+                                  this.props.history.push(`/syncProgram`)
                                 } else {
                                   this.props.history.push(`/userAgreement`)
                                 }
@@ -463,10 +487,11 @@ class Login extends Component {
                                   // console.log("offline tempuser---", tempUser)
                                   let user = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + tempUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
                                   // console.log("offline user next---", user)
-                                  let keysToRemove = ["curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "lastLoggedInUsersLanguage"];
+                                  let keysToRemove = ["curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "lastLoggedInUsersLanguage","sessionType"];
                                   keysToRemove.forEach(k => localStorage.removeItem(k))
 
                                   localStorage.setItem('typeOfSession', "Offline");
+                                  localStorage.setItem('sessionType', "Offline");
                                   localStorage.setItem('curUser', CryptoJS.AES.encrypt((user.userId).toString(), `${SECRET_KEY}`));
                                   localStorage.setItem('lang', user.language.languageCode);
                                   localStorage.setItem('i18nextLng', user.language.languageCode);
@@ -567,7 +592,7 @@ class Login extends Component {
                   </div>
 
                 </CardGroup>
-                <h5 className="text-right versionColor">{i18n.t('static.common.version')}{APP_VERSION_REACT} | <Online polling={polling}>{this.state.apiVersion}</Online><Offline polling={polling}>Offline</Offline></h5>
+                <h5 className="text-right versionColor">{i18n.t('static.common.version')}{APP_VERSION_REACT} | {this.state.apiVersionForDisplay}</h5>
               </Col>
 
 

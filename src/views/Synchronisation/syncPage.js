@@ -1,21 +1,24 @@
 import React, { Component } from 'react';
+import { Formik } from 'formik';
 import jexcel from 'jexcel-pro';
 import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import {
   Col, Row, Card, CardBody, Form,
   FormGroup, Label, InputGroup, Input, Button,
-  Nav, NavItem, NavLink, TabContent, TabPane, CardFooter, Modal, ModalBody, ModalFooter, ModalHeader
+  Nav, NavItem, NavLink, TabContent, TabPane, CardFooter, Modal, ModalBody, ModalFooter, ModalHeader,
+  FormFeedback
 } from 'reactstrap';
+import * as Yup from 'yup';
 import CryptoJS from 'crypto-js';
-import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, LOCAL_VERSION_COLOUR, LATEST_VERSION_COLOUR, PENDING_APPROVAL_VERSION_STATUS, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, CANCELLED_SHIPMENT_STATUS, JEXCEL_PAGINATION_OPTION, OPEN_PROBLEM_STATUS_ID, JEXCEL_PRO_KEY, FINAL_VERSION_TYPE, PROBLEM_STATUS_IN_COMPLIANCE } from '../../Constants.js';
+import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, LOCAL_VERSION_COLOUR, LATEST_VERSION_COLOUR, PENDING_APPROVAL_VERSION_STATUS, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, CANCELLED_SHIPMENT_STATUS, JEXCEL_PAGINATION_OPTION, OPEN_PROBLEM_STATUS_ID, JEXCEL_PRO_KEY, FINAL_VERSION_TYPE, PROBLEM_STATUS_IN_COMPLIANCE, ACTUAL_CONSUMPTION_MODIFIED, FORECASTED_CONSUMPTION_MODIFIED, INVENTORY_MODIFIED, ADJUSTMENT_MODIFIED, SHIPMENT_MODIFIED, SPECIAL_CHARECTER_WITH_NUM } from '../../Constants.js';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import getLabelText from '../../CommonComponent/getLabelText';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import ProgramService from '../../api/ProgramService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import { jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunctionOnlyHideRow, inValid, inValidWithColor, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
+import { jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunctionOnlyHideRow, inValid, inValidWithColor, jExcelLoadedFunction, } from '../../CommonComponent/JExcelCommonFunctions.js'
 import moment from "moment";
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
@@ -24,8 +27,45 @@ import getProblemDesc from '../../CommonComponent/getProblemDesc';
 import { calculateSupplyPlan } from '../SupplyPlan/SupplyPlanCalculations';
 import QatProblemActions from '../../CommonComponent/QatProblemActions'
 import QatProblemActionNew from '../../CommonComponent/QatProblemActionNew'
+import LanguageService from '../../api/LanguageService';
+import eventBus from '../../containers/DefaultLayout/eventBus';
+import { ProgressBar, Step } from "react-step-progress-bar";
+import "../../../node_modules/react-step-progress-bar/styles.css"
 
 const entityname = i18n.t('static.dashboard.commitVersion')
+
+const initialValues = {
+  notes: ''
+}
+
+const validationSchema = function (values, t) {
+  return Yup.object().shape({
+    notes: Yup.string()
+      .matches(/^([a-zA-Z0-9\s,\./<>\?;':""[\]\\{}\|`~!@#\$%\^&\*()-_=\+]*)$/, i18n.t("static.label.validData"))
+  })
+}
+const validate = (getValidationSchema) => {
+  return (values) => {
+
+    const validationSchema = getValidationSchema(values, i18n.t)
+    try {
+      validationSchema.validateSync(values, { abortEarly: false })
+      return {}
+    } catch (error) {
+      return getErrorsFromValidationError(error)
+    }
+  }
+}
+
+const getErrorsFromValidationError = (validationError) => {
+  const FIRST_ERROR = 0
+  return validationError.inner.reduce((errors, error) => {
+    return {
+      ...errors,
+      [error.path]: error.errors[FIRST_ERROR],
+    }
+  }, {})
+}
 
 export default class syncPage extends Component {
 
@@ -39,7 +79,10 @@ export default class syncPage extends Component {
       isChanged: false,
       conflictsCount: 0,
       loading: true,
-      versionType: 1
+      versionType: 1,
+      openCount: 0,
+      progressPer: 0,
+      notes: ''
     }
     this.toggle = this.toggle.bind(this);
     this.getDataForCompare = this.getDataForCompare.bind(this);
@@ -78,7 +121,37 @@ export default class syncPage extends Component {
     this.fetchData = this.fetchData.bind(this)
     this.versionTypeChanged = this.versionTypeChanged.bind(this);
     this.generateDataAfterResolveConflictsForQPL = this.generateDataAfterResolveConflictsForQPL.bind(this);
+    this.notesChange = this.notesChange.bind(this);
+    this.checkLastModifiedDateForProgram = this.checkLastModifiedDateForProgram.bind(this)
     // this.checkValidations = this.checkValidations.bind(this);
+  }
+
+  notesChange(event) {
+    this.setState({
+      notes: event.target.value
+    })
+  }
+
+  touchAll(setTouched, errors) {
+    setTouched({
+      notes: true
+    }
+    );
+    this.validateForm(errors);
+  }
+  validateForm(errors) {
+    this.findFirstError('budgetForm', (fieldName) => {
+      return Boolean(errors[fieldName])
+    })
+  }
+  findFirstError(formName, hasError) {
+    const form = document.forms[formName]
+    for (let i = 0; i < form.length; i++) {
+      if (hasError(form[i].name)) {
+        form[i].focus()
+        break
+      }
+    }
   }
 
   versionTypeChanged(event) {
@@ -91,14 +164,14 @@ export default class syncPage extends Component {
     document.getElementById('div1').style.display = 'block';
     this.state.timeout = setTimeout(function () {
       document.getElementById('div1').style.display = 'none';
-    }, 8000);
+    }, 30000);
   }
 
   hideSecondComponent() {
     document.getElementById('div2').style.display = 'block';
     this.state.timeout = setTimeout(function () {
       document.getElementById('div2').style.display = 'none';
-    }, 8000);
+    }, 30000);
   }
 
   componentWillUnmount() {
@@ -186,7 +259,7 @@ export default class syncPage extends Component {
       filters: false,
       license: JEXCEL_PRO_KEY,
       contextMenu: function (obj, x, y, e) {
-        return [];
+        return false;
       }.bind(this),
       columnSorting: false,
       tableOverflow: false,
@@ -373,7 +446,7 @@ export default class syncPage extends Component {
       filters: false,
       license: JEXCEL_PRO_KEY,
       contextMenu: function (obj, x, y, e) {
-        return [];
+        return false;
       }.bind(this),
       onload: this.loadedResolveConflictsInventory
     };
@@ -566,7 +639,7 @@ export default class syncPage extends Component {
       filters: false,
       license: JEXCEL_PRO_KEY,
       contextMenu: function (obj, x, y, e) {
-        return [];
+        return false;
       }.bind(this),
       onload: this.loadedResolveConflictsShipment
     };
@@ -681,7 +754,7 @@ export default class syncPage extends Component {
       filters: false,
       license: JEXCEL_PRO_KEY,
       contextMenu: function (obj, x, y, e) {
-        return [];
+        return false;
       }.bind(this),
       onload: this.loadedResolveConflictsProblem
     };
@@ -819,19 +892,21 @@ export default class syncPage extends Component {
     var elInstance = instance.jexcel;
     var jsonData = elInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T']
-    // for (var j = 0; j < 17; j++) {
-    var col = (colArr[10]).concat(1);
-    var col1 = (colArr[10]).concat(2);
-    var valueToCompare = (jsonData[0])[10];
-    var valueToCompareWith = (jsonData[1])[10];
-    if ((valueToCompare == valueToCompareWith) || (valueToCompare == "" && valueToCompareWith == null) || (valueToCompare == null && valueToCompareWith == "")) {
-      elInstance.setStyle(col, "background-color", "transparent");
-      elInstance.setStyle(col1, "background-color", "transparent");
-    } else {
-      elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
-      elInstance.setStyle(col1, "background-color", LATEST_VERSION_COLOUR);
+    for (var j = 0; j < 17; j++) {
+      if (j == 10 || j == 8 || j == 9 || j == 11) {
+        var col = (colArr[j]).concat(1);
+        var col1 = (colArr[j]).concat(2);
+        var valueToCompare = (jsonData[0])[j];
+        var valueToCompareWith = (jsonData[1])[j];
+        if ((valueToCompare == valueToCompareWith) || (valueToCompare == "" && valueToCompareWith == null) || (valueToCompare == null && valueToCompareWith == "")) {
+          elInstance.setStyle(col, "background-color", "transparent");
+          elInstance.setStyle(col1, "background-color", "transparent");
+        } else {
+          elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
+          elInstance.setStyle(col1, "background-color", LATEST_VERSION_COLOUR);
+        }
+      }
     }
-    // }
   }
 
   acceptCurrentChangesProblem() {
@@ -844,10 +919,10 @@ export default class syncPage extends Component {
     var jsonData = resolveConflictsInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T']
     for (var j = 0; j < 17; j++) {
-      if (j == 10) {
-        var col = ("K").concat(parseInt(index) + 1);
-        var valueToCompare = (jsonData[0])[10];
-        var valueToCompareWith = (jsonData[1])[10];
+      if (j == 10 || j == 8 || j == 9 || j == 11) {
+        var col = (colArr[j]).concat(parseInt(index) + 1);
+        var valueToCompare = (jsonData[0])[j];
+        var valueToCompareWith = (jsonData[1])[j];
         if ((valueToCompare == valueToCompareWith) || (valueToCompare == "" && valueToCompareWith == null) || (valueToCompare == null && valueToCompareWith == "")) {
           problemInstance.setStyle(col, "background-color", "transparent");
         } else {
@@ -862,10 +937,17 @@ export default class syncPage extends Component {
 
     problemInstance.orderBy(20, 0);
     problemInstance.options.editable = false;
+    var json = problemInstance.getJson()
+    var openCount = json.filter(c => c[12] == OPEN_PROBLEM_STATUS_ID).length;
     this.setState({
-      conflictsCount: this.state.conflictsCount - 1
+      conflictsCount: this.state.conflictsCount - 1,
+      openCount: openCount
     }, () => {
       if (this.state.conflictsCount == 0) {
+        this.setState({ progressPer: 25, message: i18n.t('static.commitVersion.resolvedConflictsSuccess'), color: 'green' }, () => {
+          this.hideFirstComponent();
+        })
+
         // this.generateDataAfterResolveConflictsForQPL();
       }
     })
@@ -884,18 +966,18 @@ export default class syncPage extends Component {
     oldRowData[10] = latestRowData[10];
     oldRowData[11] = latestRowData[11];
     oldRowData[12] = latestRowData[12];
-    console.log("OldRowData@@@", oldRowData)
     problemInstance.setRowData(index, oldRowData);
     var jsonData = resolveConflictsInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T']
     for (var j = 0; j < 17; j++) {
-      if (j == 10) {
+      if (j == 10 || j == 8 || j == 9 || j == 11) {
         var col = (colArr[j]).concat(parseInt(index) + 1);
         var valueToCompare = (jsonData[0])[j];
         var valueToCompareWith = (jsonData[1])[j];
         if ((valueToCompare == valueToCompareWith) || (valueToCompare == "" && valueToCompareWith == null) || (valueToCompare == null && valueToCompareWith == "")) {
           problemInstance.setStyle(col, "background-color", "transparent");
         } else {
+          problemInstance.setStyle(col, "background-color", "transparent");
           problemInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
           problemInstance.setValueFromCoords(20, (index), 3, true);
         }
@@ -906,10 +988,16 @@ export default class syncPage extends Component {
     }
     problemInstance.orderBy(20, 0);
     problemInstance.options.editable = false;
+    var json = problemInstance.getJson()
+    var openCount = json.filter(c => c[12] == OPEN_PROBLEM_STATUS_ID).length;
     this.setState({
-      conflictsCount: this.state.conflictsCount - 1
+      conflictsCount: this.state.conflictsCount - 1,
+      openCount: openCount
     }, () => {
       if (this.state.conflictsCount == 0) {
+        this.setState({ progressPer: 25, message: i18n.t('static.commitVersion.resolvedConflictsSuccess'), color: 'green' }, () => {
+          this.hideFirstComponent();
+        })
         // this.generateDataAfterResolveConflictsForQPL();
       }
     })
@@ -918,6 +1006,7 @@ export default class syncPage extends Component {
   }
 
   generateDataAfterResolveConflictsForQPL() {
+    console.log("+++in generate QPL ", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
     this.setState({ loading: true });
     var db1;
     var storeOS;
@@ -930,79 +1019,181 @@ export default class syncPage extends Component {
     }.bind(this);
     openRequest.onsuccess = function (e) {
       db1 = e.target.result;
-      var programDataTransaction = db1.transaction(['programData'], 'readwrite');
-      var programDataOs = programDataTransaction.objectStore('programData');
-      var programRequest = programDataOs.get((this.state.programId).value);
-      programRequest.onerror = function (event) {
-        this.setState({
-          supplyPlanError: i18n.t('static.program.errortext')
-        })
-      }.bind(this);
-      programRequest.onsuccess = function (e) {
-        var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-        var programJson = JSON.parse(programData);
-        var planningUnitList = [];
-        var consumptionData = [];
-        var consumptionJson = (this.state.mergedConsumptionJexcel).getJson();
-        var oldProgramDataConsumption = this.state.oldProgramDataConsumption;
-        var latestProgramDataConsumption = this.state.latestProgramDataConsumption;
-        for (var c = 0; c < consumptionJson.length; c++) {
-          if (((consumptionJson[c])[18] == 2 || (consumptionJson[c])[18] == 4) && (consumptionJson[c])[0] != 0) {
-            consumptionData.push(oldProgramDataConsumption.filter(a => a.consumptionId == (consumptionJson[c])[0])[0]);
-          } else if ((consumptionJson[c])[18] == 3 && (consumptionJson[c])[0] != 0) {
+      // var programDataTransaction = db1.transaction(['programData'], 'readwrite');
+      // var programDataOs = programDataTransaction.objectStore('programData');
+      // var programRequest = programDataOs.get((this.state.programId).value);
+      // programRequest.onerror = function (event) {
+      //   this.setState({
+      //     supplyPlanError: i18n.t('static.program.errortext')
+      //   })
+      // }.bind(this);
+      // programRequest.onsuccess = function (e) {
+      //   var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+      //   var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+      var programJson = this.state.programRequestProgramJson;
+      var actionList = programJson.actionList;
+      if (actionList == undefined) {
+        actionList = []
+      }
+      var planningUnitList = [];
+      var consumptionData = (this.state.oldProgramDataConsumption).filter(c => c.consumptionId != 0);
+      var consumptionJson = (this.state.mergedConsumptionJexcel).getJson();
+      var oldProgramDataConsumption = this.state.oldProgramDataConsumption;
+      var latestProgramDataConsumption = this.state.latestProgramDataConsumption;
+      for (var c = 0; c < consumptionJson.length; c++) {
+        if (((consumptionJson[c])[18] == 2 || (consumptionJson[c])[18] == 4) && (consumptionJson[c])[0] != 0) {
+          // consumptionData.push(oldProgramDataConsumption.filter(a => a.consumptionId == (consumptionJson[c])[0])[0]);
+        } else if ((consumptionJson[c])[18] == 3 && (consumptionJson[c])[0] != 0) {
+          var index = consumptionData.findIndex(p => p.consumptionId == (consumptionJson[c])[0]);
+          if (index == -1) {
             consumptionData.push(latestProgramDataConsumption.filter(a => a.consumptionId == (consumptionJson[c])[0])[0]);
+          } else {
+            consumptionData[index] = latestProgramDataConsumption.filter(a => a.consumptionId == (consumptionJson[c])[0])[0];
           }
         }
-        consumptionData = consumptionData.concat(oldProgramDataConsumption.filter(c => c.consumptionId == 0));
+      }
+      consumptionData = consumptionData.concat(oldProgramDataConsumption.filter(c => c.consumptionId == 0));
+      var uniquePlanningUnitsInConsumption = [];
+      consumptionJson.map(c => uniquePlanningUnitsInConsumption = uniquePlanningUnitsInConsumption.concat(parseInt(c[1])));
+      console.log("uniquePlanningUnitsInConsumption+++", uniquePlanningUnitsInConsumption);
 
-        var inventoryData = [];
-        var inventoryJson = (this.state.mergedInventoryJexcel).getJson();
-        var oldProgramDataInventory = this.state.oldProgramDataInventory;
-        var latestProgramDataInventory = this.state.latestProgramDataInventory;
-        for (var c = 0; c < inventoryJson.length; c++) {
-          if (((inventoryJson[c])[19] == 2 || (inventoryJson[c])[19] == 4) && (inventoryJson[c])[0] != 0) {
-            inventoryData.push(oldProgramDataInventory.filter(a => a.inventoryId == (inventoryJson[c])[0])[0]);
-          } else if ((inventoryJson[c])[19] == 3 && (inventoryJson[c])[0] != 0) {
+      uniquePlanningUnitsInConsumption.map(c => {
+        actionList.push({
+          planningUnitId: c,
+          type: ACTUAL_CONSUMPTION_MODIFIED,
+          date: moment(Date.now()).startOf('month').format("YYYY-MM-DD")
+        });
+        actionList.push({
+          planningUnitId: c,
+          type: FORECASTED_CONSUMPTION_MODIFIED,
+          date: moment(Date.now()).startOf('month').format("YYYY-MM-DD")
+        });
+      })
+
+      var inventoryData = (this.state.oldProgramDataInventory).filter(c => c.inventoryId != 0);
+      var inventoryJson = (this.state.mergedInventoryJexcel).getJson();
+      var oldProgramDataInventory = this.state.oldProgramDataInventory;
+      var latestProgramDataInventory = this.state.latestProgramDataInventory;
+      for (var c = 0; c < inventoryJson.length; c++) {
+        if (((inventoryJson[c])[19] == 2 || (inventoryJson[c])[19] == 4) && (inventoryJson[c])[0] != 0) {
+          // inventoryData.push(oldProgramDataInventory.filter(a => a.inventoryId == (inventoryJson[c])[0])[0]);
+        } else if ((inventoryJson[c])[19] == 3 && (inventoryJson[c])[0] != 0) {
+          var index = inventoryData.findIndex(p => p.inventoryId == (inventoryJson[c])[0]);
+          if (index == -1) {
             inventoryData.push(latestProgramDataInventory.filter(a => a.inventoryId == (inventoryJson[c])[0])[0]);
+          } else {
+            inventoryData[index] = latestProgramDataInventory.filter(a => a.inventoryId == (inventoryJson[c])[0])[0];
           }
         }
-        inventoryData = inventoryData.concat(oldProgramDataInventory.filter(c => c.inventoryId == 0));
+      }
+      inventoryData = inventoryData.concat(oldProgramDataInventory.filter(c => c.inventoryId == 0));
 
-        var shipmentData = [];
-        var shipmentJson = (this.state.mergedShipmentJexcel).getJson();
-        var oldProgramDataShipment = this.state.oldProgramDataShipment;
-        var latestProgramDataShipment = this.state.latestProgramDataShipment;
-        for (var c = 0; c < shipmentJson.length; c++) {
-          if (((shipmentJson[c])[33] == 2 || (shipmentJson[c])[33] == 4) && (shipmentJson[c])[0] != 0) {
-            shipmentData.push(oldProgramDataShipment.filter(a => a.shipmentId == (shipmentJson[c])[0])[0]);
-          } else if ((shipmentJson[c])[33] == 3 && (shipmentJson[c])[0] != 0) {
+      var uniquePlanningUnitsInInventory = [];
+      inventoryJson.map(c => uniquePlanningUnitsInInventory = uniquePlanningUnitsInInventory.concat(parseInt(c[1])));
+
+      uniquePlanningUnitsInInventory.map(c => {
+        actionList.push({
+          planningUnitId: c,
+          type: INVENTORY_MODIFIED,
+          date: moment(Date.now()).startOf('month').format("YYYY-MM-DD")
+        });
+        actionList.push({
+          planningUnitId: c,
+          type: ADJUSTMENT_MODIFIED,
+          date: moment(Date.now()).startOf('month').format("YYYY-MM-DD")
+        });
+      })
+
+      var shipmentData = (this.state.oldProgramDataShipment).filter(c => c.shipmentId != 0);
+      var shipmentJson = (this.state.mergedShipmentJexcel).getJson();
+      var oldProgramDataShipment = this.state.oldProgramDataShipment;
+      var latestProgramDataShipment = this.state.latestProgramDataShipment;
+      for (var c = 0; c < shipmentJson.length; c++) {
+        if (((shipmentJson[c])[33] == 2 || (shipmentJson[c])[33] == 4) && (shipmentJson[c])[0] != 0) {
+          // shipmentData.push(oldProgramDataShipment.filter(a => a.shipmentId == (shipmentJson[c])[0])[0]);
+        } else if ((shipmentJson[c])[33] == 3 && (shipmentJson[c])[0] != 0) {
+          var index = shipmentData.findIndex(p => p.shipmentId == (shipmentJson[c])[0]);
+          if (index == -1) {
             shipmentData.push(latestProgramDataShipment.filter(a => a.shipmentId == (shipmentJson[c])[0])[0]);
+          } else {
+            shipmentData[index] = latestProgramDataShipment.filter(a => a.shipmentId == (shipmentJson[c])[0])[0];
           }
         }
-        shipmentData = shipmentData.concat(oldProgramDataShipment.filter(c => c.shipmentId == 0 && c.active.toString() == "true"));
+      }
+      shipmentData = shipmentData.concat(oldProgramDataShipment.filter(c => c.shipmentId == 0 && c.active.toString() == "true"));
+
+      var uniquePlanningUnitsInShipment = [];
+      shipmentJson.map(c => uniquePlanningUnitsInShipment = uniquePlanningUnitsInShipment.concat(parseInt(c[1])));
+      console.log("uniquePlanningUnitsInConsumption+++", uniquePlanningUnitsInConsumption);
+
+      uniquePlanningUnitsInShipment.map(c => {
+        actionList.push({
+          planningUnitId: c,
+          type: SHIPMENT_MODIFIED,
+          date: moment(Date.now()).startOf('month').format("YYYY-MM-DD")
+        });
+      })
 
 
-        programJson.consumptionList = consumptionData;
-        programJson.inventoryList = inventoryData;
-        programJson.shipmentList = shipmentData;
-        programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+      programJson.consumptionList = consumptionData;
+      programJson.inventoryList = inventoryData;
+      programJson.shipmentList = shipmentData;
+      programJson.actionList = actionList;
 
-        var programTransaction = db1.transaction(['whatIfProgramData'], 'readwrite');
-        var programOs = programTransaction.objectStore('whatIfProgramData');
+      var planningUnitDataListFromState = this.state.planningUnitDataList;
+      var updatedJson = [];
+      var consumptionList = programJson.consumptionList;
+      var inventoryList = programJson.inventoryList;
+      var shipmentList = programJson.shipmentList;
+      var batchInfoList = programJson.batchInfoList;
+      var problemReportList = programJson.problemReportList;
+      var supplyPlan = programJson.supplyPlan;
+      console.log("Supply Plan full+++", supplyPlan);
+      var generalData = programJson;
+      delete generalData.consumptionList;
+      delete generalData.inventoryList;
+      delete generalData.shipmentList;
+      delete generalData.batchInfoList;
+      delete generalData.supplyPlan;
+      delete generalData.planningUnitList;
+      var generalEncryptedData = CryptoJS.AES.encrypt(JSON.stringify(generalData), SECRET_KEY).toString();
+      var planningUnitDataList = [];
+      for (var pu = 0; pu < planningUnitDataListFromState.length; pu++) {
+        var planningUnitDataJson = {
+          consumptionList: consumptionList.filter(c => c.planningUnit.id == planningUnitDataListFromState[pu].planningUnitId),
+          inventoryList: inventoryList.filter(c => c.planningUnit.id == planningUnitDataListFromState[pu].planningUnitId),
+          shipmentList: shipmentList.filter(c => c.planningUnit.id == planningUnitDataListFromState[pu].planningUnitId),
+          batchInfoList: batchInfoList.filter(c => c.planningUnitId == planningUnitDataListFromState[pu].planningUnitId),
+          supplyPlan: supplyPlan.filter(c => c.planningUnitId == planningUnitDataListFromState[pu].planningUnitId)
+        }
+        console.log("Supply Plan filtered+++", supplyPlan.filter(c => c.planningUnitId == planningUnitDataListFromState[pu].planningUnitId));
+        var encryptedPlanningUnitDataText = CryptoJS.AES.encrypt(JSON.stringify(planningUnitDataJson), SECRET_KEY).toString();
+        planningUnitDataList.push({ planningUnitId: planningUnitDataListFromState[pu].planningUnitId, planningUnitData: encryptedPlanningUnitDataText })
+      }
+      var programDataJson = {
+        generalData: generalEncryptedData,
+        planningUnitDataList: planningUnitDataList
+      };
 
-        var putRequest = programOs.put(programRequest.result);
+      var proRequestResult = this.state.programRequestResult;
+      proRequestResult.programData = programDataJson;
 
-        putRequest.onerror = function (event) {
-          this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-          this.props.updateState("color", "red");
-          this.props.hideFirstComponent();
-        }.bind(this);
-        putRequest.onsuccess = function (event) {
-          this.refs.problemListChild.qatProblemActions((this.state.programId).value, "loading", true);
-        }.bind(this);
+      var programTransaction = db1.transaction(['whatIfProgramData'], 'readwrite');
+      var programOs = programTransaction.objectStore('whatIfProgramData');
+
+      var putRequest = programOs.put(proRequestResult);
+
+      putRequest.onerror = function (event) {
+        this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+        this.props.updateState("color", "red");
+        this.props.hideFirstComponent();
+      }.bind(this);
+      putRequest.onsuccess = function (event) {
+        console.log("+++Ready data for QPL ", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
+        this.refs.problemListChild.qatProblemActions((this.state.programId).value, "loading", false);
       }.bind(this);
     }.bind(this);
+    // }.bind(this);
   }
 
   componentDidMount() {
@@ -1036,14 +1227,15 @@ export default class syncPage extends Component {
         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
         var userId = userBytes.toString(CryptoJS.enc.Utf8);
         for (var i = 0; i < myResult.length; i++) {
-          if (myResult[i].userId == userId) {
+          if (myResult[i].userId == userId && !myResult[i].readonly) {
             // var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
             // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
             // var programJson1 = JSON.parse(programData);
             var programJson = {
               label: myResult[i].programCode + "~v" + myResult[i].version,
               value: myResult[i].id,
-              version: myResult[i].version
+              version: myResult[i].version,
+              programId: myResult[i].programId
             }
             proList.push(programJson)
           }
@@ -1057,37 +1249,58 @@ export default class syncPage extends Component {
 
         AuthenticationService.setupAxiosInterceptors();
         ProgramService.getVersionTypeList().then(response => {
-          if (proList.length == 1) {
-            this.setState({
-              versionTypeList: response.data,
-              programList: proList,
-              // loading: false,
-              programId: proList[0].value
-            }, () => {
-              this.getDataForCompare(proList[0]);
-            })
-          } else if (localStorage.getItem("sesProgramId") != '' && localStorage.getItem("sesProgramId") != undefined) {
-            this.setState({
-              versionTypeList: response.data,
-              programList: proList,
-              // loading: false,
-              programId: localStorage.getItem("sesProgramId")
-            }, () => {
-              this.getDataForCompare(proList.filter(c => c.value == localStorage.getItem("sesProgramId"))[0]);
-            })
+          if (proList.length > 0) {
+            if (proList.length == 1) {
+              this.setState({
+                versionTypeList: response.data,
+                programList: proList,
+                // loading: false,
+                programId: proList[0].value
+              }, () => {
+                // this.getDataForCompare(proList[0]);
+                this.checkLastModifiedDateForProgram(proList[0]);
+              })
+            } else if (localStorage.getItem("sesProgramId") != '' && localStorage.getItem("sesProgramId") != undefined) {
+              var programFilter = proList.filter(c => c.value == localStorage.getItem("sesProgramId"));
+              if (programFilter.length > 0) {
+                this.setState({
+                  versionTypeList: response.data,
+                  programList: proList,
+                  // loading: false,
+                  programId: localStorage.getItem("sesProgramId")
+                }, () => {
+                  // this.getDataForCompare(proList.filter(c => c.value == localStorage.getItem("sesProgramId"))[0]);
+                  this.checkLastModifiedDateForProgram(proList.filter(c => c.value == localStorage.getItem("sesProgramId"))[0]);
+                })
+              } else {
+                this.setState({
+                  versionTypeList: response.data,
+                  programList: proList,
+                  loading: false
+                })
+              }
+            } else {
+              this.setState({
+                versionTypeList: response.data,
+                programList: proList,
+                loading: false
+              })
+            }
           } else {
             this.setState({
-              versionTypeList: response.data,
-              programList: proList,
               loading: false
             })
           }
         })
           .catch(
             error => {
+              console.log("@@@Error1", error);
+              console.log("@@@Error1", error.message);
+              console.log("@@@Error1", error.response ? error.response.status : "")
               if (error.message === "Network Error") {
+                console.log("+++in catch 1")
                 this.setState({
-                  message: 'static.unkownError',
+                  message: 'static.common.networkError',
                   loading: false,
                   statuses: [],
                 });
@@ -1117,6 +1330,7 @@ export default class syncPage extends Component {
                     });
                     break;
                   default:
+                    console.log("+++in catch 2")
                     this.setState({
                       message: 'static.unkownError',
                       loading: false,
@@ -1132,7 +1346,8 @@ export default class syncPage extends Component {
     document.getElementById("detailsDiv").style.display = "none";
   }
 
-  getDataForCompare(value) {
+  checkLastModifiedDateForProgram(value) {
+    console.log("+++Started with commit version", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
     document.getElementById("detailsDiv").style.display = "block";
     this.setState({
       programId: value,
@@ -1159,791 +1374,976 @@ export default class syncPage extends Component {
     console.log("@@@ProgramId", programId);
     console.log("@@@this.state.programList", this.state.programList);
     var programVersion = (this.state.programList).filter(c => c.value == programId)[0].version;
+    var singleProgramId = (this.state.programList).filter(c => c.value == programId)[0].programId;
+
+    if (programId != 0) {
+      localStorage.setItem("sesProgramId", programId);
+      ProgramService.getLastModifiedDateForProgram(singleProgramId, programVersion).then(response1 => {
+        if (response1.status == 200) {
+          var lastModifiedDate = response1.data;
+          console.log("LastModifiedDate+++", lastModifiedDate);
+          var db1;
+          var storeOS;
+          getDatabase();
+          var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+          openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['lastSyncDate'], 'readwrite');
+            var lastSyncDateTransaction = transaction.objectStore('lastSyncDate');
+            var lastSyncDateRequest = lastSyncDateTransaction.getAll();
+            lastSyncDateRequest.onsuccess = function (event) {
+              var lastSyncDate = lastSyncDateRequest.result[0];
+              var result = lastSyncDateRequest.result;
+              for (var i = 0; i < result.length; i++) {
+                if (result[i].id == 0) {
+                  var lastSyncDate = lastSyncDateRequest.result[i];
+                }
+              }
+              if (lastSyncDate == undefined) {
+                lastSyncDate = "2020-01-01 00:00:00";
+              } else {
+                lastSyncDate = lastSyncDate.lastSyncDate;
+              }
+              if (lastModifiedDate != undefined && lastModifiedDate != null && lastModifiedDate != "" && moment(lastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(lastSyncDate).format("YYYY-MM-DD HH:mm:ss")) {
+                alert(i18n.t('static.commitVersion.outdatedsync'));
+                this.props.history.push(`/syncProgram`)
+              } else {
+                this.getDataForCompare(value);
+              }
+            }.bind(this)
+          }.bind(this)
+        }
+      }).catch(error => {
+        console.log("@@@Error1", error);
+        console.log("@@@Error1", error.message);
+        console.log("@@@Error1", error.response ? error.response.status : "")
+        if (error.message === "Network Error") {
+          console.log("+++in catch 1")
+          this.setState({
+            message: 'static.common.networkError',
+            loading: false,
+            statuses: [],
+          });
+        } else {
+          switch (error.response ? error.response.status : "") {
+
+            case 401:
+              this.props.history.push(`/login/static.message.sessionExpired`)
+              break;
+            case 403:
+              this.props.history.push(`/accessDenied`)
+              break;
+            case 500:
+            case 404:
+            case 406:
+              this.setState({
+                message: error.response.data.messageCode,
+                loading: false,
+                statuses: [],
+              });
+              break;
+            case 412:
+              this.setState({
+                message: error.response.data.messageCode,
+                loading: false,
+                statuses: [],
+              });
+              break;
+            default:
+              console.log("+++in catch 2")
+              this.setState({
+                message: 'static.unkownError',
+                loading: false,
+                statuses: [],
+              });
+              break;
+          }
+        }
+      })
+    }
+  }
+
+  getDataForCompare(value) {
+    var programId = value != "" && value != undefined ? value.value : 0;
+    var programVersion = (this.state.programList).filter(c => c.value == programId)[0].version;
+    var singleProgramId = (this.state.programList).filter(c => c.value == programId)[0].programId;
+
     if (programId != 0) {
       localStorage.setItem("sesProgramId", programId);
       AuthenticationService.setupAxiosInterceptors();
-      var programRequestJson = { programId: (programId.split("_"))[0], versionId: -1 }
-      ProgramService.getProgramData(programRequestJson)
-        .then(response => {
-          if (response.status == 200) {
+      ProgramService.getLatestVersionForProgram((singleProgramId)).then(response1 => {
+        if (response1.status == 200) {
+          var latestVersion = response1.data;
+          var programRequestJson = [];
+          programRequestJson.push({ programId: (programId.split("_"))[0], versionId: -1 })
+          if (latestVersion == programVersion) {
+          } else {
+            programRequestJson.push({ programId: (programId.split("_"))[0], versionId: programVersion });
+          }
+          ProgramService.getAllProgramData(programRequestJson)
+            .then(response => {
+              if (response.status == 200) {
+                console.log("+++Response for latest version success", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
 
+                AuthenticationService.setupAxiosInterceptors();
+                // var programRequestJson1 = { programId: (programId.split("_"))[0], versionId: programVersion }
+                // ProgramService.getProgramData(programRequestJson1)
+                //   .then(response1 => {
+                //     if (response1.status == 200) {
+                console.log("+++Response for downloaded version", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
 
-            AuthenticationService.setupAxiosInterceptors();
-            var programRequestJson1 = { programId: (programId.split("_"))[0], versionId: programVersion }
-            ProgramService.getProgramData(programRequestJson1)
-              .then(response1 => {
-                if (response1.status == 200) {
-
-
-                  var db1;
-                  var storeOS;
-                  var realmCountryPlanningUnitList = []
-                  var dataSourceList = []
-                  var planningUnitList = []
-                  var shipmentStatusList = []
-                  var procurementAgentList = []
-                  var fundingSourceList = []
-                  var budgetList = []
-                  var currencyList = []
-                  var currencyListAll = []
-                  getDatabase();
-                  var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                  openRequest.onerror = function (event) {
+                var db1;
+                var storeOS;
+                var realmCountryPlanningUnitList = []
+                var dataSourceList = []
+                var planningUnitList = []
+                var shipmentStatusList = []
+                var procurementAgentList = []
+                var fundingSourceList = []
+                var budgetList = []
+                var currencyList = []
+                var currencyListAll = []
+                getDatabase();
+                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                openRequest.onerror = function (event) {
+                  this.setState({
+                    commitVersionError: i18n.t('static.program.errortext'),
+                    loading: false
+                  })
+                  this.hideSecondComponent()
+                }.bind(this);
+                openRequest.onsuccess = function (e) {
+                  db1 = e.target.result;
+                  var programDataTransaction = db1.transaction(['programData'], 'readwrite');
+                  var programDataOs = programDataTransaction.objectStore('programData');
+                  var programRequest = programDataOs.get(value != "" && value != undefined ? value.value : 0);
+                  programRequest.onerror = function (event) {
                     this.setState({
                       commitVersionError: i18n.t('static.program.errortext'),
                       loading: false
                     })
                     this.hideSecondComponent()
                   }.bind(this);
-                  openRequest.onsuccess = function (e) {
-                    db1 = e.target.result;
-                    var programDataTransaction = db1.transaction(['programData'], 'readwrite');
-                    var programDataOs = programDataTransaction.objectStore('programData');
-                    var programRequest = programDataOs.get(value != "" && value != undefined ? value.value : 0);
-                    programRequest.onerror = function (event) {
+                  programRequest.onsuccess = function (e) {
+                    var generalDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
+                    var generalData = generalDataBytes.toString(CryptoJS.enc.Utf8);
+                    var generalJson = JSON.parse(generalData);
+                    var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
+                    var consumptionList = [];
+                    var inventoryList = [];
+                    var shipmentList = [];
+                    var batchInfoList = [];
+                    var supplyPlan = [];
+
+                    for (var pu = 0; pu < planningUnitDataList.length; pu++) {
+                      var planningUnitData = planningUnitDataList[pu];
+                      var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                      var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                      var planningUnitDataJson = JSON.parse(programData);
+                      consumptionList = consumptionList.concat(planningUnitDataJson.consumptionList);
+                      inventoryList = inventoryList.concat(planningUnitDataJson.inventoryList);
+                      shipmentList = shipmentList.concat(planningUnitDataJson.shipmentList);
+                      batchInfoList = batchInfoList.concat(planningUnitDataJson.batchInfoList);
+                      supplyPlan = supplyPlan.concat(planningUnitDataJson.supplyPlan);
+                    }
+                    var programJson = generalJson;
+                    programJson.consumptionList = consumptionList;
+                    programJson.inventoryList = inventoryList;
+                    programJson.shipmentList = shipmentList;
+                    programJson.batchInfoList = batchInfoList;
+                    programJson.supplyPlan = supplyPlan;
+
+                    this.setState({
+                      programRequestResult: programRequest.result,
+                      programRequestProgramJson: programJson,
+                      planningUnitDataList: planningUnitDataList
+                    })
+                    console.log("+++Response of local version", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
+                    // var dProgramDataTransaction = db1.transaction(['downloadedProgramData'], 'readwrite');
+                    // var dProgramDataOs = dProgramDataTransaction.objectStore('downloadedProgramData');
+                    // var dProgramRequest = dProgramDataOs.get(value != "" && value != undefined ? value.value : 0);
+                    // dProgramRequest.onerror = function (event) {
+                    //   this.setState({
+                    //     commitVersionError: i18n.t('static.program.errortext'),
+                    //     loading: false
+                    //   })
+                    //   this.hideSecondComponent()
+                    // }.bind(this);
+                    // dProgramRequest.onsuccess = function (e) {
+                    //   var dProgramDataBytes = CryptoJS.AES.decrypt(dProgramRequest.result.programData, SECRET_KEY);
+                    //   var dProgramData = dProgramDataBytes.toString(CryptoJS.enc.Utf8);
+                    //   var dProgramJson = JSON.parse(dProgramData);
+                    var rcpuTransaction = db1.transaction(['realmCountryPlanningUnit'], 'readwrite');
+                    var rcpuOs = rcpuTransaction.objectStore('realmCountryPlanningUnit');
+                    var rcpuRequest = rcpuOs.getAll();
+                    rcpuRequest.onerror = function (event) {
                       this.setState({
                         commitVersionError: i18n.t('static.program.errortext'),
                         loading: false
                       })
                       this.hideSecondComponent()
                     }.bind(this);
-                    programRequest.onsuccess = function (e) {
-                      var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                      var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                      var programJson = JSON.parse(programData);
+                    rcpuRequest.onsuccess = function (event) {
+                      var rcpuResult = [];
+                      rcpuResult = rcpuRequest.result.filter(c => (c.active).toString() == "true");
+                      for (var k = 0; k < rcpuResult.length; k++) {
+                        var rcpuJson = {
+                          name: getLabelText(rcpuResult[k].label, this.state.lang),
+                          id: rcpuResult[k].realmCountryPlanningUnitId,
+                          multiplier: rcpuResult[k].multiplier
+                        }
+                        realmCountryPlanningUnitList.push(rcpuJson);
+                      }
 
-                      // var dProgramDataTransaction = db1.transaction(['downloadedProgramData'], 'readwrite');
-                      // var dProgramDataOs = dProgramDataTransaction.objectStore('downloadedProgramData');
-                      // var dProgramRequest = dProgramDataOs.get(value != "" && value != undefined ? value.value : 0);
-                      // dProgramRequest.onerror = function (event) {
-                      //   this.setState({
-                      //     commitVersionError: i18n.t('static.program.errortext'),
-                      //     loading: false
-                      //   })
-                      //   this.hideSecondComponent()
-                      // }.bind(this);
-                      // dProgramRequest.onsuccess = function (e) {
-                      //   var dProgramDataBytes = CryptoJS.AES.decrypt(dProgramRequest.result.programData, SECRET_KEY);
-                      //   var dProgramData = dProgramDataBytes.toString(CryptoJS.enc.Utf8);
-                      //   var dProgramJson = JSON.parse(dProgramData);
-                      var rcpuTransaction = db1.transaction(['realmCountryPlanningUnit'], 'readwrite');
-                      var rcpuOs = rcpuTransaction.objectStore('realmCountryPlanningUnit');
-                      var rcpuRequest = rcpuOs.getAll();
-                      rcpuRequest.onerror = function (event) {
+                      var dataSourceTransaction = db1.transaction(['dataSource'], 'readwrite');
+                      var dataSourceOs = dataSourceTransaction.objectStore('dataSource');
+                      var dataSourceRequest = dataSourceOs.getAll();
+                      dataSourceRequest.onerror = function (event) {
                         this.setState({
                           commitVersionError: i18n.t('static.program.errortext'),
                           loading: false
                         })
                         this.hideSecondComponent()
                       }.bind(this);
-                      rcpuRequest.onsuccess = function (event) {
-                        var rcpuResult = [];
-                        rcpuResult = rcpuRequest.result.filter(c => (c.active).toString() == "true");
-                        for (var k = 0; k < rcpuResult.length; k++) {
-                          var rcpuJson = {
-                            name: getLabelText(rcpuResult[k].label, this.state.lang),
-                            id: rcpuResult[k].realmCountryPlanningUnitId,
-                            multiplier: rcpuResult[k].multiplier
-                          }
-                          realmCountryPlanningUnitList.push(rcpuJson);
-                        }
+                      dataSourceRequest.onsuccess = function (event) {
+                        var dataSourceResult = [];
+                        dataSourceResult = dataSourceRequest.result;
+                        for (var k = 0; k < dataSourceResult.length; k++) {
 
-                        var dataSourceTransaction = db1.transaction(['dataSource'], 'readwrite');
-                        var dataSourceOs = dataSourceTransaction.objectStore('dataSource');
-                        var dataSourceRequest = dataSourceOs.getAll();
-                        dataSourceRequest.onerror = function (event) {
+                          var dataSourceJson = {
+                            name: getLabelText(dataSourceResult[k].label, this.state.lang),
+                            id: dataSourceResult[k].dataSourceId,
+                            dataSourceTypeId: dataSourceResult[k].dataSourceType.id
+                          }
+                          dataSourceList.push(dataSourceJson);
+
+                        }
+                        var puTransaction = db1.transaction(['planningUnit'], 'readwrite');
+                        var puOs = puTransaction.objectStore('planningUnit');
+                        var puRequest = puOs.getAll();
+                        planningUnitList = []
+                        puRequest.onerror = function (event) {
                           this.setState({
-                            commitVersionError: i18n.t('static.program.errortext'),
+                            supplyPlanError: i18n.t('static.program.errortext'),
                             loading: false
                           })
-                          this.hideSecondComponent()
                         }.bind(this);
-                        dataSourceRequest.onsuccess = function (event) {
-                          var dataSourceResult = [];
-                          dataSourceResult = dataSourceRequest.result;
-                          for (var k = 0; k < dataSourceResult.length; k++) {
-
-                            var dataSourceJson = {
-                              name: getLabelText(dataSourceResult[k].label, this.state.lang),
-                              id: dataSourceResult[k].dataSourceId,
-                              dataSourceTypeId: dataSourceResult[k].dataSourceType.id
+                        puRequest.onsuccess = function (e) {
+                          var puResult = [];
+                          puResult = puRequest.result;
+                          for (var k = 0; k < puResult.length; k++) {
+                            var puJson = {
+                              name: getLabelText(puResult[k].label, this.state.lang),
+                              id: puResult[k].planningUnitId,
                             }
-                            dataSourceList.push(dataSourceJson);
-
+                            planningUnitList.push(puJson);
                           }
-                          var puTransaction = db1.transaction(['planningUnit'], 'readwrite');
-                          var puOs = puTransaction.objectStore('planningUnit');
-                          var puRequest = puOs.getAll();
-                          planningUnitList = []
-                          puRequest.onerror = function (event) {
+
+
+                          var shipmentStatusTransaction = db1.transaction(['shipmentStatus'], 'readwrite');
+                          var shipmentStatusOs = shipmentStatusTransaction.objectStore('shipmentStatus');
+                          var shipmentStatusRequest = shipmentStatusOs.getAll();
+                          shipmentStatusRequest.onerror = function (event) {
                             this.setState({
-                              supplyPlanError: i18n.t('static.program.errortext'),
+                              commitVersionError: i18n.t('static.program.errortext'),
                               loading: false
                             })
+                            this.hideSecondComponent()
                           }.bind(this);
-                          puRequest.onsuccess = function (e) {
-                            var puResult = [];
-                            puResult = puRequest.result;
-                            for (var k = 0; k < puResult.length; k++) {
-                              var puJson = {
-                                name: getLabelText(puResult[k].label, this.state.lang),
-                                id: puResult[k].planningUnitId,
+                          shipmentStatusRequest.onsuccess = function (event) {
+                            var shipmentStatusResult = [];
+                            shipmentStatusResult = shipmentStatusRequest.result.filter(c => c.active == true);
+                            for (var k = 0; k < shipmentStatusResult.length; k++) {
+                              var shipmentStatusJson = {
+                                name: getLabelText(shipmentStatusResult[k].label, this.state.lang),
+                                id: shipmentStatusResult[k].shipmentStatusId
                               }
-                              planningUnitList.push(puJson);
+                              shipmentStatusList.push(shipmentStatusJson);
                             }
-
-
-                            var shipmentStatusTransaction = db1.transaction(['shipmentStatus'], 'readwrite');
-                            var shipmentStatusOs = shipmentStatusTransaction.objectStore('shipmentStatus');
-                            var shipmentStatusRequest = shipmentStatusOs.getAll();
-                            shipmentStatusRequest.onerror = function (event) {
+                            var papuTransaction = db1.transaction(['procurementAgent'], 'readwrite');
+                            var papuOs = papuTransaction.objectStore('procurementAgent');
+                            var papuRequest = papuOs.getAll();
+                            papuRequest.onerror = function (event) {
                               this.setState({
                                 commitVersionError: i18n.t('static.program.errortext'),
                                 loading: false
                               })
                               this.hideSecondComponent()
                             }.bind(this);
-                            shipmentStatusRequest.onsuccess = function (event) {
-                              var shipmentStatusResult = [];
-                              shipmentStatusResult = shipmentStatusRequest.result.filter(c => c.active == true);
-                              for (var k = 0; k < shipmentStatusResult.length; k++) {
-                                var shipmentStatusJson = {
-                                  name: getLabelText(shipmentStatusResult[k].label, this.state.lang),
-                                  id: shipmentStatusResult[k].shipmentStatusId
+                            papuRequest.onsuccess = function (event) {
+                              var papuResult = [];
+                              papuResult = papuRequest.result;
+                              for (var k = 0; k < papuResult.length; k++) {
+                                var papuJson = {
+                                  name: papuResult[k].procurementAgentCode,
+                                  id: papuResult[k].procurementAgentId
                                 }
-                                shipmentStatusList.push(shipmentStatusJson);
+                                procurementAgentList.push(papuJson);
                               }
-                              var papuTransaction = db1.transaction(['procurementAgent'], 'readwrite');
-                              var papuOs = papuTransaction.objectStore('procurementAgent');
-                              var papuRequest = papuOs.getAll();
-                              papuRequest.onerror = function (event) {
+                              this.setState({
+                                procurementAgentPlanningUnitListAll: papuResult
+                              })
+
+                              var fsTransaction = db1.transaction(['fundingSource'], 'readwrite');
+                              var fsOs = fsTransaction.objectStore('fundingSource');
+                              var fsRequest = fsOs.getAll();
+                              fsRequest.onerror = function (event) {
                                 this.setState({
                                   commitVersionError: i18n.t('static.program.errortext'),
                                   loading: false
                                 })
                                 this.hideSecondComponent()
                               }.bind(this);
-                              papuRequest.onsuccess = function (event) {
-                                var papuResult = [];
-                                papuResult = papuRequest.result;
-                                for (var k = 0; k < papuResult.length; k++) {
-                                  var papuJson = {
-                                    name: papuResult[k].procurementAgentCode,
-                                    id: papuResult[k].procurementAgentId
+                              fsRequest.onsuccess = function (event) {
+                                var fsResult = [];
+                                fsResult = fsRequest.result;
+                                for (var k = 0; k < fsResult.length; k++) {
+                                  var fsJson = {
+                                    name: fsResult[k].fundingSourceCode,
+                                    id: fsResult[k].fundingSourceId
                                   }
-                                  procurementAgentList.push(papuJson);
+                                  fundingSourceList.push(fsJson);
                                 }
-                                this.setState({
-                                  procurementAgentPlanningUnitListAll: papuResult
-                                })
 
-                                var fsTransaction = db1.transaction(['fundingSource'], 'readwrite');
-                                var fsOs = fsTransaction.objectStore('fundingSource');
-                                var fsRequest = fsOs.getAll();
-                                fsRequest.onerror = function (event) {
+                                var bTransaction = db1.transaction(['budget'], 'readwrite');
+                                var bOs = bTransaction.objectStore('budget');
+                                var bRequest = bOs.getAll();
+                                var budgetListAll = []
+                                bRequest.onerror = function (event) {
                                   this.setState({
                                     commitVersionError: i18n.t('static.program.errortext'),
                                     loading: false
                                   })
                                   this.hideSecondComponent()
                                 }.bind(this);
-                                fsRequest.onsuccess = function (event) {
-                                  var fsResult = [];
-                                  fsResult = fsRequest.result;
-                                  for (var k = 0; k < fsResult.length; k++) {
-                                    if (fsResult[k].realm.id == programJson.realmCountry.realm.realmId && fsResult[k].active == true) {
-                                      var fsJson = {
-                                        name: fsResult[k].fundingSourceCode,
-                                        id: fsResult[k].fundingSourceId
-                                      }
-                                      fundingSourceList.push(fsJson);
+                                bRequest.onsuccess = function (event) {
+                                  var bResult = [];
+                                  bResult = bRequest.result;
+                                  for (var k = 0; k < bResult.length; k++) {
+                                    var bJson = {
+                                      name: bResult[k].budgetCode,
+                                      id: bResult[k].budgetId
                                     }
+                                    budgetList.push(bJson);
+                                    budgetListAll.push({
+                                      name: bResult[k].budgetCode,
+                                      id: bResult[k].budgetId,
+                                      fundingSource: bResult[k].fundingSource,
+                                      currency: bResult[k].currency,
+                                      budgetAmt: bResult[k].budgetAmt
+                                    })
                                   }
 
-                                  var bTransaction = db1.transaction(['budget'], 'readwrite');
-                                  var bOs = bTransaction.objectStore('budget');
-                                  var bRequest = bOs.getAll();
-                                  var budgetListAll = []
-                                  bRequest.onerror = function (event) {
+                                  this.setState({
+                                    budgetListAll: budgetListAll
+                                  })
+
+                                  var currencyTransaction = db1.transaction(['currency'], 'readwrite');
+                                  var currencyOs = currencyTransaction.objectStore('currency');
+                                  var currencyRequest = currencyOs.getAll();
+                                  currencyRequest.onerror = function (event) {
                                     this.setState({
                                       commitVersionError: i18n.t('static.program.errortext'),
                                       loading: false
                                     })
                                     this.hideSecondComponent()
                                   }.bind(this);
-                                  bRequest.onsuccess = function (event) {
-                                    var bResult = [];
-                                    bResult = bRequest.result;
-                                    for (var k = 0; k < bResult.length; k++) {
-                                      var bJson = {
-                                        name: bResult[k].budgetCode,
-                                        id: bResult[k].budgetId
-                                      }
-                                      budgetList.push(bJson);
-                                      budgetListAll.push({
-                                        name: bResult[k].budgetCode,
-                                        id: bResult[k].budgetId,
-                                        fundingSource: bResult[k].fundingSource,
-                                        currency: bResult[k].currency,
-                                        budgetAmt: bResult[k].budgetAmt
-                                      })
-                                    }
+                                  currencyRequest.onsuccess = function (event) {
+                                    var currencyResult = [];
+                                    currencyResult = (currencyRequest.result).filter(c => c.active == true);
+                                    for (var k = 0; k < currencyResult.length; k++) {
 
+                                      var currencyJson = {
+                                        name: getLabelText(currencyResult[k].label, this.state.lang),
+                                        id: currencyResult[k].currencyId
+                                      }
+                                      currencyList.push(currencyJson);
+                                    }
                                     this.setState({
-                                      budgetListAll: budgetListAll
+                                      currencyListAll: currencyResult
                                     })
 
-                                    var currencyTransaction = db1.transaction(['currency'], 'readwrite');
-                                    var currencyOs = currencyTransaction.objectStore('currency');
-                                    var currencyRequest = currencyOs.getAll();
-                                    currencyRequest.onerror = function (event) {
-                                      this.setState({
-                                        commitVersionError: i18n.t('static.program.errortext'),
-                                        loading: false
-                                      })
-                                      this.hideSecondComponent()
-                                    }.bind(this);
-                                    currencyRequest.onsuccess = function (event) {
-                                      var currencyResult = [];
-                                      currencyResult = (currencyRequest.result).filter(c => c.active == true);
-                                      for (var k = 0; k < currencyResult.length; k++) {
-
-                                        var currencyJson = {
-                                          name: getLabelText(currencyResult[k].label, this.state.lang),
-                                          id: currencyResult[k].currencyId
-                                        }
-                                        currencyList.push(currencyJson);
+                                    var latestProgramData = response.data[0];
+                                    this.setState({
+                                      comparedLatestVersion: latestProgramData.currentVersion.versionId,
+                                      singleProgramId: latestProgramData.programId
+                                    })
+                                    var oldProgramData = programJson;
+                                    var downloadedProgramData = response.data.length > 1 ? response.data[1] : response.data[0];
+                                    var regionList = [];
+                                    for (var i = 0; i < latestProgramData.regionList.length; i++) {
+                                      var regionJson = {
+                                        // name: // programJson.regionList[i].regionId,
+                                        name: getLabelText(latestProgramData.regionList[i].label, this.state.lang),
+                                        id: latestProgramData.regionList[i].regionId
                                       }
-                                      this.setState({
-                                        currencyListAll: currencyResult
-                                      })
+                                      regionList.push(regionJson);
 
-                                      var latestProgramData = response.data;
-                                      var oldProgramData = programJson;
-                                      var downloadedProgramData = response1.data;
-                                      var regionList = [];
-                                      for (var i = 0; i < latestProgramData.regionList.length; i++) {
-                                        var regionJson = {
-                                          // name: // programJson.regionList[i].regionId,
-                                          name: getLabelText(programJson.regionList[i].label, this.state.lang),
-                                          id: programJson.regionList[i].regionId
-                                        }
-                                        regionList.push(regionJson);
+                                    }
+                                    console.log("+++Completion of basic flow", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
+                                    var latestProgramDataConsumption = latestProgramData.consumptionList;
+                                    var oldProgramDataConsumption = oldProgramData.consumptionList;
+                                    var downloadedProgramDataConsumption = downloadedProgramData.consumptionList;
 
-                                      }
+                                    var modifiedConsumptionIds = []
+                                    latestProgramDataConsumption.filter(c => c.versionId > oldProgramData.currentVersion.versionId).map(item => { modifiedConsumptionIds.push(item.consumptionId) });
+                                    oldProgramData.consumptionList.filter(c => moment(c.lastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(oldProgramData.currentVersion.createdDate).format("YYYY-MM-DD HH:mm:ss")).map(item => modifiedConsumptionIds.push(item.consumptionId));
 
-                                      var latestProgramDataConsumption = latestProgramData.consumptionList;
-                                      var oldProgramDataConsumption = oldProgramData.consumptionList;
-                                      var downloadedProgramDataConsumption = downloadedProgramData.consumptionList;
-                                      var mergedConsumptionData = [];
-                                      var existingConsumptionId = [];
-                                      for (var c = 0; c < oldProgramDataConsumption.length; c++) {
-                                        if (oldProgramDataConsumption[c].consumptionId != 0) {
-                                          mergedConsumptionData.push(oldProgramDataConsumption[c]);
-                                          existingConsumptionId.push(oldProgramDataConsumption[c].consumptionId);
-                                        } else {
-                                          // If 0 check whether that exists in latest version or not
-                                          var index = latestProgramDataConsumption.findIndex(f =>
-                                            f.planningUnit.id == oldProgramDataConsumption[c].planningUnit.id &&
-                                            moment(f.consumptionDate).format("YYYY-MM") == moment(oldProgramDataConsumption[c].consumptionDate).format("YYYY-MM") &&
-                                            f.region.id == oldProgramDataConsumption[c].region.id &&
-                                            f.actualFlag.toString() == oldProgramDataConsumption[c].actualFlag.toString() &&
-                                            f.realmCountryPlanningUnit.id == oldProgramDataConsumption[c].realmCountryPlanningUnit.id &&
+                                    var latestModifiedConsumptionData = latestProgramDataConsumption.filter(c => modifiedConsumptionIds.includes(c.consumptionId));
+                                    var oldModifiedConsumptionData = oldProgramDataConsumption.filter(c => c.consumptionId == 0 || modifiedConsumptionIds.includes(c.consumptionId));
+
+                                    var mergedConsumptionData = [];
+                                    var existingConsumptionId = [];
+                                    for (var c = 0; c < oldModifiedConsumptionData.length; c++) {
+                                      if (oldModifiedConsumptionData[c].consumptionId != 0) {
+                                        mergedConsumptionData.push(oldModifiedConsumptionData[c]);
+                                        existingConsumptionId.push(oldModifiedConsumptionData[c].consumptionId);
+                                      } else {
+                                        // If 0 check whether that exists in latest version or not
+                                        var index = latestProgramDataConsumption.findIndex(f =>
+                                          f.planningUnit.id == oldModifiedConsumptionData[c].planningUnit.id &&
+                                          moment(f.consumptionDate).format("YYYY-MM") == moment(oldModifiedConsumptionData[c].consumptionDate).format("YYYY-MM") &&
+                                          f.region.id == oldModifiedConsumptionData[c].region.id &&
+                                          f.actualFlag.toString() == oldModifiedConsumptionData[c].actualFlag.toString() &&
+                                          f.realmCountryPlanningUnit.id == oldModifiedConsumptionData[c].realmCountryPlanningUnit.id &&
+                                          !existingConsumptionId.includes(f.consumptionId)
+                                        );
+                                        if (index == -1) { // Does not exists
+                                          mergedConsumptionData.push(oldModifiedConsumptionData[c]);
+                                        } else { // Exists
+                                          oldModifiedConsumptionData[c].consumptionId = latestProgramDataConsumption[index].consumptionId;
+                                          var index1 = oldProgramDataConsumption.findIndex(f =>
+                                            f.planningUnit.id == oldModifiedConsumptionData[c].planningUnit.id &&
+                                            moment(f.consumptionDate).format("YYYY-MM") == moment(oldModifiedConsumptionData[c].consumptionDate).format("YYYY-MM") &&
+                                            f.region.id == oldModifiedConsumptionData[c].region.id &&
+                                            f.actualFlag.toString() == oldModifiedConsumptionData[c].actualFlag.toString() &&
+                                            f.realmCountryPlanningUnit.id == oldModifiedConsumptionData[c].realmCountryPlanningUnit.id &&
                                             !existingConsumptionId.includes(f.consumptionId)
                                           );
-                                          if (index == -1) { // Does not exists
-                                            mergedConsumptionData.push(oldProgramDataConsumption[c]);
-                                          } else { // Exists
-                                            oldProgramDataConsumption[c].consumptionId = latestProgramDataConsumption[index].consumptionId;
-                                            existingConsumptionId.push(latestProgramDataConsumption[index].consumptionId);
-                                            mergedConsumptionData.push(oldProgramDataConsumption[c]);
-                                          }
+                                          oldProgramDataConsumption[index1].consumptionId = latestProgramDataConsumption[index].consumptionId;
+                                          oldProgramDataConsumption[index1].versionId = latestProgramDataConsumption[index].versionId;
+                                          existingConsumptionId.push(latestProgramDataConsumption[index].consumptionId);
+                                          mergedConsumptionData.push(oldModifiedConsumptionData[c]);
+                                        }
 
-                                        }
                                       }
-                                      // Getting other entries of latest consumption data
-                                      var latestOtherConsumptionEntries = latestProgramDataConsumption.filter(c => !(existingConsumptionId.includes(c.consumptionId)));
-                                      mergedConsumptionData = mergedConsumptionData.concat(latestOtherConsumptionEntries);
-                                      var data = [];
-                                      var mergedConsumptionJexcel = [];
-                                      for (var cd = 0; cd < mergedConsumptionData.length; cd++) {
-                                        var consumptionFlag = 1;
-                                        if (mergedConsumptionData[cd].actualFlag == false) {
-                                          consumptionFlag = 2;
-                                        }
-                                        data = [];
-                                        data[0] = mergedConsumptionData[cd].consumptionId;
-                                        data[1] = mergedConsumptionData[cd].planningUnit.id;
-                                        data[2] = moment(mergedConsumptionData[cd].consumptionDate).format(DATE_FORMAT_CAP_WITHOUT_DATE); //A
-                                        data[3] = mergedConsumptionData[cd].region.id; //B                        
-                                        data[4] = mergedConsumptionData[cd].dataSource.id; //C
-                                        data[5] = mergedConsumptionData[cd].realmCountryPlanningUnit.id; //D
-                                        data[6] = Math.round(mergedConsumptionData[cd].consumptionRcpuQty); //E
-                                        data[7] = mergedConsumptionData[cd].multiplier; //F
-                                        data[8] = Math.round(Math.round(mergedConsumptionData[cd].consumptionRcpuQty) * mergedConsumptionData[cd].multiplier); //I
-                                        data[9] = mergedConsumptionData[cd].dayOfStockOut;
-                                        if (mergedConsumptionData[cd].notes === null || ((mergedConsumptionData[cd].notes).trim() == "NULL")) {
-                                          data[10] = "";
+                                    }
+                                    // Getting other entries of latest consumption data
+                                    var latestOtherConsumptionEntries = latestModifiedConsumptionData.filter(c => !(existingConsumptionId.includes(c.consumptionId)));
+                                    mergedConsumptionData = mergedConsumptionData.concat(latestOtherConsumptionEntries);
+                                    var data = [];
+                                    var mergedConsumptionJexcel = [];
+                                    for (var cd = 0; cd < mergedConsumptionData.length; cd++) {
+                                      var consumptionFlag = 1;
+                                      if (mergedConsumptionData[cd].actualFlag == false) {
+                                        consumptionFlag = 2;
+                                      }
+                                      data = [];
+                                      data[0] = mergedConsumptionData[cd].consumptionId;
+                                      data[1] = mergedConsumptionData[cd].planningUnit.id;
+                                      data[2] = moment(mergedConsumptionData[cd].consumptionDate).format(DATE_FORMAT_CAP_WITHOUT_DATE); //A
+                                      data[3] = mergedConsumptionData[cd].region.id; //B                        
+                                      data[4] = mergedConsumptionData[cd].dataSource.id; //C
+                                      data[5] = mergedConsumptionData[cd].realmCountryPlanningUnit.id; //D
+                                      data[6] = Math.round(mergedConsumptionData[cd].consumptionRcpuQty); //E
+                                      data[7] = mergedConsumptionData[cd].multiplier; //F
+                                      data[8] = Math.round(Math.round(mergedConsumptionData[cd].consumptionRcpuQty) * mergedConsumptionData[cd].multiplier); //I
+                                      data[9] = mergedConsumptionData[cd].dayOfStockOut;
+                                      if (mergedConsumptionData[cd].notes === null || ((mergedConsumptionData[cd].notes) == "NULL")) {
+                                        data[10] = "";
+                                      } else {
+                                        data[10] = mergedConsumptionData[cd].notes;
+                                      }
+                                      data[11] = consumptionFlag;
+                                      data[12] = mergedConsumptionData[cd].active;
+                                      data[13] = JSON.stringify(mergedConsumptionData[cd].batchInfoList != "" ? ((mergedConsumptionData[cd].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.consumptionQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : "");
+                                      data[14] = "";
+                                      var oldDataList = oldProgramDataConsumption.filter(c => c.consumptionId == mergedConsumptionData[cd].consumptionId);
+                                      var oldData = ""
+                                      if (oldDataList.length > 0) {
+                                        oldData = [oldDataList[0].consumptionId, oldDataList[0].planningUnit.id, moment(oldDataList[0].consumptionDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), oldDataList[0].region.id, oldDataList[0].dataSource.id, oldDataList[0].realmCountryPlanningUnit.id, Math.round(oldDataList[0].consumptionRcpuQty), oldDataList[0].multiplier, Math.round(Math.round(oldDataList[0].consumptionRcpuQty) * oldDataList[0].multiplier), oldDataList[0].dayOfStockOut, oldDataList[0].notes, (oldDataList[0].actualFlag.toString() == "true" ? 1 : 0), oldDataList[0].active, JSON.stringify(oldDataList[0].batchInfoList != "" ? ((oldDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.consumptionQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
+                                      }
+                                      data[15] = oldData;//Old data
+                                      var latestDataList = latestProgramDataConsumption.filter(c => c.consumptionId == mergedConsumptionData[cd].consumptionId);
+                                      var latestData = ""
+                                      if (latestDataList.length > 0) {
+                                        latestData = [latestDataList[0].consumptionId, latestDataList[0].planningUnit.id, moment(latestDataList[0].consumptionDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), latestDataList[0].region.id, latestDataList[0].dataSource.id, latestDataList[0].realmCountryPlanningUnit.id, Math.round(latestDataList[0].consumptionRcpuQty), latestDataList[0].multiplier, Math.round(Math.round(latestDataList[0].consumptionRcpuQty) * latestDataList[0].multiplier), latestDataList[0].dayOfStockOut, latestDataList[0].notes, (latestDataList[0].actualFlag.toString() == "true" ? 1 : 0), latestDataList[0].active, JSON.stringify(latestDataList[0].batchInfoList != "" ? ((latestDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.consumptionQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
+                                      }
+                                      data[16] = latestData;//Latest data
+                                      var downloadedDataList = downloadedProgramDataConsumption.filter(c => c.consumptionId == mergedConsumptionData[cd].consumptionId);
+                                      var downloadedData = "";
+                                      if (downloadedDataList.length > 0) {
+                                        downloadedData = [downloadedDataList[0].consumptionId, downloadedDataList[0].planningUnit.id, moment(downloadedDataList[0].consumptionDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), downloadedDataList[0].region.id, downloadedDataList[0].dataSource.id, downloadedDataList[0].realmCountryPlanningUnit.id, Math.round(downloadedDataList[0].consumptionRcpuQty), downloadedDataList[0].multiplier, Math.round(Math.round(downloadedDataList[0].consumptionRcpuQty) * downloadedDataList[0].multiplier), downloadedDataList[0].dayOfStockOut, downloadedDataList[0].notes, (downloadedDataList[0].actualFlag.toString() == "true" ? 1 : 0), downloadedDataList[0].active, JSON.stringify(downloadedDataList[0].batchInfoList != "" ? ((downloadedDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.consumptionQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
+                                      }
+                                      data[17] = downloadedData;//Downloaded data
+                                      data[18] = 4;
+                                      mergedConsumptionJexcel.push(data);
+                                    }
+
+                                    var options = {
+                                      data: mergedConsumptionJexcel,
+                                      columnDrag: true,
+                                      columns: [
+                                        { title: i18n.t('static.commit.consumptionId'), type: 'hidden', width: 100 },
+                                        { title: i18n.t('static.planningunit.planningunit'), type: 'dropdown', source: planningUnitList, width: 200 },
+                                        { title: i18n.t('static.pipeline.consumptionDate'), type: 'text', width: 95 },
+                                        { title: i18n.t('static.region.region'), type: 'dropdown', source: regionList, width: 100 },
+                                        { title: i18n.t('static.inventory.dataSource'), type: 'dropdown', source: dataSourceList, width: 100 },
+                                        { title: i18n.t('static.supplyPlan.alternatePlanningUnit'), type: 'dropdown', source: realmCountryPlanningUnitList, width: 150 },
+                                        { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: 'numeric', mask: '#,##', width: 80 },
+                                        { title: i18n.t('static.unit.multiplier'), type: 'numeric', mask: '#,##.000000', decimal: '.', width: 90 },
+                                        { title: i18n.t('static.supplyPlan.quantityQATProduct'), type: 'numeric', mask: '#,##', width: 80 },
+                                        { title: i18n.t('static.consumption.daysofstockout'), type: 'numeric', mask: '#,##', width: 80 },
+                                        { title: i18n.t('static.program.notes'), type: 'text', width: 200 },
+                                        { type: 'dropdown', title: i18n.t('static.consumption.consumptionType'), source: [{ id: 1, name: i18n.t('static.consumption.actual') }, { id: 2, name: i18n.t('static.consumption.forcast') }], width: 100 },
+                                        { title: i18n.t('static.inventory.active'), type: 'checkbox', width: 70 },
+                                        { type: 'hidden', title: i18n.t('static.supplyPlan.batchInfo'), width: 0 },
+                                        { type: 'text', title: i18n.t('static.supplyPlan.batchInfo'), width: 85 },
+                                        { type: 'hidden', title: 'Old data' },
+                                        { type: 'hidden', title: 'latest data' },
+                                        { type: 'hidden', title: 'downloaded data' },
+                                        { type: 'hidden', title: 'result of compare' },
+                                      ],
+                                      pagination: localStorage.getItem("sesRecordCount"),
+                                      paginationOptions: JEXCEL_PAGINATION_OPTION,
+                                      search: true,
+                                      columnSorting: true,
+                                      tableOverflow: true,
+                                      wordWrap: true,
+                                      allowInsertColumn: false,
+                                      allowManualInsertColumn: false,
+                                      allowDeleteRow: false,
+                                      editable: false,
+                                      onload: this.loadedFunctionForMerge,
+                                      text: {
+                                        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                                        show: '',
+                                        entries: '',
+                                      },
+                                      filters: true,
+                                      license: JEXCEL_PRO_KEY,
+                                      contextMenu: function (obj, x, y, e) {
+                                        var items = [];
+                                        //Resolve conflicts
+                                        var rowData = obj.getRowData(y)
+                                        if (rowData[18].toString() == 1) {
+                                          items.push({
+                                            title: "Resolve conflicts",
+                                            onclick: function () {
+                                              this.setState({ loading: true })
+                                              this.toggleLarge(rowData[15], rowData[16], y, 'consumption');
+                                            }.bind(this)
+                                          })
                                         } else {
-                                          data[10] = mergedConsumptionData[cd].notes;
+                                          return false;
                                         }
-                                        data[11] = consumptionFlag;
-                                        data[12] = mergedConsumptionData[cd].active;
-                                        data[13] = JSON.stringify(mergedConsumptionData[cd].batchInfoList != "" ? ((mergedConsumptionData[cd].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.consumptionQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : "");
-                                        data[14] = "";
-                                        var oldDataList = oldProgramDataConsumption.filter(c => c.consumptionId == mergedConsumptionData[cd].consumptionId);
+
+                                        // if (rowData[0].toString() > 0) {
+                                        //   items.push({
+                                        //     title: "Show version history",
+                                        //     onclick: function () {
+                                        //       this.toggleVersionHistory(rowData[13]);
+                                        //     }.bind(this)
+                                        //   })
+                                        // }
+                                        return items;
+                                      }.bind(this)
+                                    };
+
+                                    var mergedConsumptionJexcel = jexcel(document.getElementById("mergedVersionConsumption"), options);
+                                    this.el = mergedConsumptionJexcel;
+                                    this.setState({
+                                      mergedConsumptionJexcel: mergedConsumptionJexcel,
+                                      dataSourceList: dataSourceList,
+                                      realmCountryPlanningUnitList: realmCountryPlanningUnitList,
+                                      planningUnitList: planningUnitList,
+                                      regionList: regionList,
+                                      shipmentStatusList: shipmentStatusList,
+                                      budgetList: budgetList,
+                                      fundingSourceList: fundingSourceList,
+                                      procurementAgentList: procurementAgentList
+                                    })
+                                    console.log("+++Consumption jexcel completed", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
+
+                                    // Inventory part
+                                    var latestProgramDataInventory = latestProgramData.inventoryList;
+                                    var oldProgramDataInventory = oldProgramData.inventoryList;
+                                    var downloadedProgramDataInventory = downloadedProgramData.inventoryList;
+
+                                    var modifiedInventoryIds = []
+                                    latestProgramDataInventory.filter(c => c.versionId > oldProgramData.currentVersion.versionId).map(item => { modifiedInventoryIds.push(item.inventoryId) });
+                                    oldProgramDataInventory.filter(c => moment(c.lastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(oldProgramData.currentVersion.createdDate).format("YYYY-MM-DD HH:mm:ss")).map(item => modifiedInventoryIds.push(item.inventoryId));
+
+                                    var latestModifiedInventoryData = latestProgramDataInventory.filter(c => modifiedInventoryIds.includes(c.inventoryId));
+                                    var oldModifiedInventoryData = oldProgramDataInventory.filter(c => c.inventoryId == 0 || modifiedInventoryIds.includes(c.inventoryId));
+
+                                    var mergedInventoryData = [];
+                                    var existingInventoryId = [];
+                                    for (var c = 0; c < oldModifiedInventoryData.length; c++) {
+                                      if (oldModifiedInventoryData[c].inventoryId != 0) {
+                                        mergedInventoryData.push(oldModifiedInventoryData[c]);
+                                        existingInventoryId.push(oldModifiedInventoryData[c].inventoryId);
+                                      } else {
+                                        // If 0 check whether that exists in latest version or not
+                                        var index = 0;
+                                        if (oldModifiedInventoryData[c].actualQty != null && oldModifiedInventoryData[c].actualQty != "" && oldModifiedInventoryData[c].actualQty != undefined) {
+                                          index = latestProgramDataInventory.findIndex(f =>
+                                            f.planningUnit.id == oldModifiedInventoryData[c].planningUnit.id &&
+                                            moment(f.inventoryDate).format("YYYY-MM") == moment(oldModifiedInventoryData[c].inventoryDate).format("YYYY-MM") &&
+                                            f.region != null && f.region.id != 0 && oldModifiedInventoryData[c].region != null && oldModifiedInventoryData[c].region.id != 0 && f.region.id == oldModifiedInventoryData[c].region.id &&
+                                            (f.actualQty != null && f.actualQty.toString() != "" && f.actualQty != undefined) == (oldModifiedInventoryData[c].actualQty != null && oldModifiedInventoryData[c].actualQty != "" && oldModifiedInventoryData[c].actualQty != undefined) &&
+                                            f.realmCountryPlanningUnit.id == oldModifiedInventoryData[c].realmCountryPlanningUnit.id &&
+                                            !existingInventoryId.includes(f.inventoryId)
+                                          );
+                                        } else {
+                                          index = -1;
+                                        }
+                                        if (index == -1) { // Does not exists
+                                          mergedInventoryData.push(oldModifiedInventoryData[c]);
+                                        } else { // Exists
+                                          oldModifiedInventoryData[c].inventoryId = latestProgramDataInventory[index].inventoryId;
+                                          var index1 = oldProgramDataInventory.findIndex(f =>
+                                            f.planningUnit.id == oldModifiedInventoryData[c].planningUnit.id &&
+                                            moment(f.inventoryDate).format("YYYY-MM") == moment(oldModifiedInventoryData[c].inventoryDate).format("YYYY-MM") &&
+                                            f.region != null && f.region.id != 0 && oldModifiedInventoryData[c].region != null && oldModifiedInventoryData[c].region.id != 0 && f.region.id == oldModifiedInventoryData[c].region.id &&
+                                            (f.actualQty != null && f.actualQty.toString() != "" && f.actualQty != undefined) == (oldModifiedInventoryData[c].actualQty != null && oldModifiedInventoryData[c].actualQty != "" && oldModifiedInventoryData[c].actualQty != undefined) &&
+                                            f.realmCountryPlanningUnit.id == oldModifiedInventoryData[c].realmCountryPlanningUnit.id &&
+                                            !existingInventoryId.includes(f.inventoryId)
+                                          );
+                                          oldProgramDataInventory[index1].inventoryId = latestProgramDataInventory[index].inventoryId;
+                                          oldProgramDataInventory[index1].versionId = latestProgramDataInventory[index].versionId;
+                                          existingInventoryId.push(latestProgramDataInventory[index].inventoryId);
+                                          mergedInventoryData.push(oldModifiedInventoryData[c]);
+                                        }
+
+                                      }
+                                    }
+                                    // Getting other entries of latest inventory data
+                                    var latestOtherInventoryEntries = latestModifiedInventoryData.filter(c => !(existingInventoryId.includes(c.inventoryId)));
+                                    mergedInventoryData = mergedInventoryData.concat(latestOtherInventoryEntries);
+                                    var data = [];
+                                    var mergedInventoryJexcel = [];
+                                    for (var cd = 0; cd < mergedInventoryData.length; cd++) {
+                                      if (mergedInventoryData[cd].region != null && mergedInventoryData[cd].region.id != 0) {
+                                        data = [];
+                                        data[0] = mergedInventoryData[cd].inventoryId;
+                                        data[1] = mergedInventoryData[cd].planningUnit.id;
+                                        data[2] = moment(mergedInventoryData[cd].inventoryDate).format(DATE_FORMAT_CAP_WITHOUT_DATE);
+                                        data[3] = mergedInventoryData[cd].region.id;
+                                        data[4] = mergedInventoryData[cd].dataSource.id;
+                                        data[5] = mergedInventoryData[cd].realmCountryPlanningUnit.id;
+                                        data[6] = mergedInventoryData[cd].adjustmentQty != "" && mergedInventoryData[cd].adjustmentQty != null && mergedInventoryData[cd].adjustmentQty != undefined ? 2 : 1;
+                                        data[7] = Math.round(mergedInventoryData[cd].adjustmentQty);
+                                        data[8] = Math.round(mergedInventoryData[cd].actualQty);
+                                        data[9] = mergedInventoryData[cd].multiplier;
+                                        data[10] = Math.round(Math.round(mergedInventoryData[cd].adjustmentQty) * mergedInventoryData[cd].multiplier);
+                                        data[11] = Math.round(Math.round(mergedInventoryData[cd].actualQty) * mergedInventoryData[cd].multiplier);
+                                        data[12] = mergedInventoryData[cd].notes;
+                                        data[13] = mergedInventoryData[cd].active;
+                                        data[14] = JSON.stringify(mergedInventoryData[cd].batchInfoList != "" ? ((mergedInventoryData[cd].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty1": parseInt(a.adjustmentQty), "qty2": parseInt(a.actualQty) } })).sort(function (a, b) { return a.qty1 - b.qty1; }) : "");
+                                        data[15] = "";
+                                        var oldDataList = oldProgramDataInventory.filter(c => c.inventoryId == mergedInventoryData[cd].inventoryId && c.region != null && c.region.id != 0);
                                         var oldData = ""
                                         if (oldDataList.length > 0) {
-                                          oldData = [oldDataList[0].consumptionId, oldDataList[0].planningUnit.id, moment(oldDataList[0].consumptionDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), oldDataList[0].region.id, oldDataList[0].dataSource.id, oldDataList[0].realmCountryPlanningUnit.id, Math.round(oldDataList[0].consumptionRcpuQty), oldDataList[0].multiplier, Math.round(Math.round(oldDataList[0].consumptionRcpuQty) * oldDataList[0].multiplier), oldDataList[0].dayOfStockOut, oldDataList[0].notes, (oldDataList[0].actualFlag.toString() == "true" ? 1 : 0), oldDataList[0].active, JSON.stringify(oldDataList[0].batchInfoList != "" ? ((oldDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.consumptionQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
+                                          oldData = [oldDataList[0].inventoryId, oldDataList[0].planningUnit.id, moment(oldDataList[0].inventoryDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), oldDataList[0].region.id, oldDataList[0].dataSource.id, oldDataList[0].realmCountryPlanningUnit.id, oldDataList[0].adjustmentQty != "" && oldDataList[0].adjustmentQty != null && oldDataList[0].adjustmentQty != undefined ? 2 : 1, Math.round(oldDataList[0].adjustmentQty), Math.round(oldDataList[0].actualQty), oldDataList[0].multiplier, Math.round(Math.round(oldDataList[0].adjustmentQty) * oldDataList[0].multiplier), Math.round(Math.round(oldDataList[0].actualQty) * oldDataList[0].multiplier), oldDataList[0].notes, oldDataList[0].active, JSON.stringify(oldDataList[0].batchInfoList != "" ? ((oldDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty1": parseInt(a.adjustmentQty), "qty2": parseInt(a.actualQty) } })).sort(function (a, b) { return a.qty1 - b.qty1; }) : ""), "", "", "", "", 4];
                                         }
-                                        data[15] = oldData;//Old data
-                                        var latestDataList = latestProgramDataConsumption.filter(c => c.consumptionId == mergedConsumptionData[cd].consumptionId);
+                                        data[16] = oldData;//Old data
+                                        var latestDataList = latestProgramDataInventory.filter(c => c.inventoryId == mergedInventoryData[cd].inventoryId && c.region != null && c.region.id != 0);
                                         var latestData = ""
                                         if (latestDataList.length > 0) {
-                                          latestData = [latestDataList[0].consumptionId, latestDataList[0].planningUnit.id, moment(latestDataList[0].consumptionDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), latestDataList[0].region.id, latestDataList[0].dataSource.id, latestDataList[0].realmCountryPlanningUnit.id, Math.round(latestDataList[0].consumptionRcpuQty), latestDataList[0].multiplier, Math.round(Math.round(latestDataList[0].consumptionRcpuQty) * latestDataList[0].multiplier), latestDataList[0].dayOfStockOut, latestDataList[0].notes, (latestDataList[0].actualFlag.toString() == "true" ? 1 : 0), latestDataList[0].active, JSON.stringify(latestDataList[0].batchInfoList != "" ? ((latestDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.consumptionQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
+                                          latestData = [latestDataList[0].inventoryId, latestDataList[0].planningUnit.id, moment(latestDataList[0].inventoryDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), latestDataList[0].region.id, latestDataList[0].dataSource.id, latestDataList[0].realmCountryPlanningUnit.id, latestDataList[0].adjustmentQty != "" && latestDataList[0].adjustmentQty != null && latestDataList[0].adjustmentQty != undefined ? 2 : 1, Math.round(latestDataList[0].adjustmentQty), Math.round(latestDataList[0].actualQty), latestDataList[0].multiplier, Math.round(Math.round(latestDataList[0].adjustmentQty) * latestDataList[0].multiplier), Math.round(Math.round(latestDataList[0].actualQty) * latestDataList[0].multiplier), latestDataList[0].notes, latestDataList[0].active, JSON.stringify(latestDataList[0].batchInfoList != "" ? ((latestDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty1": parseInt(a.adjustmentQty), "qty2": parseInt(a.actualQty) } })).sort(function (a, b) { return a.qty1 - b.qty1; }) : ""), "", "", "", "", 4];
                                         }
-                                        data[16] = latestData;//Latest data
-                                        var downloadedDataList = downloadedProgramDataConsumption.filter(c => c.consumptionId == mergedConsumptionData[cd].consumptionId);
+                                        data[17] = latestData;//Latest data
+                                        var downloadedDataList = downloadedProgramDataInventory.filter(c => c.inventoryId == mergedInventoryData[cd].inventoryId && c.region != null && c.region.id != 0);
                                         var downloadedData = "";
                                         if (downloadedDataList.length > 0) {
-                                          downloadedData = [downloadedDataList[0].consumptionId, downloadedDataList[0].planningUnit.id, moment(downloadedDataList[0].consumptionDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), downloadedDataList[0].region.id, downloadedDataList[0].dataSource.id, downloadedDataList[0].realmCountryPlanningUnit.id, Math.round(downloadedDataList[0].consumptionRcpuQty), downloadedDataList[0].multiplier, Math.round(Math.round(downloadedDataList[0].consumptionRcpuQty) * downloadedDataList[0].multiplier), downloadedDataList[0].dayOfStockOut, downloadedDataList[0].notes, (downloadedDataList[0].actualFlag.toString() == "true" ? 1 : 0), downloadedDataList[0].active, JSON.stringify(downloadedDataList[0].batchInfoList != "" ? ((downloadedDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.consumptionQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
+                                          downloadedData = [downloadedDataList[0].inventoryId, downloadedDataList[0].planningUnit.id, moment(downloadedDataList[0].inventoryDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), downloadedDataList[0].region.id, downloadedDataList[0].dataSource.id, downloadedDataList[0].realmCountryPlanningUnit.id, downloadedDataList[0].adjustmentQty != "" && downloadedDataList[0].adjustmentQty != null && downloadedDataList[0].adjustmentQty != undefined ? 2 : 1, Math.round(downloadedDataList[0].adjustmentQty), Math.round(downloadedDataList[0].actualQty), downloadedDataList[0].multiplier, Math.round(Math.round(downloadedDataList[0].adjustmentQty) * downloadedDataList[0].multiplier), Math.round(Math.round(downloadedDataList[0].actualQty) * downloadedDataList[0].multiplier), downloadedDataList[0].notes, downloadedDataList[0].active, JSON.stringify(downloadedDataList[0].batchInfoList != "" ? ((downloadedDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty1": parseInt(a.adjustmentQty), "qty2": parseInt(a.actualQty) } })).sort(function (a, b) { return a.qty1 - b.qty1; }) : ""), "", "", "", "", 4];
                                         }
-                                        data[17] = downloadedData;//Downloaded data
-                                        data[18] = 4;
-                                        mergedConsumptionJexcel.push(data);
+                                        data[18] = downloadedData;//Downloaded data
+                                        data[19] = 4;
+                                        mergedInventoryJexcel.push(data);
                                       }
+                                    }
 
-                                      var options = {
-                                        data: mergedConsumptionJexcel,
-                                        columnDrag: true,
-                                        columns: [
-                                          { title: i18n.t('static.commit.consumptionId'), type: 'hidden', width: 100 },
-                                          { title: i18n.t('static.planningunit.planningunit'), type: 'dropdown', source: planningUnitList, width: 200 },
-                                          { title: i18n.t('static.pipeline.consumptionDate'), type: 'text', width: 95 },
-                                          { title: i18n.t('static.region.region'), type: 'dropdown', source: regionList, width: 100 },
-                                          { title: i18n.t('static.inventory.dataSource'), type: 'dropdown', source: dataSourceList, width: 100 },
-                                          { title: i18n.t('static.supplyPlan.alternatePlanningUnit'), type: 'dropdown', source: realmCountryPlanningUnitList, width: 150 },
-                                          { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: 'numeric', mask: '#,##', width: 80 },
-                                          { title: i18n.t('static.unit.multiplier'), type: 'numeric', mask: '#,##.000000', decimal: '.', width: 90 },
-                                          { title: i18n.t('static.supplyPlan.quantityQATProduct'), type: 'numeric', mask: '#,##', width: 80 },
-                                          { title: i18n.t('static.consumption.daysofstockout'), type: 'numeric', mask: '#,##', width: 80 },
-                                          { title: i18n.t('static.program.notes'), type: 'text', width: 200 },
-                                          { type: 'dropdown', title: i18n.t('static.consumption.consumptionType'), source: [{ id: 1, name: i18n.t('static.consumption.actual') }, { id: 2, name: i18n.t('static.consumption.forcast') }], width: 100 },
-                                          { title: i18n.t('static.inventory.active'), type: 'checkbox', width: 70 },
-                                          { type: 'hidden', title: i18n.t('static.supplyPlan.batchInfo'), width: 0 },
-                                          { type: 'text', title: i18n.t('static.supplyPlan.batchInfo'), width: 85 },
-                                          { type: 'hidden', title: 'Old data' },
-                                          { type: 'hidden', title: 'latest data' },
-                                          { type: 'hidden', title: 'downloaded data' },
-                                          { type: 'hidden', title: 'result of compare' },
-                                        ],
-                                        pagination: localStorage.getItem("sesRecordCount"),
-                                        paginationOptions: JEXCEL_PAGINATION_OPTION,
-                                        search: true,
-                                        columnSorting: true,
-                                        tableOverflow: true,
-                                        wordWrap: true,
-                                        allowInsertColumn: false,
-                                        allowManualInsertColumn: false,
-                                        allowDeleteRow: false,
-                                        editable: false,
-                                        onload: this.loadedFunctionForMerge,
-                                        text: {
-                                          showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                                          show: '',
-                                          entries: '',
-                                        },
-                                        filters: true,
-                                        license: JEXCEL_PRO_KEY,
-                                        contextMenu: function (obj, x, y, e) {
-                                          var items = [];
-                                          //Resolve conflicts
-                                          var rowData = obj.getRowData(y)
-                                          if (rowData[18].toString() == 1) {
-                                            items.push({
-                                              title: "Resolve conflicts",
-                                              onclick: function () {
-                                                this.setState({ loading: true })
-                                                this.toggleLarge(rowData[15], rowData[16], y, 'consumption');
-                                              }.bind(this)
-                                            })
-                                          }
-
-                                          // if (rowData[0].toString() > 0) {
-                                          //   items.push({
-                                          //     title: "Show version history",
-                                          //     onclick: function () {
-                                          //       this.toggleVersionHistory(rowData[13]);
-                                          //     }.bind(this)
-                                          //   })
-                                          // }
-                                          return items;
-                                        }.bind(this)
-                                      };
-
-                                      var mergedConsumptionJexcel = jexcel(document.getElementById("mergedVersionConsumption"), options);
-                                      this.el = mergedConsumptionJexcel;
-                                      this.setState({
-                                        mergedConsumptionJexcel: mergedConsumptionJexcel,
-                                        dataSourceList: dataSourceList,
-                                        realmCountryPlanningUnitList: realmCountryPlanningUnitList,
-                                        planningUnitList: planningUnitList,
-                                        regionList: regionList,
-                                        shipmentStatusList: shipmentStatusList,
-                                        budgetList: budgetList,
-                                        fundingSourceList: fundingSourceList,
-                                        procurementAgentList: procurementAgentList
-                                      })
-
-
-                                      // Inventory part
-                                      var latestProgramDataInventory = latestProgramData.inventoryList;
-                                      var oldProgramDataInventory = oldProgramData.inventoryList;
-                                      var downloadedProgramDataInventory = downloadedProgramData.inventoryList;
-                                      var mergedInventoryData = [];
-                                      var existingInventoryId = [];
-                                      for (var c = 0; c < oldProgramDataInventory.length; c++) {
-                                        if (oldProgramDataInventory[c].inventoryId != 0) {
-                                          mergedInventoryData.push(oldProgramDataInventory[c]);
-                                          existingInventoryId.push(oldProgramDataInventory[c].inventoryId);
+                                    var options = {
+                                      data: mergedInventoryJexcel,
+                                      columnDrag: true,
+                                      columns: [
+                                        { title: i18n.t('static.commit.inventoryId'), type: 'hidden', width: 100 },
+                                        { title: i18n.t('static.planningunit.planningunit'), type: 'dropdown', source: planningUnitList, width: 200 },
+                                        { title: i18n.t('static.inventory.inventoryDate'), type: 'text', width: 85 },
+                                        { title: i18n.t('static.region.region'), type: 'dropdown', source: regionList, width: 100 },
+                                        { title: i18n.t('static.inventory.dataSource'), type: 'dropdown', source: dataSourceList, width: 100 },
+                                        { title: i18n.t('static.supplyPlan.alternatePlanningUnit'), type: 'dropdown', source: realmCountryPlanningUnitList, width: 150 },
+                                        { title: i18n.t('static.supplyPlan.inventoryType'), type: 'dropdown', source: [{ id: 1, name: i18n.t('static.inventory.inventory') }, { id: 2, name: i18n.t('static.inventoryType.adjustment') }], width: 100 },
+                                        { title: i18n.t('static.inventory.adjustmentQunatity'), type: 'numeric', mask: '[-]#,##', width: 120 },
+                                        { title: i18n.t('static.inventory.inventoryQunatity'), type: 'numeric', mask: '#,##', width: 120 },
+                                        { title: i18n.t('static.unit.multiplier'), type: 'numeric', mask: '#,##.000000', decimal: '.', width: 90, },
+                                        { title: i18n.t('static.inventory.adjustmentQunatityPU'), type: 'numeric', mask: '[-]#,##', width: 120, },
+                                        { title: i18n.t('static.inventory.inventoryQunatityPU'), type: 'numeric', mask: '#,##', width: 120, },
+                                        { title: i18n.t('static.program.notes'), type: 'text', width: 200 },
+                                        { title: i18n.t('static.inventory.active'), type: 'checkbox', width: 70 },
+                                        { type: 'hidden', title: i18n.t('static.supplyPlan.batchInfo'), width: 0 },
+                                        { type: 'text', title: i18n.t('static.supplyPlan.batchInfo'), width: 90 },
+                                        { type: 'hidden', title: 'Old data' },
+                                        { type: 'hidden', title: 'latest data' },
+                                        { type: 'hidden', title: 'downloaded data' },
+                                        { type: 'hidden', title: 'result of compare' },
+                                      ],
+                                      pagination: localStorage.getItem("sesRecordCount"),
+                                      paginationOptions: JEXCEL_PAGINATION_OPTION,
+                                      search: true,
+                                      columnSorting: true,
+                                      tableOverflow: true,
+                                      wordWrap: true,
+                                      allowInsertColumn: false,
+                                      allowManualInsertColumn: false,
+                                      allowDeleteRow: false,
+                                      editable: false,
+                                      onload: this.loadedFunctionForMergeInventory,
+                                      text: {
+                                        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                                        show: '',
+                                        entries: '',
+                                      },
+                                      filters: true,
+                                      license: JEXCEL_PRO_KEY,
+                                      contextMenu: function (obj, x, y, e) {
+                                        var items = [];
+                                        //Resolve conflicts
+                                        var rowData = obj.getRowData(y)
+                                        if (rowData[19].toString() == 1) {
+                                          items.push({
+                                            title: "Resolve conflicts",
+                                            onclick: function () {
+                                              this.setState({ loading: true })
+                                              this.toggleLargeInventory(rowData[16], rowData[17], y, 'inventory');
+                                            }.bind(this)
+                                          })
                                         } else {
-                                          // If 0 check whether that exists in latest version or not
-                                          var index = 0;
-                                          if (oldProgramDataInventory[c].actualQty != null && oldProgramDataInventory[c].actualQty != "" && oldProgramDataInventory[c].actualQty != undefined) {
-                                            index = latestProgramDataInventory.findIndex(f =>
-                                              f.planningUnit.id == oldProgramDataInventory[c].planningUnit.id &&
-                                              moment(f.inventoryDate).format("YYYY-MM") == moment(oldProgramDataInventory[c].inventoryDate).format("YYYY-MM") &&
-                                              f.region != null && f.region.id != 0 && oldProgramDataInventory[c].region != null && oldProgramDataInventory[c].region.id != 0 && f.region.id == oldProgramDataInventory[c].region.id &&
-                                              (f.actualQty != null && f.actualQty.toString() != "" && f.actualQty != undefined) == (oldProgramDataInventory[c].actualQty != null && oldProgramDataInventory[c].actualQty != "" && oldProgramDataInventory[c].actualQty != undefined) &&
-                                              f.realmCountryPlanningUnit.id == oldProgramDataInventory[c].realmCountryPlanningUnit.id &&
-                                              !existingInventoryId.includes(f.inventoryId)
-                                            );
-                                          } else {
-                                            index = -1;
-                                          }
-                                          if (index == -1) { // Does not exists
-                                            mergedInventoryData.push(oldProgramDataInventory[c]);
-                                          } else { // Exists
-                                            oldProgramDataInventory[c].inventoryId = latestProgramDataInventory[index].inventoryId;
-                                            existingInventoryId.push(latestProgramDataInventory[index].inventoryId);
-                                            mergedInventoryData.push(oldProgramDataInventory[c]);
-                                          }
+                                          return false;
+                                        }
 
+                                        // if (rowData[0].toString() > 0) {
+                                        //   items.push({
+                                        //     title: "Show version history",
+                                        //     onclick: function () {
+                                        //       this.toggleVersionHistory(rowData[13]);
+                                        //     }.bind(this)
+                                        //   })
+                                        // }
+                                        return items;
+                                      }.bind(this)
+                                    };
+
+                                    var mergedInventoryJexcel = jexcel(document.getElementById("mergedVersionInventory"), options);
+                                    this.el = mergedInventoryJexcel;
+                                    this.setState({
+                                      mergedInventoryJexcel: mergedInventoryJexcel
+                                    })
+                                    console.log("+++Inventory jexcel completed", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
+
+                                    // Batch info
+                                    var latestProgramDataBatchInfo = latestProgramData.batchInfoList;
+                                    var oldProgramDataBatchInfo = oldProgramData.batchInfoList;
+
+                                    // Shipment part
+                                    var latestProgramDataShipment = latestProgramData.shipmentList;
+                                    var oldProgramDataShipment = oldProgramData.shipmentList;
+                                    var downloadedProgramDataShipment = downloadedProgramData.shipmentList;
+
+                                    var modifiedShipmentIds = []
+                                    latestProgramDataShipment.filter(c => c.versionId > oldProgramData.currentVersion.versionId || moment(c.lastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(oldProgramData.currentVersion.createdDate).format("YYYY-MM-DD HH:mm:ss")).map(item => { modifiedShipmentIds.push(item.shipmentId) });
+                                    oldProgramDataShipment.filter(c => moment(c.lastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(oldProgramData.currentVersion.createdDate).format("YYYY-MM-DD HH:mm:ss")).map(item => modifiedShipmentIds.push(item.shipmentId));
+
+                                    var latestModifiedShipmentData = latestProgramDataShipment.filter(c => modifiedShipmentIds.includes(c.shipmentId));
+                                    var oldModifiedShipmentData = oldProgramDataShipment.filter(c => c.shipmentId == 0 || modifiedShipmentIds.includes(c.shipmentId));
+
+                                    var mergedShipmentData = [];
+                                    var existingShipmentId = [];
+                                    for (var c = 0; c < oldModifiedShipmentData.length; c++) {
+                                      if (oldModifiedShipmentData[c].shipmentId != 0) {
+                                        if ((oldModifiedShipmentData[c].budget.id == "undefined" || oldModifiedShipmentData[c].budget.id == undefined) && oldModifiedShipmentData[c].active.toString() == "false") {
+                                          oldModifiedShipmentData[c].budget.id = '';
+                                        }
+                                        mergedShipmentData.push(oldModifiedShipmentData[c]);
+                                        existingShipmentId.push(oldModifiedShipmentData[c].shipmentId);
+                                      } else {
+                                        // If 0 check whether that exists in latest version or not
+                                        if (oldModifiedShipmentData[c].active.toString() == "true") {
+                                          mergedShipmentData.push(oldModifiedShipmentData[c]);
                                         }
                                       }
-                                      // Getting other entries of latest inventory data
-                                      var latestOtherInventoryEntries = latestProgramDataInventory.filter(c => !(existingInventoryId.includes(c.inventoryId)));
-                                      mergedInventoryData = mergedInventoryData.concat(latestOtherInventoryEntries);
-                                      var data = [];
-                                      var mergedInventoryJexcel = [];
-                                      for (var cd = 0; cd < mergedInventoryData.length; cd++) {
-                                        if (mergedInventoryData[cd].region != null && mergedInventoryData[cd].region.id != 0) {
-                                          data = [];
-                                          data[0] = mergedInventoryData[cd].inventoryId;
-                                          data[1] = mergedInventoryData[cd].planningUnit.id;
-                                          data[2] = moment(mergedInventoryData[cd].inventoryDate).format(DATE_FORMAT_CAP_WITHOUT_DATE);
-                                          data[3] = mergedInventoryData[cd].region.id;
-                                          data[4] = mergedInventoryData[cd].dataSource.id;
-                                          data[5] = mergedInventoryData[cd].realmCountryPlanningUnit.id;
-                                          data[6] = mergedInventoryData[cd].adjustmentQty != "" && mergedInventoryData[cd].adjustmentQty != null && mergedInventoryData[cd].adjustmentQty != undefined ? 2 : 1;
-                                          data[7] = Math.round(mergedInventoryData[cd].adjustmentQty);
-                                          data[8] = Math.round(mergedInventoryData[cd].actualQty);
-                                          data[9] = mergedInventoryData[cd].multiplier;
-                                          data[10] = Math.round(Math.round(mergedInventoryData[cd].adjustmentQty) * mergedInventoryData[cd].multiplier);
-                                          data[11] = Math.round(Math.round(mergedInventoryData[cd].actualQty) * mergedInventoryData[cd].multiplier);
-                                          data[12] = mergedInventoryData[cd].notes;
-                                          data[13] = mergedInventoryData[cd].active;
-                                          data[14] = JSON.stringify(mergedInventoryData[cd].batchInfoList != "" ? ((mergedInventoryData[cd].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty1": parseInt(a.adjustmentQty), "qty2": parseInt(a.actualQty) } })).sort(function (a, b) { return a.qty1 - b.qty1; }) : "");
-                                          data[15] = "";
-                                          var oldDataList = oldProgramDataInventory.filter(c => c.inventoryId == mergedInventoryData[cd].inventoryId && c.region != null && c.region.id != 0);
-                                          var oldData = ""
-                                          if (oldDataList.length > 0) {
-                                            oldData = [oldDataList[0].inventoryId, oldDataList[0].planningUnit.id, moment(oldDataList[0].inventoryDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), oldDataList[0].region.id, oldDataList[0].dataSource.id, oldDataList[0].realmCountryPlanningUnit.id, oldDataList[0].adjustmentQty != "" && oldDataList[0].adjustmentQty != null && oldDataList[0].adjustmentQty != undefined ? 2 : 1, Math.round(oldDataList[0].adjustmentQty), Math.round(oldDataList[0].actualQty), oldDataList[0].multiplier, Math.round(Math.round(oldDataList[0].adjustmentQty) * oldDataList[0].multiplier), Math.round(Math.round(oldDataList[0].actualQty) * oldDataList[0].multiplier), oldDataList[0].notes, oldDataList[0].active, JSON.stringify(oldDataList[0].batchInfoList != "" ? ((oldDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty1": parseInt(a.adjustmentQty), "qty2": parseInt(a.actualQty) } })).sort(function (a, b) { return a.qty1 - b.qty1; }) : ""), "", "", "", "", 4];
-                                          }
-                                          data[16] = oldData;//Old data
-                                          var latestDataList = latestProgramDataInventory.filter(c => c.inventoryId == mergedInventoryData[cd].inventoryId && c.region != null && c.region.id != 0);
-                                          var latestData = ""
-                                          if (latestDataList.length > 0) {
-                                            latestData = [latestDataList[0].inventoryId, latestDataList[0].planningUnit.id, moment(latestDataList[0].inventoryDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), latestDataList[0].region.id, latestDataList[0].dataSource.id, latestDataList[0].realmCountryPlanningUnit.id, latestDataList[0].adjustmentQty != "" && latestDataList[0].adjustmentQty != null && latestDataList[0].adjustmentQty != undefined ? 2 : 1, Math.round(latestDataList[0].adjustmentQty), Math.round(latestDataList[0].actualQty), latestDataList[0].multiplier, Math.round(Math.round(latestDataList[0].adjustmentQty) * latestDataList[0].multiplier), Math.round(Math.round(latestDataList[0].actualQty) * latestDataList[0].multiplier), latestDataList[0].notes, latestDataList[0].active, JSON.stringify(latestDataList[0].batchInfoList != "" ? ((latestDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty1": parseInt(a.adjustmentQty), "qty2": parseInt(a.actualQty) } })).sort(function (a, b) { return a.qty1 - b.qty1; }) : ""), "", "", "", "", 4];
-                                          }
-                                          data[17] = latestData;//Latest data
-                                          var downloadedDataList = downloadedProgramDataInventory.filter(c => c.inventoryId == mergedInventoryData[cd].inventoryId && c.region != null && c.region.id != 0);
-                                          var downloadedData = "";
-                                          if (downloadedDataList.length > 0) {
-                                            downloadedData = [downloadedDataList[0].inventoryId, downloadedDataList[0].planningUnit.id, moment(downloadedDataList[0].inventoryDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), downloadedDataList[0].region.id, downloadedDataList[0].dataSource.id, downloadedDataList[0].realmCountryPlanningUnit.id, downloadedDataList[0].adjustmentQty != "" && downloadedDataList[0].adjustmentQty != null && downloadedDataList[0].adjustmentQty != undefined ? 2 : 1, Math.round(downloadedDataList[0].adjustmentQty), Math.round(downloadedDataList[0].actualQty), downloadedDataList[0].multiplier, Math.round(Math.round(downloadedDataList[0].adjustmentQty) * downloadedDataList[0].multiplier), Math.round(Math.round(downloadedDataList[0].actualQty) * downloadedDataList[0].multiplier), downloadedDataList[0].notes, downloadedDataList[0].active, JSON.stringify(downloadedDataList[0].batchInfoList != "" ? ((downloadedDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty1": parseInt(a.adjustmentQty), "qty2": parseInt(a.actualQty) } })).sort(function (a, b) { return a.qty1 - b.qty1; }) : ""), "", "", "", "", 4];
-                                          }
-                                          data[18] = downloadedData;//Downloaded data
-                                          data[19] = 4;
-                                          mergedInventoryJexcel.push(data);
-                                        }
+                                    }
+                                    // Getting other entries of latest shipment data
+                                    var latestOtherShipmentEntries = latestModifiedShipmentData.filter(c => !(existingShipmentId.includes(c.shipmentId)));
+                                    mergedShipmentData = mergedShipmentData.concat(latestOtherShipmentEntries);
+                                    var data = [];
+                                    var mergedShipmentJexcel = [];
+                                    for (var cd = 0; cd < mergedShipmentData.length; cd++) {
+                                      data = [];
+                                      data[0] = mergedShipmentData[cd].shipmentId;
+                                      data[1] = mergedShipmentData[cd].planningUnit.id;
+                                      data[2] = mergedShipmentData[cd].shipmentStatus.id;
+                                      data[3] = moment(mergedShipmentData[cd].expectedDeliveryDate).format(DATE_FORMAT_CAP);
+                                      data[4] = mergedShipmentData[cd].procurementAgent.id;
+                                      data[5] = mergedShipmentData[cd].fundingSource.id;
+                                      data[6] = mergedShipmentData[cd].budget.id;
+                                      data[7] = mergedShipmentData[cd].orderNo != "" && mergedShipmentData[cd].orderNo != null ? mergedShipmentData[cd].orderNo.toString().concat(mergedShipmentData[cd].primeLineNo != null ? "~" : "").concat(mergedShipmentData[cd].primeLineNo != null ? mergedShipmentData[cd].primeLineNo : "") : "";
+                                      data[8] = mergedShipmentData[cd].dataSource.id;
+                                      data[9] = mergedShipmentData[cd].shipmentMode == "Air" ? 2 : 1;
+                                      data[10] = mergedShipmentData[cd].suggestedQty;
+                                      data[11] = mergedShipmentData[cd].shipmentQty;
+                                      data[12] = mergedShipmentData[cd].currency.currencyId;
+                                      data[13] = parseFloat(mergedShipmentData[cd].rate).toFixed(2);
+                                      data[14] = parseFloat(mergedShipmentData[cd].rate).toFixed(2) * mergedShipmentData[cd].shipmentQty;
+                                      data[15] = parseFloat(mergedShipmentData[cd].freightCost).toFixed(2);
+                                      data[16] = mergedShipmentData[cd].plannedDate != "" && mergedShipmentData[cd].plannedDate != null ? moment(mergedShipmentData[cd].plannedDate).format(DATE_FORMAT_CAP) : "";
+                                      data[17] = mergedShipmentData[cd].submittedDate != "" && mergedShipmentData[cd].submittedDate != null ? moment(mergedShipmentData[cd].submittedDate).format(DATE_FORMAT_CAP) : "";
+                                      data[18] = mergedShipmentData[cd].approvedDate != "" && mergedShipmentData[cd].approvedDate != null ? moment(mergedShipmentData[cd].approvedDate).format(DATE_FORMAT_CAP) : "";
+                                      data[19] = mergedShipmentData[cd].shippedDate != "" && mergedShipmentData[cd].shippedDate != null ? moment(mergedShipmentData[cd].shippedDate).format(DATE_FORMAT_CAP) : "";
+                                      data[20] = mergedShipmentData[cd].arrivedDate != "" && mergedShipmentData[cd].arrivedDate != null ? moment(mergedShipmentData[cd].arrivedDate).format(DATE_FORMAT_CAP) : "";
+                                      data[21] = mergedShipmentData[cd].receivedDate != "" && mergedShipmentData[cd].receivedDate != null ? moment(mergedShipmentData[cd].receivedDate).format(DATE_FORMAT_CAP) : "";
+                                      data[22] = mergedShipmentData[cd].notes;
+                                      data[23] = mergedShipmentData[cd].erpFlag;
+                                      data[24] = mergedShipmentData[cd].emergencyOrder;
+                                      data[25] = mergedShipmentData[cd].accountFlag;
+                                      data[26] = mergedShipmentData[cd].active;
+                                      data[27] = mergedShipmentData[cd].localProcurement;
+                                      data[28] = JSON.stringify(mergedShipmentData[cd].batchInfoList != "" ? ((mergedShipmentData[cd].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.shipmentQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : "");
+                                      data[29] = "";
+                                      var oldDataList = oldProgramDataShipment.filter(c => c.shipmentId == mergedShipmentData[cd].shipmentId);
+                                      var oldData = ""
+                                      if (oldDataList.length > 0) {
+                                        oldData = [oldDataList[0].shipmentId, oldDataList[0].planningUnit.id, oldDataList[0].shipmentStatus.id, moment(oldDataList[0].expectedDeliveryDate).format(DATE_FORMAT_CAP), oldDataList[0].procurementAgent.id, oldDataList[0].fundingSource.id, oldDataList[0].budget.id, oldDataList[0].orderNo != "" && oldDataList[0].orderNo != null ? oldDataList[0].orderNo.toString().concat(oldDataList[0].primeLineNo != null ? "~" : "").concat(oldDataList[0].primeLineNo != null ? oldDataList[0].primeLineNo : "") : "", oldDataList[0].dataSource.id, oldDataList[0].shipmentMode == "Air" ? 2 : 1, oldDataList[0].suggestedQty, oldDataList[0].shipmentQty, oldDataList[0].currency.currencyId, parseFloat(oldDataList[0].rate).toFixed(2), parseFloat(oldDataList[0].rate).toFixed(2) * oldDataList[0].shipmentQty, parseFloat(oldDataList[0].freightCost).toFixed(2), oldDataList[0].plannedDate != "" && oldDataList[0].plannedDate != null ? moment(oldDataList[0].plannedDate).format(DATE_FORMAT_CAP) : "", oldDataList[0].submittedDate != "" && oldDataList[0].submittedDate != null ? moment(oldDataList[0].submittedDate).format(DATE_FORMAT_CAP) : "", oldDataList[0].approvedDate != "" && oldDataList[0].approvedDate != null ? moment(oldDataList[0].approvedDate).format(DATE_FORMAT_CAP) : "", oldDataList[0].shippedDate != "" && oldDataList[0].shippedDate != null ? moment(oldDataList[0].shippedDate).format(DATE_FORMAT_CAP) : "", oldDataList[0].arrivedDate != "" && oldDataList[0].arrivedDate != null ? moment(oldDataList[0].arrivedDate).format(DATE_FORMAT_CAP) : "", oldDataList[0].receivedDate != "" && oldDataList[0].receivedDate != null ? moment(oldDataList[0].receivedDate).format(DATE_FORMAT_CAP) : "", oldDataList[0].notes, oldDataList[0].erpFlag, oldDataList[0].emergencyOrder, oldDataList[0].accountFlag, oldDataList[0].active, oldDataList[0].localProcurement, JSON.stringify(oldDataList[0].batchInfoList != "" ? ((oldDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.shipmentQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
                                       }
+                                      data[30] = oldData;//Old data
+                                      var latestDataList = latestProgramDataShipment.filter(c => c.shipmentId == mergedShipmentData[cd].shipmentId);
+                                      var latestData = ""
+                                      if (latestDataList.length > 0) {
+                                        latestData = [latestDataList[0].shipmentId, latestDataList[0].planningUnit.id, latestDataList[0].shipmentStatus.id, moment(latestDataList[0].expectedDeliveryDate).format(DATE_FORMAT_CAP), latestDataList[0].procurementAgent.id, latestDataList[0].fundingSource.id, latestDataList[0].budget.id, latestDataList[0].orderNo != "" && latestDataList[0].orderNo != null ? latestDataList[0].orderNo.toString().concat(latestDataList[0].primeLineNo != null ? "~" : "").concat(latestDataList[0].primeLineNo != null ? latestDataList[0].primeLineNo : "") : "", latestDataList[0].dataSource.id, latestDataList[0].shipmentMode == "Air" ? 2 : 1, latestDataList[0].suggestedQty, latestDataList[0].shipmentQty, latestDataList[0].currency.currencyId, parseFloat(latestDataList[0].rate).toFixed(2), parseFloat(latestDataList[0].rate).toFixed(2) * latestDataList[0].shipmentQty, parseFloat(latestDataList[0].freightCost).toFixed(2), latestDataList[0].plannedDate != "" && latestDataList[0].plannedDate != null ? moment(latestDataList[0].plannedDate).format(DATE_FORMAT_CAP) : "", latestDataList[0].submittedDate != "" && latestDataList[0].submittedDate != null ? moment(latestDataList[0].submittedDate).format(DATE_FORMAT_CAP) : "", latestDataList[0].approvedDate != "" && latestDataList[0].approvedDate != null ? moment(latestDataList[0].approvedDate).format(DATE_FORMAT_CAP) : "", latestDataList[0].shippedDate != "" && latestDataList[0].shippedDate != null ? moment(latestDataList[0].shippedDate).format(DATE_FORMAT_CAP) : "", latestDataList[0].arrivedDate != "" && latestDataList[0].arrivedDate != null ? moment(latestDataList[0].arrivedDate).format(DATE_FORMAT_CAP) : "", latestDataList[0].receivedDate != "" && latestDataList[0].receivedDate != null ? moment(latestDataList[0].receivedDate).format(DATE_FORMAT_CAP) : "", latestDataList[0].notes, latestDataList[0].erpFlag, latestDataList[0].emergencyOrder, latestDataList[0].accountFlag, latestDataList[0].active, latestDataList[0].localProcurement, JSON.stringify(latestDataList[0].batchInfoList != "" ? ((latestDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.shipmentQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
+                                      }
+                                      data[31] = latestData;//Latest data
+                                      var downloadedDataList = downloadedProgramDataShipment.filter(c => c.shipmentId == mergedShipmentData[cd].shipmentId);
+                                      var downloadedData = "";
+                                      if (downloadedDataList.length > 0) {
+                                        downloadedData = [downloadedDataList[0].shipmentId, downloadedDataList[0].planningUnit.id, downloadedDataList[0].shipmentStatus.id, moment(downloadedDataList[0].expectedDeliveryDate).format(DATE_FORMAT_CAP), downloadedDataList[0].procurementAgent.id, downloadedDataList[0].fundingSource.id, downloadedDataList[0].budget.id, downloadedDataList[0].orderNo != "" && downloadedDataList[0].orderNo != null ? downloadedDataList[0].orderNo.toString().concat(downloadedDataList[0].primeLineNo != null ? "~" : "").concat(downloadedDataList[0].primeLineNo != null ? downloadedDataList[0].primeLineNo : "") : "", downloadedDataList[0].dataSource.id, downloadedDataList[0].shipmentMode == "Air" ? 2 : 1, downloadedDataList[0].suggestedQty, downloadedDataList[0].shipmentQty, downloadedDataList[0].currency.currencyId, parseFloat(downloadedDataList[0].rate).toFixed(2), parseFloat(downloadedDataList[0].rate).toFixed(2) * downloadedDataList[0].shipmentQty, parseFloat(downloadedDataList[0].freightCost).toFixed(2), downloadedDataList[0].plannedDate != "" && downloadedDataList[0].plannedDate != null ? moment(downloadedDataList[0].plannedDate).format(DATE_FORMAT_CAP) : "", downloadedDataList[0].submittedDate != "" && downloadedDataList[0].submittedDate != null ? moment(downloadedDataList[0].submittedDate).format(DATE_FORMAT_CAP) : "", downloadedDataList[0].approvedDate != "" && downloadedDataList[0].approvedDate != null ? moment(downloadedDataList[0].approvedDate).format(DATE_FORMAT_CAP) : "", downloadedDataList[0].shippedDate != "" && downloadedDataList[0].shippedDate != null ? moment(downloadedDataList[0].shippedDate).format(DATE_FORMAT_CAP) : "", downloadedDataList[0].arrivedDate != "" && downloadedDataList[0].arrivedDate != null ? moment(downloadedDataList[0].arrivedDate).format(DATE_FORMAT_CAP) : "", downloadedDataList[0].receivedDate != "" && downloadedDataList[0].receivedDate != null ? moment(downloadedDataList[0].receivedDate).format(DATE_FORMAT_CAP) : "", downloadedDataList[0].notes, downloadedDataList[0].erpFlag, downloadedDataList[0].emergencyOrder, downloadedDataList[0].accountFlag, downloadedDataList[0].active, downloadedDataList[0].localProcurement, JSON.stringify(downloadedDataList[0].batchInfoList != "" ? ((downloadedDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.shipmentQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
+                                      }
+                                      data[32] = downloadedData;//Downloaded data
+                                      data[33] = 4;
+                                      mergedShipmentJexcel.push(data);
+                                    }
 
-                                      var options = {
-                                        data: mergedInventoryJexcel,
-                                        columnDrag: true,
-                                        columns: [
-                                          { title: i18n.t('static.commit.inventoryId'), type: 'hidden', width: 100 },
-                                          { title: i18n.t('static.planningunit.planningunit'), type: 'dropdown', source: planningUnitList, width: 200 },
-                                          { title: i18n.t('static.inventory.inventoryDate'), type: 'text', width: 85 },
-                                          { title: i18n.t('static.region.region'), type: 'dropdown', source: regionList, width: 100 },
-                                          { title: i18n.t('static.inventory.dataSource'), type: 'dropdown', source: dataSourceList, width: 100 },
-                                          { title: i18n.t('static.supplyPlan.alternatePlanningUnit'), type: 'dropdown', source: realmCountryPlanningUnitList, width: 150 },
-                                          { title: i18n.t('static.supplyPlan.inventoryType'), type: 'dropdown', source: [{ id: 1, name: i18n.t('static.inventory.inventory') }, { id: 2, name: i18n.t('static.inventoryType.adjustment') }], width: 100 },
-                                          { title: i18n.t('static.inventory.adjustmentQunatity'), type: 'numeric', mask: '[-]#,##', width: 120 },
-                                          { title: i18n.t('static.inventory.inventoryQunatity'), type: 'numeric', mask: '#,##', width: 120 },
-                                          { title: i18n.t('static.unit.multiplier'), type: 'numeric', mask: '#,##.000000', decimal: '.', width: 90, },
-                                          { title: i18n.t('static.inventory.adjustmentQunatityPU'), type: 'numeric', mask: '[-]#,##', width: 120, },
-                                          { title: i18n.t('static.inventory.inventoryQunatityPU'), type: 'numeric', mask: '#,##', width: 120, },
-                                          { title: i18n.t('static.program.notes'), type: 'text', width: 200 },
-                                          { title: i18n.t('static.inventory.active'), type: 'checkbox', width: 70 },
-                                          { type: 'hidden', title: i18n.t('static.supplyPlan.batchInfo'), width: 0 },
-                                          { type: 'text', title: i18n.t('static.supplyPlan.batchInfo'), width: 90 },
-                                          { type: 'hidden', title: 'Old data' },
-                                          { type: 'hidden', title: 'latest data' },
-                                          { type: 'hidden', title: 'downloaded data' },
-                                          { type: 'hidden', title: 'result of compare' },
-                                        ],
-                                        pagination: localStorage.getItem("sesRecordCount"),
-                                        paginationOptions: JEXCEL_PAGINATION_OPTION,
-                                        search: true,
-                                        columnSorting: true,
-                                        tableOverflow: true,
-                                        wordWrap: true,
-                                        allowInsertColumn: false,
-                                        allowManualInsertColumn: false,
-                                        allowDeleteRow: false,
-                                        editable: false,
-                                        onload: this.loadedFunctionForMergeInventory,
-                                        text: {
-                                          showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                                          show: '',
-                                          entries: '',
-                                        },
-                                        filters: true,
-                                        license: JEXCEL_PRO_KEY,
-                                        contextMenu: function (obj, x, y, e) {
-                                          var items = [];
-                                          //Resolve conflicts
-                                          var rowData = obj.getRowData(y)
-                                          if (rowData[19].toString() == 1) {
-                                            items.push({
-                                              title: "Resolve conflicts",
-                                              onclick: function () {
-                                                this.setState({ loading: true })
-                                                this.toggleLargeInventory(rowData[16], rowData[17], y, 'inventory');
-                                              }.bind(this)
-                                            })
-                                          }
-
-                                          // if (rowData[0].toString() > 0) {
-                                          //   items.push({
-                                          //     title: "Show version history",
-                                          //     onclick: function () {
-                                          //       this.toggleVersionHistory(rowData[13]);
-                                          //     }.bind(this)
-                                          //   })
-                                          // }
-                                          return items;
-                                        }.bind(this)
-                                      };
-
-                                      var mergedInventoryJexcel = jexcel(document.getElementById("mergedVersionInventory"), options);
-                                      this.el = mergedInventoryJexcel;
-                                      this.setState({
-                                        mergedInventoryJexcel: mergedInventoryJexcel
-                                      })
-
-                                      // Batch info
-                                      var latestProgramDataBatchInfo = latestProgramData.batchInfoList;
-                                      var oldProgramDataBatchInfo = oldProgramData.batchInfoList;
-
-                                      // Shipment part
-                                      var latestProgramDataShipment = latestProgramData.shipmentList;
-                                      var oldProgramDataShipment = oldProgramData.shipmentList;
-                                      var downloadedProgramDataShipment = downloadedProgramData.shipmentList;
-                                      var mergedShipmentData = [];
-                                      var existingShipmentId = [];
-                                      for (var c = 0; c < oldProgramDataShipment.length; c++) {
-                                        if (oldProgramDataShipment[c].shipmentId != 0) {
-                                          if ((oldProgramDataShipment[c].budget.id == "undefined" || oldProgramDataShipment[c].budget.id == undefined) && oldProgramDataShipment[c].active.toString() == "false") {
-                                            oldProgramDataShipment[c].budget.id = '';
-                                          }
-                                          mergedShipmentData.push(oldProgramDataShipment[c]);
-                                          existingShipmentId.push(oldProgramDataShipment[c].shipmentId);
+                                    var options = {
+                                      data: mergedShipmentJexcel,
+                                      columnDrag: true,
+                                      columns: [
+                                        { title: i18n.t('static.commit.shipmentId'), type: 'hidden', width: 100 },
+                                        { title: i18n.t('static.planningunit.planningunit'), type: 'dropdown', source: planningUnitList, width: 200 },
+                                        { type: 'dropdown', title: i18n.t('static.supplyPlan.shipmentStatus'), source: shipmentStatusList, width: 100 },
+                                        { type: 'text', title: i18n.t('static.supplyPlan.expectedDeliveryDate'), width: 100, },
+                                        { type: 'dropdown', title: i18n.t('static.procurementagent.procurementagent'), source: procurementAgentList, width: 120 },
+                                        { type: 'dropdown', title: i18n.t('static.subfundingsource.fundingsource'), source: fundingSourceList, width: 120 },
+                                        { type: 'dropdown', title: i18n.t('static.dashboard.budget'), source: budgetList, width: 120 },
+                                        { type: 'text', title: i18n.t('static.supplyPlan.orderNoAndPrimeLineNo'), width: 150 },
+                                        { type: 'dropdown', title: i18n.t('static.datasource.datasource'), source: dataSourceList, width: 150 },
+                                        { type: 'dropdown', title: i18n.t("static.supplyPlan.shipmentMode"), source: [{ id: 1, name: i18n.t('static.supplyPlan.sea') }, { id: 2, name: i18n.t('static.supplyPlan.air') }], width: 100 },
+                                        { type: 'numeric', title: i18n.t("static.shipment.suggestedQty"), width: 100, mask: '#,##' },
+                                        { type: 'numeric', title: i18n.t("static.supplyPlan.adjustesOrderQty"), width: 100, mask: '#,##' },
+                                        { type: 'dropdown', title: i18n.t('static.dashboard.currency'), source: currencyList, width: 120 },
+                                        { type: 'numeric', title: i18n.t('static.supplyPlan.pricePerPlanningUnit'), width: 80, mask: '#,##.00', decimal: '.' },
+                                        { type: 'numeric', title: i18n.t('static.shipment.productcost'), width: 80, mask: '#,##.00', decimal: '.' },
+                                        { type: 'numeric', title: i18n.t('static.shipment.freightcost'), width: 80, mask: '#,##.00', decimal: '.' },
+                                        { type: 'text', title: i18n.t('static.supplyPlan.plannedDate'), width: 100, },
+                                        { type: 'text', title: i18n.t('static.supplyPlan.submittedDate'), width: 100, },
+                                        { type: 'text', title: i18n.t('static.supplyPlan.approvedDate'), width: 100, },
+                                        { type: 'text', title: i18n.t('static.supplyPlan.shippedDate'), width: 100, },
+                                        { type: 'text', title: i18n.t('static.supplyPlan.arrivedDate'), width: 100, },
+                                        { type: 'text', title: i18n.t('static.shipment.receiveddate'), width: 100, },
+                                        { type: 'text', title: i18n.t('static.program.notes'), width: 200 },
+                                        { type: 'checkbox', title: i18n.t('static.supplyPlan.erpFlag'), width: 80 },
+                                        { type: 'checkbox', title: i18n.t('static.supplyPlan.emergencyOrder'), width: 80 },
+                                        { type: 'checkbox', title: i18n.t('static.common.accountFlag'), width: 80 },
+                                        { type: 'checkbox', title: i18n.t('static.common.active'), width: 80 },
+                                        { type: 'checkbox', title: i18n.t('static.report.localprocurement'), width: 80 },
+                                        { type: 'hidden', title: i18n.t('static.supplyPlan.batchInfo'), width: 0 },
+                                        { type: 'text', title: i18n.t('static.supplyPlan.batchInfo'), width: 90 },
+                                        { type: 'hidden', title: 'Old data' },
+                                        { type: 'hidden', title: 'latest data' },
+                                        { type: 'hidden', title: 'downloaded data' },
+                                        { type: 'hidden', title: 'result of compare' },
+                                      ],
+                                      pagination: localStorage.getItem("sesRecordCount"),
+                                      paginationOptions: JEXCEL_PAGINATION_OPTION,
+                                      search: true,
+                                      columnSorting: true,
+                                      tableOverflow: true,
+                                      wordWrap: true,
+                                      allowInsertColumn: false,
+                                      allowManualInsertColumn: false,
+                                      allowDeleteRow: false,
+                                      editable: false,
+                                      onload: this.loadedFunctionForMergeShipment,
+                                      filters: true,
+                                      license: JEXCEL_PRO_KEY,
+                                      text: {
+                                        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                                        show: '',
+                                        entries: '',
+                                      },
+                                      contextMenu: function (obj, x, y, e) {
+                                        var items = [];
+                                        //Resolve conflicts
+                                        var rowData = obj.getRowData(y)
+                                        if (rowData[33].toString() == 1) {
+                                          items.push({
+                                            title: "Resolve conflicts",
+                                            onclick: function () {
+                                              this.setState({ loading: true })
+                                              this.toggleLargeShipment(rowData[30], rowData[31], y, 'shipment');
+                                            }.bind(this)
+                                          })
                                         } else {
-                                          // If 0 check whether that exists in latest version or not
-                                          if (oldProgramDataShipment[c].active.toString() == "true") {
-                                            mergedShipmentData.push(oldProgramDataShipment[c]);
-                                          }
+                                          return false;
                                         }
+
+                                        // if (rowData[0].toString() > 0) {
+                                        //   items.push({
+                                        //     title: "Show version history",
+                                        //     onclick: function () {
+                                        //       this.toggleVersionHistory(rowData[13]);
+                                        //     }.bind(this)
+                                        //   })
+                                        // }
+                                        return items;
+                                      }.bind(this)
+                                    };
+
+                                    var mergedShipmentJexcel = jexcel(document.getElementById("mergedVersionShipment"), options);
+                                    this.el = mergedShipmentJexcel;
+                                    this.setState({
+                                      mergedShipmentJexcel: mergedShipmentJexcel,
+                                    })
+                                    console.log("+++Shipment Jexcel completed", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
+                                    this.setState({
+                                      oldProgramDataConsumption: oldProgramDataConsumption,
+                                      oldProgramDataInventory: oldProgramDataInventory,
+                                      oldProgramDataShipment: oldProgramDataShipment,
+                                      latestProgramDataConsumption: latestProgramDataConsumption,
+                                      latestProgramDataInventory: latestProgramDataInventory,
+                                      latestProgramDataShipment: latestProgramDataShipment,
+                                      oldProgramDataBatchInfo: oldProgramDataBatchInfo,
+                                      latestProgramDataBatchInfo: latestProgramDataBatchInfo,
+                                      latestProgramData: latestProgramData,
+                                      oldProgramData: oldProgramData,
+                                      downloadedProgramData: downloadedProgramData,
+                                      loading: false
+                                    }, () => {
+                                      // Problem list
+                                      if (this.state.conflictsCount == 0) {
+                                        this.generateDataAfterResolveConflictsForQPL();
                                       }
-                                      // Getting other entries of latest shipment data
-                                      var latestOtherShipmentEntries = latestProgramDataShipment.filter(c => !(existingShipmentId.includes(c.shipmentId)));
-                                      mergedShipmentData = mergedShipmentData.concat(latestOtherShipmentEntries);
-                                      var data = [];
-                                      var mergedShipmentJexcel = [];
-                                      for (var cd = 0; cd < mergedShipmentData.length; cd++) {
-                                        data = [];
-                                        data[0] = mergedShipmentData[cd].shipmentId;
-                                        data[1] = mergedShipmentData[cd].planningUnit.id;
-                                        data[2] = mergedShipmentData[cd].shipmentStatus.id;
-                                        data[3] = moment(mergedShipmentData[cd].expectedDeliveryDate).format(DATE_FORMAT_CAP);
-                                        data[4] = mergedShipmentData[cd].procurementAgent.id;
-                                        data[5] = mergedShipmentData[cd].fundingSource.id;
-                                        data[6] = mergedShipmentData[cd].budget.id;
-                                        data[7] = mergedShipmentData[cd].orderNo != "" && mergedShipmentData[cd].orderNo != null ? mergedShipmentData[cd].orderNo.toString().concat(mergedShipmentData[cd].primeLineNo != null ? "~" : "").concat(mergedShipmentData[cd].primeLineNo != null ? mergedShipmentData[cd].primeLineNo : "") : "";
-                                        data[8] = mergedShipmentData[cd].dataSource.id;
-                                        data[9] = mergedShipmentData[cd].shipmentMode == "Air" ? 2 : 1;
-                                        data[10] = mergedShipmentData[cd].suggestedQty;
-                                        data[11] = mergedShipmentData[cd].shipmentQty;
-                                        data[12] = mergedShipmentData[cd].currency.currencyId;
-                                        data[13] = parseFloat(mergedShipmentData[cd].rate).toFixed(2);
-                                        data[14] = parseFloat(mergedShipmentData[cd].rate).toFixed(2) * mergedShipmentData[cd].shipmentQty;
-                                        data[15] = parseFloat(mergedShipmentData[cd].freightCost).toFixed(2);
-                                        data[16] = mergedShipmentData[cd].plannedDate != "" && mergedShipmentData[cd].plannedDate != null ? moment(mergedShipmentData[cd].plannedDate).format(DATE_FORMAT_CAP) : "";
-                                        data[17] = mergedShipmentData[cd].submittedDate != "" && mergedShipmentData[cd].submittedDate != null ? moment(mergedShipmentData[cd].submittedDate).format(DATE_FORMAT_CAP) : "";
-                                        data[18] = mergedShipmentData[cd].approvedDate != "" && mergedShipmentData[cd].approvedDate != null ? moment(mergedShipmentData[cd].approvedDate).format(DATE_FORMAT_CAP) : "";
-                                        data[19] = mergedShipmentData[cd].shippedDate != "" && mergedShipmentData[cd].shippedDate != null ? moment(mergedShipmentData[cd].shippedDate).format(DATE_FORMAT_CAP) : "";
-                                        data[20] = mergedShipmentData[cd].arrivedDate != "" && mergedShipmentData[cd].arrivedDate != null ? moment(mergedShipmentData[cd].arrivedDate).format(DATE_FORMAT_CAP) : "";
-                                        data[21] = mergedShipmentData[cd].receivedDate != "" && mergedShipmentData[cd].receivedDate != null ? moment(mergedShipmentData[cd].receivedDate).format(DATE_FORMAT_CAP) : "";
-                                        data[22] = mergedShipmentData[cd].notes;
-                                        data[23] = mergedShipmentData[cd].erpFlag;
-                                        data[24] = mergedShipmentData[cd].emergencyOrder;
-                                        data[25] = mergedShipmentData[cd].accountFlag;
-                                        data[26] = mergedShipmentData[cd].active;
-                                        data[27] = mergedShipmentData[cd].localProcurement;
-                                        data[28] = JSON.stringify(mergedShipmentData[cd].batchInfoList != "" ? ((mergedShipmentData[cd].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.shipmentQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : "");
-                                        data[29] = "";
-                                        var oldDataList = oldProgramDataShipment.filter(c => c.shipmentId == mergedShipmentData[cd].shipmentId);
-                                        var oldData = ""
-                                        if (oldDataList.length > 0) {
-                                          oldData = [oldDataList[0].shipmentId, oldDataList[0].planningUnit.id, oldDataList[0].shipmentStatus.id, moment(oldDataList[0].expectedDeliveryDate).format(DATE_FORMAT_CAP), oldDataList[0].procurementAgent.id, oldDataList[0].fundingSource.id, oldDataList[0].budget.id, oldDataList[0].orderNo != "" && oldDataList[0].orderNo != null ? oldDataList[0].orderNo.toString().concat(oldDataList[0].primeLineNo != null ? "~" : "").concat(oldDataList[0].primeLineNo != null ? oldDataList[0].primeLineNo : "") : "", oldDataList[0].dataSource.id, oldDataList[0].shipmentMode == "Air" ? 2 : 1, oldDataList[0].suggestedQty, oldDataList[0].shipmentQty, oldDataList[0].currency.currencyId, parseFloat(oldDataList[0].rate).toFixed(2), parseFloat(oldDataList[0].rate).toFixed(2) * oldDataList[0].shipmentQty, parseFloat(oldDataList[0].freightCost).toFixed(2), oldDataList[0].plannedDate != "" && oldDataList[0].plannedDate != null ? moment(oldDataList[0].plannedDate).format(DATE_FORMAT_CAP) : "", oldDataList[0].submittedDate != "" && oldDataList[0].submittedDate != null ? moment(oldDataList[0].submittedDate).format(DATE_FORMAT_CAP) : "", oldDataList[0].approvedDate != "" && oldDataList[0].approvedDate != null ? moment(oldDataList[0].approvedDate).format(DATE_FORMAT_CAP) : "", oldDataList[0].shippedDate != "" && oldDataList[0].shippedDate != null ? moment(oldDataList[0].shippedDate).format(DATE_FORMAT_CAP) : "", oldDataList[0].arrivedDate != "" && oldDataList[0].arrivedDate != null ? moment(oldDataList[0].arrivedDate).format(DATE_FORMAT_CAP) : "", oldDataList[0].receivedDate != "" && oldDataList[0].receivedDate != null ? moment(oldDataList[0].receivedDate).format(DATE_FORMAT_CAP) : "", oldDataList[0].notes, oldDataList[0].erpFlag, oldDataList[0].emergencyOrder, oldDataList[0].accountFlag, oldDataList[0].active, oldDataList[0].localProcurement, JSON.stringify(oldDataList[0].batchInfoList != "" ? ((oldDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.shipmentQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
-                                        }
-                                        data[30] = oldData;//Old data
-                                        var latestDataList = latestProgramDataShipment.filter(c => c.shipmentId == mergedShipmentData[cd].shipmentId);
-                                        var latestData = ""
-                                        if (latestDataList.length > 0) {
-                                          latestData = [latestDataList[0].shipmentId, latestDataList[0].planningUnit.id, latestDataList[0].shipmentStatus.id, moment(latestDataList[0].expectedDeliveryDate).format(DATE_FORMAT_CAP), latestDataList[0].procurementAgent.id, latestDataList[0].fundingSource.id, latestDataList[0].budget.id, latestDataList[0].orderNo != "" && latestDataList[0].orderNo != null ? latestDataList[0].orderNo.toString().concat(latestDataList[0].primeLineNo != null ? "~" : "").concat(latestDataList[0].primeLineNo != null ? latestDataList[0].primeLineNo : "") : "", latestDataList[0].dataSource.id, latestDataList[0].shipmentMode == "Air" ? 2 : 1, latestDataList[0].suggestedQty, latestDataList[0].shipmentQty, latestDataList[0].currency.currencyId, parseFloat(latestDataList[0].rate).toFixed(2), parseFloat(latestDataList[0].rate).toFixed(2) * latestDataList[0].shipmentQty, parseFloat(latestDataList[0].freightCost).toFixed(2), latestDataList[0].plannedDate != "" && latestDataList[0].plannedDate != null ? moment(latestDataList[0].plannedDate).format(DATE_FORMAT_CAP) : "", latestDataList[0].submittedDate != "" && latestDataList[0].submittedDate != null ? moment(latestDataList[0].submittedDate).format(DATE_FORMAT_CAP) : "", latestDataList[0].approvedDate != "" && latestDataList[0].approvedDate != null ? moment(latestDataList[0].approvedDate).format(DATE_FORMAT_CAP) : "", latestDataList[0].shippedDate != "" && latestDataList[0].shippedDate != null ? moment(latestDataList[0].shippedDate).format(DATE_FORMAT_CAP) : "", latestDataList[0].arrivedDate != "" && latestDataList[0].arrivedDate != null ? moment(latestDataList[0].arrivedDate).format(DATE_FORMAT_CAP) : "", latestDataList[0].receivedDate != "" && latestDataList[0].receivedDate != null ? moment(latestDataList[0].receivedDate).format(DATE_FORMAT_CAP) : "", latestDataList[0].notes, latestDataList[0].erpFlag, latestDataList[0].emergencyOrder, latestDataList[0].accountFlag, latestDataList[0].active, latestDataList[0].localProcurement, JSON.stringify(latestDataList[0].batchInfoList != "" ? ((latestDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.shipmentQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
-                                        }
-                                        data[31] = latestData;//Latest data
-                                        var downloadedDataList = downloadedProgramDataShipment.filter(c => c.shipmentId == mergedShipmentData[cd].shipmentId);
-                                        var downloadedData = "";
-                                        if (downloadedDataList.length > 0) {
-                                          downloadedData = [downloadedDataList[0].shipmentId, downloadedDataList[0].planningUnit.id, downloadedDataList[0].shipmentStatus.id, moment(downloadedDataList[0].expectedDeliveryDate).format(DATE_FORMAT_CAP), downloadedDataList[0].procurementAgent.id, downloadedDataList[0].fundingSource.id, downloadedDataList[0].budget.id, downloadedDataList[0].orderNo != "" && downloadedDataList[0].orderNo != null ? downloadedDataList[0].orderNo.toString().concat(downloadedDataList[0].primeLineNo != null ? "~" : "").concat(downloadedDataList[0].primeLineNo != null ? downloadedDataList[0].primeLineNo : "") : "", downloadedDataList[0].dataSource.id, downloadedDataList[0].shipmentMode == "Air" ? 2 : 1, downloadedDataList[0].suggestedQty, downloadedDataList[0].shipmentQty, downloadedDataList[0].currency.currencyId, parseFloat(downloadedDataList[0].rate).toFixed(2), parseFloat(downloadedDataList[0].rate).toFixed(2) * downloadedDataList[0].shipmentQty, parseFloat(downloadedDataList[0].freightCost).toFixed(2), downloadedDataList[0].plannedDate != "" && downloadedDataList[0].plannedDate != null ? moment(downloadedDataList[0].plannedDate).format(DATE_FORMAT_CAP) : "", downloadedDataList[0].submittedDate != "" && downloadedDataList[0].submittedDate != null ? moment(downloadedDataList[0].submittedDate).format(DATE_FORMAT_CAP) : "", downloadedDataList[0].approvedDate != "" && downloadedDataList[0].approvedDate != null ? moment(downloadedDataList[0].approvedDate).format(DATE_FORMAT_CAP) : "", downloadedDataList[0].shippedDate != "" && downloadedDataList[0].shippedDate != null ? moment(downloadedDataList[0].shippedDate).format(DATE_FORMAT_CAP) : "", downloadedDataList[0].arrivedDate != "" && downloadedDataList[0].arrivedDate != null ? moment(downloadedDataList[0].arrivedDate).format(DATE_FORMAT_CAP) : "", downloadedDataList[0].receivedDate != "" && downloadedDataList[0].receivedDate != null ? moment(downloadedDataList[0].receivedDate).format(DATE_FORMAT_CAP) : "", downloadedDataList[0].notes, downloadedDataList[0].erpFlag, downloadedDataList[0].emergencyOrder, downloadedDataList[0].accountFlag, downloadedDataList[0].active, downloadedDataList[0].localProcurement, JSON.stringify(downloadedDataList[0].batchInfoList != "" ? ((downloadedDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.shipmentQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
-                                        }
-                                        data[32] = downloadedData;//Downloaded data
-                                        data[33] = 4;
-                                        mergedShipmentJexcel.push(data);
-                                      }
-
-                                      var options = {
-                                        data: mergedShipmentJexcel,
-                                        columnDrag: true,
-                                        columns: [
-                                          { title: i18n.t('static.commit.shipmentId'), type: 'hidden', width: 100 },
-                                          { title: i18n.t('static.planningunit.planningunit'), type: 'dropdown', source: planningUnitList, width: 200 },
-                                          { type: 'dropdown', title: i18n.t('static.supplyPlan.shipmentStatus'), source: shipmentStatusList, width: 100 },
-                                          { type: 'text', title: i18n.t('static.supplyPlan.expectedDeliveryDate'), width: 100, },
-                                          { type: 'dropdown', title: i18n.t('static.procurementagent.procurementagent'), source: procurementAgentList, width: 120 },
-                                          { type: 'dropdown', title: i18n.t('static.subfundingsource.fundingsource'), source: fundingSourceList, width: 120 },
-                                          { type: 'dropdown', title: i18n.t('static.dashboard.budget'), source: budgetList, width: 120 },
-                                          { type: 'text', title: i18n.t('static.supplyPlan.orderNoAndPrimeLineNo'), width: 150 },
-                                          { type: 'dropdown', title: i18n.t('static.datasource.datasource'), source: dataSourceList, width: 150 },
-                                          { type: 'dropdown', title: i18n.t("static.supplyPlan.shipmentMode"), source: [{ id: 1, name: i18n.t('static.supplyPlan.sea') }, { id: 2, name: i18n.t('static.supplyPlan.air') }], width: 100 },
-                                          { type: 'numeric', title: i18n.t("static.shipment.suggestedQty"), width: 100, mask: '#,##' },
-                                          { type: 'numeric', title: i18n.t("static.supplyPlan.adjustesOrderQty"), width: 100, mask: '#,##' },
-                                          { type: 'dropdown', title: i18n.t('static.dashboard.currency'), source: currencyList, width: 120 },
-                                          { type: 'numeric', title: i18n.t('static.supplyPlan.pricePerPlanningUnit'), width: 80, mask: '#,##.00', decimal: '.' },
-                                          { type: 'numeric', title: i18n.t('static.shipment.productcost'), width: 80, mask: '#,##.00', decimal: '.' },
-                                          { type: 'numeric', title: i18n.t('static.shipment.freightcost'), width: 80, mask: '#,##.00', decimal: '.' },
-                                          { type: 'text', title: i18n.t('static.supplyPlan.plannedDate'), width: 100, },
-                                          { type: 'text', title: i18n.t('static.supplyPlan.submittedDate'), width: 100, },
-                                          { type: 'text', title: i18n.t('static.supplyPlan.approvedDate'), width: 100, },
-                                          { type: 'text', title: i18n.t('static.supplyPlan.shippedDate'), width: 100, },
-                                          { type: 'text', title: i18n.t('static.supplyPlan.arrivedDate'), width: 100, },
-                                          { type: 'text', title: i18n.t('static.shipment.receiveddate'), width: 100, },
-                                          { type: 'text', title: i18n.t('static.program.notes'), width: 200 },
-                                          { type: 'checkbox', title: i18n.t('static.supplyPlan.erpFlag'), width: 80 },
-                                          { type: 'checkbox', title: i18n.t('static.supplyPlan.emergencyOrder'), width: 80 },
-                                          { type: 'checkbox', title: i18n.t('static.common.accountFlag'), width: 80 },
-                                          { type: 'checkbox', title: i18n.t('static.common.active'), width: 80 },
-                                          { type: 'checkbox', title: i18n.t('static.report.localprocurement'), width: 80 },
-                                          { type: 'hidden', title: i18n.t('static.supplyPlan.batchInfo'), width: 0 },
-                                          { type: 'text', title: i18n.t('static.supplyPlan.batchInfo'), width: 90 },
-                                          { type: 'hidden', title: 'Old data' },
-                                          { type: 'hidden', title: 'latest data' },
-                                          { type: 'hidden', title: 'downloaded data' },
-                                          { type: 'hidden', title: 'result of compare' },
-                                        ],
-                                        pagination: localStorage.getItem("sesRecordCount"),
-                                        paginationOptions: JEXCEL_PAGINATION_OPTION,
-                                        search: true,
-                                        columnSorting: true,
-                                        tableOverflow: true,
-                                        wordWrap: true,
-                                        allowInsertColumn: false,
-                                        allowManualInsertColumn: false,
-                                        allowDeleteRow: false,
-                                        editable: false,
-                                        onload: this.loadedFunctionForMergeShipment,
-                                        filters: true,
-                                        license: JEXCEL_PRO_KEY,
-                                        text: {
-                                          showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                                          show: '',
-                                          entries: '',
-                                        },
-                                        contextMenu: function (obj, x, y, e) {
-                                          var items = [];
-                                          //Resolve conflicts
-                                          var rowData = obj.getRowData(y)
-                                          if (rowData[33].toString() == 1) {
-                                            items.push({
-                                              title: "Resolve conflicts",
-                                              onclick: function () {
-                                                this.setState({ loading: true })
-                                                this.toggleLargeShipment(rowData[30], rowData[31], y, 'shipment');
-                                              }.bind(this)
-                                            })
-                                          }
-
-                                          // if (rowData[0].toString() > 0) {
-                                          //   items.push({
-                                          //     title: "Show version history",
-                                          //     onclick: function () {
-                                          //       this.toggleVersionHistory(rowData[13]);
-                                          //     }.bind(this)
-                                          //   })
-                                          // }
-                                          return items;
-                                        }.bind(this)
-                                      };
-
-                                      var mergedShipmentJexcel = jexcel(document.getElementById("mergedVersionShipment"), options);
-                                      this.el = mergedShipmentJexcel;
-                                      this.setState({
-                                        mergedShipmentJexcel: mergedShipmentJexcel,
-                                      })
-                                      this.setState({
-                                        oldProgramDataConsumption: oldProgramDataConsumption,
-                                        oldProgramDataInventory: oldProgramDataInventory,
-                                        oldProgramDataShipment: oldProgramDataShipment,
-                                        latestProgramDataConsumption: latestProgramDataConsumption,
-                                        latestProgramDataInventory: latestProgramDataInventory,
-                                        latestProgramDataShipment: latestProgramDataShipment,
-                                        oldProgramDataBatchInfo: oldProgramDataBatchInfo,
-                                        latestProgramDataBatchInfo: latestProgramDataBatchInfo,
-                                        latestProgramData: latestProgramData,
-                                        oldProgramData: oldProgramData,
-                                        downloadedProgramData: downloadedProgramData,
-                                        loading: false
-                                      }, () => {
-                                        // Problem list
-                                        if (this.state.conflictsCount == 0) {
-                                          this.generateDataAfterResolveConflictsForQPL();
-                                        }
-                                      })
-                                    }.bind(this)
+                                    })
                                   }.bind(this)
                                 }.bind(this)
                               }.bind(this)
@@ -1953,74 +2353,84 @@ export default class syncPage extends Component {
                       }.bind(this)
                     }.bind(this)
                   }.bind(this)
-                  // }.bind(this)
-                } else {
+                }.bind(this)
+                // }.bind(this)
+              } else {
+                this.setState({
+                  message: response.data.messageCode,
+                  loading: false,
+                  color: "red"
+                },
+                  () => {
+                    this.hideFirstComponent()
+                  })
+              }
+            })
+            .catch(
+              error => {
+                console.log("@@@Error2", error);
+                console.log("@@@Error2", error.message);
+                console.log("@@@Error2", error.response ? error.response.status : "")
+                if (error.message === "Network Error") {
+                  console.log("+++in catch 3")
                   this.setState({
-                    message: response1.data.messageCode,
-                    loading: false,
-                    color: "red"
-                  },
-                    () => {
-                      this.hideFirstComponent()
-                    })
-                }
-              })
-              .catch(
-                error => {
-                  if (error.message === "Network Error") {
-                    this.setState({
-                      message: 'static.unkownError',
-                      loading: false
-                    });
-                  } else {
-                    switch (error.response ? error.response.status : "") {
+                    message: 'static.common.networkError',
+                    loading: false
+                  });
+                } else {
+                  switch (error.response ? error.response.status : "") {
 
-                      case 401:
-                        this.props.history.push(`/login/static.message.sessionExpired`)
-                        break;
-                      case 403:
-                        this.props.history.push(`/accessDenied`)
-                        break;
-                      case 500:
-                      case 404:
-                      case 406:
-                        this.setState({
-                          message: error.response.data.messageCode,
-                          loading: false
-                        });
-                        break;
-                      case 412:
-                        this.setState({
-                          message: error.response.data.messageCode,
-                          loading: false
-                        });
-                        break;
-                      default:
-                        this.setState({
-                          message: 'static.unkownError',
-                          loading: false
-                        });
-                        break;
-                    }
+                    case 401:
+                      this.props.history.push(`/login/static.message.sessionExpired`)
+                      break;
+                    case 403:
+                      this.props.history.push(`/accessDenied`)
+                      break;
+                    case 500:
+                    case 404:
+                    case 406:
+                      this.setState({
+                        message: error.response.data.messageCode,
+                        loading: false
+                      });
+                      break;
+                    case 412:
+                      this.setState({
+                        message: error.response.data.messageCode,
+                        loading: false
+                      });
+                      break;
+                    default:
+                      console.log("+++in catch 4")
+                      this.setState({
+                        message: 'static.unkownError',
+                        loading: false
+                      });
+                      break;
                   }
                 }
-              );
-          } else {
-            this.setState({
-              message: response.data.messageCode,
-              loading: false,
-              color: "red"
-            },
-              () => {
-                this.hideFirstComponent()
-              })
-          }
-        })
+              }
+            );
+        } else {
+          this.setState({
+            message: response1.data.messageCode,
+            loading: false,
+            color: "red"
+          },
+            () => {
+              this.hideFirstComponent()
+            })
+        }
+      })
         .catch(
           error => {
+            console.log("@@@Error3", error);
+            console.log("@@@Error3", error.message);
+            console.log("@@@Error3", error.response ? error.response.status : "")
             if (error.message === "Network Error") {
+              console.log("+++in catch 5")
               this.setState({
-                message: 'static.unkownError',
+                message: 'static.common.networkError',
                 loading: false
               });
             } else {
@@ -2047,6 +2457,7 @@ export default class syncPage extends Component {
                   });
                   break;
                 default:
+                  console.log("+++in catch 6")
                   this.setState({
                     message: 'static.unkownError',
                     loading: false
@@ -2385,8 +2796,13 @@ export default class syncPage extends Component {
 
   getNote(row, lang) {
     var transList = row.problemTransList.filter(c => c.reviewed == false);
-    var listLength = transList.length;
-    return transList[listLength - 1].notes;
+    if (transList.length == 0) {
+      console.log("this problem report id do not have trans+++", row.problemReportId);
+      return ""
+    } else {
+      var listLength = transList.length;
+      return transList[listLength - 1].notes;
+    }
   }
 
   loadedFunctionForMergeProblemList = function (instance) {
@@ -2510,9 +2926,62 @@ export default class syncPage extends Component {
           }
         }
       }
+      var rowData = jsonData[c];
+      if (rowData[20] != 1) {
+        var oldData = rowData[17];
+        var latestData = rowData[18];
+        if (rowData[18] != "" && rowData[17] != "") {
+          if ((oldData[8] == latestData[8]) || (oldData[8] == "" && latestData[8] == null) || (oldData[8] == null && latestData[8] == "")) {
+          } else {
+            if (rowData[8] == oldData[8]) {
+              var col = ("I").concat(parseInt(c) + 1);
+              elInstance.setStyle(col, "background-color", "transparent");
+              elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
+            } else if (rowData[8] == latestData[8]) {
+              var col = ("I").concat(parseInt(c) + 1);
+              elInstance.setStyle(col, "background-color", "transparent");
+              elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
+            }
+          }
+          if ((oldData[9] == latestData[9]) || (oldData[9] == "" && latestData[9] == null) || (oldData[9] == null && latestData[9] == "")) {
+          } else {
+            if (rowData[9] == oldData[9]) {
+              var col = ("J").concat(parseInt(c) + 1);
+              elInstance.setStyle(col, "background-color", "transparent");
+              elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
+            } else if (rowData[9] == latestData[9]) {
+              var col = ("J").concat(parseInt(c) + 1);
+              elInstance.setStyle(col, "background-color", "transparent");
+              elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
+            }
+          }
+          console.log("RowData[11+++", rowData[11]);
+          console.log("OldData[11+++", oldData[11]);
+          console.log("LatestData[11]+++", latestData[11]);
+          if ((oldData[11] == latestData[11]) || (oldData[11] == "" && latestData[11] == null) || (oldData[11] == null && latestData[11] == "")) {
+          } else {
+            if (rowData[11] == oldData[11]) {
+              var col = ("L").concat(parseInt(c) + 1);
+              elInstance.setStyle(col, "background-color", "transparent");
+              elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
+            } else if (rowData[11] == latestData[11]) {
+              var col = ("L").concat(parseInt(c) + 1);
+              elInstance.setStyle(col, "background-color", "transparent");
+              elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
+            }
+          }
+        }
+      }
     }
     elInstance.orderBy(20, 0);
     elInstance.options.editable = false;
+    if (this.state.conflictsCount == 0) {
+      this.setState({
+        progressPer: 25, message: i18n.t('static.commitVersion.resolvedConflictsSuccess'), color: 'green'
+      }, () => {
+        this.hideFirstComponent();
+      })
+    }
   }
 
   tabPane() {
@@ -2521,8 +2990,8 @@ export default class syncPage extends Component {
         <TabPane tabId="1">
           <Row>
             <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
-              <Col md="12 pl-0" id="realmDiv">
-                <div className="table-responsive RemoveStriped">
+              <Col md="12 pl-0 pr-lg-0" id="realmDiv">
+                <div className="table-responsive RemoveStriped consumptionDataEntryTable">
                   <div id="mergedVersionConsumption" />
                 </div>
               </Col>
@@ -2532,8 +3001,8 @@ export default class syncPage extends Component {
         <TabPane tabId="2">
           <Row>
             <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
-              <Col md="12 pl-0" id="realmDiv">
-                <div className="table-responsive RemoveStriped">
+              <Col md="12 pl-0 pr-lg-0" id="realmDiv">
+                <div className="table-responsive RemoveStriped consumptionDataEntryTable">
                   <div id="mergedVersionInventory" />
                 </div>
               </Col>
@@ -2543,8 +3012,8 @@ export default class syncPage extends Component {
         <TabPane tabId="3">
           <Row>
             <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
-              <Col md="12 pl-0" id="realmDiv">
-                <div className="table-responsive RemoveStriped">
+              <Col md="12 pl-0 pr-lg-0" id="realmDiv">
+                <div className="table-responsive RemoveStriped consumptionDataEntryTable">
                   <div id="mergedVersionShipment" />
                 </div>
               </Col>
@@ -2554,8 +3023,8 @@ export default class syncPage extends Component {
         <TabPane tabId="4">
           <Row>
             <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
-              <Col md="12 pl-0" id="realmDiv">
-                <div className="table-responsive RemoveStriped">
+              <Col md="12 pl-0 pr-lg-0" id="realmDiv">
+                <div className="table-responsive RemoveStriped consumptionDataEntryTable">
                   <div id="mergedVersionProblemList" />
                 </div>
               </Col>
@@ -2578,11 +3047,11 @@ export default class syncPage extends Component {
     return (
       <div className="animated fadeIn">
         <AuthenticationServiceComponent history={this.props.history} />
-        <QatProblemActionNew ref="problemListChild" updateState={this.updateState} fetchData={this.fetchData} objectStore="whatIfProgramData"></QatProblemActionNew>
+        <QatProblemActionNew ref="problemListChild" updateState={this.updateState} fetchData={this.fetchData} objectStore="whatIfProgramData" page="commitVersion"></QatProblemActionNew>
         {/* <QatProblemActions ref="problemListChild" updateState={this.updateState} fetchData={this.fetchData} objectStore="programData" /> */}
         <h5 id="div1" className={this.state.color}>{i18n.t(this.state.message, { entityname })}</h5>
         <h5 className="red" id="div2">{this.state.noFundsBudgetError || this.state.commitVersionError}</h5>
-        <Row style={{ display: this.state.loading ? "none" : "block" }}>
+        <Row>
           <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
             <Card>
               <CardBody>
@@ -2598,9 +3067,10 @@ export default class syncPage extends Component {
                             name="programSelect"
                             id="programSelect"
                             bsSize="sm"
+                            disabled={this.state.loading}
                             options={this.state.programList}
                             value={this.state.programId}
-                            onChange={(e) => { this.getDataForCompare(e); }}
+                            onChange={(e) => { this.checkLastModifiedDateForProgram(e); }}
                           />
                         </div>
                       </FormGroup>
@@ -2617,39 +3087,151 @@ export default class syncPage extends Component {
 
                   </Col>
                 </Form>
+                <ProgressBar
+                  percent={this.state.progressPer}
+                  filledBackground="linear-gradient(to right, #fefb72, #f0bb31)"
+                  style={{ width: '75%' }}
+                >
+                  <Step transition="scale">
+                    {({ accomplished }) => (
+
+                      <img
+                        style={{ filter: `grayscale(${accomplished ? 0 : 80}%)` }}
+                        width="30"
+                        // src="https://pngimg.com/uploads/number1/number1_PNG14871.png"
+                        src="../../../../public/assets/img/numbers/number1.png"
+                      />
+
+
+                    )}
+
+                  </Step>
+
+                  <Step transition="scale">
+                    {({ accomplished }) => (
+                      <img
+                        style={{ filter: `grayscale(${accomplished ? 0 : 80}%)` }}
+                        width="30"
+                        src="../../../../public/assets/img/numbers/number2.png"
+                      // src="https://cdn.clipart.email/096a56141a18c8a5b71ee4a53609b16a_data-privacy-news-five-stories-that-you-need-to-know-about-_688-688.png"
+                      />
+                      // <h2>2</h2>
+                    )}
+
+                  </Step>
+                  <Step transition="scale">
+                    {({ accomplished }) => (
+                      <img
+                        style={{ filter: `grayscale(${accomplished ? 0 : 80}%)` }}
+                        width="30"
+                        src="../../../../public/assets/img/numbers/number3.png"
+                      // src="https://www.obiettivocoaching.it/wp-content/uploads/2016/04/recruit-circle-3-icon-blue.png"
+                      />
+                      // <h2>3</h2>
+                    )}
+                  </Step>
+                  <Step transition="scale">
+                    {({ accomplished }) => (
+                      <img
+                        style={{ filter: `grayscale(${accomplished ? 0 : 80}%)` }}
+                        width="30"
+                        src="../../../../public/assets/img/numbers/number4.png"
+                      // src="https://pngriver.com/wp-content/uploads/2017/12/number-4-digit-png-transparent-images-transparent-backgrounds-4.png"
+                      />
+                      // <h2>4</h2>
+                    )}
+                  </Step>
+                  <Step transition="scale">
+                    {({ accomplished }) => (
+                      <img
+                        style={{ filter: `grayscale(${accomplished ? 0 : 80}%)` }}
+                        width="30"
+                        src="../../../../public/assets/img/numbers/number5.png"
+                      // src="https://pngriver.com/wp-content/uploads/2017/12/number-4-digit-png-transparent-images-transparent-backgrounds-4.png"
+                      />
+                      // <h2>4</h2>
+                    )}
+                  </Step>
+                </ProgressBar>
+                <div className="d-sm-down-none  progressbar">
+                  <ul>
+                    <li className="quantimedProgressbartext1">{i18n.t('static.commitVersion.compareData')}</li>
+                    <li className="quantimedProgressbartext2">{i18n.t('static.commitVersion.resolveConflicts')}</li>
+                    <li className="quantimedProgressbartext3">{i18n.t('static.commitVersion.sendingDataToServer')}</li>
+                    <li className="quantimedProgressbartext4">{i18n.t('static.commitVersion.serverProcessing')}</li>
+                    <li className="quantimedProgressbartext5">{i18n.t('static.commitVersion.upgradeLocalToLatest')}</li>
+                  </ul>
+                </div>
+                <br></br>
                 <div id="detailsDiv">
-                  <div className="animated fadeIn">
-                    <Col md="12 pl-0 pt-3">
-                      <div className="d-md-flex">
-                        <FormGroup className="col-md-3">
-                          <Label htmlFor="appendedInputButton">{i18n.t('static.report.versiontype')}</Label>
-                          <div className="controls ">
-                            <InputGroup>
-                              <Input type="select"
-                                bsSize="sm"
-                                name="versionType" id="versionType" onChange={this.versionTypeChanged}>
-                                {versionTypes}
-                              </Input>
-                            </InputGroup>
-                          </div>
-                        </FormGroup>
-                        <FormGroup className="col-md-6">
-                          <Label htmlFor="appendedInputButton">{i18n.t('static.program.notes')}</Label>
-                          <div className="controls ">
-                            <InputGroup>
-                              <Input type="textarea"
-                                name="notes" maxLength={600} id="notes">
-                              </Input>
-                            </InputGroup>
-                          </div>
-                        </FormGroup>
-                        <FormGroup className="tab-ml-1 mt-4">
-                          <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                          {((this.state.isChanged.toString() == "true" && this.state.versionType == 1) || this.state.versionType == 2) && this.state.conflictsCount == 0 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={this.synchronize} ><i className="fa fa-check"></i>{i18n.t('static.button.commit')} </Button>}
-                          &nbsp;
-                </FormGroup>
-                      </div>
-                    </Col>
+                  <div className="animated fadeIn" style={{ display: this.state.loading ? "none" : "block" }}>
+                    <Formik
+                      initialValues={initialValues}
+                      validate={validate(validationSchema)}
+                      onSubmit={(values, { setSubmitting, setErrors }) => {
+                        this.synchronize()
+                      }}
+                      render={
+                        ({
+                          values,
+                          errors,
+                          touched,
+                          handleChange,
+                          handleBlur,
+                          handleSubmit,
+                          isSubmitting,
+                          isValid,
+                          setTouched,
+                          handleReset,
+                          setFieldValue,
+                          setFieldTouched,
+                          setFieldError
+                        }) => (
+                          <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='budgetForm' autocomplete="off">
+                            <Col md="12 pl-0 pt-3">
+                              <div className="d-md-flex">
+                                <FormGroup className="col-md-3">
+                                  <Label htmlFor="appendedInputButton">{i18n.t('static.report.versiontype')}</Label>
+                                  <div className="controls ">
+                                    <InputGroup>
+                                      <Input type="select"
+                                        bsSize="sm"
+                                        name="versionType" id="versionType" onChange={this.versionTypeChanged}>
+                                        {versionTypes}
+                                      </Input>
+                                    </InputGroup>
+                                  </div>
+                                </FormGroup>
+                                <FormGroup className="col-md-6">
+                                  <Label htmlFor="appendedInputButton">{i18n.t('static.program.notes')}</Label>
+                                  <div className="controls ">
+                                    <InputGroup>
+                                      <Input type="textarea"
+                                        name="notes"
+                                        // maxLength={600} 
+                                        id="notes"
+                                        valid={!errors.notes && this.state.notes != ''}
+                                        invalid={touched.notes && !!errors.notes}
+                                        onChange={(e) => { handleChange(e); this.notesChange(e); }}
+                                        onBlur={handleBlur}
+                                        value={this.state.notes}
+                                      >
+                                      </Input>
+                                      <FormFeedback className="red">{errors.notes}</FormFeedback>
+                                    </InputGroup>
+                                  </div>
+                                </FormGroup>
+                                <FormGroup className="tab-ml-1 mt-4">
+                                  <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                  {/* {((this.state.isChanged.toString() == "true" && this.state.versionType == 1) || (this.state.versionType == 2 && (this.state.openCount == 0 || AuthenticationService.getLoggedInUserRoleIdArr().includes("ROLE_APPLICATION_ADMIN")))) && this.state.conflictsCount == 0 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.button.commit')} </Button>} */}
+                                  {((this.state.isChanged.toString() == "true" && this.state.versionType == 1) || (this.state.versionType == 2 && (this.state.openCount == 0 || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN")))) && this.state.conflictsCount == 0 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.button.commit')} </Button>}
+                                  &nbsp;
+                                </FormGroup>
+                              </div>
+                            </Col>
+                          </Form>
+                        )} />
+                    <h5 style={{ color: 'red' }}>{i18n.t('static.commitVersion.commitNote')}</h5>
                     <Row>
                       <Col xs="12" md="12" className="mb-4">
                         <Nav tabs>
@@ -2694,6 +3276,15 @@ export default class syncPage extends Component {
                       </Col>
                     </Row>
                   </div>
+                  <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                      <div class="align-items-center">
+                        <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+                        <div class="spinner-border blue ml-4" role="status">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </CardBody>
               {/* <CardFooter> */}
@@ -2706,17 +3297,7 @@ export default class syncPage extends Component {
             </Card>
           </Col>
         </Row>
-        <div style={{ display: this.state.loading ? "block" : "none" }}>
-          <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-            <div class="align-items-center">
-              <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-              <div class="spinner-border blue ml-4" role="status">
-
-              </div>
-            </div>
-          </div>
-        </div>
         {/* Resolve conflicts modal */}
         <Modal isOpen={this.state.conflicts}
           className={'modal-lg ' + this.props.className, "modalWidth"} style={{ display: this.state.loading ? "none" : "block" }}>
@@ -2728,7 +3309,7 @@ export default class syncPage extends Component {
             </ul>
           </ModalHeader>
           <ModalBody>
-            <div className="table-responsive RemoveStriped">
+            <div className="table-responsive RemoveStriped consumptionDataEntryTable">
               <div id="resolveConflictsTable" />
               <input type="hidden" id="index" />
             </div>
@@ -2752,7 +3333,7 @@ export default class syncPage extends Component {
             </ul>
           </ModalHeader>
           <ModalBody>
-            <div className="table-responsive RemoveStriped">
+            <div className="table-responsive RemoveStriped consumptionDataEntryTable">
               <div id="resolveConflictsInventoryTable" />
               <input type="hidden" id="indexInventory" />
             </div>
@@ -2775,7 +3356,7 @@ export default class syncPage extends Component {
             </ul>
           </ModalHeader>
           <ModalBody>
-            <div className="table-responsive RemoveStriped">
+            <div className="table-responsive RemoveStriped consumptionDataEntryTable">
               <div id="resolveConflictsShipmentTable" />
               <input type="hidden" id="indexShipment" />
             </div>
@@ -2798,7 +3379,7 @@ export default class syncPage extends Component {
             </ul>
           </ModalHeader>
           <ModalBody>
-            <div className="table-responsive RemoveStriped">
+            <div className="table-responsive RemoveStriped consumptionDataEntryTable">
               <div id="resolveConflictsProblemTable" />
               <input type="hidden" id="indexProblem" />
             </div>
@@ -2874,12 +3455,11 @@ export default class syncPage extends Component {
         }
       }
       problemReportList = (problemReportList.concat(oldProgramDataProblem.filter(c => c.problemReportId == 0))).filter(c => c.newAdded != true);
-      problemReportList = problemReportList.filter(c => c.planningUnitActive != false);
-      var problemListDate = moment(Date.now()).subtract(12, 'months').endOf('month').format("YYYY-MM-DD");
+      problemReportList = problemReportList.filter(c => c.planningUnitActive != false && c.regionActive != false);
+      // var problemListDate = moment(Date.now()).subtract(12, 'months').endOf('month').format("YYYY-MM-DD");
       if (problemReportList.filter(c =>
-        c.problemStatus.id == OPEN_PROBLEM_STATUS_ID &&
-        moment(c.createdDate).format("YYYY-MM-DD") > problemListDate
-      ).length > 0 && document.getElementById("versionType").value == FINAL_VERSION_TYPE) {
+        c.problemStatus.id == OPEN_PROBLEM_STATUS_ID
+      ).length > 0 && document.getElementById("versionType").value == FINAL_VERSION_TYPE && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
         alert(i18n.t("static.commitVersion.cannotCommitWithOpenProblems"))
         this.setState({ loading: false });
       } else {
@@ -2903,198 +3483,552 @@ export default class syncPage extends Component {
             })
           }.bind(this);
           programRequest.onsuccess = function (e) {
-            var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-            var programJson = JSON.parse(programData);
-            // var planningUnitList = [];
-            // var consumptionData = [];
-            // var consumptionJson = (this.state.mergedConsumptionJexcel).getJson();
-            // var oldProgramDataConsumption = this.state.oldProgramDataConsumption;
-            // var latestProgramDataConsumption = this.state.latestProgramDataConsumption;
-            // for (var c = 0; c < consumptionJson.length; c++) {
-            //   if (((consumptionJson[c])[18] == 2 || (consumptionJson[c])[18] == 4) && (consumptionJson[c])[0] != 0) {
-            //     consumptionData.push(oldProgramDataConsumption.filter(a => a.consumptionId == (consumptionJson[c])[0])[0]);
-            //   } else if ((consumptionJson[c])[18] == 3 && (consumptionJson[c])[0] != 0) {
-            //     consumptionData.push(latestProgramDataConsumption.filter(a => a.consumptionId == (consumptionJson[c])[0])[0]);
-            //   }
-            // }
-            // consumptionData = consumptionData.concat(oldProgramDataConsumption.filter(c => c.consumptionId == 0));
+            // var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+            // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+            // var programJson = JSON.parse(programData);
 
-            // var inventoryData = [];
-            // var inventoryJson = (this.state.mergedInventoryJexcel).getJson();
-            // var oldProgramDataInventory = this.state.oldProgramDataInventory;
-            // var latestProgramDataInventory = this.state.latestProgramDataInventory;
-            // for (var c = 0; c < inventoryJson.length; c++) {
-            //   if (((inventoryJson[c])[19] == 2 || (inventoryJson[c])[19] == 4) && (inventoryJson[c])[0] != 0) {
-            //     inventoryData.push(oldProgramDataInventory.filter(a => a.inventoryId == (inventoryJson[c])[0])[0]);
-            //   } else if ((inventoryJson[c])[19] == 3 && (inventoryJson[c])[0] != 0) {
-            //     inventoryData.push(latestProgramDataInventory.filter(a => a.inventoryId == (inventoryJson[c])[0])[0]);
-            //   }
-            // }
-            // inventoryData = inventoryData.concat(oldProgramDataInventory.filter(c => c.inventoryId == 0));
+            var programQPLDetailsTransaction1 = db1.transaction(['programQPLDetails'], 'readwrite');
+            var programQPLDetailsOs1 = programQPLDetailsTransaction1.objectStore('programQPLDetails');
+            var programQPLDetailsGetRequest = programQPLDetailsOs1.get((this.state.programId).value);
+            programQPLDetailsGetRequest.onsuccess = function (event) {
+              var programQPLDetails = programQPLDetailsGetRequest.result;
+              var programIdForNotification = programQPLDetails.programId;
+              var versionIdForNotification = programQPLDetails.version;
+              // var planningUnitList = [];
+              // var consumptionData = [];
+              // var consumptionJson = (this.state.mergedConsumptionJexcel).getJson();
+              // var oldProgramDataConsumption = this.state.oldProgramDataConsumption;
+              // var latestProgramDataConsumption = this.state.latestProgramDataConsumption;
+              // for (var c = 0; c < consumptionJson.length; c++) {
+              // if (((consumptionJson[c])[18] == 2 || (consumptionJson[c])[18] == 4) && (consumptionJson[c])[0] != 0) {
+              // consumptionData.push(oldProgramDataConsumption.filter(a => a.consumptionId == (consumptionJson[c])[0])[0]);
+              // } else if ((consumptionJson[c])[18] == 3 && (consumptionJson[c])[0] != 0) {
+              // consumptionData.push(latestProgramDataConsumption.filter(a => a.consumptionId == (consumptionJson[c])[0])[0]);
+              // }
+              // }
+              // consumptionData = consumptionData.concat(oldProgramDataConsumption.filter(c => c.consumptionId == 0));
 
-            // var shipmentData = [];
-            // var shipmentJson = (this.state.mergedShipmentJexcel).getJson();
-            // var oldProgramDataShipment = this.state.oldProgramDataShipment;
-            // var latestProgramDataShipment = this.state.latestProgramDataShipment;
-            // for (var c = 0; c < shipmentJson.length; c++) {
-            //   if (((shipmentJson[c])[33] == 2 || (shipmentJson[c])[33] == 4) && (shipmentJson[c])[0] != 0) {
-            //     shipmentData.push(oldProgramDataShipment.filter(a => a.shipmentId == (shipmentJson[c])[0])[0]);
-            //   } else if ((shipmentJson[c])[33] == 3 && (shipmentJson[c])[0] != 0) {
-            //     shipmentData.push(latestProgramDataShipment.filter(a => a.shipmentId == (shipmentJson[c])[0])[0]);
-            //   }
-            // }
-            // shipmentData = shipmentData.concat(oldProgramDataShipment.filter(c => c.shipmentId == 0 && c.active.toString() == "true"));
+              // var inventoryData = [];
+              // var inventoryJson = (this.state.mergedInventoryJexcel).getJson();
+              // var oldProgramDataInventory = this.state.oldProgramDataInventory;
+              // var latestProgramDataInventory = this.state.latestProgramDataInventory;
+              // for (var c = 0; c < inventoryJson.length; c++) {
+              // if (((inventoryJson[c])[19] == 2 || (inventoryJson[c])[19] == 4) && (inventoryJson[c])[0] != 0) {
+              // inventoryData.push(oldProgramDataInventory.filter(a => a.inventoryId == (inventoryJson[c])[0])[0]);
+              // } else if ((inventoryJson[c])[19] == 3 && (inventoryJson[c])[0] != 0) {
+              // inventoryData.push(latestProgramDataInventory.filter(a => a.inventoryId == (inventoryJson[c])[0])[0]);
+              // }
+              // }
+              // inventoryData = inventoryData.concat(oldProgramDataInventory.filter(c => c.inventoryId == 0));
 
-            var problemReportList = [];
-            var problemJson = (this.state.mergedProblemListJexcel).getJson();
-            var oldProgramDataProblem = this.state.oldProgramDataProblemList;
-            var latestProgramDataProblem = this.state.latestProgramDataProblemList;
-            for (var c = 0; c < problemJson.length; c++) {
-              if (((problemJson[c])[20] == 2 || (problemJson[c])[20] == 4) && (problemJson[c])[0] != 0) {
-                problemReportList.push(oldProgramDataProblem.filter(a => a.problemReportId == (problemJson[c])[0])[0]);
-              } else if ((problemJson[c])[20] == 3 && (problemJson[c])[0] != 0) {
-                problemReportList.push(latestProgramDataProblem.filter(a => a.problemReportId == (problemJson[c])[0])[0]);
+              // var shipmentData = [];
+              // var shipmentJson = (this.state.mergedShipmentJexcel).getJson();
+              // var oldProgramDataShipment = this.state.oldProgramDataShipment;
+              // var latestProgramDataShipment = this.state.latestProgramDataShipment;
+              // for (var c = 0; c < shipmentJson.length; c++) {
+              // if (((shipmentJson[c])[33] == 2 || (shipmentJson[c])[33] == 4) && (shipmentJson[c])[0] != 0) {
+              // shipmentData.push(oldProgramDataShipment.filter(a => a.shipmentId == (shipmentJson[c])[0])[0]);
+              // } else if ((shipmentJson[c])[33] == 3 && (shipmentJson[c])[0] != 0) {
+              // shipmentData.push(latestProgramDataShipment.filter(a => a.shipmentId == (shipmentJson[c])[0])[0]);
+              // }
+              // }
+              // shipmentData = shipmentData.concat(oldProgramDataShipment.filter(c => c.shipmentId == 0 && c.active.toString() == "true"));
+
+              // var problemReportList = [];
+              // var problemJson = (this.state.mergedProblemListJexcel).getJson();
+              // var oldProgramDataProblem = this.state.oldProgramDataProblemList;
+              // var latestProgramDataProblem = this.state.latestProgramDataProblemList;
+              // for (var c = 0; c < problemJson.length; c++) {
+              // if (((problemJson[c])[20] == 2 || (problemJson[c])[20] == 4) && (problemJson[c])[0] != 0) {
+              // problemReportList.push(oldProgramDataProblem.filter(a => a.problemReportId == (problemJson[c])[0])[0]);
+              // } else if ((problemJson[c])[20] == 3 && (problemJson[c])[0] != 0) {
+              // problemReportList.push(latestProgramDataProblem.filter(a => a.problemReportId == (problemJson[c])[0])[0]);
+              // }
+              var generalDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
+              var generalData = generalDataBytes.toString(CryptoJS.enc.Utf8);
+              var generalJson = JSON.parse(generalData);
+              var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
+              var consumptionList = [];
+              var inventoryList = [];
+              var shipmentList = [];
+              var batchInfoList = [];
+              var supplyPlan = [];
+
+              for (var pu = 0; pu < planningUnitDataList.length; pu++) {
+                var planningUnitData = planningUnitDataList[pu];
+                var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                var planningUnitDataJson = JSON.parse(programData);
+                consumptionList = consumptionList.concat(planningUnitDataJson.consumptionList);
+                inventoryList = inventoryList.concat(planningUnitDataJson.inventoryList);
+                shipmentList = shipmentList.concat(planningUnitDataJson.shipmentList);
+                batchInfoList = batchInfoList.concat(planningUnitDataJson.batchInfoList);
+                supplyPlan = supplyPlan.concat(planningUnitDataJson.supplyPlan);
               }
-            }
-            problemReportList = (problemReportList.concat(oldProgramDataProblem.filter(c => c.problemReportId == 0))).filter(c => c.newAdded != true);
-            problemReportList = problemReportList.filter(c => c.planningUnitActive != false);
-            // programJson.consumptionList = consumptionData;
-            // programJson.inventoryList = inventoryData;
-            // programJson.shipmentList = shipmentData;
-            programJson.problemReportList = problemReportList;
-            // programJson.problemReportList = [];
-            programJson.versionType = { id: document.getElementById("versionType").value };
-            programJson.versionStatus = { id: PENDING_APPROVAL_VERSION_STATUS };
-            programJson.notes = document.getElementById("notes").value;
-            ProgramService.saveProgramData(programJson).then(response => {
-              if (response.status == 200) {
-                var programDataTransaction1 = db1.transaction(['programData'], 'readwrite');
-                var programDataOs1 = programDataTransaction1.objectStore('programData');
-                var programRequest1 = programDataOs1.delete((this.state.programId).value);
+              var programJson = generalJson;
+              programJson.consumptionList = consumptionList;
+              programJson.inventoryList = inventoryList;
+              programJson.shipmentList = shipmentList;
+              programJson.batchInfoList = batchInfoList;
+              programJson.supplyPlan = supplyPlan;
+              // var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+              // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+              // var programJson = JSON.parse(programData);
+              // var planningUnitList = [];
+              // var consumptionData = [];
+              // var consumptionJson = (this.state.mergedConsumptionJexcel).getJson();
+              // var oldProgramDataConsumption = this.state.oldProgramDataConsumption;
+              // var latestProgramDataConsumption = this.state.latestProgramDataConsumption;
+              // for (var c = 0; c < consumptionJson.length; c++) {
+              // if (((consumptionJson[c])[18] == 2 || (consumptionJson[c])[18] == 4) && (consumptionJson[c])[0] != 0) {
+              // consumptionData.push(oldProgramDataConsumption.filter(a => a.consumptionId == (consumptionJson[c])[0])[0]);
+              // } else if ((consumptionJson[c])[18] == 3 && (consumptionJson[c])[0] != 0) {
+              // consumptionData.push(latestProgramDataConsumption.filter(a => a.consumptionId == (consumptionJson[c])[0])[0]);
+              // }
+              // }
+              // consumptionData = consumptionData.concat(oldProgramDataConsumption.filter(c => c.consumptionId == 0));
 
-                var programDataTransaction3 = db1.transaction(['programQPLDetails'], 'readwrite');
-                var programDataOs3 = programDataTransaction3.objectStore('programQPLDetails');
-                var programRequest3 = programDataOs3.delete((this.state.programId).value);
+              // var inventoryData = [];
+              // var inventoryJson = (this.state.mergedInventoryJexcel).getJson();
+              // var oldProgramDataInventory = this.state.oldProgramDataInventory;
+              // var latestProgramDataInventory = this.state.latestProgramDataInventory;
+              // for (var c = 0; c < inventoryJson.length; c++) {
+              // if (((inventoryJson[c])[19] == 2 || (inventoryJson[c])[19] == 4) && (inventoryJson[c])[0] != 0) {
+              // inventoryData.push(oldProgramDataInventory.filter(a => a.inventoryId == (inventoryJson[c])[0])[0]);
+              // } else if ((inventoryJson[c])[19] == 3 && (inventoryJson[c])[0] != 0) {
+              // inventoryData.push(latestProgramDataInventory.filter(a => a.inventoryId == (inventoryJson[c])[0])[0]);
+              // }
+              // }
+              // inventoryData = inventoryData.concat(oldProgramDataInventory.filter(c => c.inventoryId == 0));
 
-                var programDataTransaction2 = db1.transaction(['downloadedProgramData'], 'readwrite');
-                var programDataOs2 = programDataTransaction2.objectStore('downloadedProgramData');
-                var programRequest2 = programDataOs2.delete((this.state.programId).value);
+              // var shipmentData = [];
+              // var shipmentJson = (this.state.mergedShipmentJexcel).getJson();
+              // var oldProgramDataShipment = this.state.oldProgramDataShipment;
+              // var latestProgramDataShipment = this.state.latestProgramDataShipment;
+              // for (var c = 0; c < shipmentJson.length; c++) {
+              // if (((shipmentJson[c])[33] == 2 || (shipmentJson[c])[33] == 4) && (shipmentJson[c])[0] != 0) {
+              // shipmentData.push(oldProgramDataShipment.filter(a => a.shipmentId == (shipmentJson[c])[0])[0]);
+              // } else if ((shipmentJson[c])[33] == 3 && (shipmentJson[c])[0] != 0) {
+              // shipmentData.push(latestProgramDataShipment.filter(a => a.shipmentId == (shipmentJson[c])[0])[0]);
+              // }
+              // }
+              // shipmentData = shipmentData.concat(oldProgramDataShipment.filter(c => c.shipmentId == 0 && c.active.toString() == "true"));
 
-                programRequest1.onerror = function (event) {
-                  this.setState({
-                    supplyPlanError: i18n.t('static.program.errortext')
-                  })
-                }.bind(this);
-                programRequest2.onsuccess = function (e) {
+              // var problemReportList = [];
+              // var problemJson = (this.state.mergedProblemListJexcel).getJson();
+              // var oldProgramDataProblem = this.state.oldProgramDataProblemList;
+              // var latestProgramDataProblem = this.state.latestProgramDataProblemList;
+              // for (var c = 0; c < problemJson.length; c++) {
+              // if (((problemJson[c])[20] == 2 || (problemJson[c])[20] == 4) && (problemJson[c])[0] != 0) {
+              // problemReportList.push(oldProgramDataProblem.filter(a => a.problemReportId == (problemJson[c])[0])[0]);
+              // } else if ((problemJson[c])[20] == 3 && (problemJson[c])[0] != 0) {
+              // problemReportList.push(latestProgramDataProblem.filter(a => a.problemReportId == (problemJson[c])[0])[0]);
+              // }
+              var generalDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
+              var generalData = generalDataBytes.toString(CryptoJS.enc.Utf8);
+              var generalJson = JSON.parse(generalData);
+              var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
+              var consumptionList = [];
+              var inventoryList = [];
+              var shipmentList = [];
+              var batchInfoList = [];
+              var supplyPlan = [];
 
-                  var json = response.data;
-                  json.actionList = [];
-                  var version = json.requestedProgramVersion;
-                  if (version == -1) {
-                    version = json.currentVersion.versionId
-                  }
+              for (var pu = 0; pu < planningUnitDataList.length; pu++) {
+                var planningUnitData = planningUnitDataList[pu];
+                var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                var planningUnitDataJson = JSON.parse(programData);
+                consumptionList = consumptionList.concat(planningUnitDataJson.consumptionList);
+                inventoryList = inventoryList.concat(planningUnitDataJson.inventoryList);
+                shipmentList = shipmentList.concat(planningUnitDataJson.shipmentList);
+                batchInfoList = batchInfoList.concat(planningUnitDataJson.batchInfoList);
+                supplyPlan = supplyPlan.concat(planningUnitDataJson.supplyPlan);
+              }
+              var programJson = generalJson;
+              programJson.consumptionList = consumptionList;
+              programJson.inventoryList = inventoryList;
+              programJson.shipmentList = shipmentList;
+              programJson.batchInfoList = batchInfoList;
+              programJson.supplyPlan = supplyPlan;
+              // var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+              // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+              // var programJson = JSON.parse(programData);
+              // var planningUnitList = [];
+              // var consumptionData = [];
+              // var consumptionJson = (this.state.mergedConsumptionJexcel).getJson();
+              // var oldProgramDataConsumption = this.state.oldProgramDataConsumption;
+              // var latestProgramDataConsumption = this.state.latestProgramDataConsumption;
+              // for (var c = 0; c < consumptionJson.length; c++) {
+              // if (((consumptionJson[c])[18] == 2 || (consumptionJson[c])[18] == 4) && (consumptionJson[c])[0] != 0) {
+              // consumptionData.push(oldProgramDataConsumption.filter(a => a.consumptionId == (consumptionJson[c])[0])[0]);
+              // } else if ((consumptionJson[c])[18] == 3 && (consumptionJson[c])[0] != 0) {
+              // consumptionData.push(latestProgramDataConsumption.filter(a => a.consumptionId == (consumptionJson[c])[0])[0]);
+              // }
+              // }
+              // consumptionData = consumptionData.concat(oldProgramDataConsumption.filter(c => c.consumptionId == 0));
 
-                  var transactionForSavingData = db1.transaction(['programData'], 'readwrite');
-                  var programSaveData = transactionForSavingData.objectStore('programData');
+              // var inventoryData = [];
+              // var inventoryJson = (this.state.mergedInventoryJexcel).getJson();
+              // var oldProgramDataInventory = this.state.oldProgramDataInventory;
+              // var latestProgramDataInventory = this.state.latestProgramDataInventory;
+              // for (var c = 0; c < inventoryJson.length; c++) {
+              // if (((inventoryJson[c])[19] == 2 || (inventoryJson[c])[19] == 4) && (inventoryJson[c])[0] != 0) {
+              // inventoryData.push(oldProgramDataInventory.filter(a => a.inventoryId == (inventoryJson[c])[0])[0]);
+              // } else if ((inventoryJson[c])[19] == 3 && (inventoryJson[c])[0] != 0) {
+              // inventoryData.push(latestProgramDataInventory.filter(a => a.inventoryId == (inventoryJson[c])[0])[0]);
+              // }
+              // }
+              // inventoryData = inventoryData.concat(oldProgramDataInventory.filter(c => c.inventoryId == 0));
 
-                  var transactionForSavingDownloadedProgramData = db1.transaction(['downloadedProgramData'], 'readwrite');
-                  var downloadedProgramSaveData = transactionForSavingDownloadedProgramData.objectStore('downloadedProgramData');
+              // var shipmentData = [];
+              // var shipmentJson = (this.state.mergedShipmentJexcel).getJson();
+              // var oldProgramDataShipment = this.state.oldProgramDataShipment;
+              // var latestProgramDataShipment = this.state.latestProgramDataShipment;
+              // for (var c = 0; c < shipmentJson.length; c++) {
+              // if (((shipmentJson[c])[33] == 2 || (shipmentJson[c])[33] == 4) && (shipmentJson[c])[0] != 0) {
+              // shipmentData.push(oldProgramDataShipment.filter(a => a.shipmentId == (shipmentJson[c])[0])[0]);
+              // } else if ((shipmentJson[c])[33] == 3 && (shipmentJson[c])[0] != 0) {
+              // shipmentData.push(latestProgramDataShipment.filter(a => a.shipmentId == (shipmentJson[c])[0])[0]);
+              // }
+              // }
+              // shipmentData = shipmentData.concat(oldProgramDataShipment.filter(c => c.shipmentId == 0 && c.active.toString() == "true"));
+
+              var problemReportList = [];
+              var problemJson = (this.state.mergedProblemListJexcel).getJson();
+              var oldProgramDataProblem = this.state.oldProgramDataProblemList;
+              var latestProgramDataProblem = this.state.latestProgramDataProblemList;
+              for (var c = 0; c < problemJson.length; c++) {
+                if (((problemJson[c])[20] == 2 || (problemJson[c])[20] == 4) && (problemJson[c])[0] != 0) {
+                  problemReportList.push(oldProgramDataProblem.filter(a => a.problemReportId == (problemJson[c])[0])[0]);
+                } else if ((problemJson[c])[20] == 3 && (problemJson[c])[0] != 0) {
+                  problemReportList.push(latestProgramDataProblem.filter(a => a.problemReportId == (problemJson[c])[0])[0]);
+                }
+              }
+              problemReportList = (problemReportList.concat(oldProgramDataProblem.filter(c => c.problemReportId == 0))).filter(c => c.newAdded != true);
+              problemReportList = problemReportList.filter(c => c.planningUnitActive != false && c.regionActive != false);
+              // programJson.consumptionList = consumptionData;
+              // programJson.inventoryList = inventoryData;
+              // programJson.shipmentList = shipmentData;
+              programJson.problemReportList = problemReportList;
+              console.log("ProgramJson.consumption+++", programJson.consumptionList);
+              // programJson.problemReportList = [];
+              programJson.versionType = { id: document.getElementById("versionType").value };
+              programJson.versionStatus = { id: PENDING_APPROVAL_VERSION_STATUS };
+              programJson.notes = document.getElementById("notes").value;
+              console.log("ProgramJson+++", programJson);
+              // ProgramService.getLatestVersionForProgram((this.state.singleProgramId)).then(response => {
+              //   if (response.status == 200) {
+              //     if (response.data == this.state.comparedLatestVersion) {
+              // ProgramService.checkIfCommitRequestExists((this.state.singleProgramId)).then(response1 => {
+              // if (response1.status == 200) {
+              // if (response1.data == false) {
+              ProgramService.saveProgramData(programJson, this.state.comparedLatestVersion).then(response => {
+                if (response.status == 200) {
+                  console.log(")))) Commit Request generated successfully");
+                  // var programDataTransaction1 = db1.transaction(['programData'], 'readwrite');
+                  // var programDataOs1 = programDataTransaction1.objectStore('programData');
+                  // var programRequest1 = programDataOs1.delete((this.state.programId).value);
+
+                  // var programDataTransaction3 = db1.transaction(['programQPLDetails'], 'readwrite');
+                  // var programDataOs3 = programDataTransaction3.objectStore('programQPLDetails');
+                  // var programRequest3 = programDataOs3.delete((this.state.programId).value);
+
+                  // var programDataTransaction2 = db1.transaction(['downloadedProgramData'], 'readwrite');
+                  // var programDataOs2 = programDataTransaction2.objectStore('downloadedProgramData');
+                  // var programRequest2 = programDataOs2.delete((this.state.programId).value);
+
+                  // programRequest1.onerror = function (event) {
+                  // this.setState({
+                  // supplyPlanError: i18n.t('static.program.errortext')
+                  // })
+                  // }.bind(this);
+                  // programRequest2.onsuccess = function (e) {
+
+                  // var json = response.data;
+                  // json.actionList = [];
+                  // var version = json.requestedProgramVersion;
+                  // if (version == -1) {
+                  // version = json.currentVersion.versionId
+                  // }
+
+                  // var transactionForSavingData = db1.transaction(['programData'], 'readwrite');
+                  // var programSaveData = transactionForSavingData.objectStore('programData');
+
+                  // var transactionForSavingDownloadedProgramData = db1.transaction(['downloadedProgramData'], 'readwrite');
+                  // var downloadedProgramSaveData = transactionForSavingDownloadedProgramData.objectStore('downloadedProgramData');
 
                   var transactionForProgramQPLDetails = db1.transaction(['programQPLDetails'], 'readwrite');
                   var programQPLDetailSaveData = transactionForProgramQPLDetails.objectStore('programQPLDetails');
-                  // for (var i = 0; i < json.length; i++) {
-                  var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json), SECRET_KEY);
-                  var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                  var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                  var openCount = (json.problemReportList.filter(c => c.problemStatus.id == 1)).length;
-                  var addressedCount = (json.problemReportList.filter(c => c.problemStatus.id == 3)).length;
+                  // // for (var i = 0; i < json.length; i++) {
+                  // var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json), SECRET_KEY);
+                  // var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                  // var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                  // var openCount = (json.problemReportList.filter(c => c.problemStatus.id == 1 && c.planningUnitActive != false && c.regionActive != false)).length;
+                  // var addressedCount = (json.problemReportList.filter(c => c.problemStatus.id == 3 && c.planningUnitActive != false && c.regionActive != false)).length;
 
-                  var item = {
-                    id: json.programId + "_v" + version + "_uId_" + userId,
-                    programId: json.programId,
-                    version: version,
-                    programName: (CryptoJS.AES.encrypt(JSON.stringify((json.label)), SECRET_KEY)).toString(),
-                    programData: encryptedText.toString(),
-                    userId: userId
-                  };
-                  var programQPLDetails = {
-                    id: json.programId + "_v" + version + "_uId_" + userId,
-                    programId: json.programId,
-                    version: version,
-                    userId: userId,
-                    programCode: json.programCode,
-                    openCount: openCount,
-                    addressedCount: addressedCount,
-                    programModified: 0
-                  }
-                  var putRequest = programSaveData.put(item);
-                  var putRequest1 = downloadedProgramSaveData.put(item);
+                  // var item = {
+                  // id: json.programId + "_v" + version + "_uId_" + userId,
+                  // programId: json.programId,
+                  // version: version,
+                  // programName: (CryptoJS.AES.encrypt(JSON.stringify((json.label)), SECRET_KEY)).toString(),
+                  // programData: encryptedText.toString(),
+                  // userId: userId
+                  // };
+                  // var programQPLDetails = {
+                  // id: json.programId + "_v" + version + "_uId_" + userId,
+                  // programId: json.programId,
+                  // version: version,
+                  // userId: userId,
+                  // programCode: json.programCode,
+                  // openCount: openCount,
+                  // addressedCount: addressedCount,
+                  // programModified: 0
+                  // }
+                  programQPLDetails.readonly = 1;
+                  // var putRequest = programSaveData.put(programRequest.result);
+                  // var putRequest1 = downloadedProgramSaveData.put(item);
                   var putRequest2 = programQPLDetailSaveData.put(programQPLDetails);
+                  localStorage.setItem("sesProgramId", "");
+                  console.log(")))) Made program readonly");
+                  // this.props.history.push({ pathname: `/masterDataSync/green/` + i18n.t('static.message.commitSuccess'), state: { "programIds": json.programId + "_v" + version + "_uId_" + userId } })
+                  this.setState({
+                    progressPer: 50
+                    , message: i18n.t('static.commitVersion.sendLocalToServerCompleted'), color: 'green'
+                  }, () => {
+                    this.hideFirstComponent();
+                    this.redirectToDashbaord(response.data);
+                  })
+                  // }.bind(this)
+                } else {
+                  this.setState({
+                    message: response.data.messageCode,
+                    color: "red",
+                    loading: false
+                  })
+                  this.hideFirstComponent();
+                }
+              })
+                .catch(
+                  error => {
+                    console.log("@@@Error4", error);
+                    console.log("@@@Error4", error.message);
+                    console.log("@@@Error4", error.response ? error.response.status : "")
+                    if (error.message === "Network Error") {
+                      console.log("+++in catch 7")
+                      this.setState({
+                        message: 'static.common.networkError',
+                        color: "red",
+                        loading: false
+                      }, () => {
+                        this.hideFirstComponent();
+                      });
+                    } else {
+                      switch (error.response ? error.response.status : "") {
 
-                  this.redirectToDashbaord();
-                }.bind(this)
-              } else {
-                this.setState({
-                  message: response.data.messageCode,
-                  color: "red",
-                  loading: false
-                })
-                this.hideFirstComponent();
-              }
-            })
-              .catch(
-                error => {
-                  if (error.message === "Network Error") {
-                    this.setState({
-                      message: 'static.unkownError',
-                      color: "red",
-                      loading: false
-                    }, () => {
-                      this.hideFirstComponent();
-                    });
-                  } else {
-                    switch (error.response ? error.response.status : "") {
-
-                      case 401:
-                        this.props.history.push(`/login/static.message.sessionExpired`)
-                        break;
-                      case 403:
-                        this.props.history.push(`/accessDenied`)
-                        break;
-                      case 500:
-                      case 404:
-                      case 406:
-                        this.setState({
-                          message: error.response.data.messageCode,
-                          color: "red",
-                          loading: false
-                        }, () => {
-                          this.hideFirstComponent()
-                        });
-                        break;
-                      case 412:
-                        this.setState({
-                          message: error.response.data.messageCode,
-                          loading: false,
-                          color: "red"
-                        }, () => {
-                          this.hideFirstComponent()
-                        });
-                        break;
-                      default:
-                        this.setState({
-                          message: 'static.unkownError',
-                          loading: false,
-                          color: "red"
-                        }, () => {
-                          this.hideFirstComponent()
-                        });
-                        break;
+                        case 401:
+                          this.props.history.push(`/login/static.message.sessionExpired`)
+                          break;
+                        case 403:
+                          this.props.history.push(`/accessDenied`)
+                          break;
+                        case 406:
+                          if (error.response.data.messageCode == 'static.commitVersion.versionIsOutDated') {
+                            alert(i18n.t("static.commitVersion.versionIsOutDated"));
+                          }
+                          this.setState({
+                            message: error.response.data.messageCode,
+                            color: "red",
+                            loading: false
+                          }, () => {
+                            this.hideFirstComponent()
+                            if (error.response.data.messageCode == 'static.commitVersion.versionIsOutDated') {
+                              this.checkLastModifiedDateForProgram(this.state.programId);
+                            }
+                          });
+                          break;
+                        case 500:
+                        case 404:
+                        case 412:
+                          this.setState({
+                            message: error.response.data.messageCode,
+                            loading: false,
+                            color: "red"
+                          }, () => {
+                            this.hideFirstComponent()
+                          });
+                          break;
+                        default:
+                          console.log("+++in catch 8")
+                          this.setState({
+                            message: 'static.unkownError',
+                            loading: false,
+                            color: "red"
+                          }, () => {
+                            this.hideFirstComponent()
+                          });
+                          break;
+                      }
                     }
                   }
-                }
-              );
+                );
+              //     } else {
+              //       alert(i18n.t("static.commitVersion.requestAlreadyExists"));
+              //       this.setState({
+              //         message: i18n.t("static.commitVersion.requestAlreadyExists"),
+              //         loading: false,
+              //         color: "red"
+              //       }, () => {
+              //         this.hideFirstComponent()
+              //         // this.checkLastModifiedDateForProgram(this.state.programId);
+              //       });
+
+              //     }
+              //   } else {
+              //     this.setState({
+              //       message: response.data.messageCode,
+              //       color: "red",
+              //       loading: false
+              //     })
+              //     this.hideFirstComponent();
+              //   }
+              // })
+              //   .catch(
+              //     error => {
+              //       console.log("@@@Error5", error);
+              //       console.log("@@@Error5", error.message);
+              //       console.log("@@@Error5", error.response ? error.response.status : "")
+              //       if (error.message === "Network Error") {
+              //         console.log("+++in catch 9")
+              //         this.setState({
+              //           message: 'static.common.networkError',
+              //           color: "red",
+              //           loading: false
+              //         }, () => {
+              //           this.hideFirstComponent();
+              //         });
+              //       } else {
+              //         switch (error.response ? error.response.status : "") {
+
+              //           case 401:
+              //             this.props.history.push(`/login/static.message.sessionExpired`)
+              //             break;
+              //           case 403:
+              //             this.props.history.push(`/accessDenied`)
+              //             break;
+              //           case 500:
+              //           case 404:
+              //           case 406:
+              //             this.setState({
+              //               message: error.response.data.messageCode,
+              //               color: "red",
+              //               loading: false
+              //             }, () => {
+              //               this.hideFirstComponent()
+              //             });
+              //             break;
+              //           case 412:
+              //             this.setState({
+              //               message: error.response.data.messageCode,
+              //               loading: false,
+              //               color: "red"
+              //             }, () => {
+              //               this.hideFirstComponent()
+              //             });
+              //             break;
+              //           default:
+              //             console.log("+++in catch 10")
+              //             this.setState({
+              //               message: 'static.unkownError',
+              //               loading: false,
+              //               color: "red"
+              //             }, () => {
+              //               this.hideFirstComponent()
+              //             });
+              //             break;
+              //         }
+              //       }
+              //     }
+              //   );
+              //     } else {
+              //       alert(i18n.t("static.commitVersion.versionIsOutDated"));
+              //       this.setState({
+              //         message: i18n.t("static.commitVersion.versionIsOutDated"),
+              //         loading: false,
+              //         color: "red"
+              //       }, () => {
+              //         this.hideFirstComponent()
+              //         this.checkLastModifiedDateForProgram(this.state.programId);
+              //       });
+
+              //     }
+              //   } else {
+              //     this.setState({
+              //       message: response.data.messageCode,
+              //       color: "red",
+              //       loading: false
+              //     })
+              //     this.hideFirstComponent();
+              //   }
+              // })
+              //   .catch(
+              //     error => {
+              //       console.log("@@@Error5", error);
+              //       console.log("@@@Error5", error.message);
+              //       console.log("@@@Error5", error.response ? error.response.status : "")
+              //       if (error.message === "Network Error") {
+              //         console.log("+++in catch 9")
+              //         this.setState({
+              //           message: 'static.common.networkError',
+              //           color: "red",
+              //           loading: false
+              //         }, () => {
+              //           this.hideFirstComponent();
+              //         });
+              //       } else {
+              //         switch (error.response ? error.response.status : "") {
+
+              //           case 401:
+              //             this.props.history.push(`/login/static.message.sessionExpired`)
+              //             break;
+              //           case 403:
+              //             this.props.history.push(`/accessDenied`)
+              //             break;
+              //           case 500:
+              //           case 404:
+              //           case 406:
+              //             this.setState({
+              //               message: error.response.data.messageCode,
+              //               color: "red",
+              //               loading: false
+              //             }, () => {
+              //               this.hideFirstComponent()
+              //             });
+              //             break;
+              //           case 412:
+              //             this.setState({
+              //               message: error.response.data.messageCode,
+              //               loading: false,
+              //               color: "red"
+              //             }, () => {
+              //               this.hideFirstComponent()
+              //             });
+              //             break;
+              //           default:
+              //             console.log("+++in catch 10")
+              //             this.setState({
+              //               message: 'static.unkownError',
+              //               loading: false,
+              //               color: "red"
+              //             }, () => {
+              //               this.hideFirstComponent()
+              //             });
+              //             break;
+              //         }
+              //       }
+              //     }
+              //   );
+            }.bind(this)
           }.bind(this)
         }.bind(this)
       }
@@ -3109,10 +4043,301 @@ export default class syncPage extends Component {
     this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
   }
 
-  redirectToDashbaord() {
-    this.setState({ loading: false })
-    let id = AuthenticationService.displayDashboardBasedOnRole();
-    this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.message.commitSuccess'))
+  redirectToDashbaord(commitRequestId) {
+    this.setState({ loading: true });
+    // console.log("method called", commitRequestId);
+    AuthenticationService.setupAxiosInterceptors();
+    ProgramService.sendNotificationAsync(commitRequestId).then(resp => {
+      var curUser = AuthenticationService.getLoggedInUserId();
+      if (resp.data.createdBy.userId == curUser && resp.data.status == 1) {
+        setTimeout(function () {
+          this.redirectToDashbaord(commitRequestId)
+        }.bind(this), 10000);
+      } else if (resp.data.createdBy.userId == curUser && resp.data.status == 2) {
+        this.setState({
+          progressPer: 75
+          , message: i18n.t('static.commitVersion.serverProcessingCompleted'), color: 'green'
+        }, () => {
+          this.hideFirstComponent();
+          this.getLatestProgram({ openModal: true, notificationDetails: resp.data });
+        })
+        // eventBus.dispatch("testDataAccess", { openModal: true, notificationDetails: resp.data });
+      } else if (resp.data.createdBy.userId == curUser && resp.data.status == 3) {
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onerror = function (event) {
+          this.setState({
+            message: i18n.t('static.program.errortext'),
+            color: 'red'
+          })
+          this.hideFirstComponent()
+        }.bind(this);
+        openRequest.onsuccess = function (e) {
+          db1 = e.target.result;
+          var transaction = db1.transaction(['programQPLDetails'], 'readwrite');
+          var program = transaction.objectStore('programQPLDetails');
+          var getRequest = program.get((this.state.programId).value);
+          getRequest.onerror = function (event) {
+            this.setState({
+              message: i18n.t('static.program.errortext'),
+              color: 'red'
+            })
+            this.hideFirstComponent()
+          }.bind(this);
+          getRequest.onsuccess = function (event) {
+            var myResult = [];
+            myResult = getRequest.result;
+            myResult.readonly = 0;
+            var transaction1 = db1.transaction(['programQPLDetails'], 'readwrite');
+            var program1 = transaction1.objectStore('programQPLDetails');
+            var getRequest1 = program1.put(myResult);
+            getRequest1.onsuccess = function (e) {
+              this.setState({
+                message: i18n.t('static.commitVersion.commitFailed'),
+                color: 'red',
+                loading: false
+              })
+              this.hideFirstComponent()
+            }.bind(this)
+          }.bind(this)
+        }.bind(this)
+      }
+
+      // window.visible=true;
+
+    }).catch(
+      error => {
+        this.redirectToDashbaord(commitRequestId)
+      })
+  }
+
+  getLatestProgram(notificationDetails) {
+    console.log(")))) inside getting latest version")
+    this.setState({ loading: true });
+    var checkboxesChecked = [];
+    var programIdsToSyncArray = [];
+    var notificationArray = [];
+    notificationArray.push(notificationDetails)
+    var programIdsSuccessfullyCommitted = notificationArray;
+    for (var i = 0; i < programIdsSuccessfullyCommitted.length; i++) {
+      var index = checkboxesChecked.findIndex(c => c.programId == programIdsSuccessfullyCommitted[i].notificationDetails.program.id);
+      if (index == -1) {
+        checkboxesChecked.push({ programId: programIdsSuccessfullyCommitted[i].notificationDetails.program.id, versionId: -1 })
+      }
+    }
+    // checkboxesChecked.push({ programId: programId, versionId: -1 })
+    console.log(")))) Before calling get notification api")
+    ProgramService.getAllProgramData(checkboxesChecked)
+      .then(response => {
+        console.log(")))) After calling get notification api")
+        console.log("Resposne+++", response);
+        var json = response.data;
+        var updatedJson = [];
+        for (var r = 0; r < json.length; r++) {
+          var planningUnitList = json[r].planningUnitList;
+          var consumptionList = json[r].consumptionList;
+          var inventoryList = json[r].inventoryList;
+          var shipmentList = json[r].shipmentList;
+          var batchInfoList = json[r].batchInfoList;
+          var problemReportList = json[r].problemReportList;
+          var supplyPlan = json[r].supplyPlan;
+          console.log("Supply plan+++", supplyPlan)
+          var generalData = json[r];
+          delete generalData.consumptionList;
+          delete generalData.inventoryList;
+          delete generalData.shipmentList;
+          delete generalData.batchInfoList;
+          delete generalData.supplyPlan;
+          delete generalData.planningUnitList;
+          generalData.actionList = [];
+          var generalEncryptedData = CryptoJS.AES.encrypt(JSON.stringify(generalData), SECRET_KEY).toString();
+          var planningUnitDataList = [];
+          for (var pu = 0; pu < planningUnitList.length; pu++) {
+            // console.log("json[r].consumptionList.filter(c => c.planningUnit.id == planningUnitList[pu].id)+++",programDataJson);
+            // console.log("json[r].consumptionList.filter(c => c.planningUnit.id == planningUnitList[pu].id)+++",programDataJson.consumptionList);
+            var planningUnitDataJson = {
+              consumptionList: consumptionList.filter(c => c.planningUnit.id == planningUnitList[pu].id),
+              inventoryList: inventoryList.filter(c => c.planningUnit.id == planningUnitList[pu].id),
+              shipmentList: shipmentList.filter(c => c.planningUnit.id == planningUnitList[pu].id),
+              batchInfoList: batchInfoList.filter(c => c.planningUnitId == planningUnitList[pu].id),
+              supplyPlan: supplyPlan.filter(c => c.planningUnitId == planningUnitList[pu].id)
+            }
+            console.log("Supply plan Filtered+++", supplyPlan.filter(c => c.planningUnitId == planningUnitList[pu].id));
+            var encryptedPlanningUnitDataText = CryptoJS.AES.encrypt(JSON.stringify(planningUnitDataJson), SECRET_KEY).toString();
+            planningUnitDataList.push({ planningUnitId: planningUnitList[pu].id, planningUnitData: encryptedPlanningUnitDataText })
+          }
+          var programDataJson = {
+            generalData: generalEncryptedData,
+            planningUnitDataList: planningUnitDataList
+          };
+          updatedJson.push(programDataJson);
+        }
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onerror = function (event) {
+          this.setState({
+            message: i18n.t('static.program.errortext'),
+            color: 'red'
+          })
+          this.hideFirstComponent()
+        }.bind(this);
+        openRequest.onsuccess = function (e) {
+          db1 = e.target.result;
+          var transaction = db1.transaction(['programQPLDetails'], 'readwrite');
+          var program = transaction.objectStore('programQPLDetails');
+          var getRequest = program.getAll();
+          getRequest.onerror = function (event) {
+            this.setState({
+              message: i18n.t('static.program.errortext'),
+              color: 'red'
+            })
+            this.hideFirstComponent()
+          }.bind(this);
+          getRequest.onsuccess = function (event) {
+            var myResult = [];
+            myResult = getRequest.result;
+            var userId = AuthenticationService.getLoggedInUserId();
+            console.log("Myresult+++", myResult);
+
+            var programDataTransaction1 = db1.transaction(['programData'], 'readwrite');
+            var programDataOs1 = programDataTransaction1.objectStore('programData');
+            for (var dpd = 0; dpd < programIdsSuccessfullyCommitted.length; dpd++) {
+              var checkIfProgramExists = myResult.filter(c => c.programId == programIdsSuccessfullyCommitted[dpd].notificationDetails.program.id && c.version == programIdsSuccessfullyCommitted[dpd].notificationDetails.committedVersionId && c.readonly == 1 && c.userId == userId);
+              console.log("checkIfProgramExists+++", checkIfProgramExists);
+              var programIdToDelete = 0;
+              if (checkIfProgramExists.length > 0) {
+                programIdToDelete = checkIfProgramExists[0].id;
+              }
+              var programRequest1 = programDataOs1.delete(checkIfProgramExists[0].id);
+            }
+            programDataTransaction1.oncomplete = function (event) {
+              var programDataTransaction3 = db1.transaction(['programQPLDetails'], 'readwrite');
+              var programDataOs3 = programDataTransaction3.objectStore('programQPLDetails');
+
+              for (var dpd = 0; dpd < programIdsSuccessfullyCommitted.length; dpd++) {
+                var checkIfProgramExists = myResult.filter(c => c.programId == programIdsSuccessfullyCommitted[dpd].notificationDetails.program.id && c.version == programIdsSuccessfullyCommitted[dpd].notificationDetails.committedVersionId && c.readonly == 1 && c.userId == userId);
+                console.log("checkIfProgramExists+++", checkIfProgramExists);
+                var programIdToDelete = 0;
+                if (checkIfProgramExists.length > 0) {
+                  programIdToDelete = checkIfProgramExists[0].id;
+                }
+                var programRequest3 = programDataOs3.delete(checkIfProgramExists[0].id);
+              }
+              programDataTransaction3.oncomplete = function (event) {
+                var programDataTransaction2 = db1.transaction(['downloadedProgramData'], 'readwrite');
+                var programDataOs2 = programDataTransaction2.objectStore('downloadedProgramData');
+
+                for (var dpd = 0; dpd < programIdsSuccessfullyCommitted.length; dpd++) {
+                  var checkIfProgramExists = myResult.filter(c => c.programId == programIdsSuccessfullyCommitted[dpd].notificationDetails.program.id && c.version == programIdsSuccessfullyCommitted[dpd].notificationDetails.committedVersionId && c.readonly == 1 && c.userId == userId);
+                  console.log("checkIfProgramExists+++", checkIfProgramExists);
+                  var programIdToDelete = 0;
+                  if (checkIfProgramExists.length > 0) {
+                    programIdToDelete = checkIfProgramExists[0].id;
+                  }
+                  var programRequest2 = programDataOs2.delete(checkIfProgramExists[0].id);
+                }
+                programDataTransaction2.oncomplete = function (event) {
+
+                  var transactionForSavingData = db1.transaction(['programData'], 'readwrite');
+                  var programSaveData = transactionForSavingData.objectStore('programData');
+                  for (var r = 0; r < json.length; r++) {
+                    json[r].actionList = [];
+                    // json[r].openCount = 0;
+                    // json[r].addressedCount = 0;
+                    // json[r].programCode = json[r].programCode;
+                    // var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json[r]), SECRET_KEY);
+                    var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                    var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                    var version = json[r].requestedProgramVersion;
+                    if (version == -1) {
+                      version = json[r].currentVersion.versionId
+                    }
+                    var item = {
+                      id: json[r].programId + "_v" + version + "_uId_" + userId,
+                      programId: json[r].programId,
+                      version: version,
+                      programName: (CryptoJS.AES.encrypt(JSON.stringify((json[r].label)), SECRET_KEY)).toString(),
+                      programData: updatedJson[r],
+                      userId: userId,
+                      programCode: json[r].programCode,
+                      // openCount: 0,
+                      // addressedCount: 0
+                    };
+                    programIdsToSyncArray.push(json[r].programId + "_v" + version + "_uId_" + userId)
+                    // console.log("Item------------>", item);
+                    var putRequest = programSaveData.put(item);
+
+                  }
+                  transactionForSavingData.oncomplete = function (event) {
+                    var transactionForSavingDownloadedProgramData = db1.transaction(['downloadedProgramData'], 'readwrite');
+                    var downloadedProgramSaveData = transactionForSavingDownloadedProgramData.objectStore('downloadedProgramData');
+                    for (var r = 0; r < json.length; r++) {
+                      // var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json[r]), SECRET_KEY);
+                      var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                      var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                      var version = json[r].requestedProgramVersion;
+                      if (version == -1) {
+                        version = json[r].currentVersion.versionId
+                      }
+                      var item = {
+                        id: json[r].programId + "_v" + version + "_uId_" + userId,
+                        programId: json[r].programId,
+                        version: version,
+                        programName: (CryptoJS.AES.encrypt(JSON.stringify((json[r].label)), SECRET_KEY)).toString(),
+                        programData: updatedJson[r],
+                        userId: userId
+                      };
+                      // console.log("Item------------>", item);
+                      var putRequest = downloadedProgramSaveData.put(item);
+
+                    }
+                    transactionForSavingDownloadedProgramData.oncomplete = function (event) {
+                      var programQPLDetailsTransaction = db1.transaction(['programQPLDetails'], 'readwrite');
+                      var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('programQPLDetails');
+                      var programIds = []
+                      for (var r = 0; r < json.length; r++) {
+                        var programQPLDetailsJson = {
+                          id: json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId,
+                          programId: json[r].programId,
+                          version: json[r].currentVersion.versionId,
+                          userId: userId,
+                          programCode: json[r].programCode,
+                          openCount: 0,
+                          addressedCount: 0,
+                          programModified: 0,
+                          readonly: 0
+                        };
+                        programIds.push(json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId);
+                        var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);
+                      }
+                      programQPLDetailsTransaction.oncomplete = function (event) {
+                        console.log(")))) Data saved successfully")
+                        this.setState({
+                          progressPer: 100
+                        })
+                        this.goToMasterDataSync(programIdsToSyncArray);
+                      }.bind(this)
+                    }.bind(this)
+                  }.bind(this);
+                }.bind(this);
+              }.bind(this);
+            }.bind(this);
+          }.bind(this);
+        }.bind(this);
+      })
+
+    // this.setState({ loading: false })
+    // let id = AuthenticationService.displayDashboardBasedOnRole();
+    // this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.message.commitSuccess'))
+  }
+
+  goToMasterDataSync(programIds) {
+    console.log("ProgramIds++++", programIds);
+    console.log("this props++++", this)
+    console.log("this props++++", this.props)
+    this.props.history.push({ pathname: `/syncProgram/green/` + i18n.t('static.message.commitSuccess'), state: { "programIds": programIds } });
   }
 
   updateState(parameterName, value) {
@@ -3122,6 +4347,7 @@ export default class syncPage extends Component {
   }
 
   fetchData() {
+    console.log("+++in fetch data", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
     var db1;
     getDatabase();
     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -3146,7 +4372,7 @@ export default class syncPage extends Component {
         this.hideSecondComponent()
       }.bind(this);
       programRequest.onsuccess = function (e) {
-        var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+        var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
         var programJson = JSON.parse(programData);
         var oldProgramData = programJson;
@@ -3166,9 +4392,10 @@ export default class syncPage extends Component {
               index = latestProgramDataProblemList.findIndex(
                 f =>
                   // moment(f.dt).format("YYYY-MM") == moment(oldProgramDataProblemList[c].dt).format("YYYY-MM") && 
+                  f.region != null && f.region.id != 0 &&
                   f.region.id == oldProgramDataProblemList[c].region.id
                   && f.planningUnit.id == oldProgramDataProblemList[c].planningUnit.id
-                  && f.realmProblem.problem.problemId == oldProgramDataProblemList[c].realmProblem.problem.problemId && 
+                  && f.realmProblem.problem.problemId == oldProgramDataProblemList[c].realmProblem.problem.problemId &&
                   !existingProblemReportId.includes(f.problemReportId));
             } else if (oldProgramDataProblemList[c].realmProblem.problem.problemId == 13) {
               index = -1;
@@ -3209,7 +4436,14 @@ export default class syncPage extends Component {
         // Getting other entries of latest problemList data
         var latestOtherProblemListEntries = latestProgramDataProblemList.filter(c => !(existingProblemReportId.includes(c.problemReportId)));
         mergedProblemListData = mergedProblemListData.concat(latestOtherProblemListEntries);
-        mergedProblemListData = mergedProblemListData.filter(c => c.planningUnitActive != false)
+        mergedProblemListData = mergedProblemListData.filter(c => c.planningUnitActive != false && c.regionActive != false)
+        // var problemListDate = moment(Date.now()).subtract(12, 'months').endOf('month').format("YYYY-MM-DD");
+        this.setState({
+          openCount: mergedProblemListData.filter(c =>
+            c.problemStatus.id == OPEN_PROBLEM_STATUS_ID
+            //  && moment(c.createdDate).format("YYYY-MM-DD") > problemListDate
+          ).length
+        })
 
         var data = [];
         var mergedProblemListJexcel = [];
@@ -3219,7 +4453,7 @@ export default class syncPage extends Component {
           data[1] = 1; //B
           data[2] = mergedProblemListData[cd].program.code; //C
           data[3] = 1; //D
-          data[4] = (mergedProblemListData[cd].region.label != null) ? (getLabelText(mergedProblemListData[cd].region.label, this.state.lang)) : ''; //E
+          data[4] = (mergedProblemListData[cd].region != null && mergedProblemListData[cd].region.id != 0) ? (getLabelText(mergedProblemListData[cd].region.label, this.state.lang)) : ''; //E
           data[5] = getLabelText(mergedProblemListData[cd].planningUnit.label, this.state.lang); //F
           data[6] = (mergedProblemListData[cd].dt != null) ? (moment(mergedProblemListData[cd].dt).format('MMM-YY')) : ''; //G
           data[7] = moment(mergedProblemListData[cd].createdDate).format('MMM-YY'); //H
@@ -3235,19 +4469,19 @@ export default class syncPage extends Component {
           var oldDataList = oldProgramDataProblemList.filter(c => c.problemReportId == mergedProblemListData[cd].problemReportId);
           var oldData = ""
           if (oldDataList.length > 0) {
-            oldData = [oldDataList[0].problemReportId, 1, oldDataList[0].program.code, 1, (oldDataList[0].region.label != null) ? (getLabelText(oldDataList[0].region.label, this.state.lang)) : '', getLabelText(oldDataList[0].planningUnit.label, this.state.lang), (oldDataList[0].dt != null) ? (moment(oldDataList[0].dt).format('MMM-YY')) : '', moment(oldDataList[0].createdDate).format('MMM-YY'), getProblemDesc(oldDataList[0], this.state.lang), getSuggestion(oldDataList[0], this.state.lang), getLabelText(oldDataList[0].problemStatus.label, this.state.lang), this.getNote(oldDataList[0], this.state.lang), oldDataList[0].problemStatus.id, oldDataList[0].planningUnit.id, oldDataList[0].realmProblem.problem.problemId, oldDataList[0].realmProblem.problem.actionUrl, oldDataList[0].realmProblem.criticality.id, "", "", "", 4];
+            oldData = [oldDataList[0].problemReportId, 1, oldDataList[0].program.code, 1, (oldDataList[0].region != null && oldDataList[0].region.id != 0) ? (getLabelText(oldDataList[0].region.label, this.state.lang)) : '', getLabelText(oldDataList[0].planningUnit.label, this.state.lang), (oldDataList[0].dt != null) ? (moment(oldDataList[0].dt).format('MMM-YY')) : '', moment(oldDataList[0].createdDate).format('MMM-YY'), getProblemDesc(oldDataList[0], this.state.lang), getSuggestion(oldDataList[0], this.state.lang), getLabelText(oldDataList[0].problemStatus.label, this.state.lang), this.getNote(oldDataList[0], this.state.lang), oldDataList[0].problemStatus.id, oldDataList[0].planningUnit.id, oldDataList[0].realmProblem.problem.problemId, oldDataList[0].realmProblem.problem.actionUrl, oldDataList[0].realmProblem.criticality.id, "", "", "", 4];
           }
           data[17] = oldData;//Old data //R
           var latestDataList = latestProgramDataProblemList.filter(c => mergedProblemListData[cd].problemReportId != 0 && c.problemReportId == mergedProblemListData[cd].problemReportId);
           var latestData = ""
           if (latestDataList.length > 0) {
-            latestData = [latestDataList[0].problemReportId, 1, latestDataList[0].program.code, 1, (latestDataList[0].region.label != null) ? (getLabelText(latestDataList[0].region.label, this.state.lang)) : '', getLabelText(latestDataList[0].planningUnit.label, this.state.lang), (latestDataList[0].dt != null) ? (moment(latestDataList[0].dt).format('MMM-YY')) : '', moment(latestDataList[0].createdDate).format('MMM-YY'), getProblemDesc(latestDataList[0], this.state.lang), getSuggestion(latestDataList[0], this.state.lang), getLabelText(latestDataList[0].problemStatus.label, this.state.lang), this.getNote(latestDataList[0], this.state.lang), latestDataList[0].problemStatus.id, latestDataList[0].planningUnit.id, latestDataList[0].realmProblem.problem.problemId, latestDataList[0].realmProblem.problem.actionUrl, latestDataList[0].realmProblem.criticality.id, "", "", "", 4];
+            latestData = [latestDataList[0].problemReportId, 1, latestDataList[0].program.code, 1, (latestDataList[0].region != null && latestDataList[0].region.id != 0) ? (getLabelText(latestDataList[0].region.label, this.state.lang)) : '', getLabelText(latestDataList[0].planningUnit.label, this.state.lang), (latestDataList[0].dt != null) ? (moment(latestDataList[0].dt).format('MMM-YY')) : '', moment(latestDataList[0].createdDate).format('MMM-YY'), getProblemDesc(latestDataList[0], this.state.lang), getSuggestion(latestDataList[0], this.state.lang), getLabelText(latestDataList[0].problemStatus.label, this.state.lang), this.getNote(latestDataList[0], this.state.lang), latestDataList[0].problemStatus.id, latestDataList[0].planningUnit.id, latestDataList[0].realmProblem.problem.problemId, latestDataList[0].realmProblem.problem.actionUrl, latestDataList[0].realmProblem.criticality.id, "", "", "", 4];
           }
           data[18] = latestData;//Latest data //S
           var downloadedDataList = downloadedProgramDataProblemList.filter(c => mergedProblemListData[cd].problemReportId != 0 && c.problemReportId == mergedProblemListData[cd].problemReportId);
           var downloadedData = "";
           if (downloadedDataList.length > 0) {
-            downloadedData = [downloadedDataList[0].problemReportId, 1, downloadedDataList[0].program.code, 1, (downloadedDataList[0].region.label != null) ? (getLabelText(downloadedDataList[0].region.label, this.state.lang)) : '', getLabelText(downloadedDataList[0].planningUnit.label, this.state.lang), (downloadedDataList[0].dt != null) ? (moment(downloadedDataList[0].dt).format('MMM-YY')) : '', moment(downloadedDataList[0].createdDate).format('MMM-YY'), getProblemDesc(downloadedDataList[0], this.state.lang), getSuggestion(downloadedDataList[0], this.state.lang), getLabelText(downloadedDataList[0].problemStatus.label, this.state.lang), this.getNote(downloadedDataList[0], this.state.lang), downloadedDataList[0].problemStatus.id, downloadedDataList[0].planningUnit.id, downloadedDataList[0].realmProblem.problem.problemId, downloadedDataList[0].realmProblem.problem.actionUrl, downloadedDataList[0].realmProblem.criticality.id, "", "", "", 4];
+            downloadedData = [downloadedDataList[0].problemReportId, 1, downloadedDataList[0].program.code, 1, (downloadedDataList[0].region != null && downloadedDataList[0].region.id != 0) ? (getLabelText(downloadedDataList[0].region.label, this.state.lang)) : '', getLabelText(downloadedDataList[0].planningUnit.label, this.state.lang), (downloadedDataList[0].dt != null) ? (moment(downloadedDataList[0].dt).format('MMM-YY')) : '', moment(downloadedDataList[0].createdDate).format('MMM-YY'), getProblemDesc(downloadedDataList[0], this.state.lang), getSuggestion(downloadedDataList[0], this.state.lang), getLabelText(downloadedDataList[0].problemStatus.label, this.state.lang), this.getNote(downloadedDataList[0], this.state.lang), downloadedDataList[0].problemStatus.id, downloadedDataList[0].planningUnit.id, downloadedDataList[0].realmProblem.problem.problemId, downloadedDataList[0].realmProblem.problem.actionUrl, downloadedDataList[0].realmProblem.criticality.id, "", "", "", 4];
           }
           data[19] = downloadedData;//Downloaded data //T
           data[20] = 4; //U
@@ -3362,6 +4596,8 @@ export default class syncPage extends Component {
                   this.toggleLargeProblem(rowData[17], rowData[18], y, 'problemList');
                 }.bind(this)
               })
+            } else {
+              return false;
             }
 
             // if (rowData[0].toString() > 0) {
@@ -3378,6 +4614,7 @@ export default class syncPage extends Component {
 
         var mergedProblemListJexcel = jexcel(document.getElementById("mergedVersionProblemList"), options);
         this.el = mergedProblemListJexcel;
+        console.log("+++QPL jexcel completed ", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
         this.setState({
           mergedProblemListJexcel: mergedProblemListJexcel,
           oldProgramDataProblemList: oldProgramDataProblemList,

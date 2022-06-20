@@ -18,7 +18,7 @@ import Picker from 'react-month-picker';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, polling } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, polling, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import ProductService from '../../api/ProductService';
 import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
@@ -40,7 +40,9 @@ class FunderExport extends Component {
     constructor(props) {
         super(props);
         var dt = new Date();
-        dt.setMonth(dt.getMonth() - 10);
+        dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
+        var dt1 = new Date();
+        dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
         this.state = {
             regionList: [],
             message: '',
@@ -54,9 +56,10 @@ class FunderExport extends Component {
             planningUnitLabels: [],
             data: [],
             lang: localStorage.getItem('lang'),
-            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
-            maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
+            // rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
+            minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 1 },
+            maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() + 1 },
             loading: false
         }
         this.formatLabel = this.formatLabel.bind(this);
@@ -458,7 +461,7 @@ class FunderExport extends Component {
                         var proList = []
                         // console.log(myResult)
                         for (var i = 0; i < myResult.length; i++) {
-                            if (myResult[i].program.id == programId && myResult[i].active==true) {
+                            if (myResult[i].program.id == programId && myResult[i].active == true) {
 
                                 proList[i] = myResult[i]
                             }
@@ -598,22 +601,22 @@ class FunderExport extends Component {
     exportCSV(columns) {
 
         var csvRow = [];
-        csvRow.push('"'+(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20')+'"')
+        csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
         csvRow.push('')
-        csvRow.push('"'+(i18n.t('static.budget.fundingsource') + ' : ' + document.getElementById("fundingSourceId").selectedOptions[0].text).replaceAll(' ', '%20')+'"')
+        csvRow.push('"' + (i18n.t('static.budget.fundingsource') + ' : ' + document.getElementById("fundingSourceId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('')
-        csvRow.push('"'+(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20')+'"')
+        csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('')
-        csvRow.push('"'+(i18n.t('static.report.version') + '  :  ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20')+'"')
+        csvRow.push('"' + (i18n.t('static.report.versionFinal*') + '  :  ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         this.state.planningUnitLabels.map(ele =>
-            csvRow.push('"'+(i18n.t('static.planningunit.planningunit') + ' : ' + (ele.toString())).replaceAll(' ', '%20')+'"'))
-            csvRow.push('')
-            csvRow.push('"'+(i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("isPlannedShipmentId").selectedOptions[0].text).replaceAll(' ', '%20'))
+            csvRow.push('"' + (i18n.t('static.planningunit.planningunit') + ' : ' + (ele.toString())).replaceAll(' ', '%20') + '"'))
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("isPlannedShipmentId").selectedOptions[0].text).replaceAll(' ', '%20'))
         csvRow.push('')
         csvRow.push('')
         csvRow.push('')
-        csvRow.push('"'+(i18n.t('static.common.youdatastart')).replaceAll(' ', '%20')+'"')
+        csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
         csvRow.push('')
 
         const headers = [];
@@ -654,7 +657,7 @@ class FunderExport extends Component {
                 doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
                     align: 'center'
                 })
-                doc.text('Copyright © 2020 '+i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+                doc.text('Copyright © 2020 ' + i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
                     align: 'center'
                 })
 
@@ -687,7 +690,7 @@ class FunderExport extends Component {
                         align: 'left'
                     })
 
-                    doc.text(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
+                    doc.text(i18n.t('static.report.versionFinal*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
                         align: 'left'
                     })
 
@@ -1007,7 +1010,7 @@ class FunderExport extends Component {
     }
 
     render() {
-        const checkOnline = localStorage.getItem('typeOfSession');
+        const checkOnline = localStorage.getItem('sessionType');
         const { SearchBar, ClearSearchButton } = Search;
         const customTotal = (from, to, size) => (
             <span className="react-bootstrap-table-pagination-total">
@@ -1024,7 +1027,8 @@ class FunderExport extends Component {
             && versions.map((item, i) => {
                 return (
                     <option key={i} value={item.versionId}>
-                        {item.versionId}
+                        {/* {item.versionId} */}
+                        {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)}
                     </option>
                 )
             }, this);
@@ -1156,24 +1160,24 @@ class FunderExport extends Component {
                             <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF(columns)} />
                             <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
                         </div> */}
-                        {checkOnline === 'Online' && 
-                                this.state.data.length > 0 &&
-                                <div className="card-header-actions">
-                                    <a className="card-header-action">
-                                        <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF(columns)} />
-                                    </a>
-                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
-                                </div>
-                            }
-                        {checkOnline === 'Offline' && 
-                                this.state.data.length > 0 &&
-                                <div className="card-header-actions">
-                                    <a className="card-header-action">
-                                        <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF(columns)} />
-                                    </a>
-                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
-                                </div>
-                            }
+                        {checkOnline === 'Online' &&
+                            this.state.data.length > 0 &&
+                            <div className="card-header-actions">
+                                <a className="card-header-action">
+                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF(columns)} />
+                                </a>
+                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
+                            </div>
+                        }
+                        {checkOnline === 'Offline' &&
+                            this.state.data.length > 0 &&
+                            <div className="card-header-actions">
+                                <a className="card-header-action">
+                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF(columns)} />
+                                </a>
+                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
+                            </div>
+                        }
                     </div>
                     <CardBody className="pb-lg-2 mt-3">
 
@@ -1254,7 +1258,7 @@ class FunderExport extends Component {
                                 </FormGroup>
 
                                 <FormGroup className="tab-ml-1">
-                                    <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.report.versionFinal*')}</Label>
                                     <div className="controls SelectGo">
                                         <InputGroup>
                                             <Input

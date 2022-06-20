@@ -13,7 +13,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import '../Forms/ValidationForms/ValidationForms.css';
 import classNames from 'classnames';
-import { SPECIAL_CHARECTER_WITH_NUM, DATE_FORMAT_SM, DATE_PLACEHOLDER_TEXT, ALPHABET_NUMBER_REGEX, BUDGET_NAME_REGEX } from '../../Constants.js';
+import { SPECIAL_CHARECTER_WITH_NUM, DATE_FORMAT_SM, DATE_PLACEHOLDER_TEXT, ALPHABET_NUMBER_REGEX, BUDGET_NAME_REGEX, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH } from '../../Constants.js';
 import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 
@@ -45,7 +45,8 @@ const validationSchema = function (values, t) {
             // .transform((o, v) => parseFloat(v.replace(/,/g, '')))
             // .typeError(i18n.t('static.procurementUnit.validNumberText'))
             // .matches(/^[0-9]+([,\.][0-9]+)?/, i18n.t('static.program.validBudgetAmount'))
-            .matches(/^\d{0,15}(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount'))
+            // .matches(/^\d{0,15}(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount'))
+            .matches(/^\d{0,15}(,\d{3})*(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount'))
             .required(i18n.t('static.budget.budgetamounttext')).min(0, i18n.t('static.program.validvaluetext')),
         currencyId: Yup.string()
             .required(i18n.t('static.country.currencytext')),
@@ -84,7 +85,9 @@ class AddBudgetComponent extends Component {
 
         super(props);
         var dt = new Date();
-        dt.setMonth(dt.getMonth() - 10);
+        dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
+        var dt1 = new Date();
+        dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
         this.state = {
             loading: true,
             programs: [],
@@ -92,9 +95,10 @@ class AddBudgetComponent extends Component {
             currencyList: [],
             message: '',
             lang: localStorage.getItem('lang'),
-            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
-            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() },
+            // rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
+            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
+            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
             budget: {
                 label: {
                     label_en: '',
@@ -288,7 +292,7 @@ class AddBudgetComponent extends Component {
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
 
     componentDidMount() {
@@ -488,7 +492,8 @@ class AddBudgetComponent extends Component {
         let programList = programs.length > 0 && programs.map((item, i) => {
             return (
                 <option key={i} value={item.programId}>
-                    {getLabelText(item.label, this.state.lang)}
+                    {/* {getLabelText(item.label, this.state.lang)} */}
+                    {item.programCode}
                 </option>
             )
         }, this);
@@ -510,8 +515,8 @@ class AddBudgetComponent extends Component {
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
-                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
-                <Row style={{ display: this.state.loading ? "none" : "block" }}>
+                <h5 className="red" id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+                <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             {/* <CardHeader>
@@ -591,6 +596,14 @@ class AddBudgetComponent extends Component {
                                                                 loading: false
                                                             });
                                                             break;
+                                                        case 409:
+                                                            this.setState({
+                                                                // message: error.response.data.messageCode,
+                                                                message: i18n.t('static.budget.duplicateDisplayName'),
+                                                                loading: false
+                                                            });
+                                                            break;
+
                                                         case 412:
                                                             this.setState({
                                                                 message: error.response.data.messageCode,
@@ -624,208 +637,209 @@ class AddBudgetComponent extends Component {
                                         setFieldTouched,
                                         setFieldError
                                     }) => (
-                                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='budgetForm' autocomplete="off">
-                                                <CardBody>
-                                                    <FormGroup>
-                                                        <Label htmlFor="programId">{i18n.t('static.budget.program')}<span className="red Reqasterisk">*</span></Label>
-                                                        {/* <InputGroupAddon addonType="prepend"> */}
-                                                        {/* <InputGroupText><i className="fa-object-group"></i></InputGroupText> */}
-                                                        <Input
-                                                            type="select"
-                                                            name="programId"
-                                                            id="programId"
-                                                            bsSize="sm"
-                                                            valid={!errors.programId && this.state.budget.program.id != ''}
-                                                            invalid={touched.programId && !!errors.programId}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            required
-                                                            value={this.state.budget.program.id}
+                                        <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='budgetForm' autocomplete="off">
+                                            <CardBody style={{ display: this.state.loading ? "none" : "block" }}>
+                                                <FormGroup>
+                                                    <Label htmlFor="programId">{i18n.t('static.budget.program')}<span className="red Reqasterisk">*</span></Label>
+                                                    {/* <InputGroupAddon addonType="prepend"> */}
+                                                    {/* <InputGroupText><i className="fa-object-group"></i></InputGroupText> */}
+                                                    <Input
+                                                        type="select"
+                                                        name="programId"
+                                                        id="programId"
+                                                        bsSize="sm"
+                                                        valid={!errors.programId && this.state.budget.program.id != ''}
+                                                        invalid={touched.programId && !!errors.programId}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        onBlur={handleBlur}
+                                                        required
+                                                        value={this.state.budget.program.id}
+                                                    >
+                                                        <option value="">{i18n.t('static.common.select')}</option>
+                                                        {programList}
+                                                    </Input>
+                                                    {/* </InputGroupAddon> */}
+                                                    <FormFeedback className="red">{errors.programId}</FormFeedback>
+                                                </FormGroup>
+
+
+                                                <FormGroup>
+                                                    <Label htmlFor="fundingSourceId">{i18n.t('static.budget.fundingsource')}<span className="red Reqasterisk">*</span></Label>
+                                                    {/* <InputGroupAddon addonType="prepend"> */}
+                                                    {/* <InputGroupText><i className="fa fa-building-o"></i></InputGroupText> */}
+                                                    <Input
+                                                        type="select"
+                                                        name="fundingSourceId"
+                                                        id="fundingSourceId"
+                                                        bsSize="sm"
+                                                        valid={!errors.fundingSourceId && this.state.budget.fundingSource.fundingSourceId != ''}
+                                                        invalid={touched.fundingSourceId && !!errors.fundingSourceId}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        onBlur={handleBlur}
+                                                        required
+                                                        value={this.state.budget.fundingSource.fundingSourceId}
+                                                    >
+                                                        <option value="">{i18n.t('static.common.select')}</option>
+                                                        {fundingSourceList}
+                                                    </Input>
+                                                    {/* </InputGroupAddon> */}
+                                                    <FormFeedback className="red">{errors.fundingSourceId}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label for="budget">{i18n.t('static.budget.budget')}<span className="red Reqasterisk">*</span></Label>
+                                                    {/* <InputGroupAddon addonType="prepend"> */}
+                                                    {/* <InputGroupText><i className="fa fa-money"></i></InputGroupText> */}
+                                                    <Input type="text"
+                                                        name="budget"
+                                                        id="budget"
+                                                        bsSize="sm"
+                                                        valid={!errors.budget && this.state.budget.label.label_en != ''}
+                                                        // invalid={touched.budget && !!errors.budget}
+                                                        invalid={(touched.budget && !!errors.budget) || (touched.budget && this.state.budget.label.label_en == '')}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.budget.label.label_en}
+                                                        required />
+                                                    {/* </InputGroupAddon> */}
+                                                    <FormFeedback className="red">{errors.budget}</FormFeedback>
+                                                </FormGroup>
+
+                                                <FormGroup>
+                                                    <Label for="budget">{i18n.t('static.budget.budgetDisplayName')}<span className="red Reqasterisk">*</span></Label>
+                                                    <Input type="text"
+                                                        name="budgetCode"
+                                                        id="budgetCode"
+                                                        bsSize="sm"
+                                                        valid={!errors.budgetCode && this.state.budget.budgetCode != ''}
+                                                        invalid={touched.budgetCode && !!errors.budgetCode}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        onBlur={handleBlur}
+                                                        maxLength={30}
+                                                        value={this.state.budget.budgetCode}
+                                                        required />
+                                                    <FormFeedback className="red">{errors.budgetCode}</FormFeedback>
+                                                </FormGroup>
+
+
+                                                <FormGroup>
+                                                    <Label htmlFor="currencyId">{i18n.t("static.country.currency")}<span className="red Reqasterisk">*</span></Label>
+                                                    {/* <InputGroupAddon addonType="prepend"> */}
+                                                    {/* <InputGroupText><i className="fa fa-building-o"></i></InputGroupText> */}
+                                                    <Input
+                                                        type="select"
+                                                        name="currencyId"
+                                                        id="currencyId"
+                                                        bsSize="sm"
+                                                        valid={!errors.currencyId && this.state.budget.currency.currencyId != ''}
+                                                        invalid={touched.currencyId && !!errors.currencyId}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        onBlur={handleBlur}
+                                                        required
+                                                        value={this.state.budget.currency.currencyId}
+                                                    >
+                                                        <option value="">{i18n.t('static.common.select')}</option>
+                                                        {currencyes}
+                                                    </Input>
+                                                    {/* </InputGroupAddon> */}
+                                                    <FormFeedback className="red">{errors.currencyId}</FormFeedback>
+                                                </FormGroup>
+
+                                                <FormGroup>
+                                                    <Label for="conversionRateToUsd">{i18n.t("static.currency.conversionrateusd")}<span className="red Reqasterisk">*</span></Label>
+                                                    <Input
+                                                        type="text"
+                                                        name="conversionRateToUsd"
+                                                        id="conversionRateToUsd"
+                                                        bsSize="sm"
+                                                        value={this.state.budget.currency.conversionRateToUsd}
+                                                        disabled />
+                                                    <FormFeedback className="red">{errors.budget}</FormFeedback>
+                                                </FormGroup>
+
+
+
+
+
+
+                                                <FormGroup>
+                                                    <Label for="budgetAmt">{i18n.t('static.budget.budgetamount')}<span className="red Reqasterisk">*</span></Label>
+                                                    {/* <InputGroupAddon addonType="prepend"> */}
+                                                    {/* <InputGroupText><i className="fa fa-usd"></i></InputGroupText> */}
+                                                    <Input
+                                                        type="number"
+                                                        // min="0"
+                                                        name="budgetAmt"
+                                                        id="budgetAmt"
+                                                        bsSize="sm"
+                                                        valid={!errors.budgetAmt && this.state.budget.budgetAmt != ''}
+                                                        invalid={touched.budgetAmt && !!errors.budgetAmt}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                        onBlur={handleBlur}
+                                                        type="text"
+                                                        value={this.state.budget.budgetAmt}
+                                                        // placeholder={i18n.t('static.budget.budgetamountdesc')}
+                                                        required />
+                                                    {/* </InputGroupAddon> */}
+                                                    <FormFeedback className="red">{errors.budgetAmt}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.budget.budgetrange')}</Label>
+                                                    <div className="controls edit">
+                                                        <Picker
+                                                            years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                                            ref={this.pickRange}
+                                                            value={rangeValue}
+                                                            lang={pickerLang}
+                                                            //theme="light"
+                                                            onChange={this.handleRangeChange}
+                                                            onDismiss={this.handleRangeDissmis}
                                                         >
-                                                            <option value="">{i18n.t('static.common.select')}</option>
-                                                            {programList}
-                                                        </Input>
-                                                        {/* </InputGroupAddon> */}
-                                                        <FormFeedback className="red">{errors.programId}</FormFeedback>
-                                                    </FormGroup>
+                                                            <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
+                                                        </Picker>
+                                                    </div>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label for="notes">{i18n.t('static.program.notes')}</Label>
+                                                    <Input
+                                                        name="notes"
+                                                        id="notes"
+                                                        bsSize="sm"
+                                                        onChange={(e) => { this.dataChange(e) }}
+                                                        type="textarea"
+                                                    // maxLength={600}
+                                                    />
+                                                    <FormFeedback className="red"></FormFeedback>
+                                                </FormGroup>
+                                            </CardBody>
+                                            <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                                    <div class="align-items-center">
+                                                        <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
+                                                        <div class="spinner-border blue ml-4" role="status">
 
-                                                    <FormGroup>
-                                                        <Label htmlFor="fundingSourceId">{i18n.t('static.budget.fundingsource')}<span className="red Reqasterisk">*</span></Label>
-                                                        {/* <InputGroupAddon addonType="prepend"> */}
-                                                        {/* <InputGroupText><i className="fa fa-building-o"></i></InputGroupText> */}
-                                                        <Input
-                                                            type="select"
-                                                            name="fundingSourceId"
-                                                            id="fundingSourceId"
-                                                            bsSize="sm"
-                                                            valid={!errors.fundingSourceId && this.state.budget.fundingSource.fundingSourceId != ''}
-                                                            invalid={touched.fundingSourceId && !!errors.fundingSourceId}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            required
-                                                            value={this.state.budget.fundingSource.fundingSourceId}
-                                                        >
-                                                            <option value="">{i18n.t('static.common.select')}</option>
-                                                            {fundingSourceList}
-                                                        </Input>
-                                                        {/* </InputGroupAddon> */}
-                                                        <FormFeedback className="red">{errors.fundingSourceId}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label for="budget">{i18n.t('static.budget.budget')}<span className="red Reqasterisk">*</span></Label>
-                                                        {/* <InputGroupAddon addonType="prepend"> */}
-                                                        {/* <InputGroupText><i className="fa fa-money"></i></InputGroupText> */}
-                                                        <Input type="text"
-                                                            name="budget"
-                                                            id="budget"
-                                                            bsSize="sm"
-                                                            valid={!errors.budget && this.state.budget.label.label_en != ''}
-                                                            // invalid={touched.budget && !!errors.budget}
-                                                            invalid={(touched.budget && !!errors.budget) || (touched.budget && this.state.budget.label.label_en == '')}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.budget.label.label_en}
-                                                            required />
-                                                        {/* </InputGroupAddon> */}
-                                                        <FormFeedback className="red">{errors.budget}</FormFeedback>
-                                                    </FormGroup>
-
-                                                    <FormGroup>
-                                                        <Label for="budget">{i18n.t('static.budget.budgetDisplayName')}<span className="red Reqasterisk">*</span></Label>
-                                                        <Input type="text"
-                                                            name="budgetCode"
-                                                            id="budgetCode"
-                                                            bsSize="sm"
-                                                            valid={!errors.budgetCode && this.state.budget.budgetCode != ''}
-                                                            invalid={touched.budgetCode && !!errors.budgetCode}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            maxLength={30}
-                                                            value={this.state.budget.budgetCode}
-                                                            required />
-                                                        <FormFeedback className="red">{errors.budgetCode}</FormFeedback>
-                                                    </FormGroup>
-
-
-                                                    <FormGroup>
-                                                        <Label htmlFor="currencyId">{i18n.t("static.country.currency")}<span className="red Reqasterisk">*</span></Label>
-                                                        {/* <InputGroupAddon addonType="prepend"> */}
-                                                        {/* <InputGroupText><i className="fa fa-building-o"></i></InputGroupText> */}
-                                                        <Input
-                                                            type="select"
-                                                            name="currencyId"
-                                                            id="currencyId"
-                                                            bsSize="sm"
-                                                            valid={!errors.currencyId && this.state.budget.currency.currencyId != ''}
-                                                            invalid={touched.currencyId && !!errors.currencyId}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            required
-                                                            value={this.state.budget.currency.currencyId}
-                                                        >
-                                                            <option value="">{i18n.t('static.common.select')}</option>
-                                                            {currencyes}
-                                                        </Input>
-                                                        {/* </InputGroupAddon> */}
-                                                        <FormFeedback className="red">{errors.currencyId}</FormFeedback>
-                                                    </FormGroup>
-
-                                                    <FormGroup>
-                                                        <Label for="conversionRateToUsd">{i18n.t("static.currency.conversionrateusd")}<span className="red Reqasterisk">*</span></Label>
-                                                        <Input
-                                                            type="text"
-                                                            name="conversionRateToUsd"
-                                                            id="conversionRateToUsd"
-                                                            bsSize="sm"
-                                                            value={this.state.budget.currency.conversionRateToUsd}
-                                                            disabled />
-                                                        <FormFeedback className="red">{errors.budget}</FormFeedback>
-                                                    </FormGroup>
-
-
-
-
-
-
-                                                    <FormGroup>
-                                                        <Label for="budgetAmt">{i18n.t('static.budget.budgetamount')}<span className="red Reqasterisk">*</span></Label>
-                                                        {/* <InputGroupAddon addonType="prepend"> */}
-                                                        {/* <InputGroupText><i className="fa fa-usd"></i></InputGroupText> */}
-                                                        <Input
-                                                            type="number"
-                                                            // min="0"
-                                                            name="budgetAmt"
-                                                            id="budgetAmt"
-                                                            bsSize="sm"
-                                                            valid={!errors.budgetAmt && this.state.budget.budgetAmt != ''}
-                                                            invalid={touched.budgetAmt && !!errors.budgetAmt}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                            onBlur={handleBlur}
-                                                            type="text"
-                                                            value={this.state.budget.budgetAmt}
-                                                            // placeholder={i18n.t('static.budget.budgetamountdesc')}
-                                                            required />
-                                                        {/* </InputGroupAddon> */}
-                                                        <FormFeedback className="red">{errors.budgetAmt}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.budget.budgetrange')}</Label>
-                                                        <div className="controls edit">
-                                                            <Picker
-                                                                years={{ min: this.state.minDate, max: this.state.maxDate }}
-                                                                ref={this.pickRange}
-                                                                value={rangeValue}
-                                                                lang={pickerLang}
-                                                                //theme="light"
-                                                                onChange={this.handleRangeChange}
-                                                                onDismiss={this.handleRangeDissmis}
-                                                            >
-                                                                <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
-                                                            </Picker>
                                                         </div>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label for="notes">{i18n.t('static.program.notes')}</Label>
-                                                        <Input
-                                                            name="notes"
-                                                            id="notes"
-                                                            bsSize="sm"
-                                                            onChange={(e) => { this.dataChange(e) }}
-                                                            type="textarea"
-                                                            maxLength={600}
-                                                        />
-                                                        <FormFeedback className="red"></FormFeedback>
-                                                    </FormGroup>
-                                                </CardBody>
-                                                <CardFooter>
-                                                    <FormGroup>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <CardFooter>
+                                                <FormGroup>
 
-                                                        {/* <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button> */}
-                                                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                                        <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                                        {/* <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check" disabled={!isValid}></i>{i18n.t('static.common.submit')}</Button> */}
+                                                    {/* <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button> */}
+                                                    <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                    <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                    <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                    {/* <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check" disabled={!isValid}></i>{i18n.t('static.common.submit')}</Button> */}
 
-                                                        &nbsp;
-                                                    </FormGroup>
-                                                </CardFooter>
-                                            </Form>
-                                        )} />
+                                                    &nbsp;
+                                                </FormGroup>
+                                            </CardFooter>
+                                        </Form>
+                                    )} />
                         </Card>
                     </Col>
                 </Row>
-                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div class="align-items-center">
-                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-                            <div class="spinner-border blue ml-4" role="status">
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
                 {/* <div>
                     <h6>{i18n.t(this.state.message)}</h6>
                     <h6>{i18n.t(this.props.match.params.message)}</h6>
@@ -840,7 +854,9 @@ class AddBudgetComponent extends Component {
     resetClicked() {
         let { budget } = this.state;
         var dt = new Date();
-        dt.setMonth(dt.getMonth() - 10);
+        dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
+        var dt1 = new Date();
+        dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
         budget.label.label_en = ''
         // budget.program.programId = ''
         budget.program.id = ''
@@ -855,7 +871,7 @@ class AddBudgetComponent extends Component {
 
         this.setState({
             budget,
-            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
         },
             () => { });
     }

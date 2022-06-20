@@ -531,7 +531,7 @@ class ListProcurementAgentComponent extends Component {
     hideFirstComponent() {
         this.timeout = setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
     componentWillUnmount() {
         clearTimeout(this.timeout);
@@ -541,12 +541,12 @@ class ListProcurementAgentComponent extends Component {
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
 
     addPlanningUnitMapping(event, cell) {
         event.stopPropagation();
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PROCUREMENT_AGENT')) {
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_PLANNING_UNIT')) {
             this.props.history.push({
                 pathname: `/procurementAgent/addProcurementAgentPlanningUnit/${cell}`,
             });
@@ -594,7 +594,7 @@ class ListProcurementAgentComponent extends Component {
 
     addProcurementUnitMapping(event, cell) {
         event.stopPropagation();
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PROCUREMENT_AGENT')) {
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_PROCUREMENT_UNIT')) {
             this.props.history.push({
                 pathname: `/procurementAgent/addProcurementAgentProcurementUnit/${cell}`,
             });
@@ -660,7 +660,7 @@ class ListProcurementAgentComponent extends Component {
         }
     }
     editProcurementAgent(procurementAgent) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PROCUREMENT_AGENT')) {
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROCUREMENT_AGENT')) {
             this.props.history.push({
                 pathname: `/procurementAgent/editProcurementAgent/${procurementAgent.procurementAgentId}`,
                 // state: { procurementAgent }
@@ -805,31 +805,34 @@ class ListProcurementAgentComponent extends Component {
                 var items = [];
                 if (y != null) {
                     if (obj.options.allowInsertRow == true) {
-                        items.push({
-                            title: i18n.t('static.program.mapPlanningUnit'),
-                            onclick: function () {
-                                console.log("onclick------>", this.el.getValueFromCoords(0, y));
-                                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PROCUREMENT_AGENT')) {
+
+                        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_PLANNING_UNIT')) {
+                            items.push({
+                                title: i18n.t('static.program.mapPlanningUnit'),
+                                onclick: function () {
+                                    console.log("onclick------>", this.el.getValueFromCoords(0, y));
+
                                     this.props.history.push({
                                         pathname: `/procurementAgent/addProcurementAgentPlanningUnit/${this.el.getValueFromCoords(0, y)}`,
                                     });
-                                }
 
-                            }.bind(this)
-                        });
+                                }.bind(this)
+                            });
+                        }
 
-                        items.push({
-                            title: i18n.t('static.procurementAgentProcurementUnit.mapProcurementUnit'),
-                            onclick: function () {
-                                // console.log("onclick------>", this.el.getValueFromCoords(0, y));
-                                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PROCUREMENT_AGENT')) {
+                        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_PROCUREMENT_UNIT')) {
+                            items.push({
+                                title: i18n.t('static.procurementAgentProcurementUnit.mapProcurementUnit'),
+                                onclick: function () {
+                                    // console.log("onclick------>", this.el.getValueFromCoords(0, y));
+
                                     this.props.history.push({
                                         pathname: `/procurementAgent/addProcurementAgentProcurementUnit/${this.el.getValueFromCoords(0, y)}`,
                                     });
-                                }
 
-                            }.bind(this)
-                        });
+                                }.bind(this)
+                            });
+                        }
                     }
                 }
 
@@ -850,7 +853,7 @@ class ListProcurementAgentComponent extends Component {
             // console.log("HEADER SELECTION--------------------------");
         } else {
             // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
-            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PROCUREMENT_AGENT')) {
+            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROCUREMENT_AGENT')) {
                 this.props.history.push({
                     pathname: `/procurementAgent/editProcurementAgent/${this.el.getValueFromCoords(0, x)}`,
                 });
@@ -1128,17 +1131,17 @@ class ListProcurementAgentComponent extends Component {
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
-                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
-                <Card style={{ display: this.state.loading ? "none" : "block" }}>
+                <h5 className="red" id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+                <Card>
                     <div className="Card-header-addicon">
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '} */}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PROCUREMENT_AGENT') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewProcurementAgent}><i className="fa fa-plus-square"></i></a>}
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_PROCUREMENT_AGENT') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewProcurementAgent}><i className="fa fa-plus-square"></i></a>}
                             </div>
                         </div>
                     </div>
-                    <CardBody className="pb-lg-0">
+                    <CardBody className="pb-lg-0 pt-lg-0">
                         {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN') &&
                             <Col md="3 pl-0">
                                 <FormGroup className="Selectdiv mt-md-2 mb-md-0">
@@ -1163,22 +1166,25 @@ class ListProcurementAgentComponent extends Component {
                                 </FormGroup>
                             </Col>
                         }
-                        {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className="jexcelremoveReadonlybackground">
+                        <div className='consumptionDataEntryTable'>
+                        {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROCUREMENT_AGENT') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
+                        </div>
+                        </div>
+                        <div style={{ display: this.state.loading ? "block" : "none" }}>
+                            <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                <div class="align-items-center">
+                                    <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                    <div class="spinner-border blue ml-4" role="status">
+
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                     </CardBody>
                 </Card>
-                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div class="align-items-center">
-                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-                            <div class="spinner-border blue ml-4" role="status">
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         );
     }

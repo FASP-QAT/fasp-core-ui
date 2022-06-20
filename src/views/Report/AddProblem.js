@@ -77,7 +77,7 @@ class AddRoleComponent extends Component {
     document.getElementById('div2').style.display = 'block';
     setTimeout(function () {
       document.getElementById('div2').style.display = 'none';
-    }, 8000);
+    }, 30000);
   }
 
   touchAll(setTouched, errors) {
@@ -113,7 +113,7 @@ class AddRoleComponent extends Component {
     openRequest.onerror = function (event) {
       this.setState({
         message: i18n.t('static.program.errortext'),
-        color: 'red'
+        color: '#BA0C2F'
       })
     }.bind(this);
     openRequest.onsuccess = function (e) {
@@ -125,7 +125,7 @@ class AddRoleComponent extends Component {
       getRequest.onerror = function (event) {
         this.setState({
           message: i18n.t('static.program.errortext'),
-          color: 'red'
+          color: '#BA0C2F'
         })
       }.bind(this);
       getRequest.onsuccess = function (event) {
@@ -137,7 +137,7 @@ class AddRoleComponent extends Component {
           if (myResult[i].userId == userId) {
             var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
             var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-            var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+            var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
             var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
             var programJson1 = JSON.parse(programData);
             var programJson = {
@@ -160,7 +160,7 @@ class AddRoleComponent extends Component {
         getRequestP.onerror = function (event) {
           this.setState({
             message: i18n.t('static.program.errortext'),
-            color: 'red'
+            color: '#BA0C2F'
           })
         }.bind(this);
         getRequestP.onsuccess = function (event) {
@@ -186,7 +186,7 @@ class AddRoleComponent extends Component {
     openRequest.onerror = function (event) {
       this.setState({
         message: i18n.t('static.program.errortext'),
-        color: 'red'
+        color: '#BA0C2F'
       })
     }.bind(this);
     openRequest.onsuccess = function (e) {
@@ -198,7 +198,7 @@ class AddRoleComponent extends Component {
       planningunitRequest.onerror = function (event) {
         this.setState({
           message: i18n.t('static.program.errortext'),
-          color: 'red'
+          color: '#BA0C2F'
         })
       }.bind(this);
       planningunitRequest.onsuccess = function (e) {
@@ -212,7 +212,7 @@ class AddRoleComponent extends Component {
         planningunitRequestAll.onerror = function (event) {
           this.setState({
             message: i18n.t('static.program.errortext'),
-            color: 'red'
+            color: '#BA0C2F'
           })
         }.bind(this);
         planningunitRequestAll.onsuccess = function (e) {
@@ -250,7 +250,7 @@ class AddRoleComponent extends Component {
           openRequest.onerror = function (event) {
             this.setState({
               message: i18n.t('static.program.errortext'),
-              color: 'red'
+              color: '#BA0C2F'
             })
           }.bind(this);
           openRequest.onsuccess = function (e) {
@@ -261,11 +261,11 @@ class AddRoleComponent extends Component {
             programRequest.onerror = function (event) {
               this.setState({
                 message: i18n.t('static.program.errortext'),
-                color: 'red'
+                color: '#BA0C2F'
               })
             }.bind(this);
             programRequest.onsuccess = function (event) {
-              var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+              var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
               var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
               var programJson = JSON.parse(programData);
 
@@ -307,7 +307,7 @@ class AddRoleComponent extends Component {
     openRequest.onerror = function (event) {
       this.setState({
         message: i18n.t('static.program.errortext'),
-        color: 'red'
+        color: '#BA0C2F'
       },
         () => {
           this.hideSecondComponent();
@@ -324,7 +324,7 @@ class AddRoleComponent extends Component {
       programRequest.onerror = function (event) {
         this.setState({
           message: i18n.t('static.program.errortext'),
-          color: 'red'
+          color: '#BA0C2F'
         },
           () => {
             this.hideSecondComponent();
@@ -341,7 +341,7 @@ class AddRoleComponent extends Component {
         let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
         let username = decryptedUser.username;
 
-        var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+        var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
         var programJson = JSON.parse(programData);
         // console.log("programJson===>", programJson);
@@ -372,7 +372,7 @@ class AddRoleComponent extends Component {
           getRequestP.onerror = function (event) {
             this.setState({
               message: i18n.t('static.program.errortext'),
-              color: 'red'
+              color: '#BA0C2F'
             },
               () => {
                 this.hideSecondComponent();
@@ -491,12 +491,12 @@ class AddRoleComponent extends Component {
                 var problemOs = problemTransaction.objectStore('programData');
                 var paList = problemActionList.filter(c => c.program.id == programObj.programId)
                 programObj.problemReportList = paList;
-                programRequestList.programData = (CryptoJS.AES.encrypt(JSON.stringify(programObj), SECRET_KEY)).toString();
+                programRequestList.programData.generalData = (CryptoJS.AES.encrypt(JSON.stringify(programObj), SECRET_KEY)).toString();
                 var putRequest = problemOs.put(programRequestList);
                 putRequest.onerror = function (event) {
                   this.setState({
                     message: i18n.t('static.program.errortext'),
-                    color: 'red'
+                    color: '#BA0C2F'
                   },
                     () => {
                       this.hideSecondComponent();
@@ -563,7 +563,7 @@ class AddRoleComponent extends Component {
 
     return (
       <div className="animated fadeIn">
-        <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+        <h5 className="red" id="div2">{i18n.t(this.state.message, { entityname })}</h5>
         <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
         <Row>
           <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
@@ -662,7 +662,7 @@ class AddRoleComponent extends Component {
                           <FormGroup>
                             <Label>{i18n.t('static.common.notes')}</Label>
                             <Input type="textarea"
-                              maxLength={600}
+                              // maxLength={600}
                               bsSize="sm"
                               name="notes"
                               id="notes"

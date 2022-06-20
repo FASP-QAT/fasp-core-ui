@@ -541,7 +541,7 @@ class ProductCatalog extends Component {
                     if (myResult[i].userId == userId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
                         console.log(programNameLabel)
 
@@ -842,7 +842,7 @@ class ProductCatalog extends Component {
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             contextMenu: function (obj, x, y, e) {
-                return [];
+                return false;
             }.bind(this),
         };
         var languageEl = jexcel(document.getElementById("tableDiv"), options);
@@ -1322,7 +1322,7 @@ class ProductCatalog extends Component {
                 text: 'All', value: this.state.outPutList.length
             }]
         }
-        const checkOnline = localStorage.getItem('typeOfSession');
+        const checkOnline = localStorage.getItem('sessionType');
 
         return (
             <div className="animated fadeIn" >
@@ -1330,7 +1330,7 @@ class ProductCatalog extends Component {
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
 
-                <Card style={{ display: this.state.loading ? "none" : "block" }}>
+                <Card>
                     <div className="Card-header-reporticon">
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntitypc', { entityname })}</strong>{' '} */}
                         {this.state.outPutList.length > 0 && <div className="card-header-actions">
@@ -1364,7 +1364,8 @@ class ProductCatalog extends Component {
                                                     && programs.map((item, i) => {
                                                         return (
                                                             <option key={i} value={item.programId}>
-                                                                {getLabelText(item.label, this.state.lang)}
+                                                                {/* {getLabelText(item.label, this.state.lang)} */}
+                                                                {(item.programCode)}
                                                             </option>
                                                         )
                                                     }, this)}
@@ -1475,24 +1476,24 @@ class ProductCatalog extends Component {
 
                         </Col>
 
-
-                        <div id="tableDiv" className="jexcelremoveReadonlybackground">
+                        <div style={{ display: this.state.loading ? "none" : "block" }}>
+                            <div id="tableDiv" className="jexcelremoveReadonlybackground consumptionDataEntryTable">
+                            </div>
                         </div>
+                        <div style={{ display: this.state.loading ? "block" : "none" }}>
+                            <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                <div class="align-items-center">
+                                    <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
+                                    <div class="spinner-border blue ml-4" role="status">
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
                     </CardBody>
                 </Card>
-                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div class="align-items-center">
-                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
-                            <div class="spinner-border blue ml-4" role="status">
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
             </div>
         );

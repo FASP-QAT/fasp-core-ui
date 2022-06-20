@@ -16,6 +16,7 @@ import {
     Button, FormFeedback, CardBody, Row,
     Form, FormGroup, Label, Input, Col
 } from 'reactstrap';
+import { MAX_PROGRAM_CODE_LENGTH } from '../../Constants';
 
 const initialValuesSix = {
     programName: '',
@@ -103,6 +104,16 @@ const validationSchemaSix = function (values) {
         // programNotes: Yup.string()
         //     .required(i18n.t('static.program.validnotestext')),
 
+        programCode1: Yup.string()
+        .test('programCode', i18n.t('static.programValidation.programCode'),
+            function (value) {
+                if (parseInt(document.getElementById("programCode").value.length + value.length) > MAX_PROGRAM_CODE_LENGTH) {
+                    return false;
+                } else {
+                    return true;
+                }
+            }),
+
     })
 }
 
@@ -169,7 +180,8 @@ export default class PipelineProgramDataStepSix extends Component {
             // programNotes: true,
             arrivedToDeliveredLeadTime: '',
             shippedToArrivedBySeaLeadTime: '',
-            shippedToArrivedByAirLeadTime: ''
+            shippedToArrivedByAirLeadTime: '',
+            programCode1: true
 
         }
         )
@@ -281,7 +293,7 @@ export default class PipelineProgramDataStepSix extends Component {
 
         return (
             <div className="animated fadeIn">
-                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>
+                <h5 className="red" id="div2">{i18n.t(this.state.message)}</h5>
                 <Formik
                     enableReinitialize={true}
                     initialValues={
@@ -300,7 +312,9 @@ export default class PipelineProgramDataStepSix extends Component {
                             arrivedToDeliveredLeadTime: this.props.items.program.arrivedToDeliveredLeadTime,
                             shippedToArrivedBySeaLeadTime: this.props.items.program.shippedToArrivedBySeaLeadTime,
                             shippedToArrivedByAirLeadTime: this.props.items.program.shippedToArrivedByAirLeadTime,
-                            shelfLife: this.props.items.program.shelfLife
+                            shelfLife: this.props.items.program.shelfLife,
+                            programCode1:this.props.items.program.programCode,
+                            programCode:this.props.items.realmCountryCode + "-" + this.props.items.healthAreaCode + "-" + this.props.items.organisationCode
                         }
                     }
                     validate={validateSix(validationSchemaSix)}
@@ -332,9 +346,11 @@ export default class PipelineProgramDataStepSix extends Component {
                                                         type="text" name="programCode"
                                                         bsSize="sm"
                                                         disabled
+                                                        valid={!errors.programCode1 && this.props.items.program.programCode != ''}
+                                                        invalid={touched.programCode1 && !!errors.programCode1}
                                                         value={this.props.items.realmCountryCode + "-" + this.props.items.healthAreaCode + "-" + this.props.items.organisationCode}
                                                         id="programCode" />
-                                                    <FormFeedback className="red">{errors.programCode}</FormFeedback>
+                                                    <FormFeedback className="red">{errors.programCode1}</FormFeedback>
                                                 </FormGroup>
                                             </Col>
                                             <Col xs="1" className="" style={{ marginTop: '32px' }}>
@@ -351,7 +367,7 @@ export default class PipelineProgramDataStepSix extends Component {
                                                         value={this.props.items.program.programCode}
                                                         maxLength={6}
                                                         name="programCode1" id="programCode1" />
-                                                    <FormFeedback className="red">{errors.programCode1}</FormFeedback>
+                                                    {/* <FormFeedback className="red">{errors.programCode1}</FormFeedback> */}
                                                 </FormGroup>
                                             </Col>
                                         </FormGroup>
@@ -568,7 +584,7 @@ export default class PipelineProgramDataStepSix extends Component {
                                                 bsSize="sm"
                                                 onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
                                                 type="textarea"
-                                                maxLength={600}
+                                                // maxLength={600}
                                                 name="programNotes"
                                                 id="programNotes"
                                                 value={this.props.items.program.programNotes} />

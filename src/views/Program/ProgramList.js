@@ -395,7 +395,7 @@ export default class ProgramList extends Component {
   hideFirstComponent() {
     this.timeout = setTimeout(function () {
       document.getElementById('div1').style.display = 'none';
-    }, 8000);
+    }, 30000);
   }
   componentWillUnmount() {
     clearTimeout(this.timeout);
@@ -404,7 +404,7 @@ export default class ProgramList extends Component {
   hideSecondComponent() {
     setTimeout(function () {
       document.getElementById('div2').style.display = 'none';
-    }, 8000);
+    }, 30000);
   }
 
 
@@ -462,19 +462,26 @@ export default class ProgramList extends Component {
 
   buildJExcel() {
     let programList = this.state.selProgram;
-    // console.log("programList---->", programList);
+    console.log("programList---->", programList);
+    console.log("healthAreaList---->", programList.healthAreaList);
     let programArray = [];
+    
     let count = 0;
 
     for (var j = 0; j < programList.length; j++) {
       data = [];
+      let healthAreaLabels=programList[j].healthAreaList;
+      let haValues=[];
+      healthAreaLabels.map(c=>{
+        haValues.push(getLabelText(c.label,this.state.lang));
+      })
       data[0] = programList[j].programId
       data[1] = getLabelText(programList[j].realmCountry.realm.label, this.state.lang)
       data[2] = getLabelText(programList[j].label, this.state.lang)
       data[3] = programList[j].programCode;
       data[4] = getLabelText(programList[j].realmCountry.country.label, this.state.lang)
       data[5] = getLabelText(programList[j].organisation.label, this.state.lang)
-      data[6] = getLabelText(programList[j].healthArea.label, this.state.lang)
+      data[6] = haValues.toString();
       data[7] = programList[j].lastModifiedBy.username;
       data[8] = (programList[j].lastModifiedDate ? moment(programList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
 
@@ -569,9 +576,32 @@ export default class ProgramList extends Component {
       position: 'top',
       filters: true,
       license: JEXCEL_PRO_KEY,
+      // contextMenu: function (obj, x, y, e) {
+      //   return [];
+      // }.bind(this),
       contextMenu: function (obj, x, y, e) {
-        return [];
-      }.bind(this),
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_INTEGRATION_PROGRAM')) {
+          var items = [];
+          if (y != null) {
+            if (obj.options.allowInsertRow == true) {
+              items.push({
+                title: i18n.t('static.integration.addProgramIntegration'),
+                onclick: function () {
+                  // console.log("onclick------>", this.el.getValueFromCoords(0, y));
+                  this.props.history.push({
+                    pathname: `/program/addIntegration/${this.el.getValueFromCoords(0, y)}`,
+                  })
+
+                }.bind(this)
+              });
+            }
+          }
+          return items;
+        } else {
+          return false;
+        }
+
+      }.bind(this)
       // contextMenu: function (obj, x, y, e) {
       //   var items = [];
       //   if (y != null) {
@@ -813,17 +843,17 @@ export default class ProgramList extends Component {
       <div className="animated">
         <AuthenticationServiceComponent history={this.props.history} />
         <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
-        <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
-        <Card style={{ display: this.state.loading ? "none" : "block" }}>
+        <h5 className="red" id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+        <Card>
           <div className="Card-header-addicon">
             {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '} */}
             <div className="card-header-actions">
               <div className="card-header-action">
-                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_CREATE_A_PROGRAM') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewProgram}><i className="fa fa-plus-square"></i></a>}
+                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SET_UP_PROGRAM') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewProgram}><i className="fa fa-plus-square"></i></a>}
               </div>
             </div>
           </div>
-          <CardBody className="pb-lg-0">
+          <CardBody className="pb-lg-0 pt-lg-0">
             {/* <Col md="3 pl-0" >
               <FormGroup className="Selectdiv mt-md-2 mb-md-0">
                 <Label htmlFor="appendedInputButton">{i18n.t('static.region.country')}</Label>
@@ -887,22 +917,27 @@ export default class ProgramList extends Component {
               </div>
             </Col>
 
-            {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className="jexcelremoveReadonlybackground">
+            {/* <div id="loader" className="center"></div> */}
+            
+          <div className="consumptionDataEntryTable">
+            <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROGRAM') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
+            </div>
+            </div>
+            <div style={{ display: this.state.loading ? "block" : "none" }}>
+              <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                <div class="align-items-center">
+                  <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
+
+                  <div class="spinner-border blue ml-4" role="status">
+
+                  </div>
+                </div>
+              </div>
             </div>
 
           </CardBody>
         </Card>
-        <div style={{ display: this.state.loading ? "block" : "none" }}>
-          <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-            <div class="align-items-center">
-              <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
 
-              <div class="spinner-border blue ml-4" role="status">
-
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     )
   }

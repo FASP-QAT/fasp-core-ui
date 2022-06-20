@@ -60,8 +60,8 @@ export default class CostOfInventory extends Component {
             versions: [],
             message: '',
             singleValue2: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
-            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() },
-            maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() + 1 },
+            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
+            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
             loading: true,
             programId: '',
             versionId: ''
@@ -191,7 +191,7 @@ export default class CostOfInventory extends Component {
                     if (myResult[i].userId == userId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
                         console.log(programNameLabel)
 
@@ -319,7 +319,7 @@ export default class CostOfInventory extends Component {
                     if (myResult[i].userId == userId && myResult[i].programId == programId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = databytes.toString(CryptoJS.enc.Utf8)
                         var version = JSON.parse(programData).currentVersion
 
@@ -331,26 +331,60 @@ export default class CostOfInventory extends Component {
 
                 }
 
-                console.log(verList)
-                if (localStorage.getItem("sesVersionIdReport") != '' && localStorage.getItem("sesVersionIdReport") != undefined) {
-                    this.setState({
-                        versions: verList.filter(function (x, i, a) {
-                            return a.indexOf(x) === i;
-                        }),
-                        versionId: localStorage.getItem("sesVersionIdReport")
-                    }, () => {
-                        console.log("VERSIONID-----", this.state.versionId);
-                        // this.dataChange(e); 
-                        let costOfInventoryInput = this.state.CostOfInventoryInput;
-                        costOfInventoryInput.versionId = localStorage.getItem("sesVersionIdReport");
-                        this.setState({ costOfInventoryInput }, () => { this.formSubmit() })
+                console.log(verList);
+                let versionList = verList.filter(function (x, i, a) {
+                    return a.indexOf(x) === i;
+                });
+                versionList.reverse();
 
-                    })
+                if (localStorage.getItem("sesVersionIdReport") != '' && localStorage.getItem("sesVersionIdReport") != undefined) {
+                    // this.setState({
+                    //     versions: versionList,
+                    //     versionId: localStorage.getItem("sesVersionIdReport")
+                    // }, () => {
+                    //     console.log("VERSIONID-----", this.state.versionId);
+                    //     // this.dataChange(e); 
+                    //     let costOfInventoryInput = this.state.CostOfInventoryInput;
+                    //     costOfInventoryInput.versionId = localStorage.getItem("sesVersionIdReport");
+                    //     this.setState({ costOfInventoryInput }, () => { this.formSubmit() })
+
+                    // })
+
+                    let versionVar = versionList.filter(c => c.versionId == localStorage.getItem("sesVersionIdReport"));
+                    if (versionVar.length != 0) {
+                        this.setState({
+                            versions: versionList,
+                            versionId: localStorage.getItem("sesVersionIdReport")
+                        }, () => {
+                            console.log("VERSIONID-----", this.state.versionId);
+                            // this.dataChange(e); 
+                            let costOfInventoryInput = this.state.CostOfInventoryInput;
+                            costOfInventoryInput.versionId = localStorage.getItem("sesVersionIdReport");
+                            this.setState({ costOfInventoryInput }, () => { this.formSubmit() })
+                        })
+                    } else {
+                        this.setState({
+                            versions: versionList,
+                            versionId: versionList[0].versionId
+                        }, () => {
+                            console.log("VERSIONID-----", this.state.versionId);
+                            // this.dataChange(e); 
+                            let costOfInventoryInput = this.state.CostOfInventoryInput;
+                            costOfInventoryInput.versionId = versionList[0].versionId;
+                            this.setState({ costOfInventoryInput }, () => { this.formSubmit() })
+                        })
+                    }
+
                 } else {
                     this.setState({
-                        versions: verList.filter(function (x, i, a) {
-                            return a.indexOf(x) === i;
-                        })
+                        versions: versionList,
+                        versionId: versionList[0].versionId
+                    }, () => {
+                        // this.dataChange(e); 
+                        let costOfInventoryInput = this.state.CostOfInventoryInput;
+                        costOfInventoryInput.versionId = versionList[0].versionId;
+                        this.setState({ costOfInventoryInput }, () => { this.formSubmit() })
+
                     })
                 }
 
@@ -406,7 +440,7 @@ export default class CostOfInventory extends Component {
         var csvRow = [];
 
         csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20')) + '"')
-        csvRow.push('"' + (i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.report.versionFinal*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('"' + (i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('"' + (i18n.t('static.report.month') + ' : ' + this.makeText(this.state.singleValue2)).replaceAll(' ', '%20') + '"')
         csvRow.push('')
@@ -472,7 +506,7 @@ export default class CostOfInventory extends Component {
                     doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 90, {
                         align: 'left'
                     })
-                    doc.text(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
+                    doc.text(i18n.t('static.report.versionFinal*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
                         align: 'left'
                     })
                     doc.text(i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
@@ -564,8 +598,10 @@ export default class CostOfInventory extends Component {
 
     setProgramId(event) {
         this.setState({
-            programId: event.target.value
+            programId: event.target.value,
+            versionId: ''
         }, () => {
+            localStorage.setItem("sesVersionIdReport", '');
             // this.dataChange(event);
             let costOfInventoryInput = this.state.CostOfInventoryInput;
             costOfInventoryInput.programId = this.state.programId;
@@ -674,7 +710,7 @@ export default class CostOfInventory extends Component {
             filters: true,
             license: JEXCEL_PRO_KEY,
             contextMenu: function (obj, x, y, e) {
-                return [];
+                return false;
             }.bind(this),
         };
         var languageEl = jexcel(document.getElementById("tableDiv"), options);
@@ -695,9 +731,9 @@ export default class CostOfInventory extends Component {
         var programId = this.state.CostOfInventoryInput.programId;
         var versionId = this.state.CostOfInventoryInput.versionId
         console.log("1-------3", versionId);
-        if (programId != 0 && versionId != 0) {
+        if (programId != 0 && versionId != 0 && versionId != "") {
             localStorage.setItem("sesVersionIdReport", versionId);
-            if (versionId.includes('Local')) {
+            if (versionId.toString().includes('Local')) {
                 let startDate = (this.state.singleValue2.year) + '-' + this.state.singleValue2.month + '-01';
                 let endDate = this.state.singleValue2.year + '-' + this.state.singleValue2.month + '-' + new Date(this.state.singleValue2.year, this.state.singleValue2.month + 1, 0).getDate();
 
@@ -730,10 +766,11 @@ export default class CostOfInventory extends Component {
                     }.bind(this);
                     programRequest.onsuccess = function (e) {
                         // this.setState({ loading: true })
-                        var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                        var programJson = JSON.parse(programData);
-                        console.log(programJson)
+                        // var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                        // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                        // var programJson = JSON.parse(programData);
+                        // console.log(programJson)
+                        var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
                         var proList = []
                         var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
                         var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
@@ -756,6 +793,23 @@ export default class CostOfInventory extends Component {
                             var data = []
 
                             proList.map(planningUnit => {
+
+                                var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == planningUnit.planningUnit.id);
+                                var programJson = {}
+                                if (planningUnitDataIndex != -1) {
+                                    var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == planningUnit.planningUnit.id))[0];
+                                    var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                                    programJson = JSON.parse(programData);
+                                } else {
+                                    programJson = {
+                                        consumptionList: [],
+                                        inventoryList: [],
+                                        shipmentList: [],
+                                        batchInfoList: [],
+                                        supplyPlan: []
+                                    }
+                                }
 
                                 var dtstr = this.state.singleValue2.year + "-" + String(this.state.singleValue2.month).padStart(2, '0') + "-01"
                                 var list = programJson.supplyPlan.filter(c => c.planningUnitId == planningUnit.planningUnit.id && c.transDate == dtstr)
@@ -810,6 +864,13 @@ export default class CostOfInventory extends Component {
                     });
                 }).catch(
                     error => {
+                        this.setState({
+                            costOfInventory: [],
+                            loading: false
+                        }, () => {
+                            this.el = jexcel(document.getElementById("tableDiv"), '');
+                            this.el.destroy();
+                        });
                         if (error.message === "Network Error") {
                             this.setState({
                                 message: 'static.unkownError',
@@ -876,7 +937,8 @@ export default class CostOfInventory extends Component {
             && programs.map((item, i) => {
                 return (
                     <option key={i} value={item.programId}>
-                        {getLabelText(item.label, this.state.lang)}
+                        {/* {getLabelText(item.label, this.state.lang)} */}
+                        {(item.programCode)}
                     </option>
                 )
             }, this);
@@ -886,7 +948,7 @@ export default class CostOfInventory extends Component {
             && versions.map((item, i) => {
                 return (
                     <option key={i} value={item.versionId}>
-                        {item.versionId}
+                        {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)}
                     </option>
                 )
             }, this);
@@ -990,7 +1052,7 @@ export default class CostOfInventory extends Component {
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
                 <SupplyPlanFormulas ref="formulaeChild" />
 
-                <Card style={{ display: this.state.loading ? "none" : "block" }}>
+                <Card>
                     <div className="Card-header-reporticon">
                         <div className="card-header-actions">
                             <a className="card-header-action">
@@ -1011,7 +1073,7 @@ export default class CostOfInventory extends Component {
                             <Form >
                                 <div className=" pl-0">
                                     <div className="row ">
-                                        <FormGroup className="col-md-3 pl-0">
+                                        <FormGroup className="col-md-3">
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.report.month')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                                             <div className="controls edit">
                                                 <Picker
@@ -1049,7 +1111,7 @@ export default class CostOfInventory extends Component {
                                             </div>
                                         </FormGroup>
                                         <FormGroup className="col-md-3">
-                                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.versionFinal*')}</Label>
                                             <div className="controls ">
                                                 <InputGroup>
                                                     <Input
@@ -1096,25 +1158,25 @@ export default class CostOfInventory extends Component {
                             </Form>
                         </div>
                         {/* </div> */}
-                        <div className="">
-                            <div id="tableDiv" className="jexcelremoveReadonlybackground">
+                        <div className="consumptionDataEntryTable">
+                            <div id="tableDiv" className="jexcelremoveReadonlybackground" style={{ display: this.state.loading ? "none" : "block" }}>
+                            </div>
+                        </div>
+                        <div style={{ display: this.state.loading ? "block" : "none" }}>
+                            <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                <div class="align-items-center">
+                                    <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                    <div class="spinner-border blue ml-4" role="status">
+
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
 
                     </CardBody>
                 </Card>
-                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div class="align-items-center">
-                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
-                            <div class="spinner-border blue ml-4" role="status">
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
             </div >
 

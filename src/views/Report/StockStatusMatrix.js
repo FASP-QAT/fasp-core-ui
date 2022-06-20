@@ -10,7 +10,7 @@ import paginationFactory from 'react-bootstrap-table2-paginator'
 import BootstrapTable from 'react-bootstrap-table-next';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, FIRST_DATA_ENTRY_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION } from '../../Constants.js'
+import { SECRET_KEY, FIRST_DATA_ENTRY_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import ProductService from '../../api/ProductService';
@@ -28,18 +28,20 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
 import { DatePicker } from 'antd';
 import 'antd/dist/antd.css';
-import MultiSelect from "react-multi-select-component";
+import { MultiSelect } from "react-multi-select-component";
 import SupplyPlanFormulas from "../SupplyPlan/SupplyPlanFormulas";
 import { isSiteOnline } from "../../CommonComponent/JavascriptCommonFunctions";
+import TracerCategoryService from '../../api/TracerCategoryService';
 const { RangePicker } = DatePicker;
 const pickerLang = {
   months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
   from: 'From', to: 'To',
 }
-const legendcolor = [{ text: i18n.t('static.report.stockout'), color: "#ed5626", value: 0 },
+const legendcolor = [{ text: i18n.t('static.report.stockout'), color: "#BA0C2F", value: 0 },
 { text: i18n.t('static.report.lowstock'), color: "#f48521", value: 1 },
 { text: i18n.t('static.report.okaystock'), color: "#118b70", value: 2 },
-{ text: i18n.t('static.report.overstock'), color: "#edb944", value: 3 }];
+{ text: i18n.t('static.report.overstock'), color: "#edb944", value: 3 },
+{ text: i18n.t('static.supplyPlanFormula.na'), color: "#cfcdc9", value: 4 }];
 // const legendcolor = [{ text: i18n.t('static.report.overstock'), color: "#edb944", value: 3 },
 // { text: i18n.t('static.report.stockout'), color: "#ed5626", value: 0 },
 // { text: i18n.t('static.report.okaystock'), color: "#118b70", value: 2 },
@@ -51,7 +53,9 @@ export default class StockStatusMatrix extends React.Component {
   constructor(props) {
     super(props);
     var dt = new Date();
-    dt.setMonth(dt.getMonth() - 10);
+    dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
+    var dt1 = new Date();
+    dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
     this.state = {
       realms: [],
       productCategories: [],
@@ -63,10 +67,15 @@ export default class StockStatusMatrix extends React.Component {
       includePlanningShipments: true,
       years: [],
       pulst: [],
+      tracerCategories: [],
+      tracerCategoryValues: [],
+      tracerCategoryLabels: [],
+      planningUnitList: [],
       message: '',
       planningUnitValues: [],
       planningUnitLabels: [],
-      rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+      // rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+      rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
       startYear: new Date().getFullYear() - 1,
       endYear: new Date().getFullYear(),
       loading: true,
@@ -82,6 +91,174 @@ export default class StockStatusMatrix extends React.Component {
     this.setProgramId = this.setProgramId.bind(this);
     this.setVersionId = this.setVersionId.bind(this);
 
+  }
+
+  getTracerCategoryList() {
+    let programId = document.getElementById("programId").value;
+    let versionId = document.getElementById("versionId").value;
+
+    this.setState({
+      tracerCategories: [],
+      tracerCategoryValues: [],
+      tracerCategoryLabels: [],
+    }, () => {
+      if (programId > 0 && versionId != 0) {
+        localStorage.setItem("sesVersionIdReport", versionId);
+        if (versionId.includes('Local')) {
+          const lan = 'en';
+          var db1;
+          var storeOS;
+          getDatabase();
+          var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+          openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+            var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
+            var planningunitRequest = planningunitOs.getAll();
+            var planningList = []
+            planningunitRequest.onerror = function (event) {
+              // Handle errors!
+            };
+            planningunitRequest.onsuccess = function (e) {
+              var myResult = [];
+              myResult = planningunitRequest.result;
+              var programId = (document.getElementById("programId").value).split("_")[0];
+              var proList = []
+
+              for (var i = 0; i < myResult.length; i++) {
+                if (myResult[i].program.id == programId) {
+
+                  proList.push(myResult[i].planningUnit)
+                }
+              }
+              console.log('proList', proList)
+              this.setState({ programPlanningUnitList: myResult })
+              var planningunitTransaction1 = db1.transaction(['planningUnit'], 'readwrite');
+              var planningunitOs1 = planningunitTransaction1.objectStore('planningUnit');
+              var planningunitRequest1 = planningunitOs1.getAll();
+              //  var pllist = []
+              planningunitRequest1.onerror = function (event) {
+                // Handle errors!
+              };
+              planningunitRequest1.onsuccess = function (e) {
+                var myResult = [];
+                myResult = planningunitRequest1.result;
+                var flList = []
+                console.log(myResult)
+                for (var i = 0; i < myResult.length; i++) {
+                  for (var j = 0; j < proList.length; j++) {
+                    if (myResult[i].planningUnitId == proList[j].id) {
+                      console.log(myResult[i].planningUnitId, proList[j].id)
+
+                      flList.push(myResult[i].forecastingUnit)
+                      planningList.push(myResult[i])
+                    }
+                  }
+                }
+                console.log('flList', flList)
+
+                var tcList = [];
+                flList.filter(function (item) {
+                  var i = tcList.findIndex(x => x.tracerCategoryId == item.tracerCategory.id);
+                  if (i <= -1 && item.tracerCategory.id != 0) {
+                    tcList.push({ tracerCategoryId: item.tracerCategory.id, label: item.tracerCategory.label });
+                  }
+                  return null;
+                });
+
+                console.log('tcList', tcList)
+                var lang = this.state.lang;
+                this.setState({
+                  tracerCategories: tcList.sort(function (a, b) {
+                    a = getLabelText(a.label, lang).toLowerCase();
+                    b = getLabelText(b.label, lang).toLowerCase();
+                    return a < b ? -1 : a > b ? 1 : 0;
+                  }),
+                  planningUnitList: planningList
+                }, () => {
+                  this.filterData();
+                })
+
+
+
+              }.bind(this);
+
+            }.bind(this);
+          }.bind(this)
+
+
+        }
+        else {
+
+
+          let realmId = AuthenticationService.getRealmId();
+          TracerCategoryService.getTracerCategoryByProgramId(realmId, programId).then(response => {
+
+            if (response.status == 200) {
+              var listArray = response.data;
+              listArray.sort((a, b) => {
+                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                return itemLabelA > itemLabelB ? 1 : -1;
+              });
+              this.setState({
+                tracerCategories: listArray,
+              }, () => {
+                this.filterData();
+              })
+            }
+
+          }).catch(
+            error => {
+              if (error.message === "Network Error") {
+                this.setState({
+                  message: 'static.unkownError',
+                  loading: false
+                });
+              } else {
+                switch (error.response ? error.response.status : "") {
+
+                  case 401:
+                    this.props.history.push(`/login/static.message.sessionExpired`)
+                    break;
+                  case 403:
+                    this.props.history.push(`/accessDenied`)
+                    break;
+                  case 500:
+                  case 404:
+                  case 406:
+                    this.setState({
+                      message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
+                      loading: false
+                    });
+                    break;
+                  case 412:
+                    this.setState({
+                      message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
+                      loading: false
+                    });
+                    break;
+                  default:
+                    this.setState({
+                      message: 'static.unkownError',
+                      loading: false
+                    });
+                    break;
+                }
+              }
+            }
+          );
+        }
+
+      } else {
+        // this.setState({
+        //   message: i18n.t('static.common.selectProgram'),
+        //   productCategories: [],
+        //   tracerCategories: []
+        // })
+        this.filterData();
+      }
+    })
   }
 
   makeText = m => {
@@ -160,12 +337,12 @@ export default class StockStatusMatrix extends React.Component {
         var min = ele.minMonthsOfStock
         var reorderFrequency = ele.reorderFrequency
         if (stockStatusId == 0) {
-          if ((ele.jan != null && ele.feb != null && ele.mar != null && ele.apr != null && ele.may != null && ele.jun != null && ele.jul != null && ele.aug != null && ele.sep != null && ele.oct != null && ele.nov != null && ele.dec != null) && ((this.roundN(ele.jan) == 0) || (this.roundN(ele.feb) == 0) || (this.roundN(ele.mar) == 0) || (this.roundN(ele.apr) == 0) || (this.roundN(ele.may) == 0) || (this.roundN(ele.jun) == 0) || (this.roundN(ele.jul) == 0) || (this.roundN(ele.aug) == 0) || (this.roundN(ele.sep) == 0) || (this.roundN(ele.oct) == 0) || (this.roundN(ele.nov) == 0) || (this.roundN(ele.dec) == 0))) {
+          if (((ele.jan != null && this.roundN(ele.jan) == 0) || (ele.feb != null && this.roundN(ele.feb) == 0) || (ele.mar != null && this.roundN(ele.mar) == 0) || (ele.apr != null && this.roundN(ele.apr) == 0) || (ele.may != null && this.roundN(ele.may) == 0) || (ele.jun != null && this.roundN(ele.jun) == 0) || (ele.jul != null && this.roundN(ele.jul) == 0) || (ele.aug != null && this.roundN(ele.aug) == 0) || (ele.sep != null && this.roundN(ele.sep) == 0) || (ele.oct != null && this.roundN(ele.oct) == 0) || (ele.nov != null && this.roundN(ele.nov) == 0) || (ele.dec != null && this.roundN(ele.dec) == 0))) {
             console.log('in 0')
             filteredData.push(ele)
           }
         } else if (stockStatusId == 1) {
-          if ((ele.jan != null && ele.feb != null && ele.mar != null && ele.apr != null && ele.may != null && ele.jun != null && ele.jul != null && ele.aug != null && ele.sep != null && ele.oct != null && ele.nov != null && ele.dec != null) && ((this.roundN(ele.jan) != 0 && this.roundN(ele.feb) != 0 && this.roundN(ele.mar) != 0 && this.roundN(ele.apr) != 0 && this.roundN(ele.may) != 0 && this.roundN(ele.jun) != 0 && this.roundN(ele.jul) != 0 && this.roundN(ele.aug) != 0 && this.roundN(ele.sep) != 0 && this.roundN(ele.oct) != 0 && this.roundN(ele.nov) != 0 && this.roundN(ele.dec) != 0)) && ((this.roundN(ele.jan) < min) || (this.roundN(ele.feb) < min) || (this.roundN(ele.mar) < min) || (this.roundN(ele.apr) < min) || (this.roundN(ele.may) < min) || (this.roundN(ele.jun) < min) || (this.roundN(ele.jul) < min) || (this.roundN(ele.aug) < min) || (this.roundN(ele.sep) < min) || (this.roundN(ele.oct) < min) || (this.roundN(ele.nov) < min) || (this.roundN(ele.dec) < min))) {
+          if (((ele.jan != null && this.roundN(ele.jan) != 0 && this.roundN(ele.jan) < min) || (ele.feb != null && this.roundN(ele.feb) != 0 && this.roundN(ele.feb) < min) || (ele.mar != null && this.roundN(ele.mar) != 0 && this.roundN(ele.mar) < min) || (ele.apr != null && this.roundN(ele.apr) != 0 && this.roundN(ele.apr) < min) || (ele.may != null && this.roundN(ele.may) != 0 && this.roundN(ele.may) < min) || (ele.jun != null && this.roundN(ele.jun) != 0 && this.roundN(ele.jun) < min) || (ele.jul != null && this.roundN(ele.jul) != 0 && this.roundN(ele.jul) < min) || (ele.aug != null && this.roundN(ele.aug) != 0 && this.roundN(ele.aug) < min) || (ele.sep != null && this.roundN(ele.sep) != 0 && this.roundN(ele.sep) < min) || (ele.oct != null && this.roundN(ele.oct) != 0 && this.roundN(ele.oct) < min) || (ele.nov != null && this.roundN(ele.nov) != 0 && this.roundN(ele.nov) < min) || (ele.dec != null && this.roundN(ele.dec) != 0 && this.roundN(ele.dec) < min))) {
             console.log('in 1')
             filteredData.push(ele)
           }
@@ -177,6 +354,10 @@ export default class StockStatusMatrix extends React.Component {
         } else if (stockStatusId == 2) {
           if ((this.roundN(ele.jan) < (min + reorderFrequency) && this.roundN(ele.jan) > min) || (this.roundN(ele.feb) < (min + reorderFrequency) && this.roundN(ele.feb) > min) || (this.roundN(ele.mar) < (min + reorderFrequency) && this.roundN(ele.mar) > min) || (this.roundN(ele.apr) < (min + reorderFrequency) && this.roundN(ele.apr) > min) || (this.roundN(ele.may) < (min + reorderFrequency) && this.roundN(ele.may) > min) || (this.roundN(ele.jun) < (min + reorderFrequency) && this.roundN(ele.jun) > min) || (this.roundN(ele.jul) < (min + reorderFrequency) && this.roundN(ele.jul) > min) || (this.roundN(ele.aug) < (min + reorderFrequency) && this.roundN(ele.aug) > min) || (this.roundN(ele.sep) < (min + reorderFrequency) && this.roundN(ele.sep) > min) || (this.roundN(ele.oct) < (min + reorderFrequency) && this.roundN(ele.act) > min) || (this.roundN(ele.nov) < (min + reorderFrequency) && this.roundN(ele.nov) > min) || (this.roundN(ele.dec) < (min + reorderFrequency) && this.roundN(ele.dec) > min)) {
             console.log('in 3')
+            filteredData.push(ele)
+          }
+        } else if (stockStatusId == 4) {
+          if ((ele.jan == null || ele.feb == null || ele.mar == null || ele.apr == null || ele.may == null || ele.jun == null || ele.jul == null || ele.aug == null || ele.sep == null || ele.oct == null || ele.nov == null || ele.dec == null)) {
             filteredData.push(ele)
           }
         }
@@ -194,17 +375,21 @@ export default class StockStatusMatrix extends React.Component {
     //console.log('In filter data---' + this.state.rangeValue.from.year)
     let startDate = this.state.startYear + '-01-01';
     let endDate = this.state.endYear + '-12-' + new Date(this.state.endYear, 12, 0).getDate();
-    // let programId = document.getElementById("programId").value;
-    let programId = this.state.programId;
+    let programId = document.getElementById("programId").value;
+    // let programId = this.state.programId;
     let planningUnitIds = this.state.planningUnitValues.map(ele => (ele.value).toString())//this.state.planningUnitValues.length == this.state.planningUnits.length ? [] : this.state.planningUnitValues.map(ele => (ele.value).toString());
-    // let versionId = document.getElementById("versionId").value;
-    let versionId = this.state.versionId;
+    console.log("planningUnitIds------>", planningUnitIds);
+    let versionId = document.getElementById("versionId").value;
+    let tracercategory = this.state.tracerCategoryValues.length == this.state.tracerCategories.length ? [] : this.state.tracerCategoryValues.map(ele => (ele.value).toString());//document.getElementById('tracerCategoryId').value
+    // let versionId = this.state.versionId;
     let includePlannedShipments = document.getElementById("includePlanningShipments").value
-    if (this.state.planningUnitValues.length > 0 && programId > 0 && versionId != 0) {
+    if (this.state.planningUnitValues.length > 0 && programId > 0 && versionId != 0 && this.state.tracerCategoryValues.length > 0) {
+      // if (programId > 0 && versionId != 0 && this.state.tracerCategoryValues.length > 0) {
 
       if (versionId.includes('Local')) {
         this.setState({ loading: true })
         var data = [];
+        var data1 = [];
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -229,13 +414,14 @@ export default class StockStatusMatrix extends React.Component {
           planningunitRequest.onsuccess = function (e) {
             var myResult1 = [];
             myResult1 = e.target.result;
-            console.log(myResult1)
+            console.log("RESP------>0", planningUnitIds)
+            console.log("RESP------>1", myResult1)
             var plunit1 = []
             planningUnitIds.map(planningUnitId => {
               plunit = [...plunit, ...(myResult1.filter(c => c.planningUnitId == planningUnitId))]
 
             })
-            console.log(plunit)
+            console.log("RESP------>2", plunit)
           }.bind(this)
           var transaction = db1.transaction(['programData'], 'readwrite');
           var programTransaction = transaction.objectStore('programData');
@@ -252,12 +438,27 @@ export default class StockStatusMatrix extends React.Component {
             })
           }.bind(this);
           programRequest.onsuccess = function (event) {
-            var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-            var programJson = JSON.parse(programData);
-
+            // var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+            // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+            // var programJson = JSON.parse(programData);
+            var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
             planningUnitIds.map(planningUnitId => {
-
+              var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == planningUnitId);
+              var programJson = {}
+              if (planningUnitDataIndex != -1) {
+                var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == planningUnitId))[0];
+                var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                programJson = JSON.parse(programData);
+              } else {
+                programJson = {
+                  consumptionList: [],
+                  inventoryList: [],
+                  shipmentList: [],
+                  batchInfoList: [],
+                  supplyPlan: []
+                }
+              }
               var pu = (this.state.planningUnits.filter(c => c.planningUnit.id == planningUnitId))[0]
 
               for (var from = this.state.startYear, to = this.state.endYear; from <= to; from++) {
@@ -285,6 +486,7 @@ export default class StockStatusMatrix extends React.Component {
                 }
                 console.log(monthlydata)
                 var json = {
+                  tracerCategoryId: this.state.planningUnitList.filter(c => c.planningUnitId == planningUnitId)[0].forecastingUnit.tracerCategory.id,
                   planningUnit: pu.planningUnit,
                   unit: plunit.filter(c => c.planningUnitId == planningUnitId)[0].unit,
                   reorderFrequency: pu.reorderFrequencyInMonths,
@@ -306,10 +508,26 @@ export default class StockStatusMatrix extends React.Component {
                 data.push(json)
 
               }
-              this.setState({
-                selData: data,
-                message: '', loading: false
-              }, () => { this.filterDataAsperstatus() })
+
+            })
+            console.log("RESP------>3", data);
+
+            let tracerCategoryValues = this.state.tracerCategoryValues;
+            console.log("RESP------>31", tracerCategoryValues);
+            for (let i = 0; i < data.length; i++) {
+              for (let j = 0; j < tracerCategoryValues.length; j++) {
+                if (tracerCategoryValues[j].value == data[i].tracerCategoryId) {
+                  data1.push(data[i]);
+                }
+              }
+            }
+
+            this.setState({
+              selData: data1,
+              message: '', loading: false
+            }, () => {
+              this.filterDataAsperstatus();
+              console.log("RESP------>4", this.state.selData);
             })
           }.bind(this)
 
@@ -344,7 +562,7 @@ export default class StockStatusMatrix extends React.Component {
           "stopDate": endDate,
           "planningUnitIds": planningUnitIds,
           "includePlannedShipments": includePlannedShipments,
-
+          "tracerCategoryIds": tracercategory
         }
 
 
@@ -437,14 +655,17 @@ export default class StockStatusMatrix extends React.Component {
 
       }
     } else if (programId == 0) {
-      this.setState({ message: i18n.t('static.common.selectProgram'), selData: [], data: [] });
+      this.setState({ message: i18n.t('static.common.selectProgram'), selData: [], data: [], tracerCategories: [], tracerCategoryValues: [], tracerCategoryLabels: [], planningUnits: [], planningUnitValues: [], planningUnitLabels: [] });
 
     } else if (versionId == 0) {
-      this.setState({ message: i18n.t('static.program.validversion'), selData: [], data: [] });
+      this.setState({ message: i18n.t('static.program.validversion'), selData: [], data: [], tracerCategories: [], tracerCategoryValues: [], tracerCategoryLabels: [], planningUnits: [], planningUnitValues: [], planningUnitLabels: [] });
 
-    } else {
+    }
+    else if (this.state.tracerCategoryValues.length == 0) {
+      this.setState({ message: i18n.t('static.tracercategory.tracercategoryText'), selData: [], data: [], planningUnits: [], planningUnitValues: [], planningUnitLabels: [] });
+    }
+    else if (this.state.planningUnitValues.length == 0) {
       this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), selData: [], data: [] });
-
     }
   }
 
@@ -473,23 +694,31 @@ export default class StockStatusMatrix extends React.Component {
           var programRequest = programTransaction.get(program);
 
           programRequest.onsuccess = function (event) {
-            var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-            var programJson = JSON.parse(programData);
-            var InventoryList = (programJson.inventoryList);
+            // var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+            // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+            // var programJson = JSON.parse(programData);
             let productCategories = [];
-            var json;
+            var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
+            for (var pu = 0; pu < planningUnitDataList.length; pu++) {
+              var planningUnitData = (planningUnitDataList)[pu];
+              var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+              var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+              var programJson = JSON.parse(programData);
+              var InventoryList = (programJson.inventoryList);
+              var json;
 
-            InventoryList.map(ele => (
-              productCategories.push({
-                payload: {
-                  productCategoryId: ele.planningUnit.forecastingUnit.productCategory.id,
-                  label: ele.planningUnit.forecastingUnit.productCategory.label,
-                  active: true
-                }
-              })
+              InventoryList.map(ele => (
+                productCategories.push({
+                  payload: {
+                    productCategoryId: ele.planningUnit.forecastingUnit.productCategory.id,
+                    label: ele.planningUnit.forecastingUnit.productCategory.label,
+                    active: true
+                  }
+                })
 
-            ))
+              ))
+            }
+
 
 
 
@@ -695,7 +924,7 @@ export default class StockStatusMatrix extends React.Component {
           if (myResult[i].userId == userId) {
             var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
             var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-            var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+            var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
             var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
             console.log(programNameLabel)
 
@@ -811,7 +1040,7 @@ export default class StockStatusMatrix extends React.Component {
           if (myResult[i].userId == userId && myResult[i].programId == programId) {
             var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
             var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-            var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+            var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
             var programData = databytes.toString(CryptoJS.enc.Utf8)
             var version = JSON.parse(programData).currentVersion
 
@@ -823,21 +1052,38 @@ export default class StockStatusMatrix extends React.Component {
 
         }
 
-        console.log(verList)
+        console.log(verList);
+        let versionList = verList.filter(function (x, i, a) {
+          return a.indexOf(x) === i;
+        });
+        versionList.reverse();
         if (localStorage.getItem("sesVersionIdReport") != '' && localStorage.getItem("sesVersionIdReport") != undefined) {
-          this.setState({
-            versions: verList.filter(function (x, i, a) {
-              return a.indexOf(x) === i;
-            }),
-            versionId: localStorage.getItem("sesVersionIdReport")
-          }, () => {
-            this.getPlanningUnit();
-          })
+
+          let versionVar = versionList.filter(c => c.versionId == localStorage.getItem("sesVersionIdReport"));
+          if (versionVar != '' && versionVar != undefined) {
+            this.setState({
+              versions: versionList,
+              versionId: localStorage.getItem("sesVersionIdReport")
+            }, () => {
+              // this.getPlanningUnit();
+              this.getTracerCategoryList();
+            })
+          } else {
+            this.setState({
+              versions: versionList,
+              versionId: versionList[0].versionId
+            }, () => {
+              // this.getPlanningUnit();
+              this.getTracerCategoryList();
+            })
+          }
         } else {
           this.setState({
-            versions: verList.filter(function (x, i, a) {
-              return a.indexOf(x) === i;
-            })
+            versions: versionList,
+            versionId: versionList[0].versionId
+          }, () => {
+            // this.getPlanningUnit();
+            this.getTracerCategoryList();
           })
         }
 
@@ -851,145 +1097,191 @@ export default class StockStatusMatrix extends React.Component {
 
   }
 
-
+  handleTracerCategoryChange = (tracerCategoryIds) => {
+    tracerCategoryIds = tracerCategoryIds.sort(function (a, b) {
+      return parseInt(a.value) - parseInt(b.value);
+    })
+    this.setState({
+      tracerCategoryValues: tracerCategoryIds.map(ele => ele),
+      tracerCategoryLabels: tracerCategoryIds.map(ele => ele.label)
+    }, () => {
+      this.getPlanningUnit();
+      this.filterData();
+    })
+  }
 
   getPlanningUnit = () => {
     let programId = document.getElementById("programId").value;
     let versionId = document.getElementById("versionId").value;
+    let tracercategory = this.state.tracerCategoryValues.length == this.state.tracerCategories.length ? [] : this.state.tracerCategoryValues.map(ele => (ele.value).toString());//document.getElementById('tracerCategoryId').value
 
-    this.setState({
-      planningUnits: [],
-      planningUnitValues: [],
-      planningUnitLabels: []
-    }, () => {
+    if (this.state.tracerCategoryValues.length > 0) {
 
-      if (versionId == 0) {
-        this.setState({ message: i18n.t('static.program.validversion'), selData: [], data: [] });
-      } else {
-        localStorage.setItem("sesVersionIdReport", versionId);
-        if (versionId.includes('Local')) {
-          const lan = 'en';
-          var db1;
-          var storeOS;
-          getDatabase();
-          var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-          openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
-            var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
-            var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
-            var planningunitRequest = planningunitOs.getAll();
-            var planningList = []
-            planningunitRequest.onerror = function (event) {
-              // Handle errors!
-            };
-            planningunitRequest.onsuccess = function (e) {
-              var myResult = [];
-              myResult = planningunitRequest.result;
-              var programId = (document.getElementById("programId").value).split("_")[0];
-              var proList = []
-              console.log(myResult)
-              for (var i = 0; i < myResult.length; i++) {
-                if (myResult[i].program.id == programId && myResult[i].active == true) {
+      this.setState({
+        planningUnits: [],
+        planningUnitValues: [],
+        planningUnitLabels: []
+      }, () => {
 
-                  proList[i] = myResult[i]
+        if (versionId == 0) {
+          this.setState({ message: i18n.t('static.program.validversion'), selData: [], data: [] });
+        } else {
+          localStorage.setItem("sesVersionIdReport", versionId);
+          if (versionId.includes('Local')) {
+            const lan = 'en';
+            var db1;
+            var storeOS;
+            getDatabase();
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+            openRequest.onsuccess = function (e) {
+              db1 = e.target.result;
+              var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+              var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
+              var planningunitRequest = planningunitOs.getAll();
+              var planningList = []
+              planningunitRequest.onerror = function (event) {
+                // Handle errors!
+              };
+              planningunitRequest.onsuccess = function (e) {
+                var myResult = [];
+                myResult = planningunitRequest.result;
+                var programId = (document.getElementById("programId").value).split("_")[0];
+                var proList = []
+                console.log(myResult)
+                let incrmental = 0;
+                for (var i = 0; i < myResult.length; i++) {
+                  if (myResult[i].program.id == programId && myResult[i].active == true) {
+
+                    let tempTCId = this.state.planningUnitList.filter(c => c.planningUnitId == myResult[i].planningUnit.id)[0].forecastingUnit.tracerCategory.id;
+
+                    let tempPUObj = myResult[i];
+                    tempPUObj["tracerCategoryId"] = tempTCId;
+                    // proList[i] = myResult[i];
+
+                    proList[incrmental] = tempPUObj;
+                    incrmental = incrmental + 1;
+                    // console.log("Log-------->", tempTCId);
+                  }
                 }
-              }
-              var lang = this.state.lang;
+
+                let tracerCategoryValues = this.state.tracerCategoryValues.map((item, i) => {
+                  return ({ tracerCategoryId: item.value })
+                }, this);
+
+
+                // console.log("Log--------> ******** ", tracerCategoryValues);
+                console.log("Log--------> ******** 00", proList);
+                console.log("Log--------> ******** -00", proList.length);
+
+                let data1 = [];
+                for (let i = 0; i < proList.length; i++) {
+                  for (let j = 0; j < tracerCategoryValues.length; j++) {
+                    console.log("Log--------> ******** 11", proList[i]);
+                    console.log("Log--------> ******** 22", i);
+                    if (tracerCategoryValues[j].tracerCategoryId == proList[i].tracerCategoryId) {
+                      data1.push(proList[i]);
+                    }
+                  }
+                }
+
+
+                var lang = this.state.lang;
+                this.setState({
+                  planningUnits: data1.sort(function (a, b) {
+                    a = getLabelText(a.planningUnit.label, lang).toLowerCase();
+                    b = getLabelText(b.planningUnit.label, lang).toLowerCase();
+                    return a < b ? -1 : a > b ? 1 : 0;
+                  }),
+                  planningUnitValues: data1.map((item, i) => {
+                    return ({ label: getLabelText(item.planningUnit.label, this.state.lang), value: item.planningUnit.id })
+
+                  }, this),
+                  planningUnitLabels: data1.map((item, i) => {
+                    return (getLabelText(item.planningUnit.label, this.state.lang))
+                  }, this),
+                  message: ''
+                }, () => {
+                  this.filterData();
+                })
+              }.bind(this);
+            }.bind(this)
+
+
+          }
+          else {
+            // AuthenticationService.setupAxiosInterceptors();
+
+            //let productCategoryId = document.getElementById("productCategoryId").value;
+            ProgramService.getPlanningUnitByProgramTracerCategory(programId, tracercategory).then(response => {
+              console.log('**' + JSON.stringify(response.data))
+              var listArray = response.data;
+              listArray.sort((a, b) => {
+                var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                return itemLabelA > itemLabelB ? 1 : -1;
+              });
               this.setState({
-                planningUnits: proList.sort(function (a, b) {
-                  a = getLabelText(a.planningUnit.label, lang).toLowerCase();
-                  b = getLabelText(b.planningUnit.label, lang).toLowerCase();
-                  return a < b ? -1 : a > b ? 1 : 0;
-                }), message: ''
+                planningUnits: listArray,
+                planningUnitValues: response.data.map((item, i) => {
+                  return ({ label: getLabelText(item.planningUnit.label, this.state.lang), value: item.planningUnit.id })
+
+                }, this),
+                planningUnitLabels: response.data.map((item, i) => {
+                  return (getLabelText(item.planningUnit.label, this.state.lang))
+                }, this),
+                message: ''
               }, () => {
                 this.filterData();
               })
-            }.bind(this);
-          }.bind(this)
-
-
-        }
-        else {
-          // AuthenticationService.setupAxiosInterceptors();
-
-          //let productCategoryId = document.getElementById("productCategoryId").value;
-          ProgramService.getActiveProgramPlaningUnitListByProgramId(programId).then(response => {
-            console.log('**' + JSON.stringify(response.data))
-            this.setState({
-              planningUnits: response.data, message: ''
-            }, () => {
-              this.filterData();
-            })
-          }).catch(
-            error => {
-              this.setState({
-                planningUnits: [],
-              })
-              if (error.message === "Network Error") {
+            }).catch(
+              error => {
                 this.setState({
-                  message: 'static.unkownError',
-                  loading: false
-                });
-              } else {
-                switch (error.response ? error.response.status : "") {
+                  planningUnits: [],
+                })
+                if (error.message === "Network Error") {
+                  this.setState({
+                    message: 'static.unkownError',
+                    loading: false
+                  });
+                } else {
+                  switch (error.response ? error.response.status : "") {
 
-                  case 401:
-                    this.props.history.push(`/login/static.message.sessionExpired`)
-                    break;
-                  case 403:
-                    this.props.history.push(`/accessDenied`)
-                    break;
-                  case 500:
-                  case 404:
-                  case 406:
-                    this.setState({
-                      message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
-                      loading: false
-                    });
-                    break;
-                  case 412:
-                    this.setState({
-                      message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
-                      loading: false
-                    });
-                    break;
-                  default:
-                    this.setState({
-                      message: 'static.unkownError',
-                      loading: false
-                    });
-                    break;
+                    case 401:
+                      this.props.history.push(`/login/static.message.sessionExpired`)
+                      break;
+                    case 403:
+                      this.props.history.push(`/accessDenied`)
+                      break;
+                    case 500:
+                    case 404:
+                    case 406:
+                      this.setState({
+                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
+                        loading: false
+                      });
+                      break;
+                    case 412:
+                      this.setState({
+                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
+                        loading: false
+                      });
+                      break;
+                    default:
+                      this.setState({
+                        message: 'static.unkownError',
+                        loading: false
+                      });
+                      break;
+                  }
                 }
               }
-            }
-          );
-          // .catch(
-          //   error => {
-          //     this.setState({
-          //       planningUnits: [],
-          //     })
-          //     if (error.message === "Network Error") {
-          //       this.setState({ message: error.message });
-          //     } else {
-          //       switch (error.response ? error.response.status : "") {
-          //         case 500:
-          //         case 401:
-          //         case 404:
-          //         case 406:
-          //         case 412:
-          //           this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
-          //           break;
-          //         default:
-          //           this.setState({ message: 'static.unkownError' });
-          //           break;
-          //       }
-          //     }
-          //   }
-          // );
+            );
+          }
         }
-      }
-    });
-
+      });
+    } else {
+      this.setState({ message: i18n.t('static.tracercategory.tracercategoryText'), selData: [], data: [] });
+    }
   }
 
   componentDidMount() {
@@ -999,8 +1291,10 @@ export default class StockStatusMatrix extends React.Component {
 
   setProgramId(event) {
     this.setState({
-      programId: event.target.value
+      programId: event.target.value,
+      versionId: ''
     }, () => {
+      localStorage.setItem("sesVersionIdReport", '');
       this.filterVersion();
       this.filterData()
     })
@@ -1008,11 +1302,33 @@ export default class StockStatusMatrix extends React.Component {
   }
 
   setVersionId(event) {
-    this.setState({
-      versionId: event.target.value
-    }, () => {
-      this.getPlanningUnit();
-    })
+    // this.setState({
+    //   versionId: event.target.value
+    // }, () => {
+    //   if (this.state.selData.length != 0) {
+    //     localStorage.setItem("sesVersionIdReport", this.state.versionId);
+    //     this.filterData();
+    //   } else {
+    //     this.getPlanningUnit();
+    //   }
+    // })
+
+    if (this.state.versionId != '' || this.state.versionId != undefined) {
+      this.setState({
+        versionId: event.target.value
+      }, () => {
+        localStorage.setItem("sesVersionIdReport", this.state.versionId);
+        this.getTracerCategoryList();
+        // this.filterData();
+      })
+    } else {
+      this.setState({
+        versionId: event.target.value
+      }, () => {
+        // this.getPlanningUnit();
+        this.getTracerCategoryList();
+      })
+    }
 
   }
 
@@ -1045,6 +1361,9 @@ export default class StockStatusMatrix extends React.Component {
     this.state.planningUnitLabels.map(ele =>
       csvRow.push('"' + (i18n.t('static.planningunit.planningunit') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
     csvRow.push('')
+    this.state.tracerCategoryLabels.map(ele =>
+      csvRow.push('"' + (i18n.t('static.tracercategory.tracercategory')).replaceAll(' ', '%20') + ' : ' + (ele.toString()).replaceAll(' ', '%20') + '"'))
+    csvRow.push('')
     csvRow.push('"' + (i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
     csvRow.push('')
     csvRow.push('"' + (i18n.t('static.dashboard.stockstatusmain') + ' : ' + document.getElementById("stockStatusId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
@@ -1059,7 +1378,7 @@ export default class StockStatusMatrix extends React.Component {
     columns.map((item, idx) => { headers[idx] = ((item.text).replaceAll(' ', '%20').replaceAll('#', '%23')) });
     var A = [this.addDoubleQuoteToRowContent(headers)]
     var re = this.state.data
-    this.state.data.map(ele => A.push(this.addDoubleQuoteToRowContent([ele.planningUnit.id, (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.unit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.minMonthsOfStock, ele.reorderFrequency, ele.year, isNaN(ele.jan) ? '' : this.roundN(ele.jan), isNaN(ele.feb) ? '' : this.roundN(ele.feb), isNaN(ele.mar) ? '' : this.roundN(ele.mar), isNaN(ele.apr) ? '' : this.roundN(ele.apr), isNaN(ele.may) ? '' : this.roundN(ele.may), isNaN(ele.jun) ? '' : this.roundN(ele.jun), isNaN(ele.jul) ? '' : this.roundN(ele.jul), isNaN(ele.aug) ? '' : this.roundN(ele.aug), isNaN(ele.sep) ? '' : this.roundN(ele.sep), isNaN(ele.oct) ? '' : this.roundN(ele.oct), isNaN(ele.nov) ? '' : this.roundN(ele.nov), isNaN(ele.dec) ? '' : this.roundN(ele.dec)])));
+    this.state.data.map(ele => A.push(this.addDoubleQuoteToRowContent([ele.planningUnit.id, (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.unit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.minMonthsOfStock, ele.reorderFrequency, ele.year, ele.jan != null ? isNaN(ele.jan) ? '' : this.roundN(ele.jan) : i18n.t("static.supplyPlanFormula.na"), ele.feb != null ? isNaN(ele.feb) ? '' : this.roundN(ele.feb) : i18n.t("static.supplyPlanFormula.na"), ele.mar != null ? isNaN(ele.mar) ? '' : this.roundN(ele.mar) : i18n.t("static.supplyPlanFormula.na"), ele.apr != null ? isNaN(ele.apr) ? '' : this.roundN(ele.apr) : i18n.t("static.supplyPlanFormula.na"), ele.may != null ? isNaN(ele.may) ? '' : this.roundN(ele.may) : i18n.t("static.supplyPlanFormula.na"), ele.jun != null ? isNaN(ele.jun) ? '' : this.roundN(ele.jun) : i18n.t("static.supplyPlanFormula.na"), ele.jul != null ? isNaN(ele.jul) ? '' : this.roundN(ele.jul) : i18n.t("static.supplyPlanFormula.na"), ele.aug != null ? isNaN(ele.aug) ? '' : this.roundN(ele.aug) : i18n.t("static.supplyPlanFormula.na"), ele.sep != null ? isNaN(ele.sep) ? '' : this.roundN(ele.sep) : i18n.t("static.supplyPlanFormula.na"), ele.oct != null ? isNaN(ele.oct) ? '' : this.roundN(ele.oct) : i18n.t("static.supplyPlanFormula.na"), ele.nov != null ? isNaN(ele.nov) ? '' : this.roundN(ele.nov) : i18n.t("static.supplyPlanFormula.na"), ele.dec != null ? isNaN(ele.dec) ? '' : this.roundN(ele.dec) : i18n.t("static.supplyPlanFormula.na")])));
     for (var i = 0; i < A.length; i++) {
       console.log(A[i])
       csvRow.push(A[i].join(","))
@@ -1126,8 +1445,11 @@ export default class StockStatusMatrix extends React.Component {
             align: 'left'
           })
 
-          var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+          var planningText = doc.splitTextToSize((i18n.t('static.tracercategory.tracercategory') + ' : ' + this.state.tracerCategoryLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
           doc.text(doc.internal.pageSize.width / 8, 170, planningText)
+
+          var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+          doc.text(doc.internal.pageSize.width / 8, 200, planningText)
 
         }
 
@@ -1168,9 +1490,9 @@ export default class StockStatusMatrix extends React.Component {
       { content: i18n.t('static.month.dec'), styles: { halign: 'center' } },]
     ]
     let data;
-    data = this.state.data.map(ele => [ele.planningUnit.id, getLabelText(ele.planningUnit.label, this.state.lang), getLabelText(ele.unit.label, this.state.lang), ele.minMonthsOfStock, ele.reorderFrequency, ele.year, isNaN(ele.jan) ? '' : this.formatter(ele.jan), isNaN(ele.feb) ? '' : this.formatter(ele.feb), isNaN(ele.mar) ? '' : this.formatter(ele.mar), isNaN(ele.apr) ? '' : this.formatter(ele.apr), isNaN(ele.may) ? '' : this.formatter(ele.may), isNaN(ele.jun) ? '' : this.formatter(ele.jun), isNaN(ele.jul) ? '' : this.formatter(ele.jul), isNaN(ele.aug) ? '' : this.formatter(ele.aug), isNaN(ele.sep) ? '' : this.formatter(ele.sep), isNaN(ele.oct) ? '' : this.formatter(ele.oct), isNaN(ele.nov) ? '' : this.formatter(ele.nov), isNaN(ele.dec) ? '' : this.formatter(ele.dec)]);
+    data = this.state.data.map(ele => [ele.planningUnit.id, getLabelText(ele.planningUnit.label, this.state.lang), getLabelText(ele.unit.label, this.state.lang), ele.minMonthsOfStock, ele.reorderFrequency, ele.year, ele.jan != null ? isNaN(ele.jan) ? '' : this.formatter(ele.jan) : i18n.t("static.supplyPlanFormula.na"), ele.feb != null ? isNaN(ele.feb) ? '' : this.formatter(ele.feb) : i18n.t("static.supplyPlanFormula.na"), ele.mar != null ? isNaN(ele.mar) ? '' : this.formatter(ele.mar) : i18n.t("static.supplyPlanFormula.na"), ele.apr != null ? isNaN(ele.apr) ? '' : this.formatter(ele.apr) : i18n.t("static.supplyPlanFormula.na"), ele.may != null ? isNaN(ele.may) ? '' : this.formatter(ele.may) : i18n.t("static.supplyPlanFormula.na"), ele.jun != null ? isNaN(ele.jun) ? '' : this.formatter(ele.jun) : i18n.t("static.supplyPlanFormula.na"), ele.jul != null ? isNaN(ele.jul) ? '' : this.formatter(ele.jul) : i18n.t("static.supplyPlanFormula.na"), ele.aug != null ? isNaN(ele.aug) ? '' : this.formatter(ele.aug) : i18n.t("static.supplyPlanFormula.na"), ele.sep != null ? isNaN(ele.sep) ? '' : this.formatter(ele.sep) : i18n.t("static.supplyPlanFormula.na"), ele.oct != null ? isNaN(ele.oct) ? '' : this.formatter(ele.oct) : i18n.t("static.supplyPlanFormula.na"), ele.nov != null ? isNaN(ele.nov) ? '' : this.formatter(ele.nov) : i18n.t("static.supplyPlanFormula.na"), ele.dec != null ? isNaN(ele.dec) ? '' : this.formatter(ele.dec) : i18n.t("static.supplyPlanFormula.na")]);
 
-    var startY = 180 + (this.state.planningUnitValues.length * 3)
+    var startY = 230 + (this.state.planningUnitValues.length * 3)
     let content = {
       margin: { top: 80, bottom: 90 },
       startY: startY,
@@ -1218,7 +1540,7 @@ export default class StockStatusMatrix extends React.Component {
       }
     }
     else {
-      return {}
+      return { backgroundColor: legendcolor[4].color }
     }
   }
   render() {
@@ -1271,7 +1593,8 @@ export default class StockStatusMatrix extends React.Component {
       && programs.map((item, i) => {
         return (
           <option key={i} value={item.programId}>
-            {getLabelText(item.label, this.state.lang)}
+            {/* {getLabelText(item.label, this.state.lang)} */}
+            {item.programCode}
           </option>
         )
       }, this);
@@ -1280,11 +1603,12 @@ export default class StockStatusMatrix extends React.Component {
       && versions.map((item, i) => {
         return (
           <option key={i} value={item.versionId}>
-            {item.versionId}
+            {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)}
           </option>
         )
       }, this);
 
+    const { tracerCategories } = this.state;
 
     let columns = [
       {
@@ -1469,7 +1793,7 @@ export default class StockStatusMatrix extends React.Component {
         <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
         <h5 className="red">{i18n.t(this.state.message, { entityname })}</h5>
         <SupplyPlanFormulas ref="formulaeChild" />
-        <Card style={{ display: this.state.loading ? "none" : "block" }}>
+        <Card>
           <div className="Card-header-reporticon pb-2">
             <div className="card-header-actions">
               <a className="card-header-action">
@@ -1520,7 +1844,7 @@ export default class StockStatusMatrix extends React.Component {
                   </div>
                 </FormGroup>
                 <FormGroup className="col-md-3">
-                  <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
+                  <Label htmlFor="appendedInputButton">{i18n.t('static.report.versionFinal*')}</Label>
                   <div className="controls ">
                     <InputGroup>
                       <Input
@@ -1541,6 +1865,27 @@ export default class StockStatusMatrix extends React.Component {
                 </FormGroup>
 
                 <FormGroup className="col-md-3">
+                  <Label htmlFor="appendedInputButton">{i18n.t('static.tracercategory.tracercategory')}</Label>
+                  <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                  <div className="controls">
+
+                    <MultiSelect
+                      name="tracerCategoryId"
+                      id="tracerCategoryId"
+                      bsSize="sm"
+                      value={this.state.tracerCategoryValues}
+                      onChange={(e) => { this.handleTracerCategoryChange(e) }}
+                      disabled={this.state.loading}
+                      options=
+                      {tracerCategories.length > 0 ?
+                        tracerCategories.map((item, i) => {
+                          return ({ label: getLabelText(item.label, this.state.lang), value: item.tracerCategoryId })
+
+                        }, this) : []} />
+                  </div>
+                </FormGroup>
+
+                <FormGroup className="col-md-3">
                   <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
                   <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                   <div className="controls">
@@ -1552,7 +1897,9 @@ export default class StockStatusMatrix extends React.Component {
                       value={this.state.planningUnitValues}
                       onChange={(e) => { this.handlePlanningUnitChange(e) }}
                       options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
+                      disabled={this.state.loading}
                     />     </div></FormGroup>
+
                 <FormGroup className="col-md-3">
                   <Label htmlFor="appendedInputButton">{i18n.t('static.program.isincludeplannedshipment')}</Label>
                   <div className="controls ">
@@ -1609,9 +1956,9 @@ export default class StockStatusMatrix extends React.Component {
                 </FormGroup>
               </div>
             </div>
-            <div class="TableCust">
+            <div class="TableCust" style={{ display: this.state.loading ? "none" : "block" }}>
               {this.state.data.length > 0 &&
-                <Table striped bordered hover responsive="md" style={{ width: "100%" }}>
+                <Table striped bordered responsive="md" style={{ width: "100%" }}>
                   <thead>
                     <tr>
                       <th rowSpan="2" className="text-center" style={{ width: "20%" }}>{i18n.t('static.planningunit.planningunit')}</th>
@@ -1644,18 +1991,18 @@ export default class StockStatusMatrix extends React.Component {
                         <td className="text-center">{ele.minMonthsOfStock}</td>
                         <td className="text-center">{ele.reorderFrequency}</td>
                         <td className="text-center">{ele.year}</td>
-                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.jan)}>{isNaN(ele.jan) ? '' : this.formatter(ele.jan)}</td>
-                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.feb)} > {isNaN(ele.feb) ? '' : this.formatter(ele.feb)}</td>
-                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.mar)} > {isNaN(ele.mar) ? '' : this.formatter(ele.mar)}</td>
-                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.apr)}> {isNaN(ele.apr) ? '' : this.formatter(ele.apr)}</td>
-                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.may)}> {isNaN(ele.may) ? '' : this.formatter(ele.may)}</td>
-                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.jun)}> {isNaN(ele.jun) ? '' : this.formatter(ele.jun)}</td>
-                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.jul)}> {isNaN(ele.jul) ? '' : this.formatter(ele.jul)}</td>
-                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.aug)}> {isNaN(ele.aug) ? '' : this.formatter(ele.aug)}</td>
-                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.sep)}> {isNaN(ele.sep) ? '' : this.formatter(ele.sep)}</td>
-                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.oct)}> {isNaN(ele.oct) ? '' : this.formatter(ele.oct)}</td>
-                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.nov)}> {isNaN(ele.nov) ? '' : this.formatter(ele.nov)}</td>
-                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.dec)}> {isNaN(ele.dec) ? '' : this.formatter(ele.dec)}</td></tr>)
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.jan)}>{isNaN(ele.jan) ? '' : ele.jan != null ? this.formatter(ele.jan) : i18n.t("static.supplyPlanFormula.na")}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.feb)} > {isNaN(ele.feb) ? '' : ele.feb != null ? this.formatter(ele.feb) : i18n.t("static.supplyPlanFormula.na")}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.mar)} > {isNaN(ele.mar) ? '' : ele.mar != null ? this.formatter(ele.mar) : i18n.t("static.supplyPlanFormula.na")}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.apr)}> {isNaN(ele.apr) ? '' : ele.apr != null ? this.formatter(ele.apr) : i18n.t("static.supplyPlanFormula.na")}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.may)}> {isNaN(ele.may) ? '' : ele.may != null ? this.formatter(ele.may) : i18n.t("static.supplyPlanFormula.na")}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.jun)}> {isNaN(ele.jun) ? '' : ele.jun != null ? this.formatter(ele.jun) : i18n.t("static.supplyPlanFormula.na")}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.jul)}> {isNaN(ele.jul) ? '' : ele.jul != null ? this.formatter(ele.jul) : i18n.t("static.supplyPlanFormula.na")}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.aug)}> {isNaN(ele.aug) ? '' : ele.aug != null ? this.formatter(ele.aug) : i18n.t("static.supplyPlanFormula.na")}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.sep)}> {isNaN(ele.sep) ? '' : ele.sep != null ? this.formatter(ele.sep) : i18n.t("static.supplyPlanFormula.na")}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.oct)}> {isNaN(ele.oct) ? '' : ele.oct != null ? this.formatter(ele.oct) : i18n.t("static.supplyPlanFormula.na")}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.nov)}> {isNaN(ele.nov) ? '' : ele.nov != null ? this.formatter(ele.nov) : i18n.t("static.supplyPlanFormula.na")}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.dec)}> {isNaN(ele.dec) ? '' : ele.dec != null ? this.formatter(ele.dec) : i18n.t("static.supplyPlanFormula.na")}</td></tr>)
                     })}
 
                   </tbody>
@@ -1665,19 +2012,20 @@ export default class StockStatusMatrix extends React.Component {
 
 
             </div>
-          </CardBody>
-        </Card>
-        <div style={{ display: this.state.loading ? "block" : "none" }}>
-          <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-            <div class="align-items-center">
-              <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+            <div style={{ display: this.state.loading ? "block" : "none" }}>
+              <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                <div class="align-items-center">
+                  <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-              <div class="spinner-border blue ml-4" role="status">
+                  <div class="spinner-border blue ml-4" role="status">
 
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
+          </CardBody>
+        </Card>
+
 
 
       </div>)

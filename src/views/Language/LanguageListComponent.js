@@ -311,7 +311,7 @@ export default class LanguageListComponent extends Component {
     hideFirstComponent() {
         this.timeout = setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
     componentWillUnmount() {
         clearTimeout(this.timeout);
@@ -320,11 +320,11 @@ export default class LanguageListComponent extends Component {
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
 
     editLanguage(language) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_LANGUAGE')) {
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_LANGUAGE')) {
             this.props.history.push({
                 pathname: `/language/editLanguage/${language.languageId}`,
                 // state: { language }
@@ -385,7 +385,7 @@ export default class LanguageListComponent extends Component {
                             var options = {
                                 data: data,
                                 columnDrag: true,
-                                colWidths: [0,150, 150,150, 100,100,100],
+                                colWidths: [0, 150, 150, 150, 100, 100, 100],
                                 colHeaderClasses: ["Reqasterisk"],
                                 columns: [
                                     {
@@ -453,7 +453,7 @@ export default class LanguageListComponent extends Component {
                                 filters: true,
                                 license: JEXCEL_PRO_KEY,
                                 contextMenu: function (obj, x, y, e) {
-                                    return [];
+                                    return false;
                                 }.bind(this),
                             };
                             var languageEl = jexcel(document.getElementById("tableDiv"), options);
@@ -524,7 +524,7 @@ export default class LanguageListComponent extends Component {
             // console.log("HEADER SELECTION--------------------------");
         } else {
             // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
-            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_LANGUAGE')) {
+            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_LANGUAGE')) {
                 this.props.history.push({
                     pathname: `/language/editLanguage/${this.el.getValueFromCoords(0, x)}`,
                 });
@@ -547,33 +547,33 @@ export default class LanguageListComponent extends Component {
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
-                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
-                <Card style={{ display: this.state.loading ? "none" : "block" }}>
+                <h5 className="red" id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+                <Card>
                     <div className="Card-header-addicon">
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '} */}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_LANGUAGE') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addLanguage}><i className="fa fa-plus-square"></i></a>}
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_LANGUAGE') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addLanguage}><i className="fa fa-plus-square"></i></a>}
                             </div>
                         </div>
                     </div>
                     <CardBody className=" pt-md-1 pb-md-1 table-responsive">
-                        <div id="tableDiv" className="jexcelremoveReadonlybackground">
+                        <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_LANGUAGE') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
+                        </div>
+                        <div style={{ display: this.state.loading ? "block" : "none" }}>
+                            <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                <div class="align-items-center">
+                                    <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                    <div class="spinner-border blue ml-4" role="status">
+
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                     </CardBody>
                 </Card>
-                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div class="align-items-center">
-                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
-                            <div class="spinner-border blue ml-4" role="status">
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
             </div>
         );

@@ -340,6 +340,13 @@ import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions.js
 
 
 const entityname = i18n.t('static.country.countryMaster');
+
+const sortArray = (sourceArray) => {
+    // const sortByName = (a, b) => getLabelText(a.label, this.state.lang).localeCompare(getLabelText(b.label, this.state.lang), 'en', { numeric: true });
+    const sortByName = (a, b) => a.label.label_en.localeCompare(b.label.label_en, 'en', { numeric: true });
+    return sourceArray.sort(sortByName);
+};
+
 export default class CountryListComponent extends Component {
 
     constructor(props) {
@@ -362,7 +369,7 @@ export default class CountryListComponent extends Component {
     hideFirstComponent() {
         this.timeout = setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
     componentWillUnmount() {
         clearTimeout(this.timeout);
@@ -371,7 +378,7 @@ export default class CountryListComponent extends Component {
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
 
     filterData() {
@@ -412,7 +419,7 @@ export default class CountryListComponent extends Component {
 
     }
     editCountry(country) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_COUNTRY')) {
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_COUNTRY')) {
             console.log(country);
             this.props.history.push({
                 pathname: `/country/editCountry/${country.countryId}`,
@@ -521,7 +528,7 @@ export default class CountryListComponent extends Component {
             filters: true,
             license: JEXCEL_PRO_KEY,
             contextMenu: function (obj, x, y, e) {
-                return [];
+                return false;
             }.bind(this),
         };
         var countryEl = jexcel(document.getElementById("tableDiv"), options);
@@ -540,9 +547,14 @@ export default class CountryListComponent extends Component {
                 //     countryList: response.data,
                 //     selCountry: response.data, loading: false
                 // })
+                var listArray = response.data;
+
+                if (listArray.length > 0) {
+                    sortArray(listArray);
+                }
                 this.setState({
-                    countryList: response.data,
-                    selCountry: response.data
+                    countryList: listArray,
+                    selCountry: listArray
                 },
                     () => {
                         this.buildJExcel();
@@ -614,7 +626,7 @@ export default class CountryListComponent extends Component {
             // console.log("HEADER SELECTION--------------------------");
         } else {
             // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
-            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_COUNTRY')) {
+            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_COUNTRY')) {
                 this.props.history.push({
                     pathname: `/country/editCountry/${this.el.getValueFromCoords(0, x)}`,
                 });
@@ -637,20 +649,20 @@ export default class CountryListComponent extends Component {
                 }} /> */}
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
-                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
-                <Card style={{ display: this.state.loading ? "none" : "block" }}>
+                <h5 className="red" id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+                <Card>
                     <div className="Card-header-addicon">
                         {/* <i className="icon-menu"></i>{i18n.t('static.country.countrylist')} */}
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.countrylist')}</strong>{' '} */}
 
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_COUNTRY') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewCountry}><i className="fa fa-plus-square"></i></a>}
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_COUNTRY') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewCountry}><i className="fa fa-plus-square"></i></a>}
                             </div>
                         </div>
 
                     </div>
-                    <CardBody className="">
+                    <CardBody className="pb-lg-0 pt-lg-0">
                         <Col md="3 pl-0">
                             <FormGroup className="Selectdiv mt-md-2 mb-md-0">
                                 <Label htmlFor="appendedInputButton">{i18n.t('static.common.status')}</Label>
@@ -677,23 +689,22 @@ export default class CountryListComponent extends Component {
                         </Col>
 
 
-                        <div id="tableDiv" className="jexcelremoveReadonlybackground">
+                        <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_COUNTRY') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
                         </div>
+                        <div style={{ display: this.state.loading ? "block" : "none" }}>
+                            <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                <div class="align-items-center">
+                                    <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
+                                    <div class="spinner-border blue ml-4" role="status">
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
                     </CardBody>
                 </Card>
-                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div class="align-items-center">
-                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
-                            <div class="spinner-border blue ml-4" role="status">
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         );
     }

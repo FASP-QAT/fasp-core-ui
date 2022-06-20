@@ -17,10 +17,22 @@ class ProgramService {
         return axios.get(`${API_URL}/api/program/`, {
         });
     }
+
+    getDataSetList() {
+        return axios.get(`${API_URL}/api/dataset/`, {
+        });
+    }
+
     getProgramListAll() {
         return axios.get(`${API_URL}/api/program/all`, {
         });
     }
+
+    getDataSetListAll() {
+        return axios.get(`${API_URL}/api/dataset/all`, {
+        });
+    }
+
     loadProgramList() {
         return axios.get(`${API_URL}/api/loadProgram/`, {
         });
@@ -94,8 +106,8 @@ class ProgramService {
         );
     }
 
-    saveProgramData(json) {
-        return axios.put(`${API_URL}/api/programData/`, json, {}
+    saveProgramData(json, comparedVersionId) {
+        return axios.put(`${API_URL}/api/programData/${comparedVersionId}`, json, {}
         );
     }
 
@@ -166,6 +178,71 @@ class ProgramService {
 
     getActiveProgramPlaningUnitListByProgramId(json) {
         return axios.get(`${API_URL}/api/program/${json}/planningUnit/`, {}
+        );
+    }
+
+    getPlanningUnitByProgramTracerCategory(programId, json) {
+        return axios.post(`${API_URL}/api/program/${programId}/tracerCategory/planningUnit`, json, {}
+        );
+    }
+
+    getLatestVersionForProgram(programId) {
+        return axios.get(`${API_URL}/api/programData/getLatestVersionForProgram/${programId}`, {}
+        );
+    }
+
+    getLatestVersionsForPrograms(programIds) {
+        return axios.post(`${API_URL}/api/programData/getLatestVersionForPrograms/`, programIds, {}
+        );
+    }
+
+    getLastModifiedDateForProgram(programId, versionId) {
+        return axios.get(`${API_URL}/api/programData/getLastModifiedDateForProgram/${programId}/${versionId}`, {}
+        );
+    }
+
+    addDataset(json) {
+        return axios.post(`${API_URL}/api/dataset/`, json, {}
+        );
+    }
+
+    getDatasetById(json) {
+        return axios.get(`${API_URL}/api/dataset/${json}`, {}
+        );
+    }
+
+    editDataset(json) {
+        return axios.put(`${API_URL}/api/dataset/`, json, {}
+        );
+    }
+
+    getActualConsumptionData(json) {
+        return axios.post(`${API_URL}/api/program/actualConsumptionReport`, json, {}
+
+        );
+    }
+    checkIfCommitRequestExists(programId) {
+        return axios.get(`${API_URL}/api/programData/checkIfCommitRequestExistsForProgram/${programId}`, {}
+        );
+    }
+
+    getCommitRequests(json, requestStatus) {
+        return axios.post(`${API_URL}/api/getCommitRequest/${requestStatus}`, json, {}
+        );
+    }
+
+    sendNotificationAsync(commitRequestId) {
+        return axios.get(`${API_URL}/api/sendNotification/${commitRequestId}`, {}
+        );
+    }
+
+    getPlanningUnitByProgramId(programId, json) {
+        return axios.post(`${API_URL}/api/program/${programId}/tracerCategory/simple/planningUnit`, json, {}
+        );
+    }
+
+    getProgramManagerListByProgramId(programId) {
+        return axios.get(`${API_URL}/api/user/programId/${programId}`, {}
         );
     }
 

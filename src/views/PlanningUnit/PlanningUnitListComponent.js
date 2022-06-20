@@ -435,7 +435,7 @@ export default class PlanningUnitListComponent extends Component {
     hideFirstComponent() {
         this.timeout = setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
     componentWillUnmount() {
         clearTimeout(this.timeout);
@@ -445,7 +445,7 @@ export default class PlanningUnitListComponent extends Component {
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
 
     filterData() {
@@ -538,7 +538,7 @@ export default class PlanningUnitListComponent extends Component {
                                                 return itemLabelA > itemLabelB ? 1 : -1;
                                             });
                                             PlanningUnitService.getPlanningUnitByRealmId(realmId).then(response => {
-                                                console.log(response.data)
+                                                console.log("RESP----->", response.data);
                                                 this.setState({
                                                     planningUnitList: response.data,
                                                     selSource: response.data,
@@ -730,7 +730,7 @@ export default class PlanningUnitListComponent extends Component {
 
     PlanningUnitCapacity(event, row) {
         event.stopPropagation();
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PLANNING_UNIT')) {
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_PLANNING_UNIT_CAPACITY')) {
             // console.log(JSON.stringify(row))
             this.props.history.push({
                 pathname: `/planningUnitCapacity/planningUnitCapacity/${row.planningUnitId}`,
@@ -750,7 +750,7 @@ export default class PlanningUnitListComponent extends Component {
         for (var j = 0; j < planningUnitList.length; j++) {
             data = [];
             data[0] = planningUnitList[j].planningUnitId
-            data[1] = getLabelText(planningUnitList[j].label, this.state.lang)
+            data[1] = getLabelText(planningUnitList[j].label, this.state.lang) + " | " + planningUnitList[j].planningUnitId
             data[2] = getLabelText(planningUnitList[j].forecastingUnit.label, this.state.lang)
             data[3] = getLabelText(planningUnitList[j].unit.label, this.state.lang)
             data[4] = (planningUnitList[j].multiplier).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");;
@@ -775,12 +775,13 @@ export default class PlanningUnitListComponent extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [150, 150, 100],
+            colWidths: [70, 150, 150, 100],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: 'planningUnitId',
-                    type: 'hidden',
+                    title: i18n.t('static.dataEntry.planningUnitId'),
+                    type: 'text',
+                    readOnly: true
                 },
                 {
                     title: i18n.t('static.product.productName'),
@@ -856,7 +857,7 @@ export default class PlanningUnitListComponent extends Component {
                             title: i18n.t('static.planningunit.capacityupdate'),
                             onclick: function () {
                                 // console.log("onclick------>", this.el.getValueFromCoords(0, y));
-                                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PLANNING_UNIT')) {
+                                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PLANNING_UNIT')) {
                                     this.props.history.push({
                                         pathname: `/planningUnitCapacity/planningUnitCapacity/${this.el.getValueFromCoords(0, y)}`,
                                     })
@@ -886,7 +887,7 @@ export default class PlanningUnitListComponent extends Component {
         } else {
             // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
             if (this.state.selSource.length != 0) {
-                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PLANNING_UNIT')) {
+                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PLANNING_UNIT')) {
                     this.props.history.push({
                         pathname: `/planningUnit/editPlanningUnit/${this.el.getValueFromCoords(0, x)}`,
                     });
@@ -920,7 +921,7 @@ export default class PlanningUnitListComponent extends Component {
                         })
                     } else {
                         this.setState({
-                            message: response.data.messageCode, loading: false, color: "red"
+                            message: response.data.messageCode, loading: false, color: "#BA0C2F"
                         })
                         this.hideFirstComponent()
                     }
@@ -974,7 +975,7 @@ export default class PlanningUnitListComponent extends Component {
     }
 
     editPlanningUnit(planningUnit) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PLANNING_UNIT')) {
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PLANNING_UNIT')) {
             console.log('**' + JSON.stringify(planningUnit))
             this.props.history.push({
                 pathname: `/planningUnit/editPlanningUnit/${planningUnit.planningUnitId}`,
@@ -1124,18 +1125,18 @@ export default class PlanningUnitListComponent extends Component {
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
-                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
-                <Card style={{ display: this.state.loading ? "none" : "block" }}>
+                <h5 className="red" id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+                <Card>
                     <div className="Card-header-addicon">
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong> */}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PLANNING_UNIT') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewPlanningUnit}><i className="fa fa-plus-square"></i></a>}
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_PLANNING_UNIT') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewPlanningUnit}><i className="fa fa-plus-square"></i></a>}
                             </div>
                         </div>
 
                     </div>
-                    <CardBody className="pb-lg-5 pt-lg-1">
+                    <CardBody className="pb-lg-0 pt-lg-0">
                         <Col md="9 pl-0">
                             <div className="row">
                                 <FormGroup className="col-md-3" id="realmDiv">
@@ -1220,8 +1221,18 @@ export default class PlanningUnitListComponent extends Component {
                         </Col>
 
                         {/* <div id="loader" className="center"></div> */}
-                        <div className="shipmentconsumptionSearchMarginTop">
-                            <div id="tableDiv" className="jexcelremoveReadonlybackground"></div>
+                        <div className="shipmentconsumptionSearchMarginTop consumptionDataEntryTable">
+                            <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PLANNING_UNIT') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
+                            </div>
+                            <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                    <div class="align-items-center">
+                                        <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+                                        <div class="spinner-border blue ml-4" role="status">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
 
@@ -1229,15 +1240,7 @@ export default class PlanningUnitListComponent extends Component {
 
                     </CardBody>
                 </Card>
-                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div class="align-items-center">
-                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-                            <div class="spinner-border blue ml-4" role="status">
-                            </div>
-                        </div>
-                    </div>
-                </div>
+
             </div>
         );
     }

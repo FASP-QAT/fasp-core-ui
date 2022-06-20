@@ -519,7 +519,7 @@ export default class PipelineProgramConsumption extends Component {
                                         ],
                                         pagination: localStorage.getItem("sesRecordCount"),
                                         contextMenu: function (obj, x, y, e) {
-                                            return [];
+                                            return false;
                                         }.bind(this),
                                         search: true,
                                         columnSorting: true,
@@ -887,7 +887,7 @@ export default class PipelineProgramConsumption extends Component {
             <>
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h4 className="red">{this.props.message}</h4>
-                <div className="table-responsive" style={{ display: this.state.abc ? "none" : "block" }}>
+                <div className="table-responsive consumptionDataEntryTable" style={{ display: this.state.abc ? "none" : "block" }}>
 
                     <div id="consumptiontableDiv">
                     </div>

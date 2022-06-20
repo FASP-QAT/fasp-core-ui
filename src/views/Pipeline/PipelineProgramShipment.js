@@ -1179,7 +1179,7 @@ export default class PipelineProgramShipment extends Component {
             // oneditionend: this.onedit,
             copyCompatibility: true,
             contextMenu: function (obj, x, y, e) {
-                return [];
+                return false;
             }.bind(this),
             text: {
                 showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')} `,

@@ -250,7 +250,7 @@ export default class AddProgram extends Component {
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
     getDependentLists(e) {
         if (e.target.value != 0) {
@@ -682,7 +682,7 @@ export default class AddProgram extends Component {
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
-                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+                <h5 className="red" id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row style={{ display: this.state.loading ? "none" : "block" }}>
                     <Col sm={12} md={8} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -908,7 +908,7 @@ export default class AddProgram extends Component {
                                                             // invalid={touched.programNotes && !!errors.programNotes}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
-                                                            maxLength={600}
+                                                            // maxLength={600}
                                                             type="textarea" name="programNotes" id="programNotes" />
                                                         <FormFeedback>{errors.programNotes}</FormFeedback>
                                                     </FormGroup>

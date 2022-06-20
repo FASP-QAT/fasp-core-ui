@@ -87,7 +87,7 @@ class UpdateExpiredPasswordComponent extends Component {
     hideFirstComponent() {
         setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
-        }, 8000);
+        }, 30000);
 
         // setTimeout(function () {
         //     this.setState({
@@ -141,7 +141,7 @@ class UpdateExpiredPasswordComponent extends Component {
                                 </div>
                             </Col>
                             <Col md="9" lg="7" xl="6 " className="ForgotmarginTop">
-                                <h5 style={{ color: "red" }} id="div1" className="mx-4">{i18n.t(this.state.message)}</h5>
+                                <h5 className="red" id="div1" className="mx-4">{i18n.t(this.state.message)}</h5>
                                 <Card className="mx-4">
                                     <CardHeader>
                                         <i className="fa fa-pencil-square-o frgtpass-heading"></i><strong className="frgtpass-heading">{i18n.t('static.user.updateExpiredPassword')}</strong>{' '}
@@ -160,7 +160,7 @@ class UpdateExpiredPasswordComponent extends Component {
                                                 UserService.updateExpiredPassword(this.props.location.state.emailId, values.oldPassword, values.newPassword)
                                                     .then(response => {
                                                         var decoded = jwt_decode(response.data.token);
-                                                        let keysToRemove = ["token-" + decoded.userId, "user-" + decoded.userId, "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "lastLoggedInUsersLanguage"];
+                                                        let keysToRemove = ["token-" + decoded.userId, "user-" + decoded.userId, "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "lastLoggedInUsersLanguage","sessionType"];
                                                         keysToRemove.forEach(k => localStorage.removeItem(k))
 
                                                         decoded.user.syncExpiresOn = moment().format("YYYY-MM-DD HH:mm:ss");
@@ -168,6 +168,7 @@ class UpdateExpiredPasswordComponent extends Component {
                                                         localStorage.setItem('token-' + decoded.userId, CryptoJS.AES.encrypt((response.data.token).toString(), `${SECRET_KEY}`));
                                                         // localStorage.setItem('user-' + decoded.userId, CryptoJS.AES.encrypt(JSON.stringify(decoded.user), `${SECRET_KEY}`));
                                                         localStorage.setItem('typeOfSession', "Online");
+                                                        localStorage.setItem('sessionType', "Online");
                                                         localStorage.setItem('lastActionTaken', CryptoJS.AES.encrypt((moment(new Date()).format("YYYY-MM-DD HH:mm:ss")).toString(), `${SECRET_KEY}`));
                                                         localStorage.setItem('curUser', CryptoJS.AES.encrypt((decoded.userId).toString(), `${SECRET_KEY}`));
                                                         localStorage.setItem('lang', decoded.user.language.languageCode);
