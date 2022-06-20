@@ -729,7 +729,6 @@ class Program extends Component {
 
                                                                                     </ul>
                                                                                     {/* <ul>
-
                                                                                                 {
                                                                                                     this.state.prgList.filter(c => c.programId == item2.programId).map(item3 => (
                                                                                                         (item3.versionList).map(item4 => (
@@ -768,7 +767,8 @@ class Program extends Component {
 
                             <CardFooter>
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                <Button type="button" size="md" color="success" className="float-right mr-1" onClick={() => this.downloadClicked()}><i className="fa fa-check"></i>{i18n.t('static.common.download')}</Button>
+                                <Button type="button" size="md" color="success" className="float-right mr-1" onClick={() => this.downloadClicked(1)}><i className="fa fa-check"></i>{i18n.t('static.loadProgram.loadWithoutLatestShipments')}</Button>
+                                <Button type="button" size="md" color="success" className="float-right mr-1" onClick={() => this.downloadClicked(0)}><i className="fa fa-check"></i>{i18n.t('static.common.download')}</Button>
                             </CardFooter>
                         </Card>
                     </Col>
@@ -784,7 +784,7 @@ class Program extends Component {
         this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
-    downloadClicked() {
+    downloadClicked(readonly) {
         this.setState({ loading: true })
         var programCheckboxes = document.getElementsByName("programCheckBox");
         var versionCheckBox = document.getElementsByClassName("versionCheckBox");
@@ -886,7 +886,7 @@ class Program extends Component {
                 ProgramService.getAllProgramData(checkboxesChecked)
                     .then(response => {
                         // console.log("ProgramThenCount", programThenCount)
-                        // console.log("Response data", response.data)
+                        console.log("Response data", response.data)
                         var json = response.data;
                         var updatedJson = [];
                         for (var r = 0; r < json.length; r++) {
@@ -1051,7 +1051,8 @@ class Program extends Component {
                                                                     openCount: 0,
                                                                     addressedCount: 0,
                                                                     programModified: 0,
-                                                                    readonly: 0
+                                                                    readonly: readonly,
+                                                                    doNotFollowLatestShipmentInfo:readonly
                                                                 };
                                                                 programIds.push(json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId);
                                                                 var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);
@@ -1159,7 +1160,8 @@ class Program extends Component {
                                                     openCount: 0,
                                                     addressedCount: 0,
                                                     programModified: 0,
-                                                    readonly: 0
+                                                    readonly: readonly,
+                                                    doNotFollowLatestShipmentInfo:readonly
                                                 };
                                                 programIds.push(json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId);
                                                 var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);
