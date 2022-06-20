@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 import AuthenticationService from '../Common/AuthenticationService.js';
-import { Table, ListGroup, ListGroupItem, ListGroupItemHeading, ListGroupItemText, Card, CardHeader, CardBody, FormGroup, Input, InputGroup, Label, Button, Col, Row, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
+import { Table, ListGroup, ListGroupItem, ListGroupItemHeading, ListGroupItemText, Card, CardHeader, CardBody, FormGroup, Input, InputGroup, Label, Button, Col, Row, Modal, ModalBody, ModalFooter, ModalHeader, CardFooter } from 'reactstrap';
 import BootstrapTable from 'react-bootstrap-table-next';
 import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
 import getLabelText from '../../CommonComponent/getLabelText';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import { STRING_TO_DATE_FORMAT, JEXCEL_DATE_FORMAT, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
+import { STRING_TO_DATE_FORMAT, JEXCEL_DATE_FORMAT, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY, SHIPMENT_ID_ARR_MANUAL_TAGGING, PSM_PROCUREMENT_AGENT_ID, DELIVERED_SHIPMENT_STATUS, BATCH_PREFIX, SHIPMENT_MODIFIED, NONE_SELECTED_DATA_SOURCE_ID, USD_CURRENCY_ID } from '../../Constants.js';
 import moment from 'moment';
 import BudgetServcie from '../../api/BudgetService';
 import FundingSourceService from '../../api/FundingSourceService';
@@ -24,11 +24,13 @@ import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../Com
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
-import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions.js';
-import {MultiSelect} from 'react-multi-select-component';
+import { generateRandomAplhaNumericCode, isSiteOnline, paddingZero } from '../../CommonComponent/JavascriptCommonFunctions.js';
+import { MultiSelect } from 'react-multi-select-component';
 import conversionFormula from '../../assets/img/conversionFormula.png';
 import conversionFormulaExample from '../../assets/img/conversionFormulaExample.png';
-
+import { getDatabase } from '../../CommonComponent/IndexedDbFunctions.js';
+import CryptoJS from 'crypto-js'
+import { calculateSupplyPlan } from '../SupplyPlan/SupplyPlanCalculations.js';
 
 
 const entityname = i18n.t('static.dashboard.manualTagging');
@@ -57,6 +59,7 @@ export default class ManualTagging extends Component {
             budgetList: [],
             planningUnits1: [],
             finalShipmentId: '',
+            tempShipmentId: '',
             selectedShipment: [],
             productCategories: [],
             countryList: [],
@@ -99,7 +102,10 @@ export default class ManualTagging extends Component {
             hasSelectAll: true,
             artmisHistoryModal: false,
             batchDetails: [],
-            table1Loader: true
+            table1Loader: true,
+            versionList: [],
+            versionId: -1,
+            changedDataForTab2: false
 
         }
 
@@ -143,7 +149,25 @@ export default class ManualTagging extends Component {
         this.toggleArtmisHistoryModal = this.toggleArtmisHistoryModal.bind(this);
         this.viewBatchData = this.viewBatchData.bind(this);
         this.oneditionend = this.oneditionend.bind(this);
+        this.changeTab2 = this.changeTab2.bind(this);
+        this.delink = this.delink.bind(this);
+    }
 
+    versionChange(event) {
+        var versionId = event.target.value;
+        localStorage.setItem("sesVersionIdReport", versionId);
+        this.setState({
+            versionId: versionId,
+            hasSelectAll: true
+        }, () => {
+            if (versionId != -1) {
+                this.getPlanningUnitList()
+            } else {
+                this.setState({
+                    planningUnits: []
+                })
+            }
+        })
     }
 
     viewBatchData(event, row) {
@@ -239,7 +263,7 @@ export default class ManualTagging extends Component {
             );
     }
     filterProgramByCountry() {
-        let programList = this.state.programs;
+        let programList = this.state.programObjectStoreList;
         let countryId = this.state.countryId;
         let countryWisePrograms;
         if (countryId != -1) {
@@ -247,35 +271,39 @@ export default class ManualTagging extends Component {
         } else {
             countryWisePrograms = programList;
         }
-        if (countryWisePrograms.length == 1) {
+        var setOfProgramIds = [...new Set(countryWisePrograms.map(ele => ele.programId))]
+        var localProgramList = this.state.programQPLDetailsList.filter(c => setOfProgramIds.includes(c.programId) && !c.doNotFollowLatestShipmentInfo)
+        if (localProgramList.length == 1) {
             this.setState({
                 loading: false,
                 loading1: false,
-                programId1: countryWisePrograms[0].programId,
-                countryWisePrograms
+                programId1: localProgramList[0].id,
+                countryWisePrograms: localProgramList
             }, () => {
+                this.getOrderDetails();
                 this.getNotLinkedShipments();
                 this.getPlanningUnitList();
                 this.getBudgetListByProgramId();
             });
         } else {
-            if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
-                this.setState({
-                    loading: false,
-                    loading1: false,
-                    countryWisePrograms,
-                    programId1: localStorage.getItem("sesProgramIdReport")
-                }, () => {
-                    this.getNotLinkedShipments();
-                    this.getPlanningUnitList();
-                    this.getBudgetListByProgramId();
-                });
-            } else {
-                this.setState({
-                    countryWisePrograms,
-                    planningUnits: []
-                });
-            }
+            // if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
+            //     this.setState({
+            //         loading: false,
+            //         loading1: false,
+            //         countryWisePrograms: localProgramList,
+            //         // programId1: localStorage.getItem("sesProgramIdReport")
+            //     }, () => {
+            //         this.getOrderDetails();
+            //         this.getNotLinkedShipments();
+            //         this.getPlanningUnitList();
+            //         this.getBudgetListByProgramId();
+            //     });
+            // } else {
+            this.setState({
+                countryWisePrograms: localProgramList,
+                planningUnits: []
+            });
+            // }
         }
     }
     getPlanningUnitListByRealmCountryId() {
@@ -354,67 +382,49 @@ export default class ManualTagging extends Component {
         } else {
             selectedShipment = this.state.notLinkedShipments.filter(c => (c.planningUnit.id == selectedPlanningUnitId));
         }
+        for (var ss = 0; ss < selectedShipment.length; ss++) {
+            selectedShipment[ss].tempIndex = selectedShipment[ss].shipmentId > 0 ? selectedShipment[ss].shipmentId : selectedShipment[ss].tempShipmentId;
+        }
+        // if(this.state.checkboxValue){
+
+        // }
         this.setState({
             finalShipmentId: '',
+            tempShipmentId: '',
             selectedShipment
+        }, () => {
+            this.getOrderDetails()
         })
     }
     getNotLinkedShipments() {
-
-        let programId1 = parseInt(this.state.programId1);
-        // let planningUnitId = this.state.planningUnitIdUpdated;
-        ManualTaggingService.getNotLinkedShipmentListForManualTagging(programId1, 3)
-            .then(response => {
-                var listArray = response.data;
-                listArray.sort((a, b) => {
-                    var itemLabelA = a.shipmentId;
-                    var itemLabelB = b.shipmentId;
-                    return itemLabelA > itemLabelB ? 1 : -1;
-                });
-                this.setState({
-                    notLinkedShipments: listArray
-                });
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({
-                            message: 'static.unkownError',
-                            loading: false
-                        });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-
-                            case 401:
-                                this.props.history.push(`/login/static.message.sessionExpired`)
-                                break;
-                            case 403:
-                                this.props.history.push(`/accessDenied`)
-                                break;
-                            case 500:
-                            case 404:
-                            case 406:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            case 412:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            default:
-                                this.setState({
-                                    message: 'static.unkownError',
-                                    loading: false
-                                });
-                                break;
-                        }
-                    }
-                }
-            );
+        let programId1 = this.state.programId1;
+        console.log("programId1@@@@@@@@@@@@@", programId1)
+        if (programId1 != "") {
+            var shipmentList = [];
+            var localProgramList = this.state.localProgramList;
+            var localProgramListFilter = localProgramList.filter(c => c.id == programId1);
+            var planningUnitDataList = localProgramListFilter[0].programData.planningUnitDataList;
+            for (var pu = 0; pu < planningUnitDataList.length; pu++) {
+                var planningUnitData = planningUnitDataList[pu];
+                var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                var planningUnitDataJson = JSON.parse(programData);
+                shipmentList = shipmentList.concat(planningUnitDataJson.shipmentList);
+            }
+            shipmentList = shipmentList.filter(c => c.erpFlag.toString() == "false" && c.active.toString() == "true" && c.accountFlag.toString() == "true" && c.procurementAgent.id == PSM_PROCUREMENT_AGENT_ID && SHIPMENT_ID_ARR_MANUAL_TAGGING.includes(c.shipmentStatus.id.toString()));
+            shipmentList = shipmentList.filter(c => (moment(c.expectedDeliveryDate).format("YYYY-MM-DD") < moment(Date.now()).subtract(6, 'months').format("YYYY-MM-DD") && ([3, 4, 5, 6, 9]).includes(c.shipmentStatus.id.toString())) || (moment(c.expectedDeliveryDate).format("YYYY-MM-DD") >= moment(Date.now()).subtract(6, 'months').format("YYYY-MM-DD") && SHIPMENT_ID_ARR_MANUAL_TAGGING.includes(c.shipmentStatus.id.toString())));
+            var listArray = shipmentList;
+            listArray.sort((a, b) => {
+                var itemLabelA = a.shipmentId;
+                var itemLabelB = b.shipmentId;
+                return itemLabelA > itemLabelB ? 1 : -1;
+            });
+            this.setState({
+                notLinkedShipments: listArray
+            });
+        }
     }
+
     getProductCategories() {
         // AuthenticationService.setupAxiosInterceptors();
         let realmId = AuthenticationService.getRealmId();
@@ -470,14 +480,15 @@ export default class ManualTagging extends Component {
         var valid = true;
         var json = this.el.getJson(null, false);
         for (var y = 0; y < json.length; y++) {
-            var value = this.el.getValueFromCoords(10, y);
-            if (parseInt(value) == 1) {
+            // var value = this.el.getValueFromCoords(10, y);
+            var rowData = json[y];
+            if (rowData[13] == 0) {
 
 
-                var col = ("H").concat(parseInt(y) + 1);
+                var col = ("K").concat(parseInt(y) + 1);
                 if (this.el.getValueFromCoords(0, y)) {
                     var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
-                    var value = this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                    var value = this.el.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                     value = value.replace(/,/g, "");
                     if (value == "") {
                         this.el.setStyle(col, "background-color", "transparent");
@@ -508,63 +519,134 @@ export default class ManualTagging extends Component {
     }
 
     // -----------start of changed function
+
+    changeTab2 = function (instance, cell, x, y, value) {
+        if (!this.state.changedDataForTab2) {
+            this.setState({
+                changedDataForTab2: true
+            })
+        }
+        var rowData = this.el.getRowData(y);
+        if (rowData[20] == 0) {
+            if (x == 0) {
+                var json = this.el.getJson(null, false);
+                var checkboxValue = this.el.getValue(`A${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                if (checkboxValue.toString() == "true") {
+
+                    for (var j = 0; j < json.length; j++) {
+                        if (json[j][3] == this.el.getValueFromCoords(3, y, true)) {
+                            if (j != y) {
+                                this.el.setValueFromCoords(0, j, true, true);
+                            }
+                        }
+                    }
+                } else {
+                    console.log("inside else---", checkboxValue);
+                    for (var j = 0; j < json.length; j++) {
+                        if (j != y && json[j][3] == this.el.getValueFromCoords(3, y, true)) {
+                            this.el.setValueFromCoords(0, j, false, true);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     changed = function (instance, cell, x, y, value) {
 
-        //conversion factor
-        if (x == 7) {
-            var col = ("H").concat(parseInt(y) + 1);
-            value = this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-            var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
-            var qty = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                // if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
-                if (!(reg.test(value))) {
+        var rowData = this.state.instance.getRowData(y);
+        if (rowData[13] == 0) {
+            //conversion factor
+            var json = this.state.instance.getJson(null, false);
+            if (x == 10) {
+                var col = ("K").concat(parseInt(y) + 1);
+                value = this.el.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
+                var qty = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                 } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
+                    // if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
+                    if (!(reg.test(value))) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                        this.el.setComments(col, "");
+                        if (rowData[0].toString() == "true") {
+                            for (var j = 0; j < json.length; j++) {
+                                // console.log("J@@@@@@@@################",j)
+                                // console.log("y@@@@@@@@################",y)
+                                // console.log("value@@@@@@@@################",this.state.instance.getValueFromCoords(1, y, true))
+                                // console.log("jsonvalue@@@@@@@@################",json[j][1])
+                                if (json[j][1] == this.state.instance.getValueFromCoords(1, y, true)) {
+                                    if (j != y) {
+                                        this.state.instance.setValueFromCoords(10, j, value, true);
+                                    }
+                                }
+                            }
+                        }
 
-                    // `=ROUND(G${parseInt(index) + 1}*H${parseInt(index) + 1},2)`,
-                    // this.state.instance.setValueFromCoords(8, y, `=ROUND(G${parseInt(y) + 1}*H${parseInt(y) + 1},0)`, true);
+                        // `=ROUND(G${parseInt(index) + 1}*H${parseInt(index) + 1},2)`,
+                        // this.state.instance.setValueFromCoords(8, y, `=ROUND(G${parseInt(y) + 1}*H${parseInt(y) + 1},0)`, true);
+                    }
+
                 }
-
+                // this.state.instance.setValueFromCoords(8, y, Math.round(qty * (value != null && value != "" ? value : 1)), true);
             }
-            this.state.instance.setValueFromCoords(8, y, Math.round(qty * (value != null && value != "" ? value : 1)), true);
-        }
-        // if (x == 0) {
-        //     console.log("check box value----------------", value = this.el.getValue(`A${parseInt(y) + 1}`, true).toString().replaceAll(",", ""));
-        // }
+            // if (x == 0) {
+            //     console.log("check box value----------------", value = this.el.getValue(`A${parseInt(y) + 1}`, true).toString().replaceAll(",", ""));
+            // }
 
-        // if (x == 9) {
+            // if (x == 9) {
 
-        // }
-        if (x == 0) {
-            var checkboxValue = this.el.getValue(`A${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-            console.log("checkboxValue---", checkboxValue);
-            if (checkboxValue == "true") {
-                console.log("jexcel instance---", this.state.instance);
-                this.state.instance.setValueFromCoords(9, y, this.state.tempNotes, true)
-            } else {
-                console.log("inside else---", checkboxValue);
-                this.state.instance.setValueFromCoords(7, y, "", true);
-                this.state.instance.setValueFromCoords(9, y, "", true);
-                var qty = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                this.state.instance.setValueFromCoords(8, y, Math.round(qty), true);
+            // }
+            if (x == 0) {
+                var checkboxValue = this.el.getValue(`A${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+
+                console.log("Json@@@@@@@@@@@@", json)
+                console.log("Json@@@@@@@@@@@@", json.length)
+                if (checkboxValue.toString() == "true") {
+
+                    for (var j = 0; j < json.length; j++) {
+                        // console.log("J@@@@@@@@################",j)
+                        // console.log("y@@@@@@@@################",y)
+                        // console.log("value@@@@@@@@################",this.state.instance.getValueFromCoords(1, y, true))
+                        // console.log("jsonvalue@@@@@@@@################",json[j][1])
+                        if (json[j][1] == this.state.instance.getValueFromCoords(1, y, true)) {
+                            if (j != y) {
+                                this.state.instance.setValueFromCoords(0, j, true, true);
+                            }
+                        }
+                    }
+                    // console.log("jexcel instance---", this.state.instance);
+                    // this.state.instance.setValueFromCoords(9, y, this.state.tempNotes, true)
+                } else {
+                    console.log("inside else---", checkboxValue);
+                    this.state.instance.setValueFromCoords(10, y, "", true);
+                    this.state.instance.setValueFromCoords(12, y, "", true);
+                    this.state.instance.setValueFromCoords(12, y, "", true);
+                    for (var j = 0; j < json.length; j++) {
+                        if (j != y && json[j][1] == this.state.instance.getValueFromCoords(1, y, true)) {
+                            this.state.instance.setValueFromCoords(0, j, false, true);
+                            this.state.instance.setValueFromCoords(10, j, "", true);
+                        }
+                    }
+                    // var qty = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                    // this.state.instance.setValueFromCoords(8, y, Math.round(qty), true);
+                }
             }
-        }
-        // //Active
-        if (x != 10) {
+            // //Active
+            // if (x != 10) {
 
-            this.el.setValueFromCoords(10, y, 1, true);
+            //     this.el.setValueFromCoords(10, y, 1, true);
+            // }
+            this.displayButton();
         }
-        this.displayButton();
-
 
     }.bind(this);
     // -----end of changed function
@@ -619,7 +701,7 @@ export default class ManualTagging extends Component {
                 checkboxValue: false,
                 tempNotes: ''
             }, () => {
-                this.displayButton();
+                // this.displayButton();
             });
         } else if (event.target.id == 'active5') {
             this.setState({
@@ -630,7 +712,7 @@ export default class ManualTagging extends Component {
                 checkboxValue: false,
                 tempNotes: ''
             }, () => {
-                this.displayButton();
+                // this.displayButton();
             });
         }
     }
@@ -648,14 +730,15 @@ export default class ManualTagging extends Component {
                 active3: false,
                 tempNotes: ''
             }, () => {
+                console.log("localStorage.getItem@@@@@@@@@@@@@@@@@", localStorage.getItem("sesProgramIdReport"));
                 if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
                     this.setState({
                         programId: localStorage.getItem("sesProgramIdReport")
                     }, () => {
-                        this.getPlanningUnitList();
+                        this.getVersionList()
                     });
                 } else if (this.state.programId != null && this.state.programId != "" && this.state.programId != -1) {
-                    this.getPlanningUnitList();
+                    this.getVersionList();
                 }
             });
         } else if (event.target.id == 'active2') {
@@ -674,10 +757,10 @@ export default class ManualTagging extends Component {
                     this.setState({
                         programId: localStorage.getItem("sesProgramIdReport")
                     }, () => {
-                        this.getPlanningUnitList();
+                        this.getVersionList();
                     });
                 } else if (this.state.programId != null && this.state.programId != "" && this.state.programId != -1) {
-                    this.getPlanningUnitList();
+                    this.getVersionList();
                 }
             });
         } else {
@@ -758,22 +841,32 @@ export default class ManualTagging extends Component {
 
             });
         }
-        this.state.languageEl.destroy();
+        try {
+            this.state.languageEl.destroy();
+        } catch (e) {
+
+        }
         // this.buildJExcel();
     }
 
     getBudgetListByProgramId = (e) => {
-        let programId1 = this.state.programId1;
-        const filteredBudgetList = this.state.budgetList.filter(c => c.program.id == programId1)
-        this.setState({
-            filteredBudgetList,
-            filteredBudgetListByProgram: filteredBudgetList
-        });
+        let programId1 = this.state.programId1.toString().split("_")[0];
+        console.log("this.state.budgetList@@@@@@@@@@", programId1)
+        if (programId1 != "") {
+            console.log("this.state.budgetList@@@@@@@@@@", this.state.budgetList)
+            const filteredBudgetList = this.state.budgetList.filter(c => c.program.id == programId1)
+            console.log("this.state.filteredBudgetList@@@@@@@@@@", filteredBudgetList)
+            this.setState({
+                filteredBudgetList,
+                filteredBudgetListByProgram: filteredBudgetList
+            });
+        }
     }
 
     getBudgetListByFundingSourceId = (e) => {
         let fundingSourceId = this.state.fundingSourceId;
         const filteredBudgetList = this.state.filteredBudgetListByProgram.filter(c => c.fundingSource.fundingSourceId == fundingSourceId)
+        console.log("this.state.filteredBudgetList1@@@@@@@@@@", filteredBudgetList)
         this.setState({
             filteredBudgetList
         });
@@ -900,20 +993,108 @@ export default class ManualTagging extends Component {
             );
     }
     programChange(event) {
+        var programId = event.target.value;
         this.setState({
             planningUnits: [],
             planningUnitValues: [],
             planningUnitLabels: [],
-            programId: event.target.value,
+            versionId: -1,
+            versionList: [],
+            programId: programId,
             hasSelectAll: true
         }
             , () => {
-                this.getPlanningUnitList();
+                // this.getPlanningUnitList();
+                if (programId != "" && programId != -1) {
+                    this.getVersionList();
+                } else {
+                    this.setState({
+                        outputList: []
+                    }, () => {
+                        try {
+                            this.state.languageEl.destroy();
+                        } catch (e) {
+
+                        }
+                    })
+                }
             }
         )
     }
 
+    getVersionList() {
+        console.log("VersionList@@@@@@@@@@@@")
+        this.setState({
+            loading: true
+        })
+        // var db1;
+        // getDatabase();
+        // var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        // openRequest.onerror = function (event) {
+        // }.bind(this);
+        // openRequest.onsuccess = function (e) {
+        //     db1 = e.target.result;
+        //     var datasetTransaction = db1.transaction(['programData'], 'readwrite');
+        //     var datasetOs = datasetTransaction.objectStore('programData');
+        //     var getRequest = datasetOs.getAll();
+        //     getRequest.onerror = function (event) {
+        //     }.bind(this);
+        //     getRequest.onsuccess = function (event) {
+        var myResult = this.state.localProgramList;
+        var selectedProgramId = this.state.programId;
+        // for (var mr = 0; mr < myResult.length; mr++) {
+        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+        var userId = userBytes.toString(CryptoJS.enc.Utf8);
+        var filterList = myResult.filter(c => c.programId == selectedProgramId && c.userId == userId);
+        var versionList = [];
+        var filteredProgramList = this.state.programs.filter(c => c.programId == selectedProgramId)[0];
+
+        versionList.push({ versionId: filteredProgramList.currentVersion.versionId })
+        var programQPLDetailsList = this.state.programQPLDetailsList
+        for (var v = 0; v < filterList.length; v++) {
+            var programQPLDetailsFilter = programQPLDetailsList.filter(c => c.id == filterList[v].id);
+            if (!programQPLDetailsFilter[0].doNotFollowLatestShipmentInfo) {
+                versionList.push({ versionId: filterList[v].version + "  (Local)" })
+            }
+        }
+        console.log("filteredProgramList@@@@@@@@@@@@", versionList)
+        console.log("filteredProgramList@@@@@@@@@@@@", this.state.programs)
+        console.log("filteredProgramList@@@@@@@@@@@@", this.state.programs)
+        this.setState({
+            versionList: versionList,
+            loading: false
+        }, () => {
+            if (localStorage.getItem("sesVersionIdReport") != '' && localStorage.getItem("sesVersionIdReport") != undefined && versionList.filter(c=>c.versionId==localStorage.getItem("sesVersionIdReport")).length>0) {
+                var event = {
+                    target: {
+                        value: localStorage.getItem("sesVersionIdReport")
+                    }
+                };
+                this.versionChange(event)
+
+            }else{
+            this.getPlanningUnitList()
+            }
+            if (this.state.versionId.toString() != -1) {
+                
+            } else {
+                this.setState({
+                    outputList: []
+                }, () => {
+                    try {
+                        this.state.languageEl.destroy();
+                    } catch (e) {
+
+                    }
+                })
+            }
+        })
+        //     }.bind(this)
+        // }.bind(this)
+    }
+
     getPlanningUnitArray() {
+        console.log("In Array@@@@@@@@@@@@@@@@")
         let planningUnits = this.state.planningUnits;
         let planningUnitArray = planningUnits.length > 0
             && planningUnits.map((item, i) => {
@@ -947,6 +1128,7 @@ export default class ManualTagging extends Component {
             programId1: event.target.value,
             planningUnits: []
         }, () => {
+            this.getOrderDetails();
             this.getNotLinkedShipments();
             this.getPlanningUnitList();
             this.getBudgetListByProgramId();
@@ -982,9 +1164,9 @@ export default class ManualTagging extends Component {
                 }
             }
             else {
-                if (parseInt(map1.get("10")) === 1 && map1.get("0")) {
-                    console.log("value---", Number(this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", "")));
-                    qty = Number(qty) + Number(this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""));
+                if (map1.get("0")) {
+                    console.log("value---", Number(this.el.getValue(`L${parseInt(i) + 1}`, true).toString().replaceAll(",", "")));
+                    qty = Number(qty) + Number(this.el.getValue(`L${parseInt(i) + 1}`, true).toString().replaceAll(",", ""));
                     count++;
                 }
             }
@@ -1006,218 +1188,746 @@ export default class ManualTagging extends Component {
         }
     }
 
-    link() {
-        document.getElementById('div2').style.display = 'block';
-        let valid = false;
-        var programId = (this.state.active3 ? this.state.programId1 : this.state.programId);
-        if (this.state.active3) {
-            localStorage.setItem("sesProgramIdReport", programId)
-            if (this.state.active5) {
-                if (this.state.finalShipmentId != "" && this.state.finalShipmentId != null) {
-                    valid = true;
-                } else {
-                    alert(i18n.t('static.mt.selectShipmentId'));
-                }
+    delink() {
+        this.setState({ loading: true })
+        var validation = true;
+        if (validation == true) {
+            var selectedShipment = this.state.languageEl.getJson(null, false).filter(c => c[0] == true);
+            var setOfPlanningUnitIds = [...new Set(selectedShipment.map(ele => ele[16].planningUnit.id))];
+            if (setOfPlanningUnitIds.length > 1) {
+                alert(i18n.t('static.mt.selectShipmentOfSamePlanningUnit'));
+            } else {
+                var db1;
+                var storeOS;
+                getDatabase();
+                var thisAsParameter = this;
+                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                openRequest.onerror = function (event) {
+                    this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+                    this.props.updateState("color", "#BA0C2F");
+                    this.props.hideFirstComponent();
+                }.bind(this);
+                openRequest.onsuccess = function (e) {
+                    db1 = e.target.result;
+                    var transaction;
+                    var programTransaction;
+                    transaction = db1.transaction(['programData'], 'readwrite');
+                    programTransaction = transaction.objectStore('programData');
+                    // Yaha program Id dalna hai actual wala
+                    var curUser = AuthenticationService.getLoggedInUserId();
+                    var programId = (this.state.programId + "_v" + this.state.versionId.split(" ")[0] + "_uId_" + curUser);
+                    console.log("ProgramId@@@@@@@@@@@@", programId)
+                    var programRequest = programTransaction.get(programId);
+                    programRequest.onsuccess = function (event) {
+                        var programDataJson = programRequest.result.programData;
+                        var planningUnitDataList = programDataJson.planningUnitDataList;
+                        // var planningUnitId = this.state.active1 ? this.state.selectedRowPlanningUnit : (this.state.active3 ? (this.state.active4 || this.state.active5 ? document.getElementById("planningUnitId1").value : 0) : 0)
+                        var planningUnitId = setOfPlanningUnitIds[0];
+                        // var programId1 = this.state.active1 ? this.state.programId : this.state.programId1.toString().split("_")[0]
+                        var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == planningUnitId);
+                        // var ppuObject = ppuRequest.result.filter(c => c.program.id == programId1 && c.planningUnit.id == planningUnitId)[0];
+                        var programJson = {}
+                        if (planningUnitDataIndex != -1) {
+                            var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == planningUnitId))[0];
+                            var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                            programJson = JSON.parse(programData);
+                        } else {
+                            programJson = {
+                                consumptionList: [],
+                                inventoryList: [],
+                                shipmentList: [],
+                                batchInfoList: [],
+                                supplyPlan: []
+                            }
+                        }
+                        var generalProgramDataBytes = CryptoJS.AES.decrypt(programDataJson.generalData, SECRET_KEY);
+                        var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
+                        var generalProgramJson = JSON.parse(generalProgramData);
+                        var actionList = generalProgramJson.actionList;
+                        var linkedShipmentsList = generalProgramJson.shipmentLinkingList == null ? [] : generalProgramJson.shipmentLinkingList;
+                        if (actionList == undefined) {
+                            actionList = []
+                        }
+                        var shipmentList = programJson.shipmentList;
+                        var batchInfoList = programJson.batchInfoList;
+                        var minDate = moment(Date.now()).format("YYYY-MM-DD");
+                        var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+                        var curUser = AuthenticationService.getLoggedInUserId();
+                        var username = AuthenticationService.getLoggedInUsername();
+                        for (var ss = 0; ss < selectedShipment.length; ss++) {
+                            var linkedShipmentsListIndex = linkedShipmentsList.findIndex(c => (selectedShipment[ss][16].shipmentId > 0 ? selectedShipment[ss][16].shipmentId == c.childShipmentId : selectedShipment[ss][16].tempShipmentId == c.tempChildShipmentId) && c.active.toString()=="true");
+                            var linkedShipmentsListFilter = linkedShipmentsList.filter(c => (selectedShipment[ss][16].shipmentId > 0 ? selectedShipment[ss][16].shipmentId == c.childShipmentId : selectedShipment[ss][16].tempShipmentId == c.tempChildShipmentId) && c.active.toString()=="true");
+                            linkedShipmentsList[linkedShipmentsListIndex].active = false;
+                            linkedShipmentsList[linkedShipmentsListIndex].lastModifiedBy.userId = curUser;
+                            linkedShipmentsList[linkedShipmentsListIndex].lastModifiedBy.username = username;
+                            linkedShipmentsList[linkedShipmentsListIndex].lastModifiedDate = curDate;
+                            var checkIfThereIsOnlyOneChildShipmentOrNot = linkedShipmentsList.filter(c => (linkedShipmentsListFilter[0].parentShipmentId > 0 ? c.parentShipmentId == linkedShipmentsListFilter[0].parentShipmentId : c.tempParentShipmentId == linkedShipmentsListFilter[0].tempParentShipmentId) && c.active == true);
+                            var activateParentShipment = false;
+                            if (checkIfThereIsOnlyOneChildShipmentOrNot.length == 0) {
+                                activateParentShipment = true;
+                            }
+                            var shipmentIndex = shipmentList.findIndex(c => selectedShipment[ss][16].shipmentId > 0 ? c.shipmentId == selectedShipment[ss][16].shipmentId : c.tempShipmentId == selectedShipment[ss][16].tempShipmentId);
+                            shipmentList[shipmentIndex].active = false;
+                            shipmentList[shipmentIndex].lastModifiedBy.userId = curUser;
+                            shipmentList[shipmentIndex].lastModifiedBy.username = username;
+                            shipmentList[shipmentIndex].lastModifiedDate = curDate;
+                            if (moment(minDate).format("YYYY-MM-DD") > moment(shipmentList[shipmentIndex].expectedDeliveryDate).format("YYYY-MM-DD")) {
+                                minDate = moment(shipmentList[shipmentIndex].expectedDeliveryDate).format("YYYY-MM-DD");
+                            }
+                            if (shipmentList[shipmentIndex].receivedDate != null && shipmentList[shipmentIndex].receivedDate != "" && shipmentList[shipmentIndex].receivedDate != undefined && moment(minDate).format("YYYY-MM-DD") > moment(shipmentList[shipmentIndex].receivedDate).format("YYYY-MM-DD")) {
+                                minDate = moment(shipmentList[shipmentIndex].receivedDate).format("YYYY-MM-DD");
+                            }
+                            if (activateParentShipment) {
+                                var parentShipmentIndex = shipmentList.findIndex(c => linkedShipmentsListFilter[0].parentShipmentId > 0 ? c.shipmentId == linkedShipmentsListFilter[0].parentShipmentId : c.tempShipmentId == linkedShipmentsListFilter[0].tempParentShipmentId);
+                                shipmentList[parentShipmentIndex].active = true;
+                                shipmentList[parentShipmentIndex].erpFlag = false;
+                                shipmentList[parentShipmentIndex].lastModifiedBy.userId = curUser;
+                                shipmentList[parentShipmentIndex].lastModifiedBy.username = username;
+                                shipmentList[parentShipmentIndex].lastModifiedDate = curDate;
 
-            } else if (this.state.active4) {
-                if (programId == -1) {
+                                if (moment(minDate).format("YYYY-MM-DD") > moment(shipmentList[parentShipmentIndex].expectedDeliveryDate).format("YYYY-MM-DD")) {
+                                    minDate = moment(shipmentList[shipmentIndex].expectedDeliveryDate).format("YYYY-MM-DD");
+                                }
+                                if (shipmentList[parentShipmentIndex].receivedDate != null && shipmentList[parentShipmentIndex].receivedDate != "" && shipmentList[parentShipmentIndex].receivedDate != undefined && moment(minDate).format("YYYY-MM-DD") > moment(shipmentList[parentShipmentIndex].receivedDate).format("YYYY-MM-DD")) {
+                                    minDate = moment(shipmentList[shipmentIndex].receivedDate).format("YYYY-MM-DD");
+                                }
+                            }
+                        }
+                        actionList.push({
+                            planningUnitId: planningUnitId,
+                            type: SHIPMENT_MODIFIED,
+                            date: moment(minDate).startOf('month').format("YYYY-MM-DD")
+                        })
+                        programJson.shipmentList = shipmentList;
+                        programJson.batchInfoList = batchInfoList;
+                        console.log("Program Json@@@@@@@@@@@@@@@@", programJson);
+                        if (planningUnitDataIndex != -1) {
+                            planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                        } else {
+                            planningUnitDataList.push({ planningUnitId: planningUnitId, planningUnitData: (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString() });
+                        }
+                        generalProgramJson.actionList = actionList;
+                        generalProgramJson.shipmentLinkingList = linkedShipmentsList;
+                        console.log("General Program Json@@@@@@@@@@@@@@@@", generalProgramJson);
+                        programDataJson.planningUnitDataList = planningUnitDataList;
+
+                        programDataJson.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
+                        programRequest.result.programData = programDataJson;
+                        var putRequest = programTransaction.put(programRequest.result);
+
+                        putRequest.onerror = function (event) {
+                        }.bind(this);
+                        putRequest.onsuccess = function (event) {
+                            console.log("in success@@@@@@@@@@@@@@@", thisAsParameter)
+                            calculateSupplyPlan(programId, planningUnitId, 'programData', "erpDelink", thisAsParameter, [], moment(minDate).startOf('month').format("YYYY-MM-DD"));
+                        }
+
+                    }.bind(this)
+                }.bind(this)
+            }
+        }
+    }
+
+    link() {
+        this.setState({ loading1: true })
+        console.log("This.state.outputListAfterSerach@@@@@@@@@@@@@@@@@@@@@", this.state.outputListAfterSearch)
+        var validation = this.checkValidation();
+        let linkedShipmentCount = 0;
+        if (validation == true) {
+            var selectedShipment = this.state.instance.getJson(null, false).filter(c => c[0] == true && c[13] == 0).length;
+            var valid = true;
+            if (this.state.active4) {
+                if (this.state.programId1 == -1) {
+                    valid = false;
                     alert(i18n.t('static.mt.selectProgram'));
                 }
                 else if (document.getElementById("planningUnitId1").value == -1) {
+                    valid = false;
                     alert(i18n.t('static.mt.selectPlanninfUnit'));
                 }
                 else if (this.state.fundingSourceId == -1) {
+                    valid = false;
                     alert(i18n.t('static.mt.selectFundingSource'));
                 } else if (this.state.budgetId == -1) {
+                    valid = false;
                     alert(i18n.t('static.mt.selectBudget'));
-                }
-
-
-                else {
-                    // var cf = window.confirm(i18n.t('static.mt.confirmNewShipmentCreation'));
-                    // if (cf == true) {
-                    valid = true;
-                    // } else { }
-                }
-            }
-        } else {
-            valid = true;
-        }
-        if (valid) {
-            this.setState({ loading1: true })
-            var validation = this.checkValidation();
-            let linkedShipmentCount = 0;
-            if (validation == true) {
-                var tableJson = this.state.instance.getJson(null, false);
-                let changedmtList = [];
-                for (var i = 0; i < tableJson.length; i++) {
-                    var map1 = new Map(Object.entries(tableJson[i]));
-                    if (parseInt(map1.get("10")) === 1) {
-                        let json = {
-                            parentShipmentId: (this.state.active2 ? this.state.parentShipmentId : 0),
-                            programId: programId,
-                            fundingSourceId: (this.state.active3 ? this.state.fundingSourceId : 0),
-                            budgetId: (this.state.active3 ? this.state.budgetId : 0),
-                            shipmentId: (this.state.active3 ? this.state.finalShipmentId : this.state.shipmentId),
-                            conversionFactor: this.el.getValue(`H${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                            notes: (map1.get("9") === '' ? null : map1.get("9")),
-                            active: map1.get("0"),
-                            orderNo: map1.get("11"),
-                            primeLineNo: parseInt(map1.get("12")),
-                            // planningUnitId: (this.state.active3 ? this.el.getValue(`N${parseInt(i) + 1}`, true).toString().replaceAll(",", "") : 0),
-                            planningUnitId: (this.state.active3 ? (this.state.active4 ? document.getElementById("planningUnitId1").value : 0) : 0),
-                            quantity: this.el.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll(",", "")
-                        }
-
-                        changedmtList.push(json);
-                    }
-                    if ((this.state.active2 || this.state.active4) && map1.get("0")) {
-                        linkedShipmentCount++;
-                    }
-                }
-                console.log("FINAL SUBMIT changedmtList---", changedmtList);
-                if (this.state.active4 && linkedShipmentCount > 1) {
+                } else if (selectedShipment > 1) {
+                    valid = false;
                     alert(i18n.t('static.mt.oneOrderAtATime'));
-                    this.setState({
-                        loading1: false
-                    })
-
-                } else {
-                    let goAhead = false;
-                    if (this.state.active4) {
-                        var cf = window.confirm(i18n.t('static.mt.confirmNewShipmentCreation'));
-                        if (cf == true) {
-                            goAhead = true;
-                        } else {
-                            this.setState({
-                                loading1: false
-                            })
-                        }
-                    } else {
-                        goAhead = true;
-                    }
-                    let callApiActive2 = false;
-                    if (this.state.active2) {
-                        let active2GoAhead = false;
-
-                        if (linkedShipmentCount > 0) {
-                            active2GoAhead = false
-                            callApiActive2 = true
-                        } else {
-                            active2GoAhead = true
-                        }
-                        if (active2GoAhead) {
-                            // var cf1 = window.confirm(i18n.t('static.mt.confirmNewShipmentCreation'));
-                            var cf1 = window.confirm(i18n.t("static.mt.delinkAllShipments"));
-                            if (cf1 == true) {
-                                callApiActive2 = true;
-                            } else {
-                                callApiActive2 = false;
-                            }
-                        }
-                    }
-                    if (!callApiActive2 && this.state.active2) {
-                        this.setState({
-                            loading: false,
-                            loading1: false
-                        });
-                    }
-                    if (this.state.active1 || (this.state.active3 && this.state.active4 && goAhead) || (this.state.active3 && this.state.active5) || callApiActive2) {
-                        console.log("Going to link shipment-----", changedmtList);
-                        // for (var i = 0; i <= 2; i++) {
-                        // console.log("for loop -----",i);
-                        ManualTaggingService.linkShipmentWithARTMIS(changedmtList)
-                            .then(response => {
-                                console.log("linking response---", response);
-
-                                this.setState({
-                                    message: (this.state.active2 ? i18n.t('static.mt.linkingUpdateSuccess') : i18n.t('static.shipment.linkingsuccess')),
-                                    color: 'green',
-                                    loading: false,
-                                    loading1: false,
-                                    planningUnitIdUpdated: ''
-                                },
-                                    () => {
-
-                                        this.hideSecondComponent();
-                                        this.toggleLarge();
-
-                                        (this.state.active3 ? this.filterErpData() : this.filterData(this.state.planningUnitIds));
-
-                                    })
-                                // }
-
-                            }).catch(
-                                error => {
-                                    console.log("Linking error-----------", error);
-                                    if (error.message === "Network Error") {
-                                        this.setState({
-                                            message: 'static.unkownError',
-                                            color: '#BA0C2F',
-                                            loading: false,
-                                            loading1: false
-                                        });
-                                    } else {
-                                        switch (error.response ? error.response.status : "") {
-
-                                            case 401:
-                                                this.props.history.push(`/login/static.message.sessionExpired`)
-                                                break;
-                                            case 403:
-                                                this.props.history.push(`/accessDenied`)
-                                                break;
-                                            case 500:
-                                            case 404:
-                                            case 406:
-                                                console.log("500 error--------");
-                                                this.setState({
-                                                    message: error.response.data.messageCode,
-                                                    loading: false,
-                                                    loading1: false,
-                                                    color: '#BA0C2F',
-                                                },
-                                                    () => {
-
-                                                        this.hideSecondComponent();
-                                                        this.toggleLarge();
-
-                                                        (this.state.active3 ? this.filterErpData() : this.filterData(this.state.planningUnitIds));
-
-                                                    });
-                                                break;
-                                            case 412:
-                                                this.setState({
-                                                    message: error.response.data.messageCode,
-                                                    loading: false,
-                                                    loading1: false,
-                                                    color: '#BA0C2F',
-                                                },
-                                                    () => {
-
-                                                        this.hideSecondComponent();
-                                                        this.toggleLarge();
-
-                                                        (this.state.active3 ? this.filterErpData() : this.filterData(this.state.planningUnitIds));
-
-                                                    });
-                                                break;
-                                            default:
-                                                this.setState({
-                                                    message: 'static.unkownError',
-                                                    loading: false,
-                                                    loading1: false,
-                                                    color: '#BA0C2F',
-                                                });
-                                                break;
-                                        }
-                                    }
-                                }
-                            );
-                        // }
-                    }
                 }
             }
+            if (!valid) {
+                this.setState({ loading1: false })
+            } else {
+                var db1;
+                var storeOS;
+                getDatabase();
+                var thisAsParameter = this;
+                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                openRequest.onerror = function (event) {
+                    this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+                    this.props.updateState("color", "#BA0C2F");
+                    this.props.hideFirstComponent();
+                }.bind(this);
+                openRequest.onsuccess = function (e) {
+                    db1 = e.target.result;
+                    var ppuTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+                    ppuTransaction = ppuTransaction.objectStore('programPlanningUnit');
+                    // Yaha program Id dalna hai actual wala
+
+                    var ppuRequest = ppuTransaction.getAll();
+                    ppuRequest.onsuccess = function (event) {
+
+                        var paTransaction = db1.transaction(['procurementAgent'], 'readwrite');
+                        paTransaction = paTransaction.objectStore('procurementAgent');
+                        // Yaha program Id dalna hai actual wala
+
+                        var paRequest = paTransaction.getAll();
+                        paRequest.onsuccess = function (event) {
+
+                            var dsTransaction = db1.transaction(['dataSource'], 'readwrite');
+                            dsTransaction = dsTransaction.objectStore('dataSource');
+                            // Yaha program Id dalna hai actual wala
+
+                            var dsRequest = dsTransaction.getAll();
+                            dsRequest.onsuccess = function (event) {
+
+                                var cTransaction = db1.transaction(['currency'], 'readwrite');
+                                cTransaction = cTransaction.objectStore('currency');
+                                // Yaha program Id dalna hai actual wala
+
+                                var cRequest = cTransaction.getAll();
+                                cRequest.onsuccess = function (event) {
+
+
+                                    var transaction;
+                                    var programTransaction;
+
+
+                                    transaction = db1.transaction(['programData'], 'readwrite');
+                                    programTransaction = transaction.objectStore('programData');
+                                    // Yaha program Id dalna hai actual wala
+                                    var curUser = AuthenticationService.getLoggedInUserId();
+                                    var programId = this.state.active1 ? (this.state.programId + "_v" + this.state.versionId.split(" ")[0] + "_uId_" + curUser) : this.state.programId1;
+                                    console.log("ProgramId@@@@@@@@@@@@", programId)
+                                    var programRequest = programTransaction.get(programId);
+                                    programRequest.onsuccess = function (event) {
+                                        var programDataJson = programRequest.result.programData;
+                                        var planningUnitDataList = programDataJson.planningUnitDataList;
+                                        // var planningUnitId = this.state.active1 ? this.state.selectedRowPlanningUnit : (this.state.active3 ? (this.state.active4 || this.state.active5 ? document.getElementById("planningUnitId1").value : 0) : 0)
+                                        var planningUnitId = this.state.active1 ? this.state.selectedRowPlanningUnit : (this.state.active3 ? ((this.state.active4 || this.state.active5) && !this.state.checkboxValue ? document.getElementById("planningUnitId1").value : (this.state.active4 || this.state.active5) && this.state.checkboxValue ? this.state.selectedShipment[0].planningUnit.id : 0) : 0)
+                                        var programId1 = this.state.active1 ? this.state.programId : this.state.programId1.toString().split("_")[0]
+                                        var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == planningUnitId);
+                                        var ppuObject = ppuRequest.result.filter(c => c.program.id == programId1 && c.planningUnit.id == planningUnitId)[0];
+                                        var programJson = {}
+                                        if (planningUnitDataIndex != -1) {
+                                            var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == planningUnitId))[0];
+                                            var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                                            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                                            programJson = JSON.parse(programData);
+                                        } else {
+                                            programJson = {
+                                                consumptionList: [],
+                                                inventoryList: [],
+                                                shipmentList: [],
+                                                batchInfoList: [],
+                                                supplyPlan: []
+                                            }
+                                        }
+                                        var generalProgramDataBytes = CryptoJS.AES.decrypt(programDataJson.generalData, SECRET_KEY);
+                                        var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
+                                        var generalProgramJson = JSON.parse(generalProgramData);
+                                        var actionList = generalProgramJson.actionList;
+                                        var linkedShipmentsList = generalProgramJson.shipmentLinkingList == null ? [] : generalProgramJson.shipmentLinkingList;
+                                        if (actionList == undefined) {
+                                            actionList = []
+                                        }
+                                        var shipmentList = programJson.shipmentList;
+                                        var batchInfoList = programJson.batchInfoList;
+                                        console.log("Shipment List@@@@@@@@@@@@@@@", programJson.shipmentList)
+                                        if (!this.state.active4) {
+                                            var shipmentId = this.state.active1 ? this.state.outputListAfterSearch[0].shipmentId : this.state.finalShipmentId;
+                                            var index = this.state.active1 ? this.state.outputListAfterSearch[0].tempShipmentId : this.state.tempShipmentId;
+                                            var shipmentIndex = shipmentList.findIndex(c => shipmentId > 0 ? (c.shipmentId == shipmentId) : (c.tempShipmentId == index));
+
+                                            console.log("Shipment Index@@@@@@@@@@@@@@@", shipmentIndex)
+                                            shipmentList[shipmentIndex].erpFlag = true;
+                                            shipmentList[shipmentIndex].active = false;
+                                            var minDate = shipmentList[shipmentIndex].receivedDate != "" && shipmentList[shipmentIndex].receivedDate != null && shipmentList[shipmentIndex].receivedDate != undefined && shipmentList[shipmentIndex].receivedDate != "Invalid date" ? shipmentList[shipmentIndex].receivedDate : shipmentList[shipmentIndex].expectedDeliveryDate;
+                                        }
+
+
+                                        var tableJson = this.state.instance.getJson(null, false);
+                                        for (var y = 0; y < tableJson.length; y++) {
+                                            if (tableJson[y][0] && tableJson[y][13] == 0) {
+                                                if (moment(minDate).format("YYYY-MM") > moment(tableJson[y][4]).format("YYYY-MM")) {
+                                                    minDate = moment(tableJson[y][4]).format("YYYY-MM-DD")
+                                                }
+                                                var filterList = tableJson.filter((c) => c[1] == tableJson[y][1]);
+                                                console.log("FilterList@@@@@@@@@@@@@@@", filterList);
+                                                var getUniqueOrderNoAndPrimeLineNoList = filterList.filter((v, i, a) => a.findIndex(t => (t[15].roNo === v[15].roNo && t[15].roPrimeLineNo === v[15].roPrimeLineNo && t[15].knShipmentNo === v[15].knShipmentNo)) === i);
+                                                console.log("getUniqueOrderNoAndPrimeLineNoList@@@@@@@@@@@@@@@", getUniqueOrderNoAndPrimeLineNoList)
+                                                for (var uq = 0; uq < getUniqueOrderNoAndPrimeLineNoList.length; uq++) {
+                                                    var shipmentQty = 0;
+                                                    var batchInfo = [];
+                                                    var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+                                                    var curUser = AuthenticationService.getLoggedInUserId();
+                                                    var username = AuthenticationService.getLoggedInUsername();
+                                                    tableJson.filter(c => c[15].roNo == getUniqueOrderNoAndPrimeLineNoList[uq][15].roNo && c[15].roPrimeLineNo == getUniqueOrderNoAndPrimeLineNoList[uq][15].roPrimeLineNo && c[15].knShipmentNo == getUniqueOrderNoAndPrimeLineNoList[uq][15].knShipmentNo).map(item => {
+                                                        console.log("Item@@@@@@@@@@@@@@@@", item)
+                                                        shipmentQty += Number(item[9]) * Number(item[10]);
+                                                        var batchNo = item[7];
+                                                        var expiryDate = item[8];
+                                                        var autoGenerated = false;
+                                                        var shelfLife = ppuObject.shelfLife;
+                                                        // if (batchNo.toString() == "-99" || batchNo=="") {
+                                                        var programId1 = paddingZero(this.state.programId, 0, 6);
+                                                        var planningUnitId1 = paddingZero(planningUnitId, 0, 8);
+                                                        autoGenerated = (batchNo.toString() == "-99" || batchNo == "") ? true : autoGenerated;
+                                                        batchNo = (batchNo.toString() == "-99" || batchNo == "") ? (BATCH_PREFIX).concat(programId1).concat(planningUnitId1).concat(moment(Date.now()).format("YYMMDD")).concat(generateRandomAplhaNumericCode(3)) : batchNo;
+                                                        expiryDate = expiryDate == "" ? moment(tableJson[y][4]).add(shelfLife, 'months').startOf('month').format("YYYY-MM-DD") : expiryDate;
+
+                                                        // }
+                                                        batchInfo.push({
+                                                            shipmentTransBatchInfoId: 0,
+                                                            batch: {
+                                                                batchNo: batchNo,
+                                                                expiryDate: moment(expiryDate).endOf('month').format("YYYY-MM-DD"),
+                                                                batchId: 0,
+                                                                autoGenerated: autoGenerated,
+                                                                createdDate: curDate
+                                                            },
+                                                            shipmentQty: Number(item[9]) * Number(item[10])
+                                                        })
+                                                    }
+                                                    );
+                                                    if (this.state.active4 && uq == 0) {
+                                                        var c = (cRequest.result.filter(c => c.currencyId == USD_CURRENCY_ID)[0]);
+                                                        shipmentList.push({
+                                                            accountFlag: true,
+                                                            active: false,
+                                                            dataSource: {
+                                                                id: NONE_SELECTED_DATA_SOURCE_ID,
+                                                                label: dsRequest.result.filter(c => c.dataSourceId == NONE_SELECTED_DATA_SOURCE_ID)[0].label
+                                                            },
+                                                            erpFlag: true,
+                                                            localProcurement: false,
+                                                            freightCost: tableJson[y][15].shippingCost,//Yeh
+                                                            notes: tableJson[y][12],
+                                                            planningUnit: ppuObject.planningUnit,
+                                                            procurementAgent: {
+                                                                id: PSM_PROCUREMENT_AGENT_ID,
+                                                                label: paRequest.result.filter(c => c.procurementAgentId == PSM_PROCUREMENT_AGENT_ID)[0].label,
+                                                                code: paRequest.result.filter(c => c.procurementAgentId == PSM_PROCUREMENT_AGENT_ID)[0].procurementAgentCode
+                                                            },
+                                                            productCost: Number(tableJson[y][15].price) * Number(shipmentQty),//Final cost
+                                                            shipmentQty: shipmentQty,
+                                                            rate: tableJson[y][15].price,//Price per planning unit
+                                                            shipmentId: 0,
+                                                            shipmentMode: (tableJson[y][15].shipBy == "Land" || tableJson[y][15].shipBy == "Ship" ? "Sea" : tableJson[y][15].shipBy == "Air" ? "Air" : "Sea"),//Yeh
+                                                            shipmentStatus: tableJson[y][14],
+                                                            suggestedQty: 0,
+                                                            budget: {
+                                                                id: this.state.budgetId,
+                                                                label: this.state.filteredBudgetList.filter(c => c.budgetId == this.state.budgetId)[0].label,
+                                                                code: this.state.filteredBudgetList.filter(c => c.budgetId == this.state.budgetId)[0].budgetCode,
+                                                            },
+                                                            emergencyOrder: false,
+                                                            currency: c,
+                                                            fundingSource: {
+                                                                id: this.state.fundingSourceId,
+                                                                code: this.state.fundingSourceList.filter(c => c.fundingSourceId == this.state.fundingSourceId)[0].fundingSourceCode,
+                                                                label: this.state.fundingSourceList.filter(c => c.fundingSourceId == this.state.fundingSourceId)[0].label,
+                                                            },
+                                                            plannedDate: null,
+                                                            submittedDate: null,
+                                                            approvedDate: null,
+                                                            shippedDate: null,
+                                                            arrivedDate: null,
+                                                            expectedDeliveryDate: tableJson[y][4],
+                                                            receivedDate: tableJson[y][14].id == DELIVERED_SHIPMENT_STATUS ? tableJson[y][4] : null,
+                                                            index: shipmentList.length,
+                                                            batchInfoList: batchInfo,
+                                                            orderNo: tableJson[y][2].split("|")[0],
+                                                            primeLineNo: tableJson[y][2].split("|")[1],
+                                                            parentShipmentId: null,
+                                                            createdBy: {
+                                                                userId: curUser,
+                                                                username: username
+                                                            },
+                                                            createdDate: curDate,
+                                                            lastModifiedBy: {
+                                                                userId: curUser,
+                                                                username: username
+                                                            },
+                                                            lastModifiedDate: curDate,
+                                                            tempShipmentId: ppuObject.planningUnit.id.toString().concat(shipmentList.length),
+                                                            tempParentShipmentId: null,
+                                                        })
+                                                        var shipmentId = 0;
+                                                        var index = ppuObject.planningUnit.id.toString().concat(shipmentList.length - 1);
+                                                        var shipmentIndex = shipmentList.findIndex(c => shipmentId > 0 ? (c.shipmentId == shipmentId) : (c.tempShipmentId == index));
+                                                        var minDate = shipmentList[shipmentIndex].receivedDate != "" && shipmentList[shipmentIndex].receivedDate != null && shipmentList[shipmentIndex].receivedDate != undefined && shipmentList[shipmentIndex].receivedDate != "Invalid date" ? shipmentList[shipmentIndex].receivedDate : shipmentList[shipmentIndex].expectedDeliveryDate;
+                                                    }
+
+                                                    console.log("ShipmentQty@@@@@@@@@@@@@@@@", shipmentQty);
+                                                    linkedShipmentsList.push({
+                                                        shipmentLinkingId: 0,
+                                                        versionId: this.state.versionId.toString().split(" ")[0],
+                                                        programId: this.state.programId,
+                                                        procurementAgent: shipmentList[shipmentIndex].procurementAgent,
+                                                        parentShipmentId: shipmentList[shipmentIndex].shipmentId,
+                                                        tempParentShipmentId: shipmentList[shipmentIndex].shipmentId == 0 ? shipmentList[shipmentIndex].tempShipmentId : null,
+                                                        childShipmentId: 0,
+                                                        tempChildShipmentId: shipmentList[shipmentIndex].planningUnit.id.toString().concat(shipmentList.length),
+                                                        erpPlanningUnit: getUniqueOrderNoAndPrimeLineNoList[uq][15].erpPlanningUnit,
+                                                        roNo: getUniqueOrderNoAndPrimeLineNoList[uq][15].roNo,
+                                                        roPrimeLineNo: getUniqueOrderNoAndPrimeLineNoList[uq][15].roPrimeLineNo,
+                                                        knShipmentNo: getUniqueOrderNoAndPrimeLineNoList[uq][15].knShipmentNo,
+                                                        erpShipmentStatus: getUniqueOrderNoAndPrimeLineNoList[uq][15].erpShipmentStatus,
+                                                        orderNo: getUniqueOrderNoAndPrimeLineNoList[uq][15].orderNo,
+                                                        primeLineNo: getUniqueOrderNoAndPrimeLineNoList[uq][15].primeLineNo,
+                                                        conversionFactor: Number(getUniqueOrderNoAndPrimeLineNoList[uq][10]),
+                                                        qatPlanningUnitId: ppuObject.planningUnit.id,
+                                                        active: true,
+                                                        createdBy: {
+                                                            userId: curUser,
+                                                            username: username
+                                                        },
+                                                        createdDate: curDate,
+                                                        lastModifiedBy: {
+                                                            userId: curUser,
+                                                            username: username
+                                                        },
+                                                        lastModifiedDate: curDate,
+                                                    })
+                                                    shipmentList.push({
+                                                        accountFlag: true,
+                                                        active: true,
+                                                        dataSource: shipmentList[shipmentIndex].dataSource,
+                                                        erpFlag: true,
+                                                        localProcurement: shipmentList[shipmentIndex].localProcurement,
+                                                        freightCost: getUniqueOrderNoAndPrimeLineNoList[uq][15].shippingCost,//Yeh
+                                                        notes: getUniqueOrderNoAndPrimeLineNoList[uq][12],
+                                                        planningUnit: shipmentList[shipmentIndex].planningUnit,
+
+                                                        procurementAgent: shipmentList[shipmentIndex].procurementAgent,
+                                                        productCost: Number(getUniqueOrderNoAndPrimeLineNoList[uq][15].price) * Number(shipmentQty),//Final cost
+                                                        shipmentQty: shipmentQty,
+                                                        rate: getUniqueOrderNoAndPrimeLineNoList[uq][15].price,//Price per planning unit
+                                                        shipmentId: 0,
+                                                        shipmentMode: (getUniqueOrderNoAndPrimeLineNoList[uq][15].shipBy == "Land" || getUniqueOrderNoAndPrimeLineNoList[uq][15].shipBy == "Ship" ? "Sea" : getUniqueOrderNoAndPrimeLineNoList[uq][15].shipBy == "Air" ? "Air" : "Sea"),//Yeh
+                                                        shipmentStatus: getUniqueOrderNoAndPrimeLineNoList[uq][14],
+                                                        suggestedQty: 0,
+                                                        budget: shipmentList[shipmentIndex].budget,
+                                                        emergencyOrder: shipmentList[shipmentIndex].emergencyOrder,
+                                                        currency: shipmentList[shipmentIndex].currency,
+                                                        fundingSource: shipmentList[shipmentIndex].fundingSource,
+                                                        plannedDate: null,
+                                                        submittedDate: null,
+                                                        approvedDate: null,
+                                                        shippedDate: null,
+                                                        arrivedDate: null,
+                                                        expectedDeliveryDate: getUniqueOrderNoAndPrimeLineNoList[uq][4],
+                                                        receivedDate: getUniqueOrderNoAndPrimeLineNoList[uq][14].id == DELIVERED_SHIPMENT_STATUS ? getUniqueOrderNoAndPrimeLineNoList[uq][4] : null,
+                                                        index: shipmentList.length,
+                                                        batchInfoList: batchInfo,
+                                                        orderNo: getUniqueOrderNoAndPrimeLineNoList[uq][2].split("|")[0],
+                                                        primeLineNo: getUniqueOrderNoAndPrimeLineNoList[uq][2].split("|")[1],
+                                                        parentShipmentId: shipmentList[shipmentIndex].shipmentId,
+                                                        createdBy: {
+                                                            userId: curUser,
+                                                            username: username
+                                                        },
+                                                        createdDate: curDate,
+                                                        lastModifiedBy: {
+                                                            userId: curUser,
+                                                            username: username
+                                                        },
+                                                        lastModifiedDate: curDate,
+                                                        tempShipmentId: shipmentList[shipmentIndex].planningUnit.id.toString().concat(shipmentList.length),
+                                                        tempParentShipmentId: shipmentList[shipmentIndex].shipmentId == 0 ? shipmentList[shipmentIndex].tempShipmentId : null,
+                                                    })
+
+                                                    for (var bi = 0; bi < batchInfo.length; bi++) {
+                                                        var index = batchInfoList.findIndex(c => c.batchNo == batchInfo[bi].batch.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(batchInfo[bi].batch.expiryDate).format("YYYY-MM") && c.planningUnitId == planningUnitId);
+                                                        if (index == -1) {
+                                                            var batchDetails = {
+                                                                batchId: batchInfo[bi].batch.batchId,
+                                                                batchNo: batchInfo[bi].batch.batchNo,
+                                                                planningUnitId: planningUnitId,
+                                                                expiryDate: batchInfo[bi].batch.expiryDate,
+                                                                createdDate: batchInfo[bi].batch.createdDate,
+                                                                autoGenerated: batchInfo[bi].batch.autoGenerated
+                                                            }
+                                                            batchInfoList.push(batchDetails);
+                                                        } else {
+                                                            batchInfoList[index].expiryDate = batchInfo[bi].batch.expiryDate;
+                                                            batchInfoList[index].createdDate = batchInfo[bi].batch.createdDate;
+                                                            batchInfoList[index].autoGenerated = batchInfo[bi].batch.autoGenerated;
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        actionList.push({
+                                            planningUnitId: planningUnitId,
+                                            type: SHIPMENT_MODIFIED,
+                                            date: moment(minDate).startOf('month').format("YYYY-MM-DD")
+                                        })
+                                        programJson.shipmentList = shipmentList;
+                                        programJson.batchInfoList = batchInfoList;
+                                        console.log("Program Json@@@@@@@@@@@@@@@@", programJson);
+                                        if (planningUnitDataIndex != -1) {
+                                            planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                                        } else {
+                                            planningUnitDataList.push({ planningUnitId: planningUnitId, planningUnitData: (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString() });
+                                        }
+                                        generalProgramJson.actionList = actionList;
+                                        generalProgramJson.shipmentLinkingList = linkedShipmentsList;
+                                        console.log("General Program Json@@@@@@@@@@@@@@@@", generalProgramJson);
+                                        programDataJson.planningUnitDataList = planningUnitDataList;
+
+                                        programDataJson.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
+                                        programRequest.result.programData = programDataJson;
+                                        var putRequest = programTransaction.put(programRequest.result);
+
+                                        putRequest.onerror = function (event) {
+                                        }.bind(this);
+                                        putRequest.onsuccess = function (event) {
+                                            console.log("in success@@@@@@@@@@@@@@@", thisAsParameter)
+                                            calculateSupplyPlan(programId, planningUnitId, 'programData', "erp", thisAsParameter, [], moment(minDate).startOf('month').format("YYYY-MM-DD"));
+                                        }
+                                    }.bind(this)
+                                }.bind(this)
+                            }.bind(this)
+                        }.bind(this)
+                    }.bind(this)
+                }.bind(this)
+            }
         }
+    }
+
+    updateState(parameterName, value) {
+        this.setState({
+            [parameterName]: value
+        })
+
+    }
+
+    linkOld() {
+        // document.getElementById('div2').style.display = 'block';
+        // let valid = false;
+        // var programId = (this.state.active3 ? this.state.programId1 : this.state.programId);
+        // if (this.state.active3) {
+        //     localStorage.setItem("sesProgramIdReport", programId)
+        //     if (this.state.active5) {
+        //         if (this.state.finalShipmentId != "" && this.state.finalShipmentId != null) {
+        //             valid = true;
+        //         } else {
+        //             alert(i18n.t('static.mt.selectShipmentId'));
+        //         }
+
+        //     } else if (this.state.active4) {
+        //         if (programId == -1) {
+        //             alert(i18n.t('static.mt.selectProgram'));
+        //         }
+        //         else if (document.getElementById("planningUnitId1").value == -1) {
+        //             alert(i18n.t('static.mt.selectPlanninfUnit'));
+        //         }
+        //         else if (this.state.fundingSourceId == -1) {
+        //             alert(i18n.t('static.mt.selectFundingSource'));
+        //         } else if (this.state.budgetId == -1) {
+        //             alert(i18n.t('static.mt.selectBudget'));
+        //         }
+
+
+        //         else {
+        //             // var cf = window.confirm(i18n.t('static.mt.confirmNewShipmentCreation'));
+        //             // if (cf == true) {
+        //             valid = true;
+        //             // } else { }
+        //         }
+        //     }
+        // } else {
+        //     valid = true;
+        // }
+        // if (valid) {
+        //     this.setState({ loading1: true })
+        //     var validation = this.checkValidation();
+        //     let linkedShipmentCount = 0;
+        //     if (validation == true) {
+        //         var tableJson = this.state.instance.getJson(null, false);
+        //         let changedmtList = [];
+        //         for (var i = 0; i < tableJson.length; i++) {
+        //             var map1 = new Map(Object.entries(tableJson[i]));
+        //             if (parseInt(map1.get("10")) === 1) {
+        //                 let json = {
+        //                     parentShipmentId: (this.state.active2 ? this.state.parentShipmentId : 0),
+        //                     programId: programId,
+        //                     fundingSourceId: (this.state.active3 ? this.state.fundingSourceId : 0),
+        //                     budgetId: (this.state.active3 ? this.state.budgetId : 0),
+        //                     shipmentId: (this.state.active3 ? this.state.finalShipmentId : this.state.shipmentId),
+        //                     conversionFactor: this.el.getValue(`H${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+        //                     notes: (map1.get("9") === '' ? null : map1.get("9")),
+        //                     active: map1.get("0"),
+        //                     orderNo: map1.get("11"),
+        //                     primeLineNo: parseInt(map1.get("12")),
+        //                     // planningUnitId: (this.state.active3 ? this.el.getValue(`N${parseInt(i) + 1}`, true).toString().replaceAll(",", "") : 0),
+        //                     planningUnitId: (this.state.active3 ? (this.state.active4 ? document.getElementById("planningUnitId1").value : 0) : 0),
+        //                     quantity: this.el.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll(",", "")
+        //                 }
+
+        //                 changedmtList.push(json);
+        //             }
+        //             if ((this.state.active2 || this.state.active4) && map1.get("0")) {
+        //                 linkedShipmentCount++;
+        //             }
+        //         }
+        //         console.log("FINAL SUBMIT changedmtList---", changedmtList);
+        //         if (this.state.active4 && linkedShipmentCount > 1) {
+        //             alert(i18n.t('static.mt.oneOrderAtATime'));
+        //             this.setState({
+        //                 loading1: false
+        //             })
+
+        //         } else {
+        //             let goAhead = false;
+        //             if (this.state.active4) {
+        //                 var cf = window.confirm(i18n.t('static.mt.confirmNewShipmentCreation'));
+        //                 if (cf == true) {
+        //                     goAhead = true;
+        //                 } else {
+        //                     this.setState({
+        //                         loading1: false
+        //                     })
+        //                 }
+        //             } else {
+        //                 goAhead = true;
+        //             }
+        //             let callApiActive2 = false;
+        //             if (this.state.active2) {
+        //                 let active2GoAhead = false;
+
+        //                 if (linkedShipmentCount > 0) {
+        //                     active2GoAhead = false
+        //                     callApiActive2 = true
+        //                 } else {
+        //                     active2GoAhead = true
+        //                 }
+        //                 if (active2GoAhead) {
+        //                     // var cf1 = window.confirm(i18n.t('static.mt.confirmNewShipmentCreation'));
+        //                     var cf1 = window.confirm(i18n.t("static.mt.delinkAllShipments"));
+        //                     if (cf1 == true) {
+        //                         callApiActive2 = true;
+        //                     } else {
+        //                         callApiActive2 = false;
+        //                     }
+        //                 }
+        //             }
+        //             if (!callApiActive2 && this.state.active2) {
+        //                 this.setState({
+        //                     loading: false,
+        //                     loading1: false
+        //                 });
+        //             }
+        //             if (this.state.active1 || (this.state.active3 && this.state.active4 && goAhead) || (this.state.active3 && this.state.active5) || callApiActive2) {
+        //                 console.log("Going to link shipment-----", changedmtList);
+        //                 // for (var i = 0; i <= 2; i++) {
+        //                 // console.log("for loop -----",i);
+        //                 ManualTaggingService.linkShipmentWithARTMIS(changedmtList)
+        //                     .then(response => {
+        //                         console.log("linking response---", response);
+
+        //                         this.setState({
+        //                             message: (this.state.active2 ? i18n.t('static.mt.linkingUpdateSuccess') : i18n.t('static.shipment.linkingsuccess')),
+        //                             color: 'green',
+        //                             loading: false,
+        //                             loading1: false,
+        //                             planningUnitIdUpdated: ''
+        //                         },
+        //                             () => {
+
+        //                                 this.hideSecondComponent();
+        //                                 this.toggleLarge();
+
+        //                                 (this.state.active3 ? this.filterErpData() : this.filterData(this.state.planningUnitIds));
+
+        //                             })
+        //                         // }
+
+        //                     }).catch(
+        //                         error => {
+        //                             console.log("Linking error-----------", error);
+        //                             if (error.message === "Network Error") {
+        //                                 this.setState({
+        //                                     message: 'static.unkownError',
+        //                                     color: '#BA0C2F',
+        //                                     loading: false,
+        //                                     loading1: false
+        //                                 });
+        //                             } else {
+        //                                 switch (error.response ? error.response.status : "") {
+
+        //                                     case 401:
+        //                                         this.props.history.push(`/login/static.message.sessionExpired`)
+        //                                         break;
+        //                                     case 403:
+        //                                         this.props.history.push(`/accessDenied`)
+        //                                         break;
+        //                                     case 500:
+        //                                     case 404:
+        //                                     case 406:
+        //                                         console.log("500 error--------");
+        //                                         this.setState({
+        //                                             message: error.response.data.messageCode,
+        //                                             loading: false,
+        //                                             loading1: false,
+        //                                             color: '#BA0C2F',
+        //                                         },
+        //                                             () => {
+
+        //                                                 this.hideSecondComponent();
+        //                                                 this.toggleLarge();
+
+        //                                                 (this.state.active3 ? this.filterErpData() : this.filterData(this.state.planningUnitIds));
+
+        //                                             });
+        //                                         break;
+        //                                     case 412:
+        //                                         this.setState({
+        //                                             message: error.response.data.messageCode,
+        //                                             loading: false,
+        //                                             loading1: false,
+        //                                             color: '#BA0C2F',
+        //                                         },
+        //                                             () => {
+
+        //                                                 this.hideSecondComponent();
+        //                                                 this.toggleLarge();
+
+        //                                                 (this.state.active3 ? this.filterErpData() : this.filterData(this.state.planningUnitIds));
+
+        //                                             });
+        //                                         break;
+        //                                     default:
+        //                                         this.setState({
+        //                                             message: 'static.unkownError',
+        //                                             loading: false,
+        //                                             loading1: false,
+        //                                             color: '#BA0C2F',
+        //                                         });
+        //                                         break;
+        //                                 }
+        //                             }
+        //                         }
+        //                     );
+        //                 // }
+        //             }
+        //         }
+        //     }
+        // }
     }
     getConvertedQATShipmentQty = () => {
         var conversionFactor = document.getElementById("conversionFactor").value;
@@ -1250,14 +1960,53 @@ export default class ManualTagging extends Component {
 
     getOrderDetails = () => {
         var roNoOrderNo = (this.state.searchedValue != null && this.state.searchedValue != "" ? this.state.searchedValue : "0");
-        var programId = (this.state.active3 ? 0 : document.getElementById("programId").value);
+        var programId = (this.state.active3 ? this.state.programId1.split("_")[0] : document.getElementById("programId").value);
+        var versionId = this.state.active1 ? this.state.versionId.toString().split(" ")[0] : this.state.localProgramList.filter(c => c.id == this.state.programId1)[0].version;
         var erpPlanningUnitId = (this.state.planningUnitIdUpdated != null && this.state.planningUnitIdUpdated != "" ? this.state.planningUnitIdUpdated : 0);
+        var linkedRoNoAndRoPrimeLineNo = [];
+        if (this.state.active1) {
+            var localProgramList = this.state.localProgramList;
+            var localProgramListFilter = localProgramList.filter(c => c.programId == this.state.programId && c.version == this.state.versionId.split(" ")[0]);
+            console.log("localProgramListFilter@@@@@@@@@@@@@", localProgramListFilter)
+            var generalProgramDataBytes = CryptoJS.AES.decrypt(localProgramListFilter[0].programData.generalData, SECRET_KEY);
+            var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
+            var generalProgramJson = JSON.parse(generalProgramData);
+            var linkedShipmentsList = generalProgramJson.shipmentLinkingList != null ? generalProgramJson.shipmentLinkingList : [];
+
+            linkedShipmentsList.filter(c => c.shipmentLinkingId == 0 && c.active == true).map(c => {
+                linkedRoNoAndRoPrimeLineNo.push(c.roNo + "|" + c.roPrimeLineNo)
+            })
+        } else if (this.state.active3) {
+            console.log("In else if@@@@@@@#########")
+            var localProgramList = this.state.localProgramList;
+            for (var i = 0; i < localProgramList.length; i++) {
+                var generalProgramDataBytes = CryptoJS.AES.decrypt(localProgramList[i].programData.generalData, SECRET_KEY);
+                var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
+                var generalProgramJson = JSON.parse(generalProgramData);
+                var linkedShipmentsList = generalProgramJson.shipmentLinkingList != null ? generalProgramJson.shipmentLinkingList : [];
+                var linkedRoNoAndRoPrimeLineNo = [];
+                linkedShipmentsList.filter(c => c.shipmentLinkingId == 0 && c.active == true).map(c => {
+                    linkedRoNoAndRoPrimeLineNo.push(c.roNo + "|" + c.roPrimeLineNo)
+                })
+            }
+        }
+        var shipmentPlanningUnitId = this.state.active1 ? this.state.selectedRowPlanningUnit : (this.state.active3 ? ((this.state.active4 || this.state.active5) && !this.state.checkboxValue ? document.getElementById("planningUnitId1").value : (this.state.active4 || this.state.active5) && this.state.checkboxValue ? this.state.selectedShipment[0].planningUnit.id : 0) : 0)
         if ((roNoOrderNo != "" && roNoOrderNo != "0") || (erpPlanningUnitId != 0)) {
-            ManualTaggingService.getOrderDetailsByOrderNoAndPrimeLineNo(roNoOrderNo, programId, erpPlanningUnitId, (this.state.active1 ? 1 : (this.state.active2 ? 2 : 3)), (this.state.active2 ? this.state.parentShipmentId : 0))
+            // roNoOrderNo, programId, erpPlanningUnitId, (this.state.active1 ? 1 : (this.state.active2 ? 2 : 3)), (this.state.active2 ? this.state.parentShipmentId : 0)
+            var json = {
+                programId: programId,
+                versionId: versionId,
+                shipmentPlanningUnitId: shipmentPlanningUnitId,
+                roNo: roNoOrderNo,
+                filterPlanningUnitId: erpPlanningUnitId,
+
+            }
+            console.log("In else if json@@@@@@@#########", json)
+            ManualTaggingService.getOrderDetails(json)
                 .then(response => {
                     console.log("response.data------", response.data)
                     this.setState({
-                        artmisList: response.data,
+                        artmisList: response.data.filter(c => !linkedRoNoAndRoPrimeLineNo.includes(c.roNo + "|" + c.roPrimeLineNo)),
                         displayButton: false
                     }, () => {
                         this.buildJExcelERP();
@@ -1441,22 +2190,52 @@ export default class ManualTagging extends Component {
             fundingSourceId: -1,
             budgetId: -1
         })
-        let productCategoryIdList = this.state.productCategoryValues.length == this.state.productCategories.length && this.state.productCategoryValues.length != 0 ? [] : (this.state.productCategoryValues.length == 0 ? null : this.state.productCategoryValues.map(ele => (ele.value).toString()))
-        let planningUnitIdList = this.state.planningUnitValues.length == this.state.planningUnits1.length && this.state.planningUnitValues.length != 0 ? [] : (this.state.planningUnitValues.length == 0 ? null : this.state.planningUnitValues.map(ele => (ele.value).toString()))
-        var json = {
-            countryId: countryId,
-            productCategoryIdList: productCategoryIdList,
-            planningUnitIdList: planningUnitIdList,
-            linkingType: (this.state.active1 ? 1 : (this.state.active2 ? 2 : 3))
-        }
-        console.log("length1---", this.state.planningUnitValues.length);
-        console.log("length2---", this.state.planningUnits1.length);
-        console.log("json---", json);
         if ((this.state.productCategoryValues.length > 0) || (this.state.planningUnitValues.length > 0)) {
-            ManualTaggingService.getShipmentListForManualTagging(json)
+            let productCategoryIdList = this.state.productCategoryValues.length == this.state.productCategories.length && this.state.productCategoryValues.length != 0 ? [] : (this.state.productCategoryValues.length == 0 ? null : this.state.productCategoryValues.map(ele => (ele.value).toString()))
+            let planningUnitIdList = (this.state.planningUnitValues.length == 0 ? null : this.state.planningUnitValues.map(ele => (ele.value).toString()))
+            console.log("this.state.productCategories@@@@@@@@@@@@@", this.state.productCategories)
+            console.log("this.state.productCategoryValues[0].value@@@@@@@@@@@@@@", productCategoryIdList);
+            var productCategorySortOrder = this.state.productCategories.filter(c => productCategoryIdList.includes(c.payload.productCategoryId.toString()));
+            var sortOrderList = [];
+            productCategorySortOrder.map(ele => sortOrderList.push(ele.sortOrder))
+            console.log("Sort@@@@@@@@@@@@@@", sortOrderList);
+            var json = {
+                realmCountryId: countryId,
+                productCategorySortOrder: sortOrderList,
+                planningUnitIds: planningUnitIdList,
+                // linkingType: (this.state.active1 ? 1 : (this.state.active2 ? 2 : 3))
+            }
+            console.log("length1---", this.state.planningUnitValues.length);
+            console.log("length2---", this.state.planningUnits1.length);
+            console.log("json---", json);
+            var localProgramList = this.state.localProgramList;
+            for (var i = 0; i < localProgramList.length; i++) {
+                var generalProgramDataBytes = CryptoJS.AES.decrypt(localProgramList[i].programData.generalData, SECRET_KEY);
+                var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
+                var generalProgramJson = JSON.parse(generalProgramData);
+                var linkedShipmentsList = generalProgramJson.shipmentLinkingList != null ? generalProgramJson.shipmentLinkingList : [];
+                var linkedRoNoAndRoPrimeLineNo = [];
+                console.log("linkedShipmentsList@@@@@@@@@@@@@@@",linkedShipmentsList);
+                linkedShipmentsList.filter(c => c.shipmentLinkingId == 0 && c.active == true).map(c => {
+                    linkedRoNoAndRoPrimeLineNo.push(c.roNo + "|" + c.roPrimeLineNo)
+                })
+            }
+            console.log("linkedRoNoAndRoPrimeLineNo@@@@@@@@@@@@@@@@@@@@@@@", linkedRoNoAndRoPrimeLineNo)
+            ManualTaggingService.getShipmentListForTab3(json)
                 .then(response => {
+                    var outputList = response.data;
+                    console.log("output list@@@@@@@@@@@@@@@",outputList)
+                    var filterOnLinkedData = outputList.filter(c => !linkedRoNoAndRoPrimeLineNo.includes(c.roNo + "|" + c.roPrimeLineNo));
+                    let resultTrue = Object.values(filterOnLinkedData.reduce((a, { roNo, roPrimeLineNo, knShipmentNo, erpQty, orderNo, primeLineNo, erpShipmentStatus, expectedDeliveryDate, batchNo, expiryDate, erpPlanningUnit, price, shippingCost, shipBy, qatEquivalentShipmentStatus, parentShipmentId, childShipmentId, notes, qatPlanningUnit }) => {
+                        if (!a[roNo + "|" + roPrimeLineNo + "|" + knShipmentNo])
+                            a[roNo + "|" + roPrimeLineNo + "|" + knShipmentNo] = Object.assign({}, { roNo, roPrimeLineNo, knShipmentNo, erpQty, orderNo, primeLineNo, erpShipmentStatus, expectedDeliveryDate, batchNo, expiryDate, erpPlanningUnit, price, shippingCost, shipBy, qatEquivalentShipmentStatus, parentShipmentId, childShipmentId, notes, qatPlanningUnit });
+                        else
+                            a[roNo + "|" + roPrimeLineNo + "|" + knShipmentNo].erpQty += erpQty;
+                        return a;
+                    }, {}));
+                    console.log("ResultTrue@@@@@@@@@@@@@@@", resultTrue);
                     this.setState({
-                        outputList: response.data
+                        outputList: resultTrue
                     }, () => {
                         this.buildJExcel();
                     });
@@ -1513,6 +2292,7 @@ export default class ManualTagging extends Component {
     }
 
     filterData = (planningUnitIds) => {
+        console.log("In filter data@@@@@@@@@@@@@@@")
         var programId = this.state.programId;
 
         planningUnitIds = planningUnitIds;
@@ -1521,76 +2301,174 @@ export default class ManualTagging extends Component {
             planningUnitValues: planningUnitIds.map(ele => ele),
             planningUnitLabels: planningUnitIds.map(ele => ele.label)
         }, () => {
+            var versionId = this.state.versionId.toString();
             if (programId != -1 && planningUnitIds != null && planningUnitIds != "") {
                 this.setState({
                     loading: true,
                     planningUnitIds
                 })
+                if (!versionId.includes("Local")) {
 
-                var json = {
-                    programId: parseInt(this.state.programId),
-                    planningUnitIdList: this.state.planningUnitValues.map(ele => (ele.value).toString()),
-                    linkingType: (this.state.active1 ? 1 : (this.state.active2 ? 2 : 3))
-                }
-                ManualTaggingService.getShipmentListForManualTagging(json)
-                    .then(response => {
-                        this.setState({
-                            outputList: response.data
-                        }, () => {
-                            if (!this.state.active3) {
-                                localStorage.setItem("sesProgramIdReport", programId)
-                            }
-                            // this.getPlanningUnitListByTracerCategory(planningUnitId);
-                            this.buildJExcel();
-                        });
-                    }).catch(
-                        error => {
 
-                            document.getElementById('div2').style.display = 'block';
-                            if (error.message === "Network Error") {
+                    // var json = {
+                    //     planningUnitIdList: ,
+                    // }
+                    if (this.state.active1) {
+                        ManualTaggingService.getNotLinkedQatShipments(this.state.programId, this.state.versionId, this.state.planningUnitValues.map(ele => (ele.value).toString()))
+                            .then(response => {
                                 this.setState({
-                                    message: 'static.unkownError',
-                                    loading: false
+                                    outputList: response.data
+                                }, () => {
+                                    if (!this.state.active3) {
+                                        localStorage.setItem("sesProgramIdReport", programId)
+                                    }
+                                    // this.getPlanningUnitListByTracerCategory(planningUnitId);
+                                    this.buildJExcel();
                                 });
-                            } else {
-                                switch (error.response ? error.response.status : "") {
+                            }).catch(
+                                error => {
 
-                                    case 401:
-                                        this.props.history.push(`/login/static.message.sessionExpired`)
-                                        break;
-                                    case 403:
-                                        this.props.history.push(`/accessDenied`)
-                                        break;
-                                    case 500:
-                                    case 404:
-                                    case 406:
-                                        this.setState({
-                                            message: error.response.data.messageCode,
-                                            loading: false
-                                        });
-                                        break;
-                                    case 412:
-                                        this.setState({
-                                            message: error.response.data.messageCode,
-                                            loading: false
-                                        });
-                                        break;
-                                    default:
+                                    document.getElementById('div2').style.display = 'block';
+                                    if (error.message === "Network Error") {
                                         this.setState({
                                             message: 'static.unkownError',
                                             loading: false
                                         });
-                                        break;
+                                    } else {
+                                        switch (error.response ? error.response.status : "") {
+
+                                            case 401:
+                                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                                break;
+                                            case 403:
+                                                this.props.history.push(`/accessDenied`)
+                                                break;
+                                            case 500:
+                                            case 404:
+                                            case 406:
+                                                this.setState({
+                                                    message: error.response.data.messageCode,
+                                                    loading: false
+                                                });
+                                                break;
+                                            case 412:
+                                                this.setState({
+                                                    message: error.response.data.messageCode,
+                                                    loading: false
+                                                });
+                                                break;
+                                            default:
+                                                this.setState({
+                                                    message: 'static.unkownError',
+                                                    loading: false
+                                                });
+                                                break;
+                                        }
+                                    }
                                 }
-                            }
+                            );
+                    } else {
+                        console.log("In eklse@@@@@@@@@@@@@@")
+                        ManualTaggingService.getLinkedQatShipments(this.state.programId, this.state.versionId, this.state.planningUnitValues.map(ele => (ele.value).toString()))
+                            .then(response => {
+                                console.log("In eklseresponse.data@@@@@@@@@@@@@@", response.data)
+                                this.setState({
+                                    outputList: response.data
+                                }, () => {
+                                    if (!this.state.active3) {
+                                        localStorage.setItem("sesProgramIdReport", programId)
+                                    }
+                                    // this.getPlanningUnitListByTracerCategory(planningUnitId);
+                                    this.buildJExcel();
+                                });
+                            }).catch(
+                                error => {
+
+                                    document.getElementById('div2').style.display = 'block';
+                                    if (error.message === "Network Error") {
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                    } else {
+                                        switch (error.response ? error.response.status : "") {
+
+                                            case 401:
+                                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                                break;
+                                            case 403:
+                                                this.props.history.push(`/accessDenied`)
+                                                break;
+                                            case 500:
+                                            case 404:
+                                            case 406:
+                                                this.setState({
+                                                    message: error.response.data.messageCode,
+                                                    loading: false
+                                                });
+                                                break;
+                                            case 412:
+                                                this.setState({
+                                                    message: error.response.data.messageCode,
+                                                    loading: false
+                                                });
+                                                break;
+                                            default:
+                                                this.setState({
+                                                    message: 'static.unkownError',
+                                                    loading: false
+                                                });
+                                                break;
+                                        }
+                                    }
+                                }
+                            );
+                    }
+                } else {
+                    var shipmentList = [];
+                    var localProgramList = this.state.localProgramList;
+                    var localProgramListFilter = localProgramList.filter(c => c.programId == this.state.programId && c.version == versionId.split(" ")[0]);
+                    var planningUnitDataList = localProgramListFilter[0].programData.planningUnitDataList;
+                    var gprogramDataBytes = CryptoJS.AES.decrypt(localProgramListFilter[0].programData.generalData, SECRET_KEY);
+                    var gprogramData = gprogramDataBytes.toString(CryptoJS.enc.Utf8);
+                    var gprogramJson = JSON.parse(gprogramData);
+                    var linkedShipmentsList = gprogramJson.shipmentLinkingList != null ? gprogramJson.shipmentLinkingList : []
+                    for (var pu = 0; pu < planningUnitIds.length; pu++) {
+                        var planningUnitData = planningUnitDataList.filter(c => c.planningUnitId == planningUnitIds[pu].value)[0];
+                        var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                        var planningUnitDataJson = JSON.parse(programData);
+                        shipmentList = shipmentList.concat(planningUnitDataJson.shipmentList);
+                    }
+                    if (this.state.active1) {
+                        shipmentList = shipmentList.filter(c => c.erpFlag.toString() == "false" && c.active.toString() == "true" && c.accountFlag.toString() == "true" && c.procurementAgent.id == PSM_PROCUREMENT_AGENT_ID && SHIPMENT_ID_ARR_MANUAL_TAGGING.includes(c.shipmentStatus.id.toString()));
+                        shipmentList = shipmentList.filter(c => (moment(c.expectedDeliveryDate).format("YYYY-MM-DD") < moment(Date.now()).subtract(6, 'months').format("YYYY-MM-DD") && ([3, 4, 5, 6, 9]).includes(c.shipmentStatus.id.toString())) || (moment(c.expectedDeliveryDate).format("YYYY-MM-DD") >= moment(Date.now()).subtract(6, 'months').format("YYYY-MM-DD") && SHIPMENT_ID_ARR_MANUAL_TAGGING.includes(c.shipmentStatus.id.toString())));
+                    } else if (this.state.active2) {
+                        shipmentList = shipmentList.filter(c => c.erpFlag.toString() == "true" && c.active.toString() == "true" && c.accountFlag.toString() == "true" && c.procurementAgent.id == PSM_PROCUREMENT_AGENT_ID && SHIPMENT_ID_ARR_MANUAL_TAGGING.includes(c.shipmentStatus.id.toString()));
+                    }
+                    console.log("OutList for tab2@@@@@@@@@@@@@@", shipmentList)
+                    console.log("linkedShipmentsList@@@@@@@@@@@@@@", linkedShipmentsList)
+                    this.setState({
+                        outputList: shipmentList,
+                        linkedShipmentsListForTab2: linkedShipmentsList
+                    }, () => {
+                        if (!this.state.active3) {
+                            localStorage.setItem("sesProgramIdReport", programId)
                         }
-                    );
+                        // this.getPlanningUnitListByTracerCategory(planningUnitId);
+                        this.buildJExcel();
+                    });
+                }
             } else {
 
                 this.setState({
                     outputList: []
                 }, () => {
-                    this.state.languageEl.destroy();
+                    try {
+                        this.state.languageEl.destroy();
+                    } catch (e) {
+
+                    }
                 })
             }
             // else if (programId == -1) {
@@ -1622,12 +2500,13 @@ export default class ManualTagging extends Component {
     }
     getPlanningUnitListByTracerCategory = (term) => {
         this.setState({ planningUnitName: term });
-        PlanningUnitService.getPlanningUnitByTracerCategory(this.state.planningUnitId, this.state.procurementAgentId, term.toUpperCase())
+        ManualTaggingService.autocompletePlanningUnit(this.state.planningUnitId, term.toUpperCase())
             .then(response => {
+                console.log("Response@@@@@@@@@@@@@@@@@@", response)
                 var tracercategoryPlanningUnit = [];
                 for (var i = 0; i < response.data.length; i++) {
-                    var label = response.data[i].planningUnit.label.label_en + '(' + response.data[i].skuCode + ')';
-                    tracercategoryPlanningUnit[i] = { value: response.data[i].planningUnit.id, label: label }
+                    var label = response.data[i].label.label_en + '(' + response.data[i].code + ')';
+                    tracercategoryPlanningUnit[i] = { value: response.data[i].id, label: label }
                 }
 
                 var listArray = tracercategoryPlanningUnit;
@@ -1688,13 +2567,14 @@ export default class ManualTagging extends Component {
     searchErpOrderData = (term) => {
         if (term != null && term != "") {
             var erpPlanningUnitId = this.state.planningUnitIdUpdated;
-            var programId = this.state.programId;
+            var programId = this.state.active1 ? this.state.programId : this.state.programId1.split("_")[0];
 
-            ManualTaggingService.searchErpOrderData(term.toUpperCase(), (programId != null && programId != "" ? programId : 0), (erpPlanningUnitId != null && erpPlanningUnitId != "" ? erpPlanningUnitId : 0), (this.state.active1 ? 1 : (this.state.active2 ? 2 : 3)))
+            ManualTaggingService.autocompleteDataOrderNo(term.toUpperCase(), (programId != null && programId != "" ? programId : 0), (erpPlanningUnitId != null && erpPlanningUnitId != "" ? erpPlanningUnitId : 0))
                 .then(response => {
+                    console.log("Response@@@@@@@@@@@@@@@@@@@@@", response)
                     var autocompleteData = [];
                     for (var i = 0; i < response.data.length; i++) {
-                        autocompleteData[i] = { value: response.data[i].id, label: response.data[i].label }
+                        autocompleteData[i] = { value: response.data[i], label: response.data[i] }
                     }
                     this.setState({
                         autocompleteData
@@ -1759,12 +2639,30 @@ export default class ManualTagging extends Component {
                             loading: false,
                             programId: response.data[0].programId
                         }, () => {
-                            this.getPlanningUnitList();
+                            if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
+                                this.setState({
+                                    programId: localStorage.getItem("sesProgramIdReport")
+                                }, () => {
+                                    this.getVersionList()
+                                });
+                            } else if (this.state.programId != null && this.state.programId != "" && this.state.programId != -1) {
+                                this.getVersionList();
+                            }
                         })
                     } else {
                         this.setState({
                             programs: listArray,
                             loading: false
+                        },()=>{
+                            if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
+                                this.setState({
+                                    programId: localStorage.getItem("sesProgramIdReport")
+                                }, () => {
+                                    this.getVersionList()
+                                });
+                            } else if (this.state.programId != null && this.state.programId != "" && this.state.programId != -1) {
+                                this.getVersionList();
+                            }
                         })
                     }
 
@@ -1829,6 +2727,7 @@ export default class ManualTagging extends Component {
             () => {
 
                 let erpDataList = this.state.artmisList;
+                console.log('erpDataList****************', erpDataList)
                 let erpDataArray = [];
                 let count = 0;
                 let qty = 0;
@@ -1836,45 +2735,57 @@ export default class ManualTagging extends Component {
                 // if (erpDataList.length > 0) {
                 for (var j = 0; j < erpDataList.length; j++) {
                     data = [];
-                    if (this.state.active3) {
-                        data[0] = 0;
-                        data[1] = erpDataList[j].erpOrderId;
-                        data[2] = erpDataList[j].roNo + ' - ' + erpDataList[j].roPrimeLineNo + " | " + erpDataList[j].orderNo + ' - ' + erpDataList[j].primeLineNo;
-                        data[3] = getLabelText(erpDataList[j].erpPlanningUnit.label);
-                        data[4] = erpDataList[j].expectedDeliveryDate;
-                        data[5] = erpDataList[j].erpStatus;
-                        data[6] = erpDataList[j].shipmentQty;
-                        data[7] = '';
-                        // let convertedQty = this.addCommas(erpDataList[j].shipmentQty * 1);
-                        data[8] = erpDataList[j].shipmentQty;
-                        data[9] = '';
-                        data[10] = 0;
-                        data[11] = erpDataList[j].orderNo;
-                        data[12] = erpDataList[j].primeLineNo;
-                        data[13] = erpDataList[j].erpPlanningUnit.id;
+                    // if (this.state.active3) {
+                    //     data[0] = 0;
+                    //     data[1] = erpDataList[j].erpOrderId;
+                    //     data[2] = erpDataList[j].roNo + ' - ' + erpDataList[j].roPrimeLineNo + " | " + erpDataList[j].orderNo + ' - ' + erpDataList[j].primeLineNo;
+                    //     data[3] = getLabelText(erpDataList[j].erpPlanningUnit.label);
+                    //     data[4] = erpDataList[j].expectedDeliveryDate;
+                    //     data[5] = erpDataList[j].erpStatus;
+                    //     data[6] = erpDataList[j].shipmentQty;
+                    //     data[7] = '';
+                    //     // let convertedQty = this.addCommas(erpDataList[j].shipmentQty * 1);
+                    //     data[8] = erpDataList[j].shipmentQty;
+                    //     data[9] = '';
+                    //     data[10] = 0;
+                    //     data[11] = erpDataList[j].orderNo;
+                    //     data[12] = erpDataList[j].primeLineNo;
+                    //     data[13] = erpDataList[j].erpPlanningUnit.id;
 
-                    } else {
-                        console.log("order no ---", erpDataList[j].orderNo + " active---", erpDataList[j].active)
-                        data[0] = erpDataList[j].active;
-                        data[1] = erpDataList[j].erpOrderId;
-                        data[2] = erpDataList[j].roNo + ' - ' + erpDataList[j].roPrimeLineNo + " | " + erpDataList[j].orderNo + ' - ' + erpDataList[j].primeLineNo;
-                        data[3] = getLabelText(erpDataList[j].planningUnitLabel);
-                        data[4] = erpDataList[j].currentEstimatedDeliveryDate;
-                        data[5] = erpDataList[j].status;
-                        data[6] = erpDataList[j].quantity;
-                        let conversionFactor = (erpDataList[j].conversionFactor != null && erpDataList[j].conversionFactor != "" ? erpDataList[j].conversionFactor : '');
-                        data[7] = (erpDataList[j].active ? conversionFactor : "");
-                        convertedQty = erpDataList[j].quantity * (erpDataList[j].conversionFactor != null && erpDataList[j].conversionFactor != "" ? erpDataList[j].conversionFactor : 1);
-                        data[8] = Math.round((erpDataList[j].active ? convertedQty : erpDataList[j].quantity))
-                        data[9] = (erpDataList[j].active ? erpDataList[j].notes : "");
-                        data[10] = 0;
-                        data[11] = erpDataList[j].orderNo;
-                        data[12] = erpDataList[j].primeLineNo;
-                        data[13] = 0;
-                        if (erpDataList[j].active) {
-                            qty = Number(qty) + convertedQty;
-                        }
-                    }
+                    // } else {
+                    console.log("order no ---", erpDataList[j].orderNo + " active---", erpDataList[j].active)
+                    data[0] = false;//A
+                    data[1] = erpDataList[j].roNo + ' | ' + erpDataList[j].roPrimeLineNo//B
+                    data[2] = erpDataList[j].orderNo + ' | ' + erpDataList[j].primeLineNo;//C
+                    data[3] = getLabelText(erpDataList[j].erpPlanningUnit.label);//D
+                    data[4] = erpDataList[j].expectedDeliveryDate;//E
+                    data[5] = erpDataList[j].erpShipmentStatus;//F
+                    data[6] = erpDataList[j].knShipmentNo;//G
+                    data[7] = erpDataList[j].batchNo;//H
+                    data[8] = erpDataList[j].expiryDate;//I
+                    data[9] = erpDataList[j].erpQty;//J
+                    // let conversionFactor = (erpDataList[j].conversionFactor != null && erpDataList[j].conversionFactor != "" ? erpDataList[j].conversionFactor : '');
+                    data[10] = "";//K
+                    // convertedQty = erpDataList[j].quantity * (erpDataList[j].conversionFactor != null && erpDataList[j].conversionFactor != "" ? erpDataList[j].conversionFactor : 1);
+                    // data[11] = ``;
+                    data[11] = `=ROUND(J${parseInt(j) + 1}*K${parseInt(j) + 1},2)`
+                    data[12] = "";
+                    data[13] = erpDataArray.filter(c => c[1] == erpDataList[j].roNo + ' | ' + erpDataList[j].roPrimeLineNo).length > 0 ? 1 : 0;
+                    data[14] = erpDataList[j].qatEquivalentShipmentStatus;
+                    data[15] = erpDataList[j];
+                    // data[9] = "";
+                    // data[10] = "";
+                    // data[11] = "";
+                    // data[12] = "";
+                    // data[13] = "";
+                    // // data[10] = 0;
+                    // // data[11] = erpDataList[j].orderNo;
+                    // // data[12] = erpDataList[j].primeLineNo;
+                    // // data[13] = 0;
+                    // // if (erpDataList[j].active) {
+                    // //     qty = Number(qty) + convertedQty;
+                    // // }
+                    // }
                     erpDataArray[count] = data;
                     count++;
                 }
@@ -1882,7 +2793,7 @@ export default class ManualTagging extends Component {
                     totalQuantity: this.addCommas(Math.round(qty)),
                     displayTotalQty: (qty > 0 ? true : false)
                 });
-
+                console.log("TableDiv1@@@@@@@@@@@@@@@@@@@@@", document.getElementById("tableDiv1"))
                 this.el = jexcel(document.getElementById("tableDiv1"), '');
                 this.el.destroy();
                 var json = [];
@@ -1899,11 +2810,12 @@ export default class ManualTagging extends Component {
                             type: 'checkbox',
                         },
                         {
-                            title: "erpOrderId",
-                            type: 'hidden',
+                            title: i18n.t('static.mt.roNoAndRoLineNo'),
+                            type: 'text',
+                            readOnly: true
                         },
                         {
-                            title: i18n.t('static.manualTagging.RONO'),
+                            title: i18n.t('static.mt.orderNoAndPrimeLineNo'),
                             type: 'text',
                             readOnly: true
                         },
@@ -1924,6 +2836,22 @@ export default class ManualTagging extends Component {
                             readOnly: true
                         },
                         {
+                            title: i18n.t('static.mt.knShipmentNo'),
+                            type: 'text',
+                            readOnly: true
+                        },
+                        {
+                            title: i18n.t('static.inventory.batchNumber'),
+                            type: 'text',
+                            readOnly: true
+                        },
+                        {
+                            title: i18n.t('static.supplyPlan.expiryDate'),
+                            type: 'calendar',
+                            readOnly: true,
+                            options: { format: JEXCEL_DATE_FORMAT },
+                        },
+                        {
                             title: i18n.t('static.manualTagging.erpShipmentQty'),
                             type: 'numeric',
                             mask: '#,##', decimal: '.',
@@ -1935,35 +2863,32 @@ export default class ManualTagging extends Component {
                             mask: '#,##.0000',
                             decimal: '.',
                             textEditor: true,
-                            disabledMaskOnEdition: true
+                            disabledMaskOnEdition: true,
 
                         },
                         {
                             title: i18n.t('static.manualTagging.convertedQATShipmentQty'),
                             type: 'numeric',
-                            mask: '#,##', decimal: '.',
+                            mask: '#,##.0000',
+                            decimal: '.',
                             readOnly: true
                         },
                         {
-                            title: i18n.t('static.common.notes'),
+                            title: i18n.t('static.program.notes'),
                             type: 'text',
                         },
                         {
-                            title: 'isChange',
-                            type: 'hidden'
+                            title: "Exists",
+                            type: 'hidden',
                         },
                         {
-                            title: 'orderNo',
-                            type: 'hidden'
+                            title: "QAT shipment status",
+                            type: 'hidden',
                         },
                         {
-                            title: 'primeLineNo',
-                            type: 'hidden'
+                            title: "Object",
+                            type: 'hidden',
                         },
-                        {
-                            title: 'erpPlanningUnitId',
-                            type: 'hidden'
-                        }
                     ],
                     // footers: [['Total','1','1','1','1',0,0,0,0]],
                     editable: true,
@@ -1971,6 +2896,12 @@ export default class ManualTagging extends Component {
                         showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
                         show: '',
                         entries: '',
+                    },
+                    onsearch: function (el) {
+                        el.jexcel.updateTable();
+                    },
+                    onfilter: function (el) {
+                        el.jexcel.updateTable();
                     },
                     onload: this.loadedERP,
                     pagination: localStorage.getItem("sesRecordCount"),
@@ -1989,11 +2920,19 @@ export default class ManualTagging extends Component {
                         var elInstance = el.jexcel;
                         if (y != null) {
                             var rowData = elInstance.getRowData(y);
-                            if (rowData[0]) {
-                                var cell = elInstance.getCell(("H").concat(parseInt(y) + 1))
+                            if (rowData[13] == 0 && rowData[0]) {
+                                var cell = elInstance.getCell(("K").concat(parseInt(y) + 1))
+                                cell.classList.remove('readonly');
+                                var cell = elInstance.getCell(("M").concat(parseInt(y) + 1))
                                 cell.classList.remove('readonly');
                             } else {
-                                var cell = elInstance.getCell(("H").concat(parseInt(y) + 1))
+                                var cell = elInstance.getCell(("K").concat(parseInt(y) + 1))
+                                cell.classList.add('readonly');
+                                var cell = elInstance.getCell(("M").concat(parseInt(y) + 1))
+                                cell.classList.add('readonly');
+                            }
+                            if (rowData[13] == 1) {
+                                var cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
                                 cell.classList.add('readonly');
                             }
                         }
@@ -2032,7 +2971,13 @@ export default class ManualTagging extends Component {
         let manualTaggingList = this.state.outputList;
         let manualTaggingArray = [];
         let count = 0;
-
+        if (this.state.active2) {
+            manualTaggingList = manualTaggingList.sort(function (a, b) {
+                a = a.parentShipmentId > 0 ? a.parentShipmentId : a.tempParentShipmentId;
+                b = b.parentShipmentId > 0 ? b.parentShipmentId : b.tempParentShipmentId;
+                return a < b ? -1 : a > b ? 1 : 0;
+            })
+        }
         for (var j = 0; j < manualTaggingList.length; j++) {
             data = [];
             if (this.state.active1) {
@@ -2045,30 +2990,44 @@ export default class ManualTagging extends Component {
                 data[6] = manualTaggingList[j].orderNo
                 data[7] = manualTaggingList[j].shipmentQty
                 data[8] = manualTaggingList[j].notes
+                data[9] = manualTaggingList[j].shipmentId != 0 ? -1 : manualTaggingList[j].tempShipmentId;
             } else if (this.state.active2) {
-                let shipmentQty = manualTaggingList[j].shipmentQty;
-                data[0] = manualTaggingList[j].parentShipmentId
-                data[1] = manualTaggingList[j].shipmentId
-                data[2] = manualTaggingList[j].shipmentTransId
-                data[3] = manualTaggingList[j].roNo + " - " + manualTaggingList[j].roPrimeLineNo + " | " + manualTaggingList[j].orderNo + " - " + manualTaggingList[j].primeLineNo
-                data[4] = getLabelText(manualTaggingList[j].erpPlanningUnit.label, this.state.lang)
-                data[5] = getLabelText(manualTaggingList[j].planningUnit.label, this.state.lang)
-                data[6] = manualTaggingList[j].expectedDeliveryDate
-                data[7] = manualTaggingList[j].erpStatus
-                data[8] = Math.round(manualTaggingList[j].shipmentQty)
-                data[9] = (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? (manualTaggingList[j].conversionFactor) : 1)
-                data[10] = Math.round(shipmentQty * (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? manualTaggingList[j].conversionFactor : 1))
-                data[11] = manualTaggingList[j].notes
-                data[12] = manualTaggingList[j].orderNo
-                data[13] = manualTaggingList[j].primeLineNo
+                let shipmentQty = !this.state.versionId.toString().includes("Local") ? manualTaggingList[j].erpQty : manualTaggingList[j].shipmentQty;
+                let linkedShipmentsListForTab2 = this.state.versionId.toString().includes("Local") ? this.state.linkedShipmentsListForTab2.filter(c => manualTaggingList[j].shipmentId > 0 ? c.childShipmentId == manualTaggingList[j].shipmentId : c.tempChildShipmentId == manualTaggingList[j].tempShipmentId) : [manualTaggingList[j]];
+                console.log("linkedShipmentsListForTab2@@@@@@@@@@@", linkedShipmentsListForTab2)
+                data[0] = false;
+                data[1] = manualTaggingList[j].parentShipmentId
+                data[2] = !this.state.versionId.toString().includes("Local") ? manualTaggingList[j].childShipmentId : manualTaggingList[j].shipmentId
+                data[3] = linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].roNo + " | " + linkedShipmentsListForTab2[0].roPrimeLineNo : ""
+                data[4] = manualTaggingList[j].orderNo + " | " + manualTaggingList[j].primeLineNo
+                data[5] = linkedShipmentsListForTab2.length > 0 ? getLabelText(linkedShipmentsListForTab2[0].erpPlanningUnit.label, this.state.lang) : ""
+                data[6] = !this.state.versionId.toString().includes("Local") ? getLabelText(manualTaggingList[j].erpPlanningUnit.label, this.state.lang) : getLabelText(manualTaggingList[j].planningUnit.label, this.state.lang)
+                data[7] = manualTaggingList[j].expectedDeliveryDate
+                data[8] = linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].erpShipmentStatus : ""
+                // data[7] = ""
+                data[9] = !this.state.versionId.toString().includes("Local") ? Math.round(manualTaggingList[j].erpQty) : Math.round(manualTaggingList[j].shipmentQty)
+                data[10] = (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? (manualTaggingList[j].conversionFactor) : 1)
+                data[11] = Math.round(shipmentQty * (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? manualTaggingList[j].conversionFactor : 1))
+                data[12] = manualTaggingList[j].notes
+                data[13] = manualTaggingList[j].orderNo
+                data[14] = manualTaggingList[j].primeLineNo
+                data[15] = manualTaggingList[j].tempShipmentId;
+                data[16] = manualTaggingList[j];
+                data[17] = linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2 : {}
+                data[18] = linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].roNo : ""
+                data[19] = linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].roPrimeLineNo : ""
+                data[20] = manualTaggingArray.filter(c => (c[18] == (linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].roNo : "")) && (c[19] == (linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].roPrimeLineNo : ""))).length > 0 ? 1 : 0;
             }
             else {
-                data[0] = manualTaggingList[j].erpOrderId
-                data[1] = manualTaggingList[j].roNo + " - " + manualTaggingList[j].roPrimeLineNo + " | " + manualTaggingList[j].orderNo + " - " + manualTaggingList[j].primeLineNo
-                data[2] = getLabelText(manualTaggingList[j].erpPlanningUnit.label, this.state.lang)
-                data[3] = manualTaggingList[j].expectedDeliveryDate
-                data[4] = manualTaggingList[j].erpStatus
-                data[5] = manualTaggingList[j].shipmentQty
+                // data[0] = manualTaggingList[j].erpOrderId
+                data[0] = manualTaggingList[j].roNo + " | " + manualTaggingList[j].roPrimeLineNo
+                data[1] = manualTaggingList[j].orderNo + " - " + manualTaggingList[j].primeLineNo
+                data[2] = manualTaggingList[j].knShipmentNo;
+                data[3] = getLabelText(manualTaggingList[j].erpPlanningUnit.label, this.state.lang)
+                data[4] = manualTaggingList[j].expectedDeliveryDate
+                data[5] = manualTaggingList[j].erpShipmentStatus
+                data[6] = manualTaggingList[j].erpQty
+                data[7] = j;
 
             }
             manualTaggingArray[count] = data;
@@ -2127,6 +3086,10 @@ export default class ManualTagging extends Component {
                         title: i18n.t('static.common.notes'),
                         type: 'text',
                     },
+                    {
+                        title: "Index",
+                        type: 'hidden',
+                    },
                 ],
                 editable: false,
                 text: {
@@ -2167,61 +3130,79 @@ export default class ManualTagging extends Component {
                 colHeaderClasses: ["Reqasterisk"],
                 columns: [
                     {
+                        title: i18n.t('static.common.dlink'),
+                        type: 'checkbox',
+                        // readOnly: this.state.versionId.toString().includes("Local") ? false : true
+                        // mask: '#,##', decimal: '.'
+                    },
+                    {
                         title: i18n.t('static.mt.parentShipmentId'),
-                        type: 'numeric'
+                        type: 'numeric',
+                        readOnly: true
                         // mask: '#,##', decimal: '.'
                     },
                     {
                         title: i18n.t('static.mt.childShipmentId'),
-                        type: 'numeric'
+                        type: 'numeric',
+                        readOnly: true
                         // mask: '#,##', decimal: '.'
                     },
                     {
-                        title: "shipmentTransId",
-                        type: 'hidden',
+                        title: i18n.t('static.mt.roNoAndRoLineNo'),
+                        type: 'text',
+                        readOnly: true
                     },
                     {
                         title: i18n.t('static.manualTagging.procOrderNo'),
                         type: 'text',
+                        readOnly: true
                     },
                     {
                         title: i18n.t('static.manualTagging.erpPlanningUnit'),
                         type: 'text',
+                        readOnly: true
                     },
                     {
                         title: i18n.t('static.supplyPlan.qatProduct'),
                         type: 'text',
+                        readOnly: true
                     },
                     {
                         title: i18n.t('static.manualTagging.currentEstimetedDeliveryDate'),
                         type: 'calendar',
                         options: { format: JEXCEL_DATE_FORMAT },
+                        readOnly: true
                     },
                     {
                         title: i18n.t('static.manualTagging.erpStatus'),
                         type: 'text',
+                        readOnly: true
                     },
 
                     {
                         title: i18n.t('static.supplyPlan.shipmentQty'),
                         type: 'numeric',
-                        mask: '#,##', decimal: '.'
+                        mask: '#,##', decimal: '.',
+                        readOnly: true
                     },
                     {
                         title: i18n.t('static.manualTagging.conversionFactor'),
                         type: 'numeric',
-                        mask: '#,##.0000', decimal: '.'
+                        mask: '#,##.0000', decimal: '.',
+                        readOnly: true
                     },
 
                     {
                         title: i18n.t('static.manualTagging.convertedQATShipmentQty'),
                         type: 'numeric',
-                        mask: '#,##', decimal: '.'
+                        mask: '#,##', decimal: '.',
+                        readOnly: true
                     },
 
                     {
                         title: i18n.t('static.common.notes'),
                         type: 'text',
+                        readOnly: true
                     },
                     {
                         title: "orderNo",
@@ -2231,8 +3212,32 @@ export default class ManualTagging extends Component {
                         title: "primeLineNo",
                         type: 'hidden',
                     },
+                    {
+                        title: "tempShipmentId",
+                        type: 'hidden',
+                    },
+                    {
+                        title: "shipment list",
+                        type: 'hidden',
+                    },
+                    {
+                        title: "linked shipment list",
+                        type: 'hidden',
+                    },
+                    {
+                        title: "linked shipment list",
+                        type: 'hidden',
+                    },
+                    {
+                        title: "linked shipment list",
+                        type: 'hidden',
+                    },
+                    {
+                        title: "linked shipment list",
+                        type: 'hidden',
+                    },
                 ],
-                editable: false,
+                editable: true,
                 text: {
                     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
                     show: '',
@@ -2247,7 +3252,8 @@ export default class ManualTagging extends Component {
                 allowInsertColumn: false,
                 allowManualInsertColumn: false,
                 allowDeleteRow: false,
-                onselection: this.selected,
+                onchange: this.changeTab2,
+                // onselection: this.selected,
 
 
                 oneditionend: this.onedit,
@@ -2257,6 +3263,23 @@ export default class ManualTagging extends Component {
                 position: 'top',
                 filters: true,
                 license: JEXCEL_PRO_KEY,
+                updateTable: function (el, cell, x, y, source, value, id) {
+                    var elInstance = el.jexcel;
+                    if (y != null) {
+                        var rowData = elInstance.getRowData(y);
+                        console.log("RowData@@@@@@@@", rowData)
+                        if (rowData[20] == 1 || !this.state.versionId.toString().includes("Local")) {
+                            var cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
+                            cell.classList.add('readonly');
+                        }
+                    }
+                }.bind(this),
+                onsearch: function (el) {
+                    el.jexcel.updateTable();
+                },
+                onfilter: function (el) {
+                    el.jexcel.updateTable();
+                },
                 contextMenu: function (obj, x, y, e) {
                     var items = [];
                     if (y != null) {
@@ -2355,11 +3378,15 @@ export default class ManualTagging extends Component {
                 columns: [
 
                     {
-                        title: "erpOrderId",
-                        type: 'hidden',
+                        title: i18n.t('static.mt.roNoAndRoLineNo'),
+                        type: 'text',
                     },
                     {
-                        title: i18n.t('static.manualTagging.procOrderNo'),
+                        title: i18n.t('static.mt.orderNoAndPrimeLineNo'),
+                        type: 'text',
+                    },
+                    {
+                        title: i18n.t('static.mt.knShipmentNo'),
                         type: 'text',
                     },
                     {
@@ -2380,6 +3407,10 @@ export default class ManualTagging extends Component {
                         title: i18n.t('static.supplyPlan.shipmentQty'),
                         type: 'numeric',
                         mask: '#,##', decimal: '.'
+                    },
+                    {
+                        title: "Index",
+                        type: 'hidden',
                     },
                 ],
                 editable: false,
@@ -2430,16 +3461,20 @@ export default class ManualTagging extends Component {
     }
 
     selected = function (instance, cell, x, y, value) {
-
-        if ((x == 0 && value != 0) || (y == 0)) {
+        console.log("x$$$$$$$$$$$$$$$$",x);
+        console.log("y$$$$$$$$$$$$$$$$",y);
+        console.log("value$$$$$$$$$$$$$$$$",value);
+        if ((x == 0 && value != 0) || (y == 0 && value!=0)) {
             // console.log("HEADER SELECTION--------------------------");
         } else {
             var outputListAfterSearch = [];
             let row;
             let json;
             let buildJexcelRequired = true;
-            if (this.state.active1) {
-                row = this.state.outputList.filter(c => (c.shipmentId == this.el.getValueFromCoords(0, x)))[0];
+            if (this.state.active1
+                && this.state.versionId.includes("Local")
+            ) {
+                row = this.state.outputList.filter(c => (this.el.getValueFromCoords(0, x) != 0 ? c.shipmentId == this.el.getValueFromCoords(0, x) : c.tempShipmentId == this.el.getValueFromCoords(9, x)))[0];
                 outputListAfterSearch.push(row);
                 if (outputListAfterSearch[0].orderNo != null && outputListAfterSearch[0].orderNo != "") {
                     json = { id: outputListAfterSearch[0].orderNo, label: outputListAfterSearch[0].orderNo };
@@ -2461,22 +3496,16 @@ export default class ManualTagging extends Component {
 
                     this.getOrderDetails();
                 });
-            } else if (this.state.active2) {
-                row = this.state.outputList.filter(c => (c.shipmentId == this.el.getValueFromCoords(1, x)))[0];
-                outputListAfterSearch.push(row);
-                json = { id: outputListAfterSearch[0].roNo, label: outputListAfterSearch[0].roNo };
-                this.setState({
-                    parentShipmentId: outputListAfterSearch[0].parentShipmentId,
-                    roNoOrderNo: json,
-                    searchedValue: outputListAfterSearch[0].roNo,
-                    selectedRowPlanningUnit: outputListAfterSearch[0].erpPlanningUnit.id
-                    // planningUnitIdUpdated: outputListAfterSearch[0].erpPlanningUnit.id
-                }, () => {
-                    this.getOrderDetails();
-                    this.getShipmentDetailsByParentShipmentId(this.el.getValueFromCoords(0, x));
-                });
-            } else {
-                row = this.state.outputList.filter(c => (c.erpOrderId == this.el.getValueFromCoords(0, x)))[0];
+            } else if (this.state.active2 && this.state.versionId.includes("Local")) {
+                // var index = this.state.outputList.findIndex(c => (this.el.getValueFromCoords(1, x))>0?c.shipmentId == (this.el.getValueFromCoords(1, x)):c.tempShipmentId==(this.el.getValueFromCoords(14, x)))[0];
+                var rowData = this.el.getRowData(x);
+                // outputListAfterSearch.push(row);
+                this.toggleLarge();
+                this.getShipmentsForTab2(rowData[1], rowData[14], rowData[2].split("|")[0], rowData[2].split("|")[1]);
+                // this.getOrderDetails();
+
+            } else if (this.state.active3) {
+                row = this.state.outputList.filter((c, index) => (index == this.el.getValueFromCoords(7, x)))[0];
                 outputListAfterSearch.push(row);
                 json = { id: outputListAfterSearch[0].roNo, label: outputListAfterSearch[0].roNo };
 
@@ -2489,33 +3518,101 @@ export default class ManualTagging extends Component {
                     // planningUnitIdUpdated: outputListAfterSearch[0].erpPlanningUnit.id
                 }, () => {
                     this.filterProgramByCountry();
-                    this.getOrderDetails();
+                    // this.getOrderDetails();
                 });
             }
             // outputListAfterSearch.push(row);
             // console.log("1------------------------------>>>>", outputListAfterSearch[0].erpPlanningUnit.id)
-            this.setState({
-                planningUnitId: (this.state.active2 || this.state.active3 ? outputListAfterSearch[0].erpPlanningUnit.id : outputListAfterSearch[0].planningUnit.id),
-                shipmentId: (this.state.active1 ? this.el.getValueFromCoords(0, x) : (this.state.active2 ? this.el.getValueFromCoords(1, x) : 0)),
-                procurementAgentId: (this.state.active3 ? 1 : outputListAfterSearch[0].procurementAgent.id),
-                planningUnitName: (this.state.active2 || this.state.active3 ? row.erpPlanningUnit.label.label_en + "(" + row.skuCode + ")" : row.planningUnit.label.label_en + '(' + row.skuCode + ')')
-            })
-            this.toggleLarge();
+            if (!this.state.active2) {
+                this.setState({
+                    planningUnitId: (this.state.active3 ? outputListAfterSearch[0].erpPlanningUnit.id : outputListAfterSearch[0].planningUnit.id),
+                    shipmentId: (this.state.active1 ? this.el.getValueFromCoords(0, x) : (this.state.active2 ? this.el.getValueFromCoords(1, x) : 0)),
+                    procurementAgentId: (this.state.active3 ? 1 : outputListAfterSearch[0].procurementAgent.id),
+                    planningUnitName: (this.state.active3 ? row.erpPlanningUnit.label.label_en + "(" + row.skuCode + ")" : row.planningUnit.label.label_en + '(' + row.skuCode + ')')
+                })
+                this.toggleLarge();
+            }
         }
     }.bind(this);
 
+    getShipmentsForTab2 = (shipmentId, tempShipmentId, roNo, roPrimeLineNo) => {
+        console.log("MohitShipmentId*****************", shipmentId);
+        console.log("MohitParentShipmentId*****************", tempShipmentId);
+        console.log("MohitRoNo*****************", roNo);
+        console.log("MohitRoPrimeLineNo*****************", roPrimeLineNo);
+        var linkedShipmentsListForTab2 = this.state.linkedShipmentsListForTab2;
+        var filterOnRoNoAndRoPrimeLineNo = linkedShipmentsListForTab2.filter(c => c.roNo.toString().trim() == roNo.toString().trim() && c.roPrimeLineNo.toString().trim() == roPrimeLineNo.toString().trim());
+        console.log("filterOnRoNoAndRoPrimeLineNo@@@@@@@@@@@", filterOnRoNoAndRoPrimeLineNo)
+        this.setState({
+            artmisList: filterOnRoNoAndRoPrimeLineNo,
+            displayButton: false
+        }, () => {
+            this.buildJExcelERP()
+        })
 
+    }
     componentDidMount() {
         this.setState({ active1: true }, () => {
             this.hideFirstComponent();
-            this.getProgramList();
+            this.getLocalProgramList();
         });
 
     }
 
+    getLocalProgramList(parameter) {
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onerror = function (event) {
+        }.bind(this);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var datasetTransaction = db1.transaction(['programData'], 'readwrite');
+            var datasetOs = datasetTransaction.objectStore('programData');
+            var getRequest = datasetOs.getAll();
+            getRequest.onerror = function (event) {
+            }.bind(this);
+            getRequest.onsuccess = function (event) {
+
+                var datasetTransaction1 = db1.transaction(['program'], 'readwrite');
+                var datasetOs1 = datasetTransaction1.objectStore('program');
+                var getRequest1 = datasetOs1.getAll();
+                getRequest1.onsuccess = function (event) {
+                    var programList = getRequest1.result;
+
+                    var datasetTransaction2 = db1.transaction(['programQPLDetails'], 'readwrite');
+                    var datasetOs2 = datasetTransaction2.objectStore('programQPLDetails');
+                    var getRequest2 = datasetOs2.getAll();
+                    getRequest2.onsuccess = function (event) {
+                        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                        var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                        var programQPLDetails = getRequest2.result.filter(c => c.userId == userId);
+                        var programList = getRequest1.result;
+
+
+                        var myResult = getRequest.result.filter(c => c.userId == userId);
+                        this.setState({
+                            localProgramList: myResult,
+                            programObjectStoreList: programList,
+                            programQPLDetailsList: programQPLDetails
+                        }, () => {
+                            this.getProgramList();
+                            if (parameter == 1) {
+                                this.filterErpData();
+                            }
+                        })
+                    }.bind(this)
+                }.bind(this)
+            }.bind(this)
+        }.bind(this)
+    }
+
     getPlanningUnitList() {
-        var programId = (this.state.active3 ? this.state.programId1 : this.state.programId);
-        if (programId != -1 && programId != null && programId != "") {
+        var programId = (this.state.active3 ? this.state.programId1.toString().split("_")[0] : this.state.programId);
+        var versionId = this.state.versionId.toString();
+        console.log("Condition@@@@@@@@@@@@@", programId != -1 && programId != null && programId != "" && (this.state.active3 || ((this.state.active1 || this.state.active2) && versionId != "-1")));
+        if (programId != -1 && programId != null && programId != "" && (this.state.active3 || ((this.state.active1 || this.state.active2) && versionId != "-1"))) {
+            // if (!versionId.includes("Local")) {
             ProgramService.getProgramPlaningUnitListByProgramId(programId)
                 .then(response => {
                     if (response.status == 200) {
@@ -2585,16 +3682,55 @@ export default class ManualTagging extends Component {
                         }
                     }
                 );
+            // } else {
+            //     var localProgramList = this.state.localProgramList;
+            //     var localProgramListFilter = localProgramList.filter(c => c.programId == this.state.programId && c.version == versionId.split(" ")[0]);
+            //     var programDataBytes = CryptoJS.AES.decrypt(localProgramListFilter[0].programData.generalData, SECRET_KEY);
+            //     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+            //     var programJson = JSON.parse(programData);
+            //     console.log("ProgramJson@@@@@@@@@@@",programJson)
+            //     var listArray = programJson.planningUnitList;
+            //     var list = []
+            //     for (var l = 0; l < listArray.length; l++) {
+            //         list.push({
+            //             planningUnit: {
+            //                 id: listArray[l].id,
+            //                 label: listArray[l].label,
+            //                 active: listArray[l].active
+            //             }
+            //         })
+            //     }
+            //     list.sort((a, b) => {
+            //         var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+            //         var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+            //         return itemLabelA > itemLabelB ? 1 : -1;
+            //     });
+
+            //     list = list.filter(c => (c.active == true))
+            //     this.setState({
+            //         planningUnits: list
+            //     }, () => {
+            //         if (!this.state.active3) {
+            //             this.getPlanningUnitArray();
+            //         }
+            //     })
+
+            // }
         } else {
             this.setState({
                 outputList: []
             }, () => {
-                this.state.languageEl.destroy();
+                try {
+                    this.state.languageEl.destroy();
+                } catch (e) {
+
+                }
             })
         }
         // this.filterData();
 
     }
+
 
     formatLabel(cell, row) {
         if (cell != null && cell != "") {
@@ -2693,6 +3829,7 @@ export default class ManualTagging extends Component {
                 this.setState({
                     originalQty: row.shipmentQty,
                     finalShipmentId: row.shipmentId,
+                    tempShipmentId: row.shipmentId > 0 ? null : row.tempShipmentId,
                     tempNotes: (row.notes != null && row.notes != "" ? row.notes : "")
                 });
             }
@@ -2707,12 +3844,22 @@ export default class ManualTagging extends Component {
             )
         }, this);
 
+        const { versionList } = this.state;
+        let versions = versionList.length > 0 && versionList.map((item, i) => {
+            return (
+                <option key={i} value={item.versionId}>
+                    {/* {getLabelText(item.label, this.state.lang)} */}
+                    {item.versionId}
+                </option>
+            )
+        }, this);
+
         const { countryWisePrograms } = this.state;
         let filteredProgramList = countryWisePrograms.length > 0 && countryWisePrograms.map((item, i) => {
             return (
-                <option key={i} value={item.programId}>
+                <option key={i} value={item.id}>
                     {/* {getLabelText(item.label, this.state.lang)} */}
-                    {item.programCode}
+                    {item.programCode + "~v" + item.version}
                 </option>
             )
         }, this);
@@ -2749,7 +3896,7 @@ export default class ManualTagging extends Component {
 
 
         const { notLinkedShipments } = this.state;
-        let shipmentIdList = notLinkedShipments.length > 0 && notLinkedShipments.map((item, i) => {
+        let shipmentIdList = notLinkedShipments.length > 0 && notLinkedShipments.filter(c => c.shipmentId != 0).map((item, i) => {
             return (
                 <option key={i} value={item.shipmentId}>
                     {item.shipmentId}
@@ -3174,6 +4321,26 @@ export default class ManualTagging extends Component {
                                             </InputGroup>
                                         </div>
                                     </FormGroup>}
+                                {(this.state.active1 || this.state.active2) &&
+                                    <FormGroup className="col-md-3 ">
+                                        <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
+                                        <div className="controls ">
+                                            <InputGroup>
+                                                <Input
+                                                    type="select"
+                                                    name="versionId"
+                                                    id="versionId"
+                                                    bsSize="sm"
+                                                    value={this.state.versionId}
+                                                    // onChange={this.getPlanningUnitList}
+                                                    onChange={(e) => { this.versionChange(e); }}
+                                                >
+                                                    <option value="-1">{i18n.t('static.common.select')}</option>
+                                                    {versions}
+                                                </Input>
+                                            </InputGroup>
+                                        </div>
+                                    </FormGroup>}
                                 {this.state.active3 &&
                                     <FormGroup className="col-md-3">
                                         <Label htmlFor="appendedInputButton">{i18n.t('static.procurementUnit.planningUnit')}</Label>
@@ -3223,8 +4390,8 @@ export default class ManualTagging extends Component {
                                     </FormGroup>}
                             </Row>
 
-                            <div className="ReportSearchMarginTop consumptionDataEntryTable">
-                                <div id="tableDiv" className="jexcelremoveReadonlybackground RowClickable" style={{ display: this.state.loading ? "none" : "block" }}>
+                            <div className="ReportSearchMarginTop  consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
+                                <div id="tableDiv" className={!this.state.active2 ? "jexcelremoveReadonlybackground RowClickable" : "RowClickable"}>
                                 </div>
                             </div>
                             <div style={{ display: this.state.loading ? "block" : "none" }}>
@@ -3254,8 +4421,8 @@ export default class ManualTagging extends Component {
                                 </ModalHeader>
                                 <ModalBody>
                                     <div>
-                                        <p><h5><b>{i18n.t('static.manualTagging.qatShipmentTitle')}</b></h5></p>
-                                        {!this.state.active3 &&
+                                        {!this.state.active3 && !this.state.active2 && <p><h5><b>{i18n.t('static.manualTagging.qatShipmentTitle')}</b></h5></p>}
+                                        {!this.state.active3 && !this.state.active2 &&
                                             <ToolkitProvider
                                                 keyField="optList"
                                                 data={this.state.outputListAfterSearch}
@@ -3444,7 +4611,7 @@ export default class ManualTagging extends Component {
                                                 </div>
                                                 {this.state.active5 &&
                                                     <ToolkitProvider
-                                                        keyField="shipmentId"
+                                                        keyField="tempIndex"
                                                         data={this.state.selectedShipment}
                                                         columns={columns}
                                                         search={{ searchFormatted: true }}
@@ -3474,85 +4641,85 @@ export default class ManualTagging extends Component {
                                         }
                                     </div><br />
                                     <div>
-                                        <p><h5><b>{i18n.t('static.manualTagging.erpShipment')}</b></h5></p>
-                                        <Col md="12 pl-0">
-                                            <div className="d-md-flex">
-                                                <FormGroup className="col-md-6">
-                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.manualTagging.erpPlanningUnit')}</Label>
-                                                    <div className="controls ">
-                                                        <Autocomplete
-                                                            id="combo-box-demo1"
-                                                            // value={this.state.selectedPlanningUnit}
-                                                            // defaultValue={{ id: this.state.planningUnitIdUpdated, label: this.state.planningUnitName }}
-                                                            options={this.state.tracercategoryPlanningUnit}
-                                                            getOptionLabel={(option) => option.label}
-                                                            style={{ width: 450 }}
-                                                            onChange={(event, value) => {
-                                                                // console.log("demo2 value---", value);
-                                                                if (value != null) {
-                                                                    this.setState({
-                                                                        erpPlanningUnitId: value.value,
-                                                                        planningUnitIdUpdated: value.value,
-                                                                        planningUnitName: value.label
-                                                                    }, () => { this.getOrderDetails() });
-                                                                } else {
-                                                                    this.setState({
-                                                                        erpPlanningUnitId: '',
-                                                                        planningUnitIdUpdated: '',
-                                                                        planningUnitName: '',
-                                                                        tracercategoryPlanningUnit: []
-                                                                    }, () => { this.getOrderDetails() });
-                                                                }
+                                        {!this.state.active2 && <><p><h5><b>{i18n.t('static.manualTagging.erpShipment')}</b></h5></p>
+                                            <Col md="12 pl-0">
+                                                <div className="d-md-flex">
+                                                    <FormGroup className="col-md-6">
+                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.manualTagging.erpPlanningUnit')}</Label>
+                                                        <div className="controls ">
+                                                            <Autocomplete
+                                                                id="combo-box-demo1"
+                                                                // value={this.state.selectedPlanningUnit}
+                                                                // defaultValue={{ id: this.state.planningUnitIdUpdated, label: this.state.planningUnitName }}
+                                                                options={this.state.tracercategoryPlanningUnit}
+                                                                getOptionLabel={(option) => option.label}
+                                                                style={{ width: 450 }}
+                                                                onChange={(event, value) => {
+                                                                    // console.log("demo2 value---", value);
+                                                                    if (value != null) {
+                                                                        this.setState({
+                                                                            erpPlanningUnitId: value.value,
+                                                                            planningUnitIdUpdated: value.value,
+                                                                            planningUnitName: value.label
+                                                                        }, () => { this.getOrderDetails() });
+                                                                    } else {
+                                                                        this.setState({
+                                                                            erpPlanningUnitId: '',
+                                                                            planningUnitIdUpdated: '',
+                                                                            planningUnitName: '',
+                                                                            tracercategoryPlanningUnit: []
+                                                                        }, () => { this.getOrderDetails() });
+                                                                    }
 
-                                                            }} // prints the selected value
-                                                            renderInput={(params) => <TextField
-                                                                {...params}
-                                                                // InputProps={{ style: { fontSize: 12.24992 } }}
-                                                                variant="outlined"
-                                                                onChange={(e) => this.getPlanningUnitListByTracerCategory(e.target.value)} />}
-                                                        />
+                                                                }} // prints the selected value
+                                                                renderInput={(params) => <TextField
+                                                                    {...params}
+                                                                    // InputProps={{ style: { fontSize: 12.24992 } }}
+                                                                    variant="outlined"
+                                                                    onChange={(e) => this.getPlanningUnitListByTracerCategory(e.target.value)} />}
+                                                            />
 
-                                                    </div>
-                                                </FormGroup>
+                                                        </div>
+                                                    </FormGroup>
 
-                                                <FormGroup className="col-md-6 pl-0">
-                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.manualTagging.search')}</Label>
-                                                    <div className="controls "
-                                                    >
-                                                        <Autocomplete
-                                                            id="combo-box-demo"
-                                                            // value={this.state.roNoOrderNo}
-                                                            defaultValue={this.state.roNoOrderNo}
-                                                            options={this.state.autocompleteData}
-                                                            getOptionLabel={(option) => option.label}
-                                                            style={{ width: 450 }}
-                                                            onChange={(event, value) => {
-                                                                // console.log("combo 2 ro combo box---", value)
-                                                                if (value != null) {
-                                                                    this.setState({
-                                                                        searchedValue: value.label
-                                                                        ,
-                                                                        roNoOrderNo: value.label
-                                                                    }, () => { this.getOrderDetails() });
-                                                                } else {
-                                                                    this.setState({
-                                                                        searchedValue: ''
-                                                                        , autocompleteData: []
-                                                                    }, () => { this.getOrderDetails() });
-                                                                }
+                                                    <FormGroup className="col-md-6 pl-0">
+                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.manualTagging.search')}</Label>
+                                                        <div className="controls "
+                                                        >
+                                                            <Autocomplete
+                                                                id="combo-box-demo"
+                                                                // value={this.state.roNoOrderNo}
+                                                                defaultValue={this.state.roNoOrderNo}
+                                                                options={this.state.autocompleteData}
+                                                                getOptionLabel={(option) => option.label}
+                                                                style={{ width: 450 }}
+                                                                onChange={(event, value) => {
+                                                                    // console.log("combo 2 ro combo box---", value)
+                                                                    if (value != null) {
+                                                                        this.setState({
+                                                                            searchedValue: value.label
+                                                                            ,
+                                                                            roNoOrderNo: value.label
+                                                                        }, () => { this.getOrderDetails() });
+                                                                    } else {
+                                                                        this.setState({
+                                                                            searchedValue: ''
+                                                                            , autocompleteData: []
+                                                                        }, () => { this.getOrderDetails() });
+                                                                    }
 
-                                                            }} // prints the selected value
-                                                            renderInput={(params) => <TextField {...params} variant="outlined"
-                                                                onChange={(e) => {
-                                                                    this.searchErpOrderData(e.target.value)
-                                                                }} />}
-                                                        />
+                                                                }} // prints the selected value
+                                                                renderInput={(params) => <TextField {...params} variant="outlined"
+                                                                    onChange={(e) => {
+                                                                        this.searchErpOrderData(e.target.value)
+                                                                    }} />}
+                                                            />
 
-                                                    </div>
-                                                </FormGroup>
+                                                        </div>
+                                                    </FormGroup>
 
-                                            </div>
-                                        </Col>
+                                                </div>
+                                            </Col></>}
                                         <div id="tableDiv1" className="RemoveStriped" style={{ display: this.state.table1Loader ? "block" : "none" }}>
                                         </div>
                                         <div style={{ display: this.state.table1Loader ? "none" : "block" }}>
@@ -3574,7 +4741,9 @@ export default class ManualTagging extends Component {
                                     <b><h3 className="float-right">{i18n.t('static.mt.originalQty')} : {this.state.active4 ? this.state.totalQuantity : this.addCommas(this.state.originalQty)}</h3></b>
                                     {this.state.displayTotalQty && <b><h3 className="float-right">{i18n.t('static.mt.totalQty')} : {this.state.totalQuantity}</h3></b>}
 
-                                    {this.state.displaySubmitButton && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.link}> <i className="fa fa-check"></i>{(this.state.active2 ? i18n.t('static.common.update') : i18n.t('static.manualTagging.link'))}</Button>}
+                                    {this.state.displaySubmitButton
+                                        && (this.state.active4 || this.state.originalQty > 0)
+                                        && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.link}> <i className="fa fa-check"></i>{(this.state.active2 ? i18n.t('static.common.update') : i18n.t('static.manualTagging.link'))}</Button>}
 
                                     <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.cancelClicked()} disabled={(this.state.table1Loader ? false : true)}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}
                                     </Button>
@@ -3799,6 +4968,9 @@ export default class ManualTagging extends Component {
                         </Modal>
                         {/* ARTMIS history modal end */}
                     </CardBody>
+                    {this.state.active2 && <CardFooter>
+                        {this.state.changedDataForTab2 && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.delink}> <i className="fa fa-check"></i>{(this.state.active2 ? i18n.t('static.common.update') : i18n.t('static.manualTagging.link'))}</Button>}
+                    </CardFooter>}
                 </Card>
 
             </div>
