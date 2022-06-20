@@ -9243,16 +9243,18 @@ export default class BuildTree extends Component {
                         </div>
                     </div>
                     <div className="row pl-lg-2 pr-lg-2">
-                        <div className="row pl-lg-2 pr-lg-2" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 1 ? "none" : "block" }}>
+                        <div style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 1 ? "none" : "block" }}>
+                        <div className="row pl-lg-2 pr-lg-2">
                             <div>
                                 <Popover placement="top" isOpen={this.state.popoverOpenMonth} target="Popover24" trigger="hover" toggle={this.toggleMonth}>
                                     <PopoverBody>{i18n.t('static.tooltip.ModelingTransferMonth')}</PopoverBody>
                                 </Popover>
                             </div>
+                            {/* <div className='row'> */}
                             <FormGroup className="col-md-2 pt-lg-1">
                                 <Label htmlFor="">{i18n.t('static.common.month')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover24" onClick={this.toggleMonth} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                             </FormGroup>
-                            <FormGroup className="col-md-4 pl-lg-0">
+                            <FormGroup className="col-md-8 pl-lg-0 ModTransferMonthPickerWidth">
                                 <Picker
                                     ref={this.pickAMonth2}
                                     years={{ min: this.state.minDate, max: this.state.maxDate }}
@@ -9266,6 +9268,8 @@ export default class BuildTree extends Component {
                                         onClick={this.handleClickMonthBox2} />
                                 </Picker>
                             </FormGroup>
+                            {/* </div> */}
+                        </div>
                         </div>
                         <div className="col-md-12">
                             {this.state.showModelingJexcelNumber &&
