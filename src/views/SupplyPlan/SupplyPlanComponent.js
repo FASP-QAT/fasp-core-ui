@@ -48,6 +48,9 @@ export default class SupplyPlanComponent extends React.Component {
         var value = JSON.parse(localStorage.getItem("sesStartDate"));
         console.log("&&&&&&&&&&&&&&&&&Value",value);
         console.log("&&&&&&&&&&&&&&&&&ValueWith+"+value);
+        console.log("&&&&&&&&&&&&&&&&&Value month"+value.month);
+        console.log("&&&&&&&&&&&&&&&&&Value year"+value.year);
+        console.log("&&&&&&&&&&&&&&&&&Current Date json. stringfy",localStorage.getItem("sesStartDate"));
         var date = moment(value.year + "-" + value.month + "-01").format("YYYY-MM-DD");
         console.log("&&&&&&&&&&&&&&&&&Date",date);
         console.log("&&&&&&&&&&&&&&&&&Date+"+date);

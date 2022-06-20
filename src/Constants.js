@@ -5,7 +5,7 @@
 
 export const API_URL = 'https://uat-api.quantificationanalytics.org'
 // export const API_URL = 'https://api.quantificationanalytics.org'
-export const API_URL = 'https://demo-api.quantificationanalytics.org'
+// export const API_URL = 'https://demo-api.quantificationanalytics.org'
 
 
 // export const API_URL='http://192.168.43.70:8080/FASP'
