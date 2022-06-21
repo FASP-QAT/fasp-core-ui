@@ -1742,8 +1742,8 @@ class ForecastMetrics extends Component {
                 </div>
               </Col> */}
 
-            <div className="ReportSearchMarginTop" style={{ display: this.state.loading ? "none" : "block" }}>
-              <div id="tableDiv" className="jexcelremoveReadonlybackground consumptionDataEntryTable">
+            <div className="ReportSearchMarginTop" >
+              <div id="tableDiv" className="jexcelremoveReadonlybackground" style={{ display: this.state.loading ? "none" : "block" }}>
               </div>
             </div>
             <div style={{ display: this.state.loading ? "block" : "none" }}>
