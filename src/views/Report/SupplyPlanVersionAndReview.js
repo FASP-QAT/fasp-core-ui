@@ -114,6 +114,7 @@ class SupplyPlanVersionAndReview extends Component {
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.setProgramId = this.setProgramId.bind(this);
+        this.addMannualProblem = this.addMannualProblem.bind(this);
     }
 
     setProgramId(event) {
@@ -139,6 +140,11 @@ class SupplyPlanVersionAndReview extends Component {
         clearTimeout(this.timeout);
     }
 
+    addMannualProblem() {
+        console.log("-------------------addNewProblem--------------------");
+        this.props.history.push("/report/addProblem");
+        // this.props.history.push("/role/addRole");
+    }
 
     buildJexcel() {
 
@@ -1192,6 +1198,11 @@ class SupplyPlanVersionAndReview extends Component {
 
                                 </a>
                                 <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
+                            </div>
+                        }
+                        {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_PROBLEM') &&
+                            <div className="card-header-actions">
+                                <a className="card-header-action" style={{ height: '25px', width: '25px', cursor: 'pointer' }} href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addMannualProblem}><i className="fa fa-plus-square"></i></a>
                             </div>
                         }
                     </div>
