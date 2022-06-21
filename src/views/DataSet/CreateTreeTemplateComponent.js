@@ -452,6 +452,7 @@ export default class CreateTreeTemplate extends Component {
         this.pickAMonth2 = React.createRef()
         this.pickAMonth1 = React.createRef()
         this.state = {
+            isValidError: '',
             isTemplateChanged: false,
             percentForOneMonth: '',
             sameLevelNodeList1: [],
@@ -1731,92 +1732,99 @@ export default class CreateTreeTemplate extends Component {
                     var items = this.state.items;
                     var item = items.filter(x => x.id == this.state.currentItemConfig.context.id)[0];
                     const itemIndex1 = items.findIndex(o => o.id === this.state.currentItemConfig.context.id);
-                    if (itemIndex1 != -1) {
-                        for (var i = 0; i < tableJson.length; i++) {
-                            var map1 = new Map(Object.entries(tableJson[i]));
-                            console.log("11 map---" + map1.get("11"))
-                            if (parseInt(map1.get("11")) === 1 && parseInt(map1.get("12")) != 1) {
-                                var startDate = map1.get("1");
-                                var stopDate = map1.get("2");
-                                if (map1.get("10") != "" && map1.get("10") != 0) {
-                                    const itemIndex = data.findIndex(o => o.nodeDataModelingId === map1.get("10"));
-                                    console.log("data[itemIndex]---", data[itemIndex]);
-                                    obj = data.filter(x => x.nodeDataModelingId == map1.get("10"))[0];
-                                    console.log("obj--->>>>>", obj);
-                                    var transfer = map1[3] != "" ? map1.get("3").split('_')[0] : '';
-                                    console.log("transfer---", transfer);
-                                    obj.transferNodeDataId = transfer;
-                                    obj.notes = map1.get("0");
-                                    obj.modelingType.id = map1.get("4");
-                                    obj.startDateNo = startDate;
-                                    obj.stopDateNo = stopDate;
-                                    obj.increaseDecrease = map1.get("5");
-                                    obj.dataValue = map1.get("4") == 2 ? map1.get("7").toString().replaceAll(",", "") : map1.get("6").toString().replaceAll(",", "").split("%")[0];
-                                    obj.nodeDataModelingId = map1.get("10")
+                    // if (itemIndex1 != -1) {
+                    for (var i = 0; i < tableJson.length; i++) {
+                        var map1 = new Map(Object.entries(tableJson[i]));
+                        console.log("11 map---" + map1.get("11"))
+                        if (parseInt(map1.get("11")) === 1 && parseInt(map1.get("12")) != 1) {
+                            var startDate = map1.get("1");
+                            var stopDate = map1.get("2");
+                            if (map1.get("10") != "" && map1.get("10") != 0) {
+                                const itemIndex = data.findIndex(o => o.nodeDataModelingId === map1.get("10"));
+                                console.log("data[itemIndex]---", data[itemIndex]);
+                                obj = data.filter(x => x.nodeDataModelingId == map1.get("10"))[0];
+                                console.log("obj--->>>>>", obj);
+                                var transfer = map1[3] != "" ? map1.get("3").split('_')[0] : '';
+                                console.log("transfer---", transfer);
+                                obj.transferNodeDataId = transfer;
+                                obj.notes = map1.get("0");
+                                obj.modelingType.id = map1.get("4");
+                                obj.startDateNo = startDate;
+                                obj.stopDateNo = stopDate;
+                                obj.increaseDecrease = map1.get("5");
+                                obj.dataValue = map1.get("4") == 2 ? map1.get("7").toString().replaceAll(",", "") : map1.get("6").toString().replaceAll(",", "").split("%")[0];
+                                obj.nodeDataModelingId = map1.get("10")
 
-                                    // data[itemIndex] = obj;
-                                } else {
-                                    console.log("maxModelingId---", maxModelingId);
-                                    obj = {
-                                        transferNodeDataId: map1[3] != "" ? map1.get("3").split('_')[0] : '',
-                                        notes: map1.get("0"),
-                                        modelingType: {
-                                            id: map1.get("4")
-                                        },
-                                        increaseDecrease: map1.get("5"),
-                                        startDateNo: startDate,
-                                        stopDateNo: stopDate,
-                                        dataValue: map1.get("4") == 2 ? map1.get("7").toString().replaceAll(",", "") : map1.get("6").toString().replaceAll(",", "").split("%")[0],
-                                        nodeDataModelingId: parseInt(maxModelingId) + 1
-                                    }
-                                    maxModelingId++;
-                                    console.log("obj to push---", obj);
-                                    // data.push(obj);
+                                // data[itemIndex] = obj;
+                            } else {
+                                console.log("maxModelingId---", maxModelingId);
+                                obj = {
+                                    transferNodeDataId: map1[3] != "" ? map1.get("3").split('_')[0] : '',
+                                    notes: map1.get("0"),
+                                    modelingType: {
+                                        id: map1.get("4")
+                                    },
+                                    increaseDecrease: map1.get("5"),
+                                    startDateNo: startDate,
+                                    stopDateNo: stopDate,
+                                    dataValue: map1.get("4") == 2 ? map1.get("7").toString().replaceAll(",", "") : map1.get("6").toString().replaceAll(",", "").split("%")[0],
+                                    nodeDataModelingId: parseInt(maxModelingId) + 1
                                 }
-                                dataArr.push(obj);
+                                maxModelingId++;
+                                console.log("obj to push---", obj);
+                                // data.push(obj);
                             }
+                            dataArr.push(obj);
                         }
-                        console.log("obj---", obj);
-                        console.log("dataArr--->>>", dataArr);
-                        item.payload = this.state.currentItemConfig.context.payload;
-                        if (dataArr.length > 0) {
-                            (item.payload.nodeDataMap[0])[0].nodeDataModelingList = dataArr;
+                    }
+                    console.log("obj---", obj);
+                    console.log("dataArr--->>>", dataArr);
+                    if (itemIndex1 != -1) {
+                        if (this.state.isValidError.toString() == "false") {
+                            item.payload = this.state.currentItemConfig.context.payload;
+                            if (dataArr.length > 0) {
+                                (item.payload.nodeDataMap[0])[0].nodeDataModelingList = dataArr;
+                            }
+                            if (this.state.lastRowDeleted == true) {
+                                (item.payload.nodeDataMap[0])[0].nodeDataModelingList = [];
+                            }
+                            console.log("item---", item);
+                            items[itemIndex1] = item;
+                            console.log("items---", items);
+                            // Call function by dolly
+                            this.setState({
+                                items,
+                                scalingList: dataArr,
+                                lastRowDeleted: false,
+                                modelingChanged: false,
+                                // openAddNodeModal: false,
+                                activeTab1: new Array(2).fill('2')
+                            }, () => {
+                                console.log("going to call MOM data");
+                                this.calculateMOMData(0, 0);
+                            });
+                        } else {
+                            console.log("inside else form submit");
+                            this.setState({
+                                modelingJexcelLoader: false
+                            }, () => {
+                                alert("Please fill all the required fields in Node Data Tab");
+                            });
                         }
-                        if (this.state.lastRowDeleted == true) {
-                            (item.payload.nodeDataMap[0])[0].nodeDataModelingList = [];
-                        }
-                        console.log("item---", item);
-                        items[itemIndex1] = item;
-                        console.log("items---", items);
-                        // Call function by dolly
-                        this.setState({
-                            items,
-                            scalingList: dataArr,
-                            lastRowDeleted: false,
-                            modelingChanged: false,
-                            // openAddNodeModal: false,
-                            activeTab1: new Array(2).fill('2')
-                        }, () => {
-                            console.log("going to call MOM data");
-                            this.calculateMOMData(0, 0);
-                        });
-
                     } else {
-                        this.setState({
-                            modelingJexcelLoader: false
-                        }, () => {
-                            // setTimeout(() => {
-                            alert("You are creating a new node.Please submit the node data first and then apply modeling/transfer.");
-                            // confirmAlert({
-                            //     message: "You are creating a new node.Please submit the node data first and then apply modeling/transfer.",
-                            //     buttons: [
-                            //         {
-                            //             label: i18n.t('static.report.ok')
-                            //         }
-                            //     ]
-                            // });
-                            // }, 0);
-                        });
+
+                        if (this.state.isValidError.toString() == "false") {
+                            console.log("inside if form submit");
+                            this.onAddButtonClick(this.state.currentItemConfig, true, dataArr);
+                        } else {
+                            console.log("inside else form submit");
+                            this.setState({
+                                modelingJexcelLoader: false
+                            }, () => {
+                                alert("Please fill all the required fields in Node Data Tab");
+                            });
+
+                        }
                     }
                 } catch (err) {
                     console.log("scaling err---", err);
@@ -5640,6 +5648,10 @@ export default class CreateTreeTemplate extends Component {
                 this.calculateParentValueFromMOM(currentItemConfig.context.payload.nodeDataMap[0][0].monthNo);
             })
         }
+        if (this.state.addNodeFlag) {
+            this.getSameLevelNodeList(parseInt(currentItemConfig.context.level + 1), 0, nodeTypeId, currentItemConfig.context.parent);
+            // this.getNodeTransferList(currentItemConfig.context.level, 0, currentItemConfig.context.payload.nodeType.id, currentItemConfig.context.parent, 0);
+        }
     }
 
     toggleModal(tabPane, tab) {
@@ -5649,6 +5661,9 @@ export default class CreateTreeTemplate extends Component {
             activeTab1: newArray,
             showCalculatorFields: false
         });
+        var isValid = document.getElementById('isValidError').value;
+        // console.log("isValid 1---", isValid);
+        this.setState({ isValidError: isValid });
         if (tab == 2) {
             console.log("***>>>", this.state.currentItemConfig);
             if (this.state.currentItemConfig.context.payload.nodeType.id != 1) {
@@ -6169,7 +6184,7 @@ export default class CreateTreeTemplate extends Component {
         });
     }
 
-    onAddButtonClick(itemConfig) {
+    onAddButtonClick(itemConfig, addNode, data) {
         console.log("add button clicked---", itemConfig);
         const { items } = this.state;
         var maxNodeId = items.length > 0 ? Math.max(...items.map(o => o.id)) : 0;
@@ -6209,6 +6224,9 @@ export default class CreateTreeTemplate extends Component {
         var childList = items.filter(c => c.parent == itemConfig.context.parent);
         newItem.sortOrder = parentSortOrder.concat(".").concat(("0" + (Number(childList.length) + 1)).slice(-2));
         (newItem.payload.nodeDataMap[0])[0].nodeDataId = this.getMaxNodeDataId() + 1;
+        if (addNode) {
+            (newItem.payload.nodeDataMap[0])[0].nodeDataModelingList = data;
+        }
         // (newItem.payload.nodeDataMap[0])[0].month = moment((newItem.payload.nodeDataMap[0])[0].month).startOf('month').format("YYYY-MM-DD")
         if (itemConfig.context.payload.nodeType.id == 4) {
             (newItem.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en = (itemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en;
@@ -6967,6 +6985,12 @@ export default class CreateTreeTemplate extends Component {
                                                 <PopoverBody>{i18n.t('static.tooltip.NodeType')}</PopoverBody>
                                             </Popover>
                                         </div>
+                                        <Input
+                                            type="hidden"
+                                            name="isValidError"
+                                            id="isValidError"
+                                            value={JSON.stringify(errors) != '{}'}
+                                        />
                                         <FormGroup className="col-md-6">
                                             <Label htmlFor="currencyId">Node Type<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover4" onClick={this.toggleNodeType} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                             <Input
@@ -9000,6 +9024,7 @@ export default class CreateTreeTemplate extends Component {
                                 }
                                 console.log("level unit id on add button click---", levelUnitId);
                                 this.setState({
+                                    isValidError: true,
                                     tempPlanningUnitId: '',
                                     showMomDataPercent: false,
                                     showMomData: false,

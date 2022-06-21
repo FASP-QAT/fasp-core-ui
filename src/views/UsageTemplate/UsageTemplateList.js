@@ -846,6 +846,7 @@ class usageTemplate extends Component {
                 data[18] = 0;
                 data[19] = (papuList[j].program == null ? -1 : papuList[j].program.id)
                 data[20] = papuList[j].notes
+                data[21] = papuList[j].active
 
                 papuDataArr[count] = data;
                 count++;
@@ -880,6 +881,7 @@ class usageTemplate extends Component {
             data[18] = 1;
             data[19] = 0;
             data[20] = "";
+            data[20] = 0;
             papuDataArr[0] = data;
         }
 
@@ -1035,7 +1037,13 @@ class usageTemplate extends Component {
                     type: 'hidden',
                     // width: 400 //20 U
                 },
-
+                {
+                    title: i18n.t('static.checkbox.active'),
+                    type: 'checkbox',
+                    width: '130',
+                    readOnly: false
+                    // readOnly: true //21 V
+                },
 
             ],
             // nestedHeaders: [
@@ -2226,7 +2234,7 @@ class usageTemplate extends Component {
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
                 var index = (instance.jexcel).getValue(`G${parseInt(data[i].y) + 1}`, true);
-                if (index == "" || index == null || index == undefined) {
+                if (index === "" || index == null || index == undefined) {
                     (instance.jexcel).setValueFromCoords(0, data[i].y, 0, true);
                     (instance.jexcel).setValueFromCoords(2, data[i].y, true, true);
                     (instance.jexcel).setValueFromCoords(5, data[i].y, 1, true);
@@ -2269,7 +2277,7 @@ class usageTemplate extends Component {
                         usageFrequencyCount: this.el.getValue(`L${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                         repeatUsagePeriod: { usagePeriodId: (parseInt(map1.get("14")) == -1 ? null : parseInt(map1.get("14"))) },
                         repeatCount: this.el.getValue(`N${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                        active: true,
+                        active: map1.get("21"),
                         notes: map1.get("20")
                         // capacityCbm: map1.get("2").replace(",", ""),
                         // capacityCbm: map1.get("2").replace(/,/g, ""),
@@ -2518,7 +2526,7 @@ class usageTemplate extends Component {
         tr.children[2].classList.add('InfoTrAsteriskTheadtrTd');
         tr.children[3].classList.add('InfoTrAsteriskTheadtrTd');
         tr.children[6].classList.add('InfoTrAsteriskTheadtrTd');
-        // tr.children[7].classList.add('InfoTrAsteriskTheadtrTd');
+        tr.children[7].classList.add('InfoTrAsteriskTheadtrTd');
         tr.children[8].classList.add('InfoTr');
         tr.children[9].classList.add('InfoTr');
         tr.children[10].classList.add('InfoTr');
@@ -2528,7 +2536,7 @@ class usageTemplate extends Component {
         tr.children[14].classList.add('InfoTr');
         tr.children[15].classList.add('InfoTr');
         tr.children[16].classList.add('InfoTr');
-        // tr.children[17].classList.add('InfoTr');
+        tr.children[17].classList.add('InfoTr');
         // tr.children[18].classList.add('InfoTr');
         // tr.children[19].classList.add('InfoTr');
         // tr.children[20].classList.add('InfoTr');
@@ -2537,20 +2545,20 @@ class usageTemplate extends Component {
         // tr.children[23].classList.add('InfoTr');
         // tr.children[24].classList.add('InfoTr');
 
-        // tr.children[2].title = i18n.t('static.tooltip.ForecastProgram');
-        // tr.children[3].title = i18n.t('static.tooltip.UsageName');
-        // tr.children[6].title = i18n.t('static.tooltip.LagInMonth');
-        // // tr.children[7].title = i18n.t('static.tooltip.UsageType');
-        // tr.children[8].title = i18n.t('static.tooltip.Persons');
-        // tr.children[9].title = i18n.t('static.tooltip.PersonsUnit');
-        // // tr.children[12].title = i18n.t('static.tooltip.FUPersonTime');
-        // tr.children[11].title = i18n.t('static.tooltip.OneTimeUsage');
-        // // tr.children[16].title = i18n.t('static.tooltip.OfTimeFreqwency');
-        // // tr.children[18].title = i18n.t('static.tooltip.Freqwency');
-        // tr.children[14].title = i18n.t('static.tooltip.UsagePeriod');
-        // // tr.children[22].title = i18n.t('static.tooltip.PeriodUnit');
-        // tr.children[16].title = i18n.t('static.tooltip.OfFuRequired');
-        // tr.children[24].title = i18n.t('static.tooltip.UsageInWords');
+        tr.children[2].title = i18n.t('static.tooltip.ForecastProgram');
+        tr.children[3].title = i18n.t('static.tooltip.UsageName');
+        tr.children[6].title = i18n.t('static.tooltip.LagInMonth');
+        tr.children[7].title = i18n.t('static.tooltip.UsageType');
+        tr.children[8].title = i18n.t('static.tooltip.Persons');
+        tr.children[9].title = i18n.t('static.tooltip.PersonsUnit');
+        tr.children[10].title = i18n.t('static.tooltip.FUPersonTime');
+        tr.children[11].title = i18n.t('static.tooltip.OneTimeUsage');
+        tr.children[12].title = i18n.t('static.tooltip.OfTimeFreqwency');
+        tr.children[13].title = i18n.t('static.tooltip.Freqwency');
+        tr.children[14].title = i18n.t('static.tooltip.UsagePeriod');
+        tr.children[15].title = i18n.t('static.tooltip.PeriodUnit');
+        tr.children[16].title = i18n.t('static.tooltip.OfFuRequired');
+        tr.children[17].title = i18n.t('static.tooltip.UsageInWords');
 
 
 
@@ -2995,7 +3003,9 @@ class usageTemplate extends Component {
         // if (x != 24) {
         //     this.el.setValueFromCoords(24, y, 1, true);
         // }
-        if (x == 10 || x == 11 || x == 12) {
+        console.log("LOG---------->2", x);
+
+        if (x == 10 || x == 11 || x == 12 || x == 21) {
             this.el.setValueFromCoords(17, y, 1, true);
         }
 
