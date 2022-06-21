@@ -51,7 +51,10 @@ export default class SupplyPlanComponent extends React.Component {
         console.log("&&&&&&&&&&&&&&&&&Value month"+value.month);
         console.log("&&&&&&&&&&&&&&&&&Value year"+value.year);
         console.log("&&&&&&&&&&&&&&&&&Current Date json. stringfy",localStorage.getItem("sesStartDate"));
-        var date = moment(value.year + "-" + value.month + "-01").format("YYYY-MM-DD");
+        var date=moment(value.year + "-" + value.month + "-01").format("YYYY-MM-DD");;
+        if(value.month<=9){
+            date = moment(value.year + "-0" + value.month + "-01").format("YYYY-MM-DD");
+        }
         console.log("&&&&&&&&&&&&&&&&&Date",date);
         console.log("&&&&&&&&&&&&&&&&&Date+"+date);
         var currentDate = moment(Date.now()).startOf('month').format("YYYY-MM-DD");
@@ -190,6 +193,9 @@ export default class SupplyPlanComponent extends React.Component {
     }
     handleRangeDissmis(value) {
         var date = moment(value.year + "-" + value.month + "-01").format("YYYY-MM-DD");
+        if(value.month<=9){
+            date = moment(value.year + "-0" + value.month + "-01").format("YYYY-MM-DD");
+        }
         var currentDate = moment(Date.now()).startOf('month').format("YYYY-MM-DD");
         const monthDifference = moment(new Date(date)).diff(new Date(currentDate), 'months', true) + MONTHS_IN_PAST_FOR_SUPPLY_PLAN;
         this.setState({ startDate: value, monthCount: monthDifference })
