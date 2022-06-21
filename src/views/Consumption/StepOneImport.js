@@ -707,6 +707,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 data[3] = papuList[j].multiplier
                 data[4] = papuList[j].forecastingUnit.id
                 data[5] = planningUnitObj != undefined ? planningUnitObj.forecastingUnit.tracerCategory.id : ""
+                // data[5] = papuList[j].forecastingUnit.tracerCategory.id
+
 
                 // let selectedForecastProgram = this.state.datasetList.filter(c => c.programId == document.getElementById("forecastProgramId").value && c.versionId == this.state.forecastProgramVersionId)[0];
                 // let filteredForecastingUnit = selectedForecastProgram.filteredForecastingUnit;
