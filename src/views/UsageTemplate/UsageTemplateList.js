@@ -2526,7 +2526,7 @@ class usageTemplate extends Component {
         tr.children[2].classList.add('InfoTrAsteriskTheadtrTd');
         tr.children[3].classList.add('InfoTrAsteriskTheadtrTd');
         tr.children[6].classList.add('InfoTrAsteriskTheadtrTd');
-        // tr.children[7].classList.add('InfoTrAsteriskTheadtrTd');
+        tr.children[7].classList.add('InfoTrAsteriskTheadtrTd');
         tr.children[8].classList.add('InfoTr');
         tr.children[9].classList.add('InfoTr');
         tr.children[10].classList.add('InfoTr');
@@ -2536,7 +2536,7 @@ class usageTemplate extends Component {
         tr.children[14].classList.add('InfoTr');
         tr.children[15].classList.add('InfoTr');
         tr.children[16].classList.add('InfoTr');
-        // tr.children[17].classList.add('InfoTr');
+        tr.children[17].classList.add('InfoTr');
         // tr.children[18].classList.add('InfoTr');
         // tr.children[19].classList.add('InfoTr');
         // tr.children[20].classList.add('InfoTr');
@@ -2545,20 +2545,20 @@ class usageTemplate extends Component {
         // tr.children[23].classList.add('InfoTr');
         // tr.children[24].classList.add('InfoTr');
 
-        // tr.children[2].title = i18n.t('static.tooltip.ForecastProgram');
-        // tr.children[3].title = i18n.t('static.tooltip.UsageName');
-        // tr.children[6].title = i18n.t('static.tooltip.LagInMonth');
-        // // tr.children[7].title = i18n.t('static.tooltip.UsageType');
-        // tr.children[8].title = i18n.t('static.tooltip.Persons');
-        // tr.children[9].title = i18n.t('static.tooltip.PersonsUnit');
-        // // tr.children[12].title = i18n.t('static.tooltip.FUPersonTime');
-        // tr.children[11].title = i18n.t('static.tooltip.OneTimeUsage');
-        // // tr.children[16].title = i18n.t('static.tooltip.OfTimeFreqwency');
-        // // tr.children[18].title = i18n.t('static.tooltip.Freqwency');
-        // tr.children[14].title = i18n.t('static.tooltip.UsagePeriod');
-        // // tr.children[22].title = i18n.t('static.tooltip.PeriodUnit');
-        // tr.children[16].title = i18n.t('static.tooltip.OfFuRequired');
-        // tr.children[24].title = i18n.t('static.tooltip.UsageInWords');
+        tr.children[2].title = i18n.t('static.tooltip.ForecastProgram');
+        tr.children[3].title = i18n.t('static.tooltip.UsageName');
+        tr.children[6].title = i18n.t('static.tooltip.LagInMonth');
+        tr.children[7].title = i18n.t('static.tooltip.UsageType');
+        tr.children[8].title = i18n.t('static.tooltip.Persons');
+        tr.children[9].title = i18n.t('static.tooltip.PersonsUnit');
+        tr.children[10].title = i18n.t('static.tooltip.FUPersonTime');
+        tr.children[11].title = i18n.t('static.tooltip.OneTimeUsage');
+        tr.children[12].title = i18n.t('static.tooltip.OfTimeFreqwency');
+        tr.children[13].title = i18n.t('static.tooltip.Freqwency');
+        tr.children[14].title = i18n.t('static.tooltip.UsagePeriod');
+        tr.children[15].title = i18n.t('static.tooltip.PeriodUnit');
+        tr.children[16].title = i18n.t('static.tooltip.OfFuRequired');
+        tr.children[17].title = i18n.t('static.tooltip.UsageInWords');
 
 
 

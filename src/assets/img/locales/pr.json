@@ -879,7 +879,7 @@
     "static.organisationType.organisationTypeValue": "Selecione o tipo de organização",
     "static.forecastReport.unitPrice": "Preço unitário",
     "static.common.onlinepasswordtext": "Você deve estar online para atualizar a sua senha",
-    "static.tooltip.UsageType": "O produto de uso contínuo será usado por um período indeterminado O produto de uso discreto será usado por um período finito conforme definido pelo usuário",
+    "static.tooltip.UsageType": "Uso contínuo: o produto será usado por tempo indeterminado. Uso discreto: o produto será usado por um período finito, conforme definido pelo usuário.",
     "static.quantimed.quantimedImportCosumptionPeriod": "Selecione o período de consumo para o qual deseja importar dados",
     "static.procurementAgentPlanningUnit.weightText": "Insira o peso",
     "static.problemList.medium": "Média",

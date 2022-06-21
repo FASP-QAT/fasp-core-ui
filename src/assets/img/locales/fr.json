@@ -879,7 +879,7 @@
     "static.organisationType.organisationTypeValue": "Sélectionnez le type dorganisation",
     "static.forecastReport.unitPrice": "Prix ​​unitaire",
     "static.common.onlinepasswordtext": "Une connexion intenet est nécessaire pour mettre à jour le mot de passe",
-    "static.tooltip.UsageType": "Le produit à usage continu sera utilisé pendant une durée indéterminée Le produit à usage discret sera utilisé pendant une période déterminée définie par lutilisateur",
+    "static.tooltip.UsageType": "Utilisation continue : le produit sera utilisé pendant une durée indéterminée. Utilisation discrète : le produit sera utilisé pendant une période déterminée, définie par l`utilisateur.",
     "static.quantimed.quantimedImportCosumptionPeriod": "Sélectionnez la période de consommation pour laquelle vous souhaitez importer des données",
     "static.procurementAgentPlanningUnit.weightText": "Entrez le poids",
     "static.problemList.medium": "Moyenne",
