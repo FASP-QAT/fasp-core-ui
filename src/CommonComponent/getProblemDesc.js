@@ -283,9 +283,12 @@ export default function getProblemDesc(row, lang) {
     }
     if (row.realmProblem.problem.problemId == 13) {
         // Inventory doen't fall within min/max range
-        var label = row.realmProblem.problem.label;
+        // var label = row.realmProblem.problem.label;
+        var label = row.data5.problemDescription;
         // label.label_en="Inventory doen't fall within min/max range";
-        return getLabelText(label, lang);
+        return label;
+        // return getLabelText(label, lang);
+
     }
     if (row.realmProblem.problem.problemId == 14) {
         // Dynamic forecasting is not used for certain commodity groups (Malaria, ARV, VMMC)

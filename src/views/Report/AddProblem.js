@@ -16,7 +16,7 @@ import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 
 const initialValues = {
   programId: '',
-  problemId: '',
+  // problemId: '',
   planningUnitId: ''
 }
 const entityname = i18n.t('static.problem.problem');
@@ -24,8 +24,8 @@ const validationSchema = function (values) {
   return Yup.object().shape({
     programId: Yup.string()
       .required(i18n.t('static.budget.programtext')),
-    problemId: Yup.string()
-      .required(i18n.t('static.addProblem.problemError')),
+    // problemId: Yup.string()
+    //   .required(i18n.t('static.addProblem.problemError')),
     planningUnitId: Yup.string()
       .required(i18n.t('static.procurementUnit.validPlanningUnitText')),
 
@@ -84,7 +84,7 @@ class AddRoleComponent extends Component {
     setTouched({
       programId: true,
       planningUnitId: true,
-      problemId: true
+      // problemId: true
       // businessFunctions: true,
       // canCreateRoles: true
     }
@@ -297,7 +297,10 @@ class AddRoleComponent extends Component {
     var programId = document.getElementById("programId").value;
     var regionId = document.getElementById("regionId").value;
     var planningUnitId = document.getElementById("planningUnitId").value;
-    var problemId = document.getElementById("problemId").value;
+    // var problemId = document.getElementById("problemId").value;
+    var problemDescription = document.getElementById("problemDescription").value;
+    var suggession = document.getElementById("suggession").value;
+    var problemId = 13;
     var problemActionIndex = 0;
 
     var db1;
@@ -397,7 +400,7 @@ class AddRoleComponent extends Component {
               // console.log("programObj====>", programObj);
               // console.log("planningUnitObj====>", planningUnitObj);
               // console.log("regionObj====>", regionObj);
-              // console.log("problemObj====>", problemObj);
+              console.log("problemObj====>", problemObj);
               // console.log("problemActionList====>", problemActionList);
               problemActionIndex = problemActionList.length;
 
@@ -426,14 +429,18 @@ class AddRoleComponent extends Component {
 
                   },
                   shipmentId: '',
-                  data5: '',
+                  // data5: '',
+                  data5: {
+                    problemDescription: problemDescription,
+                    suggession: suggession
+                  },
 
                   problemActionIndex: problemActionIndex,
 
                   index: '',
                   problemCategory: {
-                    id: 1,
-                    label: { label_en: 'Data Quality' }
+                    id: 4,
+                    label: { label_en: 'Other' }
                   },
                   problemStatus: {
                     id: 1,
@@ -484,7 +491,7 @@ class AddRoleComponent extends Component {
 
                 }
                 problemActionList.push(json);
-                // console.log("problemActionList===>", problemActionList);
+                console.log("problemActionList===>", problemActionList);
 
 
                 var problemTransaction = db1.transaction(['programData'], 'readwrite');
@@ -504,8 +511,8 @@ class AddRoleComponent extends Component {
                 }.bind(this);
                 putRequest.onsuccess = function (event) {
                   var programId = document.getElementById("programId").value;
-                  // this.props.history.push(`/report/problemList/` + programId + '/' + false + '/green/' + i18n.t('static.problem.addedSuccessfully'));
-                  this.props.history.push(`/report/supplyPlanVersionAndReview/` + programId + '/' + false + '/green/' + i18n.t('static.problem.addedSuccessfully'));
+                  this.props.history.push(`/report/problemList/` + programId + '/' + false + '/green/' + i18n.t('static.problem.addedSuccessfully'));
+                  // this.props.history.push(`/report/supplyPlanVersionAndReview/` + programId + '/' + false + '/green/' + i18n.t('static.problem.addedSuccessfully'));
 
                 }.bind(this);
 
@@ -554,13 +561,13 @@ class AddRoleComponent extends Component {
         )
       }, this);
 
-    const { problemList } = this.state;
-    let problems = problemList.length > 0
-      && problemList.map((item, i) => {
-        return (
-          <option key={i} value={item.problem.problemId}>{getLabelText(item.problem.label, this.state.lang)}</option>
-        )
-      }, this);
+    // const { problemList } = this.state;
+    // let problems = problemList.length > 0
+    //   && problemList.map((item, i) => {
+    //     return (
+    //       <option key={i} value={item.problem.problemId}>{getLabelText(item.problem.label, this.state.lang)}</option>
+    //     )
+    //   }, this);
 
     return (
       <div className="animated fadeIn">
