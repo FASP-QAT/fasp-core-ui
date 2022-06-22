@@ -567,6 +567,9 @@ export default class ManualTagging extends Component {
                 value = this.el.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
                 var qty = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                console.log("x@@@@@@@@@@@@",x)
+                console.log("y@@@@@@@@@@@@",y)
+                console.log("Value@@@@@@@@@@@@",value)
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
@@ -2942,7 +2945,7 @@ export default class ManualTagging extends Component {
                             }
                         }
                     }.bind(this),
-                    oneditionend: this.oneditionend,
+                    // oneditionend: this.oneditionend,
                     copyCompatibility: true,
                     allowManualInsertRow: false,
                     parseFormulas: true,
@@ -3259,7 +3262,7 @@ export default class ManualTagging extends Component {
                 // onselection: this.selected,
 
 
-                oneditionend: this.onedit,
+                // oneditionend: this.onedit,
                 copyCompatibility: true,
                 allowExport: false,
                 paginationOptions: JEXCEL_PAGINATION_OPTION,
@@ -3434,7 +3437,7 @@ export default class ManualTagging extends Component {
                 onselection: this.selected,
 
 
-                oneditionend: this.onedit,
+                // oneditionend: this.onedit,
                 copyCompatibility: true,
                 allowExport: false,
                 paginationOptions: JEXCEL_PAGINATION_OPTION,
