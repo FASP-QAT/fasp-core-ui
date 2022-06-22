@@ -916,7 +916,9 @@ class ListUserComponent extends Component {
                     {/* <Card> */}
                     <CardBody className="pl-lg-1 pr-lg-1 pt-lg-0">
                         {/* <div id="tableDiv1" className="table-responsive consumptionDataEntryTable"> */}
+                        <div className='consumptionDataEntryTable'>
                         <div id="tableDiv1" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USER') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
+                        </div>
                         </div>
                     </CardBody>
                     {/* <CardFooter> */}
@@ -2153,7 +2155,9 @@ class ListUserComponent extends Component {
                         <TabContent activeTab={this.state.activeTab1[0]}>
                             {this.tabPane1()}
                         </TabContent>
+                        <div className='consumptionDataEntryTable'>
                         <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USER') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
+                        </div>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>
                             <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
