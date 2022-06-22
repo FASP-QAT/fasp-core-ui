@@ -1743,7 +1743,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                             }
                         </ToolkitProvider>}
  */}
-                        <div className="ReportSearchMarginTop">
+                        <div className="ReportSearchMarginTop consumptionDataEntryTable">
                             <div id="tableDiv" className="jexcelremoveReadonlybackground " style={{ display: this.state.loading ? "none" : "block" }}>
                             </div>
                         </div>
