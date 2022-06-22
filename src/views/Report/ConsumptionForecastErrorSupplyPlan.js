@@ -108,6 +108,8 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
 
     componentDidMount() {
         this.getPrograms();
+        this.hideSecondComponent();
+
     }
 
     getPrograms = () => {
@@ -624,8 +626,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             regionValues: regionIds.map(ele => ele),
             regionLabels: regionIds.map(ele => ele.label),
             regionListFiltered: event,
+            show: false
         }, () => {
-            this.fetchData()
+            this.fetchData();
         })
     }
 
@@ -706,6 +709,20 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         if (falg) {
             this.fetchData();
         }
+    }
+
+
+    hideFirstComponent() {
+        document.getElementById('div1').style.display = 'block';
+        this.state.timeout = setTimeout(function () {
+            document.getElementById('div1').style.display = 'none';
+        }, 30000);
+    }
+    hideSecondComponent() {
+        document.getElementById('div2').style.display = 'block';
+        this.state.timeout = setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 30000);
     }
 
     getEquivalencyUnitData() {
@@ -1137,6 +1154,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                 }
                             }
                             var consumptionList = (programJson.consumptionList);
+                            console.log("consumptionList---", consumptionList);
                             var monthArray = [];
                             var curDate = startDate;
                             for (var m = 0; moment(curDate).format("YYYY-MM") < moment(stopDate).format("YYYY-MM"); m++) {
@@ -1206,7 +1224,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                 monthArray: monthArray,
                                 dataList: dataList,
                                 consumptionAdjForStockOutId: consumptionAdjForStockOutId
-                            })
+                            }, () => {
+                                this.hideFirstComponent();
+                            }).bind(this)
                         }.bind(this);
                     }.bind(this);
                 }
@@ -1214,7 +1234,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                 this.setState({
                     message: '',
                     loading: true
-                })
+                }, () => {
+                    this.hideFirstComponent();
+                }).bind(this)
                 console.log("viewBy--->", viewById);
                 console.log("equivalencyUnitId--->", equivalencyUnitId);
 
@@ -1246,10 +1268,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                             consumptionAdjForStockOutId: consumptionAdjForStockOutId,
                             message: '',
                             loading: false
-                        },
-                            () => {
-
-                            })
+                        }, () => {
+                            this.hideFirstComponent();
+                        }).bind(this)
                     }).catch(
                         error => {
                             if (error.message === "Network Error") {
@@ -1292,18 +1313,19 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                     );
             }
 
-        } else if (programId == -1) {//validation message            
-            this.setState({ message: i18n.t('static.common.selectProgram'), monthArrayList: [], datasetList: [], versions: [], planningUnits: [], planningUnitValues: [], planningUnitLabels: [], forecastingUnits: [], forecastingUnitValues: [], forecastingUnitLabels: [], equivalencyUnitList: [], programId: '', versionId: '', forecastPeriod: '', yaxisEquUnit: -1 });
-
-        } else if (versionId == -1) {
-            this.setState({ message: i18n.t('static.program.validversion'), monthArrayList: [], datasetList: [], planningUnits: [], planningUnitValues: [], planningUnitLabels: [], forecastingUnits: [], forecastingUnitValues: [], forecastingUnitLabels: [], equivalencyUnitList: [], versionId: '', forecastPeriod: '', yaxisEquUnit: -1 });
-
-        } else if (viewById == 1 && planningUnitId == -1) {
-            this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), monthArrayList: [], datasetList: [], planningUnitValues: [], planningUnitLabels: [], forecastingUnitValues: [], forecastingUnitLabels: [] });
-
-        } else if (viewById == 2 && forecastingUnitId == -1) {
-            this.setState({ message: i18n.t('static.planningunit.forcastingunittext'), monthArrayList: [], datasetList: [], planningUnitValues: [], planningUnitLabels: [], forecastingUnitValues: [], forecastingUnitLabels: [] });
         }
+        //  else if (programId == -1) {//validation message            
+        //     this.setState({ message: i18n.t('static.common.selectProgram'), monthArrayList: [], datasetList: [], versions: [], planningUnits: [], planningUnitValues: [], planningUnitLabels: [], forecastingUnits: [], forecastingUnitValues: [], forecastingUnitLabels: [], equivalencyUnitList: [], programId: '', versionId: '', forecastPeriod: '', yaxisEquUnit: -1 });
+
+        // } else if (versionId == -1) {
+        //     this.setState({ message: i18n.t('static.program.validversion'), monthArrayList: [], datasetList: [], planningUnits: [], planningUnitValues: [], planningUnitLabels: [], forecastingUnits: [], forecastingUnitValues: [], forecastingUnitLabels: [], equivalencyUnitList: [], versionId: '', forecastPeriod: '', yaxisEquUnit: -1 });
+
+        // } else if (planningUnitId == -1  && viewById == 1) {
+        //     this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), monthArrayList: [], datasetList: [], planningUnitValues: [], planningUnitLabels: [], forecastingUnitValues: [], forecastingUnitLabels: [] });
+
+        // } else if (forecastingUnitId == -1  && viewById == 2) {
+        //     this.setState({ message: i18n.t('static.planningunit.forcastingunittext'), monthArrayList: [], datasetList: [], planningUnitValues: [], planningUnitLabels: [], forecastingUnitValues: [], forecastingUnitLabels: [] });
+        // }
     }
 
     addDoubleQuoteToRowContent = (arr) => {
@@ -1368,17 +1390,17 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         datacsv.push([(('Error*').replaceAll(',', ' ')).replaceAll(' ', '%20')])
         this.state.monthArray.map((item1, count) => {
             var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
-            totalError += Number((data[0].errorPerc==null || data[0].errorPerc=='infinity')?'':parseFloat(data[0].errorPerc));
+            totalError += Number(isNaN(data[0].errorPerc) ? '' : data[0].errorPerc == null || data[0].errorPerc == 'Infinity' ? '' : parseFloat(data[0].errorPerc));
             countError += 1;
-            datacsv.push(Number(data[0].errorPerc==null || data[0].errorPerc=='infinity')?'':parseFloat(data[0].errorPerc).toFixed(2))
+            datacsv.push(isNaN(data[0].errorPerc) ? '' : data[0].errorPerc == null || data[0].errorPerc == 'Infinity' ? '' : this.PercentageFormatter(data[0].errorPerc))
         })
-        datacsv.push(Number(totalError / countError).toFixed(2));
+        datacsv.push(this.PercentageFormatter(totalError / countError));
         // datacsv.push(this.state.showInPlanningUnit ? Math.round(totalPU) : Math.round(total));
         // datacsv.push("100 %");
         A.push(this.addDoubleQuoteToRowContent(datacsv))
 
         datacsv = [];
-        datacsv.push([(('Forcaste').replaceAll(',', ' ')).replaceAll(' ', '%20')])
+        datacsv.push([(('Forecaste').replaceAll(',', ' ')).replaceAll(' ', '%20')])
         this.state.monthArray.map((item1, count) => {
             var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
             totalForcaste += Number(data[0].forecastQty);
@@ -1490,7 +1512,14 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         a.click();
 
     }
+    PercentageFormatter = num => {
 
+        if (num != '' && num != null) {
+            return parseFloat(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2) + '%';
+        } else {
+            return ''
+        }
+    }
     exportPDF = () => {
         const addFooters = doc => {
             const pageCount = doc.internal.getNumberOfPages()
@@ -1618,11 +1647,11 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             var countError = 0;
             this.state.monthArray.map((item1, count) => {
                 var datavalue = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
-                totalError += Number(datavalue[0].errorPerc);
+                totalError += Number(isNaN(datavalue[0].errorPerc) ? '' : datavalue[0].errorPerc == null || datavalue[0].errorPerc == 'Infinity' ? '' : datavalue[0].errorPerc);
                 countError += 1;
-                A.push(((datavalue[0].errorPerc==null || datavalue[0].errorPerc=='infinity')?'':Number(parseFloat(datavalue[0].errorPerc)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
+                A.push(isNaN(datavalue[0].errorPerc) ? '' : datavalue[0].errorPerc == null || datavalue[0].errorPerc == 'Infinity' ? '' : this.PercentageFormatter(datavalue[0].errorPerc))
             })
-            A.push((Number(totalError / countError).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
+            A.push(this.PercentageFormatter(totalError / countError))
         }
         data.push(A);
         A = [];
@@ -1837,12 +1866,16 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             }, this);
 
 
+        console.log("PlanningUnit", this.state.planningUnits.filter(c => c.planningUnit.id == this.state.planningUnitId)[0])
 
         var chartOptions = {
             title: {
                 display: true,
-                // text: (this.state.yaxisEquUnit > 0 ? this.state.equivalencyUnitLabel : 'Monthly Forecast ' + (this.state.viewById == 1 ? '(' + i18n.t('static.product.product') + ')' : '(' + i18n.t('static.forecastingunit.forecastingunit') + ')'))
-                text: 'Monthly Forecast - ' + (this.state.programs.filter(c => c.programId == this.state.programId).length > 0 ? this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode : '') + ' - ' + (this.state.versions.filter(c => c.versionId == this.state.versionId).length > 0 ? this.state.versions.filter(c => c.versionId == this.state.versionId)[0].versionId : '')
+                text: 'Monthly Forecast - ' + (this.state.viewById == 1 ?
+                    this.state.planningUnits.filter(c => c.planningUnit.id == this.state.planningUnitId).length > 0 ?
+                        this.state.planningUnits.filter(c => c.planningUnit.id == this.state.planningUnitId)[0].planningUnit.label.label_en : '' :
+                    this.state.forecastingUnits.filter(c => c.id == this.state.forecastingUnitId).length > 0 ?
+                        this.state.forecastingUnits.filter(c => c.id == this.state.forecastingUnitId)[0].label.label_en : '')
             },
             scales: {
                 yAxes: [
@@ -1882,10 +1915,15 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                             labelString: "Forecast Error",
                             fontColor: 'black'
                         },
-                        stacked: true,
+                        stacked: false,
                         ticks: {
                             beginAtZero: true,
-                            fontColor: 'black'
+                            fontColor: 'black',
+                            callback: function (value) {
+                                var cell1 = value
+                                cell1 += ' %';
+                                return cell1;
+                            }
                         },
                         gridLines: {
                             drawBorder: true, lineWidth: 0
@@ -1958,12 +1996,24 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         var elInstance = this.state.dataList;
         if (elInstance != undefined) {
             var colourCount = 0;
+
+            var consumptionActualValue = [];
+            var consumptionForecastValue = [];
+            for (var i = 0; i < elInstance.length; i++) {
+                var value = elInstance[i];
+                if (value) {
+                    consumptionActualValue.push(value.actualQty)
+                    consumptionForecastValue.push(value.forecastQty)
+                } else {
+                    consumptionActualValue.push("");
+                    consumptionForecastValue.push("");
+                }
+            }
             datasetListForGraph.push({
                 label: 'Error',
                 data: this.state.dataList.map(item => (item.errorPerc !== "" ? item.errorPerc : null)),
                 type: 'line',
-                stack: 3,
-                yAxisID: 'A',
+                yAxisID: 'B',
                 backgroundColor: (this.state.yaxisEquUnit > 0 ? '#002F6C' : 'transparent'),
                 borderColor: '#EDB944',
                 borderStyle: 'dotted',
@@ -1979,22 +2029,11 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                 pointRadius: 4,
             })
 
-            var consumptionActualValue = [];
-            var consumptionForecastValue = [];
-            for (var i = 0; i < elInstance.length; i++) {
-                var value = elInstance[i];
-                if (value) {
-                    consumptionActualValue.push(value.actualQty)
-                    consumptionForecastValue.push(value.forecastQty)
-                } else {
-                    consumptionActualValue.push("");
-                    consumptionForecastValue.push("");
-                }
-            }
             datasetListForGraph.push({
                 label: "Forecast",
                 data: consumptionForecastValue,
-                stack: 2,
+                stack: 3,
+                yAxisID: 'A',
                 backgroundColor: '#002F6C',
                 ticks: {
                     fontSize: 2,
@@ -2006,7 +2045,8 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             datasetListForGraph.push({
                 label: "Actual",
                 data: consumptionActualValue,
-                stack: 1,
+                stack: 2,
+                yAxisID: 'A',
                 backgroundColor: '#BA0C2F',
                 ticks: {
                     fontSize: 2,
@@ -2014,6 +2054,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                 },
                 showInLegend: true,
             })
+
         }
         console.log("datasetListForGraph--", datasetListForGraph)
 
@@ -2027,8 +2068,8 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         return (
             <div className="animated fadeIn" >
                 <AuthenticationServiceComponent history={this.props.history} />
-                <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
-                <h5 className="red">{i18n.t(this.state.message)}</h5>
+                <h6 className="mt-success" id="div2">{i18n.t(this.props.match.params.message)}</h6>
+                <h5 className="red" id="div1">{i18n.t(this.state.message)}</h5>
                 <Card>
                     <div className="Card-header-reporticon pb-2">
                         {this.state.dataList.length > 0 &&
@@ -2180,6 +2221,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                             value={this.state.forecastingUnitId}
                                                             onChange={(e) => { this.setForecastingUnit(e); }}
                                                             bsSize="sm"
+                                                            className="selectWrapText"
                                                         >
                                                             <option value="-1">{i18n.t('static.common.select')}</option>
                                                             {forecastingUnits.length > 0
@@ -2208,6 +2250,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                             //  onChange={this.fetchData}
                                                             value={this.state.planningUnitId}
                                                             onChange={(e) => { this.setPlanningUnit(e); }}
+                                                            className="selectWrapText"
                                                         >
                                                             <option value="-1">{i18n.t('static.common.select')}</option>
                                                             {planningUnits.length > 0
@@ -2237,13 +2280,13 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                     <Label
                                                         className="form-check-label"
                                                         check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                        Y-axis in equivelency unit?
+                                                        Y-axis in equivalency unit?
                                                     </Label>
                                                 </div>
                                             </FormGroup>
 
                                             <FormGroup className="col-md-3" id="equivelencyUnitDiv" style={{ display: "none" }}>
-                                                <Label htmlFor="appendedInputButton">Y-axis in equivelency unit</Label>
+                                                <Label htmlFor="appendedInputButton">Y-axis in equivalency unit</Label>
                                                 <div className="controls ">
                                                     <InputGroup>
                                                         <Input
@@ -2320,12 +2363,12 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                                 <td className="sticky-col first-col clone hoverTd" align="left"><b>Error*</b></td>
                                                                 {this.state.monthArray.map((item1, count) => {
                                                                     var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
-                                                                    totalError += Number(data[0].errorPerc);
+                                                                    totalError += isNaN(data[0].errorPerc) ? '' : (data[0].errorPerc == null || data[0].errorPerc == 'Infinity') ? '' : data[0].errorPerc;
                                                                     countError += 1;
-                                                                    return (<td><NumberFormat displayType={'text'} thousandSeparator={true} />{(data[0].errorPerc==null || data[0].errorPerc=='infinity')?'':parseFloat(data[0].errorPerc).toFixed(2)}</td>)
+                                                                    return (<td><NumberFormat displayType={'text'} thousandSeparator={true} />{isNaN(data[0].errorPerc) ? '' : (data[0].errorPerc == null || data[0].errorPerc == 'Infinity') ? '' : this.PercentageFormatter(data[0].errorPerc)}</td>)
 
                                                                 })}
-                                                                <td className="sticky-col first-col clone hoverTd" align="left">{(Number(totalError / countError).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                                <td className="sticky-col first-col clone hoverTd" align="left">{this.PercentageFormatter(totalError / countError)}</td>
                                                             </tr>
                                                             <tr className="hoverTd">
                                                                 <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordion(0)}>
@@ -2393,9 +2436,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                                 <td className="sticky-col first-col clone hoverTd" align="left"><b>Difference</b></td>
                                                                 {this.state.monthArray.map((item1, count) => {
                                                                     var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
-                                                                    return (<td><NumberFormat displayType={'text'} thousandSeparator={true} />{(Number(data[0].actualQty - data[0].forecastQty).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>)
+                                                                    return (<td style={{ color: (data[0].actualQty - data[0].forecastQty) < 0 ? 'red' : 'black' }}><NumberFormat displayType={'text'} thousandSeparator={true} />{(Number(data[0].actualQty - data[0].forecastQty).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>)
                                                                 })}
-                                                                <td className="sticky-col first-col clone hoverTd" align="left">{(Number((totalActal / countActal) - (totalForcaste / countForcaste)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                                <td className="sticky-col first-col clone hoverTd" align="left" style={{ color: ((totalActal / countActal) - (totalForcaste / countForcaste)) < 0 ? 'red' : 'black' }} >{(Number((totalActal / countActal) - (totalForcaste / countForcaste)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
                                                             </tr>
                                                             {this.state.regions.map(r => {
                                                                 var totalRegion = 0;
@@ -2407,9 +2450,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                                         var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.regionData[0].region.id == r.regionId)
                                                                         totalRegion += Number(data[0].actualQty - data[0].forecastQty);
                                                                         totalRegionCount += 1;
-                                                                        return (<td><NumberFormat displayType={'text'} thousandSeparator={true} />{(Number(data[0].actualQty - data[0].forecastQty).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>)
+                                                                        return (<td style={{ color: (data[0].actualQty - data[0].forecastQty) < 0 ? 'red' : 'black' }}><NumberFormat displayType={'text'} thousandSeparator={true} />{(Number(data[0].actualQty - data[0].forecastQty).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>)
                                                                     })}
-                                                                    <td className="sticky-col first-col clone text-left">{(Number(totalRegion / totalRegionCount).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                                    <td className="sticky-col first-col clone text-left" style={{ color: (totalRegion / totalRegionCount) < 0 ? 'red' : 'black' }}>{(Number(totalRegion / totalRegionCount).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
                                                                 </tr>)
                                                             })}
                                                             {/* </>)
