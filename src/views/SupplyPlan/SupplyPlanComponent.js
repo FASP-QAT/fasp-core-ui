@@ -46,17 +46,10 @@ export default class SupplyPlanComponent extends React.Component {
     constructor(props) {
         super(props);
         var value = JSON.parse(localStorage.getItem("sesStartDate"));
-        console.log("&&&&&&&&&&&&&&&&&Value",value);
-        console.log("&&&&&&&&&&&&&&&&&ValueWith+"+value);
-        console.log("&&&&&&&&&&&&&&&&&Value month"+value.month);
-        console.log("&&&&&&&&&&&&&&&&&Value year"+value.year);
-        console.log("&&&&&&&&&&&&&&&&&Current Date json. stringfy",localStorage.getItem("sesStartDate"));
-        var date=moment(value.year + "-" + value.month + "-01").format("YYYY-MM-DD");;
+        var date = moment(value.year + "-" + value.month + "-01").format("YYYY-MM-DD");
         if(value.month<=9){
             date = moment(value.year + "-0" + value.month + "-01").format("YYYY-MM-DD");
         }
-        console.log("&&&&&&&&&&&&&&&&&Date",date);
-        console.log("&&&&&&&&&&&&&&&&&Date+"+date);
         var currentDate = moment(Date.now()).startOf('month').format("YYYY-MM-DD");
         console.log("&&&&&&&&&&&&&&&&&CyrrentDateDate",currentDate);
         console.log("&&&&&&&&&&&&&&&&&CyrrentDateDate+"+currentDate);
