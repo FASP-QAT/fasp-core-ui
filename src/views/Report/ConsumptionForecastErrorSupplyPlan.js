@@ -108,7 +108,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
 
     componentDidMount() {
         this.getPrograms();
-        this.hideSecondComponent();
+        // this.hideSecondComponent();
 
     }
 
@@ -816,12 +816,14 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                 }.bind(this)
             }
             else {//api call
-                if (forecastingUnitId == -1 && planningUnitId != -1) {
+                console.log("In API CALL^^^^^^^^^^^^^^^")
+                if (planningUnitId != -1) {
                     var planningList = this.state.planningUnits;
                     let filteredPlanningUnit = planningList.filter(c => c.planningUnit.id == planningUnitId && c.active == true)
                     forecastingUnitId = filteredPlanningUnit[0].forecastingUnit.id;
                 }
-
+                console.log("forecastingUnitId^^^^^^^^^^", forecastingUnitId);
+                console.log("programId^^^^^^^^^^", programId);
                 EquivalancyUnitService.getEquivalencyUnitMappingForForecastingUnit(forecastingUnitId, programId).then(response => {
                     console.log("response.status == 200*******", response.status);
                     if (response.status == 200) {
@@ -831,13 +833,30 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                             document.getElementById("equivelencyUnitDiv").style.display = "none";
                             this.setState({ message: 'No EquivalencyUnitData Available for the selected forcecastingUnit' });
                         } else {
-
+                            var listArray = response.data;
                             listArray.sort((a, b) => {
-                                var itemLabelA = getLabelText(a.equivalencyUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                                var itemLabelB = getLabelText(b.equivalencyUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
                                 return itemLabelA > itemLabelB ? 1 : -1;
                             });
-                            var filteredEquList = []
+                            console.log("listArray^^^^^^^", listArray);
+
+
+                            // var equivalencyUnitList = [];
+                            // for (var i = 0; i <= listArray.length; i++) {
+                            //     console.log("I = equivalencyUnit^^^^^^^", i, "--->", listArray[i].equivalencyUnit);
+                            //     equivalencyUnitList.push(listArray[i].equivalencyUnit);
+                            //     console.log("Inside Loop equivalencyUnitList^^^^^^^", equivalencyUnitList);
+                            // }
+                            // console.log("equivalencyUnitList^^^^^^^", equivalencyUnitList);
+                            // console.log("equivalencyUnit.label^^^^^^^", equivalencyUnitList.label);
+                            // console.log("equivalencyUnit.label.label_en^^^^^^^", equivalencyUnit.label.label_en);
+                            // equivalencyUnitList.sort((a, b) => {
+                            //     var itemLabelA = getLabelText(a.label.label_en).toUpperCase(); // ignore upper and lowercase
+                            //     var itemLabelB = getLabelText(b.label.label_en).toUpperCase(); // ignore upper and lowercase                   
+                            //     return itemLabelA > itemLabelB ? 1 : -1;
+                            // });
+                            // var filteredEquList = []
                             // for (var i = 0; i < listArray.length; i++) {
                             //     if (listArray[i].program != null) {
                             //         if (listArray[i].program.id == programId && listArray[i].active == true) {
@@ -847,7 +866,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                             //         filteredEquList.push(listArray[i]);
                             //     }
                             // }
-                            console.log("EquivalencyUnitList---------->1", filteredEquList);
+                            // console.log("EquivalencyUnitList---------->1", filteredEquList);
                             // var filteredEQUnit = [];
                             // if (forecastingUnitId != -1) {
                             //     filteredEQUnit = filteredEquList.filter(c => c.forecastingUnit.id == forecastingUnitId);
@@ -879,10 +898,10 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                     } else {
                         this.setState({
                             message: response.data.messageCode, loading: false
-                        },
-                            () => {
-                                this.hideSecondComponent();
-                            })
+                            // },
+                            //     () => {
+                            //         this.hideSecondComponent();
+                        })
                     }
                 })
                     .catch(
@@ -1224,9 +1243,10 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                 monthArray: monthArray,
                                 dataList: dataList,
                                 consumptionAdjForStockOutId: consumptionAdjForStockOutId
-                            }, () => {
-                                this.hideFirstComponent();
-                            }).bind(this)
+                            })
+                            // , () => {
+                            //     this.hideFirstComponent();
+                            // }).bind(this)
                         }.bind(this);
                     }.bind(this);
                 }
@@ -1234,9 +1254,10 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                 this.setState({
                     message: '',
                     loading: true
-                }, () => {
-                    this.hideFirstComponent();
-                }).bind(this)
+                })
+                // , () => {
+                //     this.hideFirstComponent();
+                // }).bind(this)
                 console.log("viewBy--->", viewById);
                 console.log("equivalencyUnitId--->", equivalencyUnitId);
 
@@ -1268,9 +1289,10 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                             consumptionAdjForStockOutId: consumptionAdjForStockOutId,
                             message: '',
                             loading: false
-                        }, () => {
-                            this.hideFirstComponent();
-                        }).bind(this)
+                        })
+                        // , () => {
+                        //     this.hideFirstComponent();
+                        // }).bind(this)
                     }).catch(
                         error => {
                             if (error.message === "Network Error") {
@@ -1842,8 +1864,8 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         let equivalencyUnitList1 = equivalencyUnitList.length > 0
             && equivalencyUnitList.map((item, i) => {
                 return (
-                    <option key={i} value={item.equivalencyUnitId}>
-                        {item.label.label_en}
+                    <option key={i} value={item.equivalencyUnit.equivalencyUnitId}>
+                        {item.equivalencyUnit.label.label_en}
                     </option>
                 )
             }, this);
