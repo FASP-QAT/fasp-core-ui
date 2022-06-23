@@ -567,6 +567,9 @@ export default class ManualTagging extends Component {
                 value = this.el.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
                 var qty = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                console.log("x@@@@@@@@@@@@",x)
+                console.log("y@@@@@@@@@@@@",y)
+                console.log("Value@@@@@@@@@@@@",value)
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
@@ -2449,7 +2452,7 @@ export default class ManualTagging extends Component {
                         shipmentList = shipmentList.filter(c => c.erpFlag.toString() == "false" && c.active.toString() == "true" && c.accountFlag.toString() == "true" && c.procurementAgent.id == PSM_PROCUREMENT_AGENT_ID && SHIPMENT_ID_ARR_MANUAL_TAGGING.includes(c.shipmentStatus.id.toString()));
                         shipmentList = shipmentList.filter(c => (moment(c.expectedDeliveryDate).format("YYYY-MM-DD") < moment(Date.now()).subtract(6, 'months').format("YYYY-MM-DD") && ([3, 4, 5, 6, 9]).includes(c.shipmentStatus.id.toString())) || (moment(c.expectedDeliveryDate).format("YYYY-MM-DD") >= moment(Date.now()).subtract(6, 'months').format("YYYY-MM-DD") && SHIPMENT_ID_ARR_MANUAL_TAGGING.includes(c.shipmentStatus.id.toString())));
                     } else if (this.state.active2) {
-                        shipmentList = shipmentList.filter(c => c.erpFlag.toString() == "true" && c.active.toString() == "true" && c.accountFlag.toString() == "true" && c.procurementAgent.id == PSM_PROCUREMENT_AGENT_ID && SHIPMENT_ID_ARR_MANUAL_TAGGING.includes(c.shipmentStatus.id.toString()));
+                        shipmentList = shipmentList.filter(c => c.erpFlag.toString() == "true" && c.active.toString() == "true" && c.accountFlag.toString() == "true" && c.procurementAgent.id == PSM_PROCUREMENT_AGENT_ID);
                     }
                     console.log("OutList for tab2@@@@@@@@@@@@@@", shipmentList)
                     console.log("linkedShipmentsList@@@@@@@@@@@@@@", linkedShipmentsList)
@@ -2942,7 +2945,7 @@ export default class ManualTagging extends Component {
                             }
                         }
                     }.bind(this),
-                    oneditionend: this.oneditionend,
+                    // oneditionend: this.oneditionend,
                     copyCompatibility: true,
                     allowManualInsertRow: false,
                     parseFormulas: true,
@@ -3261,7 +3264,7 @@ export default class ManualTagging extends Component {
                 // onselection: this.selected,
 
 
-                oneditionend: this.onedit,
+                // oneditionend: this.onedit,
                 copyCompatibility: true,
                 allowExport: false,
                 paginationOptions: JEXCEL_PAGINATION_OPTION,
@@ -3436,7 +3439,7 @@ export default class ManualTagging extends Component {
                 onselection: this.selected,
 
 
-                oneditionend: this.onedit,
+                // oneditionend: this.onedit,
                 copyCompatibility: true,
                 allowExport: false,
                 paginationOptions: JEXCEL_PAGINATION_OPTION,

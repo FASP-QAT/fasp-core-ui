@@ -1351,10 +1351,10 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
 
                   </div>
                   <div className="row" style={{ display: this.state.loading ? "none" : "block" }}>
-                    <div className="col-md-12">
-                      <div className="table-responsive ">
+                    <div className="col-md-12 mt-3">
+                      <div className="table-responsive fixTableHead">
 
-                        {this.state.data.length > 0 && <Table responsive className="table-striped  table-fixed  table-bordered text-center mt-2">
+                        {this.state.data.length > 0 && <Table className="table-striped  table-fixed  table-bordered text-center ">
 
 
                           <thead>
