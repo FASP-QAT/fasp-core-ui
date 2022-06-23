@@ -90,5 +90,10 @@ class PlanningUnitService {
         return axios.get(`${API_URL}/api/planningUnit/programId/${programId}/versionId/${versionId}`, {}
         );
     }
+
+    getPlanningUnitForProductCategoryAndProgram(productCategoryId,programId){
+        return axios.get(`${API_URL}/api/planningUnit/productCategory/${productCategoryId}/programId/${programId}`, {}
+        );
+    }
 }
 export default new PlanningUnitService();

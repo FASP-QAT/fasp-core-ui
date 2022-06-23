@@ -699,15 +699,22 @@ export default class PlanningUnitSetting extends Component {
             if (value != -1 && value !== null && value !== '') {
                 let planningUnitId = this.el.getValueFromCoords(1, y);
                 // let planningUnitId = this.el.getValueFromCoords(7, y);
-                let procurementAgentPlanningUnitList = this.state.responsePa;
-                let tempPaList = procurementAgentPlanningUnitList[planningUnitId];
-                console.log("mylist--------->1111", procurementAgentPlanningUnitList);
+
+                // let procurementAgentPlanningUnitList = this.state.responsePa;
+                // let tempPaList = procurementAgentPlanningUnitList[planningUnitId];
+                // console.log("mylist--------->1111", procurementAgentPlanningUnitList);
+
+                let procurementAgentPlanningUnitList = this.state.originalPlanningUnitList;
+                let tempPaList = procurementAgentPlanningUnitList.filter(c => c.id == planningUnitId)[0];
+
+
                 console.log("mylist--------->1112", planningUnitId);
 
-                let obj = tempPaList.filter(c => c.procurementAgent.id == value)[0];
+                // let obj = tempPaList.filter(c => c.procurementAgent.id == value)[0];
+                let obj = tempPaList.procurementAgentPriceList.filter(c => c.id == value)[0];
                 console.log("mylist--------->1113", obj);
                 if (typeof obj != 'undefined') {
-                    this.el.setValueFromCoords(8, y, obj.catalogPrice, true);
+                    this.el.setValueFromCoords(8, y, obj.price, true);
                 } else {
                     // this.el.setValueFromCoords(8, y, '', true);
                     let q = '';
@@ -1458,7 +1465,8 @@ export default class PlanningUnitSetting extends Component {
                         // if (this.state.datasetList.length == 1) {
                         //     this.setProgramId();
                         // }
-                        this.setProgramId();
+                        // this.setProgramId();
+                        this.productCategoryList();
                         // this.buildJExcel();
                     })
 
@@ -1606,7 +1614,8 @@ export default class PlanningUnitSetting extends Component {
             // console.log("tracerCategoryArray----------->3", tracerCategoryArray3);
 
             // PlanningUnitService.getPlanningUnitByRealmId(AuthenticationService.getRealmId())
-            PlanningUnitService.getActivePlanningUnitList()
+            // PlanningUnitService.getActivePlanningUnitList()
+            PlanningUnitService.getPlanningUnitForProductCategoryAndProgram(-1, programId)
                 .then(response => {
                     console.log("RESP----->pu", response.data);
 
@@ -1621,10 +1630,16 @@ export default class PlanningUnitSetting extends Component {
                     if (listArray.length > 0) {
                         for (var i = 0; i < listArray.length; i++) {
                             var paJson = {
-                                name: getLabelText(listArray[i].label, this.state.lang) + ' | ' + parseInt(listArray[i].planningUnitId),
-                                id: parseInt(listArray[i].planningUnitId),
-                                active: listArray[i].active,
-                                forecastingUnit: listArray[i].forecastingUnit,
+                                // name: getLabelText(listArray[i].label, this.state.lang) + ' | ' + parseInt(listArray[i].planningUnitId),
+                                // id: parseInt(listArray[i].planningUnitId),
+                                // active: listArray[i].active,
+                                // forecastingUnit: listArray[i].forecastingUnit,
+                                // label: listArray[i].label
+
+                                name: getLabelText(listArray[i].label, this.state.lang) + ' | ' + parseInt(listArray[i].id),
+                                id: parseInt(listArray[i].id),
+                                // active: listArray[i].active,
+                                // forecastingUnit: listArray[i].forecastingUnit,
                                 label: listArray[i].label
                             }
                             tempList[i] = paJson
@@ -1635,7 +1650,7 @@ export default class PlanningUnitSetting extends Component {
                         originalPlanningUnitList: response.data,
                         planningUnitList: response.data,
                     }, () => {
-                        console.log("List------->pu", this.state.allPlanningUnitList)
+                        console.log("List------->pu123", this.state.allPlanningUnitList.filter(c => c.id == 915));
 
                         let forecastStartDate = selectedForecastProgram.forecastStartDate;
                         let forecastStopDate = selectedForecastProgram.forecastStopDate;
@@ -1665,8 +1680,8 @@ export default class PlanningUnitSetting extends Component {
                                 // console.log("d----------->1", this.state.startDateDisplay);
                                 // console.log("d----------->2", this.state.endDateDisplay);
                                 // console.log("d----------->3", this.state.beforeEndDateDisplay);
-                                this.productCategoryList();
-                                // this.filterData();
+                                // this.productCategoryList();
+                                this.filterData();
                             })
                     });
                 }).catch(
@@ -1910,15 +1925,23 @@ export default class PlanningUnitSetting extends Component {
                 console.log("constant product category list====>0", productCategoryListNew);
 
                 const ids = productCategoryListNew.map(o => o.id)
-                const filteredEQUnit = productCategoryListNew.filter(({ id }, index) => !ids.includes(id, index + 1))
+                let filteredEQUnit = productCategoryListNew.filter(({ id }, index) => !ids.includes(id, index + 1))
 
                 console.log("constant product category list====>1", filteredEQUnit);
 
+
+                filteredEQUnit.sort((a, b) => {
+                    var itemLabelA = a.name.toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = b.name.toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
+
                 this.setState({
                     productCategoryList: myResult,
-                    productCategoryListNew: productCategoryListNew
+                    productCategoryListNew: filteredEQUnit
                 }, () => {
-                    this.filterData();
+                    // this.filterData();
+                    this.setProgramId();
                 });
 
 
@@ -1952,10 +1975,10 @@ export default class PlanningUnitSetting extends Component {
                 }, () => {
                     // this.buildJExcel();
                     // let planningUnitIds = this.state.selsource.map(ele => ele.planningUnit.id);
-                    let planningUnitIds = this.state.allPlanningUnitList.map(ele => ele.id);
-                    console.log("selectedForecastProgram---------->11", planningUnitIds);
-                    this.getProcurementAgentPlanningUnitByPlanningUnitIds(planningUnitIds);
-                    // this.buildJExcel();
+                    // let planningUnitIds = this.state.allPlanningUnitList.map(ele => ele.id);
+                    // console.log("selectedForecastProgram---------->11", planningUnitIds);
+                    // this.getProcurementAgentPlanningUnitByPlanningUnitIds(planningUnitIds);
+                    this.buildJExcel();
 
                 })
         } else {
@@ -2317,39 +2340,37 @@ export default class PlanningUnitSetting extends Component {
         })
     }
 
-    filterProcurementAgentByPlanningUnit = function (instance, cell, c, r, source) {
+    // filterProcurementAgentByPlanningUnit = function (instance, cell, c, r, source) {
 
-        var mylist = [];
-        let procurementAgentPlanningUnitList = this.state.responsePa;
-        var planningUnitId = (instance.jexcel.getJson(null, false)[r])[1];
-        console.log("ID------->", planningUnitId);
+    //     var mylist = [];
+    //     let procurementAgentPlanningUnitList = this.state.responsePa;
+    //     var planningUnitId = (instance.jexcel.getJson(null, false)[r])[1];
+    //     console.log("ID------->", planningUnitId);
 
-        if (planningUnitId !== '') {
+    //     if (planningUnitId !== '') {
 
-            let tempPaList = procurementAgentPlanningUnitList[planningUnitId];
-            let paList = tempPaList.map(template => {
-                return {
-                    name: template.procurementAgent.code,
-                    id: template.procurementAgent.id,
-                    price: template.catalogPrice
-                };
-            });
+    //         let tempPaList = procurementAgentPlanningUnitList[planningUnitId];
+    //         let paList = tempPaList.map(template => {
+    //             return {
+    //                 name: template.procurementAgent.code,
+    //                 id: template.procurementAgent.id,
+    //                 price: template.catalogPrice
+    //             };
+    //         });
 
-            paList.unshift({
-                id: -1,
-                name: 'CUSTOM',
-                price: 0
-            })
+    //         paList.unshift({
+    //             id: -1,
+    //             name: 'CUSTOM',
+    //             price: 0
+    //         })
 
-            // console.log("planningUnitId------->33", paList);
+    //         // console.log("planningUnitId------->33", paList);
 
-            return paList;
-        } else {
-            return [];
-        }
-
-
-    }.bind(this)
+    //         return paList;
+    //     } else {
+    //         return [];
+    //     }
+    // }.bind(this)
 
 
     filterPlanningUnitListByTracerCategoryId = function (instance, cell, c, r, source) {
@@ -2398,16 +2419,21 @@ export default class PlanningUnitSetting extends Component {
         // console.log("mylist--------->32", mylist);
         // return mylist;
 
-        var puList = []
+        var puList = [];
+        console.log("in if=====>0", this.state.productCategoryList);
         if (value != -1) {
-            console.log("in if=====>");
+            console.log("in if=====>1");
             var pc = this.state.productCategoryList.filter(c => c.payload.productCategoryId == value)[0]
             var pcList = this.state.productCategoryList.filter(c => c.payload.productCategoryId == pc.payload.productCategoryId || c.parentId == pc.id);
             var pcIdArray = [];
             for (var pcu = 0; pcu < pcList.length; pcu++) {
                 pcIdArray.push(pcList[pcu].payload.productCategoryId);
             }
-            puList = (this.state.planningUnitList).filter(c => pcIdArray.includes(c.forecastingUnit.productCategory.id) && c.active.toString() == "true");
+            console.log("in if=====>1.1", pcIdArray);
+            console.log("in if=====>1.2", this.state.planningUnitList);
+            console.log("in if=====>1.3", this.state.planningUnitList.filter(c => c.productCategory.id == 21));
+            puList = (this.state.planningUnitList).filter(c => pcIdArray.includes(c.productCategory.id));
+            console.log("in if=====>1.4", puList);
         } else {
             console.log("in else=====>2");
             puList = this.state.planningUnitList;
@@ -2417,8 +2443,8 @@ export default class PlanningUnitSetting extends Component {
 
         for (var k = 0; k < puList.length; k++) {
             var planningUnitJson = {
-                name: puList[k].label.label_en + ' | ' + puList[k].planningUnitId,
-                id: puList[k].planningUnitId
+                name: puList[k].label.label_en + ' | ' + puList[k].id,
+                id: puList[k].id
             }
             mylist.push(planningUnitJson);
         }
@@ -2595,7 +2621,7 @@ export default class PlanningUnitSetting extends Component {
                 var map1 = new Map(Object.entries(tableJson[i]));
 
                 // let planningUnitObj = this.state.allPlanningUnitList.filter(c => c.id == parseInt(map1.get("1")))[0];
-                let planningUnitObj = this.state.originalPlanningUnitList.filter(c => c.planningUnitId == parseInt(map1.get("1")))[0];
+                let planningUnitObj = this.state.originalPlanningUnitList.filter(c => c.id == parseInt(map1.get("1")))[0];
                 let procurementAgentObj = "";
                 if (parseInt(map1.get("7")) === -1) {
                     procurementAgentObj = null
