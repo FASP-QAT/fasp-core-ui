@@ -2452,7 +2452,7 @@ export default class ManualTagging extends Component {
                         shipmentList = shipmentList.filter(c => c.erpFlag.toString() == "false" && c.active.toString() == "true" && c.accountFlag.toString() == "true" && c.procurementAgent.id == PSM_PROCUREMENT_AGENT_ID && SHIPMENT_ID_ARR_MANUAL_TAGGING.includes(c.shipmentStatus.id.toString()));
                         shipmentList = shipmentList.filter(c => (moment(c.expectedDeliveryDate).format("YYYY-MM-DD") < moment(Date.now()).subtract(6, 'months').format("YYYY-MM-DD") && ([3, 4, 5, 6, 9]).includes(c.shipmentStatus.id.toString())) || (moment(c.expectedDeliveryDate).format("YYYY-MM-DD") >= moment(Date.now()).subtract(6, 'months').format("YYYY-MM-DD") && SHIPMENT_ID_ARR_MANUAL_TAGGING.includes(c.shipmentStatus.id.toString())));
                     } else if (this.state.active2) {
-                        shipmentList = shipmentList.filter(c => c.erpFlag.toString() == "true" && c.active.toString() == "true" && c.accountFlag.toString() == "true" && c.procurementAgent.id == PSM_PROCUREMENT_AGENT_ID && SHIPMENT_ID_ARR_MANUAL_TAGGING.includes(c.shipmentStatus.id.toString()));
+                        shipmentList = shipmentList.filter(c => c.erpFlag.toString() == "true" && c.active.toString() == "true" && c.accountFlag.toString() == "true" && c.procurementAgent.id == PSM_PROCUREMENT_AGENT_ID);
                     }
                     console.log("OutList for tab2@@@@@@@@@@@@@@", shipmentList)
                     console.log("linkedShipmentsList@@@@@@@@@@@@@@", linkedShipmentsList)
