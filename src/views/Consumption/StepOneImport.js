@@ -851,8 +851,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
 
                     var match = rowData[10];
-                    // console.log("addRowId------>", addRowId);
-                    if (match == 1) {// grade out
+                    if (match == 1 || rowData[1] == rowData[7]) {// grade out
                         var cell1 = elInstance.getCell(`J${parseInt(y) + 1}`)
                         cell1.classList.add('readonly');
                     } else {
