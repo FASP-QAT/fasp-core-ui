@@ -3554,12 +3554,12 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             shipmentDataList[parseInt(map.get("24"))].shipmentMode = shipmentMode;
                             shipmentDataList[parseInt(map.get("24"))].productCost = productCost.toString().replaceAll("\,", "");
                             shipmentDataList[parseInt(map.get("24"))].freightCost = Number(freightCost.toString().replaceAll("\,", "")).toFixed(2);
-                            shipmentDataList[parseInt(map.get("24"))].notes = map.get("20");
+                            shipmentDataList[parseInt(map.get("24"))].notes = map.get("20").toString().trim();
                             shipmentDataList[parseInt(map.get("24"))].accountFlag = map.get("0");
                             shipmentDataList[parseInt(map.get("24"))].localProcurement = map.get("7");
                             shipmentDataList[parseInt(map.get("24"))].active = map.get("30");
 
-                            shipmentDataList[parseInt(map.get("24"))].orderNo = map.get("8");
+                            shipmentDataList[parseInt(map.get("24"))].orderNo = map.get("8").toString().trim();
 
                             shipmentDataList[parseInt(map.get("24"))].emergencyOrder = map.get("11");
                             var c = (this.state.currencyListAll.filter(c => c.currencyId == map.get("14"))[0])
@@ -3690,7 +3690,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                 erpFlag: false,
                                 localProcurement: map.get("7"),
                                 freightCost: Number(freightCost.toString().replaceAll("\,", "")).toFixed(2),
-                                notes: map.get("20"),
+                                notes: map.get("20").toString().trim(),
                                 planningUnit: {
                                     id: map.get("2"),
                                     label: (this.props.items.planningUnitListAll.filter(c => c.planningUnit.id == map.get("2"))[0]).planningUnit.label
@@ -3732,7 +3732,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                 receivedDate: receivedDate,
                                 index: shipmentDataList.length,
                                 batchInfoList: [],
-                                orderNo: map.get("8"),
+                                orderNo: map.get("8").toString().trim(),
                                 createdBy: {
                                     userId: curUser,
                                     username: username
