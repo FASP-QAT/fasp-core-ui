@@ -13,7 +13,8 @@ import { DATE_FORMAT_CAP, QAT_HELPDESK_CUSTOMER_PORTAL_URL, polling } from '../.
 import moment from 'moment';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import { Online, Offline } from "react-detect-offline";
-import ProgramService from "../../api/ProgramService"
+import ProgramService from "../../api/ProgramService";
+import { confirmAlert } from 'react-confirm-alert'; // Import
 import {
   Badge,
   Button,
@@ -249,8 +250,9 @@ class ApplicationDashboard extends Component {
     this.getPrograms = this.getPrograms.bind(this);
     this.checkNewerVersions = this.checkNewerVersions.bind(this);
     this.updateState = this.updateState.bind(this);
-    this.getDataSetList = this.getDataSetList.bind(this)
-      ;
+    this.getDataSetList = this.getDataSetList.bind(this);
+    this.deleteProgram = this.deleteProgram.bind(this);
+    this.deleteSupplyPlanProgram = this.deleteSupplyPlanProgram.bind(this);
   }
 
   rowClassNameFormat(row, rowIdx) {
@@ -265,6 +267,140 @@ class ApplicationDashboard extends Component {
     } else {
       return row.realmProblem.criticality.id == 1 && row.problemStatus.id == 1 ? 'background-yellow' : '';
     }
+  }
+
+  deleteSupplyPlanProgram(programId, versionId) {
+
+    // console.log(">>>", changed);
+    confirmAlert({
+      title: i18n.t('static.program.confirmsubmit'),
+      message: "Delete this program",
+      buttons: [
+        {
+          label: i18n.t('static.program.yes'),
+          onClick: () => {
+            this.setState({
+              loading: true
+            })
+            var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+            var userId = userBytes.toString(CryptoJS.enc.Utf8);
+            var id = programId + "_v" + versionId + "_uId_" + userId;
+            var db1;
+            getDatabase();
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+            openRequest.onerror = function (event) {
+            }.bind(this);
+            openRequest.onsuccess = function (e) {
+              db1 = e.target.result;
+              var transaction = db1.transaction(['programData'], 'readwrite');
+              var programTransaction = transaction.objectStore('programData');
+              var deleteRequest = programTransaction.delete(id);
+              deleteRequest.onsuccess = function (event) {
+                var transaction1 = db1.transaction(['downloadedProgramData'], 'readwrite');
+                var programTransaction1 = transaction1.objectStore('downloadedProgramData');
+                var deleteRequest1 = programTransaction1.delete(id);
+                deleteRequest1.onsuccess = function (event) {
+                  var transaction2 = db1.transaction(['programQPLDetails'], 'readwrite');
+                  var programTransaction2 = transaction2.objectStore('programQPLDetails');
+                  var deleteRequest2 = programTransaction2.delete(id);
+                  deleteRequest2.onsuccess = function (event) {
+                    this.setState({
+                      loading: false,
+                      message: "Program delete succesfully.",
+                      color: 'green'
+                    }, () => {
+                      this.hideFirstComponent()
+                    })
+                    this.getPrograms();
+                    // this.getLocalPrograms();
+
+                  }.bind(this)
+                }.bind(this)
+              }.bind(this)
+            }.bind(this)
+          }
+        }, {
+          label: i18n.t('static.program.no'),
+          onClick: () => {
+            this.setState({
+              message: i18n.t('static.actionCancelled'), loading: false, color: "red"
+            })
+            this.setState({ loading: false, color: "red" }, () => {
+              this.hideFirstComponent()
+            })
+            // this.props.history.push(`/program/downloadProgram`)
+          }
+        }
+      ]
+    })
+
+
+  }
+
+  deleteProgram(programId, versionId) {
+    // console.log(">>>", changed);
+    confirmAlert({
+      title: i18n.t('static.program.confirmsubmit'),
+      message: "Delete this program",
+      buttons: [
+        {
+          label: i18n.t('static.program.yes'),
+          onClick: () => {
+            this.setState({
+              loading: true
+            })
+            var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+            var userId = userBytes.toString(CryptoJS.enc.Utf8);
+            // var id = programId + "_v" + versionId + "_uId_" + userId;
+            var id = programId + "_v" + versionId + "_uId_" + userId;
+            var db1;
+            getDatabase();
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+            openRequest.onerror = function (event) {
+            }.bind(this);
+            openRequest.onsuccess = function (e) {
+              db1 = e.target.result;
+              var transaction = db1.transaction(['datasetData'], 'readwrite');
+              var programTransaction = transaction.objectStore('datasetData');
+              var deleteRequest = programTransaction.delete(id);
+              deleteRequest.onsuccess = function (event) {
+                var transaction1 = db1.transaction(['downloadedDatasetData'], 'readwrite');
+                var programTransaction1 = transaction1.objectStore('downloadedDatasetData');
+                var deleteRequest1 = programTransaction1.delete(id);
+                deleteRequest1.onsuccess = function (event) {
+                  var transaction2 = db1.transaction(['datasetDetails'], 'readwrite');
+                  var programTransaction2 = transaction2.objectStore('datasetDetails');
+                  var deleteRequest2 = programTransaction2.delete(id);
+                  deleteRequest2.onsuccess = function (event) {
+                    this.setState({
+                      loading: false,
+                      message: "Dataset delete succesfully.",
+                      color: 'green'
+                    }, () => {
+                      this.hideFirstComponent()
+                    })
+                    this.getDataSetList();
+                    // this.getLocalPrograms();
+
+                  }.bind(this)
+                }.bind(this)
+              }.bind(this)
+            }.bind(this)
+          }
+        }, {
+          label: i18n.t('static.program.no'),
+          onClick: () => {
+            this.setState({
+              message: i18n.t('static.actionCancelled'), loading: false, color: "red"
+            })
+            this.setState({ loading: false, color: "red" }, () => {
+              this.hideFirstComponent()
+            })
+            // this.props.history.push(`/dataSet/loadDeleteDataSet`)
+          }
+        }
+      ]
+    })
   }
 
   problemAction(problemAction) {
@@ -1042,6 +1178,7 @@ class ApplicationDashboard extends Component {
           this.setState({ message: message })
         }} />
         <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message)}</h5>
+        <h5 className={this.state.color} id="div1">{i18n.t(this.state.message)}</h5>
         <Row className="mt-2">
           {checkOnline === 'Online' && this.state.id == 1 &&
 
@@ -1467,6 +1604,7 @@ class ApplicationDashboard extends Component {
                             <DropdownToggle caret className="p-0" color="transparent">
                             </DropdownToggle>
                             <DropdownMenu right>
+                              <DropdownItem onClick={() => this.deleteProgram(item.programId, item.versionId)}>{'Delete'}</DropdownItem>
                               <DropdownItem onClick={() => this.redirectToCrudWithValue("/dataset/versionSettings", item.programId, item.versionId, 1)}>{'Version Settings'}</DropdownItem>
                               <DropdownItem onClick={() => this.redirectToCrudWithValue("/dataset/listTree", item.programId, item.versionId, 2)}>{'Tree'}</DropdownItem>
                               <DropdownItem onClick={() => this.redirectToCrudWithValue("/dataentry/consumptionDataEntryAndAdjustment", item.programId, item.versionId, 2)}>{'Consumption'}</DropdownItem>
@@ -1517,6 +1655,7 @@ class ApplicationDashboard extends Component {
                             <DropdownToggle caret className="p-0" color="transparent">
                             </DropdownToggle>
                             <DropdownMenu right>
+                              <DropdownItem onClick={() => this.deleteSupplyPlanProgram(item.programId, item.versionId)}>{'Delete'}</DropdownItem>
                               <DropdownItem onClick={() => this.getProblemListAfterCalculation(item.id)}>{i18n.t('static.qpl.calculate')}</DropdownItem>
                               <DropdownItem onClick={() => this.redirectToCrud(`/report/problemList/1/` + item.id + "/false")}>{i18n.t('static.dashboard.qatProblemList')}</DropdownItem>
                             </DropdownMenu>
