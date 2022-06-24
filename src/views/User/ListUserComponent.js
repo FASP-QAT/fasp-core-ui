@@ -659,7 +659,7 @@ class ListUserComponent extends Component {
         UserService.getUserList()
             .then(response => {
                 if (response.status == 200) {
-                    console.log("response.data---->", response.data)
+                    console.log("response.data---->123", response.data)
                     this.setState({
                         userList: response.data,
                         selUserList: response.data
@@ -692,74 +692,76 @@ class ListUserComponent extends Component {
                                         roleList: listArray,
                                         roleListJexcel: roleListJexcel,
                                         roleListInUpdate: roleListInUpdate,
-                                        loading: false
+                                        loading: false,
                                     },
                                         () => {
-                                            LanguageService.getLanguageListActive()
-                                                .then(response => {
-                                                    if (response.status == 200) {
-                                                        var listArray = response.data;
-                                                        listArray.sort((a, b) => {
-                                                            var itemLabelA = a.label.label_en.toUpperCase(); // ignore upper and lowercase
-                                                            var itemLabelB = b.label.label_en.toUpperCase(); // ignore upper and lowercase                   
-                                                            return itemLabelA > itemLabelB ? 1 : -1;
-                                                        });
-                                                        this.setState({
-                                                            languages: listArray, loading: false
-                                                        },
-                                                            () => {
-                                                                this.buildJExcel1();
-                                                                this.buildJExcel2();
-                                                            })
-                                                    } else {
-                                                        this.setState({
-                                                            message: response.data.messageCode, loading: false
-                                                        },
-                                                            () => {
-                                                                this.hideSecondComponent();
-                                                            })
-                                                    }
+                                            this.buildJExcel1();
+                                            this.buildJExcel2();
+                                            // LanguageService.getLanguageListActive()
+                                            //     .then(response => {
+                                            //         if (response.status == 200) {
+                                            //             var listArray = response.data;
+                                            //             listArray.sort((a, b) => {
+                                            //                 var itemLabelA = a.label.label_en.toUpperCase(); // ignore upper and lowercase
+                                            //                 var itemLabelB = b.label.label_en.toUpperCase(); // ignore upper and lowercase                   
+                                            //                 return itemLabelA > itemLabelB ? 1 : -1;
+                                            //             });
+                                            //             this.setState({
+                                            //                 languages: listArray, loading: false
+                                            //             },
+                                            //                 () => {
+                                            //                     this.buildJExcel1();
+                                            //                     this.buildJExcel2();
+                                            //                 })
+                                            //         } else {
+                                            //             this.setState({
+                                            //                 message: response.data.messageCode, loading: false
+                                            //             },
+                                            //                 () => {
+                                            //                     this.hideSecondComponent();
+                                            //                 })
+                                            //         }
 
-                                                }).catch(
-                                                    error => {
-                                                        if (error.message === "Network Error") {
-                                                            this.setState({
-                                                                message: 'static.unkownError',
-                                                                loading: false
-                                                            });
-                                                        } else {
-                                                            switch (error.response ? error.response.status : "") {
+                                            //     }).catch(
+                                            //         error => {
+                                            //             if (error.message === "Network Error") {
+                                            //                 this.setState({
+                                            //                     message: 'static.unkownError',
+                                            //                     loading: false
+                                            //                 });
+                                            //             } else {
+                                            //                 switch (error.response ? error.response.status : "") {
 
-                                                                case 401:
-                                                                    this.props.history.push(`/login/static.message.sessionExpired`)
-                                                                    break;
-                                                                case 403:
-                                                                    this.props.history.push(`/accessDenied`)
-                                                                    break;
-                                                                case 500:
-                                                                case 404:
-                                                                case 406:
-                                                                    this.setState({
-                                                                        message: error.response.data.messageCode,
-                                                                        loading: false
-                                                                    });
-                                                                    break;
-                                                                case 412:
-                                                                    this.setState({
-                                                                        message: error.response.data.messageCode,
-                                                                        loading: false
-                                                                    });
-                                                                    break;
-                                                                default:
-                                                                    this.setState({
-                                                                        message: 'static.unkownError',
-                                                                        loading: false
-                                                                    });
-                                                                    break;
-                                                            }
-                                                        }
-                                                    }
-                                                );
+                                            //                     case 401:
+                                            //                         this.props.history.push(`/login/static.message.sessionExpired`)
+                                            //                         break;
+                                            //                     case 403:
+                                            //                         this.props.history.push(`/accessDenied`)
+                                            //                         break;
+                                            //                     case 500:
+                                            //                     case 404:
+                                            //                     case 406:
+                                            //                         this.setState({
+                                            //                             message: error.response.data.messageCode,
+                                            //                             loading: false
+                                            //                         });
+                                            //                         break;
+                                            //                     case 412:
+                                            //                         this.setState({
+                                            //                             message: error.response.data.messageCode,
+                                            //                             loading: false
+                                            //                         });
+                                            //                         break;
+                                            //                     default:
+                                            //                         this.setState({
+                                            //                             message: 'static.unkownError',
+                                            //                             loading: false
+                                            //                         });
+                                            //                         break;
+                                            //                 }
+                                            //             }
+                                            //         }
+                                            //     );
 
                                         })
                                 } else {
