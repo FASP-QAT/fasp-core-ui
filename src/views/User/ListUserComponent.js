@@ -659,7 +659,7 @@ class ListUserComponent extends Component {
         UserService.getUserList()
             .then(response => {
                 if (response.status == 200) {
-                    console.log("response.data---->", response.data)
+                    console.log("response.data---->123", response.data)
                     this.setState({
                         userList: response.data,
                         selUserList: response.data
@@ -692,74 +692,76 @@ class ListUserComponent extends Component {
                                         roleList: listArray,
                                         roleListJexcel: roleListJexcel,
                                         roleListInUpdate: roleListInUpdate,
-                                        loading: false
+                                        loading: false,
                                     },
                                         () => {
-                                            LanguageService.getLanguageListActive()
-                                                .then(response => {
-                                                    if (response.status == 200) {
-                                                        var listArray = response.data;
-                                                        listArray.sort((a, b) => {
-                                                            var itemLabelA = a.label.label_en.toUpperCase(); // ignore upper and lowercase
-                                                            var itemLabelB = b.label.label_en.toUpperCase(); // ignore upper and lowercase                   
-                                                            return itemLabelA > itemLabelB ? 1 : -1;
-                                                        });
-                                                        this.setState({
-                                                            languages: listArray, loading: false
-                                                        },
-                                                            () => {
-                                                                this.buildJExcel1();
-                                                                this.buildJExcel2();
-                                                            })
-                                                    } else {
-                                                        this.setState({
-                                                            message: response.data.messageCode, loading: false
-                                                        },
-                                                            () => {
-                                                                this.hideSecondComponent();
-                                                            })
-                                                    }
+                                            this.buildJExcel1();
+                                            this.buildJExcel2();
+                                            // LanguageService.getLanguageListActive()
+                                            //     .then(response => {
+                                            //         if (response.status == 200) {
+                                            //             var listArray = response.data;
+                                            //             listArray.sort((a, b) => {
+                                            //                 var itemLabelA = a.label.label_en.toUpperCase(); // ignore upper and lowercase
+                                            //                 var itemLabelB = b.label.label_en.toUpperCase(); // ignore upper and lowercase                   
+                                            //                 return itemLabelA > itemLabelB ? 1 : -1;
+                                            //             });
+                                            //             this.setState({
+                                            //                 languages: listArray, loading: false
+                                            //             },
+                                            //                 () => {
+                                            //                     this.buildJExcel1();
+                                            //                     this.buildJExcel2();
+                                            //                 })
+                                            //         } else {
+                                            //             this.setState({
+                                            //                 message: response.data.messageCode, loading: false
+                                            //             },
+                                            //                 () => {
+                                            //                     this.hideSecondComponent();
+                                            //                 })
+                                            //         }
 
-                                                }).catch(
-                                                    error => {
-                                                        if (error.message === "Network Error") {
-                                                            this.setState({
-                                                                message: 'static.unkownError',
-                                                                loading: false
-                                                            });
-                                                        } else {
-                                                            switch (error.response ? error.response.status : "") {
+                                            //     }).catch(
+                                            //         error => {
+                                            //             if (error.message === "Network Error") {
+                                            //                 this.setState({
+                                            //                     message: 'static.unkownError',
+                                            //                     loading: false
+                                            //                 });
+                                            //             } else {
+                                            //                 switch (error.response ? error.response.status : "") {
 
-                                                                case 401:
-                                                                    this.props.history.push(`/login/static.message.sessionExpired`)
-                                                                    break;
-                                                                case 403:
-                                                                    this.props.history.push(`/accessDenied`)
-                                                                    break;
-                                                                case 500:
-                                                                case 404:
-                                                                case 406:
-                                                                    this.setState({
-                                                                        message: error.response.data.messageCode,
-                                                                        loading: false
-                                                                    });
-                                                                    break;
-                                                                case 412:
-                                                                    this.setState({
-                                                                        message: error.response.data.messageCode,
-                                                                        loading: false
-                                                                    });
-                                                                    break;
-                                                                default:
-                                                                    this.setState({
-                                                                        message: 'static.unkownError',
-                                                                        loading: false
-                                                                    });
-                                                                    break;
-                                                            }
-                                                        }
-                                                    }
-                                                );
+                                            //                     case 401:
+                                            //                         this.props.history.push(`/login/static.message.sessionExpired`)
+                                            //                         break;
+                                            //                     case 403:
+                                            //                         this.props.history.push(`/accessDenied`)
+                                            //                         break;
+                                            //                     case 500:
+                                            //                     case 404:
+                                            //                     case 406:
+                                            //                         this.setState({
+                                            //                             message: error.response.data.messageCode,
+                                            //                             loading: false
+                                            //                         });
+                                            //                         break;
+                                            //                     case 412:
+                                            //                         this.setState({
+                                            //                             message: error.response.data.messageCode,
+                                            //                             loading: false
+                                            //                         });
+                                            //                         break;
+                                            //                     default:
+                                            //                         this.setState({
+                                            //                             message: 'static.unkownError',
+                                            //                             loading: false
+                                            //                         });
+                                            //                         break;
+                                            //                 }
+                                            //             }
+                                            //         }
+                                            //     );
 
                                         })
                                 } else {
@@ -914,39 +916,39 @@ class ListUserComponent extends Component {
             <>
                 <TabPane tabId="1" className='pb-lg-0'>
                     {/* <Card> */}
-                        <CardBody className="pl-lg-1 pr-lg-1 pt-lg-0">
-                            {/* <div id="tableDiv1" className="table-responsive consumptionDataEntryTable"> */}
-                            <div id="tableDiv1" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USER') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
-                            </div>
-                        </CardBody>
-                        {/* <CardFooter> */}
-                            {/* <FormGroup>
+                    <CardBody className="pl-lg-1 pr-lg-1 pt-lg-0">
+                        {/* <div id="tableDiv1" className="table-responsive consumptionDataEntryTable"> */}
+                        <div id="tableDiv1" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USER') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
+                        </div>
+                    </CardBody>
+                    {/* <CardFooter> */}
+                    {/* <FormGroup>
                                 <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                 <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => { this.addRow1(); }}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>
                                 &nbsp;
                             </FormGroup> */}
 
 
-                        {/* </CardFooter> */}
+                    {/* </CardFooter> */}
                     {/* </Card> */}
                 </TabPane>
 
                 <TabPane tabId="2" className='pb-lg-0'>
                     {/* <Card> */}
-                        <CardBody className="pl-lg-1 pr-lg-1 pt-lg-0">
-                            {/* <div id="tableDiv2" className="table-responsive consumptionDataEntryTable"> */}
-                            <div id="tableDiv2" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USER') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
-                            </div>
-                        </CardBody>
-                        {/* <CardFooter> */}
-                            {/* <FormGroup>
+                    <CardBody className="pl-lg-1 pr-lg-1 pt-lg-0">
+                        {/* <div id="tableDiv2" className="table-responsive consumptionDataEntryTable"> */}
+                        <div id="tableDiv2" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USER') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
+                        </div>
+                    </CardBody>
+                    {/* <CardFooter> */}
+                    {/* <FormGroup>
                                 <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                 <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => { this.addRow2(); }}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>
                                 &nbsp;
                             </FormGroup> */}
 
 
-                        {/* </CardFooter> */}
+                    {/* </CardFooter> */}
                     {/* </Card> */}
                 </TabPane>
 
