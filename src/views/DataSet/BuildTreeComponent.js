@@ -5537,7 +5537,7 @@ export default class BuildTree extends Component {
                     console.log("pl 5---");
                     if (this.state.addNodeFlag && currentItemConfig.context.payload.nodeType.id == 5) {
                         console.log("pl 6---");
-                        currentItemConfig.context.payload.label = this.state.planningUnitList[0].label;
+                        currentItemConfig.context.payload.label = JSON.parse(JSON.stringify(this.state.planningUnitList[0].label));
                     }
                     console.log("pl 7---");
                     this.setState({
@@ -6958,17 +6958,6 @@ export default class BuildTree extends Component {
             console.log("currentItemConfig.context.payload after$$$", currentItemConfig.context.payload);
             console.log("current scenario$$$", this.state.currentScenario);
             this.calculateParentValueFromMOM((currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].month);
-            // var parentValue;
-            // if (this.state.addNodeFlag !== "true") {
-            //     parentValue = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue;
-            // } else {
-            //     parentValue = (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue;
-            // }
-            // (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue = ((value * parentValue) / 100).toString()
-            // console.log("calculatedDataValue---", (value * parentValue) / 100);
-            // this.setState({
-            //     parentValue: parentValue
-            // })
         }
         if (event.target.name === "nodeValue") {
             console.log("$$$$-----", (event.target.value).replaceAll(",", ""));
@@ -6979,82 +6968,12 @@ export default class BuildTree extends Component {
             (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].notes = event.target.value;
             this.getNotes();
         }
-        // if (event.target.name === "forecastingUnitId") {
-        //     (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.id = event.target.value;
-        //     if (event.target.value != null && event.target.value != "") {
-        //         var forecastingUnitId = document.getElementById("forecastingUnitId");
-        //         var forecastingUnitLabel = forecastingUnitId.options[forecastingUnitId.selectedIndex].text;
-        //         console.log("forecastingUnitLabel---", forecastingUnitLabel);
-        //         (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.label.label_en = forecastingUnitLabel;
-        //     }
-        //     this.getForecastingUnitUnitByFUId(event.target.value);
-        // }
 
         if (event.target.name === "tracerCategoryId") {
             console.log("currentItemConfig before tc---", currentItemConfig);
             var fuNode = (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode;
-            // var forecastingUnit = (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit;
-            // var tracerCategory = {
-            //     "id": parseInt(event.target.value),
-            //     "label": {
-            //         "active": true,
-            //         "createdBy": "",
-            //         "createdDate": "",
-            //         "labelId": "",
-            //         "label_en": "",
-            //         "label_fr": "",
-            //         "label_pr": "",
-            //         "label_sp": "",
-            //         "lastModifiedBy": "",
-            //         "lastModifiedDate": ""
-            //     },
-            //     "idString": ''
-            // }
 
-            // var forecastingUnit = {
-            //     "id": fuNode.forecastingUnit.id,
-            //     "label": fuNode.forecastingUnit.label,
-            //     "unit": fuNode.forecastingUnit.unit,
-            //     "tracerCategory": {
-            //         "id": parseInt(event.target.value),
-            //         "label": {
-            //             "active": true,
-            //             "createdBy": "",
-            //             "createdDate": "",
-            //             "labelId": "",
-            //             "label_en": "",
-            //             "label_fr": "",
-            //             "label_pr": "",
-            //             "label_sp": "",
-            //             "lastModifiedBy": "",
-            //             "lastModifiedDate": ""
-            //         },
-            //         "idString": ''
-            //     }
-            // }
-            // console.log("tracerCategory obj 1---", tracerCategory);
-            // // forecastingUnit.tracerCategory = tracerCategory;
-            // console.log("tracerCategory obj 2---", forecastingUnit);
-
-            // var value = event.target.value;
-            // var forecastingUnit = {
-            //     id: fuNode.forecastingUnit.id,
-            //     label: fuNode.forecastingUnit.label,
-            //     unit: fuNode.forecastingUnit.unit,
-            //     tracerCategory: {
-            //         id: 6
-            //     }
-            // }
-
-
-            // fuNode.forecastingUnit = JSON.parse(JSON.stringify(forecastingUnit));
-            // fuNode.forecastingUnit = forecastingUnit;
-            // console.log("tracerCategory obj 3---", fuNode);
-            // console.log("scenarioId---", scenarioId);
-
-            currentItemConfig.context.payload.nodeDataMap[scenarioId][0].fuNode.forecastingUnit.tracerCategory.id = event.target.value;
-            console.log("tracer category on change---", event.target.value);
-            console.log("tracer category on change- obj--", currentItemConfig);
+            currentItemConfig.context.payload.nodeDataMap[scenarioId][0].fuNode.forecastingUnit.tracerCategory.id = event.target.value;        
             this.filterUsageTemplateList(event.target.value);
         }
 
@@ -7169,7 +7088,7 @@ export default class BuildTree extends Component {
                 (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].puNode.planningUnit.unit.id = pu.unit.id;
                 (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].puNode.planningUnit.id = event.target.value;
                 (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].puNode.planningUnit.multiplier = pu.multiplier;
-                currentItemConfig.context.payload.label = pu.label;
+                currentItemConfig.context.payload.label = JSON.parse(JSON.stringify(pu.label));
             } else {
                 (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].puNode.planningUnit.unit.id = '';
                 (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].puNode.planningUnit.id = '';
@@ -7180,7 +7099,7 @@ export default class BuildTree extends Component {
                     label_sp: '',
                     label_pr: ''
                 }
-                currentItemConfig.context.payload.label = label;
+                currentItemConfig.context.payload.label = JSON.parse(JSON.stringify(label));
             }
             this.setState({
                 conversionFactor: event.target.value != "" && pu != "" ? pu.multiplier : ''
@@ -7200,12 +7119,6 @@ export default class BuildTree extends Component {
         }, () => {
             console.log("after state update---", this.state.currentItemConfig);
             console.log("after state update current scenario---", this.state.currentScenario);
-            // if (this.state.activeTab1[0] == '1') {
-            //     var isValid = document.getElementById('isValidError').value;
-            //     console.log("isValid 1---", isValid);
-            //     console.log("isValid 2---", isValid != '{}');
-            //     this.setState({ isValidError: isValid != '{}' });
-            // }
             if (flag) {
                 if (event.target.name === "planningUnitId") {
                     this.calculatePUPerVisit(false);
