@@ -455,7 +455,9 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                 var parent = (flatList[fl].parent);
                                 var parentFiltered = (flatListUnsorted.filter(c => c.id == parent))[0];
                                 var parentNodeNodeData = (parentFiltered.payload.nodeDataMap[scenarioList[ndm].id])[0];
-                                if (parentNodeNodeData.fuNode.usageType.id == 2 && nodeDataMapForScenario.puNode.refillMonths > 1) {
+                                if (parentNodeNodeData.fuNode.usageType.id == 2
+                                    //  && nodeDataMapForScenario.puNode.refillMonths > 1
+                                ) {
                                     var daysPerMonth = 365 / 12;
 
                                     var grandParent = parentFiltered.parent;

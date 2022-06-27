@@ -2711,7 +2711,18 @@ export default class CreateTreeTemplate extends Component {
                 grandParentMomList = grandParentNodeData.nodeDataMomList;
                 console.log("grandParentNodeData$$$%%%", grandParentNodeData)
                 if (grandParentNodeData != undefined) {
-                    patients = grandParentNodeData.calculatedDataValue != null ? grandParentNodeData.calculatedDataValue : grandParentNodeData.dataValue;
+                    var minusNumber = (momList[0].month == 1 ? momList[0].month - 2 : momList[0].month - 1);
+                    var grandParentPrevMonthMMDValue = grandParentNodeData.nodeDataMomList.filter(c => c.month == minusNumber);
+                    if (grandParentPrevMonthMMDValue.length > 0) {
+                        patients = grandParentPrevMonthMMDValue[0].calculatedValue;
+                    } else {
+                        var grandParentCurMonthMMDValue = grandParentNodeData.nodeDataMomList.filter(c => c.month == momList[0].month);
+                        if (grandParentCurMonthMMDValue.length > 0) {
+                            patients = grandParentCurMonthMMDValue[0].calculatedValue;
+                        } else {
+                            patients = 0;
+                        }
+                    }
                 } else {
                     patients = 0;
                 }
@@ -2733,19 +2744,31 @@ export default class CreateTreeTemplate extends Component {
             data[6] = this.state.currentItemConfig.context.payload.nodeType.id != 5 ? `=ROUND((E${parseInt(j) + 1}*${momListParentForMonth.length > 0 ? parseFloat(momListParentForMonth[0].calculatedValue) : 0}/100)*L${parseInt(j) + 1},4)` : `=ROUND((E${parseInt(j) + 1}*${momListParentForMonth.length > 0 ? parseFloat(momListParentForMonth[0].calculatedValue) : 0}/100)/${(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.multiplier},4)`;
             // data[6] = this.state.manualChange ? momList[j].calculatedValue : ((momListParent[j].manualChange > 0) ? momListParent[j].endValueWithManualChangeWMC : momListParent[j].calculatedValueWMC *  momList[j].endValueWithManualChangeWMC) / 100
             data[7] = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].nodeDataId
-            data[8] = this.state.currentItemConfig.context.payload.nodeType.id == 4 || (this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 2 && (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.refillMonths > 1) ? j >= lagInMonths ? `=IF(P${parseInt(j) + 1 - lagInMonths}<0,0,P${parseInt(j) + 1 - lagInMonths})` : 0 : `=IF(P${parseInt(j) + 1}<0,0,P${parseInt(j) + 1})`;
+            data[8] = this.state.currentItemConfig.context.payload.nodeType.id == 4 || (this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 2) ? j >= lagInMonths ? `=IF(P${parseInt(j) + 1 - lagInMonths}<0,0,P${parseInt(j) + 1 - lagInMonths})` : 0 : `=IF(P${parseInt(j) + 1}<0,0,P${parseInt(j) + 1})`;
             data[9] = `=ROUND(IF(B${parseInt(j) + 1}+C${parseInt(j) + 1}<0,0,B${parseInt(j) + 1}+C${parseInt(j) + 1}),4)`
             data[10] = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].manualChangesEffectFuture;
             data[11] = this.state.currentItemConfig.context.payload.nodeType.id == 4 ? fuPerMonth : 1;
             data[12] = `=FLOOR.MATH(${j}/${monthsPerVisit},1)`;
-            if (this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 2 && (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.refillMonths > 1) {
+            if (this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 2) {
+                var dataValue = 0;
+                var minusNumber = (momList[j].month == 1 ? momList[j].month - 2 : momList[j].month - 1);
+                var calculatedValueFromCurMonth = grandParentMomList.filter(c => c.month == momList[j].month);
+                var calculatedValueFromPrevMonth = grandParentMomList.filter(c => c.month == minusNumber);
+                var calculatedValueForCurMonth = 0;
+                var calculatedValueForPrevMonth = 0;
+                if (calculatedValueFromCurMonth.length > 0) {
+                    calculatedValueForCurMonth = calculatedValueFromCurMonth[0].calculatedValue;
+                }
+                if (calculatedValueFromPrevMonth.length > 0) {
+                    calculatedValueForPrevMonth = calculatedValueFromPrevMonth[0].calculatedValue;
+                }
                 var dataValue = 0;
                 if (Math.floor(j / monthsPerVisit) == 0) {
-                    dataValue = (patients / monthsPerVisit) + (j == 0 ? grandParentMomList[j].calculatedValue - patients : grandParentMomList[j].calculatedValue - grandParentMomList[j - 1].calculatedValue)
+                    dataValue = (patients / monthsPerVisit) + (j == 0 ? calculatedValueForCurMonth - patients : calculatedValueForCurMonth - calculatedValueForPrevMonth)
                 } else {
-                    dataValue = dataArray[j - monthsPerVisit][14] + (j == 0 ? grandParentMomList[j].calculatedValue - patients : grandParentMomList[j].calculatedValue - grandParentMomList[j - 1].calculatedValue)
+                    dataValue = dataArray[j - monthsPerVisit][14] + (j == 0 ? calculatedValueForCurMonth - patients : calculatedValueForCurMonth - calculatedValueForPrevMonth)
                 }
-                data[13] = j == 0 ? grandParentMomList[j].calculatedValue - patients : grandParentMomList[j].calculatedValue - grandParentMomList[j - 1].calculatedValue;
+                data[13] = j == 0 ? calculatedValueForCurMonth - patients : calculatedValueForCurMonth - calculatedValueForPrevMonth;
                 data[14] = dataValue;
             } else {
                 data[13] = 0;
@@ -2753,7 +2776,7 @@ export default class CreateTreeTemplate extends Component {
             }
             var nodeDataMomListPercForFU = [];
             var fuPercentage = 0;
-            if (this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 2 && (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.refillMonths > 1) {
+            if (this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 2) {
                 if (parentNodeNodeData.nodeDataMomList != undefined) {
                     nodeDataMomListPercForFU = parentNodeNodeData.nodeDataMomList.filter(c => c.month == momList[j].month);
                     if (nodeDataMomListPercForFU.length > 0) {
@@ -2761,7 +2784,7 @@ export default class CreateTreeTemplate extends Component {
                     }
                 }
             }
-            data[15] = this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 2 && (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.refillMonths > 1 ? `=ROUND((O${parseInt(j) + 1}*${noOfBottlesInOneVisit}*(E${parseInt(j) + 1}/100)*${fuPercentage}/100),0)` : `=G${parseInt(j) + 1}`;
+            data[15] = this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 2 ? `=ROUND((O${parseInt(j) + 1}*${noOfBottlesInOneVisit}*(E${parseInt(j) + 1}/100)*${fuPercentage}/100),0)` : `=G${parseInt(j) + 1}`;
             // `=ROUND(((E${parseInt(j) + 1}*F${parseInt(j) + 1})/100),0)`
             dataArray[count] = data;
             count++;
