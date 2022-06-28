@@ -1929,21 +1929,21 @@ export default class PlanningUnitSetting extends Component {
                     // readOnly: true //1B
                 },
                 {
-                    title: i18n.t('static.commitTree.consumptionForecast')+' ?',
+                    title: i18n.t('static.commitTree.consumptionForecast') + ' ?',
                     type: 'checkbox',
                     width: '150',
                     readOnly: ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) ? false : true)
                     // readOnly: true //2C
                 },
                 {
-                    title: i18n.t('static.TreeForecast.TreeForecast')+' ?',
+                    title: i18n.t('static.TreeForecast.TreeForecast') + ' ?',
                     type: 'checkbox',
                     width: '150',
                     readOnly: ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) ? false : true)
                     // readOnly: true //3D
                 },
                 {
-                    title: i18n.t('static.planningUnitSetting.stockEndOf') + this.state.beforeEndDateDisplay + ')',
+                    title: i18n.t('static.planningUnitSetting.stockEndOf') + ' ' + this.state.beforeEndDateDisplay + ')',
                     type: 'numeric',
                     textEditor: true,
                     decimal: '.',
@@ -2919,14 +2919,14 @@ export default class PlanningUnitSetting extends Component {
                 {/* <h5 className="red">{i18n.t(this.state.message)}</h5> */}
                 <h5 className={this.state.color} id="div2">{i18n.t(this.state.message)}</h5>
                 <Card>
-                <div className="card-header-actions">
-            <div className="Card-header-reporticon">
-              <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
-              <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span>
-              <span className="compareAndSelect-larrowText"> {i18n.t('static.common.backTo')} <a href="/#/dataset/versionSettings" className="supplyplanformulas">{i18n.t('static.UpdateversionSettings.UpdateversionSettings')}</a></span>
-              <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')} <a href={this.state.datasetId != -1 && this.state.datasetId != "" && this.state.datasetId != undefined ? "/#/dataSet/buildTree/tree/0/" + this.state.datasetId : "/#/dataSet/buildTree"} className="supplyplanformulas">{i18n.t('static.common.managetree')}</a> {i18n.t('static.tree.or')} <a href="/#/importFromQATSupplyPlan/listImportFromQATSupplyPlan" className='supplyplanformulas'>{i18n.t('static.importFromQATSupplyPlan.importFromQATSupplyPlan')}</a></span>
-            </div>
-          </div>
+                    <div className="card-header-actions">
+                        <div className="Card-header-reporticon">
+                            <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
+                            <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span>
+                            <span className="compareAndSelect-larrowText"> {i18n.t('static.common.backTo')} <a href="/#/dataset/versionSettings" className="supplyplanformulas">{i18n.t('static.UpdateversionSettings.UpdateversionSettings')}</a></span>
+                            <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')} <a href={this.state.datasetId != -1 && this.state.datasetId != "" && this.state.datasetId != undefined ? "/#/dataSet/buildTree/tree/0/" + this.state.datasetId : "/#/dataSet/buildTree"} className="supplyplanformulas">{i18n.t('static.common.managetree')}</a> {i18n.t('static.tree.or')} <a href="/#/importFromQATSupplyPlan/listImportFromQATSupplyPlan" className='supplyplanformulas'>{i18n.t('static.importFromQATSupplyPlan.importFromQATSupplyPlan')}</a></span>
+                        </div>
+                    </div>
 
                     <CardBody className="pb-lg-3 pt-lg-0">
                         <div className="" >
@@ -3028,14 +3028,14 @@ export default class PlanningUnitSetting extends Component {
                         this.state.allowAdd &&
                         <CardFooter>
                             {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS') &&
-                            <FormGroup>
-                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                {this.state.isChanged1 &&
-                                    <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                }
-                                <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>
-                                &nbsp;
-                            </FormGroup>
+                                <FormGroup>
+                                    <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                    {this.state.isChanged1 &&
+                                        <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                    }
+                                    <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>
+                                    &nbsp;
+                                </FormGroup>
                             }
                         </CardFooter>
                     }
