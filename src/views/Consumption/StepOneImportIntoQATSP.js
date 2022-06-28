@@ -1315,33 +1315,33 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     <Modal isOpen={this.state.showGuidance}
                         className={'modal-xl ' + this.props.className} >
                         <ModalHeader toggle={() => this.toggleShowGuidance()} className="ModalHead modal-info-Headher">
-                            <strong className="TextWhite">Show Guidance</strong>
+                            <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
                         </ModalHeader>
                         <div>
                             <ModalBody>
                                 <div>
-                                    <h3 className='ShowGuidanceHeading'>QAT Forecast Import</h3>
+                                    <h3 className='ShowGuidanceHeading'>{i18n.t('static.importIntoQATSupplyPlan.importIntoQATSupplyPlan')}</h3>
                                 </div>
                                 <p>
-                                    <p style={{ fontSize: '13px' }}><span className="UnderLineText">Purpose :</span> Enable users to import QAT-created forecasts into supply plan programs. Forecasts are only available for importing if 1) they are committed as a final version and 2) there is a forecast selected for each planning unit.</p>
+                                    <p style={{ fontSize: '13px' }}><span className="UnderLineText">{i18n.t('static.listTree.purpose')} :</span> {i18n.t('static.QATForecastImport.EnableUsers')}</p>
                                 </p>
                                 <p>
-                                    <p style={{ fontSize: '13px' }}><span className="UnderLineText">Using this screen :</span></p>
-                                    <p><b>(Step 1)</b>
+                                    <p style={{ fontSize: '13px' }}><span className="UnderLineText">{i18n.t('static.listTree.useThisScreen')} :</span></p>
+                                    <p><b>{i18n.t('static.QATForecastImport.StepOne')}</b>
                                         <ul>
-                                            <li>Select which forecast program to import from (only final forecasts are available)</li>
-                                            <li>Select which supply plan program to import to. </li>
-                                            <li>Select the date range of forecast data to import, which are restricted as follows:
+                                            <li>{i18n.t('static.QATForecastImport.ForecastProgram')}</li>
+                                            <li>{i18n.t('static.QATForecastImport.ProgramToImport')} </li>
+                                            <li>{i18n.t('static.QATForecastImport.DateRange')}:
                                                 <ul>
-                                                    <li>Must be within the forecast period</li>
-                                                    <li>The oldest forecasted consumption you can import is 6 months before the current month. </li>
-                                                    <li>If the entire forecast period is more than 6 months in the past, the forecast cannot be imported, and the version will not appear in the program dropdown </li>
+                                                    <li>{i18n.t('static.QATForecastImport.ForecastPeriod')}</li>
+                                                    <li>{i18n.t('static.QATForecastImport.OldestForecasted')} </li>
+                                                    <li>{i18n.t('static.QATForecastImport.EntireForecast')} </li>
                                                 </ul>
                                             </li>
-                                            <li>In the table that appears, select and map planning units.
+                                            <li>{i18n.t('static.QATForecastImport.TableAppears')}
                                                 <ul>
-                                                    <li>For every Forecasting Planning Unit, QAT requires a corresponding Supply Plan Planning Unit and conversion factor. QAT automatically maps exact planning unit matches, but users can override both the planning unit mapping and conversion factor. </li>
-                                                    <li>Not all forecast planning units need to be imported, however, all forecast planning units must have a selection in the mapping table. For example, in the below table, even though 2 products are not being imported, you would still need to select 'Do not import'.</li>
+                                                    <li>{i18n.t('static.QATForecastImport.EveryForecasting')} </li>
+                                                    <li>{i18n.t('static.QATForecastImport.AllForecast')}</li>
                                                     <br></br>
                                                     <img className="img-fluid" src={ShowGuidanceScreenshot1} style={{width:'971px'}} />
                                                 </ul>
@@ -1350,103 +1350,103 @@ export default class StepOneImportMapPlanningUnits extends Component {
                                             </li>
                                         </ul>
                                     </p>
-                                    <p><b>(Step 2) </b>
-                                        For each Forecast region, input how much (%) of that region's forecast you will import and which region the forecasted consumption will be imported into. Below are some use cases:
+                                    <p><b>{i18n.t('static.QATForecastImport.StepTwo')} </b>
+                                    {i18n.t('static.QATForecastImport.ForecastRegion')}:
                                         <ul>
-                                            <li>National forecast to national supply plan
+                                            <li>{i18n.t('static.QATForecastImport.NationalForecast')}
                                                 <table className="table table-bordered ">
                                                     <thead>
                                                         <tr>
-                                                            <th>Forecast Region (s)</th>
-                                                            <th>% of Forecast</th>
-                                                            <th>Supply Plan Region</th>
+                                                            <th>{i18n.t('static.QATForecastImport.ForecastRegion')}</th>
+                                                            <th>% {i18n.t('static.QATForecastImport.OfForecast')}</th>
+                                                            <th>{i18n.t('static.QATForecastImport.SPRegion')}</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
                                                         <tr>
-                                                            <td>National</td>
+                                                            <td>{i18n.t('static.QATForecastImport.National')}</td>
                                                             <td>100</td>
-                                                            <td>National</td>
+                                                            <td>{i18n.t('static.QATForecastImport.National')}</td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
                                             </li>
                                         </ul>
                                         <ul>
-                                            <li>Multi-region forecast to multi-region supply plan
+                                            <li>{i18n.t('static.QATForecastImport.MultiRegion')}
                                                 <table className="table table-bordered ">
                                                     <thead>
                                                         <tr>
-                                                            <th>Forecast Region (s)</th>
-                                                            <th>% of Forecast</th>
-                                                            <th>Supply Plan Region</th>
+                                                            <th>{i18n.t('static.QATForecastImport.ForecastRegion')}</th>
+                                                            <th>% {i18n.t('static.QATForecastImport.OfForecast')}</th>
+                                                            <th>{i18n.t('static.QATForecastImport.SPRegion')}</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
                                                         <tr>
-                                                            <td>North</td>
+                                                            <td>{i18n.t('static.QATForecastImport.North')}</td>
                                                             <td>100</td>
-                                                            <td>North</td>
+                                                            <td>{i18n.t('static.QATForecastImport.North')}</td>
                                                         </tr>
                                                         <tr>
-                                                            <td>East</td>
+                                                            <td>{i18n.t('static.QATForecastImport.East')}</td>
                                                             <td>100</td>
-                                                            <td>East</td>
+                                                            <td>{i18n.t('static.QATForecastImport.East')}</td>
                                                         </tr>
                                                         <tr>
-                                                            <td>South</td>
+                                                            <td>{i18n.t('static.QATForecastImport.South')}</td>
                                                             <td>100</td>
-                                                            <td>South</td>
+                                                            <td>{i18n.t('static.QATForecastImport.South')}</td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
                                             </li>
                                         </ul>
                                         <ul>
-                                            <li>Multi-region forecast to national supply plan –
+                                            <li>{i18n.t('static.QATForecastImport.MultiRegionSP')} -
                                                 <table className="table table-bordered ">
                                                     <thead>
                                                         <tr>
-                                                            <th>Forecast Region (s)</th>
-                                                            <th>% of Forecast</th>
-                                                            <th>Supply Plan Region</th>
+                                                            <th>{i18n.t('static.QATForecastImport.ForecastRegion')}</th>
+                                                            <th>% {i18n.t('static.QATForecastImport.OfForecast')}</th>
+                                                            <th>{i18n.t('static.QATForecastImport.SPRegion')}</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
                                                         <tr>
-                                                            <td>North</td>
+                                                            <td>{i18n.t('static.QATForecastImport.North')}</td>
                                                             <td>100</td>
-                                                            <td>National</td>
+                                                            <td>{i18n.t('static.QATForecastImport.National')}</td>
                                                         </tr>
                                                         <tr>
-                                                            <td>East</td>
+                                                            <td>{i18n.t('static.QATForecastImport.East')}</td>
                                                             <td>100</td>
-                                                            <td>National</td>
+                                                            <td>{i18n.t('static.QATForecastImport.National')}</td>
                                                         </tr>
                                                         <tr>
-                                                            <td>South</td>
+                                                            <td>{i18n.t('static.QATForecastImport.South')}</td>
                                                             <td>100</td>
-                                                            <td>National</td>
+                                                            <td>{i18n.t('static.QATForecastImport.National')}</td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
                                             </li>
                                         </ul>
                                         <ul>
-                                            <li>National forecast to multi-region supply plan - note that the import process needs to be repeated for each supply plan region.
+                                            <li>{i18n.t('static.QATForecastImport.ForecastToMultiRegion')}
                                                 <table className="table table-bordered ">
                                                     <thead>
                                                         <tr>
-                                                            <th>Forecast Region (s)</th>
-                                                            <th>% of Forecast</th>
-                                                            <th>Supply Plan Region</th>
+                                                            <th>{i18n.t('static.QATForecastImport.ForecastRegion')}</th>
+                                                            <th>% {i18n.t('static.QATForecastImport.OfForecast')}</th>
+                                                            <th>{i18n.t('static.QATForecastImport.SPRegion')}</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
                                                         <tr>
-                                                            <td>National</td>
+                                                            <td>{i18n.t('static.QATForecastImport.National')}</td>
                                                             <td>20</td>
-                                                            <td>North</td>
+                                                            <td>{i18n.t('static.QATForecastImport.North')}</td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
@@ -1454,16 +1454,16 @@ export default class StepOneImportMapPlanningUnits extends Component {
                                                 <table className="table table-bordered ">
                                                     <thead>
                                                         <tr>
-                                                            <th>Forecast Region (s)</th>
-                                                            <th>% of Forecast</th>
-                                                            <th>Supply Plan Region</th>
+                                                            <th>{i18n.t('static.QATForecastImport.ForecastRegion')}</th>
+                                                            <th>% {i18n.t('static.QATForecastImport.OfForecast')}</th>
+                                                            <th>{i18n.t('static.QATForecastImport.SPRegion')}</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
                                                         <tr>
-                                                            <td>National</td>
+                                                            <td>{i18n.t('static.QATForecastImport.National')}</td>
                                                             <td>45</td>
-                                                            <td>South</td>
+                                                            <td>{i18n.t('static.QATForecastImport.South')}</td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
@@ -1471,38 +1471,38 @@ export default class StepOneImportMapPlanningUnits extends Component {
                                                 <table className="table table-bordered ">
                                                     <thead>
                                                         <tr>
-                                                            <th>Forecast Region (s)</th>
-                                                            <th>% of Forecast</th>
-                                                            <th>Supply Plan Region</th>
+                                                            <th>{i18n.t('static.QATForecastImport.ForecastRegion')}</th>
+                                                            <th>% {i18n.t('static.QATForecastImport.OfForecast')}</th>
+                                                            <th>{i18n.t('static.QATForecastImport.SPRegion')}</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
                                                         <tr>
-                                                            <td>National</td>
+                                                            <td>{i18n.t('static.QATForecastImport.National')}</td>
                                                             <td>35</td>
-                                                            <td>East</td>
+                                                            <td>{i18n.t('static.QATForecastImport.East')}</td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
                                             </li>
                                         </ul>
                                     </p>
-                                    <p><b>(Step 3) </b><br></br>
-                                        QAT will list each forecast record to be imported (one row for each planning unit, region and month combination).
+                                    <p><b>{i18n.t('static.QATForecastImport.StepThree')} </b><br></br>
+                                    {i18n.t('static.QATForecastImport.ListForecast')}
                                         <ul>
-                                            <li>QAT calculates the Forecasted Consumption to be imported as follows: </li>
+                                            <li>{i18n.t('static.QATForecastImport.ImportedFollows')}: </li>
                                             <img className="formula-img-mr img-fluid mb-lg-0" src={ForecastedConsumptionimported} style={{ border: '1px solid #fff', marginLeft: '-20px' }} />
                                             <p>
-                                                For the following example:
+                                            {i18n.t('static.QATForecastImport.FollowingExample')}:
                                                 <ul>
-                                                    <li>A national forecast that will be split into two regions of 50% each</li>
-                                                    <li>The Forecast Planning Unit is in packs of 3, and the Supply Plan Planning Unit is in packs of 1 (Conversion factor = 3)</li>
-                                                    <li>The national forecast for Month X was 100 (packs of 3)</li>
-                                                    <li>Forecast of 100 * 50% * 3 = 150  (packs of 1) will be imported into each region for month X</li>
+                                                    <li>{i18n.t('static.QATForecastImport.SplitInto')}</li>
+                                                    <li>{i18n.t('static.QATForecastImport.ForecastPlanning')}</li>
+                                                    <li>{i18n.t('static.QATForecastImport.ForecastForMonth')}</li>
+                                                    <li>Forecast of 100 * 50% * 3 = 150  {i18n.t('static.QATForecastImport.ImportedIntoEach')}</li>
                                                 </ul>
                                             </p>
-                                            <li>If there is an existing forecasted consumption in the supply plan, the 'Current Forecasted Consumption' cell will be highlighted yellow. </li>
-                                            <li>Use the "Import?" column to de-select any forecasts that you do NOT want to import into the supply plan. If checked, the Converted Forecasted Consumption will override the Supply Plan forecast. If unchecked, the current Supply Plan forecast will remain.</li>
+                                            <li>{i18n.t('static.QATForecastImport.ExistingForecasted')} </li>
+                                            <li>{i18n.t('static.QATForecastImport.ImportColumn')}</li>
                                             <br></br>
                                             <img className="img-fluid" src={ShowGuidanceScreenshot2} style={{width:'971px'}}/>
                                         </ul>
