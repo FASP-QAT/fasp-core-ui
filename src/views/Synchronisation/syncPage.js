@@ -3548,8 +3548,8 @@ export default class syncPage extends Component {
         <TabPane tabId="1">
           <Row>
             <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
-              <Col md="12 pl-0" id="realmDiv">
-                <div className="table-responsive RemoveStriped">
+              <Col md="12 pl-0 pr-lg-0" id="realmDiv">
+                <div className="table-responsive RemoveStriped consumptionDataEntryTable">
                   <div id="mergedVersionConsumption" />
                 </div>
               </Col>
@@ -3559,8 +3559,8 @@ export default class syncPage extends Component {
         <TabPane tabId="2">
           <Row>
             <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
-              <Col md="12 pl-0" id="realmDiv">
-                <div className="table-responsive RemoveStriped">
+              <Col md="12 pl-0 pr-lg-0" id="realmDiv">
+                <div className="table-responsive RemoveStriped consumptionDataEntryTable">
                   <div id="mergedVersionInventory" />
                 </div>
               </Col>
@@ -3570,8 +3570,8 @@ export default class syncPage extends Component {
         <TabPane tabId="3">
           <Row>
             <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
-              <Col md="12 pl-0" id="realmDiv">
-                <div className="table-responsive RemoveStriped">
+              <Col md="12 pl-0 pr-lg-0" id="realmDiv">
+                <div className="table-responsive RemoveStriped consumptionDataEntryTable">
                   <div id="mergedVersionShipment" />
                 </div>
               </Col>
@@ -3582,7 +3582,7 @@ export default class syncPage extends Component {
           <Row>
             <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
               <Col md="12 pl-0" id="realmDiv">
-                <div className="table-responsive RemoveStriped">
+                <div className="table-responsive RemoveStriped consumptionDataEntryTable">
                   <div id="mergedVersionShipmentLinked" />
                 </div>
               </Col>
@@ -3593,7 +3593,7 @@ export default class syncPage extends Component {
           <Row>
             <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
               <Col md="12 pl-0" id="realmDiv">
-                <div className="table-responsive RemoveStriped">
+                <div className="table-responsive RemoveStriped consumptionDataEntryTable">
                   <div id="mergedVersionProblemList" />
                 </div>
               </Col>
@@ -3885,7 +3885,7 @@ export default class syncPage extends Component {
             </ul>
           </ModalHeader>
           <ModalBody>
-            <div className="table-responsive RemoveStriped">
+            <div className="table-responsive RemoveStriped consumptionDataEntryTable">
               <div id="resolveConflictsTable" />
               <input type="hidden" id="index" />
             </div>
@@ -3909,7 +3909,7 @@ export default class syncPage extends Component {
             </ul>
           </ModalHeader>
           <ModalBody>
-            <div className="table-responsive RemoveStriped">
+            <div className="table-responsive RemoveStriped consumptionDataEntryTable">
               <div id="resolveConflictsInventoryTable" />
               <input type="hidden" id="indexInventory" />
             </div>
@@ -3932,7 +3932,7 @@ export default class syncPage extends Component {
             </ul>
           </ModalHeader>
           <ModalBody>
-            <div className="table-responsive RemoveStriped">
+            <div className="table-responsive RemoveStriped consumptionDataEntryTable">
               <div id="resolveConflictsShipmentTable" />
               <input type="hidden" id="indexShipment" />
             </div>
@@ -3955,7 +3955,7 @@ export default class syncPage extends Component {
             </ul>
           </ModalHeader>
           <ModalBody>
-            <div className="table-responsive RemoveStriped">
+            <div className="table-responsive RemoveStriped consumptionDataEntryTable">
               <div id="resolveConflictsProblemTable" />
               <input type="hidden" id="indexProblem" />
             </div>

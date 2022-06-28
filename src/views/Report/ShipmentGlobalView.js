@@ -42,7 +42,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import RealmCountryService from '../../api/RealmCountryService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH } from '../../Constants.js'
+import { SECRET_KEY, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, DATE_FORMAT_CAP } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
@@ -56,7 +56,7 @@ import ProgramService from '../../api/ProgramService';
 import FundingSourceService from '../../api/FundingSourceService';
 import ProcurementAgentService from "../../api/ProcurementAgentService";
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import {MultiSelect} from 'react-multi-select-component';
+import { MultiSelect } from 'react-multi-select-component';
 // const { getToggledOptions } = utils;
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
@@ -84,180 +84,6 @@ var dates = ["Some l-o-o-o-o-o-o-o-o-o-o-o-n-n-n-n-n-n-g-g-g-g-g-g-g label", "AA
 
 var bar_ctx = document.getElementById('bar-chart');
 const colors = ['#004876', '#0063a0', '#007ecc', '#0093ee', '#82caf8', '#c8e6f4'];
-const options = {
-    title: {
-        display: true,
-        text: i18n.t('static.dashboard.shipmentGlobalViewheader'),
-        fontColor: 'black'
-    },
-    scales: {
-        xAxes: [{
-            labelMaxWidth: 100,
-            stacked: true,
-            gridLines: {
-                display: false
-            },
-        }],
-        yAxes: [{
-            stacked: true,
-            labelString: i18n.t('static.shipment.amount'),
-            ticks: {
-                beginAtZero: true,
-                fontColor: 'black',
-                callback: function (value) {
-                    var cell1 = value
-                    cell1 += '';
-                    var x = cell1.split('.');
-                    var x1 = x[0];
-                    var x2 = x.length > 1 ? '.' + x[1] : '';
-                    var rgx = /(\d+)(\d{3})/;
-                    while (rgx.test(x1)) {
-                        x1 = x1.replace(rgx, '$1' + ',' + '$2');
-                    }
-                    return x1 + x2;
-
-                }
-            }
-        }
-        ],
-    },
-    tooltips: {
-        enabled: false,
-        custom: CustomTooltips,
-        callbacks: {
-            label: function (tooltipItem, data) {
-
-                let label = data.labels[tooltipItem.index];
-                let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
-
-                var cell1 = value
-                cell1 += '';
-                var x = cell1.split('.');
-                var x1 = x[0];
-                var x2 = x.length > 1 ? '.' + x[1] : '';
-                var rgx = /(\d+)(\d{3})/;
-                while (rgx.test(x1)) {
-                    x1 = x1.replace(rgx, '$1' + ',' + '$2');
-                }
-                return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
-            }
-        }
-    },
-    maintainAspectRatio: false
-    ,
-    legend: {
-        display: true,
-        position: 'bottom',
-        labels: {
-            usePointStyle: true,
-            fontColor: 'black'
-        }
-    }
-}
-
-const options1 = {
-    title: {
-        display: true,
-        text: i18n.t('static.shipment.shipmentfundingSource'),
-        fontColor: 'black'
-    },
-    scales: {
-        xAxes: [{
-            labelMaxWidth: 100,
-            stacked: true,
-            gridLines: {
-                display: false
-            },
-        }],
-        yAxes: [{
-            stacked: true,
-            labelString: i18n.t('static.shipment.amount'),
-            ticks: {
-                beginAtZero: true,
-                fontColor: 'black',
-                callback: function (value) {
-                    var cell1 = value
-                    cell1 += '';
-                    var x = cell1.split('.');
-                    var x1 = x[0];
-                    var x2 = x.length > 1 ? '.' + x[1] : '';
-                    var rgx = /(\d+)(\d{3})/;
-                    while (rgx.test(x1)) {
-                        x1 = x1.replace(rgx, '$1' + ',' + '$2');
-                    }
-                    return x1 + x2;
-
-                }
-            }
-        }],
-    },
-    tooltips: {
-        enabled: false,
-        custom: CustomTooltips,
-        callbacks: {
-            label: function (tooltipItem, data) {
-
-                let label = data.labels[tooltipItem.index];
-                let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
-
-                var cell1 = value
-                cell1 += '';
-                var x = cell1.split('.');
-                var x1 = x[0];
-                var x2 = x.length > 1 ? '.' + x[1] : '';
-                var rgx = /(\d+)(\d{3})/;
-                while (rgx.test(x1)) {
-                    x1 = x1.replace(rgx, '$1' + ',' + '$2');
-                }
-                return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
-            }
-        }
-    },
-    maintainAspectRatio: false
-    ,
-    legend: {
-        display: true,
-        position: 'bottom',
-        labels: {
-            usePointStyle: true,
-            fontColor: 'black'
-        }
-    }
-}
-const options2 = {
-    title: {
-        display: true,
-        text: i18n.t('static.shipment.shipmentProcurementAgent'),
-        fontColor: 'black'
-    },
-    scales: {
-        xAxes: [{
-            labelMaxWidth: 100,
-            stacked: true,
-            gridLines: {
-                display: false
-            },
-        }],
-        yAxes: [{
-            stacked: true,
-            labelString: i18n.t('static.shipment.amount'),
-        }],
-    },
-    tooltips: {
-        enabled: false,
-        custom: CustomTooltips
-    },
-    maintainAspectRatio: false
-    ,
-    legend: {
-        display: true,
-        position: 'bottom',
-        labels: {
-            usePointStyle: true,
-            fontColor: 'black'
-        }
-    }
-}
 
 const chartData = {
     labels: ["Malawi", "Kenya", "Zimbabwe"],
@@ -408,7 +234,12 @@ class ShipmentGlobalView extends Component {
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
             loading: true,
-            programLst: []
+            programLst: [],
+            puUnit: {
+                label: {
+                    label_en: ''
+                }
+            },
 
 
         };
@@ -502,7 +333,7 @@ class ShipmentGlobalView extends Component {
             var B = [this.addDoubleQuoteToRowContent([(i18n.t('static.dashboard.months').replaceAll(',', ' ')).replaceAll(' ', '%20'), (i18n.t('static.program.realmcountry').replaceAll(',', ' ')).replaceAll(' ', '%20'), (i18n.t('static.supplyPlan.amountInUSD').replaceAll(',', ' ')).replaceAll(' ', '%20'), (tempLabel.replaceAll(',', ' ')).replaceAll(' ', '%20'), (i18n.t('static.common.status').replaceAll(',', ' ')).replaceAll(' ', '%20')])];
             re = this.state.shipmentList;
             for (var item = 0; item < re.length; item++) {
-                B.push([this.addDoubleQuoteToRowContent([(moment(re[item].transDate, 'YYYY-MM-dd').format('MMM YYYY').replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(re[item].country.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), re[item].amount, (getLabelText(re[item].fundingSourceProcurementAgent.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(re[item].shipmentStatus.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20')])])
+                B.push([this.addDoubleQuoteToRowContent([(moment(re[item].transDate, 'YYYY-MM-dd').format(DATE_FORMAT_CAP).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(re[item].country.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), re[item].amount, (getLabelText(re[item].fundingSourceProcurementAgent.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(re[item].shipmentStatus.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20')])])
             }
             for (var i = 0; i < B.length; i++) {
                 csvRow.push(B[i].join(","))
@@ -1356,10 +1187,12 @@ class ShipmentGlobalView extends Component {
         // console.log("endDate-----", endDate);
 
         if (realmId > 0 && planningUnitId != 0 && productCategoryId != -1 && this.state.countryValues.length > 0 && this.state.programValues.length > 0 && ((viewby == 2 && this.state.procurementAgentValues.length > 0) || (viewby == 1 && this.state.fundingSourceValues.length > 0))) {
-
+            let planningUnitUnit = this.state.planningUnits.filter(c => c.planningUnitId == planningUnitId)[0].unit;
+            console.log("planningUnitUnit------>", planningUnitUnit);
             this.setState({
                 message: '',
-                loading: true
+                loading: true,
+                puUnit: planningUnitUnit
             })
             // let realmId = AuthenticationService.getRealmId();
             var inputjson = {
@@ -1816,6 +1649,197 @@ class ShipmentGlobalView extends Component {
             if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
             return '?'
         }
+
+        const options = {
+            title: {
+                display: true,
+                text: i18n.t('static.dashboard.shipmentGlobalViewheader'),
+                fontColor: 'black'
+            },
+            scales: {
+                xAxes: [{
+                    labelMaxWidth: 100,
+                    stacked: true,
+                    gridLines: {
+                        display: false
+                    },
+                }],
+                yAxes: [{
+                    scaleLabel: {
+                        display: true,
+                        labelString: this.state.puUnit.label.label_en,
+                        fontColor: 'black'
+                    },
+                    stacked: true,
+                    labelString: i18n.t('static.shipment.amount'),
+                    ticks: {
+                        beginAtZero: true,
+                        fontColor: 'black',
+                        callback: function (value) {
+                            var cell1 = value
+                            cell1 += '';
+                            var x = cell1.split('.');
+                            var x1 = x[0];
+                            var x2 = x.length > 1 ? '.' + x[1] : '';
+                            var rgx = /(\d+)(\d{3})/;
+                            while (rgx.test(x1)) {
+                                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                            }
+                            return x1 + x2;
+
+                        }
+                    }
+                }
+                ],
+            },
+            tooltips: {
+                enabled: false,
+                custom: CustomTooltips,
+                callbacks: {
+                    label: function (tooltipItem, data) {
+
+                        let label = data.labels[tooltipItem.index];
+                        let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+
+                        var cell1 = value
+                        cell1 += '';
+                        var x = cell1.split('.');
+                        var x1 = x[0];
+                        var x2 = x.length > 1 ? '.' + x[1] : '';
+                        var rgx = /(\d+)(\d{3})/;
+                        while (rgx.test(x1)) {
+                            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                        }
+                        return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
+                    }
+                }
+            },
+            maintainAspectRatio: false
+            ,
+            legend: {
+                display: true,
+                position: 'bottom',
+                labels: {
+                    usePointStyle: true,
+                    fontColor: 'black'
+                }
+            }
+        }
+
+        const options1 = {
+            title: {
+                display: true,
+                text: i18n.t('static.shipment.shipmentfundingSource'),
+                fontColor: 'black'
+            },
+            scales: {
+                xAxes: [{
+                    labelMaxWidth: 100,
+                    stacked: true,
+                    gridLines: {
+                        display: false
+                    },
+                }],
+                yAxes: [{
+                    scaleLabel: {
+                        display: true,
+                        labelString: this.state.puUnit.label.label_en,
+                        fontColor: 'black'
+                    },
+                    stacked: true,
+                    labelString: i18n.t('static.shipment.amount'),
+                    ticks: {
+                        beginAtZero: true,
+                        fontColor: 'black',
+                        callback: function (value) {
+                            var cell1 = value
+                            cell1 += '';
+                            var x = cell1.split('.');
+                            var x1 = x[0];
+                            var x2 = x.length > 1 ? '.' + x[1] : '';
+                            var rgx = /(\d+)(\d{3})/;
+                            while (rgx.test(x1)) {
+                                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                            }
+                            return x1 + x2;
+
+                        }
+                    }
+                }],
+            },
+            tooltips: {
+                enabled: false,
+                custom: CustomTooltips,
+                callbacks: {
+                    label: function (tooltipItem, data) {
+
+                        let label = data.labels[tooltipItem.index];
+                        let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+
+                        var cell1 = value
+                        cell1 += '';
+                        var x = cell1.split('.');
+                        var x1 = x[0];
+                        var x2 = x.length > 1 ? '.' + x[1] : '';
+                        var rgx = /(\d+)(\d{3})/;
+                        while (rgx.test(x1)) {
+                            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                        }
+                        return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
+                    }
+                }
+            },
+            maintainAspectRatio: false
+            ,
+            legend: {
+                display: true,
+                position: 'bottom',
+                labels: {
+                    usePointStyle: true,
+                    fontColor: 'black'
+                }
+            }
+        }
+        const options2 = {
+            title: {
+                display: true,
+                text: i18n.t('static.shipment.shipmentProcurementAgent'),
+                fontColor: 'black'
+            },
+            scales: {
+                xAxes: [{
+                    labelMaxWidth: 100,
+                    stacked: true,
+                    gridLines: {
+                        display: false
+                    },
+                }],
+                yAxes: [{
+                    scaleLabel: {
+                        display: true,
+                        labelString: this.state.puUnit.label.label_en,
+                        fontColor: 'black'
+                    },
+                    stacked: true,
+                    labelString: i18n.t('static.shipment.amount'),
+                }],
+            },
+            tooltips: {
+                enabled: false,
+                custom: CustomTooltips
+            },
+            maintainAspectRatio: false
+            ,
+            legend: {
+                display: true,
+                position: 'bottom',
+                labels: {
+                    usePointStyle: true,
+                    fontColor: 'black'
+                }
+            }
+        }
+
 
 
         const bar = {

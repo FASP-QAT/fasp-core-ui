@@ -660,7 +660,7 @@ export default class PlanningUnitSetting extends Component {
             if (z != data[i].y) {
                 console.log("-----------------onPaste---------------------2");
                 var index = (instance.jexcel).getValue(`N${parseInt(data[i].y) + 1}`, true);
-                if (index == "" || index == null || index == undefined) {
+                if (index === "" || index == null || index == undefined) {
                     console.log("-----------------onPaste---------------------3");
                     // (instance.jexcel).setValueFromCoords(8, data[i].y, true, true);
                     (instance.jexcel).setValueFromCoords(2, data[i].y, true, true);
@@ -1931,13 +1931,15 @@ export default class PlanningUnitSetting extends Component {
                 {
                     title: i18n.t('static.commitTree.consumptionForecast')+' ?',
                     type: 'checkbox',
-                    width: '150'
+                    width: '150',
+                    readOnly: ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) ? false : true)
                     // readOnly: true //2C
                 },
                 {
                     title: i18n.t('static.TreeForecast.TreeForecast')+' ?',
                     type: 'checkbox',
-                    width: '150'
+                    width: '150',
+                    readOnly: ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) ? false : true)
                     // readOnly: true //3D
                 },
                 {
@@ -2026,6 +2028,7 @@ export default class PlanningUnitSetting extends Component {
                 {
                     title: 'Active',
                     type: 'checkbox',
+                    readOnly: ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) ? false : true)
                     // readOnly: true //16Q
                 },
                 {
@@ -2133,6 +2136,7 @@ export default class PlanningUnitSetting extends Component {
             position: 'top',
             filters: true,
             license: JEXCEL_PRO_KEY,
+            editable: ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) ? true : false),
             // contextMenu: function (obj, x, y, e) {
             //     return [];
             // }.bind(this),
@@ -3002,7 +3006,7 @@ export default class PlanningUnitSetting extends Component {
                             </div>
                         </div>
 
-                        <div className="UpdatePlanningSettingTable" style={{ display: this.state.loading ? "none" : "block" }}>
+                        <div className="UpdatePlanningSettingTable consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
                             <div id="tableDiv">
                             </div>
                         </div>
@@ -3023,7 +3027,7 @@ export default class PlanningUnitSetting extends Component {
                     {
                         this.state.allowAdd &&
                         <CardFooter>
-                            {/* {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_REALM_COUNTRY_PLANNING_UNIT') && */}
+                            {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS') &&
                             <FormGroup>
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 {this.state.isChanged1 &&
@@ -3032,7 +3036,7 @@ export default class PlanningUnitSetting extends Component {
                                 <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>
                                 &nbsp;
                             </FormGroup>
-                            {/* } */}
+                            }
                         </CardFooter>
                     }
 

@@ -405,7 +405,7 @@ export default class SupplyPlanComponent extends React.Component {
         csvRow.push('')
 
         const header = [...[""], ... (this.state.monthsArray.map(item => (
-            item.monthName.concat('%20').concat(item.monthYear)
+            ("\'").concat(item.monthName).concat('%20').concat(item.monthYear)
         ))
         )]
         var A = [header]

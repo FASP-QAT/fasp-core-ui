@@ -1805,11 +1805,11 @@ export default class ConsumptionDetails extends React.Component {
                                 <li><span className="problemList-yellow legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.problemList.low')} </span></li>
                             </ul>
                         </FormGroup>
-                        <div className="" style={{ display: this.state.loading ? "none" : "block" }}>
+                        <div className="" >
                             {this.state.showProblemDashboard == 1 && <ProblemListDashboard problemListUnFilttered={this.state.problemReportListUnFiltered} problemCategoryList={this.state.problemCategoryList} problemStatusList={this.state.problemStatusList} />}
 
                             {/* <div className="ProgramListSearch"> */}
-                            <div id="tableDiv">
+                            <div id="tableDiv" style={{ display: this.state.loading ? "none" : "block" }}>
                             </div>
                             {/* </div> */}
                         </div>

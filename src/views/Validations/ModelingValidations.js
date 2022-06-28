@@ -661,7 +661,11 @@ class ModelingValidation extends Component {
             this.setState({
                 levelId: levelId,
                 levelUnit: levelUnit != null ? levelUnit : "",
-                nodeList: nodeList,
+                nodeList: nodeList.sort(function (a, b) {
+                    a = a.label.toLowerCase();
+                    b = b.label.toLowerCase();
+                    return a < b ? -1 : a > b ? 1 : 0;
+                }),
                 nodeIdArr: nodeIdArr,
                 nodeLabelArr: nodeLabelArr,
                 nodeVal: nodeVal,
@@ -1726,7 +1730,7 @@ class ModelingValidation extends Component {
 
                                             {/* // <div className="table-scroll">
                                                     // <div className="table-wrap table-responsive"> */}
-                                            <div id="tableDiv" className="jexcelremoveReadonlybackground" style={{ display: this.state.show && !this.state.loading ? "block" : "none" }}>
+                                            <div id="tableDiv" className="jexcelremoveReadonlybackground consumptionDataEntryTable" style={{ display: this.state.show && !this.state.loading ? "block" : "none" }}>
                                             </div>
                                             {/* // </div>
                                                 // </div> */}

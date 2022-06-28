@@ -596,6 +596,14 @@ class AddBudgetComponent extends Component {
                                                                 loading: false
                                                             });
                                                             break;
+                                                        case 409:
+                                                            this.setState({
+                                                                // message: error.response.data.messageCode,
+                                                                message: i18n.t('static.budget.duplicateDisplayName'),
+                                                                loading: false
+                                                            });
+                                                            break;
+
                                                         case 412:
                                                             this.setState({
                                                                 message: error.response.data.messageCode,

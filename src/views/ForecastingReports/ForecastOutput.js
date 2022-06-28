@@ -1259,6 +1259,7 @@ class ForecastOutput extends Component {
                                     let forecastingUniObj = planningUnitList.filter(c => c.planningUnit.forecastingUnit.id == selectedForecastingUnit[i].value);
 
 
+                                    console.log("TestFU------------>1", forecastingUniObj);
                                     for (let l = 0; l < forecastingUniObj.length; l++) {
 
                                         let selectedForecastMap = forecastingUniObj[l].selectedForecastMap;
@@ -1342,9 +1343,9 @@ class ForecastOutput extends Component {
                                                                 // }
 
                                                                 if (resultTrue.length > 0) {
-                                                                    let checkIdPresent = consumptionData.filter(c => c.objUnit.id == forecastingUniObj[l].planningUnit.forecastingUnit.id && c.treeId == treeId && c.scenarioId == scenarioId);
+                                                                    let checkIdPresent = consumptionData.filter(c => c.objUnit.id == forecastingUniObj[l].planningUnit.forecastingUnit.id && c.treeId == treeId && c.scenarioId == scenarioId && c.region.regionId == keys[j]);
                                                                     if (checkIdPresent.length > 0) {
-                                                                        let findIndex = consumptionData.findIndex(c => c.objUnit.id == forecastingUniObj[l].planningUnit.forecastingUnit.id && c.treeId == treeId && c.scenarioId == scenarioId);
+                                                                        let findIndex = consumptionData.findIndex(c => c.objUnit.id == forecastingUniObj[l].planningUnit.forecastingUnit.id && c.treeId == treeId && c.scenarioId == scenarioId && c.region.regionId == keys[j]);
                                                                         let alreadyPresentConsumptionList = consumptionData[findIndex].consumptionList.concat(resultTrue);
 
                                                                         // logic for add same date data
@@ -1362,7 +1363,7 @@ class ForecastOutput extends Component {
                                                                         consumptionData.push(jsonTemp);
                                                                     }
                                                                 } else {
-                                                                    let checkIdPresent = consumptionData.filter(c => c.objUnit.id == forecastingUniObj[l].planningUnit.forecastingUnit.id && c.treeId == treeId && c.scenarioId == scenarioId);
+                                                                    let checkIdPresent = consumptionData.filter(c => c.objUnit.id == forecastingUniObj[l].planningUnit.forecastingUnit.id && c.treeId == treeId && c.scenarioId == scenarioId && c.region.regionId == keys[j]);
                                                                     if (checkIdPresent.length > 0) {
 
                                                                     } else {
@@ -1458,9 +1459,9 @@ class ForecastOutput extends Component {
                                                                 // let jsonTemp = { objUnit: forecastingUniObj[l].planningUnit.forecastingUnit, scenario: { id: 1, label: "" }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
                                                                 // let jsonTemp = { objUnit: { id: forecastingUniObj[l].planningUnit.forecastingUnit.id, label: forecastingUniObj[l].planningUnit.forecastingUnit.label }, scenario: { id: consumptionExtrapolationObj[0].extrapolationMethod.id, label: '(' + consumptionExtrapolationObj[0].extrapolationMethod.label.label_en + ')' }, display: true, color: "#ba0c2f", consumptionList: consumptionList, treeId: 0, scenarioId: 0, consumptionExtrapolationId: consumptionExtrapolationId }
                                                                 // consumptionData.push(jsonTemp);
-                                                                let checkIdPresent = consumptionData.filter(c => c.objUnit.id == forecastingUniObj[l].planningUnit.forecastingUnit.id && c.consumptionExtrapolationId == consumptionExtrapolationId);
+                                                                let checkIdPresent = consumptionData.filter(c => c.objUnit.id == forecastingUniObj[l].planningUnit.forecastingUnit.id && c.consumptionExtrapolationId == consumptionExtrapolationId && c.region.regionId == keys[j]);
                                                                 if (checkIdPresent.length > 0) {
-                                                                    let findIndex = consumptionData.findIndex(c => c.objUnit.id == forecastingUniObj[l].planningUnit.forecastingUnit.id && c.consumptionExtrapolationId == consumptionExtrapolationId);
+                                                                    let findIndex = consumptionData.findIndex(c => c.objUnit.id == forecastingUniObj[l].planningUnit.forecastingUnit.id && c.consumptionExtrapolationId == consumptionExtrapolationId && c.region.regionId == keys[j]);
                                                                     let alreadyPresentConsumptionList = consumptionData[findIndex].consumptionList.concat(consumptionList);
 
                                                                     // logic for add same date data
@@ -1478,7 +1479,7 @@ class ForecastOutput extends Component {
                                                                     consumptionData.push(jsonTemp);
                                                                 }
 
-                                                            } else {
+                                                            } else {//NO
                                                                 let consumptionList = consumptionExtrapolationObj[0].extrapolationDataList.map(m => {
                                                                     return {
                                                                         consumptionDate: m.month,
@@ -1489,9 +1490,10 @@ class ForecastOutput extends Component {
                                                                 // let jsonTemp = { objUnit: { id: forecastingUniObj[l].planningUnit.forecastingUnit.id, label: forecastingUniObj[l].planningUnit.forecastingUnit.label }, scenario: { id: consumptionExtrapolationObj[0].extrapolationMethod.id, label: '(' + consumptionExtrapolationObj[0].extrapolationMethod.label.label_en + ')' }, display: true, color: "#ba0c2f", consumptionList: consumptionList, treeId: 0, scenarioId: 0, consumptionExtrapolationId: consumptionExtrapolationId }
                                                                 // consumptionData.push(jsonTemp);
 
-                                                                let checkIdPresent = consumptionData.filter(c => c.objUnit.id == forecastingUniObj[l].planningUnit.forecastingUnit.id && c.consumptionExtrapolationId == consumptionExtrapolationId);
+                                                                let checkIdPresent = consumptionData.filter(c => c.objUnit.id == forecastingUniObj[l].planningUnit.forecastingUnit.id && c.consumptionExtrapolationId == consumptionExtrapolationId && c.region.regionId == keys[j]);
                                                                 if (checkIdPresent.length > 0) {
-                                                                    let findIndex = consumptionData.findIndex(c => c.objUnit.id == forecastingUniObj[l].planningUnit.forecastingUnit.id && c.consumptionExtrapolationId == consumptionExtrapolationId);
+                                                                    console.log("Test------------>ELSE--1");
+                                                                    let findIndex = consumptionData.findIndex(c => c.objUnit.id == forecastingUniObj[l].planningUnit.forecastingUnit.id && c.consumptionExtrapolationId == consumptionExtrapolationId && c.region.regionId == keys[j]);
                                                                     let alreadyPresentConsumptionList = consumptionData[findIndex].consumptionList.concat(consumptionList);
 
                                                                     // logic for add same date data
@@ -1506,6 +1508,7 @@ class ForecastOutput extends Component {
 
 
                                                                 } else {
+                                                                    console.log("Test------------>ELSE--2");
                                                                     let jsonTemp = { objUnit: { id: forecastingUniObj[l].planningUnit.forecastingUnit.id, label: forecastingUniObj[l].planningUnit.forecastingUnit.label }, scenario: { id: consumptionExtrapolationObj[0].extrapolationMethod.id, label: '(' + consumptionExtrapolationObj[0].extrapolationMethod.label.label_en + ')' }, display: true, color: "#ba0c2f", consumptionList: consumptionList, treeId: 0, scenarioId: 0, consumptionExtrapolationId: consumptionExtrapolationId, region: filteredProgram.regionList.filter(c => c.regionId == keys[j])[0], graphId: 0 }
                                                                     consumptionData.push(jsonTemp);
                                                                 }
@@ -1519,7 +1522,7 @@ class ForecastOutput extends Component {
                                                             // let jsonTemp = { objUnit: { id: forecastingUniObj[l].planningUnit.forecastingUnit.id, label: forecastingUniObj[l].planningUnit.forecastingUnit.label }, scenario: { id: 1, label: "" }, display: true, color: "#ba0c2f", consumptionList: [], treeId: 0, scenarioId: 0, consumptionExtrapolationId: consumptionExtrapolationId }
                                                             // consumptionData.push(jsonTemp);
 
-                                                            let checkIdPresent = consumptionData.filter(c => c.objUnit.id == forecastingUniObj[l].planningUnit.forecastingUnit.id && c.consumptionExtrapolationId == consumptionExtrapolationId);
+                                                            let checkIdPresent = consumptionData.filter(c => c.objUnit.id == forecastingUniObj[l].planningUnit.forecastingUnit.id && c.consumptionExtrapolationId == consumptionExtrapolationId && c.region.regionId == keys[j]);
                                                             if (checkIdPresent.length > 0) {
 
                                                             } else {
@@ -3523,7 +3526,7 @@ class ForecastOutput extends Component {
                                             </FormGroup>
 
                                             <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon fa fa-sort-desc ml-1"></span>
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}
                                                     <i> (Forecast: {this.state.forecastPeriod})</i>
                                                 </Label>
                                                 <div className="controls edit">

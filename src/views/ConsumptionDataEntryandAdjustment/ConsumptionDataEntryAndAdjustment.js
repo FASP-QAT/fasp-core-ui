@@ -7,7 +7,7 @@ import {
   CardFooter, Button, Col, Form, InputGroup, Modal, ModalHeader, ModalBody, ModalFooter, FormFeedback
 } from 'reactstrap';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, DATE_FORMAT_CAP_WITHOUT_DATE, DATE_FORMAT_CAP, TITLE_FONT, JEXCEL_DECIMAL_CATELOG_PRICE, SPECIAL_CHARECTER_WITH_NUM, TBD_PROCUREMENT_AGENT_ID } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, DATE_FORMAT_CAP_WITHOUT_DATE, DATE_FORMAT_CAP, TITLE_FONT, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_DECIMAL_NO_REGEX_LONG_2_DECIMAL, SPECIAL_CHARECTER_WITH_NUM, TBD_PROCUREMENT_AGENT_ID } from '../../Constants.js'
 import getLabelText from '../../CommonComponent/getLabelText'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import i18n from '../../i18n';
@@ -456,6 +456,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     var reportRateStart = 3;
     var stockDayStart = 4;
     var adjustedConsumption = 6;
+    var reg = JEXCEL_DECIMAL_NO_REGEX_LONG_2_DECIMAL;
 
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN']
     var regionList = this.state.regionList;
@@ -490,6 +491,11 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         // elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
         elInstance.setComments(col, "Please enter a positive number");
 
+      } else if (!(reg.test(value))) {
+        var col = (colArr[x]).concat(parseInt(y) + 1);
+        elInstance.setStyle(col, "background-color", "transparent");
+        elInstance.setStyle(col, "background-color", "yellow");
+        this.el.setComments(col, i18n.t('static.common.positiveIntegerWithLength'));
       } else {
         var col = (colArr[x]).concat(parseInt(y) + 1);
         var cell = elInstance.getCell((colArr[x]).concat(parseInt(y) + 2))
@@ -512,8 +518,12 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         elInstance.setStyle(col, "background-color", "yellow");
         // elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
         elInstance.setComments(col, "Please enter any positive number upto 100");
-      }
-      else {
+      } else if (!(reg.test(value))) {
+        var col = (colArr[x]).concat(parseInt(y) + 1);
+        elInstance.setStyle(col, "background-color", "transparent");
+        elInstance.setStyle(col, "background-color", "yellow");
+        this.el.setComments(col, i18n.t('static.common.positiveIntegerWithLength'));
+      } else {
         var col = (colArr[x]).concat(parseInt(y) + 1);
         elInstance.setStyle(col, "background-color", "transparent");
         elInstance.setComments(col, "");
@@ -530,6 +540,11 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         elInstance.setStyle(col, "background-color", "yellow");
         // elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
         elInstance.setComments(col, "Please enter positive value lesser than number of days.");
+      } else if (!(reg.test(value))) {
+        var col = (colArr[x]).concat(parseInt(y) + 1);
+        elInstance.setStyle(col, "background-color", "transparent");
+        elInstance.setStyle(col, "background-color", "yellow");
+        this.el.setComments(col, i18n.t('static.common.positiveIntegerWithLength'));
       } else {
         var col = (colArr[x]).concat(parseInt(y) + 1);
         elInstance.setStyle(col, "background-color", "transparent");
@@ -550,6 +565,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     var stockDayStart = 4;
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN']
     var regionList = this.state.regionList;
+    var reg = JEXCEL_DECIMAL_NO_REGEX_LONG_2_DECIMAL;
 
     for (var i = 0; i < regionList.length; i++) {
       possibleActualConsumptionY.push(actualConsumptionStart.toString());
@@ -573,6 +589,12 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             // elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
             elInstance.setComments(col, "Please enter a positive number)");
             valid = false;
+          } else if (!(reg.test(value))) {
+            var col = (colArr[x]).concat(parseInt(y) + 1);
+            elInstance.setStyle(col, "background-color", "transparent");
+            elInstance.setStyle(col, "background-color", "yellow");
+            this.el.setComments(col, i18n.t('static.common.positiveIntegerWithLength'));
+            valid = false;
           } else {
             var col = (colArr[x]).concat(parseInt(y) + 1);
             elInstance.setStyle(col, "background-color", "transparent");
@@ -591,6 +613,12 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             elInstance.setStyle(col, "background-color", "yellow");
             //elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
             elInstance.setComments(col, "Please enter any positive number upto 100");
+            valid = false;
+          } else if (!(reg.test(value))) {
+            var col = (colArr[x]).concat(parseInt(y) + 1);
+            elInstance.setStyle(col, "background-color", "transparent");
+            elInstance.setStyle(col, "background-color", "yellow");
+            this.el.setComments(col, i18n.t('static.common.positiveIntegerWithLength'));
             valid = false;
           }
           else {
@@ -612,6 +640,12 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             elInstance.setStyle(col, "background-color", "yellow");
             // elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
             elInstance.setComments(col, "Please enter positive value lesser than number of days.");
+            valid = false;
+          } else if (!(reg.test(value))) {
+            var col = (colArr[x]).concat(parseInt(y) + 1);
+            elInstance.setStyle(col, "background-color", "transparent");
+            elInstance.setStyle(col, "background-color", "yellow");
+            this.el.setComments(col, i18n.t('static.common.positiveIntegerWithLength'));
             valid = false;
           } else {
             var col = (colArr[x]).concat(parseInt(y) + 1);
@@ -1450,13 +1484,12 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               var datasetJson = JSON.parse(datasetData);
               console.log("datasetJson@@@@@@@@@@@@@@", datasetJson);
               var consumptionList = datasetJson.actualConsumptionList;
-              var planningUnitList = datasetJson.planningUnitList.filter(c => c.active && c.consuptionForecast);
+              var planningUnitList = datasetJson.planningUnitList.filter(c => c.consuptionForecast && c.active);
               planningUnitList.sort((a, b) => {
-                var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                var itemLabelA = (this.state.showInPlanningUnit ? getLabelText(a.planningUnit.label, this.state.lang) : a.consumptionDataType == 1 ? getLabelText(a.planningUnit.forecastingUnit.label, this.state.lang) : a.consumptionDataType == 2 ? getLabelText(a.planningUnit.label, this.state.lang) : getLabelText(a.otherUnit.label, this.state.lang)).toUpperCase(); // ignore upper and lowercase
+                var itemLabelB = (this.state.showInPlanningUnit ? getLabelText(b.planningUnit.label, this.state.lang) : b.consumptionDataType == 1 ? getLabelText(b.planningUnit.forecastingUnit.label, this.state.lang) : b.consumptionDataType == 2 ? getLabelText(b.planningUnit.label, this.state.lang) : getLabelText(b.otherUnit.label, this.state.lang)).toUpperCase(); // ignore upper and lowercase                   
                 return itemLabelA > itemLabelB ? 1 : -1;
               });
-             
               var regionList = datasetJson.regionList;
               regionList.sort((a, b) => {
                 var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -2342,58 +2375,59 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           </ModalHeader>
           <div>
             <ModalBody>
-            <div>
-                               <h3 className='ShowGuidanceHeading'>Data Entry and Adjustment </h3>
-                           </div>
-                            <p>
-                                <p style={{fontSize:'13px'}}><span className="UnderLineText">Purpose :</span> Enable users to prepare historical consumption data before moving on the '<a href="/#/Extrapolation/extrapolateData" target="_blank" style={{textDecoration:'underline'}}>Extrapolation</a>' screen. Historical actual consumption can be quantities sold, quantities dispensed to user or quantities issued by storage facilities. On this screen, users can adjust historical consumption data that has been either manually entered on this screen or that has been imported from a QAT supply plan program (if you desire to import, please proceed first to the '<a href="/#/importFromQATSupplyPlan/listImportFromQATSupplyPlan" target="_blank" style={{textDecoration:'underline'}}>Import from QAT Supply Plan</a>' screen). </p>
-                            </p>
-                            <p>
-                                <p style={{fontSize:'13px'}}><span className="UnderLineText">Using this screen :</span></p>
-                               <ol>
-                                 <li>Select the forecast program and the desired review period. By default, QAT pre-selects a date range of 36 months prior to the start of the forecasting period. A non-editable table and all products related to this forecast program are displayed, along with their consumption data if you have previously entered that data; otherwise you will see yellow cells indicating that no consumption data has been entered. By default, the products and consumption are shown in planning units. The user can also expand each row of the table to display the consumption by region, if managing a multi-region program.   </li>
-                                 <li>On the top table, click on a product to display the detailed data table for that product. The detailed data table will have a section for each region in your program. 
-                                 </li>
-                                 <li>The detailed data table allows users to add, edit, adjust, or delete historical consumption records. 
-                                   <ol type="a">
-                                      <li>If you would like to enter data manually, enter the historical consumption for each region and month in the 'Actual Consumption' row.  </li>
-                                      <li>If you have imported data from QAT, you will see your imported historical consumption in the 'Actual Consumption' row.  </li>
-                                      <li>By default, data is assumed to be entered in the Planning Unit. However, the user can specify the appropriate unit for the detailed data by clicking on the “change” link under the product name and in the subsequent pop-up, choosing to enter data using the planning unit, the forecasting unit quantities (applying a realm-managed conversion factor) or another user-entered unit (and conversion factor). </li>
-                                   </ol>
-                                 </li>
-                                 <li>There are three ways to adjust the data:  
-                                   <ol type="a">
-                                     <li><b>Adjust for under-reporting</b>: The default value is 100% reporting every month. The user can change this to the correct value. QAT will calculate the adjusted consumption due to underreporting. </li>
-                                     <li><b>Adjust for stock outs</b>: For imported data, the number of stock out days is pulled in from the QAT supply plan program, if data is collected. The default value for stock out days is zero days (product assumed always in stock). The user can change this to the correct value. The default value for number of days in a month are based on the calendar days, but users can adjust the number of days used for the stock out calculation in '<a href="/#/dataset/versionSettings" target="_blank" style={{textDecoration:'underline'}}>Update Version Settings</a>'. </li>
-                                   
-                                   <p className="pl-lg-5">
-                                   <span style={{fontStyle:'italic'}}><b>Stock Out Rate</b> = Stocked Out (days)/ (# of Days in Month). </span><br></br>
+              <div>
+                <h3 className='ShowGuidanceHeading'>Data Entry and Adjustment </h3>
+              </div>
+              <p>
+                <p style={{ fontSize: '13px' }}><span className="UnderLineText">Purpose :</span> Enable users to prepare historical consumption data before moving on the '<a href="/#/Extrapolation/extrapolateData" target="_blank" style={{ textDecoration: 'underline' }}>Extrapolation</a>' screen. Historical actual consumption can be quantities sold, quantities dispensed to user or quantities issued by storage facilities. On this screen, users can adjust historical consumption data that has been either manually entered on this screen or that has been imported from a QAT supply plan program (if you desire to import, please proceed first to the '<a href="/#/importFromQATSupplyPlan/listImportFromQATSupplyPlan" target="_blank" style={{ textDecoration: 'underline' }}>Import from QAT Supply Plan</a>' screen). </p>
+              </p>
+              <p>
+                <p style={{ fontSize: '13px' }}><span className="UnderLineText">Using this screen :</span></p>
+                <ol>
+                  <li>Select the forecast program and the desired review period. By default, QAT pre-selects a date range of 36 months prior to the start of the forecasting period. A non-editable table and all products related to this forecast program are displayed, along with their consumption data if you have previously entered that data; otherwise you will see yellow cells indicating that no consumption data has been entered. By default, the products and consumption are shown in planning units. The user can also expand each row of the table to display the consumption by region, if managing a multi-region program.   </li>
+                  <li>On the top table, click on a product to display the detailed data table for that product. The detailed data table will have a section for each region in your program.
+                  </li>
+                  <li>The detailed data table allows users to add, edit, adjust, or delete historical consumption records.
+                    <ol type="a">
+                      <li>If you would like to enter data manually, enter the historical consumption for each region and month in the 'Actual Consumption' row.  </li>
+                      <li>If you have imported data from QAT, you will see your imported historical consumption in the 'Actual Consumption' row.  </li>
+                      <li>By default, data is assumed to be entered in the Planning Unit. However, the user can specify the appropriate unit for the detailed data by clicking on the “change” link under the product name and in the subsequent pop-up, choosing to enter data using the planning unit, the forecasting unit quantities (applying a realm-managed conversion factor) or another user-entered unit (and conversion factor). </li>
+                    </ol>
+                  </li>
+                  <li>There are three ways to adjust the data:
+                    <ol type="a">
+                      <li><b>Adjust for under-reporting</b>: The default value is 100% reporting every month. The user can change this to the correct value. QAT will calculate the adjusted consumption due to underreporting. </li>
+                      <li><b>Adjust for stock outs</b>: For imported data, the number of stock out days is pulled in from the QAT supply plan program, if data is collected. The default value for stock out days is zero days (product assumed always in stock). The user can change this to the correct value. The default value for number of days in a month are based on the calendar days, but users can adjust the number of days used for the stock out calculation in '<a href="/#/dataset/versionSettings" target="_blank" style={{ textDecoration: 'underline' }}>Update Version Settings</a>'. </li>
 
-                                    <span style={{fontStyle:'italic'}}><b>Adjusted Consumption</b> = Actual Consumption / Reporting Rate / (1 - Stock Out Rate) </span>
-                                  </p>
-                                  <p>For example, if for a given month, a product had a consumption of 1,000 units, was out-of-stock for 5 out of 31 days in the month and the reporting rate was 98%: <br></br>
+                      <p className="pl-lg-5">
+                        <span style={{ fontStyle: 'italic' }}><b>Stock Out Rate</b> = Stocked Out (days)/ (# of Days in Month). </span><br></br>
 
-                                  <span className="pl-lg-5" style={{fontStyle:'italic'}}><b> Stock Out Rate </b>= 5 days stocked out /31 days in a month = 16.1%. </span><br></br>
+                        <span style={{ fontStyle: 'italic' }}><b>Adjusted Consumption</b> = Actual Consumption / Reporting Rate / (1 - Stock Out Rate) </span>
+                      </p>
+                      <p>For example, if for a given month, a product had a consumption of 1,000 units, was out-of-stock for 5 out of 31 days in the month and the reporting rate was 98%: <br></br>
 
-                                  <span className="pl-lg-5" style={{fontStyle:'italic'}}><b>  Adjusted Consumption </b>= 1,000 units / 98% Reporting / (1 - 16.1%) = 1,217</span>  </p>
-                                 
-                                 <li>Interpolating missing values: Click the green 'Interpolate' button in the middle right of the screen to search for periods where the consumption value is blank and replace them with an interpolated value. QAT interpolates by finding the nearest values on either side (before or after the blank), calculates the straight line in between them and uses that straight-line formula to calculate the value for the blank(s).  Note that QAT will not interpolate for months where actual consumption is zero. QAT will only interpolate if there is at least one data point before and one data point after the blank value(s).
-                                   <br></br>
-                                   Mathematically:<br></br>
-                                   Where x's represent months, and y's represent actual consumption,<br></br>
-                                   Where known data values are (x0 , y0) and (x1 , y1) <br></br>
-                                   Where any unknown data values are (x, y) <br></br>
+                        <span className="pl-lg-5" style={{ fontStyle: 'italic' }}><b> Stock Out Rate </b>= 5 days stocked out /31 days in a month = 16.1%. </span><br></br>
 
-                                        The formula for the interpolated line is <br></br>
-                                        <span><img className="formula-img-mr img-fluid mb-lg-0" src={dataentryScreenshot1} style={{border:'1px solid #fff',width:'250px'}}/></span><br></br>
-                                    <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0" src={dataentryScreenshot2} style={{border:'1px solid #fff',width:'250px'}}/></span>
+                        <span className="pl-lg-5" style={{ fontStyle: 'italic' }}><b>  Adjusted Consumption </b>= 1,000 units / 98% Reporting / (1 - 16.1%) = 1,217</span>  </p>
 
-                                 </li>
-                                 <li>
-                                   Use the graph below the Detailed Data table to view the adjusted data </li>
-                                  </ol>
-                                   </li>
-                                 {/* <li>The detailed data table allows users to add, edit, adjust, or delete historical consumption records. 
+                      <li>Interpolating missing values: Click the green 'Interpolate' button in the middle right of the screen to search for periods where the consumption value is blank and replace them with an interpolated value. QAT interpolates by finding the nearest values on either side (before or after the blank), calculates the straight line in between them and uses that straight-line formula to calculate the value for the blank(s).  Note that QAT will not interpolate for months where actual consumption is zero. QAT will only interpolate if there is at least one data point before and one data point after the blank value(s).
+                        <br></br>
+                        Mathematically:<br></br>
+                        <ul>
+                          <li>Where x's represent months, and y's represent actual consumption,</li>
+                          <li>Where known data values are (x0 , y0) and (x1 , y1) </li>
+                          <li>Where any unknown data values are (x, y) </li>
+                          <li>The formula for the interpolated line is </li>
+                        </ul>
+                        <span><img className="formula-img-mr img-fluid mb-lg-0" src={dataentryScreenshot1} style={{ border: '1px solid #fff', width: '250px' }} /></span><br></br>
+                        <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0" src={dataentryScreenshot2} style={{ border: '1px solid #fff', width: '250px' }} /></span>
+
+                      </li>
+                      <li>
+                        Use the graph below the Detailed Data table to view the adjusted data </li>
+                    </ol>
+                  </li>
+                  {/* <li>The detailed data table allows users to add, edit, adjust, or delete historical consumption records. 
                                    <ol type="a">
                                      <li><b>Interpolating missing values:</b> Click the green 'Interpolate' button above the top right corner of the unit table to search for periods where the consumption value is blank and replace them with an interpolated value. QAT interpolates by finding the nearest values on either side (before or after the blank), calculates the straight line in between them and uses that straight-line formula to calculate the value for the blank(s).  Note that QAT will not interpolate for months where actual consumption is zero. QAT will only interpolate if there is at least one data point before and one data point after the blank <br></br>value(s).
                                      Mathematically:<br></br>
@@ -2421,15 +2455,15 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                                    </ol>
                                    </li>
                                 */}
-                                 <li>Click ‘Submit’ to save any entered data </li>
-                                 <li>Repeat steps 2-4 for each planning unit 
-                                 
-                                 {/* <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0" src={dataentryScreenshot3} style={{border:'1px solid #fff'}}/></span> */}
-                                 </li>
-                                
-                                 
-                               </ol>
-                            </p>
+                  <li>Click ‘Submit’ to save any entered data </li>
+                  <li>Repeat steps 2-4 for each planning unit
+
+                    {/* <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0" src={dataentryScreenshot3} style={{border:'1px solid #fff'}}/></span> */}
+                  </li>
+
+
+                </ol>
+              </p>
               {/* <p>Methods are organized from simple to robust
 
                 More sophisticated models are more sensitive to problems in the data

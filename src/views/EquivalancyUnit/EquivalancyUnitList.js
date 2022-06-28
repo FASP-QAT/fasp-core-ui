@@ -130,7 +130,7 @@ class EquivalancyUnit extends Component {
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
                 var index = (instance.jexcel).getValue(`G${parseInt(data[i].y) + 1}`, true);
-                if (index == "" || index == null || index == undefined) {
+                if (index === "" || index == null || index == undefined) {
                     (instance.jexcel).setValueFromCoords(0, data[i].y, 0, true);
                     (instance.jexcel).setValueFromCoords(8, data[i].y, 1, true);
                     (instance.jexcel).setValueFromCoords(9, data[i].y, 1, true);
@@ -1883,7 +1883,7 @@ class EquivalancyUnit extends Component {
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
                 var index = (instance.jexcel).getValue(`G${parseInt(data[i].y) + 1}`, true);
-                if (index == "" || index == null || index == undefined) {
+                if (index === "" || index == null || index == undefined) {
                     (instance.jexcel).setValueFromCoords(0, data[i].y, 0, true);
                     (instance.jexcel).setValueFromCoords(8, data[i].y, true, true);
                     (instance.jexcel).setValueFromCoords(11, data[i].y, 1, true);
@@ -3059,7 +3059,7 @@ className={'modal-lg ' + this.props.className} >
                             <span><h5 style={{ color: this.state.color }} id="div3">{this.state.message}</h5></span>
                             {/* <h6 className="red" id="div3"></h6> */}
                             <div>
-                                <div id="eqUnitInfoTable" className="AddListbatchtrHeight RemoveStriped">
+                                <div id="eqUnitInfoTable" className="AddListbatchtrHeight RemoveStriped consumptionDataEntryTable">
                                 </div>
                             </div>
                             <br />

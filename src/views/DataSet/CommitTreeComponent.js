@@ -216,12 +216,13 @@ export default class CommitTreeComponent extends React.Component {
     }
 
     setProgramId(e) {
+        console.log("In set program Id@@@@@@@@@@@%%%%%%%%%%%%%")
+        var programId = e.target.value;
         this.setState({
             loading: true,
             showCompare: false,
-        })
-        var programId = e.target.value;
-        var myResult = [];
+        },()=>{
+            var myResult = [];
         myResult = this.state.programList;
         localStorage.setItem("sesDatasetId", programId);
         this.setState({
@@ -271,20 +272,25 @@ export default class CommitTreeComponent extends React.Component {
                 programVersionJson = programVersionJson.concat([json]);
                 DatasetService.getAllDatasetData(programVersionJson)
                     .then(response => {
+                        console.log("In response@@@@@@@@@@@%%%%%%%%%%%%%")
                         this.setState({
                             programDataServer: response.data[0],
                             showCompare: true,
                             comparedLatestVersion: response.data[0].currentVersion.versionId
+                        },()=>{
+                            dataCheck(this, programData[0].datasetJson)
                         })
                     })
-                dataCheck(this, programData[0].datasetJson)
+                
 
             }.bind(this)
         }.bind(this)
+        })
     }
 
 
     updateState(parameterName, value) {
+        console.log("In update state@@@@@@@@@@@%%%%%%%%%%%%%")
         console.log("ParameterName$$$", parameterName)
         console.log("Value$$$", value)
         this.setState({
@@ -537,8 +543,24 @@ export default class CommitTreeComponent extends React.Component {
                 if (flatList1.length > 0) {
                     checkIfThereAreTreesWithBlankFU = true;
                 }
+                // var completeFlatList = (tree.tree).flatList;
+                // console.log("completeFlatList---", completeFlatList);
+                // for (let i = 0; i < completeFlatList.length; i++) {
+                //     var node = completeFlatList[i];
+                //     console.log("node---", node);
+                //     if (node.payload.nodeType == 1 || node.payload.nodeType == 2 || node.payload.nodeType == 3) {
+                //         node.payload.nodeDataMap[scenarioList[ndm].id][0].fuNode = null;
+                //         node.payload.nodeDataMap[scenarioList[ndm].id][0].puNode = null;
+                //     } else if (node.payload.nodeType == 4) {
+                //         node.payload.nodeDataMap[scenarioList[ndm].id][0].puNode = null;
+                //     } else if (node.payload.nodeType == 5) {
+                //         node.payload.nodeDataMap[scenarioList[ndm].id][0].fuNode = null;
+                //     }
+                // }
+
             }
         }
+
         if (checkIfThereAreTreesWithBlankFU || checkIfThereAreTreesWithBlankPU) {
             alert(i18n.t("static.commitTree.noPUorFUMapping"));
         } else {
@@ -578,6 +600,41 @@ export default class CommitTreeComponent extends React.Component {
                                 programJson.currentVersion.notes = document.getElementById("notes").value;;
                                 console.log("ProgramJson+++", programJson);
                                 console.log("this.state.comparedLatestVersion----", this.state.comparedLatestVersion);
+                                var treeList = programJson.treeList;
+                                for (var tl = 0; tl < treeList.length; tl++) {
+                                    var tree = treeList[tl];
+                                    var scenarioList = tree.scenarioList;
+                                    var completeFlatList = (tree.tree).flatList;
+                                    for (var ndm = 0; ndm < scenarioList.length; ndm++) {
+                                        console.log("commit*** completeFlatList before---", completeFlatList);
+                                        for (let i = 0; i < completeFlatList.length; i++) {
+                                            var node = completeFlatList[i];
+                                            console.log("commit*** node before---", node);
+                                            if (node.payload.nodeType.id == 1 || node.payload.nodeType.id == 2 || node.payload.nodeType.id == 3) {
+                                                node.payload.nodeDataMap[scenarioList[ndm].id][0].fuNode = null;
+                                                node.payload.nodeDataMap[scenarioList[ndm].id][0].puNode = null;
+                                            } else if (node.payload.nodeType.id == 4) {
+                                                node.payload.nodeDataMap[scenarioList[ndm].id][0].puNode = null;
+                                            } else if (node.payload.nodeType.id == 5) {
+                                                node.payload.nodeDataMap[scenarioList[ndm].id][0].fuNode = null;
+                                            }
+                                            console.log("commit*** node after---", node);
+                                            var findNodeIndex = completeFlatList.findIndex(n => n.id == node.id);
+                                            console.log("commit*** findNodeIndex1---", findNodeIndex);
+                                            completeFlatList[findNodeIndex] = node;
+                                            console.log("commit*** completeFlatList after---", completeFlatList);
+                                        }
+                                    }
+                                    tree.tree.flatList = completeFlatList;
+                                    console.log("commit*** tree---", tree);
+                                    var findTreeIndex = treeList.findIndex(n => n.treeId == tree.treeId);
+                                    console.log("commit*** findTreeIndex---", findTreeIndex);
+                                    treeList[findTreeIndex] = tree;
+                                    console.log("commit*** treeList---", treeList);
+                                }
+                                programJson.treeList = treeList;
+                                console.log("commit*** final programJson---",programJson);
+
                                 //create saveDatasetData in ProgramService
                                 DatasetService.saveDatasetData(programJson, this.state.comparedLatestVersion).then(response => {
                                     if (response.status == 200) {
@@ -732,6 +789,7 @@ export default class CommitTreeComponent extends React.Component {
     }
 
     render() {
+        console.log("In render@@@@@@@@@@@%%%%%%%%%%%%%",this.state.loading);
         const { programList } = this.state;
         let programs = programList.length > 0 && programList.map((item, i) => {
             return (
@@ -1124,9 +1182,10 @@ export default class CommitTreeComponent extends React.Component {
                             <span><b>4. {i18n.t('static.program.notes')}:</b></span><br />
 
                             <span>a. {i18n.t('static.forecastMethod.historicalData')}:</span>
-                            <div className="">
-                                {(datasetPlanningUnitNotes.length > 0 && datasetPlanningUnitNotes.filter(c => c.consuptionForecast.toString() == "true").length > 0) ? <div className="table-wrap table-responsive fixTableHead">
-                                    <Table className="table-bordered text-center mt-2 overflowhide main-table table-striped1" bordered size="sm" >
+                            <div className="mt-2">
+                                {(datasetPlanningUnitNotes.length > 0 && datasetPlanningUnitNotes.filter(c => c.consuptionForecast.toString() == "true").length > 0) ?
+                                 <div className="table-wrap table-responsive fixTableHead">
+                                    <Table className="table-bordered text-center overflowhide main-table table-striped1" bordered size="sm" >
                                         <thead>
                                             <tr>
                                                 <th style={{ width: '30%' }}><b>{i18n.t('static.dashboard.planningunitheader')}</b></th>
@@ -1155,9 +1214,9 @@ export default class CommitTreeComponent extends React.Component {
                             </div><br />
                             <span>c. {i18n.t('static.commitTree.treeNodes')}:</span>
                             {/* <div className="table-scroll"> */}
-                            <div className="">
+                            <div className="mt-2">
                                 {treeNodeList.length > 0 && treeNodeList.filter(c => (c.notes != null && c.notes != "") || (c.madelingNotes != null && c.madelingNotes != "")).length > 0 ? <div className="table-wrap table-responsive fixTableHead">
-                                    <Table className="table-bordered text-center mt-2 overflowhide main-table table-striped1" bordered size="sm" >
+                                    <Table className="table-bordered text-center overflowhide main-table table-striped1" bordered size="sm" >
                                         <thead>
                                             <tr>
                                                 <th><b>{i18n.t('static.forecastMethod.tree')}</b></th>

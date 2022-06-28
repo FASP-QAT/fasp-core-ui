@@ -503,6 +503,7 @@ class EditBudgetComponent extends Component {
                                                         loading: false
                                                     });
                                                 } else {
+                                                    console.log("ERROR------->", error.response);
                                                     switch (error.response ? error.response.status : "") {
 
                                                         case 401:
@@ -516,6 +517,13 @@ class EditBudgetComponent extends Component {
                                                         case 406:
                                                             this.setState({
                                                                 message: error.response.data.messageCode,
+                                                                loading: false
+                                                            });
+                                                            break;
+                                                        case 409:
+                                                            this.setState({
+                                                                // message: error.response.data.messageCode,
+                                                                message: i18n.t('static.budget.duplicateDisplayName'),
                                                                 loading: false
                                                             });
                                                             break;

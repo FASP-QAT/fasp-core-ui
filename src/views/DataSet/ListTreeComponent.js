@@ -667,6 +667,7 @@ export default class ListTreeComponent extends Component {
                     nodeDataMap[1] = tempArray;
                     flatList[i].payload.nodeDataMap = nodeDataMap;
                 }
+                console.log("treeTemplate@@@@@@@@@@@@@@",treeTemplate)
                 tempTree = {
                     treeId: treeId,
                     active: this.state.active,
@@ -679,7 +680,7 @@ export default class ListTreeComponent extends Component {
                     },
                     notes: this.state.notes,
                     regionList: this.state.regionList,
-                    levelList: [],
+                    levelList: treeTemplate.levelList,
                     scenarioList: [{
                         id: 1,
                         label: {
@@ -816,7 +817,7 @@ export default class ListTreeComponent extends Component {
 
             treeList.push(tempTree);
         }
-
+        console.log("TreeList@@@@@@@@@@@@@@",treeList)
         tempProgram.programData.treeList = treeList;
         var programCopy = JSON.parse(JSON.stringify(tempProgram));
         var programData = (CryptoJS.AES.encrypt(JSON.stringify(tempProgram.programData), SECRET_KEY)).toString();
@@ -1302,7 +1303,7 @@ export default class ListTreeComponent extends Component {
         if (x == 0 && value != 0) {
             // console.log("HEADER SELECTION--------------------------");
         } else {
-            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE_TEMPLATE')) {
+            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE')) {
                 var treeId = this.el.getValueFromCoords(0, x);
                 var programId = this.el.getValueFromCoords(8, x);
                 console.log("programId>>>", programId);
@@ -1392,7 +1393,7 @@ export default class ListTreeComponent extends Component {
                                 </a>
                                 <Col md="12 pl-0 pr-lg-0">
                                     <div className="d-md-flex">
-                                        {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_TREE') &&
+                                        {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_TREE') && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') &&
                                             // <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.createTreeFromTemplate')}</Button>
                                             // <Col md="3" className="pl-0">
                                             <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
@@ -1407,7 +1408,7 @@ export default class ListTreeComponent extends Component {
                                                             className="addtreebg"
                                                             onChange={(e) => { this.onTemplateChange(e) }}
                                                         >
-                                                            <option value="">Select</option>
+                                                            <option value="">{i18n.t('static.tree.createOrSelect')}</option>
                                                             {/* <option value="">{i18n.t('static.tree.+AddTree')}</option> */}
                                                             <option value="0">+ {i18n.t('static.tree.blank')}</option>
                                                             {treeTemplates}
@@ -1480,7 +1481,7 @@ export default class ListTreeComponent extends Component {
                             </div>
                         </Col>
                         {/* <div id="loader" className="center"></div> */}
-                        <div className="listtreetable">
+                        <div className="listtreetable consumptionDataEntryTable">
                             <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DIMENSION') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
                             </div>
                         </div>
@@ -1508,17 +1509,18 @@ export default class ListTreeComponent extends Component {
                                 </div>
                                 <p>
                                     <p style={{ fontSize: '14px' }}><span className="UnderLineText">{i18n.t('static.listTree.purpose')} :</span> {i18n.t('static.listTree.enableUsersTo')} :</p>
-                                    <p className='pl-lg-4'>
-                                        1) {i18n.t('static.listTree.listExistingTree')}<br></br>
-                                        2) {i18n.t('static.listTree.editExistingTree')} <br></br>
-                                        3) {i18n.t('static.listTree.deleteDuplicateExistingTree')}<br></br>
-                                        4) {i18n.t('static.listTree.newTreeToLoadedProgram')}<br></br>
+                                    <ul type="1">
+                                        <li>{i18n.t('static.listTree.listExistingTree')}</li>
+                                        <li> {i18n.t('static.listTree.editExistingTree')} </li>
+                                        <li>{i18n.t('static.listTree.deleteDuplicateExistingTree')}</li>
+                                        <li> {i18n.t('static.listTree.newTreeToLoadedProgram')}</li>
                                         <ul>
                                             <li>{i18n.t('static.listTree.manuallySelectAddTree')}</li>
                                             <li>{i18n.t('static.listTree.nameOfDesiredTemplate')}</li>
                                         </ul>
-                                    </p>
+                                   </ul>
                                 </p>
+                                <p>Note: The table on this screen lists trees for each forecast program that has been loaded. </p>
                                 <p>
                                     <p style={{ fontSize: '14px' }}><span className="UnderLineText">{i18n.t('static.listTree.useThisScreen')} :</span></p>
                                     <p className='pl-lg-4'>
@@ -1530,6 +1532,7 @@ export default class ListTreeComponent extends Component {
                                         </ul>
                                     </p>
                                 </p>
+                               
                             </ModalBody>
                         </div>
                     </Modal>

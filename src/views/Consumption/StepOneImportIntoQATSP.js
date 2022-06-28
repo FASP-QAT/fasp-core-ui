@@ -72,6 +72,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             programListFilter: [],
             forecastPeriod: '',
             selSource1: [],
+            selectedForecastProgramDesc: '',
 
         }
         this.changed = this.changed.bind(this);
@@ -1118,6 +1119,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
         if (e.target.value != "") {
             programListFilter = this.state.programs.filter(c => c.generalProgramJson.realmCountry.realmCountryId == selectedForecastProgram.realmCountry.realmCountryId);
         }
+        let selectedForecastProgramDesc = e.target.options[e.target.selectedIndex].text;
+        this.props.updateStepOneData("selectedForecastProgramDesc", selectedForecastProgramDesc);
         this.setState({
             forecastProgramId: e.target.value,
             versionId: '',
@@ -1238,7 +1241,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
             }, () => {
                 this.props.finishedStepOne();
             })
-
+            let versionId = document.getElementById("versionId").value;
+            this.props.updateStepOneData("versionId", versionId);
             this.props.updateStepOneData("stepOneData", changedpapuList);
             this.props.updateStepOneData("regionList", changedpapuList);
             this.props.updateStepOneData("supplyPlanPlanningUnitIds", supplyPlanPlanningUnitIds);
@@ -1339,7 +1343,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                                                     <li>For every Forecasting Planning Unit, QAT requires a corresponding Supply Plan Planning Unit and conversion factor. QAT automatically maps exact planning unit matches, but users can override both the planning unit mapping and conversion factor. </li>
                                                     <li>Not all forecast planning units need to be imported, however, all forecast planning units must have a selection in the mapping table. For example, in the below table, even though 2 products are not being imported, you would still need to select 'Do not import'.</li>
                                                     <br></br>
-                                                    <img className="img-fluid" src={ShowGuidanceScreenshot1} />
+                                                    <img className="img-fluid" src={ShowGuidanceScreenshot1} style={{width:'971px'}} />
                                                 </ul>
 
 
@@ -1500,7 +1504,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                                             <li>If there is an existing forecasted consumption in the supply plan, the 'Current Forecasted Consumption' cell will be highlighted yellow. </li>
                                             <li>Use the "Import?" column to de-select any forecasts that you do NOT want to import into the supply plan. If checked, the Converted Forecasted Consumption will override the Supply Plan forecast. If unchecked, the current Supply Plan forecast will remain.</li>
                                             <br></br>
-                                            <img className="img-fluid" src={ShowGuidanceScreenshot2} />
+                                            <img className="img-fluid" src={ShowGuidanceScreenshot2} style={{width:'971px'}}/>
                                         </ul>
 
                                     </p>
@@ -1596,9 +1600,9 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
                 </div>
 
-                <div className="table-responsive" style={{ display: this.props.items.loading ? "none" : "block" }} >
+                <div className="table-responsive" style={{ marginTop: '-10px' }}>
 
-                    <div id="mapPlanningUnit" style={{ marginTop: '-10px' }}>
+                    <div id="mapPlanningUnit" style={{ display: this.props.items.loading ? "none" : "block" }}>
                     </div>
                 </div>
                 <div style={{ display: this.props.items.loading ? "block" : "none" }}>

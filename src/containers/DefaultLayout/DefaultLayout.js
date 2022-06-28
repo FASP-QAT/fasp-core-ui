@@ -234,6 +234,7 @@ const GlobalConsumptionReport = React.lazy(() => import('../../views/Report/Glob
 const ProgramOnboarding = React.lazy(() => import('../../views/Program/ProgramOnboarding'));
 const ShipmentList = React.lazy(() => import('../../views/Shipment/ShipmentDetails'));
 const ForecastMetricsOverTime = React.lazy(() => import('../../views/Report/ForecastMetricsOverTime'));
+const ConsumptionForecastErrorSupplyPlan = React.lazy(() => import('../../views/Report/ConsumptionForecastErrorSupplyPlan'));
 const pipeline = React.lazy(() => import('../../views/Pipeline/PipelineProgramImport'));
 const pipelineProgramSetup = React.lazy(() => import('../../views/Pipeline/PipelineProgramSetup'));
 const StockStatusOverTime = React.lazy(() => import('../../views/Report/StockStatusOverTime'));
@@ -592,6 +593,7 @@ const routes = [
   { path: '/report/stockStatus', name: 'static.dashboard.stockstatus', component: StockStatusReport },
   { path: '/report/globalConsumption', name: 'static.dashboard.globalconsumption', component: GlobalConsumptionReport },
   { path: '/report/forecastOverTheTime', name: 'static.report.forecasterrorovertime', component: ForecastMetricsOverTime },
+  { path: '/report/consumptionForecastErrorSupplyPlan', name: 'static.report.forecasterrorovertime', component: ConsumptionForecastErrorSupplyPlan },
   { path: '/report/stockStatusOverTime', name: 'static.dashboard.stockstatusovertime', component: StockStatusOverTime },
   { path: '/report/forecastMetrics', name: 'static.dashboard.forecastmetrics', component: ForecastMetrics },
 
@@ -974,19 +976,19 @@ class DefaultLayout extends Component {
   getNotificationCount() {
     if (localStorage.getItem("sessionType") === 'Online') {
       AuthenticationService.setupAxiosInterceptors();
-      ManualTaggingService.getNotificationCount()
-        .then(response => {
-          console.log("notification response===", response.data);
-          this.setState({
-            notificationCount: response.data
-          })
-        }).catch(
-          error => {
-            this.setState({
-              notificationCount: 0
-            })
-          }
-        );
+      // ManualTaggingService.getNotificationCount()
+      //   .then(response => {
+      //     console.log("notification response===", response.data);
+      //     this.setState({
+      //       notificationCount: response.data
+      //     })
+      //   }).catch(
+      //     error => {
+      //       this.setState({
+      //         notificationCount: 0
+      //       })
+      //     }
+      //   );
     }
   }
   getProgramData() {
@@ -2858,6 +2860,28 @@ class DefaultLayout extends Component {
                                 }
                               },
                               {
+                                name: i18n.t('static.report.forecasterrorovertime'),
+                                url: '/report/consumptionForecastErrorSupplyPlan',
+                                icon: 'fa fa-line-chart',
+                                attributes: {
+                                  hidden: ((this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT') && this.state.activeTab == 2) ? false : true),
+                                  onClick: e => {
+                                    this.refreshPage();
+                                  }
+                                }
+                              },
+                              // {
+                              //   name:'Forecast Error (Monthly) (New)',
+                              //   url: '/report/consumptionForecastErrorSupplyPlan',
+                              //   icon: 'fa fa-line-chart',
+                              //   attributes: {
+                              //     hidden: ((this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT') && this.state.activeTab == 2) ? false : true),
+                              //     onClick: e => {
+                              //       this.refreshPage();
+                              //     }
+                              //   }
+                              // },
+                              {
                                 name: i18n.t('static.dashboard.forecastmetrics'),
                                 url: '/report/forecastMetrics',
                                 icon: 'fa fa-table',
@@ -3913,7 +3937,28 @@ class DefaultLayout extends Component {
                                   }
                                 }
                               },
-
+                              {
+                                name: i18n.t('static.report.forecasterrorovertime'),
+                                url: '/report/consumptionForecastErrorSupplyPlan',
+                                icon: 'fa fa-line-chart',
+                                attributes: {
+                                  hidden: (this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT') && this.state.activeTab == 2 ? false : true),
+                                  onClick: e => {
+                                    this.refreshPage();
+                                  }
+                                }
+                              },
+                              // {
+                              //   name: 'Forecast Error (Monthly) (New)',
+                              //   url: '/report/consumptionForecastErrorSupplyPlan',
+                              //   icon: 'fa fa-line-chart',
+                              //   attributes: {
+                              //     hidden: (this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT') && this.state.activeTab == 2 ? false : true),
+                              //     onClick: e => {
+                              //       this.refreshPage();
+                              //     }
+                              //   }
+                              // },
                             ]
                           },
 
