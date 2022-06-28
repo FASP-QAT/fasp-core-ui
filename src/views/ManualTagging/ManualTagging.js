@@ -276,7 +276,7 @@ export default class ManualTagging extends Component {
             countryWisePrograms = programList;
         }
         var setOfProgramIds = [...new Set(countryWisePrograms.map(ele => ele.programId))]
-        var localProgramList = this.state.programQPLDetailsList.filter(c => setOfProgramIds.includes(c.programId) && !c.doNotFollowLatestShipmentInfo)
+        var localProgramList = this.state.programQPLDetailsList.filter(c => setOfProgramIds.includes(c.programId))
         if (localProgramList.length == 1) {
             this.setState({
                 // loading: false,
@@ -1061,9 +1061,7 @@ export default class ManualTagging extends Component {
         var programQPLDetailsList = this.state.programQPLDetailsList
         for (var v = 0; v < filterList.length; v++) {
             var programQPLDetailsFilter = programQPLDetailsList.filter(c => c.id == filterList[v].id);
-            if (!programQPLDetailsFilter[0].doNotFollowLatestShipmentInfo) {
-                versionList.push({ versionId: filterList[v].version + "  (Local)" })
-            }
+            versionList.push({ versionId: filterList[v].version + "  (Local)" })
         }
         console.log("filteredProgramList@@@@@@@@@@@@", versionList)
         console.log("filteredProgramList@@@@@@@@@@@@", this.state.programs)
@@ -3020,7 +3018,7 @@ export default class ManualTagging extends Component {
                 let shipmentQty = !this.state.versionId.toString().includes("Local") ? manualTaggingList[j].erpQty : manualTaggingList[j].shipmentQty;
                 let linkedShipmentsListForTab2 = this.state.versionId.toString().includes("Local") ? this.state.linkedShipmentsListForTab2.filter(c => manualTaggingList[j].shipmentId > 0 ? c.childShipmentId == manualTaggingList[j].shipmentId : c.tempChildShipmentId == manualTaggingList[j].tempShipmentId) : [manualTaggingList[j]];
                 console.log("linkedShipmentsListForTab2@@@@@@@@@@@", linkedShipmentsListForTab2)
-                console.log("manualTaggingList[j]@@@@@@@@@@@@",manualTaggingList[j])
+                console.log("manualTaggingList[j]@@@@@@@@@@@@", manualTaggingList[j])
                 data[0] = true;
                 data[1] = manualTaggingList[j].parentShipmentId + " (" + (!this.state.versionId.toString().includes("Local") ? manualTaggingList[j].childShipmentId : manualTaggingList[j].shipmentId + ")");
                 data[2] = !this.state.versionId.toString().includes("Local") ? manualTaggingList[j].childShipmentId : manualTaggingList[j].shipmentId
@@ -3046,7 +3044,7 @@ export default class ManualTagging extends Component {
             }
             else {
                 // data[0] = manualTaggingList[j].erpOrderId
-                data[0] = (manualTaggingList[j].roNo + " - " + manualTaggingList[j].roPrimeLineNo)+" | "+(manualTaggingList[j].orderNo + " - " + manualTaggingList[j].primeLineNo)+(manualTaggingList[j].knShipmentNo!="" && manualTaggingList[j].knShipmentNo!=null?" | "+ manualTaggingList[j].knShipmentNo:"");
+                data[0] = (manualTaggingList[j].roNo + " - " + manualTaggingList[j].roPrimeLineNo) + " | " + (manualTaggingList[j].orderNo + " - " + manualTaggingList[j].primeLineNo) + (manualTaggingList[j].knShipmentNo != "" && manualTaggingList[j].knShipmentNo != null ? " | " + manualTaggingList[j].knShipmentNo : "");
                 data[1] = manualTaggingList[j].orderNo + " - " + manualTaggingList[j].primeLineNo
                 data[2] = manualTaggingList[j].knShipmentNo;
                 data[3] = getLabelText(manualTaggingList[j].erpPlanningUnit.label, this.state.lang)
@@ -3150,7 +3148,7 @@ export default class ManualTagging extends Component {
             var options = {
                 data: data,
                 columnDrag: true,
-                colWidths: [40, 40, 0, 50, 0, 80, 80, 30, 35, 25, 35, 35,80],
+                colWidths: [40, 40, 0, 50, 0, 80, 80, 30, 35, 25, 35, 35, 80],
                 colHeaderClasses: ["Reqasterisk"],
                 columns: [
                     {

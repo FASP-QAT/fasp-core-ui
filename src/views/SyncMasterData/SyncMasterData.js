@@ -231,7 +231,7 @@ export default class SyncMasterData extends Component {
             var generalJson = JSON.parse(generalData);
             console.log("GeneralJson@@@@@@@@@@@@@@", generalJson)
             var programQPLListFilter=programQPLDetailsList.filter(c=>c.id==programList[pl].id);
-            var linkedShipmentsList = generalJson.shipmentLinkingList != null && programQPLListFilter[0].doNotFollowLatestShipmentInfo==0 ? generalJson.shipmentLinkingList : [];
+            var linkedShipmentsList = generalJson.shipmentLinkingList != null ? generalJson.shipmentLinkingList : [];
             var listOfRoNoAndRoPrimeLineNo = [];
             for (var lsl = 0; lsl < linkedShipmentsList.length; lsl++) {
                 if (listOfRoNoAndRoPrimeLineNo.findIndex(c => c.roNo == linkedShipmentsList[lsl].roNo && c.roPrimeLineNo == linkedShipmentsList[lsl].roPrimeLineNo) == -1) {
