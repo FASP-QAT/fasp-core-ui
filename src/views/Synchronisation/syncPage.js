@@ -2493,28 +2493,28 @@ export default class syncPage extends Component {
                                                                           var listFromAPIFiltered=listFromAPI.filter(c=>uniqueRoNoAndRoPrimeLineNo[cd]==c.roNo+"|"+c.roPrimeLineNo);
                                                                           console.log("latestProgramDataShipmentLinkedFiltered@@@@@@@@@@@@@",latestProgramDataShipmentLinkedFiltered)
                                                                           console.log("oldProgramDataShipmentLinkedFiltered@@@@@@@@@@@@@",oldProgramDataShipmentLinkedFiltered)
-                                                                          data[0] = uniqueRoNoAndRoPrimeLineNo[cd].split("|")[0];
+                                                                          data[0] = uniqueRoNoAndRoPrimeLineNo[cd].split("|")[0]+" - "+uniqueRoNoAndRoPrimeLineNo[cd].split("|")[1];
                                                                           data[1] = uniqueRoNoAndRoPrimeLineNo[cd].split("|")[1];
                                                                           data[2] = oldProgramDataShipmentLinkedFiltered.length>0?getLabelText(oldProgramData.label,this.state.lang):"";
-                                                                          data[3] = oldProgramDataShipmentLinkedFiltered.length>0?oldProgramDataShipmentLinkedFiltered[0].parentShipmentId:"";
-                                                                          data[4] = oldProgramDataShipmentLinkedFiltered.length>0?oldProgramDataShipmentLinkedFiltered[0].conversionFactor:"";
-                                                                          data[5] = oldProgramDataShipmentLinkedFiltered.length>0?oldProgramDataShipmentLinkedFiltered[0].active:"";
+                                                                          data[3] = oldProgramDataShipmentLinkedFiltered.length>0?oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length-1].parentShipmentId:"";
+                                                                          data[4] = oldProgramDataShipmentLinkedFiltered.length>0?oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length-1].conversionFactor:"";
+                                                                          data[5] = oldProgramDataShipmentLinkedFiltered.length>0?oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length-1].active==1 || oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length-1].active==true?true:false:false;
                                                                           data[6] = listFromAPIFiltered.length>0?getLabelText(listFromAPIFiltered[0].program.label,this.state.lang):latestProgramDataShipmentLinkedFiltered.length>0?getLabelText(latestProgramData.label,this.state.lang):"";
-                                                                          data[7] = listFromAPIFiltered.length>0?listFromAPIFiltered[0].shipmentId:latestProgramDataShipmentLinkedFiltered.length>0?latestProgramDataShipmentLinkedFiltered[0].parentShipmentId:"";
-                                                                          data[8] = listFromAPIFiltered.length>0?listFromAPIFiltered[0].conversionFactor:latestProgramDataShipmentLinkedFiltered.length>0?latestProgramDataShipmentLinkedFiltered[0].conversionFactor:"";
-                                                                          data[9] = listFromAPIFiltered.length>0?listFromAPIFiltered[0].conversionFactor:latestProgramDataShipmentLinkedFiltered.length>0?latestProgramDataShipmentLinkedFiltered[0].active:"";
-                                                                          data[10] = oldProgramDataShipmentLinkedFiltered.length>0?oldProgramDataShipmentLinkedFiltered[0].shipmentLinkingId:"";
-                                                                          data[11] = latestProgramDataShipmentLinkedFiltered.length>0?latestProgramDataShipmentLinkedFiltered[0].shipmentLinkingId:"";
-                                                                          data[12]=downloadedProgramDataShipmentLinkedFiltered.length>0?downloadedProgramDataShipmentLinkedFiltered[0].shipmentLinkingId:"";
+                                                                          data[7] = listFromAPIFiltered.length>0?listFromAPIFiltered[listFromAPIFiltered.length-1].shipmentId:latestProgramDataShipmentLinkedFiltered.length>0?latestProgramDataShipmentLinkedFiltered[latestProgramDataShipmentLinkedFiltered.length-1].parentShipmentId:"";
+                                                                          data[8] = listFromAPIFiltered.length>0?listFromAPIFiltered[listFromAPIFiltered.length-1].conversionFactor:latestProgramDataShipmentLinkedFiltered.length>0?latestProgramDataShipmentLinkedFiltered[latestProgramDataShipmentLinkedFiltered.length-1].conversionFactor:"";
+                                                                          data[9] = listFromAPIFiltered.length>0?listFromAPIFiltered[listFromAPIFiltered.length-1].conversionFactor:latestProgramDataShipmentLinkedFiltered.length>0?latestProgramDataShipmentLinkedFiltered[latestProgramDataShipmentLinkedFiltered.length-1].active==1 || latestProgramDataShipmentLinkedFiltered[latestProgramDataShipmentLinkedFiltered.length-1].active==true?true:false:false;
+                                                                          data[10] = oldProgramDataShipmentLinkedFiltered.length>0?oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length-1].shipmentLinkingId:"";
+                                                                          data[11] = latestProgramDataShipmentLinkedFiltered.length>0?latestProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length-1].shipmentLinkingId:"";
+                                                                          data[12]=downloadedProgramDataShipmentLinkedFiltered.length>0?downloadedProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length-1].shipmentLinkingId:"";
                                                                           data[13]= 4;
                                                                           data[14]=(oldProgramDataShipmentLinkedFiltered.length>0 && latestProgramDataShipmentLinkedFiltered.length==0) || (oldProgramDataShipmentLinkedFiltered.length==0 && latestProgramDataShipmentLinkedFiltered.length>0)?(oldProgramDataShipmentLinkedFiltered.length>0 && latestProgramDataShipmentLinkedFiltered.length==0)?oldProgramData.currentVersion.versionId:latestProgramData.currentVersion.versionId:"";
                                                                           data[15]=cd;
                                                                           data[16]=oldProgramData.currentVersion.versionId;
                                                                           data[17]=latestProgramData.currentVersion.versionId;
                                                                           data[18]=[];
-                                                                          data[19] = oldProgramDataShipmentLinkedFiltered.length>0?oldProgramDataShipmentLinkedFiltered[0]:{};
-                                                                          data[20] = latestProgramDataShipmentLinkedFiltered.length>0?latestProgramDataShipmentLinkedFiltered[0]:{};
-                                                                          data[21] = downloadedProgramDataShipmentLinkedFiltered.length>0?downloadedProgramDataShipmentLinkedFiltered[0].active:""
+                                                                          data[19] = oldProgramDataShipmentLinkedFiltered.length>0?oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length-1]:{};
+                                                                          data[20] = latestProgramDataShipmentLinkedFiltered.length>0?latestProgramDataShipmentLinkedFiltered[latestProgramDataShipmentLinkedFiltered.length-1]:{};
+                                                                          data[21] = downloadedProgramDataShipmentLinkedFiltered.length>0?downloadedProgramDataShipmentLinkedFiltered[downloadedProgramDataShipmentLinkedFiltered.length-1].active:""
                                                                           // data[8] = mergedShipmentData[cd].dataSource.id;
                                                                           // data[9] = mergedShipmentData[cd].shipmentMode == "Air" ? 2 : 1;
                                                                           // data[10] = mergedShipmentData[cd].suggestedQty;
@@ -2583,16 +2583,16 @@ export default class syncPage extends Component {
                                                             
                                                                         ],
                                                                           columns: [
-                                                                            { title: i18n.t('static.commit.erpNo'), type: 'text', width: 100 },
-                                                                            { title: i18n.t('static.commit.erpLineNo'), type: 'text', width: 200 },
-                                                                            { type: 'text', title: i18n.t('static.dashboard.programheader'), width: 100 },
-                                                                            { type: 'text', title: i18n.t('static.commit.shipmentId'), width: 100, },
+                                                                            { title: i18n.t('static.manualTagging.RONO'), type: 'text', width: 200 },
+                                                                            { title: i18n.t('static.commit.erpLineNo'), type: 'hidden', width: 200 },
+                                                                            { type: 'text', title: i18n.t('static.dashboard.programheader'), width: 150 },
+                                                                            { type: 'text', title: i18n.t('static.report.id'), width: 100, },
                                                                             { type: 'text', title: i18n.t('static.manualTagging.conversionFactor'),width: 120 },
-                                                                            { type: 'text', title: i18n.t('static.common.active'),width: 120 },
+                                                                            { type: 'checkbox', title: i18n.t('static.common.active'),width: 120 },
                                                                             { type: 'text', title: i18n.t('static.dashboard.programheader'), width: 100 },
-                                                                            { type: 'text', title: i18n.t('static.commit.shipmentId'), width: 100, },
+                                                                            { type: 'text', title: i18n.t('static.report.id'), width: 100, },
                                                                             { type: 'text', title: i18n.t('static.manualTagging.conversionFactor'),width: 120 },
-                                                                            { type: 'text', title: i18n.t('static.common.active'),width: 120 },
+                                                                            { type: 'checkbox', title: i18n.t('static.common.active'),width: 120 },
                                                                             // { type: 'dropdown', title: i18n.t('static.subfundingsource.fundingsource'), source: fundingSourceList, width: 120 },
                                                                             // { type: 'dropdown', title: i18n.t('static.dashboard.budget'), source: budgetList, width: 120 },
                                                                             // { type: 'text', title: i18n.t('static.supplyPlan.orderNoAndPrimeLineNo'), width: 150 },
@@ -3826,7 +3826,7 @@ export default class syncPage extends Component {
                               active={this.state.activeTab[0] === '3'}
                               onClick={() => { this.toggle(0, '3'); }}
                             >
-                              {i18n.t('static.shipment.shipment')}
+                              {i18n.t('static.shipment.manualShipments')}
                             </NavLink>
                           </NavItem>
                           <NavItem>
@@ -3834,7 +3834,7 @@ export default class syncPage extends Component {
                               active={this.state.activeTab[0] === '4'}
                               onClick={() => { this.toggle(0, '4'); }}
                             >
-                              {i18n.t('static.commitVersion.linkedShipments')}
+                              {i18n.t('static.supplyPlan.erpShipments')}
                             </NavLink>
                           </NavItem>
                           <NavItem>
