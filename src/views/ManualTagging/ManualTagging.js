@@ -155,7 +155,7 @@ export default class ManualTagging extends Component {
 
     versionChange(event) {
         this.setState({
-            loading:true
+            loading: true
         })
         var versionId = event.target.value;
         localStorage.setItem("sesVersionIdReport", versionId);
@@ -168,7 +168,7 @@ export default class ManualTagging extends Component {
             } else {
                 this.setState({
                     planningUnits: [],
-                    loading:false
+                    loading: false
                 })
             }
         })
@@ -567,9 +567,9 @@ export default class ManualTagging extends Component {
                 value = this.el.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
                 var qty = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                console.log("x@@@@@@@@@@@@",x)
-                console.log("y@@@@@@@@@@@@",y)
-                console.log("Value@@@@@@@@@@@@",value)
+                console.log("x@@@@@@@@@@@@", x)
+                console.log("y@@@@@@@@@@@@", y)
+                console.log("Value@@@@@@@@@@@@", value)
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
@@ -695,7 +695,7 @@ export default class ManualTagging extends Component {
     dataChangeCheckbox(event) {
         this.setState({
             selectedShipment: [],
-            originalQty:0,
+            originalQty: 0,
             checkboxValue: (event.target.checked ? true : false)
         })
     }
@@ -1072,7 +1072,7 @@ export default class ManualTagging extends Component {
             versionList: versionList,
             loading: false
         }, () => {
-            if (localStorage.getItem("sesVersionIdReport") != '' && localStorage.getItem("sesVersionIdReport") != undefined && versionList.filter(c=>c.versionId==localStorage.getItem("sesVersionIdReport")).length>0) {
+            if (localStorage.getItem("sesVersionIdReport") != '' && localStorage.getItem("sesVersionIdReport") != undefined && versionList.filter(c => c.versionId == localStorage.getItem("sesVersionIdReport")).length > 0) {
                 var event = {
                     target: {
                         value: localStorage.getItem("sesVersionIdReport")
@@ -1080,11 +1080,11 @@ export default class ManualTagging extends Component {
                 };
                 this.versionChange(event)
 
-            }else{
-            this.getPlanningUnitList()
+            } else {
+                this.getPlanningUnitList()
             }
             if (this.state.versionId.toString() != -1) {
-                
+
             } else {
                 this.setState({
                     outputList: []
@@ -1200,7 +1200,7 @@ export default class ManualTagging extends Component {
         this.setState({ loading: true })
         var validation = true;
         if (validation == true) {
-            var selectedShipment = this.state.languageEl.getJson(null, false).filter(c => c[0] == true);
+            var selectedShipment = this.state.languageEl.getJson(null, false).filter(c => c[0] == false);
             var setOfPlanningUnitIds = [...new Set(selectedShipment.map(ele => ele[16].planningUnit.id))];
             if (setOfPlanningUnitIds.length > 1) {
                 alert(i18n.t('static.mt.selectShipmentOfSamePlanningUnit'));
@@ -1264,8 +1264,8 @@ export default class ManualTagging extends Component {
                         var curUser = AuthenticationService.getLoggedInUserId();
                         var username = AuthenticationService.getLoggedInUsername();
                         for (var ss = 0; ss < selectedShipment.length; ss++) {
-                            var linkedShipmentsListIndex = linkedShipmentsList.findIndex(c => (selectedShipment[ss][16].shipmentId > 0 ? selectedShipment[ss][16].shipmentId == c.childShipmentId : selectedShipment[ss][16].tempShipmentId == c.tempChildShipmentId) && c.active.toString()=="true");
-                            var linkedShipmentsListFilter = linkedShipmentsList.filter(c => (selectedShipment[ss][16].shipmentId > 0 ? selectedShipment[ss][16].shipmentId == c.childShipmentId : selectedShipment[ss][16].tempShipmentId == c.tempChildShipmentId) && c.active.toString()=="true");
+                            var linkedShipmentsListIndex = linkedShipmentsList.findIndex(c => (selectedShipment[ss][16].shipmentId > 0 ? selectedShipment[ss][16].shipmentId == c.childShipmentId : selectedShipment[ss][16].tempShipmentId == c.tempChildShipmentId) && c.active.toString() == "true");
+                            var linkedShipmentsListFilter = linkedShipmentsList.filter(c => (selectedShipment[ss][16].shipmentId > 0 ? selectedShipment[ss][16].shipmentId == c.childShipmentId : selectedShipment[ss][16].tempShipmentId == c.tempChildShipmentId) && c.active.toString() == "true");
                             linkedShipmentsList[linkedShipmentsListIndex].active = false;
                             linkedShipmentsList[linkedShipmentsListIndex].lastModifiedBy.userId = curUser;
                             linkedShipmentsList[linkedShipmentsListIndex].lastModifiedBy.username = username;
@@ -1472,7 +1472,7 @@ export default class ManualTagging extends Component {
                                                 if (moment(minDate).format("YYYY-MM") > moment(tableJson[y][4]).format("YYYY-MM")) {
                                                     minDate = moment(tableJson[y][4]).format("YYYY-MM-DD")
                                                 }
-                                                var filterList = tableJson.filter((c) => c[1] == tableJson[y][1]);
+                                                var filterList = tableJson.filter((c) => c[16] == tableJson[y][16]);
                                                 console.log("FilterList@@@@@@@@@@@@@@@", filterList);
                                                 var getUniqueOrderNoAndPrimeLineNoList = filterList.filter((v, i, a) => a.findIndex(t => (t[15].roNo === v[15].roNo && t[15].roPrimeLineNo === v[15].roPrimeLineNo && t[15].knShipmentNo === v[15].knShipmentNo)) === i);
                                                 console.log("getUniqueOrderNoAndPrimeLineNoList@@@@@@@@@@@@@@@", getUniqueOrderNoAndPrimeLineNoList)
@@ -1998,7 +1998,7 @@ export default class ManualTagging extends Component {
                 })
             }
         }
-        var shipmentPlanningUnitId = this.state.active1 ? this.state.selectedRowPlanningUnit : (this.state.active3 ? ((this.state.active4 || this.state.active5) && !this.state.checkboxValue ? document.getElementById("planningUnitId1").value : (this.state.active4 || this.state.active5) && this.state.checkboxValue ? this.state.selectedShipment.length>0?this.state.selectedShipment[0].planningUnit.id:0 : 0) : 0)
+        var shipmentPlanningUnitId = this.state.active1 ? this.state.selectedRowPlanningUnit : (this.state.active3 ? ((this.state.active4 || this.state.active5) && !this.state.checkboxValue ? document.getElementById("planningUnitId1").value : (this.state.active4 || this.state.active5) && this.state.checkboxValue ? this.state.selectedShipment.length > 0 ? this.state.selectedShipment[0].planningUnit.id : 0 : 0) : 0)
         if ((roNoOrderNo != "" && roNoOrderNo != "0") || (erpPlanningUnitId != 0)) {
             // roNoOrderNo, programId, erpPlanningUnitId, (this.state.active1 ? 1 : (this.state.active2 ? 2 : 3)), (this.state.active2 ? this.state.parentShipmentId : 0)
             var json = {
@@ -2223,7 +2223,7 @@ export default class ManualTagging extends Component {
                 var generalProgramJson = JSON.parse(generalProgramData);
                 var linkedShipmentsList = generalProgramJson.shipmentLinkingList != null ? generalProgramJson.shipmentLinkingList : [];
                 var linkedRoNoAndRoPrimeLineNo = [];
-                console.log("linkedShipmentsList@@@@@@@@@@@@@@@",linkedShipmentsList);
+                console.log("linkedShipmentsList@@@@@@@@@@@@@@@", linkedShipmentsList);
                 linkedShipmentsList.filter(c => c.shipmentLinkingId == 0 && c.active == true).map(c => {
                     linkedRoNoAndRoPrimeLineNo.push(c.roNo + "|" + c.roPrimeLineNo)
                 })
@@ -2232,7 +2232,7 @@ export default class ManualTagging extends Component {
             ManualTaggingService.getShipmentListForTab3(json)
                 .then(response => {
                     var outputList = response.data;
-                    console.log("output list@@@@@@@@@@@@@@@",outputList)
+                    console.log("output list@@@@@@@@@@@@@@@", outputList)
                     var filterOnLinkedData = outputList.filter(c => !linkedRoNoAndRoPrimeLineNo.includes(c.roNo + "|" + c.roPrimeLineNo));
                     let resultTrue = Object.values(filterOnLinkedData.reduce((a, { roNo, roPrimeLineNo, knShipmentNo, erpQty, orderNo, primeLineNo, erpShipmentStatus, expectedDeliveryDate, batchNo, expiryDate, erpPlanningUnit, price, shippingCost, shipBy, qatEquivalentShipmentStatus, parentShipmentId, childShipmentId, notes, qatPlanningUnit }) => {
                         if (!a[roNo + "|" + roPrimeLineNo + "|" + knShipmentNo])
@@ -2661,7 +2661,7 @@ export default class ManualTagging extends Component {
                         this.setState({
                             programs: listArray,
                             loading: false
-                        },()=>{
+                        }, () => {
                             if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
                                 this.setState({
                                     programId: localStorage.getItem("sesProgramIdReport")
@@ -2763,7 +2763,7 @@ export default class ManualTagging extends Component {
                     // } else {
                     console.log("order no ---", erpDataList[j].orderNo + " active---", erpDataList[j].active)
                     data[0] = false;//A
-                    data[1] = erpDataList[j].roNo + ' | ' + erpDataList[j].roPrimeLineNo//B
+                    data[1] = erpDataList[j].roNo + ' - ' + erpDataList[j].roPrimeLineNo + ' | ' + erpDataList[j].orderNo + ' - ' + erpDataList[j].primeLineNo + (erpDataList[j].knShipmentNo != '' && erpDataList[j].knShipmentNo != null ? ' | ' + erpDataList[j].knShipmentNo : "");//B
                     data[2] = erpDataList[j].orderNo + ' | ' + erpDataList[j].primeLineNo;//C
                     data[3] = getLabelText(erpDataList[j].erpPlanningUnit.label);//D
                     data[4] = erpDataList[j].expectedDeliveryDate;//E
@@ -2778,9 +2778,10 @@ export default class ManualTagging extends Component {
                     // data[11] = ``;
                     data[11] = `=ROUND(J${parseInt(j) + 1}*K${parseInt(j) + 1},2)`
                     data[12] = "";
-                    data[13] = erpDataArray.filter(c => c[1] == erpDataList[j].roNo + ' | ' + erpDataList[j].roPrimeLineNo).length > 0 ? 1 : 0;
+                    data[13] = erpDataArray.filter(c => c[16] == erpDataList[j].roNo + ' | ' + erpDataList[j].roPrimeLineNo).length > 0 ? 1 : 0;
                     data[14] = erpDataList[j].qatEquivalentShipmentStatus;
                     data[15] = erpDataList[j];
+                    data[16] = erpDataList[j].roNo + ' | ' + erpDataList[j].roPrimeLineNo
                     // data[9] = "";
                     // data[10] = "";
                     // data[11] = "";
@@ -2816,54 +2817,64 @@ export default class ManualTagging extends Component {
                         {
                             title: i18n.t('static.mt.linkColumn'),
                             type: 'checkbox',
+                            width: 60
                         },
                         {
                             title: i18n.t('static.mt.roNoAndRoLineNo'),
                             type: 'text',
-                            readOnly: true
+                            readOnly: true,
+                            width: 150
                         },
                         {
                             title: i18n.t('static.mt.orderNoAndPrimeLineNo'),
-                            type: 'text',
-                            readOnly: true
+                            type: 'hidden',
+                            readOnly: true,
+                            width: 0
                         },
                         {
-                            title: i18n.t('static.manualTagging.erpPlanningUnit'),
+                            title: i18n.t('static.dashboard.planningunitheader'),
                             type: 'text',
-                            readOnly: true
+                            readOnly: true,
+                            width: 200
                         },
                         {
                             title: i18n.t('static.supplyPlan.mtexpectedDeliveryDate'),
                             type: 'calendar',
                             readOnly: true,
                             options: { format: JEXCEL_DATE_FORMAT },
+                            width: 80
                         },
                         {
-                            title: i18n.t('static.manualTagging.erpStatus'),
+                            title: i18n.t('static.shipmentDataEntry.shipmentStatus'),
                             type: 'text',
-                            readOnly: true
+                            readOnly: true,
+                            width: 60
                         },
                         {
                             title: i18n.t('static.mt.knShipmentNo'),
-                            type: 'text',
-                            readOnly: true
+                            type: 'hidden',
+                            readOnly: true,
+                            width: 0
                         },
                         {
-                            title: i18n.t('static.inventory.batchNumber'),
+                            title: i18n.t('static.mt.batchNo'),
                             type: 'text',
-                            readOnly: true
+                            readOnly: true,
+                            width: 80
                         },
                         {
                             title: i18n.t('static.supplyPlan.expiryDate'),
                             type: 'calendar',
                             readOnly: true,
                             options: { format: JEXCEL_DATE_FORMAT },
+                            width: 80
                         },
                         {
-                            title: i18n.t('static.manualTagging.erpShipmentQty'),
+                            title: i18n.t('static.supplyPlan.qty'),
                             type: 'numeric',
                             mask: '#,##', decimal: '.',
-                            readOnly: true
+                            readOnly: true,
+                            width: 80
                         },
                         {
                             title: i18n.t('static.manualTagging.conversionFactor'),
@@ -2872,18 +2883,20 @@ export default class ManualTagging extends Component {
                             decimal: '.',
                             textEditor: true,
                             disabledMaskOnEdition: true,
-
+                            width: 80
                         },
                         {
                             title: i18n.t('static.manualTagging.convertedQATShipmentQty'),
                             type: 'numeric',
                             mask: '#,##.0000',
                             decimal: '.',
-                            readOnly: true
+                            readOnly: true,
+                            width: 80
                         },
                         {
                             title: i18n.t('static.program.notes'),
                             type: 'text',
+                            width: 200
                         },
                         {
                             title: "Exists",
@@ -2895,6 +2908,10 @@ export default class ManualTagging extends Component {
                         },
                         {
                             title: "Object",
+                            type: 'hidden',
+                        },
+                        {
+                            title: "Ro No and Ro Prime line No",
                             type: 'hidden',
                         },
                     ],
@@ -3003,10 +3020,11 @@ export default class ManualTagging extends Component {
                 let shipmentQty = !this.state.versionId.toString().includes("Local") ? manualTaggingList[j].erpQty : manualTaggingList[j].shipmentQty;
                 let linkedShipmentsListForTab2 = this.state.versionId.toString().includes("Local") ? this.state.linkedShipmentsListForTab2.filter(c => manualTaggingList[j].shipmentId > 0 ? c.childShipmentId == manualTaggingList[j].shipmentId : c.tempChildShipmentId == manualTaggingList[j].tempShipmentId) : [manualTaggingList[j]];
                 console.log("linkedShipmentsListForTab2@@@@@@@@@@@", linkedShipmentsListForTab2)
-                data[0] = false;
-                data[1] = manualTaggingList[j].parentShipmentId
+                console.log("manualTaggingList[j]@@@@@@@@@@@@",manualTaggingList[j])
+                data[0] = true;
+                data[1] = manualTaggingList[j].parentShipmentId + " (" + (!this.state.versionId.toString().includes("Local") ? manualTaggingList[j].childShipmentId : manualTaggingList[j].shipmentId + ")");
                 data[2] = !this.state.versionId.toString().includes("Local") ? manualTaggingList[j].childShipmentId : manualTaggingList[j].shipmentId
-                data[3] = linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].roNo + " | " + linkedShipmentsListForTab2[0].roPrimeLineNo : ""
+                data[3] = (linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].roNo + " - " + linkedShipmentsListForTab2[0].roPrimeLineNo : "") + " | " + (manualTaggingList[j].orderNo + " - " + manualTaggingList[j].primeLineNo) + (linkedShipmentsListForTab2.length > 0 && linkedShipmentsListForTab2[0].knShipmentNo != "" && linkedShipmentsListForTab2[0].knShipmentNo != null ? " | " + linkedShipmentsListForTab2[0].knShipmentNo : "");
                 data[4] = manualTaggingList[j].orderNo + " | " + manualTaggingList[j].primeLineNo
                 data[5] = linkedShipmentsListForTab2.length > 0 ? getLabelText(linkedShipmentsListForTab2[0].erpPlanningUnit.label, this.state.lang) : ""
                 data[6] = !this.state.versionId.toString().includes("Local") ? getLabelText(manualTaggingList[j].erpPlanningUnit.label, this.state.lang) : getLabelText(manualTaggingList[j].planningUnit.label, this.state.lang)
@@ -3028,7 +3046,7 @@ export default class ManualTagging extends Component {
             }
             else {
                 // data[0] = manualTaggingList[j].erpOrderId
-                data[0] = manualTaggingList[j].roNo + " | " + manualTaggingList[j].roPrimeLineNo
+                data[0] = (manualTaggingList[j].roNo + " - " + manualTaggingList[j].roPrimeLineNo)+" | "+(manualTaggingList[j].orderNo + " - " + manualTaggingList[j].primeLineNo)+(manualTaggingList[j].knShipmentNo!="" && manualTaggingList[j].knShipmentNo!=null?" | "+ manualTaggingList[j].knShipmentNo:"");
                 data[1] = manualTaggingList[j].orderNo + " - " + manualTaggingList[j].primeLineNo
                 data[2] = manualTaggingList[j].knShipmentNo;
                 data[3] = getLabelText(manualTaggingList[j].erpPlanningUnit.label, this.state.lang)
@@ -3050,7 +3068,7 @@ export default class ManualTagging extends Component {
             var options = {
                 data: data,
                 columnDrag: true,
-                colWidths: [20, 40, 25, 20, 20, 40, 40, 25, 25],
+                colWidths: [20, 40, 50, 20, 20, 30, 30, 25, 50],
                 colHeaderClasses: ["Reqasterisk"],
                 columns: [
 
@@ -3132,35 +3150,35 @@ export default class ManualTagging extends Component {
             var options = {
                 data: data,
                 columnDrag: true,
-                colWidths: [20, 20, 40, 45, 45, 45, 30, 30, 35, 25, 35, 35],
+                colWidths: [40, 40, 0, 50, 0, 80, 80, 30, 35, 25, 35, 35,80],
                 colHeaderClasses: ["Reqasterisk"],
                 columns: [
                     {
-                        title: i18n.t('static.common.dlink'),
+                        title: i18n.t('static.mt.linked'),
                         type: 'checkbox',
                         // readOnly: this.state.versionId.toString().includes("Local") ? false : true
                         // mask: '#,##', decimal: '.'
                     },
                     {
-                        title: i18n.t('static.mt.parentShipmentId'),
+                        title: i18n.t('static.mt.parentShipmentId(childShipmentId)'),
                         type: 'numeric',
                         readOnly: true
                         // mask: '#,##', decimal: '.'
                     },
                     {
                         title: i18n.t('static.mt.childShipmentId'),
-                        type: 'numeric',
+                        type: 'hidden',
                         readOnly: true
                         // mask: '#,##', decimal: '.'
                     },
                     {
-                        title: i18n.t('static.mt.roNoAndRoLineNo'),
+                        title: i18n.t('static.manualTagging.RONO'),
                         type: 'text',
                         readOnly: true
                     },
                     {
                         title: i18n.t('static.manualTagging.procOrderNo'),
-                        type: 'text',
+                        type: 'hidden',
                         readOnly: true
                     },
                     {
@@ -3180,13 +3198,13 @@ export default class ManualTagging extends Component {
                         readOnly: true
                     },
                     {
-                        title: i18n.t('static.manualTagging.erpStatus'),
+                        title: i18n.t('static.common.status'),
                         type: 'text',
                         readOnly: true
                     },
 
                     {
-                        title: i18n.t('static.supplyPlan.shipmentQty'),
+                        title: i18n.t('static.supplyPlan.qty'),
                         type: 'numeric',
                         mask: '#,##', decimal: '.',
                         readOnly: true
@@ -3379,7 +3397,7 @@ export default class ManualTagging extends Component {
             var options = {
                 data: data,
                 columnDrag: true,
-                colWidths: [20, 20, 40, 45, 45, 45],
+                colWidths: [50, 0, 0, 60, 45, 45],
                 colHeaderClasses: ["Reqasterisk"],
                 columns: [
 
@@ -3389,11 +3407,11 @@ export default class ManualTagging extends Component {
                     },
                     {
                         title: i18n.t('static.mt.orderNoAndPrimeLineNo'),
-                        type: 'text',
+                        type: 'hidden',
                     },
                     {
                         title: i18n.t('static.mt.knShipmentNo'),
-                        type: 'text',
+                        type: 'hidden',
                     },
                     {
                         title: i18n.t('static.manualTagging.erpPlanningUnit'),
@@ -3405,7 +3423,7 @@ export default class ManualTagging extends Component {
                         options: { format: JEXCEL_DATE_FORMAT },
                     },
                     {
-                        title: i18n.t('static.manualTagging.erpStatus'),
+                        title: i18n.t('static.common.status'),
                         type: 'text',
                     },
 
@@ -3463,18 +3481,18 @@ export default class ManualTagging extends Component {
         jExcelLoadedFunction(instance, 1);
         var asterisk = document.getElementsByClassName("resizable")[2];
         var tr = asterisk.firstChild;
-        tr.children[8].classList.add('AsteriskTheadtrTd');
+        tr.children[10].classList.add('AsteriskTheadtrTd');
     }
 
     selected = function (instance, cell, x, y, value) {
-        console.log("x$$$$$$$$$$$$$$$$",x);
-        console.log("y$$$$$$$$$$$$$$$$",y);
-        console.log("value$$$$$$$$$$$$$$$$",value);
-        if ((x == 0 && value != 0) || (y == 0 && value!=0)) {
+        console.log("x$$$$$$$$$$$$$$$$", x);
+        console.log("y$$$$$$$$$$$$$$$$", y);
+        console.log("value$$$$$$$$$$$$$$$$", value);
+        if ((x == 0 && value != 0) || (y == 0 && value != 0)) {
             // console.log("HEADER SELECTION--------------------------");
         } else {
             this.setState({
-                loading:true
+                loading: true
             })
             var outputListAfterSearch = [];
             let row;
@@ -3645,7 +3663,7 @@ export default class ManualTagging extends Component {
 
                         this.setState({
                             message: response.data.messageCode,
-                            loading:false,
+                            loading: false,
                             color: '#BA0C2F'
                         },
                             () => {
@@ -4188,7 +4206,7 @@ export default class ManualTagging extends Component {
                     </div>
                     <CardBody className="pb-lg-5">
                         {/* <Col md="10 ml-0"> */}
-                        <b><div className="col-md-11 pl-3" style={{ 'marginLeft': '-15px', 'marginTop': '-13px' }}> <span style={{ 'color': '#002f6c', 'fontSize': '13px' }}>{i18n.t('static.mt.masterDataSyncNote')}</span></div></b><br />
+                        <b><div className="col-md-11 pl-3" style={{ 'marginLeft': '-15px', 'marginTop': '-13px' }}> <span style={{ 'color': '#002f6c', 'fontSize': '13px' }}>{i18n.t('static.mt.manualTaggingNotePart1')}<a href="#/program/downloadProgram" target="_blank">{i18n.t('static.mt.manualTaggingNotePart2')}</a>{i18n.t('static.mt.manualTaggingNotePart3')}</span></div></b><br />
 
                         <div className="col-md-12 pl-0">
                             <Row>
@@ -4558,7 +4576,7 @@ export default class ManualTagging extends Component {
                                                                     </FormGroup>}
                                                             </>}
                                                         {(this.state.active4 || (this.state.active5 && !this.state.checkboxValue)) &&
-                                                            <FormGroup className="col-md-3 ">
+                                                            <FormGroup className="col-md-6 ">
                                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.procurementUnit.planningUnit')}{this.state.active4 && <span class="red Reqasterisk">*</span>}</Label>
                                                                 <div className="controls ">
                                                                     <InputGroup>
