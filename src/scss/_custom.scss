@@ -6425,3 +6425,15 @@ top: calc(20em + 3px);
     transform: translate3d(0, 14.4rem, 0);
 }
 }
+
+.jexcel > tbody > tr > td.readonly.commitShipmentAlreadyLinkedToOtherPro {
+  background-color: yellow !important;
+  color: #BA0C2F!important;
+  font-weight: bold!important;
+}
+
+.jexcel > tbody > tr > td.commitShipmentAlreadyLinkedToOtherPro {
+  background-color: yellow !important;
+  color: red!important;
+  font-weight: bold!important;
+}

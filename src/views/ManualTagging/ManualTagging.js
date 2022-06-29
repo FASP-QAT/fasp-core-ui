@@ -531,6 +531,7 @@ export default class ManualTagging extends Component {
             })
         }
         var rowData = this.el.getRowData(y);
+        this.el.setValueFromCoords(22, j, 1, true);
         if (rowData[20] == 0) {
             if (x == 0) {
                 var json = this.el.getJson(null, false);
@@ -547,12 +548,34 @@ export default class ManualTagging extends Component {
                 } else {
                     console.log("inside else---", checkboxValue);
                     for (var j = 0; j < json.length; j++) {
+                        this.el.setValueFromCoords(10, j, this.el.getValueFromCoords(23,j), true);
+                        this.el.setValueFromCoords(12, j, this.el.getValueFromCoords(24,j), true);
                         if (j != y && json[j][21] == this.el.getValueFromCoords(21, y, true)) {
                             this.el.setValueFromCoords(0, j, false, true);
                         }
                     }
                 }
             }
+
+            if (x == 10) {
+                var json = this.el.getJson(null, false);
+                // var checkboxValue = this.el.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                for (var j = 0; j < json.length; j++) {
+                    if (j != y && json[j][21] == this.el.getValueFromCoords(21, y, true)) {
+                        this.el.setValueFromCoords(10, j, value, true);
+                    }
+                }
+            }
+            if (x == 12) {
+                var json = this.el.getJson(null, false);
+                // var checkboxValue = this.el.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                for (var j = 0; j < json.length; j++) {
+                    if (j != y && json[j][21] == this.el.getValueFromCoords(21, y, true)) {
+                        this.el.setValueFromCoords(12, j, value, true);
+                    }
+                }
+            }
+
         }
     }
 
@@ -624,23 +647,23 @@ export default class ManualTagging extends Component {
                 //         this.el.setStyle(col, "background-color", "yellow");
                 //         this.el.setComments(col, i18n.t('static.message.invalidnumber'));
                 //     } else {
-                        if (rowData[0].toString() == "true") {
-                            for (var j = 0; j < json.length; j++) {
-                                // console.log("J@@@@@@@@################",j)
-                                // console.log("y@@@@@@@@################",y)
-                                // console.log("value@@@@@@@@################",this.state.instance.getValueFromCoords(1, y, true))
-                                // console.log("jsonvalue@@@@@@@@################",json[j][1])
-                                if (json[j][16] == this.state.instance.getValueFromCoords(16, y, true)) {
-                                    if (j != y) {
-                                        this.state.instance.setValueFromCoords(12, j, value, true);
-                                    }
-                                }
+                if (rowData[0].toString() == "true") {
+                    for (var j = 0; j < json.length; j++) {
+                        // console.log("J@@@@@@@@################",j)
+                        // console.log("y@@@@@@@@################",y)
+                        // console.log("value@@@@@@@@################",this.state.instance.getValueFromCoords(1, y, true))
+                        // console.log("jsonvalue@@@@@@@@################",json[j][1])
+                        if (json[j][16] == this.state.instance.getValueFromCoords(16, y, true)) {
+                            if (j != y) {
+                                this.state.instance.setValueFromCoords(12, j, value, true);
                             }
                         }
+                    }
+                }
 
-                        // `=ROUND(G${parseInt(index) + 1}*H${parseInt(index) + 1},2)`,
-                        // this.state.instance.setValueFromCoords(8, y, `=ROUND(G${parseInt(y) + 1}*H${parseInt(y) + 1},0)`, true);
-                    // }
+                // `=ROUND(G${parseInt(index) + 1}*H${parseInt(index) + 1},2)`,
+                // this.state.instance.setValueFromCoords(8, y, `=ROUND(G${parseInt(y) + 1}*H${parseInt(y) + 1},0)`, true);
+                // }
 
                 // }
                 // this.state.instance.setValueFromCoords(8, y, Math.round(qty * (value != null && value != "" ? value : 1)), true);
@@ -1239,6 +1262,7 @@ export default class ManualTagging extends Component {
         this.setState({ loading: true })
         var validation = true;
         if (validation == true) {
+            console.log("this.state.languageEl.getJson(null, false)---------------->",this.state.languageEl.getJson(null, false))
             var selectedShipment = this.state.languageEl.getJson(null, false).filter(c => c[0] == false);
             var setOfPlanningUnitIds = [...new Set(selectedShipment.map(ele => ele[16].planningUnit.id))];
             if (setOfPlanningUnitIds.length > 1) {
@@ -1399,7 +1423,7 @@ export default class ManualTagging extends Component {
                 } else if (this.state.budgetId == -1) {
                     valid = false;
                     alert(i18n.t('static.mt.selectBudget'));
-                } else if (selectedShipment.length > 1 || [...new Set(this.state.instance.getJson(null, false).filter(c => c[0] == true).map(ele => ele[15].orderNo+"|"+ele[15].primeLineNo+"|"+ele[15].knShipmentNo))].length>1) {
+                } else if (selectedShipment.length > 1 || [...new Set(this.state.instance.getJson(null, false).filter(c => c[0] == true).map(ele => ele[15].orderNo + "|" + ele[15].primeLineNo + "|" + ele[15].knShipmentNo))].length > 1) {
                     valid = false;
                     alert(i18n.t('static.mt.oneOrderAtATime'));
                 }
@@ -1513,7 +1537,7 @@ export default class ManualTagging extends Component {
                                                 }
                                                 var filterList = tableJson.filter((c) => c[16] == tableJson[y][16]);
                                                 console.log("FilterList@@@@@@@@@@@@@@@", filterList);
-                                                var getUniqueOrderNoAndPrimeLineNoList = filterList.filter((v, i, a) => a.findIndex(t => (t[15].roNo === v[15].roNo && t[15].roPrimeLineNo === v[15].roPrimeLineNo && t[15].knShipmentNo === v[15].knShipmentNo && t[15].orderNo===v[15].orderNo && t[15].primeLineNo===v[15].primeLineNo)) === i);
+                                                var getUniqueOrderNoAndPrimeLineNoList = filterList.filter((v, i, a) => a.findIndex(t => (t[15].roNo === v[15].roNo && t[15].roPrimeLineNo === v[15].roPrimeLineNo && t[15].knShipmentNo === v[15].knShipmentNo && t[15].orderNo === v[15].orderNo && t[15].primeLineNo === v[15].primeLineNo)) === i);
                                                 console.log("getUniqueOrderNoAndPrimeLineNoList@@@@@@@@@@@@@@@", getUniqueOrderNoAndPrimeLineNoList)
                                                 for (var uq = 0; uq < getUniqueOrderNoAndPrimeLineNoList.length; uq++) {
                                                     var shipmentQty = 0;
@@ -2274,10 +2298,10 @@ export default class ManualTagging extends Component {
                     console.log("output list@@@@@@@@@@@@@@@", outputList)
                     var filterOnLinkedData = outputList.filter(c => !linkedRoNoAndRoPrimeLineNo.includes(c.roNo + "|" + c.roPrimeLineNo));
                     let resultTrue = Object.values(filterOnLinkedData.reduce((a, { roNo, roPrimeLineNo, knShipmentNo, erpQty, orderNo, primeLineNo, erpShipmentStatus, expectedDeliveryDate, batchNo, expiryDate, erpPlanningUnit, price, shippingCost, shipBy, qatEquivalentShipmentStatus, parentShipmentId, childShipmentId, notes, qatPlanningUnit }) => {
-                        if (!a[roNo + "|" + roPrimeLineNo + "|" + orderNo+"|"+primeLineNo+"|"+knShipmentNo])
-                            a[roNo + "|" + roPrimeLineNo+"|"+orderNo+"|"+primeLineNo + "|" + knShipmentNo] = Object.assign({}, { roNo, roPrimeLineNo, knShipmentNo, erpQty, orderNo, primeLineNo, erpShipmentStatus, expectedDeliveryDate, batchNo, expiryDate, erpPlanningUnit, price, shippingCost, shipBy, qatEquivalentShipmentStatus, parentShipmentId, childShipmentId, notes, qatPlanningUnit });
+                        if (!a[roNo + "|" + roPrimeLineNo + "|" + orderNo + "|" + primeLineNo + "|" + knShipmentNo])
+                            a[roNo + "|" + roPrimeLineNo + "|" + orderNo + "|" + primeLineNo + "|" + knShipmentNo] = Object.assign({}, { roNo, roPrimeLineNo, knShipmentNo, erpQty, orderNo, primeLineNo, erpShipmentStatus, expectedDeliveryDate, batchNo, expiryDate, erpPlanningUnit, price, shippingCost, shipBy, qatEquivalentShipmentStatus, parentShipmentId, childShipmentId, notes, qatPlanningUnit });
                         else
-                            a[roNo + "|" + roPrimeLineNo+"|"+orderNo+"|"+primeLineNo + "|" + knShipmentNo].erpQty += erpQty;
+                            a[roNo + "|" + roPrimeLineNo + "|" + orderNo + "|" + primeLineNo + "|" + knShipmentNo].erpQty += erpQty;
                         return a;
                     }, {}));
                     console.log("ResultTrue@@@@@@@@@@@@@@@", resultTrue);
@@ -3070,9 +3094,9 @@ export default class ManualTagging extends Component {
                 data[7] = manualTaggingList[j].expectedDeliveryDate
                 data[8] = linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].erpShipmentStatus : ""
                 // data[7] = ""
-                data[9] = Math.round((manualTaggingList[j].shipmentQty)/(linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].conversionFactor : 1))
+                data[9] = Math.round((manualTaggingList[j].shipmentQty) / (linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].conversionFactor : 1))
                 data[10] = linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].conversionFactor : 1
-                data[11] = Math.round(shipmentQty)
+                data[11] = `=ROUND(J${parseInt(j)+1}*K${parseInt(j)+1},0)`;
                 data[12] = manualTaggingList[j].notes
                 data[13] = manualTaggingList[j].orderNo
                 data[14] = manualTaggingList[j].primeLineNo
@@ -3082,7 +3106,10 @@ export default class ManualTagging extends Component {
                 data[18] = linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].roNo : ""
                 data[19] = linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].roPrimeLineNo : ""
                 data[20] = manualTaggingArray.filter(c => (c[18] == (linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].roNo : "")) && (c[19] == (linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].roPrimeLineNo : ""))).length > 0 ? 1 : 0;
-                data[21]=(linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].roNo + " - " + linkedShipmentsListForTab2[0].roPrimeLineNo : "")
+                data[21] = (linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].roNo + " - " + linkedShipmentsListForTab2[0].roPrimeLineNo : "")
+                data[22] =0;
+                data[23]=linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].conversionFactor : 1;
+                data[24]=manualTaggingList[j].notes;
             }
             else {
                 // data[0] = manualTaggingList[j].erpOrderId
@@ -3253,7 +3280,7 @@ export default class ManualTagging extends Component {
                         title: i18n.t('static.manualTagging.conversionFactor'),
                         type: 'numeric',
                         mask: '#,##.0000', decimal: '.',
-                        readOnly: true
+                        // readOnly: true
                     },
 
                     {
@@ -3266,7 +3293,7 @@ export default class ManualTagging extends Component {
                     {
                         title: i18n.t('static.common.notes'),
                         type: 'text',
-                        readOnly: true
+                        // readOnly: true
                     },
                     {
                         title: "orderNo",
@@ -3282,6 +3309,18 @@ export default class ManualTagging extends Component {
                     },
                     {
                         title: "shipment list",
+                        type: 'hidden',
+                    },
+                    {
+                        title: "linked shipment list",
+                        type: 'hidden',
+                    },
+                    {
+                        title: "linked shipment list",
+                        type: 'hidden',
+                    },
+                    {
+                        title: "linked shipment list",
                         type: 'hidden',
                     },
                     {
@@ -3339,7 +3378,29 @@ export default class ManualTagging extends Component {
                         if (rowData[20] == 1 || !this.state.versionId.toString().includes("Local")) {
                             var cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
                             cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("K").concat(parseInt(y) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("M").concat(parseInt(y) + 1))
+                            cell.classList.add('readonly');
+                            if(rowData[0]==false){
+                                var cell = elInstance.getCell(("K").concat(parseInt(y) + 1))
+                                cell.classList.add('readonly');
+                                var cell = elInstance.getCell(("M").concat(parseInt(y) + 1))
+                                cell.classList.add('readonly');
+                            }
+                        }else{
+                        if(rowData[0]==false){
+                            var cell = elInstance.getCell(("K").concat(parseInt(y) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("M").concat(parseInt(y) + 1))
+                            cell.classList.add('readonly');
+                        }else{
+                            var cell = elInstance.getCell(("K").concat(parseInt(y) + 1))
+                            cell.classList.remove('readonly');
+                            var cell = elInstance.getCell(("M").concat(parseInt(y) + 1))
+                            cell.classList.remove('readonly');
                         }
+                    }
                     }
                 }.bind(this),
                 onsearch: function (el) {
@@ -3358,8 +3419,8 @@ export default class ManualTagging extends Component {
                                 onclick: function () {
                                     let orderNo = this.el.getValueFromCoords(13, y).toString().trim();
                                     let primeLineNo = this.el.getValueFromCoords(14, y).toString().trim();
-                                    console.log("OrderNo@@@@@@@@@@",orderNo)
-                                    console.log("primeLineNo@@@@@@@@@@",primeLineNo)
+                                    console.log("OrderNo@@@@@@@@@@", orderNo)
+                                    console.log("primeLineNo@@@@@@@@@@", primeLineNo)
                                     ManualTaggingService.getARTMISHistory(orderNo, primeLineNo)
                                         .then(response => {
 

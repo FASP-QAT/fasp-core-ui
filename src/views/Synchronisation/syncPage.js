@@ -84,7 +84,8 @@ export default class syncPage extends Component {
       progressPer: 0,
       notes: '',
       deletedRowsListLocal:[],
-      deletedRowsListServer:[]
+      deletedRowsListServer:[],
+      shipmentAlreadyLinkedToOtherProgCount:0
     }
     this.toggle = this.toggle.bind(this);
     this.getDataForCompare = this.getDataForCompare.bind(this);
@@ -3154,13 +3155,16 @@ export default class syncPage extends Component {
     for (var c = 0; c < jsonData.length; c++) {
       if(jsonData[c][2]!=="" && jsonData[c][6]!=="" && jsonData[c][2]!==jsonData[c][6]){
         this.setState({
-          conflictsCount: this.state.conflictsCount + 1
+          conflictsCount: this.state.conflictsCount + 1,
+          shipmentAlreadyLinkedToOtherProgCount:this.state.shipmentAlreadyLinkedToOtherProgCount+1
         })
         elInstance.setValueFromCoords(13, c, 6, true);
         for (var j = 0; j < colArr.length; j++) {
           var col = (colArr[j]).concat(parseInt(c) + 1);
-          elInstance.setStyle(col, "background-color", "transparent");
-          elInstance.setStyle(col, "background-color", "red");
+          // elInstance.setStyle(col, "background-color", "transparent");
+          // elInstance.setStyle(col, "background-color", "red");
+          var cell = elInstance.getCell(col);
+          cell.classList.add('commitShipmentAlreadyLinkedToOtherPro');
         }
       }else{
         var checkIfSameParentShipmentIdExists=jsonData.filter((d,index)=>(((jsonData[c][3]!=="" && jsonData[c][3]===d[7] && jsonData[c][17]!==d[16]) || (jsonData[c][7]!=="" && jsonData[c][7]===d[3]) && jsonData[c][17]!==d[16]) && !jsonData[c][18].includes(index) && c!=index)).length;
@@ -3582,6 +3586,7 @@ export default class syncPage extends Component {
           <Row>
             <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
               <Col md="12 pl-0" id="realmDiv">
+                <div style={{marginBottom:"-42px"}}><h5 style={{color:"red"}}>{this.state.shipmentAlreadyLinkedToOtherProgCount>0?i18n.t("static.commitVersion.shipmentAlreadyLinkedToOtherProgram"):""}</h5></div>
                 <div className="table-responsive RemoveStriped consumptionDataEntryTable">
                   <div id="mergedVersionShipmentLinked" />
                 </div>
