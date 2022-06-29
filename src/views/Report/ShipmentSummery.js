@@ -58,7 +58,7 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 import ReportService from '../../api/ReportService';
 import ProgramService from '../../api/ProgramService';
-import {MultiSelect} from 'react-multi-select-component';
+import { MultiSelect } from 'react-multi-select-component';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 import { filter } from 'jszip';
@@ -2591,7 +2591,9 @@ class ShipmentSummery extends Component {
                                                 </ul>
                                             </FormGroup>
                                             <div className="ShipmentSummeryReportMarginTop consumptionDataEntryTable" id="mytable2">
-                                                <div id="shipmentDetailsListTableDiv" style={{ display: this.props.items.loading ? "none" : "block" }} className={document.getElementById("versionId") != null && document.getElementById("versionId").value.includes('Local') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} >
+                                                {/* this.props.items is undefined that's why removed this style - Sonal */}
+                                                {/* <div id="shipmentDetailsListTableDiv" style={{ display: this.props.items.loading ? "none" : "block" }} className={document.getElementById("versionId") != null && document.getElementById("versionId").value.includes('Local') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} > */}
+                                                <div id="shipmentDetailsListTableDiv" className={document.getElementById("versionId") != null && document.getElementById("versionId").value.includes('Local') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} >
                                                 </div>
                                             </div>
                                         </div>

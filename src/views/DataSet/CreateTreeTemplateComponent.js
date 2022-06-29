@@ -4129,7 +4129,7 @@ export default class CreateTreeTemplate extends Component {
                         currentItemConfig.context.payload.nodeDataMap[0][0].puNode.planningUnit.unit.id = this.state.planningUnitList[0].unit.id;
                     }
                     if (this.state.addNodeFlag && currentItemConfig.context.payload.nodeType.id == 5) {
-                        currentItemConfig.context.payload.label = this.state.planningUnitList[0].label;
+                        currentItemConfig.context.payload.label = JSON.parse(JSON.stringify(this.state.planningUnitList[0].label));
                     }
                     this.setState({
                         conversionFactor: this.state.planningUnitList[0].multiplier,
@@ -6031,7 +6031,7 @@ export default class CreateTreeTemplate extends Component {
                 (currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.unit.id = pu.unit.id;
                 (currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.id = event.target.value;
                 (currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.multiplier = pu.multiplier;
-                currentItemConfig.context.payload.label = pu.label;
+                currentItemConfig.context.payload.label = JSON.parse(JSON.stringify(pu.label));
             } else {
                 (currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.unit.id = '';
                 (currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.id = '';
@@ -6042,7 +6042,7 @@ export default class CreateTreeTemplate extends Component {
                     label_sp: '',
                     label_pr: ''
                 }
-                currentItemConfig.context.payload.label = label;
+                currentItemConfig.context.payload.label = JSON.parse(JSON.stringify(label));
             }
             this.setState({
                 conversionFactor: event.target.value != "" && pu != "" ? pu.multiplier : ''
