@@ -847,6 +847,7 @@ class usageTemplate extends Component {
                 data[19] = (papuList[j].program == null ? -1 : papuList[j].program.id)
                 data[20] = papuList[j].notes
                 data[21] = papuList[j].active
+                data[22] = papuList[j].createdBy.userId
 
                 papuDataArr[count] = data;
                 count++;
@@ -881,7 +882,9 @@ class usageTemplate extends Component {
             data[18] = 1;
             data[19] = 0;
             data[20] = "";
-            data[20] = 0;
+            data[21] = 0;
+            data[22] = papuList[j].createdBy.userId
+
             papuDataArr[0] = data;
         }
 
@@ -1043,6 +1046,11 @@ class usageTemplate extends Component {
                     width: '130',
                     readOnly: false
                     // readOnly: true //21 V
+                },
+                {
+                    title: 'createdBy',
+                    type: 'hidden',
+                    // width: 400 //22 W
                 },
 
             ],
@@ -2436,8 +2444,10 @@ class usageTemplate extends Component {
 
             var typeId = rowData[19];
             let roleArray = this.state.roleArray;
+            var userId = rowData[22];
+            var curUser = AuthenticationService.getLoggedInUserId();
             // if ((roleArray.includes('ROLE_REALM_ADMIN') && typeId != -1 && typeId != 0) || (roleArray.includes('ROLE_DATASET_ADMIN') && typeId == -1 && typeId != 0)) {
-            if ((roleArray.includes('ROLE_DATASET_ADMIN') && typeId == -1 && typeId != 0)) {
+            if ((roleArray.includes('ROLE_DATASET_ADMIN') && ((typeId == -1 && typeId != 0) || curUser != userId))) {
                 var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
                 cell1.classList.add('readonly');
                 var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
@@ -2632,9 +2642,10 @@ class usageTemplate extends Component {
 
 
             var typeId = rowData[19];
-
+            var userId = rowData[22];
+            var curUser = AuthenticationService.getLoggedInUserId();
             // if ((roleArray.includes('ROLE_REALM_ADMIN') && typeId != -1 && typeId != 0) || (roleArray.includes('ROLE_DATASET_ADMIN') && typeId == -1 && typeId != 0)) {
-            if ((roleArray.includes('ROLE_DATASET_ADMIN') && typeId == -1 && typeId != 0)) {
+            if ((roleArray.includes('ROLE_DATASET_ADMIN') && ((typeId == -1 && typeId != 0) || curUser != userId))) {
                 var cell1 = elInstance.getCell(("B").concat(parseInt(j) + 1))
                 cell1.classList.add('readonly');
                 var cell1 = elInstance.getCell(("C").concat(parseInt(j) + 1))
