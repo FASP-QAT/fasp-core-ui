@@ -97,6 +97,11 @@ class ManualTaggingSerice {
         });
     }
 
+    getDataBasedOnRoNoAndRoPrimeLineNo(json) {
+        return axios.post(`${API_URL}/api/erpLinking/batchDetails`, json, {
+        });
+    }
+
 }
 
 export default new ManualTaggingSerice()

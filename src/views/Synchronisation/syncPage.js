@@ -3584,10 +3584,10 @@ export default class syncPage extends Component {
         </TabPane>
         <TabPane tabId="4">
           <Row>
-            <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
+            <Col sm={12} md={12} className="pt-2" style={{ flexBasis: 'auto' }}>
               <Col md="12 pl-0" id="realmDiv">
-                <div style={{marginBottom:"-42px"}}><h5 style={{color:"red"}}>{this.state.shipmentAlreadyLinkedToOtherProgCount>0?i18n.t("static.commitVersion.shipmentAlreadyLinkedToOtherProgram"):""}</h5></div>
-                <div className="table-responsive RemoveStriped consumptionDataEntryTable">
+                <div><h5 style={{color:"red"}}>{this.state.shipmentAlreadyLinkedToOtherProgCount>0?i18n.t("static.commitVersion.shipmentAlreadyLinkedToOtherProgram"):""}</h5></div>
+                <div className="table-responsive RemoveStriped consumptionDataEntryTable rightClickColors" style={{marginTop:"-30px"}}>
                   <div id="mergedVersionShipmentLinked" />
                 </div>
               </Col>

@@ -90,7 +90,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                             }
                             programPlanningUnitList = ppList;
                         }
-                        if ((page == 'masterDataSync' || page == 'syncPage') && planningUnitList.length == 0) {
+                        if ((page == 'masterDataSync' || page == 'syncPage' || page=='erpDelink') && planningUnitList.length == 0) {
                             programPlanningUnitList = [];
                         }
                         try {
@@ -1185,7 +1185,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     console.log("ProgramJson@@@@@@@@@@@@@@@@", props)
                                     props.updateState("message", (props.state.active2 ? i18n.t('static.mt.linkingUpdateSuccess') : i18n.t('static.shipment.linkingsuccess')))
                                     props.updateState("color", "green");
-                                    // props.updateState("loading",false);
+                                    props.updateState("changedDataForTab2",0);
                                     props.updateState("loading", false);
                                     props.updateState("planningUnitIdUpdated", "");
                                     props.hideSecondComponent();
