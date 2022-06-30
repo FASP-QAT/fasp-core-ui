@@ -4129,7 +4129,7 @@ export default class CreateTreeTemplate extends Component {
                         currentItemConfig.context.payload.nodeDataMap[0][0].puNode.planningUnit.unit.id = this.state.planningUnitList[0].unit.id;
                     }
                     if (this.state.addNodeFlag && currentItemConfig.context.payload.nodeType.id == 5) {
-                        currentItemConfig.context.payload.label = this.state.planningUnitList[0].label;
+                        currentItemConfig.context.payload.label = JSON.parse(JSON.stringify(this.state.planningUnitList[0].label));
                     }
                     this.setState({
                         conversionFactor: this.state.planningUnitList[0].multiplier,
@@ -5660,56 +5660,61 @@ export default class CreateTreeTemplate extends Component {
         this.setState({
             activeTab1: newArray,
             showCalculatorFields: false
-        });
-        var isValid = document.getElementById('isValidError').value;
-        // console.log("isValid 1---", isValid);
-        this.setState({ isValidError: isValid });
-        if (tab == 2) {
-            console.log("***>>>", this.state.currentItemConfig);
-            if (this.state.currentItemConfig.context.payload.nodeType.id != 1) {
-                var curDate = (moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD'));
-                var month = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].monthNo;
-                var monthList = JSON.parse(JSON.stringify(this.state.monthList));
-                var minMonth = monthList[0].id;
-                var maxMonth = monthList.sort((a, b) => b.id - a.id)[0].id;
-                var modelingTypeList = this.state.modelingTypeList;
-                var arr = [];
-                if (this.state.currentItemConfig.context.payload.nodeType.id == 2) {
-                    arr = modelingTypeList.filter(x => x.modelingTypeId != 1 && x.modelingTypeId != 5);
-                } else {
-                    arr = modelingTypeList.filter(x => x.modelingTypeId == 5);
-                }
-                console.log("arr---", arr);
-                var modelingTypeListNew = [];
-                for (var i = 0; i < arr.length; i++) {
-                    console.log("arr[i]---", arr[i]);
-                    modelingTypeListNew[i] = { id: arr[i].modelingTypeId, name: getLabelText(arr[i].label, this.state.lang) }
-                }
-                this.setState({
-                    showModelingJexcelNumber: true,
-                    minMonth, maxMonth, filteredModelingType: modelingTypeListNew
-                }, () => {
-                    this.buildModelingJexcel();
-                })
+        }, () => {
+            var isValid = document.getElementById('isValidError').value;
+            // console.log("isValid 1---", isValid);
+            this.setState({ isValidError: isValid });
 
-            } else {
-                this.setState({
-                    showModelingJexcelNumber: true
-                }, () => {
-                    this.buildModelingJexcel();
-                })
+            if (this.state.currentItemConfig.context.payload.nodeType.id == 1) {
+                this.showMomData();
             }
-            this.setState({ scalingMonth: this.state.currentItemConfig.context.payload.nodeDataMap[0][0].monthNo });
-            // if (this.state.modelingEl != "") {
-            //     console.log("this.state.modelingEl---", this.state.modelingEl)
-            //     this.state.modelingEl.setHeader(9, i18n.t('static.tree.calculatedChangeForMonth') + " " + this.state.scalingMonth);
-            // }
-            //  else if (this.state.currentItemConfig.context.payload.nodeType.id == 3) {
-            //     this.setState({ showModelingJexcelPercent: true }, () => {
-            //         this.buildModelingJexcelPercent()
-            //     })
-            // }
-        }
+            if (tab == 2) {
+                console.log("***>>>", this.state.currentItemConfig);
+                if (this.state.currentItemConfig.context.payload.nodeType.id != 1) {
+                    var curDate = (moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD'));
+                    var month = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].monthNo;
+                    var monthList = JSON.parse(JSON.stringify(this.state.monthList));
+                    var minMonth = monthList[0].id;
+                    var maxMonth = monthList.sort((a, b) => b.id - a.id)[0].id;
+                    var modelingTypeList = this.state.modelingTypeList;
+                    var arr = [];
+                    if (this.state.currentItemConfig.context.payload.nodeType.id == 2) {
+                        arr = modelingTypeList.filter(x => x.modelingTypeId != 1 && x.modelingTypeId != 5);
+                    } else {
+                        arr = modelingTypeList.filter(x => x.modelingTypeId == 5);
+                    }
+                    console.log("arr---", arr);
+                    var modelingTypeListNew = [];
+                    for (var i = 0; i < arr.length; i++) {
+                        console.log("arr[i]---", arr[i]);
+                        modelingTypeListNew[i] = { id: arr[i].modelingTypeId, name: getLabelText(arr[i].label, this.state.lang) }
+                    }
+                    this.setState({
+                        showModelingJexcelNumber: true,
+                        minMonth, maxMonth, filteredModelingType: modelingTypeListNew
+                    }, () => {
+                        this.buildModelingJexcel();
+                    })
+
+                } else {
+                    this.setState({
+                        showModelingJexcelNumber: true
+                    }, () => {
+                        this.buildModelingJexcel();
+                    })
+                }
+                this.setState({ scalingMonth: this.state.currentItemConfig.context.payload.nodeDataMap[0][0].monthNo });
+                // if (this.state.modelingEl != "") {
+                //     console.log("this.state.modelingEl---", this.state.modelingEl)
+                //     this.state.modelingEl.setHeader(9, i18n.t('static.tree.calculatedChangeForMonth') + " " + this.state.scalingMonth);
+                // }
+                //  else if (this.state.currentItemConfig.context.payload.nodeType.id == 3) {
+                //     this.setState({ showModelingJexcelPercent: true }, () => {
+                //         this.buildModelingJexcelPercent()
+                //     })
+                // }
+            }
+        });
     }
 
     resetTree() {
@@ -6027,7 +6032,7 @@ export default class CreateTreeTemplate extends Component {
                 (currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.unit.id = pu.unit.id;
                 (currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.id = event.target.value;
                 (currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.multiplier = pu.multiplier;
-                currentItemConfig.context.payload.label = pu.label;
+                currentItemConfig.context.payload.label = JSON.parse(JSON.stringify(pu.label));
             } else {
                 (currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.unit.id = '';
                 (currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.id = '';
@@ -6038,7 +6043,7 @@ export default class CreateTreeTemplate extends Component {
                     label_sp: '',
                     label_pr: ''
                 }
-                currentItemConfig.context.payload.label = label;
+                currentItemConfig.context.payload.label = JSON.parse(JSON.stringify(label));
             }
             this.setState({
                 conversionFactor: event.target.value != "" && pu != "" ? pu.multiplier : ''
@@ -8054,39 +8059,42 @@ export default class CreateTreeTemplate extends Component {
                                 value={this.state.currentItemConfig.context.payload.label.label_en}>
                             </Input>
                         </FormGroup> */}
-                        <div>
-                            <Popover placement="top" isOpen={this.state.popoverOpenMonth} target="Popover21" trigger="hover" toggle={this.toggleMonth}>
-                                <PopoverBody>{i18n.t('static.tooltip.ModelingTransferMonth')}</PopoverBody>
-                            </Popover>
+                        <div style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 1 ? "none" : "block" }}>
+                            <div className="row pl-lg-2 pr-lg-2">
+                                <div>
+                                    <Popover placement="top" isOpen={this.state.popoverOpenMonth} target="Popover21" trigger="hover" toggle={this.toggleMonth}>
+                                        <PopoverBody>{i18n.t('static.tooltip.ModelingTransferMonth')}</PopoverBody>
+                                    </Popover>
+                                </div>
+                                <FormGroup className="col-md-2 pt-lg-1">
+                                    <Label htmlFor="">{i18n.t('static.common.month')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover21" onClick={this.toggleMonth} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                </FormGroup>
+                                <FormGroup className="col-md-8 pl-lg-0 ModTransferMonthPickerWidth">
+                                    <Input
+                                        type="select"
+                                        id="monthNoFilter"
+                                        name="monthNoFilter"
+                                        bsSize="sm"
+                                        onChange={(e) => { this.dataChange(e) }}
+                                        required
+                                        value={this.state.scalingMonth}
+                                    >
+                                        <option value="">{i18n.t('static.common.select')}</option>
+                                        {this.state.monthList.length > 0
+                                            && this.state.monthList.map((item, i) => {
+                                                return (
+                                                    <option key={i} value={item.id}>
+                                                        {item.name}
+                                                    </option>
+                                                )
+                                            }, this)}
+                                    </Input>
+                                </FormGroup>
+                            </div>
                         </div>
-                        <FormGroup className="col-md-2 pt-lg-1">
-                            <Label htmlFor="">{i18n.t('static.common.month')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover21" onClick={this.toggleMonth} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
-                        </FormGroup>
-                        <FormGroup className="col-md-4 pl-lg-0">
-                            <Input
-                                type="select"
-                                id="monthNoFilter"
-                                name="monthNoFilter"
-                                bsSize="sm"
-                                onChange={(e) => { this.dataChange(e) }}
-                                required
-                                value={this.state.scalingMonth}
-                            >
-                                <option value="">{i18n.t('static.common.select')}</option>
-                                {this.state.monthList.length > 0
-                                    && this.state.monthList.map((item, i) => {
-                                        return (
-                                            <option key={i} value={item.id}>
-                                                {item.name}
-                                            </option>
-                                        )
-                                    }, this)}
-                            </Input>
-                        </FormGroup>
-
                         <div className="col-md-12">
                             {this.state.showModelingJexcelNumber &&
-                                <>
+                                <div style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 1 ? "none" : "block" }}>
                                     <span>{i18n.t('static.modelingTable.note')}</span>
                                     <div className="calculatorimg calculatorTable">
                                         <div id="modelingJexcel" className={"RowClickable ScalingTable"} style={{ display: this.state.modelingJexcelLoader ? "none" : "block" }}>
@@ -8105,9 +8113,9 @@ export default class CreateTreeTemplate extends Component {
                                     </div>
                                     <div style={{ 'float': 'right', 'fontSize': '18px' }}><b>{i18n.t('static.supplyPlan.total')}: {this.state.scalingTotal !== "" && addCommas(parseFloat(this.state.scalingTotal).toFixed(4))}</b></div><br /><br />
 
-                                </>
+                                </div>
                             }
-                            <div><Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.showMomData()}> <i className={this.state.viewMonthlyData ? "fa fa-eye" : "fa fa-eye-slash"} style={{ color: '#fff' }}></i> {this.state.viewMonthlyData ? i18n.t('static.tree.viewMonthlyData') : i18n.t('static.tree.hideMonthlyData')}</Button>
+                            <div>{this.state.currentItemConfig.context.payload.nodeType.id != 1 && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.showMomData()}> <i className={this.state.viewMonthlyData ? "fa fa-eye" : "fa fa-eye-slash"} style={{ color: '#fff' }}></i> {this.state.viewMonthlyData ? i18n.t('static.tree.viewMonthlyData') : i18n.t('static.tree.hideMonthlyData')}</Button>}
                                 {this.state.aggregationNode && <><Button color="success" size="md" className="float-right mr-1" type="button" onClick={(e) => this.formSubmitLoader(e)}> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                     <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button></>}
                             </div>
@@ -8448,7 +8456,7 @@ export default class CreateTreeTemplate extends Component {
                                     <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => {
                                         this.setState({ showMomData: false })
                                     }}><i className="fa fa-times"></i> {'Close'}</Button>
-                                    <Button type="button" size="md" color="success" className="float-right mr-1" onClick={(e) => this.updateMomDataInDataSet(e)}><i className="fa fa-check"></i> {i18n.t('static.common.update')}</Button>
+                                    {this.state.currentItemConfig.context.payload.nodeType.id != 1 && <Button type="button" size="md" color="success" className="float-right mr-1" onClick={(e) => this.updateMomDataInDataSet(e)}><i className="fa fa-check"></i> {i18n.t('static.common.update')}</Button>}
 
                                 </div>
                                 {/* </div> */}
