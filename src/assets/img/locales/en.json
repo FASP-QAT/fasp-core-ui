@@ -1312,6 +1312,7 @@
     "static.budget.budgetName": "Budget name",
     "static.dashboard.procurementAgentExport": "Procurement Agent Report",
     "static.procurementAgent.selectProcurementAgent": "Select Procurement Agent",
+    "static.procurementAgent.procurementAgentNotMappedWithProgram": "No Procurement Agent mapped with this Program",
     "static.period.selectPeriod": "Select Date Range",
     "static.common.submit": "Submit",
     "static.tree.calculated": "Recalculate",

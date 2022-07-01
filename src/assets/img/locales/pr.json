@@ -2370,5 +2370,6 @@
     "static.procurementagenttype.procurementtypename": "Nome do tipo de agente de aquisição",
     "static.procurementagenttype.procurementagenttypecode": "Nome de exibição do tipo de agente de compras",
     "static.procurementagent.procurementagenttypetext": "O tipo de agente de aquisição é obrigatório",
-    "static.procurementagent.programtext": "O programa é obrigatório"
+    "static.procurementagent.programtext": "O programa é obrigatório",
+    "static.procurementAgent.procurementAgentNotMappedWithProgram": "Nenhum Agente de Compras mapeado com este Programa"
 }
