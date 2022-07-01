@@ -24,7 +24,7 @@ class ManualTaggingSerice {
     }
 
     getARTMISHistory(orderNo, primeLineNo) {
-        return axios.get(`${API_URL}/api/artmisHistory/${orderNo}/${primeLineNo}`, {
+        return axios.get(`${API_URL}/api/erpLinking/artmisHistory/${orderNo}/${primeLineNo}`, {
         });
     }
 
@@ -94,6 +94,11 @@ class ManualTaggingSerice {
     getLinkedQatShipments(programId, versionId, json) {
         console.log('Json@@@@@@@@@', json)
         return axios.post(`${API_URL}/api/erpLinking/linkedShipments/programId/${programId}/versionId/${versionId}`, json, {
+        });
+    }
+
+    getDataBasedOnRoNoAndRoPrimeLineNo(json) {
+        return axios.post(`${API_URL}/api/erpLinking/batchDetails`, json, {
         });
     }
 
