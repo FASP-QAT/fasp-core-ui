@@ -1534,11 +1534,19 @@ class SupplierLeadTimes extends Component {
                 })
         }
         else {
-            this.setState({ message: i18n.t('static.procurementAgent.selectProcurementAgent'), outPutList: [] },
-                () => {
-                    this.el = jexcel(document.getElementById("tableDiv"), '');
-                    this.el.destroy();
-                })
+            if (this.state.procurementAgents.length == 0) {
+                this.setState({ message: i18n.t('static.procurementAgent.procurementAgentNotMappedWithProgram'), outPutList: [] },
+                    () => {
+                        this.el = jexcel(document.getElementById("tableDiv"), '');
+                        this.el.destroy();
+                    })
+            } else {
+                this.setState({ message: i18n.t('static.procurementAgent.selectProcurementAgent'), outPutList: [] },
+                    () => {
+                        this.el = jexcel(document.getElementById("tableDiv"), '');
+                        this.el.destroy();
+                    })
+            }
 
         }
     }

@@ -1357,7 +1357,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
     }.bind(this)
 
     filterProcurementAgent = function (instance, cell, c, r, source) {
-        return this.state.procurementAgentList.filter(c => c.active.toString() == "true").sort(function (a, b) {
+        return this.state.procurementAgentList.filter(c => c.name != "" && c.active.toString() == "true").sort(function (a, b) {
             a = a.name.toLowerCase();
             b = b.name.toLowerCase();
             return a < b ? -1 : a > b ? 1 : 0;
