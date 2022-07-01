@@ -4186,7 +4186,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         <li><span className="legendcolor" style={{ backgroundColor: "#cfcdc9" }}></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlanFormula.na')}</span></li>
                                     </ul>
                                 </FormGroup>
-                                {(this.state.programQPLDetails.filter(c => c.id == this.state.programId)).length > 0 && (this.state.programQPLDetails.filter(c => c.id == this.state.programId))[0].readonly == 1 && <h5 style={{ color: 'red' }}>{this.state.programQPLDetails.filter(c => c.id == this.state.programId)[0].doNotFollowLatestShipmentInfo == 1 ? i18n.t('static.dataEntry.doNotFollowLatestShipment') : i18n.t('static.dataentry.readonly')}</h5>}
+                                {(this.state.programQPLDetails.filter(c => c.id == this.state.programId)).length > 0 && (this.state.programQPLDetails.filter(c => c.id == this.state.programId))[0].readonly == 1 && <h5 style={{ color: 'red' }}>{i18n.t('static.dataentry.readonly')}</h5>}
                                 <Row>
                                     <Col xs="12" md="12" className="mb-4  mt-3">
                                         <Nav tabs>

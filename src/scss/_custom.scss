@@ -6439,3 +6439,32 @@ top: calc(20em + 3px);
 .ModTransferMonthPickerWidth{
   width: 467px;
 }
+
+.jexcel > tbody > tr > td.readonly.commitShipmentAlreadyLinkedToOtherPro {
+  background-color: yellow !important;
+  color: #BA0C2F!important;
+  font-weight: bold!important;
+}
+
+.jexcel > tbody > tr > td.commitShipmentAlreadyLinkedToOtherPro {
+  background-color: yellow !important;
+  color: red!important;
+  font-weight: bold!important;
+}
+
+.rightClickColors .jcontextmenu > div:nth-of-type(2){
+  background-color: #86cd99;
+}
+
+.rightClickColors .jcontextmenu > div:nth-of-type(3){
+  background-color: #e5edf5;
+}
+
+.RemoveStriped .jexcel_content .jexcel .draggable .jexcel_nested td:nth-child(4) {
+  background-color: #86cd99 !important;
+
+}
+.RemoveStriped .jexcel_content .jexcel .draggable .jexcel_nested td:nth-child(5) {
+  background-color: #e5edf5 !important;
+
+}
