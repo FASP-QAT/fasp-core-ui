@@ -2064,8 +2064,8 @@ class ListUserComponent extends Component {
         // console.log("userList---->1", userList.filter(c => c.userId == 663));
         console.log("userList---->1", userList);
 
-        console.log("userList---->1", (userList.filter(c => c.userId == 1)[0].userAclList.map(c => (c.programName.label_en == "" || c.programName.label_en == null ? "All" : c.programName.label_en))).toString());
-        console.log("userList---->1", (userList.filter(c => c.userId == 30)[0].userAclList.map(c => (c.programName.label_en == "" ? "All" : c.programName.label_en))).toString());
+        // console.log("userList---->1", (userList.filter(c => c.userId == 1)[0].userAclList.map(c => (c.programName.label_en == "" || c.programName.label_en == null ? "All" : c.programName.label_en))).toString());
+        // console.log("userList---->1", (userList.filter(c => c.userId == 30)[0].userAclList.map(c => (c.programName.label_en == "" ? "All" : c.programName.label_en))).toString());
 
         // console.log("userList---->12", countryList);
 
