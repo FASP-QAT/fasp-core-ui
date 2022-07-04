@@ -1188,7 +1188,7 @@ class SupplyPlanVersionAndReview extends Component {
                 <h5 className="red" id="div2">{i18n.t(this.state.message, { entityname })}</h5>
 
                 <Card>
-                    <div className="Card-header-reporticon">
+                    <div className="Card-header-addicon">
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.report.supplyplanversionandreviewReport')}</strong> */}
                         {
                             this.state.matricsList.length > 0 &&
@@ -1201,8 +1201,8 @@ class SupplyPlanVersionAndReview extends Component {
                             </div>
                         }
                         {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_PROBLEM') &&
-                            <div className="card-header-actions">
-                                <a className="card-header-action" style={{ height: '25px', width: '25px', cursor: 'pointer' }} href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addMannualProblem}><i className="fa fa-plus-square"></i></a>
+                            <div className="card-header-action pull-right">
+                                <a className="" href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addMannualProblem}><i className="fa fa-plus-square"></i></a>
                             </div>
                         }
                     </div>
