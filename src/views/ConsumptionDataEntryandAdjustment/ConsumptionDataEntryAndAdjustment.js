@@ -408,6 +408,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           freezeColumns: 1,
           license: JEXCEL_PRO_KEY,
           parseFormulas: true,
+          editable:AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT')?true:false,
           contextMenu: function (obj, x, y, e) {
             return [];
           }.bind(this),
@@ -2278,7 +2279,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                               </Label><br/>
                               <Label htmlFor="appendedInputButton">{i18n.t('static.common.dataEnteredIn')}: <b>{this.state.tempConsumptionUnitObject.consumptionDataType == 1 ? (this.state.tempConsumptionUnitObject.planningUnit.forecastingUnit.label.label_en) : this.state.tempConsumptionUnitObject.consumptionDataType == 2 ? this.state.tempConsumptionUnitObject.planningUnit.label.label_en : this.state.tempConsumptionUnitObject.otherUnit.label.label_en}</b>
                                 <a className="card-header-action">
-                                  <span style={{ cursor: 'pointer' }} className="hoverDiv" onClick={() => { this.changeUnit(this.state.selectedConsumptionUnitId) }}><u>({i18n.t('static.dataentry.change')})</u></span>
+                                 {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT') && <span style={{ cursor: 'pointer' }} className="hoverDiv" onClick={() => { this.changeUnit(this.state.selectedConsumptionUnitId) }}>({i18n.t('static.dataentry.change')})</span>}
                                 </a>
                               </Label><br/>
                               <Label htmlFor="appendedInputButton">{i18n.t('static.dataentry.conversionToPu')}: <b>{this.state.tempConsumptionUnitObject.consumptionDataType == 1 ? Number(1 / this.state.tempConsumptionUnitObject.planningUnit.multiplier).toFixed(4) : this.state.tempConsumptionUnitObject.consumptionDataType == 2 ? 1 : Number(1 / this.state.tempConsumptionUnitObject.planningUnit.multiplier * this.state.tempConsumptionUnitObject.otherUnit.multiplier).toFixed(4)}</b>
@@ -2294,6 +2295,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                                 name="consumptionNotes"
                                 id="consumptionNotes"
                                 bsSize="sm"
+                                readOnly={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT')?false:true}
                                 onChange={(e) => this.setState({ consumptionChanged: true })}
                               >
                               </Input>
@@ -2301,8 +2303,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                           </div>
                         </FormGroup>
                         <FormGroup className="col-md-4" style={{ paddingTop: '30px', display: this.state.showDetailTable ? 'block' : 'none' }}>
-                          <Button type="button" id="formSubmitButton" size="md" color="success" className="float-right mr-1" onClick={() => this.interpolationMissingActualConsumption()}>
-                            <i className="fa fa-check"></i>{i18n.t('static.pipeline.interpolateMissingValues')}</Button>
+                         {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT') && <Button type="button" id="formSubmitButton" size="md" color="success" className="float-right mr-1" onClick={() => this.interpolationMissingActualConsumption()}>
+                            <i className="fa fa-check"></i>{i18n.t('static.pipeline.interpolateMissingValues')}</Button>}
                         </FormGroup>
                       </div>
                       {/* <div className="table-scroll">
@@ -2387,6 +2389,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           </ModalHeader>
           <div>
             <ModalBody>
+<<<<<<< HEAD
             <div>
                                <h3 className='ShowGuidanceHeading'>{i18n.t('static.dashboard.dataEntryAndAdjustments')} </h3>
                            </div>
@@ -2440,6 +2443,61 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                                   </ol>
                                    </li>
                                  {/* <li>The detailed data table allows users to add, edit, adjust, or delete historical consumption records. 
+=======
+              <div>
+                <h3 className='ShowGuidanceHeading'>{i18n.t('static.dashboard.dataEntryAndAdjustments')} </h3>
+              </div>
+              <p>
+                <p style={{ fontSize: '13px' }}><span className="UnderLineText">{i18n.t('static.listTree.purpose')} :</span> {i18n.t('static.dataEntryAndAdjustments.EnableUser')} '<a href="/#/Extrapolation/extrapolateData" target="_blank" style={{ textDecoration: 'underline' }}>{i18n.t('static.commitTree.extrapolation')}</a>' {i18n.t('static.dataEntryAndAdjustments.HistoricalActual')} '<a href="/#/importFromQATSupplyPlan/listImportFromQATSupplyPlan" target="_blank" style={{ textDecoration: 'underline' }}>{i18n.t('static.importFromQATSupplyPlan.importFromQATSupplyPlan')}</a>' screen). </p>
+              </p>
+              <p>
+                <p style={{ fontSize: '13px' }}><span className="UnderLineText">{i18n.t('static.listTree.useThisScreen')}:</span></p>
+                <ol>
+                  <li>{i18n.t('static.dataEntryAndAdjustments.DesiredReview')} {i18n.t('static.dataEntryAndAdjustments.YellowCellsIndicating')}  </li>
+                  <li>{i18n.t('static.dataEntryAndAdjustments.TopTable')}
+                  </li>
+                  <li>{i18n.t('static.dataEntryAndAdjustments.DetailedData')}
+                    <ol type="a">
+                      <li>{i18n.t('static.dataEntryAndAdjustments.DataManually')}  </li>
+                      <li>{i18n.t('static.dataEntryAndAdjustments.ImportedData')}  </li>
+                      <li>{i18n.t('static.dataEntryAndAdjustments.DataIsAssumed')} </li>
+                    </ol>
+                  </li>
+                  <li>{i18n.t('static.dataEntryAndAdjustments.AdjustTheData')}:
+                    <ol type="a">
+                      <li><b>{i18n.t('static.dataEntryAndAdjustments.UnderReporting')}</b>: {i18n.t('static.dataEntryAndAdjustments.DefaultValue')} </li>
+                      <li><b>{i18n.t('static.dataEntryAndAdjustments.AdjustStockOuts')}</b>: {i18n.t('static.dataEntryAndAdjustments.NumberOfStock')} '<a href="/#/dataset/versionSettings" target="_blank" style={{ textDecoration: 'underline' }}>{i18n.t('static.UpdateversionSettings.UpdateversionSettings')}</a>'. </li>
+
+                      <p className="pl-lg-5">
+                        <span style={{ fontStyle: 'italic' }}><b>{i18n.t('static.dataEntryAndAdjustments.StockOutRate')}</b> = {i18n.t('static.dataEntryAndAdjustments.StockOutDays')}/ {i18n.t('static.dataEntryAndAdjustments.DaysInMonth')}. </span><br></br>
+
+                        <span style={{ fontStyle: 'italic' }}><b>{i18n.t('static.dataEntryAndAdjustments.AdjustedConsumption')}</b> = {i18n.t('static.dataEntryAndAdjustments.ActualConsumption')} / {i18n.t('static.dataEntryAndAdjustments.ReportingRate')} / {i18n.t('static.dataEntryAndAdjustments.StockRate')} </span>
+                      </p>
+                      <p>{i18n.t('static.dataEntryAndAdjustments.GivenMonth')}: <br></br>
+
+                        <span className="pl-lg-5" style={{ fontStyle: 'italic' }}><b> {i18n.t('static.dataEntryAndAdjustments.StockOutRate')} </b>= 5 days stocked out /31 days in a month = 16.1%. </span><br></br>
+
+                        <span className="pl-lg-5" style={{ fontStyle: 'italic' }}><b>  {i18n.t('static.dataEntryAndAdjustments.AdjustedConsumption')} </b>= 1,000 units / 98% Reporting / (1 - 16.1%) = 1,217</span>  </p>
+
+                      <li>{i18n.t('static.dataEntryAndAdjustments.Interpolating')}: {i18n.t('static.dataEntryAndAdjustments.ClickInterpolate')}  {i18n.t('static.dataEntryAndAdjustments.InterpolateForMonths')}
+                        <br></br>
+                        {i18n.t('static.dataEntryAndAdjustments.Mathematically')}:<br></br>
+                        <ul>
+                          <li>{i18n.t('static.dataEntryAndAdjustments.XRepresentMonths')}</li>
+                          <li>{i18n.t('static.dataEntryAndAdjustments.DataValues')} </li>
+                          <li>{i18n.t('static.dataEntryAndAdjustments.UnknownData')} </li>
+                          <li>{i18n.t('static.dataEntryAndAdjustments.InterpolatedLine')} </li>
+                        </ul>
+                        <span><img className="formula-img-mr img-fluid mb-lg-0" src={dataentryScreenshot1} style={{ border: '1px solid #fff', width: '250px' }} /></span><br></br>
+                        <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0" src={dataentryScreenshot2} style={{ border: '1px solid #fff', width: '250px' }} /></span>
+
+                      </li>
+                      <li>
+                        {i18n.t('static.dataEntryAndAdjustments.GraphBelow')}  </li>
+                    </ol>
+                  </li>
+                  {/* <li>The detailed data table allows users to add, edit, adjust, or delete historical consumption records. 
+>>>>>>> QAT-1819A
                                    <ol type="a">
                                      <li><b>Interpolating missing values:</b> Click the green 'Interpolate' button above the top right corner of the unit table to search for periods where the consumption value is blank and replace them with an interpolated value. QAT interpolates by finding the nearest values on either side (before or after the blank), calculates the straight line in between them and uses that straight-line formula to calculate the value for the blank(s).  Note that QAT will not interpolate for months where actual consumption is zero. QAT will only interpolate if there is at least one data point before and one data point after the blank <br></br>value(s).
                                      Mathematically:<br></br>
@@ -2467,6 +2525,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                                    </ol>
                                    </li>
                                 */}
+<<<<<<< HEAD
                                  <li>{i18n.t('static.dataEntryAndAdjustments.ClickSubmit')} </li>
                                  <li>{i18n.t('static.dataEntryAndAdjustments.RepeatSteps')} 
                                  
@@ -2476,6 +2535,17 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                                  
                                </ol>
                             </p>
+=======
+                  <li>{i18n.t('static.dataEntryAndAdjustments.ClickSubmit')} </li>
+                  <li>{i18n.t('static.dataEntryAndAdjustments.RepeatSteps')}
+
+                    {/* <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0" src={dataentryScreenshot3} style={{border:'1px solid #fff'}}/></span> */}
+                  </li>
+
+
+                </ol>
+              </p>
+>>>>>>> QAT-1819A
               {/* <p>Methods are organized from simple to robust
 
                 More sophisticated models are more sensitive to problems in the data
