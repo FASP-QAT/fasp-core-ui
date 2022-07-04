@@ -897,7 +897,9 @@ class ForecastOutput extends Component {
     addGraphConsumptionData() {
         // alert("Hi");
         let consumptionData1 = this.state.consumptionData;
+        console.log("graphConsumption----------->0 ", consumptionData1);
         consumptionData1 = consumptionData1.filter(c => c.display == true).filter(c => c.scenario.id != 0);
+        console.log("graphConsumption----------->1 ", consumptionData1);
         if (consumptionData1.length > 0) {
 
             let planningUnitIdList = consumptionData1.map(c => c.objUnit.id);
@@ -922,7 +924,7 @@ class ForecastOutput extends Component {
                 }, {}));
 
                 // let localObj = tempData[0];
-                let jsonTemp = { objUnit: tempData[0].objUnit, scenario: tempData[0].scenario, display: tempData[0].display, color: tempData[0].color, consumptionList: resultTrue1, region: tempData[0].region, graphId: 0 }
+                let jsonTemp = { objUnit: tempData[0].objUnit, scenario: tempData[0].scenario, display: tempData[0].display, color: tempData[0].color, consumptionList: resultTrue1, region: tempData[0].region, graphId: i }
                 graphConsumptionData.push(jsonTemp);
             }
 
@@ -3129,7 +3131,17 @@ class ForecastOutput extends Component {
 
         const backgroundColor = [
             "#002F6C", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED",
-            "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"
+            "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721",
+            "#002F6C", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED",
+            "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721",
+            "#002F6C", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED",
+            "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721",
+            "#002F6C", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED",
+            "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721",
+            "#002F6C", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED",
+            "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721",
+            "#002F6C", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED",
+            "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721",
             // '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
             // '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
             // '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
@@ -3262,9 +3274,9 @@ class ForecastOutput extends Component {
                             stack: 3,
                             yAxisID: 'A',
                             // backgroundColor: 'transparent',
-                            backgroundColor: (this.state.yaxisEquUnit > 0 ? backgroundColor[index] : 'transparent'),
+                            backgroundColor: (this.state.yaxisEquUnit > 0 ? backgroundColor[item.graphId] : 'transparent'),
                             // backgroundColor: item.color,//stacked
-                            borderColor: backgroundColor[index],
+                            borderColor: backgroundColor[item.graphId],
                             borderStyle: 'dotted',
                             borderWidth: 5,
                             ticks: {
@@ -3780,7 +3792,7 @@ class ForecastOutput extends Component {
                                                                             <td className="sticky-col first-col clone Firstcolum" align="center"><input type="checkbox" id={"planningUnitCheckbox" + item.objUnit.id} checked={item.display} onChange={() => this.planningUnitCheckedChanged(item.objUnit.id, item.region.regionId)} /></td>
                                                                             <td className="" style={{ textAlign: 'left' }}>{item.region.label.label_en}</td>
                                                                             {/* <td className="sticky-col first-col clone Secondcolum" style={{ textAlign: 'left' }}>{item.display && <i class="fa fa-circle" style={{ color: backgroundColor[countVar] }} aria-hidden="true"></i>} {" "} {item.objUnit.label.label_en}</td> */}
-                                                                            <td className="sticky-col first-col clone Secondcolum" style={{ textAlign: 'left' }}>{item.graphId != -1 && <i class="fa fa-circle" style={{ color: backgroundColor[item.graphId] }} aria-hidden="true"></i>} {" "} {item.objUnit.label.label_en}</td>
+                                                                            <td className="sticky-col first-col clone Secondcolum" style={{ textAlign: 'left' }}>{item.graphId != -1 && <i class="fa fa-circle" style={{ color: backgroundColor[this.state.graphConsumptionData.filter(c => c.display == true && c.objUnit.id == item.objUnit.id)[0].graphId] }} aria-hidden="true"></i>} {" "} {item.objUnit.label.label_en}</td>
                                                                             <td className='text-left sticky-col first-col clone Thirdcolum'>{item.scenario.label}</td>
                                                                             {this.state.monthArrayList.map(item1 => (
                                                                                 <td>{item.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM")).length > 0 ? <NumberFormat displayType={'text'} thousandSeparator={true} value={item.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM"))[0].consumptionQty} /> : ""}</td>
@@ -3808,7 +3820,8 @@ class ForecastOutput extends Component {
                                                                             <td className="sticky-col first-col clone Firstcolum" align="center"><input type="checkbox" id={"planningUnitCheckbox" + item.objUnit.id} checked={item.display} onChange={() => this.planningUnitCheckedChanged(item.objUnit.id, item.region.regionId)} /></td>
                                                                             <td className="" style={{ textAlign: 'left' }}>{item.region.label.label_en}</td>
                                                                             {/* <td className="sticky-col first-col clone Secondcolum" style={{ textAlign: 'left' }}>{item.display && <i class="fa fa-circle" style={{ color: backgroundColor[countVar1] }} aria-hidden="true"></i>} {" "} {item.objUnit.label.label_en}</td> */}
-                                                                            <td className="sticky-col first-col clone Secondcolum" style={{ textAlign: 'left' }}>{item.graphId != -1 && <i class="fa fa-circle" style={{ color: backgroundColor[item.graphId] }} aria-hidden="true"></i>} {" "} {item.objUnit.label.label_en}</td>
+                                                                            {/* <td className="sticky-col first-col clone Secondcolum" style={{ textAlign: 'left' }}>{item.graphId != -1 && <i class="fa fa-circle" style={{ color: backgroundColor[item.graphId] }} aria-hidden="true"></i>} {" "} {item.objUnit.label.label_en}</td> */}
+                                                                            <td className="sticky-col first-col clone Secondcolum" style={{ textAlign: 'left' }}>{item.graphId != -1 && <i class="fa fa-circle" style={{ color: backgroundColor[this.state.graphConsumptionData.filter(c => c.display == true && c.objUnit.id == item.objUnit.id)[0].graphId] }} aria-hidden="true"></i>} {" "} {item.objUnit.label.label_en}</td>
                                                                             <td className='text-left sticky-col first-col clone Thirdcolum'>{item.scenario.label}</td>
                                                                             {this.state.monthArrayList.map(item1 => (
                                                                                 <td>{item.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY") == moment(item1).format("YYYY")).length > 0 ? <NumberFormat displayType={'text'} thousandSeparator={true} value={item.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY") == moment(item1).format("YYYY"))[0].consumptionQty} /> : ""}</td>
