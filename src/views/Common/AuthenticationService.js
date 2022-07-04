@@ -1327,7 +1327,7 @@ class AuthenticationService {
                         }
                         break;
                     case "/extrapolation/extrapolateData":
-                        if (bfunction.includes("ROLE_BF_EXTRAPOLATION")) {
+                        if (bfunction.includes("ROLE_BF_EXTRAPOLATION") || bfunction.includes("ROLE_BF_VIEW_EXTRAPOLATION")) {
                             return true;
                         }
                         break;
@@ -1368,7 +1368,7 @@ class AuthenticationService {
                     case "/dataentry/consumptionDataEntryAndAdjustment":
                     case "/dataentry/consumptionDataEntryAndAdjustment/:color/:message":
                     case "/dataentry/consumptionDataEntryAndAdjustment/:planningUnitId":
-                        if (bfunction.includes("ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT")) {
+                        if (bfunction.includes("ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT") || bfunction.includes("ROLE_BF_VIEW_CONSUMPTION_DATA_ENTRY_ADJUSTMENT")) {
                             return true;
                         }
                         break;
