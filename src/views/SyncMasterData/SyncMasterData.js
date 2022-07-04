@@ -301,7 +301,7 @@ export default class SyncMasterData extends Component {
                                         var problemReportList = generalJson.problemReportList;
                                         // console.log("Shipment data list", shipmentDataList);
                                         // console.log("Batch Info list", batchInfoList);
-                                        var shipArray = shipmentSyncResponse.data[response.data.programId];
+                                        var shipArray = shipmentSyncResponse.data[response.data.programId].filter(c=>c.shipmentActive==true);
                                         var pplModified = programPlanningUnitList.filter(c => moment(c.lastModifiedDate).format("YYYY-MM-DD HH:mm:ss") >= moment(date).format("YYYY-MM-DD HH:mm:ss") && c.program.id == response.data.programId);
 
                                         var rebuild = false;
@@ -325,7 +325,7 @@ export default class SyncMasterData extends Component {
                                         //         planningUnitList.push(shipArray[j].planningUnit.id);
                                         //     }
                                         // }
-                                        var linkedShipmentsList=generalJson.shipmentLinkingList!=null?generalJson.shipmentLinkingList:[];
+                                        var linkedShipmentsList=generalJson.shipmentLinkingList!=null?generalJson.shipmentLinkingList.filter(c=>c.active==true):[];
                                         console.log("LinkedShipmentsList=========================>",linkedShipmentsList)
                                         var linkedShipmentsListFilter=linkedShipmentsList.filter(c=>roNoAndRoPrimeLineNoSetFromAPI.includes(c.roNo+"|"+c.roPrimeLineNo));
                                         planningUnitList=[...new Set(linkedShipmentsListFilter).map(ele => ele.qatPlanningUnitId)];
