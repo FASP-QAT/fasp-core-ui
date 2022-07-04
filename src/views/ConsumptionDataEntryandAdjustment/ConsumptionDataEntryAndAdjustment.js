@@ -2371,60 +2371,60 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         <Modal isOpen={this.state.showGuidance}
           className={'modal-lg ' + this.props.className} >
           <ModalHeader toggle={() => this.toggleShowGuidance()} className="ModalHead modal-info-Headher">
-            <strong className="TextWhite">Show Guidance</strong>
+            <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
           </ModalHeader>
           <div>
             <ModalBody>
               <div>
-                <h3 className='ShowGuidanceHeading'>Data Entry and Adjustment </h3>
+                <h3 className='ShowGuidanceHeading'>{i18n.t('static.dashboard.dataEntryAndAdjustments')} </h3>
               </div>
               <p>
-                <p style={{ fontSize: '13px' }}><span className="UnderLineText">Purpose :</span> Enable users to prepare historical consumption data before moving on the '<a href="/#/Extrapolation/extrapolateData" target="_blank" style={{ textDecoration: 'underline' }}>Extrapolation</a>' screen. Historical actual consumption can be quantities sold, quantities dispensed to user or quantities issued by storage facilities. On this screen, users can adjust historical consumption data that has been either manually entered on this screen or that has been imported from a QAT supply plan program (if you desire to import, please proceed first to the '<a href="/#/importFromQATSupplyPlan/listImportFromQATSupplyPlan" target="_blank" style={{ textDecoration: 'underline' }}>Import from QAT Supply Plan</a>' screen). </p>
+                <p style={{ fontSize: '13px' }}><span className="UnderLineText">{i18n.t('static.listTree.purpose')} :</span> {i18n.t('static.dataEntryAndAdjustments.EnableUser')} '<a href="/#/Extrapolation/extrapolateData" target="_blank" style={{ textDecoration: 'underline' }}>{i18n.t('static.commitTree.extrapolation')}</a>' {i18n.t('static.dataEntryAndAdjustments.HistoricalActual')} '<a href="/#/importFromQATSupplyPlan/listImportFromQATSupplyPlan" target="_blank" style={{ textDecoration: 'underline' }}>{i18n.t('static.importFromQATSupplyPlan.importFromQATSupplyPlan')}</a>' screen). </p>
               </p>
               <p>
-                <p style={{ fontSize: '13px' }}><span className="UnderLineText">Using this screen :</span></p>
+                <p style={{ fontSize: '13px' }}><span className="UnderLineText">{i18n.t('static.listTree.useThisScreen')}:</span></p>
                 <ol>
-                  <li>Select the forecast program and the desired review period. By default, QAT pre-selects a date range of 36 months prior to the start of the forecasting period. A non-editable table and all products related to this forecast program are displayed, along with their consumption data if you have previously entered that data; otherwise you will see yellow cells indicating that no consumption data has been entered. By default, the products and consumption are shown in planning units. The user can also expand each row of the table to display the consumption by region, if managing a multi-region program.   </li>
-                  <li>On the top table, click on a product to display the detailed data table for that product. The detailed data table will have a section for each region in your program.
+                  <li>{i18n.t('static.dataEntryAndAdjustments.DesiredReview')} {i18n.t('static.dataEntryAndAdjustments.YellowCellsIndicating')}  </li>
+                  <li>{i18n.t('static.dataEntryAndAdjustments.TopTable')}
                   </li>
-                  <li>The detailed data table allows users to add, edit, adjust, or delete historical consumption records.
+                  <li>{i18n.t('static.dataEntryAndAdjustments.DetailedData')}
                     <ol type="a">
-                      <li>If you would like to enter data manually, enter the historical consumption for each region and month in the 'Actual Consumption' row.  </li>
-                      <li>If you have imported data from QAT, you will see your imported historical consumption in the 'Actual Consumption' row.  </li>
-                      <li>By default, data is assumed to be entered in the Planning Unit. However, the user can specify the appropriate unit for the detailed data by clicking on the “change” link under the product name and in the subsequent pop-up, choosing to enter data using the planning unit, the forecasting unit quantities (applying a realm-managed conversion factor) or another user-entered unit (and conversion factor). </li>
+                      <li>{i18n.t('static.dataEntryAndAdjustments.DataManually')}  </li>
+                      <li>{i18n.t('static.dataEntryAndAdjustments.ImportedData')}  </li>
+                      <li>{i18n.t('static.dataEntryAndAdjustments.DataIsAssumed')} </li>
                     </ol>
                   </li>
-                  <li>There are three ways to adjust the data:
+                  <li>{i18n.t('static.dataEntryAndAdjustments.AdjustTheData')}:
                     <ol type="a">
-                      <li><b>Adjust for under-reporting</b>: The default value is 100% reporting every month. The user can change this to the correct value. QAT will calculate the adjusted consumption due to underreporting. </li>
-                      <li><b>Adjust for stock outs</b>: For imported data, the number of stock out days is pulled in from the QAT supply plan program, if data is collected. The default value for stock out days is zero days (product assumed always in stock). The user can change this to the correct value. The default value for number of days in a month are based on the calendar days, but users can adjust the number of days used for the stock out calculation in '<a href="/#/dataset/versionSettings" target="_blank" style={{ textDecoration: 'underline' }}>Update Version Settings</a>'. </li>
+                      <li><b>{i18n.t('static.dataEntryAndAdjustments.UnderReporting')}</b>: {i18n.t('static.dataEntryAndAdjustments.DefaultValue')} </li>
+                      <li><b>{i18n.t('static.dataEntryAndAdjustments.AdjustStockOuts')}</b>: {i18n.t('static.dataEntryAndAdjustments.NumberOfStock')} '<a href="/#/dataset/versionSettings" target="_blank" style={{ textDecoration: 'underline' }}>{i18n.t('static.UpdateversionSettings.UpdateversionSettings')}</a>'. </li>
 
                       <p className="pl-lg-5">
-                        <span style={{ fontStyle: 'italic' }}><b>Stock Out Rate</b> = Stocked Out (days)/ (# of Days in Month). </span><br></br>
+                        <span style={{ fontStyle: 'italic' }}><b>{i18n.t('static.dataEntryAndAdjustments.StockOutRate')}</b> = {i18n.t('static.dataEntryAndAdjustments.StockOutDays')}/ {i18n.t('static.dataEntryAndAdjustments.DaysInMonth')}. </span><br></br>
 
-                        <span style={{ fontStyle: 'italic' }}><b>Adjusted Consumption</b> = Actual Consumption / Reporting Rate / (1 - Stock Out Rate) </span>
+                        <span style={{ fontStyle: 'italic' }}><b>{i18n.t('static.dataEntryAndAdjustments.AdjustedConsumption')}</b> = {i18n.t('static.dataEntryAndAdjustments.ActualConsumption')} / {i18n.t('static.dataEntryAndAdjustments.ReportingRate')} / {i18n.t('static.dataEntryAndAdjustments.StockRate')} </span>
                       </p>
-                      <p>For example, if for a given month, a product had a consumption of 1,000 units, was out-of-stock for 5 out of 31 days in the month and the reporting rate was 98%: <br></br>
+                      <p>{i18n.t('static.dataEntryAndAdjustments.GivenMonth')}: <br></br>
 
-                        <span className="pl-lg-5" style={{ fontStyle: 'italic' }}><b> Stock Out Rate </b>= 5 days stocked out /31 days in a month = 16.1%. </span><br></br>
+                        <span className="pl-lg-5" style={{ fontStyle: 'italic' }}><b> {i18n.t('static.dataEntryAndAdjustments.StockOutRate')} </b>= 5 days stocked out /31 days in a month = 16.1%. </span><br></br>
 
-                        <span className="pl-lg-5" style={{ fontStyle: 'italic' }}><b>  Adjusted Consumption </b>= 1,000 units / 98% Reporting / (1 - 16.1%) = 1,217</span>  </p>
+                        <span className="pl-lg-5" style={{ fontStyle: 'italic' }}><b>  {i18n.t('static.dataEntryAndAdjustments.AdjustedConsumption')} </b>= 1,000 units / 98% Reporting / (1 - 16.1%) = 1,217</span>  </p>
 
-                      <li>Interpolating missing values: Click the green 'Interpolate' button in the middle right of the screen to search for periods where the consumption value is blank and replace them with an interpolated value. QAT interpolates by finding the nearest values on either side (before or after the blank), calculates the straight line in between them and uses that straight-line formula to calculate the value for the blank(s).  Note that QAT will not interpolate for months where actual consumption is zero. QAT will only interpolate if there is at least one data point before and one data point after the blank value(s).
+                      <li>{i18n.t('static.dataEntryAndAdjustments.Interpolating')}: {i18n.t('static.dataEntryAndAdjustments.ClickInterpolate')}  {i18n.t('static.dataEntryAndAdjustments.InterpolateForMonths')}
                         <br></br>
-                        Mathematically:<br></br>
+                        {i18n.t('static.dataEntryAndAdjustments.Mathematically')}:<br></br>
                         <ul>
-                          <li>Where x's represent months, and y's represent actual consumption,</li>
-                          <li>Where known data values are (x0 , y0) and (x1 , y1) </li>
-                          <li>Where any unknown data values are (x, y) </li>
-                          <li>The formula for the interpolated line is </li>
+                          <li>{i18n.t('static.dataEntryAndAdjustments.XRepresentMonths')}</li>
+                          <li>{i18n.t('static.dataEntryAndAdjustments.DataValues')} </li>
+                          <li>{i18n.t('static.dataEntryAndAdjustments.UnknownData')} </li>
+                          <li>{i18n.t('static.dataEntryAndAdjustments.InterpolatedLine')} </li>
                         </ul>
                         <span><img className="formula-img-mr img-fluid mb-lg-0" src={dataentryScreenshot1} style={{ border: '1px solid #fff', width: '250px' }} /></span><br></br>
                         <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0" src={dataentryScreenshot2} style={{ border: '1px solid #fff', width: '250px' }} /></span>
 
                       </li>
                       <li>
-                        Use the graph below the Detailed Data table to view the adjusted data </li>
+                        {i18n.t('static.dataEntryAndAdjustments.GraphBelow')}  </li>
                     </ol>
                   </li>
                   {/* <li>The detailed data table allows users to add, edit, adjust, or delete historical consumption records. 
@@ -2455,8 +2455,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                                    </ol>
                                    </li>
                                 */}
-                  <li>Click ‘Submit’ to save any entered data </li>
-                  <li>Repeat steps 2-4 for each planning unit
+                  <li>{i18n.t('static.dataEntryAndAdjustments.ClickSubmit')} </li>
+                  <li>{i18n.t('static.dataEntryAndAdjustments.RepeatSteps')}
 
                     {/* <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0" src={dataentryScreenshot3} style={{border:'1px solid #fff'}}/></span> */}
                   </li>

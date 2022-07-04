@@ -1509,41 +1509,40 @@ class VersionSettingsComponent extends Component {
                 <Modal isOpen={this.state.showGuidance}
                     className={'modal-lg ' + this.props.className} >
                     <ModalHeader toggle={() => this.toggleShowGuidance()} className="ModalHead modal-info-Headher">
-                        <strong className="TextWhite">Show Guidance</strong>
+                        <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
                     </ModalHeader>
                     <div>
                         <ModalBody>
                            <div>
-                               <h3 className='ShowGuidanceHeading'>Update Version Setting</h3>
+                               <h3 className='ShowGuidanceHeading'>{i18n.t('static.UpdateversionSettings.UpdateversionSettings')}</h3>
                            </div>
                             <p>
-                                <p style={{fontSize:'13px'}}><span className="UnderLineText">Purpose :</span> Enable users to update their program settings and view details about previous versions. For viewing forecast results, use the screens in the Forecast Analysis Output section.</p>
+                                <p style={{fontSize:'13px'}}><span className="UnderLineText">{i18n.t('static.listTree.purpose')}</span> {i18n.t('static.VersionSetting.enableUsersTo')}</p>
                             </p>
                             <p>
-                                <p style={{fontSize:'13px'}}><span className="UnderLineText">Using this screen :</span></p>
+                                <p style={{fontSize:'13px'}}><span className="UnderLineText">{i18n.t('static.listTree.useThisScreen')}:</span></p>
                                 <p style={{fontSize:'13px'}}>
-                                <b>Note:</b> A forecast program must be loaded to update version settings. All past versions of each forecast program will be in a read-only format; only the local version is available for updating and editing.
+                                <b>{i18n.t('static.versionSettings.note')}:</b>{i18n.t('static.versionSettings.forecastProgramMustBeLoaded')}
                                 </p>
                             </p>
                             <p style={{fontSize:'13px'}}>
-                            On this screen, users can:<br></br>
-                            <ul style={{listStyle:'none'}}>
-                                <li>1.Update the following program settings for the loaded, local program:
-                                <ul style={{listStyle:'none'}}>
-                                    <li>a. <b>Forecast period</b> (start and end date)</li>
-                                    <li>b. <b>Freight percentage</b> - used in the <a href="/#/forecastReport/forecastSummary" target="_blank" style={{textDecoration:'underline'}}>Forecast Summary</a> screen for estimating total procurement costs</li>
-                                    <li>c. <b>Forecast threshold </b> used in the <a href="/#/report/compareAndSelectScenario" target="_blank" style={{textDecoration:'underline'}}>Compare and Select</a> screen. QAT compares available Consumption Forecasts and &nbsp;&nbsp;&nbsp;&nbsp;Tree Forecasts. For any Tree Forecasts, QAT will flag the percentage above the highest or below the lowest &nbsp;&nbsp;&nbsp;&nbsp;Consumption Forecast. The comparison will be highlighted in <span style={{color:'#BA0C2F'}}>red text</span> if it is outside of the threshold percentages set &nbsp;&nbsp;&nbsp;&nbsp;by the user in this screen. Assuming reliable actual consumption data, this comparison helps users determine if their &nbsp;&nbsp;&nbsp;&nbsp;Tree Forecasts are realistic.</li>
-                                    <li>d. <b>Version notes</b> - also visible and editable when committing a program.</li>
-                                </ul>
+                            {i18n.t('static.versionSettings.OnthisScreen')}:<br></br>
+                            <ol type="1">
+                                <li>{i18n.t('static.versionSettings.Updatethefollowingprogram')}:
+                                <ol type="a">
+                                    <li><b>{i18n.t('static.versionSettings.Forecastperiod')}</b> {i18n.t('static.versionSettings.StartEndDate')}</li>
+                                    <li><b>{i18n.t('static.versionSettings.Freightpercentage')}</b> -{i18n.t('static.versionSettings.usedInThe')} <a href="/#/forecastReport/forecastSummary" target="_blank" style={{textDecoration:'underline'}}> {i18n.t('static.ForecastSummary.ForecastSummary')}</a> {i18n.t('static.versionSettings.ScreenForEstimating')}</li>
+                                    <li><b>{i18n.t('static.versionSettings.Forecastthreshold')} </b> -{i18n.t('static.versionSettings.usedInThe')} <a href="/#/report/compareAndSelectScenario" target="_blank" style={{textDecoration:'underline'}}>{i18n.t('static.dashboard.compareAndSelect')}</a> {i18n.t('static.versionSettings.QATComparesAvailable')}  <span style={{color:'#BA0C2F'}}>{i18n.t('static.versionSettings.RedText')}</span> {i18n.t('static.versionSettings.OutsideThresholdPercentages')} </li>
+                                    <li><b>{i18n.t('static.versionSettings.VersionNotes')}</b> - {i18n.t('static.versionSettings.AlsoVisibleEditable')}</li>
+                                </ol>
                                 </li>
-                                <li>2.See a historical lifecycle of each program through all its versions. 
-                                <ul style={{listStyle:'none'}}>
-                                    <li>a. View all version settings above</li>
-                                    <li>b. (Right click) View the Forecast Validation screen (same screen as viewed during the Commit process) - which lists &nbsp;&nbsp;&nbsp;&nbsp;missing forecasts, missing data and all notes. This serves as an easy for users to understand previous forecasts &nbsp;&nbsp;&nbsp;&nbsp;without downloading them. Use the <a href="/#/forecastReport/forecastOutput" target="_blank" style={{textDecoration:'underline'}}>Monthly Forecast</a>, <a href="/#/forecastReport/forecastSummary" target="_blank" style={{textDecoration:'underline'}}>Forecast Summary</a> or <a href="/#/report/compareVersion" target="_blank" style={{textDecoration:'underline'}}>Version Comparison</a> screens to view the  &nbsp;&nbsp;&nbsp;&nbsp;forecast outputs from other versions.</li>
-                                    
-                                </ul>
+                                <li>{i18n.t('static.versionSettings.HistoricalLifecycle')}
+                                <ol type="a">
+                                    <li>{i18n.t('static.versionSettings.ViewAllVersion')} </li>
+                                    <li>{i18n.t('static.versionSettings.ForecastValidationScreen')} <a href="/#/forecastReport/forecastOutput" target="_blank" style={{textDecoration:'underline'}}>{i18n.t('static.dashboard.monthlyForecast')}</a>, <a href="/#/forecastReport/forecastSummary" target="_blank" style={{textDecoration:'underline'}}>{i18n.t('static.commitTree.forecastSummary')}</a> or <a href="/#/report/compareVersion" target="_blank" style={{textDecoration:'underline'}}>{i18n.t('static.dashboard.Versioncomarition')}</a> {i18n.t('static.dashboard.ViewForecastOutputs')} </li>
+                                </ol>
                                 </li>
-                            </ul>
+                            </ol>
                             </p>
                         </ModalBody>
                     </div>
