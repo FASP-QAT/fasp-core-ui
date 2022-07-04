@@ -732,7 +732,7 @@ class ForecastSummary extends Component {
                         // doc.text(i18n.t('static.forecastReport.hideCalculations') + ': ' + (this.state.hideCalculation == true ? i18n.t('static.realm.yes') : i18n.t('static.program.no')), doc.internal.pageSize.width / 8, 110, {
                         //     align: 'left'
                         // })
-                        doc.fromHTML("<span style = 'font-family:helvetica;'><font size = '1' color = '#002f6c'><b>" + i18n.t('static.forecastReport.hideCalculations') + ":</b> " + (this.state.hideCalculation == true ? i18n.t('static.realm.yes') : i18n.t('static.program.no')) + "</font></span>", (doc.internal.pageSize.width / 8), 110)
+                        doc.fromHTML("<span style = 'font-family:helvetica;'><font size = '1' color = '#002f6c'><b>" + i18n.t('static.forecastReport.hideCalculations') + ":</b> " + (this.state.hideCalculation == true ? i18n.t('static.realm.yes') : i18n.t('static.program.no')) + "</font></span>", (doc.internal.pageSize.width / 8) - 50, 110)
                     }
 
                 }
@@ -823,7 +823,7 @@ class ForecastSummary extends Component {
 
                 console.log("data------------------>12345 ", data);
 
-                var startY = 130;
+                var startY = 140;
                 let content = {
                     margin: { top: 80, bottom: 90 },
                     startY: startY,
@@ -1643,6 +1643,7 @@ class ForecastSummary extends Component {
                                         position: 'top',
                                         filters: true,
                                         onchange: this.forecastChanged,
+                                        editable:AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_LIST_FORECAST_SUMMARY')?true:false,
                                         onload: function (instance, cell, x, y, value) {
                                             jExcelLoadedFunctionOnlyHideRow(instance);
                                             var elInstance = instance.jexcel;
