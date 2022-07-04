@@ -231,7 +231,7 @@ export default class SyncMasterData extends Component {
             var generalJson = JSON.parse(generalData);
             console.log("GeneralJson@@@@@@@@@@@@@@", generalJson)
             var programQPLListFilter=programQPLDetailsList.filter(c=>c.id==programList[pl].id);
-            var linkedShipmentsList = generalJson.shipmentLinkingList != null && programQPLListFilter[0].doNotFollowLatestShipmentInfo==0 ? generalJson.shipmentLinkingList : [];
+            var linkedShipmentsList = generalJson.shipmentLinkingList != null ? generalJson.shipmentLinkingList : [];
             var listOfRoNoAndRoPrimeLineNo = [];
             for (var lsl = 0; lsl < linkedShipmentsList.length; lsl++) {
                 if (listOfRoNoAndRoPrimeLineNo.findIndex(c => c.roNo == linkedShipmentsList[lsl].roNo && c.roPrimeLineNo == linkedShipmentsList[lsl].roPrimeLineNo) == -1) {
@@ -301,7 +301,7 @@ export default class SyncMasterData extends Component {
                                         var problemReportList = generalJson.problemReportList;
                                         // console.log("Shipment data list", shipmentDataList);
                                         // console.log("Batch Info list", batchInfoList);
-                                        var shipArray = shipmentSyncResponse.data[response.data.programId];
+                                        var shipArray = shipmentSyncResponse.data[response.data.programId].filter(c=>c.shipmentActive==true);
                                         var pplModified = programPlanningUnitList.filter(c => moment(c.lastModifiedDate).format("YYYY-MM-DD HH:mm:ss") >= moment(date).format("YYYY-MM-DD HH:mm:ss") && c.program.id == response.data.programId);
 
                                         var rebuild = false;
@@ -325,7 +325,7 @@ export default class SyncMasterData extends Component {
                                         //         planningUnitList.push(shipArray[j].planningUnit.id);
                                         //     }
                                         // }
-                                        var linkedShipmentsList=generalJson.shipmentLinkingList!=null?generalJson.shipmentLinkingList:[];
+                                        var linkedShipmentsList=generalJson.shipmentLinkingList!=null?generalJson.shipmentLinkingList.filter(c=>c.active==true):[];
                                         console.log("LinkedShipmentsList=========================>",linkedShipmentsList)
                                         var linkedShipmentsListFilter=linkedShipmentsList.filter(c=>roNoAndRoPrimeLineNoSetFromAPI.includes(c.roNo+"|"+c.roPrimeLineNo));
                                         planningUnitList=[...new Set(linkedShipmentsListFilter).map(ele => ele.qatPlanningUnitId)];
@@ -360,20 +360,20 @@ export default class SyncMasterData extends Component {
                                             var uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId=[...new Set(shipArrayForPlanningUnit).map(ele => ele.roNo+"|"+ele.roPrimeLineNo)];
                                             for (var j = 0; j < uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId.length; j++) {
                                                 console.log("Ship Array filter=========================>",shipArray.filter(c=>c.roNo+"|"+c.roPrimeLineNo==uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId[j]))
-                                                var uniqueKnShipmentNo=[...new Set(shipArray.filter(c=>c.roNo+"|"+c.roPrimeLineNo==uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId[j])).map(ele => ele.knShipmentNo)];
-                                                var knShipmentNoThatExistsInLinkedShipmentsList=linkedShipmentsListFilter.filter(x => x.roNo+"|"+x.roPrimeLineNo==uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId[j] && !uniqueKnShipmentNo.includes(x.knShipmentNo));
+                                                var uniqueKnShipmentNo=[...new Set(shipArray.filter(c=>c.roNo+"|"+c.roPrimeLineNo==uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId[j])).map(ele => ele.orderNo+"|"+ele.primeLineNo+"|"+ele.knShipmentNo)];
+                                                var knShipmentNoThatExistsInLinkedShipmentsList=linkedShipmentsListFilter.filter(x => x.roNo+"|"+x.roPrimeLineNo==uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId[j] && !uniqueKnShipmentNo.includes(x.orderNo+"|"+x.primeLineNo+"|"+x.knShipmentNo));
 
                                                 console.log("knShipmentNoThatExistsInLinkedShipmentsList=========================>",knShipmentNoThatExistsInLinkedShipmentsList);
                                                 console.log("uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId=========================>",uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId[j]);
                                                 console.log("UniqueKnShipmentNo=========================>",uniqueKnShipmentNo);
                                                 for(var u=0;u<uniqueKnShipmentNo.length;u++){
-                                                    var checkIfAlreadyExists=linkedShipmentsList.findIndex(c=>c.roNo+"|"+c.roPrimeLineNo==uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId[j] && c.knShipmentNo==uniqueKnShipmentNo[u]);
+                                                    var checkIfAlreadyExists=linkedShipmentsList.findIndex(c=>c.roNo+"|"+c.roPrimeLineNo==uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId[j] && c.orderNo+"|"+c.primeLineNo+"|"+c.knShipmentNo==uniqueKnShipmentNo[u]);
                                                     console.log("checkIfAlreadyExists=========================>",checkIfAlreadyExists)
                                                     if(checkIfAlreadyExists==-1){
                                                         var linkedShipmentsListBasedOnRoNoAndRoPrimeLineNo=linkedShipmentsList.filter(c=>c.roNo+"|"+c.roPrimeLineNo==uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId[j]);
                                                         var index=shipmentDataList.findIndex(c=>linkedShipmentsListBasedOnRoNoAndRoPrimeLineNo[0].childShipmentId>0?linkedShipmentsListBasedOnRoNoAndRoPrimeLineNo[0].childShipmentId==c.shipmentId:linkedShipmentsListBasedOnRoNoAndRoPrimeLineNo[0].tempChildShipmentId==c.tempShipmentId);
 
-                                                        var shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo=shipArray.filter(c=>c.roNo+"|"+c.roPrimeLineNo==uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId[j] && c.knShipmentNo==uniqueKnShipmentNo[u])
+                                                        var shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo=shipArray.filter(c=>c.roNo+"|"+c.roPrimeLineNo==uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId[j] && c.orderNo+"|"+c.primeLineNo+"|"+c.knShipmentNo==uniqueKnShipmentNo[u])
                                                         if(shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].erpShipmentStatus!="Cancelled"){
                                                         var shipmentQty = 0;
                                                         var batchInfo = [];
@@ -509,8 +509,8 @@ export default class SyncMasterData extends Component {
                                                         // var childShipmentId=linkedShipmentsList[checkIfAlreadyExists].childShipmentId>0?linkedShipmentsList[checkIfAlreadyExists].childShipmentId:linkedShipmentsList[checkIfAlreadyExists].tempChildShipmentId;
                                                     }else{
                                                         var index=shipmentDataList.findIndex(c=>linkedShipmentsList[checkIfAlreadyExists].childShipmentId>0?linkedShipmentsList[checkIfAlreadyExists].childShipmentId==c.shipmentId:linkedShipmentsList[checkIfAlreadyExists].tempChildShipmentId==c.tempShipmentId);
-                                                        var shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo=shipArray.filter(c=>c.roNo+"|"+c.roPrimeLineNo==uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId[j] && c.knShipmentNo==uniqueKnShipmentNo[u])
-                                                        var linkedShipmentsListIndex=linkedShipmentsList.findIndex(c=>c.roNo+"|"+c.roPrimeLineNo==uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId[j] && c.knShipmentNo==uniqueKnShipmentNo[u]);
+                                                        var shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo=shipArray.filter(c=>c.roNo+"|"+c.roPrimeLineNo==uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId[j] && c.orderNo+"|"+c.primeLineNo+"|"+c.knShipmentNo==uniqueKnShipmentNo[u])
+                                                        var linkedShipmentsListIndex=linkedShipmentsList.findIndex(c=>c.roNo+"|"+c.roPrimeLineNo==uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId[j] && c.orderNo+"|"+c.primeLineNo+"|"+c.knShipmentNo==uniqueKnShipmentNo[u]);
                                                         var shipmentQty = 0;
                                                         var batchInfo = [];
                                                         var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
@@ -592,8 +592,8 @@ export default class SyncMasterData extends Component {
                                                     }
                                                 }
                                                 for(var u=0;u<knShipmentNoThatExistsInLinkedShipmentsList.length;u++){
-                                                    var linkedShipmentsListIndex = linkedShipmentsList.findIndex(c=>c.roNo+"|"+c.roPrimeLineNo==uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId[j] && c.knShipmentNo==knShipmentNoThatExistsInLinkedShipmentsList[u].knShipmentNo);
-                                                    var linkedShipmentsListFilter = linkedShipmentsList.filter(c=>c.roNo+"|"+c.roPrimeLineNo==uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId[j] && c.knShipmentNo==knShipmentNoThatExistsInLinkedShipmentsList[u].knShipmentNo);
+                                                    var linkedShipmentsListIndex = linkedShipmentsList.findIndex(c=>c.roNo+"|"+c.roPrimeLineNo==uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId[j] && c.knShipmentNo==knShipmentNoThatExistsInLinkedShipmentsList[u].knShipmentNo && c.orderNo==knShipmentNoThatExistsInLinkedShipmentsList[u].orderNo && c.primeLineNo==knShipmentNoThatExistsInLinkedShipmentsList[u].primeLineNo);
+                                                    var linkedShipmentsListFilter = linkedShipmentsList.filter(c=>c.roNo+"|"+c.roPrimeLineNo==uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId[j] && c.knShipmentNo==knShipmentNoThatExistsInLinkedShipmentsList[u].knShipmentNo && c.orderNo==knShipmentNoThatExistsInLinkedShipmentsList[u].orderNo && c.primeLineNo==knShipmentNoThatExistsInLinkedShipmentsList[u].primeLineNo);
                                                     linkedShipmentsList[linkedShipmentsListIndex].active=false;
                                                     linkedShipmentsList[linkedShipmentsListIndex].lastModifiedBy.userId=curUser;
                                                     linkedShipmentsList[linkedShipmentsListIndex].lastModifiedBy.username=username;

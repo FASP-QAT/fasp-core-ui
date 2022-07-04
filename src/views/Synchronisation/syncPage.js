@@ -84,7 +84,8 @@ export default class syncPage extends Component {
       progressPer: 0,
       notes: '',
       deletedRowsListLocal:[],
-      deletedRowsListServer:[]
+      deletedRowsListServer:[],
+      shipmentAlreadyLinkedToOtherProgCount:0
     }
     this.toggle = this.toggle.bind(this);
     this.getDataForCompare = this.getDataForCompare.bind(this);
@@ -2493,28 +2494,28 @@ export default class syncPage extends Component {
                                                                           var listFromAPIFiltered=listFromAPI.filter(c=>uniqueRoNoAndRoPrimeLineNo[cd]==c.roNo+"|"+c.roPrimeLineNo);
                                                                           console.log("latestProgramDataShipmentLinkedFiltered@@@@@@@@@@@@@",latestProgramDataShipmentLinkedFiltered)
                                                                           console.log("oldProgramDataShipmentLinkedFiltered@@@@@@@@@@@@@",oldProgramDataShipmentLinkedFiltered)
-                                                                          data[0] = uniqueRoNoAndRoPrimeLineNo[cd].split("|")[0];
+                                                                          data[0] = uniqueRoNoAndRoPrimeLineNo[cd].split("|")[0]+" - "+uniqueRoNoAndRoPrimeLineNo[cd].split("|")[1];
                                                                           data[1] = uniqueRoNoAndRoPrimeLineNo[cd].split("|")[1];
                                                                           data[2] = oldProgramDataShipmentLinkedFiltered.length>0?getLabelText(oldProgramData.label,this.state.lang):"";
-                                                                          data[3] = oldProgramDataShipmentLinkedFiltered.length>0?oldProgramDataShipmentLinkedFiltered[0].parentShipmentId:"";
-                                                                          data[4] = oldProgramDataShipmentLinkedFiltered.length>0?oldProgramDataShipmentLinkedFiltered[0].conversionFactor:"";
-                                                                          data[5] = oldProgramDataShipmentLinkedFiltered.length>0?oldProgramDataShipmentLinkedFiltered[0].active:"";
+                                                                          data[3] = oldProgramDataShipmentLinkedFiltered.length>0?oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length-1].parentShipmentId:"";
+                                                                          data[4] = oldProgramDataShipmentLinkedFiltered.length>0?oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length-1].conversionFactor:"";
+                                                                          data[5] = oldProgramDataShipmentLinkedFiltered.length>0?oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length-1].active==1 || oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length-1].active==true?true:false:false;
                                                                           data[6] = listFromAPIFiltered.length>0?getLabelText(listFromAPIFiltered[0].program.label,this.state.lang):latestProgramDataShipmentLinkedFiltered.length>0?getLabelText(latestProgramData.label,this.state.lang):"";
-                                                                          data[7] = listFromAPIFiltered.length>0?listFromAPIFiltered[0].shipmentId:latestProgramDataShipmentLinkedFiltered.length>0?latestProgramDataShipmentLinkedFiltered[0].parentShipmentId:"";
-                                                                          data[8] = listFromAPIFiltered.length>0?listFromAPIFiltered[0].conversionFactor:latestProgramDataShipmentLinkedFiltered.length>0?latestProgramDataShipmentLinkedFiltered[0].conversionFactor:"";
-                                                                          data[9] = listFromAPIFiltered.length>0?listFromAPIFiltered[0].conversionFactor:latestProgramDataShipmentLinkedFiltered.length>0?latestProgramDataShipmentLinkedFiltered[0].active:"";
-                                                                          data[10] = oldProgramDataShipmentLinkedFiltered.length>0?oldProgramDataShipmentLinkedFiltered[0].shipmentLinkingId:"";
-                                                                          data[11] = latestProgramDataShipmentLinkedFiltered.length>0?latestProgramDataShipmentLinkedFiltered[0].shipmentLinkingId:"";
-                                                                          data[12]=downloadedProgramDataShipmentLinkedFiltered.length>0?downloadedProgramDataShipmentLinkedFiltered[0].shipmentLinkingId:"";
+                                                                          data[7] = listFromAPIFiltered.length>0?listFromAPIFiltered[listFromAPIFiltered.length-1].shipmentId:latestProgramDataShipmentLinkedFiltered.length>0?latestProgramDataShipmentLinkedFiltered[latestProgramDataShipmentLinkedFiltered.length-1].parentShipmentId:"";
+                                                                          data[8] = listFromAPIFiltered.length>0?listFromAPIFiltered[listFromAPIFiltered.length-1].conversionFactor:latestProgramDataShipmentLinkedFiltered.length>0?latestProgramDataShipmentLinkedFiltered[latestProgramDataShipmentLinkedFiltered.length-1].conversionFactor:"";
+                                                                          data[9] = listFromAPIFiltered.length>0?listFromAPIFiltered[listFromAPIFiltered.length-1].conversionFactor:latestProgramDataShipmentLinkedFiltered.length>0?latestProgramDataShipmentLinkedFiltered[latestProgramDataShipmentLinkedFiltered.length-1].active==1 || latestProgramDataShipmentLinkedFiltered[latestProgramDataShipmentLinkedFiltered.length-1].active==true?true:false:false;
+                                                                          data[10] = oldProgramDataShipmentLinkedFiltered.length>0?oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length-1].shipmentLinkingId:"";
+                                                                          data[11] = latestProgramDataShipmentLinkedFiltered.length>0?latestProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length-1].shipmentLinkingId:"";
+                                                                          data[12]=downloadedProgramDataShipmentLinkedFiltered.length>0?downloadedProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length-1].shipmentLinkingId:"";
                                                                           data[13]= 4;
                                                                           data[14]=(oldProgramDataShipmentLinkedFiltered.length>0 && latestProgramDataShipmentLinkedFiltered.length==0) || (oldProgramDataShipmentLinkedFiltered.length==0 && latestProgramDataShipmentLinkedFiltered.length>0)?(oldProgramDataShipmentLinkedFiltered.length>0 && latestProgramDataShipmentLinkedFiltered.length==0)?oldProgramData.currentVersion.versionId:latestProgramData.currentVersion.versionId:"";
                                                                           data[15]=cd;
                                                                           data[16]=oldProgramData.currentVersion.versionId;
                                                                           data[17]=latestProgramData.currentVersion.versionId;
                                                                           data[18]=[];
-                                                                          data[19] = oldProgramDataShipmentLinkedFiltered.length>0?oldProgramDataShipmentLinkedFiltered[0]:{};
-                                                                          data[20] = latestProgramDataShipmentLinkedFiltered.length>0?latestProgramDataShipmentLinkedFiltered[0]:{};
-                                                                          data[21] = downloadedProgramDataShipmentLinkedFiltered.length>0?downloadedProgramDataShipmentLinkedFiltered[0].active:""
+                                                                          data[19] = oldProgramDataShipmentLinkedFiltered.length>0?oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length-1]:{};
+                                                                          data[20] = latestProgramDataShipmentLinkedFiltered.length>0?latestProgramDataShipmentLinkedFiltered[latestProgramDataShipmentLinkedFiltered.length-1]:{};
+                                                                          data[21] = downloadedProgramDataShipmentLinkedFiltered.length>0?downloadedProgramDataShipmentLinkedFiltered[downloadedProgramDataShipmentLinkedFiltered.length-1].active:""
                                                                           // data[8] = mergedShipmentData[cd].dataSource.id;
                                                                           // data[9] = mergedShipmentData[cd].shipmentMode == "Air" ? 2 : 1;
                                                                           // data[10] = mergedShipmentData[cd].suggestedQty;
@@ -2583,16 +2584,16 @@ export default class syncPage extends Component {
                                                             
                                                                         ],
                                                                           columns: [
-                                                                            { title: i18n.t('static.commit.erpNo'), type: 'text', width: 100 },
-                                                                            { title: i18n.t('static.commit.erpLineNo'), type: 'text', width: 200 },
-                                                                            { type: 'text', title: i18n.t('static.dashboard.programheader'), width: 100 },
-                                                                            { type: 'text', title: i18n.t('static.commit.shipmentId'), width: 100, },
+                                                                            { title: i18n.t('static.manualTagging.RONO'), type: 'text', width: 200 },
+                                                                            { title: i18n.t('static.commit.erpLineNo'), type: 'hidden', width: 200 },
+                                                                            { type: 'text', title: i18n.t('static.dashboard.programheader'), width: 150 },
+                                                                            { type: 'text', title: i18n.t('static.report.id'), width: 100, },
                                                                             { type: 'text', title: i18n.t('static.manualTagging.conversionFactor'),width: 120 },
-                                                                            { type: 'text', title: i18n.t('static.common.active'),width: 120 },
+                                                                            { type: 'checkbox', title: i18n.t('static.common.active'),width: 120 },
                                                                             { type: 'text', title: i18n.t('static.dashboard.programheader'), width: 100 },
-                                                                            { type: 'text', title: i18n.t('static.commit.shipmentId'), width: 100, },
+                                                                            { type: 'text', title: i18n.t('static.report.id'), width: 100, },
                                                                             { type: 'text', title: i18n.t('static.manualTagging.conversionFactor'),width: 120 },
-                                                                            { type: 'text', title: i18n.t('static.common.active'),width: 120 },
+                                                                            { type: 'checkbox', title: i18n.t('static.common.active'),width: 120 },
                                                                             // { type: 'dropdown', title: i18n.t('static.subfundingsource.fundingsource'), source: fundingSourceList, width: 120 },
                                                                             // { type: 'dropdown', title: i18n.t('static.dashboard.budget'), source: budgetList, width: 120 },
                                                                             // { type: 'text', title: i18n.t('static.supplyPlan.orderNoAndPrimeLineNo'), width: 150 },
@@ -3154,13 +3155,16 @@ export default class syncPage extends Component {
     for (var c = 0; c < jsonData.length; c++) {
       if(jsonData[c][2]!=="" && jsonData[c][6]!=="" && jsonData[c][2]!==jsonData[c][6]){
         this.setState({
-          conflictsCount: this.state.conflictsCount + 1
+          conflictsCount: this.state.conflictsCount + 1,
+          shipmentAlreadyLinkedToOtherProgCount:this.state.shipmentAlreadyLinkedToOtherProgCount+1
         })
         elInstance.setValueFromCoords(13, c, 6, true);
         for (var j = 0; j < colArr.length; j++) {
           var col = (colArr[j]).concat(parseInt(c) + 1);
-          elInstance.setStyle(col, "background-color", "transparent");
-          elInstance.setStyle(col, "background-color", "red");
+          // elInstance.setStyle(col, "background-color", "transparent");
+          // elInstance.setStyle(col, "background-color", "red");
+          var cell = elInstance.getCell(col);
+          cell.classList.add('commitShipmentAlreadyLinkedToOtherPro');
         }
       }else{
         var checkIfSameParentShipmentIdExists=jsonData.filter((d,index)=>(((jsonData[c][3]!=="" && jsonData[c][3]===d[7] && jsonData[c][17]!==d[16]) || (jsonData[c][7]!=="" && jsonData[c][7]===d[3]) && jsonData[c][17]!==d[16]) && !jsonData[c][18].includes(index) && c!=index)).length;
@@ -3580,9 +3584,10 @@ export default class syncPage extends Component {
         </TabPane>
         <TabPane tabId="4">
           <Row>
-            <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
+            <Col sm={12} md={12} className="pt-2" style={{ flexBasis: 'auto' }}>
               <Col md="12 pl-0" id="realmDiv">
-                <div className="table-responsive RemoveStriped consumptionDataEntryTable">
+                <div><h5 style={{color:"red"}}>{this.state.shipmentAlreadyLinkedToOtherProgCount>0?i18n.t("static.commitVersion.shipmentAlreadyLinkedToOtherProgram"):""}</h5></div>
+                <div className="table-responsive RemoveStriped consumptionDataEntryTable rightClickColors" style={{marginTop:"-30px"}}>
                   <div id="mergedVersionShipmentLinked" />
                 </div>
               </Col>
@@ -3826,7 +3831,7 @@ export default class syncPage extends Component {
                               active={this.state.activeTab[0] === '3'}
                               onClick={() => { this.toggle(0, '3'); }}
                             >
-                              {i18n.t('static.shipment.shipment')}
+                              {i18n.t('static.shipment.manualShipments')}
                             </NavLink>
                           </NavItem>
                           <NavItem>
@@ -3834,7 +3839,7 @@ export default class syncPage extends Component {
                               active={this.state.activeTab[0] === '4'}
                               onClick={() => { this.toggle(0, '4'); }}
                             >
-                              {i18n.t('static.commitVersion.linkedShipments')}
+                              {i18n.t('static.supplyPlan.erpShipments')}
                             </NavLink>
                           </NavItem>
                           <NavItem>
@@ -4883,8 +4888,7 @@ export default class syncPage extends Component {
                           openCount: 0,
                           addressedCount: 0,
                           programModified: 0,
-                          readonly: 0,
-                          doNotFollowLatestShipmentInfo:0
+                          readonly: 0
                         };
                         programIds.push(json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId);
                         var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);

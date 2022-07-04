@@ -885,7 +885,7 @@ export default class AddInventory extends Component {
                                         </div>
                                     </Form>
                                 )} />
-                        {(this.state.programQPLDetails.filter(c => c.id == this.state.programId)).length > 0 && (this.state.programQPLDetails.filter(c => c.id == this.state.programId))[0].readonly == 1 && <h5 style={{ color: 'red' }}>{(this.state.programQPLDetails.filter(c => c.id == this.state.programId))[0].doNotFollowLatestShipmentInfo == 1?i18n.t('static.dataEntry.doNotFollowLatestShipment'):i18n.t('static.dataentry.readonly')}</h5>}
+                        {(this.state.programQPLDetails.filter(c => c.id == this.state.programId)).length > 0 && (this.state.programQPLDetails.filter(c => c.id == this.state.programId))[0].readonly == 1 && <h5 style={{ color: 'red' }}>{i18n.t('static.dataentry.readonly')}</h5>}
                         <div className="col-md-10 pb-3">
                             <ul className="legendcommitversion">
                                 {/* <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyOrder')}</span></li> */}
@@ -1001,4 +1001,3 @@ export default class AddInventory extends Component {
         this.pickRange.current.show()
     }
 }
-
