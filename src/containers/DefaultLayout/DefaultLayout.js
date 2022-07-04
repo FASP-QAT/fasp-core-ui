@@ -1992,7 +1992,7 @@ class DefaultLayout extends Component {
                         // hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true)
                         // },
                         attributes: {
-                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_COMPARE_AND_SELECT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_MONTHLY_FORECAST')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECAST_SUMMARY')) || (this.state.businessFunctions.includes('ROLE_BF_COMPARE_VERSION')) || (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_FORECAST_ERROR'))) && this.state.activeTab == 1) ? false : true)
+                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_COMPARE_AND_SELECT')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_COMPARE_AND_SELECT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_MONTHLY_FORECAST')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECAST_SUMMARY')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_FORECAST_SUMMARY')) || (this.state.businessFunctions.includes('ROLE_BF_COMPARE_VERSION')) || (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_FORECAST_ERROR'))) && this.state.activeTab == 1) ? false : true)
                         },
                         children: [
                           // {
@@ -2007,7 +2007,7 @@ class DefaultLayout extends Component {
                             url: '/report/compareAndSelectScenario',
                             icon: 'fa fa-check-square-o',
                             attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_COMPARE_AND_SELECT') && this.state.activeTab == 1 ? false : true),
+                              hidden: ((((this.state.businessFunctions.includes('ROLE_BF_COMPARE_AND_SELECT')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_COMPARE_AND_SELECT'))) && this.state.activeTab == 1) ? false : true),
                               onClick: e => {
                                 this.refreshPage();
                               }
@@ -2031,7 +2031,7 @@ class DefaultLayout extends Component {
                             url: '/forecastReport/forecastSummary',
                             icon: 'fa fa-table',
                             attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECAST_SUMMARY') && this.state.activeTab == 1 ? false : true),
+                              hidden: ((((this.state.businessFunctions.includes('ROLE_BF_LIST_FORECAST_SUMMARY')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_FORECAST_SUMMARY'))) && this.state.activeTab == 1) ? false : true),
                               onClick: e => {
                                 this.refreshPage();
                               }
@@ -3512,7 +3512,7 @@ class DefaultLayout extends Component {
                         // hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true)
                         // },
                         attributes: {
-                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_COMPARE_AND_SELECT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_MONTHLY_FORECAST')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECAST_SUMMARY')) || (this.state.businessFunctions.includes('ROLE_BF_COMPARE_VERSION')) || (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_FORECAST_ERROR'))) && this.state.activeTab == 1) ? false : true)
+                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_COMPARE_AND_SELECT')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_COMPARE_AND_SELECT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_MONTHLY_FORECAST')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECAST_SUMMARY')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_FORECAST_SUMMARY')) || (this.state.businessFunctions.includes('ROLE_BF_COMPARE_VERSION')) || (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_FORECAST_ERROR'))) && this.state.activeTab == 1) ? false : true)
                         },
                         children: [
                           // {
@@ -3535,7 +3535,7 @@ class DefaultLayout extends Component {
                             url: '/report/compareAndSelectScenario',
                             icon: 'fa fa-check-square-o',
                             attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_COMPARE_AND_SELECT') && this.state.activeTab == 1 ? false : true),
+                              hidden: ((((this.state.businessFunctions.includes('ROLE_BF_COMPARE_AND_SELECT')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_COMPARE_AND_SELECT'))) && this.state.activeTab == 1) ? false : true),
                               onClick: e => {
                                 this.refreshPage();
                               }
@@ -3560,7 +3560,7 @@ class DefaultLayout extends Component {
                             url: '/forecastReport/forecastSummary',
                             icon: 'fa fa-pie-chart',
                             attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECAST_SUMMARY') && this.state.activeTab == 1 ? false : true),
+                              hidden: ((((this.state.businessFunctions.includes('ROLE_BF_LIST_FORECAST_SUMMARY')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_FORECAST_SUMMARY'))) && this.state.activeTab == 1) ? false : true),
                               onClick: e => {
                                 this.refreshPage();
                               }

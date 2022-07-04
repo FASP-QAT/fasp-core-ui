@@ -2069,7 +2069,7 @@ class CompareAndSelectScenario extends Component {
                                                     </tr> */}
                                                     {this.state.treeScenarioList.map((item, idx) => (
                                                         <tr id="addr0" style={{ backgroundColor: item.readonly ? "#CFCDC9" : this.state.selectedTreeScenarioId == item.id ? "#d1e3f5" : "" }}>
-                                                            <td align="center"><input style={{ width: "100%", height: "1.5em" }} type="radio" id="selectAsForecast" name="selectAsForecast" checked={this.state.selectedTreeScenarioId == item.id ? true : false} onClick={() => this.scenarioOrderChanged(item.id)} disabled={item.readonly}></input></td>
+                                                            <td align="center"><input style={{ width: "100%", height: "1.5em" }} type="radio" id="selectAsForecast" name="selectAsForecast" checked={this.state.selectedTreeScenarioId == item.id ? true : false} onClick={() => this.scenarioOrderChanged(item.id)} disabled={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_COMPARE_AND_SELECT')?item.readonly:true}></input></td>
                                                             <td align="center"><input type="checkbox" id={"scenarioCheckbox" + item.id} checked={item.checked} onChange={() => this.scenarioCheckedChanged(item.id)} disabled={item.readonly} /></td>
                                                             <td align="center" >{item.type == "T" ? i18n.t('static.forecastMethod.tree') : i18n.t('static.compareAndSelect.cons')}</td>
                                                             <td><i class="fa fa-circle" style={{ color: item.color }} aria-hidden="true"></i> {" "}{item.type == "T" ? getLabelText(item.tree.label, this.state.lang) + " - " + getLabelText(item.scenario.label, this.state.lang) : getLabelText(item.scenario.extrapolationMethod.label, this.state.lang)}{"  "}{item.readonly && <i class="fa fa-exclamation-triangle"></i>}</td>
@@ -2093,6 +2093,7 @@ class CompareAndSelectScenario extends Component {
                                                             id="forecastNotes"
                                                             value={this.state.forecastNotes}
                                                             onChange={(e) => { this.setForecastNotes(e); }}
+                                                            readOnly={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_COMPARE_AND_SELECT')?false:true}
                                                             bsSize="sm"
                                                         >
                                                         </Input>
@@ -2310,7 +2311,7 @@ class CompareAndSelectScenario extends Component {
                     <CardFooter>
                         <FormGroup>
                             <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                            {this.state.showAllData && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={this.submitScenario}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
+                            {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_COMPARE_AND_SELECT') && this.state.showAllData && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={this.submitScenario}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
                             &nbsp;
                         </FormGroup>
                     </CardFooter>

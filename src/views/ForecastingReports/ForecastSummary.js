@@ -1643,6 +1643,7 @@ class ForecastSummary extends Component {
                                         position: 'top',
                                         filters: true,
                                         onchange: this.forecastChanged,
+                                        editable:AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_LIST_FORECAST_SUMMARY')?true:false,
                                         onload: function (instance, cell, x, y, value) {
                                             jExcelLoadedFunctionOnlyHideRow(instance);
                                             var elInstance = instance.jexcel;

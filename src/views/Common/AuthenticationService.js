@@ -1341,7 +1341,7 @@ class AuthenticationService {
                         break;
                     case "/report/compareAndSelectScenario":
                     case "/report/compareAndSelectScenario/:programId/:planningUnitId/:regionId":
-                        if (bfunction.includes("ROLE_BF_COMPARE_AND_SELECT")) {
+                        if (bfunction.includes("ROLE_BF_COMPARE_AND_SELECT") || bfunction.includes("ROLE_BF_VIEW_COMPARE_AND_SELECT")) {
                             return true;
                         }
                         break;
@@ -1458,7 +1458,7 @@ class AuthenticationService {
 
                     case "/forecastReport/forecastSummary":
                     case "/forecastReport/forecastSummary/:programId/:versionId":
-                        if (bfunction.includes("ROLE_BF_LIST_FORECAST_SUMMARY")) {
+                        if (bfunction.includes("ROLE_BF_LIST_FORECAST_SUMMARY") || bfunction.includes("ROLE_BF_VIEW_FORECAST_SUMMARY")) {
                             return true;
                         }
                         break;
