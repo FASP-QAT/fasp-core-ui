@@ -707,6 +707,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 data[3] = papuList[j].multiplier
                 data[4] = papuList[j].forecastingUnit.id
                 data[5] = planningUnitObj != undefined ? planningUnitObj.forecastingUnit.tracerCategory.id : ""
+                // data[5] = papuList[j].forecastingUnit.tracerCategory.id
+
 
                 // let selectedForecastProgram = this.state.datasetList.filter(c => c.programId == document.getElementById("forecastProgramId").value && c.versionId == this.state.forecastProgramVersionId)[0];
                 // let filteredForecastingUnit = selectedForecastProgram.filteredForecastingUnit;
@@ -849,8 +851,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
 
                     var match = rowData[10];
-                    // console.log("addRowId------>", addRowId);
-                    if (match == 1) {// grade out
+                    if (match == 1 || rowData[1] == rowData[7]) {// grade out
                         var cell1 = elInstance.getCell(`J${parseInt(y) + 1}`)
                         cell1.classList.add('readonly');
                     } else {

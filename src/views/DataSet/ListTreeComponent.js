@@ -1303,7 +1303,7 @@ export default class ListTreeComponent extends Component {
         if (x == 0 && value != 0) {
             // console.log("HEADER SELECTION--------------------------");
         } else {
-            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE_TEMPLATE')) {
+            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE')) {
                 var treeId = this.el.getValueFromCoords(0, x);
                 var programId = this.el.getValueFromCoords(8, x);
                 console.log("programId>>>", programId);
@@ -1393,7 +1393,7 @@ export default class ListTreeComponent extends Component {
                                 </a>
                                 <Col md="12 pl-0 pr-lg-0">
                                     <div className="d-md-flex">
-                                        {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_TREE') &&
+                                        {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_TREE') && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') &&
                                             // <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.createTreeFromTemplate')}</Button>
                                             // <Col md="3" className="pl-0">
                                             <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
@@ -1408,7 +1408,7 @@ export default class ListTreeComponent extends Component {
                                                             className="addtreebg"
                                                             onChange={(e) => { this.onTemplateChange(e) }}
                                                         >
-                                                            <option value="">Select</option>
+                                                            <option value="">{i18n.t('static.tree.createOrSelect')}</option>
                                                             {/* <option value="">{i18n.t('static.tree.+AddTree')}</option> */}
                                                             <option value="0">+ {i18n.t('static.tree.blank')}</option>
                                                             {treeTemplates}
@@ -1509,7 +1509,7 @@ export default class ListTreeComponent extends Component {
                                 </div>
                                 <p>
                                     <p style={{ fontSize: '14px' }}><span className="UnderLineText">{i18n.t('static.listTree.purpose')} :</span> {i18n.t('static.listTree.enableUsersTo')} :</p>
-                                    <ul type="1">
+                                    <ol type="1">
                                         <li>{i18n.t('static.listTree.listExistingTree')}</li>
                                         <li> {i18n.t('static.listTree.editExistingTree')} </li>
                                         <li>{i18n.t('static.listTree.deleteDuplicateExistingTree')}</li>
@@ -1518,9 +1518,9 @@ export default class ListTreeComponent extends Component {
                                             <li>{i18n.t('static.listTree.manuallySelectAddTree')}</li>
                                             <li>{i18n.t('static.listTree.nameOfDesiredTemplate')}</li>
                                         </ul>
-                                   </ul>
+                                   </ol>
                                 </p>
-                                <p>Note: The table on this screen lists trees for each forecast program that has been loaded. </p>
+                                <p>{i18n.t('static.listTree.NoteTableOnListTree')} </p>
                                 <p>
                                     <p style={{ fontSize: '14px' }}><span className="UnderLineText">{i18n.t('static.listTree.useThisScreen')} :</span></p>
                                     <p className='pl-lg-4'>

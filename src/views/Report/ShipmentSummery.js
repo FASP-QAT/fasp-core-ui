@@ -58,7 +58,7 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 import ReportService from '../../api/ReportService';
 import ProgramService from '../../api/ProgramService';
-import {MultiSelect} from 'react-multi-select-component';
+import { MultiSelect } from 'react-multi-select-component';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 import { filter } from 'jszip';
@@ -2590,7 +2590,9 @@ class ShipmentSummery extends Component {
                                                     {this.state.shipmentDetailsList.length > 0 && <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyOrder')}</span></li>}
                                                 </ul>
                                             </FormGroup>
-                                            <div className="ShipmentSummeryReportMarginTop consumptionDataEntryTable" id="mytable2">
+                                            <div className="col-md-12 ShipmentSummeryReportMarginTop" id="mytable2">
+                                                {/* this.props.items is undefined that's why removed this style - Sonal */}
+                                                {/* <div id="shipmentDetailsListTableDiv" style={{ display: this.props.items.loading ? "none" : "block" }} className={document.getElementById("versionId") != null && document.getElementById("versionId").value.includes('Local') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} > */}
                                                 <div id="shipmentDetailsListTableDiv" className={document.getElementById("versionId") != null && document.getElementById("versionId").value.includes('Local') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} >
                                                 </div>
                                             </div>

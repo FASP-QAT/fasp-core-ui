@@ -202,7 +202,7 @@ class CompareAndSelectScenario extends Component {
             var colourArrayCount = 0;
             // var compareToConsumptionForecast = ["","","","22.7% above the highest consumption forecast.","7.9% below the lowest consumption forecast.","In between the highest and lowest consumption forecast."];
             var count = 0;
-            var consumptionExtrapolation = datasetJson.consumptionExtrapolation.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.active);
+            var consumptionExtrapolation = datasetJson.consumptionExtrapolation.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId);
             for (var ce = 0; ce < consumptionExtrapolation.length; ce++) {
                 if (colourArrayCount > 10) {
                     colourArrayCount = 0;
@@ -2318,39 +2318,39 @@ class CompareAndSelectScenario extends Component {
                 <Modal isOpen={this.state.showGuidance}
                     className={'modal-lg ' + this.props.className} >
                     <ModalHeader toggle={() => this.toggleShowGuidance()} className="ModalHead modal-info-Headher">
-                        <strong className="TextWhite">Show Guidance</strong>
+                        <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
                     </ModalHeader>
                     <div>
                         <ModalBody>
                            <div>
-                               <h3 className='ShowGuidanceHeading'>Compare and Select</h3>
+                               <h3 className='ShowGuidanceHeading'>{i18n.t('static.CompareSelect.CompareAndSelect')}</h3>
                            </div>
                             <p>
-                                <p style={{fontSize:'13px'}}><span className="UnderLineText">Purpose :</span> Enable users to compare all the available forecasts (from tree and consumption methods), and select their final forecast. In this screen, users select their forecasts one planning unit and region at a time. For selecting forecasts across multiple planning units and regions, use the <a href="/#/forecastReport/forecastSummary" target="_blank" style={{textDecoration:'underline'}}>Forecast Summary</a> screen.</p>
+                                <p style={{fontSize:'13px'}}><span className="UnderLineText">{i18n.t('static.listTree.purpose')} :</span> {i18n.t('static.CompareSelect.EnableUser')} <a href="/#/forecastReport/forecastSummary" target="_blank" style={{textDecoration:'underline'}}> {i18n.t('static.commitTree.forecastSummary')}</a> screen.</p>
                             </p>
                             <p style={{fontSize:'13px'}}>
-                                <p style={{fontSize:'13px'}}><span className="UnderLineText">Using this screen :</span></p>
-                                <ul style={{listStyle:'none'}}>
-                                   <li>1. Check to make sure all expected forecasts appear in the Compare & Select table. To add forecasts, navigate to the &nbsp;&nbsp;&nbsp;&nbsp;<a href='/#/dataset/listTree' target="_blank" style={{textDecoration:'underline'}}>Manage Tree</a> screen to build a tree forecast or the <a href='/#/Extrapolation/extrapolateData' target="_blank" style={{textDecoration:'underline'}}>Extrapolation</a> screen to build a consumption-based forecast. The <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>  &nbsp;&nbsp;&nbsp;&nbsp;symbol denotes that there is no forecast quantity available; the entire row will be gray and non-editable as there is nothing  &nbsp;&nbsp;&nbsp;&nbsp;to display or select.</li>
-                                   <li>2. Review available forecasts using the following information on the screen:
-                                       <ul style={{listStyle:'none'}}>
-                                           <li>a. <b>Forecast Error (%):</b> this error is calculated using the Weighted Absolute Percentage Error (WAPE) calculation. If the &nbsp;&nbsp;&nbsp;&nbsp;forecast error is highlighted in <span style={{color:'rgb(17, 139, 112)'}}>green text</span>, this forecast has the lowest forecast error out of the available forecasts.  &nbsp;&nbsp;&nbsp;&nbsp;Example WAPE calculation using the default 6-month time window:
+                                <p style={{fontSize:'13px'}}><span className="UnderLineText">{i18n.t('static.listTree.useThisScreen')}  :</span></p>
+                                <ol type='1'>
+                                   <li>{i18n.t('static.CompareSelect.ExpectedForecasts')} <a href='/#/dataset/listTree' target="_blank" style={{textDecoration:'underline'}}>{i18n.t('static.common.managetree')}</a> {i18n.t('static.CompareSelect.BuildForecast')} <a href='/#/Extrapolation/extrapolateData' target="_blank" style={{textDecoration:'underline'}}>{i18n.t('static.commitTree.extrapolation')}</a> {i18n.t('static.CompareSelect.BuildConsumption')} <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>  {i18n.t('static.CompareSelect.SymbolDenotes')}</li>
+                                   <li>{i18n.t('static.CompareSelect.ReviewAvailable')}
+                                       <ul type="a">
+                                           <li> <b>{i18n.t('static.CompareSelect.ForecastError')} (%):</b> {i18n.t('static.CompareSelect.ErrorCalculated')} <span style={{color:'rgb(17, 139, 112)'}}>{i18n.t('static.CompareSelect.GreenText')}</span>, {i18n.t('static.CompareSelect.LowestForecast')}
                                            <img className="img-fluid" src={forcasterror} /><br></br>
-                                           &nbsp;&nbsp;&nbsp;&nbsp;If 6 months of data is not available, QAT will utilize as many months as available and denote it in this column.
+                                           {i18n.t('static.CompareSelect.WillUtilize')} 
                                            </li>
-                                           <li>b. <b>Compare to Consumption Forecast:</b> QAT compares available Consumption Forecasts and Tree Forecasts. For  &nbsp;&nbsp;&nbsp;&nbsp;any Tree Forecasts, QAT will flag the percentage above the highest or below the lowest Consumption Forecast. The &nbsp;&nbsp;&nbsp;&nbsp;comparison will be highlighted in <span style={{color:'#BA0C2F'}}>red text</span> if it is outside of the threshold percentages set by the user in the <br></br> &nbsp;&nbsp;&nbsp;&nbsp; <a href='/#/dataset/versionSettings' target="_blank" style={{textDecoration:'underline'}}>Version Settings</a> screen.Assuming reliable actual consumption data, this comparison helps users determine if their  &nbsp;&nbsp;&nbsp;&nbsp;Tree Forecasts are realistic. </li>
-                                           <li>c. <b>Graph:</b> Visually compare the different forecasts. The selected forecast will appear <b>bolded.</b></li>
-                                           <li>d. <b>Tabular Data Table:</b> Compare the data between forecasts side-by-side by clicking the “Show Data” button below the &nbsp;&nbsp;&nbsp;&nbsp;graph. Any <b>bolded/<span style={{color:'#800080',fontStyle:'italic'}}>bolded italicized purple</span></b> data fall within the forecast period. </li>
+                                           <li> <b>{i18n.t('static.CompareSelect.CompareConsumptionForecast')}:</b> {i18n.t('static.CompareSelect.AvailableConsumption')} <span style={{color:'#BA0C2F'}}>{i18n.t('static.versionSettings.RedText')}</span> {i18n.t('static.CompareSelect.ThresholdPercentages')} <br></br>  <a href='/#/dataset/versionSettings' target="_blank" style={{textDecoration:'underline'}}>{i18n.t('static.versionSettings.versionSettings')}</a> {i18n.t('static.CompareSelect.AssumingReliable')} </li>
+                                           <li> <b>{i18n.t('static.CompareSelect.Graph')}:</b> {i18n.t('static.CompareSelect.VisuallyCompare')} <b>{i18n.t('static.CompareSelect.bolded')}.</b></li>
+                                           <li> <b>{i18n.t('static.CompareSelect.TabularData')}:</b> {i18n.t('static.CompareSelect.ForecastsSidebySide')} <b>{i18n.t('static.CompareSelect.bolded')}/<span style={{color:'#800080',fontStyle:'italic'}}>{i18n.t('static.CompareSelect.boldedItalicized')}</span></b> {i18n.t('static.CompareSelect.ForecastPeriod')} </li>
                                        </ul>
                                    </li>
-                                   <li>3.Select the final forecast in the Compare & Select table. Repeat steps 1-3 for each planning unit and region. Once completed, &nbsp;&nbsp;&nbsp;&nbsp;continue forward to the <a href='/#/forecastReport/forecastOutput' target="_blank" style={{textDecoration:'underline'}}>Monthly Forecasts</a> to verify all planning units together.</li>
-                               </ul>
+                                   <li>{i18n.t('static.CompareSelect.FinalForecast')} <a href='/#/forecastReport/forecastOutput' target="_blank" style={{textDecoration:'underline'}}>{i18n.t('static.dashboard.monthlyForecast')}</a> {i18n.t('static.CompareSelect.VerifyPlanningUnit')}</li>
+                               </ol>
                             </p>
                             <p style={{fontSize:'13px'}}>
-                            <span className="UnderLineText">Tips on Using the Graph & Tabular Data:</span>
+                            <span className="UnderLineText">{i18n.t('static.CompareSelect.TipsGraphAndTabular')}:</span>
                             <ul>
-                                <li>By default, QAT will display all available forecasts by Planning Unit and any actuals entered or imported from QAT Supply Planning module; however, a user may deselect the “Display?” checkbox for any forecasts in the top table if they do not wish to view it in the graph.  </li>
-                                <li>A user may view the graph in Forecasting Unit, Equivalency Unit, and for a specific period of time. If a user choses to “Show only Forecast Period,” the graph will display only the period of time the user chose as the forecast period in the <a href='/#/dataset/versionSettings' target="_blank" style={{textDecoration:'underline'}}>Version Settings</a> screen. </li>
+                                <li>{i18n.t('static.CompareSelect.ByDefault')}  </li>
+                                <li>{i18n.t('static.CompareSelect.ViewForecastingUnit')} <a href='/#/dataset/versionSettings' target="_blank" style={{textDecoration:'underline'}}>{i18n.t('static.versionSettings.versionSettings')}</a> screen. </li>
                             </ul>
                             </p>
                         </ModalBody>

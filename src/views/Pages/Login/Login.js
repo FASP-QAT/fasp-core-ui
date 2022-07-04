@@ -74,6 +74,7 @@ class Login extends Component {
       message: '',
       loading: false,
       apiVersion: '',
+      apiVersionForDisplay:'',
       dropdownOpen: new Array(19).fill(false),
       icon: AuthenticationService.getIconAndStaticLabel("icon"),
       staticLabel: AuthenticationService.getIconAndStaticLabel("label"),
@@ -242,19 +243,7 @@ class Login extends Component {
     // console.log("--------Going to call version api-----------")
     AuthenticationService.clearUserDetails()
     if (isSiteOnline()) {
-      LoginService.getApiVersion()
-        .then(response => {
-          // console.log("--------version api success----------->", response)
-          if (response != null && response != "") {
-            this.setState({
-              apiVersion: response.data.app.version
 
-            })
-            // console.log("response---", response.data.app.version)
-          }
-        }).catch(error => {
-          // console.log("--------version api error----------->", error)
-        })
     } else {
       console.log("############## Offline so can't fetch version #####################");
     }
@@ -262,6 +251,40 @@ class Login extends Component {
     console.log("timeout going to change language")
     this.getLanguageList();
     i18n.changeLanguage(AuthenticationService.getDefaultUserLanguage())
+    this.checkIfApiIsActive()
+  }
+
+  checkIfApiIsActive() {
+    var apiVersionForDisplay = "";
+    if (!isSiteOnline()) {
+      apiVersionForDisplay = "Offline"
+      setTimeout(function () {
+        this.checkIfApiIsActive();
+      }.bind(this), 10000);
+    } else {
+      LoginService.getApiVersion()
+        .then(response => {
+          // console.log("--------version api success----------->", response)
+          if (response != null && response != "") {
+            this.setState({
+              apiVersionForDisplay: response.data.app.version,
+              apiVersion:response.data.app.version,
+
+            },()=>{
+              setTimeout(function () {
+                this.checkIfApiIsActive();
+              }.bind(this), 10000);
+            })
+            // console.log("response---", response.data.app.version)
+          }
+        }).catch(error => {
+          // console.log("--------version api error----------->", error)
+        })
+    }
+    this.setState({
+      apiVersionForDisplay: apiVersionForDisplay
+    })
+
   }
 
   forgotPassword() {
@@ -569,7 +592,7 @@ class Login extends Component {
                   </div>
 
                 </CardGroup>
-                <h5 className="text-right versionColor">{i18n.t('static.common.version')}{APP_VERSION_REACT} | <Online polling={polling}>{this.state.apiVersion}</Online><Offline polling={polling}>Offline</Offline></h5>
+                <h5 className="text-right versionColor">{i18n.t('static.common.version')}{APP_VERSION_REACT} | {this.state.apiVersionForDisplay}</h5>
               </Col>
 
 

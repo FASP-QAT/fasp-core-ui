@@ -48,7 +48,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                 console.log("+++in data[i and z not equal", data[i].y, "Z------------>", z);
                 (instance.jexcel).setValueFromCoords(7, data[i].y, `=ROUND(F${parseInt(data[i].y) + 1}*G${parseInt(data[i].y) + 1},0)`, true);
                 var index = (instance.jexcel).getValue(`M${parseInt(data[i].y) + 1}`, true);
-                if (index == "" || index == null || index == undefined) {
+                if (index === "" || index == null || index == undefined) {
                     (instance.jexcel).setValueFromCoords(11, data[i].y, "", true);
                     (instance.jexcel).setValueFromCoords(12, data[i].y, -1, true);
                     (instance.jexcel).setValueFromCoords(13, data[i].y, 1, true);
@@ -67,7 +67,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
                 var index = (instance.jexcel).getValue(`D${parseInt(data[i].y) + 1}`, true);
-                if (index == "" || index == null || index == undefined) {
+                if (index === "" || index == null || index == undefined) {
                     var rowData = (instance.jexcel).getRowData(0);
                     (instance.jexcel).setValueFromCoords(3, data[i].y, 0, true);
                     (instance.jexcel).setValueFromCoords(4, data[i].y, rowData[4], true);

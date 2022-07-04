@@ -660,7 +660,7 @@ export default class PlanningUnitSetting extends Component {
             if (z != data[i].y) {
                 console.log("-----------------onPaste---------------------2");
                 var index = (instance.jexcel).getValue(`N${parseInt(data[i].y) + 1}`, true);
-                if (index == "" || index == null || index == undefined) {
+                if (index === "" || index == null || index == undefined) {
                     console.log("-----------------onPaste---------------------3");
                     // (instance.jexcel).setValueFromCoords(8, data[i].y, true, true);
                     (instance.jexcel).setValueFromCoords(2, data[i].y, true, true);

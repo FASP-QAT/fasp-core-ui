@@ -130,7 +130,7 @@ class EquivalancyUnit extends Component {
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
                 var index = (instance.jexcel).getValue(`G${parseInt(data[i].y) + 1}`, true);
-                if (index == "" || index == null || index == undefined) {
+                if (index === "" || index == null || index == undefined) {
                     (instance.jexcel).setValueFromCoords(0, data[i].y, 0, true);
                     (instance.jexcel).setValueFromCoords(8, data[i].y, 1, true);
                     (instance.jexcel).setValueFromCoords(9, data[i].y, 1, true);
@@ -1883,7 +1883,7 @@ class EquivalancyUnit extends Component {
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
                 var index = (instance.jexcel).getValue(`G${parseInt(data[i].y) + 1}`, true);
-                if (index == "" || index == null || index == undefined) {
+                if (index === "" || index == null || index == undefined) {
                     (instance.jexcel).setValueFromCoords(0, data[i].y, 0, true);
                     (instance.jexcel).setValueFromCoords(8, data[i].y, true, true);
                     (instance.jexcel).setValueFromCoords(11, data[i].y, 1, true);
@@ -2934,29 +2934,25 @@ class EquivalancyUnit extends Component {
                     <Modal isOpen={this.state.showGuidance}
 className={'modal-lg ' + this.props.className} >
 <ModalHeader toggle={() => this.toggleShowGuidance()} className="ModalHead modal-info-Headher">
-    <strong className="TextWhite">Show Guidance</strong>
+    <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
 </ModalHeader>
 <div>
     <ModalBody>
        <div>
-           <h3 className='ShowGuidanceHeading'>Equivalency Unit</h3>
+           <h3 className='ShowGuidanceHeading'>{i18n.t('static.equivalancyUnit.equivalancyUnits')}</h3>
        </div>
         <p>
-            <p style={{fontSize:'13px'}}><span className="UnderLineText">Purpose :</span> Enable users manage Equivalency Units. Equivalency Units (EUs) allow users to aggregate data across products that are different, but related. 
-            <ul>
-                <li><b>Regional View:</b>  Use this view to see your forecast across planning units and regions. Directly update the forecast method for every region-planning unit combination and add notes in the table, if desired. Forecast selections can also be updated in the '<a href='/#/report/compareAndSelectScenario' target="_blank" style={{textDecoration:'underline'}}>Compare and Select Forecast</a>' screen.</li>
-                <li><b>National View:</b> Use this view to see your forecast at a <span style={{textDecoration:'underline'}}>national level</span> and evaluate your <span style={{textDecoration:'underline'}}>procurement surplus or gaps</span>. </li>
-            </ul>
+            <p style={{fontSize:'13px'}}><span className="UnderLineText">{i18n.t('static.listTree.purpose')} :</span> {i18n.t('static.equivalancyUnit.EnableUser')}
             </p>
         </p>
         <p style={{fontSize:'13px'}}>
-            <p style={{fontSize:'13px'}}><span className="UnderLineText">Using this screen:</span><br></br>
-            <b>Mapping equivalency units to forecasting units</b><br></br>
-            Use the main screen to manage mappings between equivalency units and forecasting units. Realm-level mappings are available to all users and are indicated by "All". However, program admins can create program-specific mappings (by adding a row and tagging it to a specific EU). If there are any conflicts, program-specific mappings will take precedence and be used instead of realm-level mappings.
+            <p style={{fontSize:'13px'}}><span className="UnderLineText">{i18n.t('static.listTree.useThisScreen')}:</span><br></br>
+            <b>{i18n.t('static.equivalancyUnit.MappingEquivalency')}</b><br></br>
+            {i18n.t('static.equivalancyUnit.ManageMappings')} {i18n.t('static.equivalancyUnit.ProgramAdmins')}
             </p>
         </p>
         <p>
-        For example, a user is forecasting medicines to treat QATitis, a condition where people cannot stop using QAT. The user may forecast by different treatments (different forecasting units) but want to see how they are aggregated together. 
+        {i18n.t('static.equivalancyUnit.ForecastingMedicines')}
         <table className="table table-bordered ">
                                 <thead>
                                 <tr>
@@ -3007,14 +3003,14 @@ className={'modal-lg ' + this.props.className} >
                                 </table>
         </p>
         <p style={{fontSize:'13px'}}>
-        <b>Creating and managing equivalency units  </b><br></br>
-        If you don't see an equivalency unit that you would like to map or you would like to edit an existing equivalency unit, click on the "Manage Equivalency Unit" button in top right of the screen. 
+        <b>{i18n.t('static.equivalancyUnit.CreatingManaging')}  </b><br></br>
+        {i18n.t('static.equivalancyUnit.ExistingEquivalency')}
          </p>
         <p>
-        <b>Where are equivalency units used?</b>
+        <b>{i18n.t('static.equivalancyUnit.EquivalencyUsed')}</b>
         <ul>
-            <li>In the '<a href="/#/report/compareAndSelectScenario" target="_blank" style={{textDecoration:'underline'}}>Compare and Select</a>' screen, the user can display their forecasts in EUs. Using the example above, a user that forecasts 10,000 bars of dark chocolate per month, could elect to display their forecast in the EU of “Treatments for QATitis” and display their forecast as 5,000 “Treatments for QATitis” per month instead. </li>
-            <li>In the '<a href="/#/forecastReport/forecastOutput" target="_blank" style={{textDecoration:'underline'}}>Monthly Forecast</a>' screen, the user can display their selected forecasts by individual planning units, or aggregate across planning units if they are connected by EUs. For example, if a user forecasted 10,000 bars of dark chocolate, and 10,000 bars of white chocolate and 14,000 per month, QAT would display 7,000 "Treatments for QATitis".</li>
+            <li>{i18n.t('static.equivalancyUnit.InThe')} '<a href="/#/report/compareAndSelectScenario" target="_blank" style={{textDecoration:'underline'}}>{i18n.t('static.dashboard.compareAndSelect')}</a>' {i18n.t('static.equivalancyUnit.ForecastsInEUs')} {i18n.t('static.equivalancyUnit.DisplayTheirForecast')} </li>
+            <li>{i18n.t('static.equivalancyUnit.InThe')} '<a href="/#/forecastReport/forecastOutput" target="_blank" style={{textDecoration:'underline'}}>{i18n.t('static.dashboard.monthlyForecast')}</a>' {i18n.t('static.equivalancyUnit.SelectedForecasts')} {i18n.t('static.equivalancyUnit.UserForecasted')}</li>
         </ul>
         </p>
         <p>

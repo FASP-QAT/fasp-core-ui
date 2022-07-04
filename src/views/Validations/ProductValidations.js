@@ -440,8 +440,7 @@ class ProductValidation extends Component {
                 // selectedText = this.state.currentItemConfig.parentItem.payload.nodeUnit.label.label_en
                 selectedText = getLabelText(unitList.filter(c=>c.unitId==nodeDataList.filter(c => c.flatItem.id == finalData[i].parentNodeFlatItem.parent)[0].flatItem.payload.nodeUnit.id)[0].label, this.state.lang);
                 // console.log("+++UNit Label", getLabelText(nodeDataList.filter(c => c.flatItem.id == finalData[i].parentNodeFlatItem.parent)[0].flatItem.payload.nodeUnit.label, this.state.lang));
-                var unitListFilterForFu = this.state.unitList.filter(c => c.unitId == finalData[i].parentNodeNodeDataMap.fuNode.forecastingUnit.unit.id);
-                selectedText1 = getLabelText(unitListFilterForFu[0].label, this.state.lang);
+                selectedText1 = getLabelText(unitList.filter(c=>c.unitId==nodeDataList.filter(c => c.flatItem.id == finalData[i].parentNodeFlatItem.parent)[0].flatItem.payload.nodeUnit.id)[0].label, this.state.lang)
                 if (finalData[i].parentNodeNodeDataMap.fuNode.usageType.id == 2 || finalData[i].parentNodeNodeDataMap.fuNode.oneTimeUsage != "true") {
                     console.log("finalData[i].parentNodeNodeDataMap.fuNode+++", finalData[i].parentNodeNodeDataMap.fuNode)
                     var upListFiltered = this.state.upList.filter(c => c.usagePeriodId == finalData[i].parentNodeNodeDataMap.fuNode.usagePeriod.usagePeriodId);
@@ -502,15 +501,16 @@ class ProductValidation extends Component {
                         if (finalData[i].nodeDataMap.puNode.sharePlanningUnit == "true") {
                             sharePu = (noOfMonthsInUsagePeriod / finalData[i].nodeDataMap.puNode.planningUnit.multiplier);
                         } else {
-                            sharePu = Math.round((noOfMonthsInUsagePeriod / finalData[i].nodeDataMap.puNode.planningUnit.multiplier));
+                            sharePu = this.round((noOfMonthsInUsagePeriod / finalData[i].nodeDataMap.puNode.planningUnit.multiplier));
                         }
                         usageTextPU = i18n.t('static.tree.forEach') + " " + selectedText + " " + i18n.t('static.tree.weNeed') + " " + sharePu + " " + planningUnit;
                     } else {
                         console.log("finalData[i].parentNodeNodeDataMap.fuNode.noOfForecastingUnitsPerPerson+++", finalData[i].parentNodeNodeDataMap.fuNode.noOfForecastingUnitsPerPerson);
                         console.log("noOfMonthsInUsagePeriod+++", noOfMonthsInUsagePeriod);
                         console.log("finalData[i].nodeDataMap.puNode.refillMonths+++", finalData[i].nodeDataMap.puNode.refillMonths);
-                        var puPerInterval = (((finalData[i].parentNodeNodeDataMap.fuNode.noOfForecastingUnitsPerPerson / noOfMonthsInUsagePeriod) / finalData[i].nodeDataMap.puNode.planningUnit.multiplier) / finalData[i].nodeDataMap.puNode.refillMonths);
+                        var puPerInterval = finalData[i].nodeDataMap.puNode.puPerVisit;
                         console.log("puPerInterval###", puPerInterval);
+
                         usageTextPU = i18n.t('static.tree.forEach') + " " + selectedText + " " + i18n.t('static.tree.weNeed') + " " + this.addCommas(this.round(puPerInterval)) + " " + planningUnit + " " + i18n.t('static.usageTemplate.every') + " " + finalData[i].nodeDataMap.puNode.refillMonths + " " + i18n.t('static.report.month');
                     }
                     var currency = this.state.currencyList.filter(c => c.id == this.state.currencyId)[0];
@@ -521,6 +521,9 @@ class ProductValidation extends Component {
                         price = Number(selectedPlanningUnit[0].price);
                     }
                     var qty = Number(finalData[i].nodeDataMap.puNode.puPerVisit);
+                    if(finalData[i].parentNodeNodeDataMap.fuNode.usageType.id == 2){
+                        qty=Number(qty)/Number(finalData[i].nodeDataMap.puNode.refillMonths)
+                    }
 
                     // if (finalData[i].parentNodeNodeDataMap.fuNode.usageType.id == 1) {
                     //     cost = (sharePu * price) / currency.conversionRateToUsd;
