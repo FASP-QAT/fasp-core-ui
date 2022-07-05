@@ -1452,7 +1452,7 @@ export default class RealmCountryPlanningUnitList extends Component {
                             <div className="pl-0">
                                 <div className="row">
 
-                                    <FormGroup className="col-md-3">
+                                    <FormGroup className="col-md-3 pt-2">
                                         <Label htmlFor="programIds">{i18n.t('static.program.program')}</Label>
                                         <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
 

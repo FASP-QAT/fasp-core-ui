@@ -1284,116 +1284,116 @@ export default class EditProcurementUnit extends Component {
                                         setTouched
                                     }) => (
 
-                                            <Form onSubmit={handleSubmit} noValidate name='procurementUnitForm' autocomplete="off">
-                                                {/* <CardHeader>
+                                        <Form onSubmit={handleSubmit} noValidate name='procurementUnitForm' autocomplete="off">
+                                            {/* <CardHeader>
                                                     <strong>{i18n.t('static.common.editEntity', { entityname })}</strong>
                                                 </CardHeader> */}
-                                                <CardBody className="pb-0" style={{ display: this.state.loading ? "none" : "block" }}>
-                                                    <FormGroup>
-                                                        <Label htmlFor="select">{i18n.t('static.procurementUnit.planningUnit')}<span class="red Reqasterisk">*</span></Label>
-                                                        <Input
-                                                            value={getLabelText(this.state.procurementUnit.planningUnit.label, this.state.lang)}
-                                                            bsSize="sm"
-                                                            valid={!errors.planningUnitId}
-                                                            invalid={touched.planningUnitId && !!errors.planningUnitId}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            disabled
-                                                            type="text"
-                                                            name="planningUnitId" id="planningUnitId">
-                                                        </Input>
-                                                        <FormFeedback>{errors.planningUnitId}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label htmlFor="procurementUnit">{i18n.t('static.procurementUnit.procurementUnit')}<span class="red Reqasterisk">*</span></Label>
-                                                        <Input
-                                                            type="text" name="procurementUnitName"
-                                                            valid={!errors.procurementUnitName}
-                                                            bsSize="sm"
-                                                            // invalid={touched.procurementUnitName && !!errors.procurementUnitName || this.state.procurementUnit.label.label_en == ''}
-                                                            invalid={touched.procurementUnitName && !!errors.procurementUnitName || !!errors.procurementUnitName}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.procurementUnit.label.label_en}
-                                                            id="procurementUnitName" />
-                                                        <FormFeedback className="red">{errors.procurementUnitName}</FormFeedback>
-                                                    </FormGroup>
+                                            <CardBody className="pb-0" style={{ display: this.state.loading ? "none" : "block" }}>
+                                                <FormGroup>
+                                                    <Label htmlFor="select">{i18n.t('static.procurementUnit.planningUnit')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Input
+                                                        value={getLabelText(this.state.procurementUnit.planningUnit.label, this.state.lang)}
+                                                        bsSize="sm"
+                                                        valid={!errors.planningUnitId}
+                                                        invalid={touched.planningUnitId && !!errors.planningUnitId}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        onBlur={handleBlur}
+                                                        disabled
+                                                        type="text"
+                                                        name="planningUnitId" id="planningUnitId">
+                                                    </Input>
+                                                    <FormFeedback>{errors.planningUnitId}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label htmlFor="procurementUnit">{i18n.t('static.procurementUnit.procurementUnit')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Input
+                                                        type="text" name="procurementUnitName"
+                                                        valid={!errors.procurementUnitName}
+                                                        bsSize="sm"
+                                                        // invalid={touched.procurementUnitName && !!errors.procurementUnitName || this.state.procurementUnit.label.label_en == ''}
+                                                        invalid={touched.procurementUnitName && !!errors.procurementUnitName || !!errors.procurementUnitName}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.procurementUnit.label.label_en}
+                                                        id="procurementUnitName" />
+                                                    <FormFeedback className="red">{errors.procurementUnitName}</FormFeedback>
+                                                </FormGroup>
 
-                                                    <FormGroup>
-                                                        <Label htmlFor="multiplier">{i18n.t('static.procurementUnit.multiplier')}<span class="red Reqasterisk">*</span></Label>
-                                                        <Input
-                                                            type="number" name="multiplier" valid={!errors.multiplier}
-                                                            bsSize="sm"
-                                                            invalid={touched.multiplier && !!errors.multiplier || this.state.procurementUnit.multiplier == ''}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.procurementUnit.multiplier}
-                                                            id="multiplier" />
-                                                        <FormFeedback className="red">{errors.multiplier}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label htmlFor="select">{i18n.t('static.procurementUnit.unit')}<span class="red Reqasterisk">*</span></Label>
-                                                        <Input
-                                                            bsSize="sm"
-                                                            valid={!errors.unitId}
-                                                            invalid={touched.unitId && !!errors.unitId || this.state.procurementUnit.unit.id == ''}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.procurementUnit.unit.id}
-                                                            type="select" name="unitId" id="unitId">
-                                                            <option value="">{i18n.t('static.common.select')}</option>
-                                                            {units}
-                                                        </Input>
-                                                        <FormFeedback>{errors.unitId}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label htmlFor="select">{i18n.t('static.procurementUnit.supplier')}<span class="red Reqasterisk">*</span></Label>
-                                                        <Input
-                                                            value={getLabelText(this.state.procurementUnit.supplier.label, this.state.lang)}
-                                                            bsSize="sm"
-                                                            valid={!errors.supplierId}
-                                                            invalid={touched.supplierId && !!errors.supplierId}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            disabled
-                                                            type="text"
-                                                            name="supplierId" id="supplierId">
-                                                        </Input>
-                                                        <FormFeedback>{errors.supplierId}</FormFeedback>
-                                                    </FormGroup>
+                                                <FormGroup>
+                                                    <Label htmlFor="multiplier">{i18n.t('static.procurementUnit.multiplier')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Input
+                                                        type="number" name="multiplier" valid={!errors.multiplier}
+                                                        bsSize="sm"
+                                                        invalid={touched.multiplier && !!errors.multiplier || this.state.procurementUnit.multiplier == ''}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.procurementUnit.multiplier}
+                                                        id="multiplier" />
+                                                    <FormFeedback className="red">{errors.multiplier}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label htmlFor="select">{i18n.t('static.procurementUnit.unit')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Input
+                                                        bsSize="sm"
+                                                        valid={!errors.unitId}
+                                                        invalid={touched.unitId && !!errors.unitId || this.state.procurementUnit.unit.id == ''}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.procurementUnit.unit.id}
+                                                        type="select" name="unitId" id="unitId">
+                                                        <option value="">{i18n.t('static.common.select')}</option>
+                                                        {units}
+                                                    </Input>
+                                                    <FormFeedback>{errors.unitId}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label htmlFor="select">{i18n.t('static.procurementUnit.supplier')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Input
+                                                        value={getLabelText(this.state.procurementUnit.supplier.label, this.state.lang)}
+                                                        bsSize="sm"
+                                                        valid={!errors.supplierId}
+                                                        invalid={touched.supplierId && !!errors.supplierId}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        onBlur={handleBlur}
+                                                        disabled
+                                                        type="text"
+                                                        name="supplierId" id="supplierId">
+                                                    </Input>
+                                                    <FormFeedback>{errors.supplierId}</FormFeedback>
+                                                </FormGroup>
 
-                                                    <FormGroup>
-                                                        <Label htmlFor="select">{i18n.t('static.procurementUnit.lengthUnit')}</Label>
-                                                        <Input
-                                                            bsSize="sm"
-                                                            valid={!errors.lengthUnitId && this.state.procurementUnit.lengthUnit.id != ''}
-                                                            // invalid={touched.lengthUnitId && !!errors.lengthUnitId || this.state.procurementUnit.lengthUnit.id == ''}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.procurementUnit.lengthUnit.id}
+                                                <FormGroup>
+                                                    <Label htmlFor="select">{i18n.t('static.procurementUnit.lengthUnit')}</Label>
+                                                    <Input
+                                                        bsSize="sm"
+                                                        valid={!errors.lengthUnitId && this.state.procurementUnit.lengthUnit.id != ''}
+                                                        // invalid={touched.lengthUnitId && !!errors.lengthUnitId || this.state.procurementUnit.lengthUnit.id == ''}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.procurementUnit.lengthUnit.id}
 
-                                                            type="select" name="lengthUnitId" id="lengthUnitId">
-                                                            <option value="">{i18n.t('static.common.select')}</option>
-                                                            {units}
-                                                        </Input>
-                                                        <FormFeedback>{errors.lengthUnitId}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label htmlFor="lengthQty">{i18n.t('static.procurementUnit.lengthQty')}</Label>
-                                                        <Input
-                                                            type="number" name="lengthQty"
-                                                            bsSize="sm"
-                                                            valid={!errors.lengthQty && this.state.procurementUnit.lengthQty >= 0}
-                                                            // invalid={(touched.lengthQty && !!errors.lengthQty) || (this.state.procurementUnit.lengthQty < 0 || (this.state.procurementUnit.lengthQty).toString() == '')}
-                                                            invalid={(touched.lengthQty && !!errors.lengthQty) || !!errors.lengthQty}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.procurementUnit.lengthQty}
-                                                            id="lengthQty" />
-                                                        <FormFeedback className="red">{errors.lengthQty}</FormFeedback>
-                                                    </FormGroup>
+                                                        type="select" name="lengthUnitId" id="lengthUnitId">
+                                                        <option value="">{i18n.t('static.common.select')}</option>
+                                                        {units}
+                                                    </Input>
+                                                    <FormFeedback>{errors.lengthUnitId}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label htmlFor="lengthQty">{i18n.t('static.procurementUnit.lengthQty')}</Label>
+                                                    <Input
+                                                        type="number" name="lengthQty"
+                                                        bsSize="sm"
+                                                        valid={!errors.lengthQty && this.state.procurementUnit.lengthQty >= 0}
+                                                        // invalid={(touched.lengthQty && !!errors.lengthQty) || (this.state.procurementUnit.lengthQty < 0 || (this.state.procurementUnit.lengthQty).toString() == '')}
+                                                        invalid={(touched.lengthQty && !!errors.lengthQty) || !!errors.lengthQty}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.procurementUnit.lengthQty}
+                                                        id="lengthQty" />
+                                                    <FormFeedback className="red">{errors.lengthQty}</FormFeedback>
+                                                </FormGroup>
 
-                                                    {/* <FormGroup>
+                                                {/* <FormGroup>
                                                         <Label htmlFor="select">{i18n.t('static.procurementUnit.heightUnit')}</Label>
                                                         <Input
                                                             bsSize="sm"
@@ -1409,22 +1409,22 @@ export default class EditProcurementUnit extends Component {
                                                         <FormFeedback>{errors.heightUnitId}</FormFeedback>
                                                     </FormGroup> */}
 
-                                                    <FormGroup>
-                                                        <Label htmlFor="heightQty">{i18n.t('static.procurementUnit.heightQty')}</Label>
-                                                        <Input
-                                                            type="number" name="heightQty"
-                                                            bsSize="sm"
-                                                            valid={!errors.heightQty && this.state.procurementUnit.heightQty >= 0}
-                                                            // invalid={(touched.heightQty && !!errors.heightQty) || (this.state.procurementUnit.heightQty < 0 || (this.state.procurementUnit.heightQty).toString() == '')}
-                                                            invalid={(touched.heightQty && !!errors.heightQty) || !!errors.heightQty}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.procurementUnit.heightQty}
-                                                            id="heightQty" />
-                                                        <FormFeedback className="red">{errors.heightQty}</FormFeedback>
-                                                    </FormGroup>
+                                                <FormGroup>
+                                                    <Label htmlFor="heightQty">{i18n.t('static.procurementUnit.heightQty')}</Label>
+                                                    <Input
+                                                        type="number" name="heightQty"
+                                                        bsSize="sm"
+                                                        valid={!errors.heightQty && this.state.procurementUnit.heightQty >= 0}
+                                                        // invalid={(touched.heightQty && !!errors.heightQty) || (this.state.procurementUnit.heightQty < 0 || (this.state.procurementUnit.heightQty).toString() == '')}
+                                                        invalid={(touched.heightQty && !!errors.heightQty) || !!errors.heightQty}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.procurementUnit.heightQty}
+                                                        id="heightQty" />
+                                                    <FormFeedback className="red">{errors.heightQty}</FormFeedback>
+                                                </FormGroup>
 
-                                                    {/* <FormGroup>
+                                                {/* <FormGroup>
                                                         <Label htmlFor="select">{i18n.t('static.procurementUnit.widthUnit')}</Label>
                                                         <Input
                                                             bsSize="sm"
@@ -1439,207 +1439,207 @@ export default class EditProcurementUnit extends Component {
                                                         </Input>
                                                         <FormFeedback>{errors.widthUnitId}</FormFeedback>
                                                     </FormGroup> */}
-                                                    <FormGroup>
-                                                        <Label htmlFor="widthQty">{i18n.t('static.procurementUnit.widthQty')}</Label>
-                                                        <Input
-                                                            type="number" name="widthQty"
-                                                            bsSize="sm"
-                                                            valid={!errors.widthQty && this.state.procurementUnit.widthQty >= 0}
-                                                            // invalid={(touched.widthQty && !!errors.widthQty) || (this.state.procurementUnit.widthQty < 0 || (this.state.procurementUnit.widthQty).toString() == '')}
-                                                            invalid={(touched.widthQty && !!errors.widthQty) || !!errors.widthQty}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.procurementUnit.widthQty}
-                                                            id="widthQty" />
-                                                        <FormFeedback className="red">{errors.widthQty}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label htmlFor="select">{i18n.t('static.procurementUnit.weightUnit')}</Label>
-                                                        <Input
-                                                            bsSize="sm"
-                                                            valid={!errors.weightUnitId && this.state.procurementUnit.weightUnit.id != ''}
-                                                            // invalid={touched.weightUnitId && !!errors.weightUnitId || this.state.procurementUnit.weightUnit.id == ''}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.procurementUnit.weightUnit.id}
-                                                            type="select" name="weightUnitId" id="weightUnitId">
-                                                            <option value="">{i18n.t('static.common.select')}</option>
-                                                            {units}
-                                                        </Input>
-                                                        <FormFeedback>{errors.weightUnitId}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label htmlFor="weightQty">{i18n.t('static.procurementUnit.weightQty')}</Label>
-                                                        <Input
-                                                            type="number" name="weightQty"
-                                                            bsSize="sm"
-                                                            valid={!errors.weightQty && this.state.procurementUnit.weightQty >= 0}
-                                                            // invalid={(touched.weightQty && !!errors.weightQty) || (this.state.procurementUnit.weightQty < 0 || (this.state.procurementUnit.weightQty).toString() == '')}
-                                                            invalid={(touched.weightQty && !!errors.weightQty) || !!errors.weightQty}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.procurementUnit.weightQty}
-                                                            id="weightQty" />
-                                                        <FormFeedback className="red">{errors.weightQty}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label htmlFor="select">{i18n.t('static.procurementUnit.volumeUnit')}</Label>
-                                                        <Input
-                                                            bsSize="sm"
-                                                            valid={!errors.volumeUnitId && this.state.procurementUnit.volumeUnit.id != ''}
-                                                            // invalid={touched.weightUnitId && !!errors.weightUnitId || this.state.procurementUnit.weightUnit.id == ''}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.procurementUnit.volumeUnit.id}
-                                                            type="select" name="volumeUnitId" id="volumeUnitId">
-                                                            <option value="">{i18n.t('static.common.select')}</option>
-                                                            {units}
-                                                        </Input>
-                                                        <FormFeedback>{errors.volumeUnitId}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label htmlFor="volumeQty">{i18n.t('static.procurementUnit.volumeQty')}</Label>
-                                                        <Input
-                                                            type="number" name="volumeQty"
-                                                            bsSize="sm"
-                                                            valid={!errors.volumeQty && this.state.procurementUnit.volumeQty >= 0}
-                                                            // invalid={(touched.volumeQty && !!errors.volumeQty) || (this.state.procurementUnit.volumeQty < 0 || (this.state.procurementUnit.volumeQty).toString() == '')}
-                                                            invalid={(touched.volumeQty && !!errors.volumeQty) || !!errors.volumeQty}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.procurementUnit.volumeQty}
-                                                            id="volumeQty" />
-                                                        <FormFeedback className="red">{errors.volumeQty}</FormFeedback>
-                                                    </FormGroup>
+                                                <FormGroup>
+                                                    <Label htmlFor="widthQty">{i18n.t('static.procurementUnit.widthQty')}</Label>
+                                                    <Input
+                                                        type="number" name="widthQty"
+                                                        bsSize="sm"
+                                                        valid={!errors.widthQty && this.state.procurementUnit.widthQty >= 0}
+                                                        // invalid={(touched.widthQty && !!errors.widthQty) || (this.state.procurementUnit.widthQty < 0 || (this.state.procurementUnit.widthQty).toString() == '')}
+                                                        invalid={(touched.widthQty && !!errors.widthQty) || !!errors.widthQty}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.procurementUnit.widthQty}
+                                                        id="widthQty" />
+                                                    <FormFeedback className="red">{errors.widthQty}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label htmlFor="select">{i18n.t('static.procurementUnit.weightUnit')}</Label>
+                                                    <Input
+                                                        bsSize="sm"
+                                                        valid={!errors.weightUnitId && this.state.procurementUnit.weightUnit.id != ''}
+                                                        // invalid={touched.weightUnitId && !!errors.weightUnitId || this.state.procurementUnit.weightUnit.id == ''}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.procurementUnit.weightUnit.id}
+                                                        type="select" name="weightUnitId" id="weightUnitId">
+                                                        <option value="">{i18n.t('static.common.select')}</option>
+                                                        {units}
+                                                    </Input>
+                                                    <FormFeedback>{errors.weightUnitId}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label htmlFor="weightQty">{i18n.t('static.procurementUnit.weightQty')}</Label>
+                                                    <Input
+                                                        type="number" name="weightQty"
+                                                        bsSize="sm"
+                                                        valid={!errors.weightQty && this.state.procurementUnit.weightQty >= 0}
+                                                        // invalid={(touched.weightQty && !!errors.weightQty) || (this.state.procurementUnit.weightQty < 0 || (this.state.procurementUnit.weightQty).toString() == '')}
+                                                        invalid={(touched.weightQty && !!errors.weightQty) || !!errors.weightQty}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.procurementUnit.weightQty}
+                                                        id="weightQty" />
+                                                    <FormFeedback className="red">{errors.weightQty}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label htmlFor="select">{i18n.t('static.procurementUnit.volumeUnit')}</Label>
+                                                    <Input
+                                                        bsSize="sm"
+                                                        valid={!errors.volumeUnitId && this.state.procurementUnit.volumeUnit.id != ''}
+                                                        // invalid={touched.weightUnitId && !!errors.weightUnitId || this.state.procurementUnit.weightUnit.id == ''}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.procurementUnit.volumeUnit.id}
+                                                        type="select" name="volumeUnitId" id="volumeUnitId">
+                                                        <option value="">{i18n.t('static.common.select')}</option>
+                                                        {units}
+                                                    </Input>
+                                                    <FormFeedback>{errors.volumeUnitId}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label htmlFor="volumeQty">{i18n.t('static.procurementUnit.volumeQty')}</Label>
+                                                    <Input
+                                                        type="number" name="volumeQty"
+                                                        bsSize="sm"
+                                                        valid={!errors.volumeQty && this.state.procurementUnit.volumeQty >= 0}
+                                                        // invalid={(touched.volumeQty && !!errors.volumeQty) || (this.state.procurementUnit.volumeQty < 0 || (this.state.procurementUnit.volumeQty).toString() == '')}
+                                                        invalid={(touched.volumeQty && !!errors.volumeQty) || !!errors.volumeQty}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.procurementUnit.volumeQty}
+                                                        id="volumeQty" />
+                                                    <FormFeedback className="red">{errors.volumeQty}</FormFeedback>
+                                                </FormGroup>
 
-                                                    <FormGroup>
-                                                        <Label htmlFor="labeling">{i18n.t('static.procurementUnit.labeling')}</Label>
-                                                        <Input
-                                                            type="text" name="labeling" valid={!errors.labeling && this.state.procurementUnit.labeling != ''}
-                                                            bsSize="sm"
-                                                            // invalid={touched.labeling && !!errors.labeling || this.state.procurementUnit.labeling == ''}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.procurementUnit.labeling}
-                                                            id="labeling" />
-                                                        <FormFeedback className="red">{errors.labeling}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label htmlFor="unitsPerCase">{i18n.t('static.procurementUnit.unitsPerCase')}</Label>
-                                                        <Input
-                                                            type="number" name="unitsPerCase" valid={!errors.unitsPerCase}
-                                                            bsSize="sm"
-                                                            valid={!errors.unitsPerCase && this.state.procurementUnit.unitsPerCase >= 0}
-                                                            // invalid={(touched.unitsPerCase && !!errors.unitsPerCase) || (this.state.procurementUnit.unitsPerCase < 0 || (this.state.procurementUnit.unitsPerCase).toString() == '')}
-                                                            invalid={(touched.unitsPerCase && !!errors.unitsPerCase) || !!errors.unitsPerCase}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.procurementUnit.unitsPerCase}
-                                                            id="unitsPerCase" />
-                                                        <FormFeedback className="red">{errors.unitsPerCase}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label htmlFor="unitsPerPalletEuro1">{i18n.t('static.procurementUnit.unitsPerPalletEuro1')}</Label>
-                                                        <Input
-                                                            type="number" name="unitsPerPalletEuro1" valid={!errors.unitsPerPalletEuro1}
-                                                            bsSize="sm"
-                                                            valid={!errors.unitsPerPalletEuro1 && this.state.procurementUnit.unitsPerPalletEuro1 >= 0}
-                                                            // invalid={(touched.unitsPerPalletEuro1 && !!errors.unitsPerPalletEuro1) || (this.state.procurementUnit.unitsPerPalletEuro1 < 0 || (this.state.procurementUnit.unitsPerPalletEuro1).toString() == '')}
-                                                            invalid={(touched.unitsPerPalletEuro1 && !!errors.unitsPerPalletEuro1) || !!errors.unitsPerPalletEuro1}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.procurementUnit.unitsPerPalletEuro1}
-                                                            id="unitsPerPalletEuro1" />
-                                                        <FormFeedback className="red">{errors.unitsPerPalletEuro1}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label htmlFor="unitsPerPalletEuro2">{i18n.t('static.procurementUnit.unitsPerPalletEuro2')}</Label>
-                                                        <Input
-                                                            type="number" name="unitsPerPalletEuro2" valid={!errors.unitsPerPalletEuro1}
-                                                            bsSize="sm"
-                                                            valid={!errors.unitsPerPalletEuro2 && this.state.procurementUnit.unitsPerPalletEuro2 >= 0}
-                                                            // invalid={(touched.unitsPerPalletEuro2 && !!errors.unitsPerPalletEuro2) || (this.state.procurementUnit.unitsPerPalletEuro2 < 0 || (this.state.procurementUnit.unitsPerPalletEuro2).toString() == '')}
-                                                            invalid={(touched.unitsPerPalletEuro2 && !!errors.unitsPerPalletEuro2) || !!errors.unitsPerPalletEuro2}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.procurementUnit.unitsPerPalletEuro2}
-                                                            id="unitsPerPalletEuro2" />
-                                                        <FormFeedback className="red">{errors.unitsPerPalletEuro2}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label htmlFor="unitsPerContainer">{i18n.t('static.procurementUnit.unitsPerContainer')}</Label>
-                                                        <Input
-                                                            type="number" name="unitsPerContainer" valid={!errors.unitsPerContainer}
-                                                            bsSize="sm"
-                                                            valid={!errors.unitsPerContainer && this.state.procurementUnit.unitsPerContainer >= 0}
-                                                            // invalid={(touched.unitsPerContainer && !!errors.unitsPerContainer) || (this.state.procurementUnit.unitsPerContainer < 0 || (this.state.procurementUnit.unitsPerContainer).toString() == '')}
-                                                            invalid={(touched.unitsPerContainer && !!errors.unitsPerContainer) || !!errors.unitsPerContainer}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.procurementUnit.unitsPerContainer}
-                                                            id="unitsPerContainer" />
-                                                        <FormFeedback className="red">{errors.unitsPerContainer}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
+                                                <FormGroup>
+                                                    <Label htmlFor="labeling">{i18n.t('static.procurementUnit.labeling')}</Label>
+                                                    <Input
+                                                        type="text" name="labeling" valid={!errors.labeling && this.state.procurementUnit.labeling != ''}
+                                                        bsSize="sm"
+                                                        // invalid={touched.labeling && !!errors.labeling || this.state.procurementUnit.labeling == ''}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.procurementUnit.labeling}
+                                                        id="labeling" />
+                                                    <FormFeedback className="red">{errors.labeling}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label htmlFor="unitsPerCase">{i18n.t('static.procurementUnit.unitsPerCase')}</Label>
+                                                    <Input
+                                                        type="number" name="unitsPerCase" valid={!errors.unitsPerCase}
+                                                        bsSize="sm"
+                                                        valid={!errors.unitsPerCase && this.state.procurementUnit.unitsPerCase >= 0}
+                                                        // invalid={(touched.unitsPerCase && !!errors.unitsPerCase) || (this.state.procurementUnit.unitsPerCase < 0 || (this.state.procurementUnit.unitsPerCase).toString() == '')}
+                                                        invalid={(touched.unitsPerCase && !!errors.unitsPerCase) || !!errors.unitsPerCase}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.procurementUnit.unitsPerCase}
+                                                        id="unitsPerCase" />
+                                                    <FormFeedback className="red">{errors.unitsPerCase}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label htmlFor="unitsPerPalletEuro1">{i18n.t('static.procurementUnit.unitsPerPalletEuro1')}</Label>
+                                                    <Input
+                                                        type="number" name="unitsPerPalletEuro1" valid={!errors.unitsPerPalletEuro1}
+                                                        bsSize="sm"
+                                                        valid={!errors.unitsPerPalletEuro1 && this.state.procurementUnit.unitsPerPalletEuro1 >= 0}
+                                                        // invalid={(touched.unitsPerPalletEuro1 && !!errors.unitsPerPalletEuro1) || (this.state.procurementUnit.unitsPerPalletEuro1 < 0 || (this.state.procurementUnit.unitsPerPalletEuro1).toString() == '')}
+                                                        invalid={(touched.unitsPerPalletEuro1 && !!errors.unitsPerPalletEuro1) || !!errors.unitsPerPalletEuro1}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.procurementUnit.unitsPerPalletEuro1}
+                                                        id="unitsPerPalletEuro1" />
+                                                    <FormFeedback className="red">{errors.unitsPerPalletEuro1}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label htmlFor="unitsPerPalletEuro2">{i18n.t('static.procurementUnit.unitsPerPalletEuro2')}</Label>
+                                                    <Input
+                                                        type="number" name="unitsPerPalletEuro2" valid={!errors.unitsPerPalletEuro1}
+                                                        bsSize="sm"
+                                                        valid={!errors.unitsPerPalletEuro2 && this.state.procurementUnit.unitsPerPalletEuro2 >= 0}
+                                                        // invalid={(touched.unitsPerPalletEuro2 && !!errors.unitsPerPalletEuro2) || (this.state.procurementUnit.unitsPerPalletEuro2 < 0 || (this.state.procurementUnit.unitsPerPalletEuro2).toString() == '')}
+                                                        invalid={(touched.unitsPerPalletEuro2 && !!errors.unitsPerPalletEuro2) || !!errors.unitsPerPalletEuro2}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.procurementUnit.unitsPerPalletEuro2}
+                                                        id="unitsPerPalletEuro2" />
+                                                    <FormFeedback className="red">{errors.unitsPerPalletEuro2}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label htmlFor="unitsPerContainer">{i18n.t('static.procurementUnit.unitsPerContainer')}</Label>
+                                                    <Input
+                                                        type="number" name="unitsPerContainer" valid={!errors.unitsPerContainer}
+                                                        bsSize="sm"
+                                                        valid={!errors.unitsPerContainer && this.state.procurementUnit.unitsPerContainer >= 0}
+                                                        // invalid={(touched.unitsPerContainer && !!errors.unitsPerContainer) || (this.state.procurementUnit.unitsPerContainer < 0 || (this.state.procurementUnit.unitsPerContainer).toString() == '')}
+                                                        invalid={(touched.unitsPerContainer && !!errors.unitsPerContainer) || !!errors.unitsPerContainer}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.procurementUnit.unitsPerContainer}
+                                                        id="unitsPerContainer" />
+                                                    <FormFeedback className="red">{errors.unitsPerContainer}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
 
-                                                        <Label className="P-absltRadio">{i18n.t('static.common.status')}&nbsp;&nbsp;</Label>
+                                                    <Label className="P-absltRadio">{i18n.t('static.common.status')}&nbsp;&nbsp;</Label>
 
-                                                        <FormGroup check inline>
-                                                            <Input
-                                                                className="form-check-input"
-                                                                type="radio"
-                                                                id="active1"
-                                                                name="active"
-                                                                value={true}
-                                                                checked={this.state.procurementUnit.active === true}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            />
-                                                            <Label
-                                                                className="form-check-label"
-                                                                check htmlFor="inline-active1">
-                                                                {i18n.t('static.common.active')}
-                                                            </Label>
-                                                        </FormGroup>
-                                                        <FormGroup check inline>
-                                                            <Input
-                                                                className="form-check-input"
-                                                                type="radio"
-                                                                id="active2"
-                                                                name="active"
-                                                                value={false}
-                                                                checked={this.state.procurementUnit.active === false}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            />
-                                                            <Label
-                                                                className="form-check-label"
-                                                                check htmlFor="inline-active2">
-                                                                {i18n.t('static.common.disabled')}
-                                                            </Label>
-                                                        </FormGroup>
+                                                    <FormGroup check inline>
+                                                        <Input
+                                                            className="form-check-input"
+                                                            type="radio"
+                                                            id="active1"
+                                                            name="active"
+                                                            value={true}
+                                                            checked={this.state.procurementUnit.active === true}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        />
+                                                        <Label
+                                                            className="form-check-label"
+                                                            check htmlFor="inline-active1">
+                                                            {i18n.t('static.common.active')}
+                                                        </Label>
                                                     </FormGroup>
+                                                    <FormGroup check inline>
+                                                        <Input
+                                                            className="form-check-input"
+                                                            type="radio"
+                                                            id="active2"
+                                                            name="active"
+                                                            value={false}
+                                                            checked={this.state.procurementUnit.active === false}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        />
+                                                        <Label
+                                                            className="form-check-label"
+                                                            check htmlFor="inline-active2">
+                                                            {i18n.t('static.common.disabled')}
+                                                        </Label>
+                                                    </FormGroup>
+                                                </FormGroup>
 
-                                                </CardBody>
-                                                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                                                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                                                        <div class="align-items-center">
-                                                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+                                            </CardBody>
+                                            <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                                    <div class="align-items-center">
+                                                        <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-                                                            <div class="spinner-border blue ml-4" role="status">
+                                                        <div class="spinner-border blue ml-4" role="status">
 
-                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <CardFooter>
-                                                    <FormGroup>
-                                                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                                        <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
-                                                        &nbsp;
+                                            </div>
+                                            <CardFooter>
+                                                <FormGroup>
+                                                    <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
+                                                    <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                    <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
+                                                    &nbsp;
                                                 </FormGroup>
-                                                </CardFooter>
-                                            </Form>
-                                        )} />
+                                            </CardFooter>
+                                        </Form>
+                                    )} />
                         </Card>
                     </Col>
                 </Row>

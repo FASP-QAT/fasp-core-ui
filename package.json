@@ -96,6 +96,7 @@
     "react-idle-timer": "^4.3.6",
     "react-ladda": "6.0.0",
     "react-month-picker": "^2.2.0",
+    "react-multi-checkbox-select": "^1.2.0",
     "react-multi-select-component": "^4.0.2",
     "react-multiselect-checkboxes": "^0.1.1",
     "react-number-format": "^4.4.1",
