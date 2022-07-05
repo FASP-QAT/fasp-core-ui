@@ -231,7 +231,7 @@ export default class ManualTagging extends Component {
                         this.setState({
                             message: 'static.unkownError',
                             loading: false
-                        },()=>{
+                        }, () => {
                             this.hideSecondComponent()
                         });
                     } else {
@@ -249,7 +249,7 @@ export default class ManualTagging extends Component {
                                 this.setState({
                                     message: error.response.data.messageCode,
                                     loading: false
-                                },()=>{
+                                }, () => {
                                     this.hideSecondComponent()
                                 });
                                 break;
@@ -257,7 +257,7 @@ export default class ManualTagging extends Component {
                                 this.setState({
                                     message: error.response.data.messageCode,
                                     loading: false
-                                },()=>{
+                                }, () => {
                                     this.hideSecondComponent()
                                 });
                                 break;
@@ -265,7 +265,7 @@ export default class ManualTagging extends Component {
                                 this.setState({
                                     message: 'static.unkownError',
                                     loading: false
-                                },()=>{
+                                }, () => {
                                     this.hideSecondComponent()
                                 });
                                 break;
@@ -330,7 +330,7 @@ export default class ManualTagging extends Component {
                         this.setState({
                             message: 'static.unkownError',
                             loading: false
-                        },()=>{
+                        }, () => {
                             this.hideSecondComponent()
                         });
                     } else {
@@ -348,7 +348,7 @@ export default class ManualTagging extends Component {
                                 this.setState({
                                     message: error.response.data.messageCode,
                                     loading: false
-                                },()=>{
+                                }, () => {
                                     this.hideSecondComponent()
                                 });
                                 break;
@@ -356,7 +356,7 @@ export default class ManualTagging extends Component {
                                 this.setState({
                                     message: error.response.data.messageCode,
                                     loading: false
-                                },()=>{
+                                }, () => {
                                     this.hideSecondComponent()
                                 });
                                 break;
@@ -364,7 +364,7 @@ export default class ManualTagging extends Component {
                                 this.setState({
                                     message: 'static.unkownError',
                                     loading: false
-                                },()=>{
+                                }, () => {
                                     this.hideSecondComponent()
                                 });
                                 break;
@@ -460,7 +460,7 @@ export default class ManualTagging extends Component {
                         this.setState({
                             message: 'static.unkownError',
                             loading: false
-                        },()=>{
+                        }, () => {
                             this.hideSecondComponent()
                         });
                     } else {
@@ -478,7 +478,7 @@ export default class ManualTagging extends Component {
                                 this.setState({
                                     message: error.response.data.messageCode,
                                     loading: false
-                                },()=>{
+                                }, () => {
                                     this.hideSecondComponent()
                                 });
                                 break;
@@ -486,7 +486,7 @@ export default class ManualTagging extends Component {
                                 this.setState({
                                     message: error.response.data.messageCode,
                                     loading: false
-                                },()=>{
+                                }, () => {
                                     this.hideSecondComponent()
                                 });
                                 break;
@@ -494,7 +494,7 @@ export default class ManualTagging extends Component {
                                 this.setState({
                                     message: 'static.unkownError',
                                     loading: false
-                                },()=>{
+                                }, () => {
                                     this.hideSecondComponent()
                                 });
                                 break;
@@ -504,6 +504,49 @@ export default class ManualTagging extends Component {
             );
 
     }
+
+    checkValidationTab2 = function () {
+        var valid = true;
+        var json = this.state.languageEl.getJson(null, false);
+        for (var y = 0; y < json.length; y++) {
+            // var value = this.el.getValueFromCoords(10, y);
+            var rowData = json[y];
+            if (rowData[20] == 0) {
+
+
+                var col = ("K").concat(parseInt(y) + 1);
+                if (this.state.languageEl.getValueFromCoords(0, y)) {
+                    var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
+                    var value = this.state.languageEl.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                    value = value.replace(/,/g, "");
+                    if (value == "") {
+                        this.state.languageEl.setStyle(col, "background-color", "transparent");
+                        this.state.languageEl.setStyle(col, "background-color", "yellow");
+                        this.state.languageEl.setComments(col, i18n.t('static.label.fieldRequired'));
+                        valid = false;
+                    } else {
+                        // if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
+                        if (!(reg.test(value))) {
+                            this.state.languageEl.setStyle(col, "background-color", "transparent");
+                            this.state.languageEl.setStyle(col, "background-color", "yellow");
+                            this.state.languageEl.setComments(col, i18n.t('static.message.invalidnumber'));
+                            valid = false;
+                        } else {
+                            this.state.languageEl.setStyle(col, "background-color", "transparent");
+                            this.state.languageEl.setComments(col, "");
+                        }
+
+                    }
+                } else {
+                    this.state.languageEl.setStyle(col, "background-color", "transparent");
+                    this.state.languageEl.setComments(col, "");
+                }
+
+            }
+        }
+        return valid;
+    }
+
     checkValidation = function () {
         var valid = true;
         var json = this.el.getJson(null, false);
@@ -584,11 +627,34 @@ export default class ManualTagging extends Component {
             }
 
             if (x == 10) {
-                var json = this.el.getJson(null, false);
-                // var checkboxValue = this.el.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                for (var j = 0; j < json.length; j++) {
-                    if (j != y && json[j][21] == this.el.getValueFromCoords(21, y, true)) {
-                        this.el.setValueFromCoords(10, j, value, true);
+                var col = ("K").concat(parseInt(y) + 1);
+                value = this.el.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
+                var qty = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                console.log("x@@@@@@@@@@@@", x)
+                console.log("y@@@@@@@@@@@@", y)
+                console.log("Value@@@@@@@@@@@@", value)
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                } else {
+                    // if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
+                    if (!(reg.test(value))) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                        this.el.setComments(col, "");
+                        var json = this.el.getJson(null, false);
+                        // var checkboxValue = this.el.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                        for (var j = 0; j < json.length; j++) {
+                            if (j != y && json[j][21] == this.el.getValueFromCoords(21, y, true)) {
+                                this.el.setValueFromCoords(10, j, value, true);
+                            }
+                        }
                     }
                 }
             }
@@ -891,26 +957,26 @@ export default class ManualTagging extends Component {
                             // });
                             this.setState({
                                 countryList: response.data
-                            },()=>{
-                                if(this.state.countryList.length==1){
+                            }, () => {
+                                if (this.state.countryList.length == 1) {
                                     var event = {
                                         target: {
                                             value: this.state.countryList[0].realmCountry.id
                                         }
                                     };
                                     this.countryChange(event)
-                                }else if (localStorage.getItem("sesCountryId") != '' && localStorage.getItem("sesCountryId") != undefined && this.state.countryList.filter(c => c.realmCountry.id == localStorage.getItem("sesCountryId")).length > 0) {
+                                } else if (localStorage.getItem("sesCountryId") != '' && localStorage.getItem("sesCountryId") != undefined && this.state.countryList.filter(c => c.realmCountry.id == localStorage.getItem("sesCountryId")).length > 0) {
                                     var event = {
                                         target: {
                                             value: localStorage.getItem("sesCountryId")
                                         }
                                     };
                                     this.countryChange(event)
-                    
+
                                 }
                             })
                         } else {
-                            this.setState({ message: response.data.messageCode },()=>{
+                            this.setState({ message: response.data.messageCode }, () => {
                                 this.hideSecondComponent()
                             })
                         }
@@ -920,7 +986,7 @@ export default class ManualTagging extends Component {
                                 this.setState({
                                     message: 'static.unkownError',
                                     loading: false
-                                },()=>{
+                                }, () => {
                                     this.hideSecondComponent()
                                 });
                             } else {
@@ -938,7 +1004,7 @@ export default class ManualTagging extends Component {
                                         this.setState({
                                             message: error.response.data.messageCode,
                                             loading: false
-                                        },()=>{
+                                        }, () => {
                                             this.hideSecondComponent()
                                         });
                                         break;
@@ -946,7 +1012,7 @@ export default class ManualTagging extends Component {
                                         this.setState({
                                             message: error.response.data.messageCode,
                                             loading: false
-                                        },()=>{
+                                        }, () => {
                                             this.hideSecondComponent()
                                         });
                                         break;
@@ -954,7 +1020,7 @@ export default class ManualTagging extends Component {
                                         this.setState({
                                             message: 'static.unkownError',
                                             loading: false
-                                        },()=>{
+                                        }, () => {
                                             this.hideSecondComponent()
                                         });
                                         break;
@@ -1021,7 +1087,7 @@ export default class ManualTagging extends Component {
                         this.setState({
                             message: 'static.unkownError',
                             loading: false
-                        },()=>{
+                        }, () => {
                             this.hideSecondComponent()
                         });
                     } else {
@@ -1039,7 +1105,7 @@ export default class ManualTagging extends Component {
                                 this.setState({
                                     message: error.response.data.messageCode,
                                     loading: false
-                                },()=>{
+                                }, () => {
                                     this.hideSecondComponent()
                                 });
                                 break;
@@ -1047,7 +1113,7 @@ export default class ManualTagging extends Component {
                                 this.setState({
                                     message: error.response.data.messageCode,
                                     loading: false
-                                },()=>{
+                                }, () => {
                                     this.hideSecondComponent()
                                 });
                                 break;
@@ -1055,7 +1121,7 @@ export default class ManualTagging extends Component {
                                 this.setState({
                                     message: 'static.unkownError',
                                     loading: false
-                                },()=>{
+                                }, () => {
                                     this.hideSecondComponent()
                                 });
                                 break;
@@ -1090,7 +1156,7 @@ export default class ManualTagging extends Component {
                         this.setState({
                             message: 'static.unkownError',
                             loading: false
-                        },()=>{
+                        }, () => {
                             this.hideSecondComponent()
                         });
                     } else {
@@ -1108,7 +1174,7 @@ export default class ManualTagging extends Component {
                                 this.setState({
                                     message: error.response.data.messageCode,
                                     loading: false
-                                },()=>{
+                                }, () => {
                                     this.hideSecondComponent()
                                 });
                                 break;
@@ -1116,7 +1182,7 @@ export default class ManualTagging extends Component {
                                 this.setState({
                                     message: error.response.data.messageCode,
                                     loading: false
-                                },()=>{
+                                }, () => {
                                     this.hideSecondComponent()
                                 });
                                 break;
@@ -1124,7 +1190,7 @@ export default class ManualTagging extends Component {
                                 this.setState({
                                     message: 'static.unkownError',
                                     loading: false
-                                },()=>{
+                                }, () => {
                                     this.hideSecondComponent()
                                 });
                                 break;
@@ -1330,7 +1396,7 @@ export default class ManualTagging extends Component {
 
     delink() {
         this.setState({ loading: true })
-        var validation = true;
+        var validation = this.checkValidationTab2();
         if (validation == true) {
             console.log("this.state.languageEl.getJson(null, false)---------------->", this.state.languageEl.getJson(null, false))
             var selectedChangedShipment = this.state.languageEl.getJson(null, false).filter(c => c[22] == 1);
@@ -1515,6 +1581,13 @@ export default class ManualTagging extends Component {
                 }.bind(this)
             }.bind(this)
             // }
+        }else{
+            this.setState({
+                loading:false,
+                message:i18n.t("static.supplyPlan.validationFailed")
+            },()=>{
+                this.hideSecondComponent()
+            })
         }
     }
 
@@ -2206,7 +2279,7 @@ export default class ManualTagging extends Component {
                             this.setState({
                                 message: 'static.unkownError',
                                 loading: false
-                            },()=>{
+                            }, () => {
                                 this.hideSecondComponent()
                             });
                         } else {
@@ -2225,7 +2298,7 @@ export default class ManualTagging extends Component {
                                         message: error.response.data.messageCode,
                                         loading: false,
                                         result: error.response.data.messageCode
-                                    },()=>{
+                                    }, () => {
                                         this.hideSecondComponent()
                                     });
                                     break;
@@ -2233,7 +2306,7 @@ export default class ManualTagging extends Component {
                                     this.setState({
                                         message: error.response.data.messageCode,
                                         loading: false
-                                    },()=>{
+                                    }, () => {
                                         this.hideSecondComponent()
                                     });
                                     break;
@@ -2241,7 +2314,7 @@ export default class ManualTagging extends Component {
                                     this.setState({
                                         message: 'static.unkownError',
                                         loading: false
-                                    },()=>{
+                                    }, () => {
                                         this.hideSecondComponent()
                                     });
                                     break;
@@ -2340,7 +2413,7 @@ export default class ManualTagging extends Component {
                         this.setState({
                             message: 'static.unkownError',
                             loading: false
-                        },()=>{
+                        }, () => {
                             this.hideSecondComponent()
                         });
                     } else {
@@ -2358,7 +2431,7 @@ export default class ManualTagging extends Component {
                                 this.setState({
                                     message: error.response.data.messageCode,
                                     loading: false
-                                },()=>{
+                                }, () => {
                                     this.hideSecondComponent()
                                 });
                                 break;
@@ -2366,7 +2439,7 @@ export default class ManualTagging extends Component {
                                 this.setState({
                                     message: error.response.data.messageCode,
                                     loading: false
-                                },()=>{
+                                }, () => {
                                     this.hideSecondComponent()
                                 });
                                 break;
@@ -2374,7 +2447,7 @@ export default class ManualTagging extends Component {
                                 this.setState({
                                     message: 'static.unkownError',
                                     loading: false
-                                },()=>{
+                                }, () => {
                                     this.hideSecondComponent()
                                 });
                                 break;
@@ -2451,7 +2524,7 @@ export default class ManualTagging extends Component {
                             this.setState({
                                 message: 'static.unkownError',
                                 loading: false
-                            },()=>{
+                            }, () => {
                                 this.hideSecondComponent()
                             });
                         } else {
@@ -2469,7 +2542,7 @@ export default class ManualTagging extends Component {
                                     this.setState({
                                         message: error.response.data.messageCode,
                                         loading: false
-                                    },()=>{
+                                    }, () => {
                                         this.hideSecondComponent()
                                     });
                                     break;
@@ -2477,7 +2550,7 @@ export default class ManualTagging extends Component {
                                     this.setState({
                                         message: error.response.data.messageCode,
                                         loading: false
-                                    },()=>{
+                                    }, () => {
                                         this.hideSecondComponent()
                                     });
                                     break;
@@ -2485,7 +2558,7 @@ export default class ManualTagging extends Component {
                                     this.setState({
                                         message: 'static.unkownError',
                                         loading: false
-                                    },()=>{
+                                    }, () => {
                                         this.hideSecondComponent()
                                     });
                                     break;
@@ -2546,7 +2619,7 @@ export default class ManualTagging extends Component {
                                         this.setState({
                                             message: 'static.unkownError',
                                             loading: false
-                                        },()=>{
+                                        }, () => {
                                             this.hideSecondComponent()
                                         });
                                     } else {
@@ -2564,7 +2637,7 @@ export default class ManualTagging extends Component {
                                                 this.setState({
                                                     message: error.response.data.messageCode,
                                                     loading: false
-                                                },()=>{
+                                                }, () => {
                                                     this.hideSecondComponent()
                                                 });
                                                 break;
@@ -2572,7 +2645,7 @@ export default class ManualTagging extends Component {
                                                 this.setState({
                                                     message: error.response.data.messageCode,
                                                     loading: false
-                                                },()=>{
+                                                }, () => {
                                                     this.hideSecondComponent()
                                                 });
                                                 break;
@@ -2580,7 +2653,7 @@ export default class ManualTagging extends Component {
                                                 this.setState({
                                                     message: 'static.unkownError',
                                                     loading: false
-                                                },()=>{
+                                                }, () => {
                                                     this.hideSecondComponent()
                                                 });
                                                 break;
@@ -2610,7 +2683,7 @@ export default class ManualTagging extends Component {
                                         this.setState({
                                             message: 'static.unkownError',
                                             loading: false
-                                        },()=>{
+                                        }, () => {
                                             this.hideSecondComponent()
                                         });
                                     } else {
@@ -2628,7 +2701,7 @@ export default class ManualTagging extends Component {
                                                 this.setState({
                                                     message: error.response.data.messageCode,
                                                     loading: false
-                                                },()=>{
+                                                }, () => {
                                                     this.hideSecondComponent()
                                                 });
                                                 break;
@@ -2636,7 +2709,7 @@ export default class ManualTagging extends Component {
                                                 this.setState({
                                                     message: error.response.data.messageCode,
                                                     loading: false
-                                                },()=>{
+                                                }, () => {
                                                     this.hideSecondComponent()
                                                 });
                                                 break;
@@ -2644,7 +2717,7 @@ export default class ManualTagging extends Component {
                                                 this.setState({
                                                     message: 'static.unkownError',
                                                     loading: false
-                                                },()=>{
+                                                }, () => {
                                                     this.hideSecondComponent()
                                                 });
                                                 break;
@@ -2675,7 +2748,7 @@ export default class ManualTagging extends Component {
                         shipmentList = shipmentList.filter(c => (moment(c.expectedDeliveryDate).format("YYYY-MM-DD") < moment(Date.now()).subtract(6, 'months').format("YYYY-MM-DD") && ([3, 4, 5, 6, 9]).includes(c.shipmentStatus.id.toString())) || (moment(c.expectedDeliveryDate).format("YYYY-MM-DD") >= moment(Date.now()).subtract(6, 'months').format("YYYY-MM-DD") && SHIPMENT_ID_ARR_MANUAL_TAGGING.includes(c.shipmentStatus.id.toString())));
                     } else if (this.state.active2) {
                         shipmentList = shipmentList.filter(c => c.erpFlag.toString() == "true" && c.active.toString() == "true" && c.accountFlag.toString() == "true" && c.procurementAgent.id == PSM_PROCUREMENT_AGENT_ID);
-                        console.log("ShipmentList@@@@@@@@@@@@@@@",shipmentList);
+                        console.log("ShipmentList@@@@@@@@@@@@@@@", shipmentList);
                         for (var sl = 0; sl < shipmentList.length; sl++) {
                             var lsf = linkedShipmentsList.filter(c => shipmentList[sl].shipmentId > 0 ? c.childShipmentId == shipmentList[sl].shipmentId : c.tempChildShipmentId == shipmentList[sl].tempShipmentId);
                             if (lsf.length > 0) {
@@ -2776,7 +2849,7 @@ export default class ManualTagging extends Component {
                         this.setState({
                             message: 'static.unkownError',
                             loading: false
-                        },()=>{
+                        }, () => {
                             this.hideSecondComponent()
                         });
                     } else {
@@ -2794,7 +2867,7 @@ export default class ManualTagging extends Component {
                                 this.setState({
                                     message: error.response.data.messageCode,
                                     loading: false
-                                },()=>{
+                                }, () => {
                                     this.hideSecondComponent()
                                 });
                                 break;
@@ -2802,7 +2875,7 @@ export default class ManualTagging extends Component {
                                 this.setState({
                                     message: error.response.data.messageCode,
                                     loading: false
-                                },()=>{
+                                }, () => {
                                     this.hideSecondComponent()
                                 });
                                 break;
@@ -2810,7 +2883,7 @@ export default class ManualTagging extends Component {
                                 this.setState({
                                     message: 'static.unkownError',
                                     loading: false
-                                },()=>{
+                                }, () => {
                                     this.hideSecondComponent()
                                 });
                                 break;
@@ -2841,7 +2914,7 @@ export default class ManualTagging extends Component {
                             this.setState({
                                 message: 'static.unkownError',
                                 loading: false
-                            },()=>{
+                            }, () => {
                                 this.hideSecondComponent()
                             });
                         } else {
@@ -2859,7 +2932,7 @@ export default class ManualTagging extends Component {
                                     this.setState({
                                         message: error.response.data.messageCode,
                                         loading: false
-                                    },()=>{
+                                    }, () => {
                                         this.hideSecondComponent()
                                     });
                                     break;
@@ -2867,7 +2940,7 @@ export default class ManualTagging extends Component {
                                     this.setState({
                                         message: error.response.data.messageCode,
                                         loading: false
-                                    },()=>{
+                                    }, () => {
                                         this.hideSecondComponent()
                                     });
                                     break;
@@ -2875,7 +2948,7 @@ export default class ManualTagging extends Component {
                                     this.setState({
                                         message: 'static.unkownError',
                                         loading: false
-                                    },()=>{
+                                    }, () => {
                                         this.hideSecondComponent()
                                     });
                                     break;
@@ -2947,7 +3020,7 @@ export default class ManualTagging extends Component {
                         this.setState({
                             message: 'static.unkownError',
                             loading: false
-                        },()=>{
+                        }, () => {
                             this.hideSecondComponent()
                         });
                     } else {
@@ -2965,7 +3038,7 @@ export default class ManualTagging extends Component {
                                 this.setState({
                                     message: error.response.data.messageCode,
                                     loading: false
-                                },()=>{
+                                }, () => {
                                     this.hideSecondComponent()
                                 });
                                 break;
@@ -2973,7 +3046,7 @@ export default class ManualTagging extends Component {
                                 this.setState({
                                     message: error.response.data.messageCode,
                                     loading: false
-                                },()=>{
+                                }, () => {
                                     this.hideSecondComponent()
                                 });
                                 break;
@@ -2981,7 +3054,7 @@ export default class ManualTagging extends Component {
                                 this.setState({
                                     message: 'static.unkownError',
                                     loading: false
-                                },()=>{
+                                }, () => {
                                     this.hideSecondComponent()
                                 });
                                 break;
@@ -3310,7 +3383,7 @@ export default class ManualTagging extends Component {
                 data[22] = 0;
                 data[23] = linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].conversionFactor : 1;
                 data[24] = manualTaggingList[j].notes;
-                data[25] = this.state.versionId.toString().includes("Local") && linkedShipmentsListForTab2.length>0 ? this.state.roPrimeNoListOriginal.filter(c => c.roNo == linkedShipmentsListForTab2[0].roNo && c.roPrimeLineNo == linkedShipmentsListForTab2[0].roPrimeLineNo)[0] : {};
+                data[25] = this.state.versionId.toString().includes("Local") && linkedShipmentsListForTab2.length > 0 ? this.state.roPrimeNoListOriginal.filter(c => c.roNo == linkedShipmentsListForTab2[0].roNo && c.roPrimeLineNo == linkedShipmentsListForTab2[0].roPrimeLineNo)[0] : {};
             }
             else {
                 // data[0] = manualTaggingList[j].erpOrderId
@@ -3662,7 +3735,7 @@ export default class ManualTagging extends Component {
                                                     this.setState({
                                                         message: 'static.unkownError',
                                                         loading: false
-                                                    },()=>{
+                                                    }, () => {
                                                         this.hideSecondComponent()
                                                     });
                                                 } else {
@@ -3680,7 +3753,7 @@ export default class ManualTagging extends Component {
                                                             this.setState({
                                                                 message: error.response.data.messageCode,
                                                                 loading: false
-                                                            },()=>{
+                                                            }, () => {
                                                                 this.hideSecondComponent()
                                                             });
                                                             break;
@@ -3688,7 +3761,7 @@ export default class ManualTagging extends Component {
                                                             this.setState({
                                                                 message: error.response.data.messageCode,
                                                                 loading: false
-                                                            },()=>{
+                                                            }, () => {
                                                                 this.hideSecondComponent()
                                                             });
                                                             break;
@@ -3696,7 +3769,7 @@ export default class ManualTagging extends Component {
                                                             this.setState({
                                                                 message: 'static.unkownError',
                                                                 loading: false
-                                                            },()=>{
+                                                            }, () => {
                                                                 this.hideSecondComponent()
                                                             });
                                                             break;
@@ -3867,7 +3940,7 @@ export default class ManualTagging extends Component {
                     this.filterProgramByCountry();
                     // this.getOrderDetails();
                 });
-            }else{
+            } else {
                 this.setState({
                     loading: false
                 })
@@ -3876,7 +3949,7 @@ export default class ManualTagging extends Component {
             // console.log("1------------------------------>>>>", outputListAfterSearch[0].erpPlanningUnit.id)
             if ((this.state.active1
                 && this.state.versionId.includes("Local")) || this.state.active3) {
-                console.log("In function To open popup@@@@@@@@@@@@@@@@@@@@@@@))))))))))))))))")    
+                console.log("In function To open popup@@@@@@@@@@@@@@@@@@@@@@@))))))))))))))))")
                 this.setState({
                     planningUnitId: (this.state.active3 ? outputListAfterSearch[0].erpPlanningUnit.id : outputListAfterSearch[0].planningUnit.id),
                     shipmentId: (this.state.active1 ? this.el.getValueFromCoords(0, x) : (this.state.active2 ? this.el.getValueFromCoords(1, x) : 0)),
@@ -4002,7 +4075,7 @@ export default class ManualTagging extends Component {
                             this.setState({
                                 message: 'static.unkownError',
                                 loading: false
-                            },()=>{
+                            }, () => {
                                 this.hideSecondComponent()
                             });
                         } else {
@@ -4020,7 +4093,7 @@ export default class ManualTagging extends Component {
                                     this.setState({
                                         message: error.response.data.messageCode,
                                         loading: false
-                                    },()=>{
+                                    }, () => {
                                         this.hideSecondComponent()
                                     });
                                     break;
@@ -4028,7 +4101,7 @@ export default class ManualTagging extends Component {
                                     this.setState({
                                         message: error.response.data.messageCode,
                                         loading: false
-                                    },()=>{
+                                    }, () => {
                                         this.hideSecondComponent()
                                     });
                                     break;
@@ -4036,7 +4109,7 @@ export default class ManualTagging extends Component {
                                     this.setState({
                                         message: 'static.unkownError',
                                         loading: false
-                                    },()=>{
+                                    }, () => {
                                         this.hideSecondComponent()
                                     });
                                     break;
