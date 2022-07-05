@@ -4756,7 +4756,7 @@ class EditSupplyPlanStatus extends Component {
                                                                     isModalOpen: !this.state.isModalOpen,
                                                                 })
                                                                 // window.location.reload(false);
-                                                                // window.location.href='/report/editStatus/' + this.props.match.params.programId + '/' + this.props.match.params.versionId + '/' + false + '/green/' + i18n.t('static.problem.addedSuccessfully')
+                                                                this.componentDidMount();
                                                                 this.toggle(0, '2');
 
                                                             } else {
