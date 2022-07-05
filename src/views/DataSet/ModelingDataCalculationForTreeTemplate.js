@@ -467,7 +467,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                     console.log("grandParentNodeData$$$%%%", grandParentNodeData)
                                     if (grandParentNodeData != undefined) {
                                         var minusNumber = (nodeDataMapForScenario.month == 1 ? nodeDataMapForScenario.month - 2 : nodeDataMapForScenario.month - 1);
-                                        var grandParentPrevMonthMMDValue = grandParentNodeData.nodeDataMomList.filter(c => month == minusNumber);
+                                        var grandParentPrevMonthMMDValue = grandParentNodeData.nodeDataMomList.filter(c => c.month == minusNumber);
                                         if (grandParentPrevMonthMMDValue.length > 0) {
                                             patients = grandParentPrevMonthMMDValue[0].calculatedValue;
                                         } else {
