@@ -659,7 +659,7 @@ class ListUserComponent extends Component {
         UserService.getUserList()
             .then(response => {
                 if (response.status == 200) {
-                    console.log("response.data---->", response.data)
+                    console.log("response.data---->123", response.data)
                     this.setState({
                         userList: response.data,
                         selUserList: response.data
@@ -692,74 +692,76 @@ class ListUserComponent extends Component {
                                         roleList: listArray,
                                         roleListJexcel: roleListJexcel,
                                         roleListInUpdate: roleListInUpdate,
-                                        loading: false
+                                        loading: false,
                                     },
                                         () => {
-                                            LanguageService.getLanguageListActive()
-                                                .then(response => {
-                                                    if (response.status == 200) {
-                                                        var listArray = response.data;
-                                                        listArray.sort((a, b) => {
-                                                            var itemLabelA = a.label.label_en.toUpperCase(); // ignore upper and lowercase
-                                                            var itemLabelB = b.label.label_en.toUpperCase(); // ignore upper and lowercase                   
-                                                            return itemLabelA > itemLabelB ? 1 : -1;
-                                                        });
-                                                        this.setState({
-                                                            languages: listArray, loading: false
-                                                        },
-                                                            () => {
-                                                                this.buildJExcel1();
-                                                                this.buildJExcel2();
-                                                            })
-                                                    } else {
-                                                        this.setState({
-                                                            message: response.data.messageCode, loading: false
-                                                        },
-                                                            () => {
-                                                                this.hideSecondComponent();
-                                                            })
-                                                    }
+                                            this.buildJExcel1();
+                                            this.buildJExcel2();
+                                            // LanguageService.getLanguageListActive()
+                                            //     .then(response => {
+                                            //         if (response.status == 200) {
+                                            //             var listArray = response.data;
+                                            //             listArray.sort((a, b) => {
+                                            //                 var itemLabelA = a.label.label_en.toUpperCase(); // ignore upper and lowercase
+                                            //                 var itemLabelB = b.label.label_en.toUpperCase(); // ignore upper and lowercase                   
+                                            //                 return itemLabelA > itemLabelB ? 1 : -1;
+                                            //             });
+                                            //             this.setState({
+                                            //                 languages: listArray, loading: false
+                                            //             },
+                                            //                 () => {
+                                            //                     this.buildJExcel1();
+                                            //                     this.buildJExcel2();
+                                            //                 })
+                                            //         } else {
+                                            //             this.setState({
+                                            //                 message: response.data.messageCode, loading: false
+                                            //             },
+                                            //                 () => {
+                                            //                     this.hideSecondComponent();
+                                            //                 })
+                                            //         }
 
-                                                }).catch(
-                                                    error => {
-                                                        if (error.message === "Network Error") {
-                                                            this.setState({
-                                                                message: 'static.unkownError',
-                                                                loading: false
-                                                            });
-                                                        } else {
-                                                            switch (error.response ? error.response.status : "") {
+                                            //     }).catch(
+                                            //         error => {
+                                            //             if (error.message === "Network Error") {
+                                            //                 this.setState({
+                                            //                     message: 'static.unkownError',
+                                            //                     loading: false
+                                            //                 });
+                                            //             } else {
+                                            //                 switch (error.response ? error.response.status : "") {
 
-                                                                case 401:
-                                                                    this.props.history.push(`/login/static.message.sessionExpired`)
-                                                                    break;
-                                                                case 403:
-                                                                    this.props.history.push(`/accessDenied`)
-                                                                    break;
-                                                                case 500:
-                                                                case 404:
-                                                                case 406:
-                                                                    this.setState({
-                                                                        message: error.response.data.messageCode,
-                                                                        loading: false
-                                                                    });
-                                                                    break;
-                                                                case 412:
-                                                                    this.setState({
-                                                                        message: error.response.data.messageCode,
-                                                                        loading: false
-                                                                    });
-                                                                    break;
-                                                                default:
-                                                                    this.setState({
-                                                                        message: 'static.unkownError',
-                                                                        loading: false
-                                                                    });
-                                                                    break;
-                                                            }
-                                                        }
-                                                    }
-                                                );
+                                            //                     case 401:
+                                            //                         this.props.history.push(`/login/static.message.sessionExpired`)
+                                            //                         break;
+                                            //                     case 403:
+                                            //                         this.props.history.push(`/accessDenied`)
+                                            //                         break;
+                                            //                     case 500:
+                                            //                     case 404:
+                                            //                     case 406:
+                                            //                         this.setState({
+                                            //                             message: error.response.data.messageCode,
+                                            //                             loading: false
+                                            //                         });
+                                            //                         break;
+                                            //                     case 412:
+                                            //                         this.setState({
+                                            //                             message: error.response.data.messageCode,
+                                            //                             loading: false
+                                            //                         });
+                                            //                         break;
+                                            //                     default:
+                                            //                         this.setState({
+                                            //                             message: 'static.unkownError',
+                                            //                             loading: false
+                                            //                         });
+                                            //                         break;
+                                            //                 }
+                                            //             }
+                                            //         }
+                                            //     );
 
                                         })
                                 } else {
@@ -1443,620 +1445,812 @@ class ListUserComponent extends Component {
         );
     };
 
+    // buildJExcel2() {
+    //     RealmCountryService.getRealmCountryListAll()
+    //         .then(response => {
+    //             if (response.status == 200) {
+    //                 var listArray = response.data;
+    //                 listArray.sort((a, b) => {
+    //                     var itemLabelA = getLabelText(a.country.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+    //                     var itemLabelB = getLabelText(b.country.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+    //                     return itemLabelA > itemLabelB ? 1 : -1;
+    //                 });
+    //                 this.setState({
+    //                     realmCountryList: listArray,
+    //                     selRealmCountry: listArray.filter(c => c.active.toString() == "true")
+    //                 })
+    //                 OrganisationService.getOrganisationList()
+    //                     .then(response => {
+    //                         if (response.status == "200") {
+    //                             var listArray = response.data;
+    //                             listArray.sort((a, b) => {
+    //                                 var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+    //                                 var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+    //                                 return itemLabelA > itemLabelB ? 1 : -1;
+    //                             });
+    //                             this.setState({
+    //                                 organisations: listArray,
+    //                                 selOrganisation: listArray.filter(c => c.active.toString() == "true")
+    //                             });
+    //                             HealthAreaService.getHealthAreaList()
+    //                                 .then(response => {
+    //                                     if (response.status == "200") {
+    //                                         var listArray = response.data;
+    //                                         listArray.sort((a, b) => {
+    //                                             var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+    //                                             var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+    //                                             return itemLabelA > itemLabelB ? 1 : -1;
+    //                                         });
+    //                                         this.setState({
+    //                                             healthAreas: listArray.filter(c => c.active == true),
+    //                                             selHealthArea: listArray.filter(c => c.active == true)
+    //                                         });
+    //                                         ProgramService.getProgramList()
+    //                                             .then(response => {
+    //                                                 if (response.status == "200") {
+    //                                                     //                                                         var listArray = [...response.data]
+    //                                                     //                                                         var arr = [];
+    //                                                     // for (var i = 0; i <= response.data.length; i++) {
+    //                                                     //     response.data[i].programTypeId = 1;
+    //                                                     // }
+    //                                                     // var listArray = response.data;
+    //                                                     // listArray.sort((a, b) => {
+    //                                                     //     var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+    //                                                     //     var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+    //                                                     //     return itemLabelA > itemLabelB ? 1 : -1;
+    //                                                     // });
+    //                                                     DatasetService.getDatasetList()
+    //                                                         .then(response1 => {
+    //                                                             if (response1.status == "200") {
+
+    //                                                                 var listArray = [...response.data, ...response1.data]
+    //                                                                 listArray.sort((a, b) => {
+    //                                                                     var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+    //                                                                     var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+    //                                                                     return itemLabelA > itemLabelB ? 1 : -1;
+    //                                                                 });
+    //                                                                 this.setState({
+    //                                                                     programs: listArray,
+    //                                                                     selProgram: listArray.filter(c => c.active.toString() == "true")
+    //                                                                 }, (
+    //                                                                 ) => {
+    //                                                                     // this.buildJexcel2();
+
+    //                                                                     const { selProgram } = this.state;
+    //                                                                     const { selRealmCountry } = this.state;
+    //                                                                     const { selOrganisation } = this.state;
+    //                                                                     const { selHealthArea } = this.state;
+    //                                                                     const { selUserList } = this.state;
+    //                                                                     let programList = [];
+    //                                                                     let countryList = [];
+    //                                                                     let organisationList = [];
+    //                                                                     let healthAreaList = [];
+    //                                                                     let userList1 = [];
+
+    //                                                                     if (selUserList.length > 0) {
+    //                                                                         for (var i = 0; i < selUserList.length; i++) {
+    //                                                                             var paJson = {
+    //                                                                                 // name: getLabelText(selProgram[i].label, this.state.lang),
+    //                                                                                 name: selUserList[i].username,
+    //                                                                                 id: parseInt(selUserList[i].userId),
+    //                                                                                 active: selUserList[i].active
+    //                                                                             }
+    //                                                                             userList1[i] = paJson
+    //                                                                         }
+    //                                                                     }
+
+    //                                                                     userList1 = userList1.filter(c => c.active);
+
+    //                                                                     if (selProgram.length > 0) {
+    //                                                                         for (var i = 0; i < selProgram.length; i++) {
+    //                                                                             var paJson = {
+    //                                                                                 // name: getLabelText(selProgram[i].label, this.state.lang),
+    //                                                                                 name: selProgram[i].programCode,
+    //                                                                                 id: parseInt(selProgram[i].programId),
+    //                                                                                 active: selProgram[i].active
+    //                                                                             }
+    //                                                                             programList[i] = paJson
+    //                                                                         }
+    //                                                                         var paJson = {
+    //                                                                             // name: "All",
+    //                                                                             name: "All",
+    //                                                                             id: -1,
+    //                                                                             active: true
+    //                                                                         }
+    //                                                                         programList.unshift(paJson);
+    //                                                                     }
+
+    //                                                                     if (selRealmCountry.length > 0) {
+    //                                                                         for (var i = 0; i < selRealmCountry.length; i++) {
+    //                                                                             var paJson = {
+    //                                                                                 name: getLabelText(selRealmCountry[i].country.label, this.state.lang),
+    //                                                                                 id: parseInt(selRealmCountry[i].realmCountryId),
+    //                                                                                 active: selRealmCountry[i].active
+    //                                                                             }
+    //                                                                             countryList[i] = paJson
+    //                                                                         }
+    //                                                                         var paJson = {
+    //                                                                             name: "All",
+    //                                                                             id: -1,
+    //                                                                             active: true
+    //                                                                         }
+    //                                                                         countryList.unshift(paJson);
+    //                                                                     }
+
+    //                                                                     if (selOrganisation.length > 0) {
+    //                                                                         for (var i = 0; i < selOrganisation.length; i++) {
+    //                                                                             var paJson = {
+    //                                                                                 name: getLabelText(selOrganisation[i].label, this.state.lang),
+    //                                                                                 id: parseInt(selOrganisation[i].organisationId),
+    //                                                                                 active: selOrganisation[i].active
+    //                                                                             }
+    //                                                                             organisationList[i] = paJson
+    //                                                                         }
+    //                                                                         var paJson = {
+    //                                                                             name: "All",
+    //                                                                             id: -1,
+    //                                                                             active: true
+    //                                                                         }
+    //                                                                         organisationList.unshift(paJson);
+    //                                                                     }
+
+    //                                                                     if (selHealthArea.length > 0) {
+    //                                                                         for (var i = 0; i < selHealthArea.length; i++) {
+    //                                                                             var paJson = {
+    //                                                                                 name: getLabelText(selHealthArea[i].label, this.state.lang),
+    //                                                                                 id: parseInt(selHealthArea[i].healthAreaId),
+    //                                                                                 active: selHealthArea[i].active
+    //                                                                             }
+    //                                                                             healthAreaList[i] = paJson
+    //                                                                         }
+    //                                                                         var paJson = {
+    //                                                                             name: "All",
+    //                                                                             id: -1,
+    //                                                                             active: true
+    //                                                                         }
+    //                                                                         healthAreaList.unshift(paJson);
+    //                                                                     }
+
+
+
+
+    //                                                                     let userList = this.state.selUserList;
+    //                                                                     console.log("userList---->1", userList.filter(c => c.userId == 663));
+    //                                                                     console.log("userList---->12", countryList);
+
+
+    //                                                                     let userArray = [];
+    //                                                                     let count = 0;
+
+    //                                                                     for (var j = 0; j < userList.length; j++) {
+    //                                                                         // console.log("userList---->2", userList.filter(c => c.userId == 663)[0].userAclList.map(a => a.realmCountryId).toString().trim().replaceAll(',', ';'));
+    //                                                                         data = [];
+    //                                                                         data[0] = userList[j].userId
+    //                                                                         data[1] = userList[j].userId
+    //                                                                         data[2] = userList[j].userAclList.map(a => a.realmCountryId).toString().trim().replaceAll(',', ';');
+    //                                                                         data[3] = userList[j].userAclList.map(a => a.healthAreaId).toString().trim().replaceAll(',', ';');
+    //                                                                         // data[1] = papuList[j].healthAreaList.map(a => a.id).toString().trim().replaceAll(',', ';')
+    //                                                                         data[4] = userList[j].userAclList.map(a => a.organisationId).toString().trim().replaceAll(',', ';');
+    //                                                                         data[5] = userList[j].userAclList.map(a => a.programId).toString().trim().replaceAll(',', ';');
+
+
+    //                                                                         userArray[count] = data;
+    //                                                                         count++;
+    //                                                                     }
+    //                                                                     // if (userList.length == 0) {
+    //                                                                     //     data = [];
+    //                                                                     //     userArray[0] = data;
+    //                                                                     // }
+    //                                                                     // console.log("userArray---->", userArray);
+    //                                                                     // if (this.state.table1Instance != "" && this.state.table1Instance != undefined) {
+    //                                                                     //     this.state.table1Instance.destroy();
+    //                                                                     // }
+    //                                                                     this.el = jexcel(document.getElementById("tableDiv2"), '');
+    //                                                                     this.el.destroy();
+    //                                                                     var json = [];
+    //                                                                     var data = userArray;
+
+    //                                                                     var options = {
+    //                                                                         data: data,
+    //                                                                         columnDrag: true,
+    //                                                                         colWidths: [50, 50, 50, 50, 120],
+    //                                                                         colHeaderClasses: ["Reqasterisk"],
+    //                                                                         columns: [
+    //                                                                             {
+    //                                                                                 title: 'userId', //0A 
+    //                                                                                 type: 'hidden',
+    //                                                                             },
+    //                                                                             {
+    //                                                                                 title: i18n.t('static.user.username'),
+    //                                                                                 type: 'autocomplete',
+    //                                                                                 source: userList1,
+    //                                                                                 // multiple: true,
+    //                                                                                 readOnly: true//2C
+    //                                                                             },
+    //                                                                             {
+    //                                                                                 title: i18n.t('static.program.realmcountry'),
+    //                                                                                 type: 'autocomplete',
+    //                                                                                 source: countryList,
+    //                                                                                 multiple: true,
+    //                                                                                 readOnly: true//3D
+    //                                                                             },
+    //                                                                             {
+    //                                                                                 title: i18n.t('static.dashboard.healthareaheader'),
+    //                                                                                 type: 'autocomplete',
+    //                                                                                 source: healthAreaList,
+    //                                                                                 multiple: true,
+    //                                                                                 readOnly: true//4E
+    //                                                                             },
+    //                                                                             {
+    //                                                                                 title: i18n.t('static.organisation.organisation'),
+    //                                                                                 type: 'autocomplete',
+    //                                                                                 source: organisationList,
+    //                                                                                 readOnly: true,
+    //                                                                                 multiple: true,
+    //                                                                                 // filter: this.filterOrganisation
+
+    //                                                                             },
+    //                                                                             {
+    //                                                                                 title: i18n.t('static.dashboard.programheader'),
+    //                                                                                 type: 'autocomplete',
+    //                                                                                 source: programList,
+    //                                                                                 multiple: true,
+    //                                                                                 // filter: this.filterProgram
+    //                                                                                 readOnly: true
+
+    //                                                                             },
+
+
+    //                                                                         ],
+    //                                                                         // updateTable: function (el, cell, x, y, source, value, id) {
+    //                                                                         //     if (y != null) {
+    //                                                                         //         var elInstance = el.jexcel;
+    //                                                                         //         //left align
+    //                                                                         //         // elInstance.setStyle(`B${parseInt(y) + 1}`, 'text-align', 'left');
+
+    //                                                                         //         var rowData = elInstance.getRowData(y);
+    //                                                                         //         var addRowId = rowData[9];
+    //                                                                         //         console.log("addRowId------>", addRowId);
+    //                                                                         //         if (addRowId == 1) {//active grade out
+    //                                                                         //             var cell1 = elInstance.getCell(`F${parseInt(y) + 1}`)
+    //                                                                         //             cell1.classList.add('readonly');
+
+    //                                                                         //             var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
+    //                                                                         //             cell1.classList.remove('readonly');
+    //                                                                         //         } else {
+    //                                                                         //             var cell1 = elInstance.getCell(`F${parseInt(y) + 1}`)
+    //                                                                         //             cell1.classList.remove('readonly');
+
+    //                                                                         //             var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
+    //                                                                         //             cell1.classList.add('readonly');
+    //                                                                         //         }
+    //                                                                         //     }
+    //                                                                         // },
+    //                                                                         text: {
+    //                                                                             showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')} `,
+    //                                                                             show: '',
+    //                                                                             entries: '',
+    //                                                                         },
+    //                                                                         onload: this.loaded2,
+    //                                                                         onselection: this.selected,
+    //                                                                         pagination: localStorage.getItem("sesRecordCount"),
+    //                                                                         search: true,
+    //                                                                         columnSorting: true,
+    //                                                                         tableOverflow: true,
+    //                                                                         wordWrap: true,
+    //                                                                         allowInsertColumn: false,
+    //                                                                         allowManualInsertColumn: false,
+    //                                                                         allowDeleteRow: true,
+    //                                                                         // onselection: this.selected,
+    //                                                                         oneditionend: this.onedit,
+    //                                                                         copyCompatibility: true,
+    //                                                                         allowExport: false,
+    //                                                                         paginationOptions: JEXCEL_PAGINATION_OPTION,
+    //                                                                         position: 'top',
+    //                                                                         filters: true,
+    //                                                                         parseFormulas: true,
+    //                                                                         license: JEXCEL_PRO_KEY,
+    //                                                                         editable: true,
+    //                                                                         contextMenu: function (obj, x, y, e) {
+    //                                                                             var items = [];
+
+    //                                                                             if (y != null) {
+    //                                                                                 if (obj.options.allowInsertRow == true) {
+    //                                                                                     // items.push({
+    //                                                                                     //     title: i18n.t('static.user.accessControlText'),
+    //                                                                                     //     onclick: function () {
+    //                                                                                     //         // console.log("onclick------>", this.el.getValueFromCoords(0, y));
+    //                                                                                     //         if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_ACCESS_CONTROL')) {
+    //                                                                                     //             this.props.history.push({
+    //                                                                                     //                 pathname: `/user/accessControl/${this.el.getValueFromCoords(0, y)}`,
+    //                                                                                     //             });
+    //                                                                                     //         }
+
+    //                                                                                     //     }.bind(this)
+    //                                                                                     // });
+
+    //                                                                                     // if (obj.options.allowInsertRow == true) {
+    //                                                                                     //     items.push({
+    //                                                                                     //         title: i18n.t('static.user.accessControlText'),
+    //                                                                                     //         onclick: function () {
+    //                                                                                     //             // console.log("onclick------>", this.el.getValueFromCoords(0, y));
+    //                                                                                     //             if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_ACCESS_CONTROL')) {
+    //                                                                                     //                 this.props.history.push({
+    //                                                                                     //                     pathname: `/user/accessControl/${this.el.getValueFromCoords(0, y)}`,
+    //                                                                                     //                 });
+    //                                                                                     //             }
+
+    //                                                                                     //         }.bind(this)
+    //                                                                                     //     });
+    //                                                                                     // }
+    //                                                                                 }
+
+    //                                                                                 // Delete a row                                                                                    
+    //                                                                                 // if (obj.options.allowDeleteRow == true) {
+    //                                                                                 //     // region id
+    //                                                                                 //     console.log("getRowData---------->", obj.getRowData(y));
+    //                                                                                 //     if (obj.getRowData(y)[0] == 0) {
+    //                                                                                 //         items.push({
+    //                                                                                 //             title: i18n.t("static.common.deleterow"),
+    //                                                                                 //             onclick: function () {
+    //                                                                                 //                 obj.deleteRow(parseInt(y));
+    //                                                                                 //             }
+    //                                                                                 //         });
+    //                                                                                 //         // Line
+    //                                                                                 //         // items.push({ type: 'line' });
+    //                                                                                 //     }
+    //                                                                                 // }
+    //                                                                             }
+
+
+    //                                                                             return items;
+    //                                                                         }.bind(this)
+    //                                                                     };
+    //                                                                     var table2Instance = jexcel(document.getElementById("tableDiv2"), options);
+    //                                                                     this.el = table2Instance;
+    //                                                                     this.setState({
+    //                                                                         table2Instance: table2Instance,
+    //                                                                         loading: false
+    //                                                                     })
+
+
+
+
+
+
+
+    //                                                                 });
+    //                                                             }
+
+    //                                                         }).catch(
+    //                                                             error => {
+    //                                                                 if (error.message === "Network Error") {
+    //                                                                     this.setState({
+    //                                                                         message: 'static.unkownError',
+    //                                                                         loading: false
+    //                                                                     });
+    //                                                                 } else {
+    //                                                                     switch (error.response ? error.response.status : "") {
+
+    //                                                                         case 401:
+    //                                                                             this.props.history.push(`/login/static.message.sessionExpired`)
+    //                                                                             break;
+    //                                                                         case 403:
+    //                                                                             this.props.history.push(`/accessDenied`)
+    //                                                                             break;
+    //                                                                         case 500:
+    //                                                                         case 404:
+    //                                                                         case 406:
+    //                                                                             this.setState({
+    //                                                                                 message: error.response.data.messageCode,
+    //                                                                                 loading: false
+    //                                                                             });
+    //                                                                             break;
+    //                                                                         case 412:
+    //                                                                             this.setState({
+    //                                                                                 message: error.response.data.messageCode,
+    //                                                                                 loading: false
+    //                                                                             });
+    //                                                                             break;
+    //                                                                         default:
+    //                                                                             this.setState({
+    //                                                                                 message: 'static.unkownError',
+    //                                                                                 loading: false
+    //                                                                             });
+    //                                                                             break;
+    //                                                                     }
+    //                                                                 }
+    //                                                             }
+    //                                                         );
+    //                                                 } else {
+    //                                                     this.setState({
+    //                                                         message: response.data.messageCode
+    //                                                     },
+    //                                                         () => {
+    //                                                             this.hideSecondComponent();
+    //                                                         })
+    //                                                 }
+
+    //                                             }).catch(
+    //                                                 error => {
+    //                                                     if (error.message === "Network Error") {
+    //                                                         this.setState({
+    //                                                             message: 'static.unkownError',
+    //                                                             loading: false
+    //                                                         });
+    //                                                     } else {
+    //                                                         switch (error.response ? error.response.status : "") {
+
+    //                                                             case 401:
+    //                                                                 this.props.history.push(`/login/static.message.sessionExpired`)
+    //                                                                 break;
+    //                                                             case 403:
+    //                                                                 this.props.history.push(`/accessDenied`)
+    //                                                                 break;
+    //                                                             case 500:
+    //                                                             case 404:
+    //                                                             case 406:
+    //                                                                 this.setState({
+    //                                                                     message: error.response.data.messageCode,
+    //                                                                     loading: false
+    //                                                                 });
+    //                                                                 break;
+    //                                                             case 412:
+    //                                                                 this.setState({
+    //                                                                     message: error.response.data.messageCode,
+    //                                                                     loading: false
+    //                                                                 });
+    //                                                                 break;
+    //                                                             default:
+    //                                                                 this.setState({
+    //                                                                     message: 'static.unkownError',
+    //                                                                     loading: false
+    //                                                                 });
+    //                                                                 break;
+    //                                                         }
+    //                                                     }
+    //                                                 }
+    //                                             );
+    //                                     } else {
+    //                                         this.setState({
+    //                                             message: response.data.message
+    //                                         })
+    //                                     }
+
+    //                                 }).catch(
+    //                                     error => {
+    //                                         if (error.message === "Network Error") {
+    //                                             this.setState({
+    //                                                 message: 'static.unkownError',
+    //                                                 loading: false
+    //                                             });
+    //                                         } else {
+    //                                             switch (error.response ? error.response.status : "") {
+
+    //                                                 case 401:
+    //                                                     this.props.history.push(`/login/static.message.sessionExpired`)
+    //                                                     break;
+    //                                                 case 403:
+    //                                                     this.props.history.push(`/accessDenied`)
+    //                                                     break;
+    //                                                 case 500:
+    //                                                 case 404:
+    //                                                 case 406:
+    //                                                     this.setState({
+    //                                                         message: error.response.data.messageCode,
+    //                                                         loading: false
+    //                                                     });
+    //                                                     break;
+    //                                                 case 412:
+    //                                                     this.setState({
+    //                                                         message: error.response.data.messageCode,
+    //                                                         loading: false
+    //                                                     });
+    //                                                     break;
+    //                                                 default:
+    //                                                     this.setState({
+    //                                                         message: 'static.unkownError',
+    //                                                         loading: false
+    //                                                     });
+    //                                                     break;
+    //                                             }
+    //                                         }
+    //                                     }
+    //                                 );
+    //                         } else {
+    //                             this.setState({
+    //                                 message: response.data.messageCode
+    //                             },
+    //                                 () => {
+    //                                     this.hideSecondComponent();
+    //                                 })
+    //                         }
+
+    //                     }).catch(
+    //                         error => {
+    //                             if (error.message === "Network Error") {
+    //                                 this.setState({
+    //                                     message: 'static.unkownError',
+    //                                     loading: false
+    //                                 });
+    //                             } else {
+    //                                 switch (error.response ? error.response.status : "") {
+
+    //                                     case 401:
+    //                                         this.props.history.push(`/login/static.message.sessionExpired`)
+    //                                         break;
+    //                                     case 403:
+    //                                         this.props.history.push(`/accessDenied`)
+    //                                         break;
+    //                                     case 500:
+    //                                     case 404:
+    //                                     case 406:
+    //                                         this.setState({
+    //                                             message: error.response.data.messageCode,
+    //                                             loading: false
+    //                                         });
+    //                                         break;
+    //                                     case 412:
+    //                                         this.setState({
+    //                                             message: error.response.data.messageCode,
+    //                                             loading: false
+    //                                         });
+    //                                         break;
+    //                                     default:
+    //                                         this.setState({
+    //                                             message: 'static.unkownError',
+    //                                             loading: false
+    //                                         });
+    //                                         break;
+    //                                 }
+    //                             }
+    //                         }
+    //                     );
+    //             } else {
+    //                 this.setState({
+    //                     message: response.data.messageCode
+    //                 },
+    //                     () => {
+    //                         this.hideSecondComponent();
+    //                     })
+    //             }
+
+    //         }).catch(
+    //             error => {
+    //                 if (error.message === "Network Error") {
+    //                     this.setState({
+    //                         message: 'static.unkownError',
+    //                         loading: false
+    //                     });
+    //                 } else {
+    //                     switch (error.response ? error.response.status : "") {
+
+    //                         case 401:
+    //                             this.props.history.push(`/login/static.message.sessionExpired`)
+    //                             break;
+    //                         case 403:
+    //                             this.props.history.push(`/accessDenied`)
+    //                             break;
+    //                         case 500:
+    //                         case 404:
+    //                         case 406:
+    //                             this.setState({
+    //                                 message: error.response.data.messageCode,
+    //                                 loading: false
+    //                             });
+    //                             break;
+    //                         case 412:
+    //                             this.setState({
+    //                                 message: error.response.data.messageCode,
+    //                                 loading: false
+    //                             });
+    //                             break;
+    //                         default:
+    //                             this.setState({
+    //                                 message: 'static.unkownError',
+    //                                 loading: false
+    //                             });
+    //                             break;
+    //                     }
+    //                 }
+    //             }
+    //         );
+    // }
+
+
     buildJExcel2() {
 
+        let userList = this.state.selUserList;
+        // console.log("userList---->1", userList.filter(c => c.userId == 663));
+        console.log("userList---->1", userList);
 
-        RealmCountryService.getRealmCountryListAll()
-            .then(response => {
-                if (response.status == 200) {
-                    var listArray = response.data;
-                    listArray.sort((a, b) => {
-                        var itemLabelA = getLabelText(a.country.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = getLabelText(b.country.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
-                        return itemLabelA > itemLabelB ? 1 : -1;
-                    });
-                    this.setState({
-                        realmCountryList: listArray,
-                        selRealmCountry: listArray.filter(c => c.active.toString() == "true")
-                    })
-                    OrganisationService.getOrganisationList()
-                        .then(response => {
-                            if (response.status == "200") {
-                                var listArray = response.data;
-                                listArray.sort((a, b) => {
-                                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
-                                    return itemLabelA > itemLabelB ? 1 : -1;
-                                });
-                                this.setState({
-                                    organisations: listArray,
-                                    selOrganisation: listArray.filter(c => c.active.toString() == "true")
-                                });
-                                HealthAreaService.getHealthAreaList()
-                                    .then(response => {
-                                        if (response.status == "200") {
-                                            var listArray = response.data;
-                                            listArray.sort((a, b) => {
-                                                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                                                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
-                                                return itemLabelA > itemLabelB ? 1 : -1;
-                                            });
-                                            this.setState({
-                                                healthAreas: listArray.filter(c => c.active == true),
-                                                selHealthArea: listArray.filter(c => c.active == true)
-                                            });
-                                            ProgramService.getProgramList()
-                                                .then(response => {
-                                                    if (response.status == "200") {
-                                                        //                                                         var listArray = [...response.data]
-                                                        //                                                         var arr = [];
-                                                        // for (var i = 0; i <= response.data.length; i++) {
-                                                        //     response.data[i].programTypeId = 1;
-                                                        // }
-                                                        // var listArray = response.data;
-                                                        // listArray.sort((a, b) => {
-                                                        //     var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                                                        //     var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
-                                                        //     return itemLabelA > itemLabelB ? 1 : -1;
-                                                        // });
-                                                        DatasetService.getDatasetList()
-                                                            .then(response1 => {
-                                                                if (response1.status == "200") {
+        // console.log("userList---->1", (userList.filter(c => c.userId == 1)[0].userAclList.map(c => (c.programName.label_en == "" || c.programName.label_en == null ? "All" : c.programName.label_en))).toString());
+        // console.log("userList---->1", (userList.filter(c => c.userId == 30)[0].userAclList.map(c => (c.programName.label_en == "" ? "All" : c.programName.label_en))).toString());
 
-                                                                    var listArray = [...response.data, ...response1.data]
-                                                                    listArray.sort((a, b) => {
-                                                                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                                                                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
-                                                                        return itemLabelA > itemLabelB ? 1 : -1;
-                                                                    });
-                                                                    this.setState({
-                                                                        programs: listArray,
-                                                                        selProgram: listArray.filter(c => c.active.toString() == "true")
-                                                                    }, (
-                                                                    ) => {
-                                                                        // this.buildJexcel2();
+        // console.log("userList---->12", countryList);
 
-                                                                        const { selProgram } = this.state;
-                                                                        const { selRealmCountry } = this.state;
-                                                                        const { selOrganisation } = this.state;
-                                                                        const { selHealthArea } = this.state;
-                                                                        const { selUserList } = this.state;
-                                                                        let programList = [];
-                                                                        let countryList = [];
-                                                                        let organisationList = [];
-                                                                        let healthAreaList = [];
-                                                                        let userList1 = [];
+        let userArray = [];
+        let count = 0;
 
-                                                                        if (selUserList.length > 0) {
-                                                                            for (var i = 0; i < selUserList.length; i++) {
-                                                                                var paJson = {
-                                                                                    // name: getLabelText(selProgram[i].label, this.state.lang),
-                                                                                    name: selUserList[i].username,
-                                                                                    id: parseInt(selUserList[i].userId),
-                                                                                    active: selUserList[i].active
-                                                                                }
-                                                                                userList1[i] = paJson
-                                                                            }
-                                                                        }
-
-                                                                        userList1 = userList1.filter(c => c.active);
-
-                                                                        if (selProgram.length > 0) {
-                                                                            for (var i = 0; i < selProgram.length; i++) {
-                                                                                var paJson = {
-                                                                                    // name: getLabelText(selProgram[i].label, this.state.lang),
-                                                                                    name: selProgram[i].programCode,
-                                                                                    id: parseInt(selProgram[i].programId),
-                                                                                    active: selProgram[i].active
-                                                                                }
-                                                                                programList[i] = paJson
-                                                                            }
-                                                                            var paJson = {
-                                                                                // name: "All",
-                                                                                name: "All",
-                                                                                id: -1,
-                                                                                active: true
-                                                                            }
-                                                                            programList.unshift(paJson);
-                                                                        }
-
-                                                                        if (selRealmCountry.length > 0) {
-                                                                            for (var i = 0; i < selRealmCountry.length; i++) {
-                                                                                var paJson = {
-                                                                                    name: getLabelText(selRealmCountry[i].country.label, this.state.lang),
-                                                                                    id: parseInt(selRealmCountry[i].realmCountryId),
-                                                                                    active: selRealmCountry[i].active
-                                                                                }
-                                                                                countryList[i] = paJson
-                                                                            }
-                                                                            var paJson = {
-                                                                                name: "All",
-                                                                                id: -1,
-                                                                                active: true
-                                                                            }
-                                                                            countryList.unshift(paJson);
-                                                                        }
-
-                                                                        if (selOrganisation.length > 0) {
-                                                                            for (var i = 0; i < selOrganisation.length; i++) {
-                                                                                var paJson = {
-                                                                                    name: getLabelText(selOrganisation[i].label, this.state.lang),
-                                                                                    id: parseInt(selOrganisation[i].organisationId),
-                                                                                    active: selOrganisation[i].active
-                                                                                }
-                                                                                organisationList[i] = paJson
-                                                                            }
-                                                                            var paJson = {
-                                                                                name: "All",
-                                                                                id: -1,
-                                                                                active: true
-                                                                            }
-                                                                            organisationList.unshift(paJson);
-                                                                        }
-
-                                                                        if (selHealthArea.length > 0) {
-                                                                            for (var i = 0; i < selHealthArea.length; i++) {
-                                                                                var paJson = {
-                                                                                    name: getLabelText(selHealthArea[i].label, this.state.lang),
-                                                                                    id: parseInt(selHealthArea[i].healthAreaId),
-                                                                                    active: selHealthArea[i].active
-                                                                                }
-                                                                                healthAreaList[i] = paJson
-                                                                            }
-                                                                            var paJson = {
-                                                                                name: "All",
-                                                                                id: -1,
-                                                                                active: true
-                                                                            }
-                                                                            healthAreaList.unshift(paJson);
-                                                                        }
+        for (var j = 0; j < userList.length; j++) {
+            // console.log("userList---->2", userList.filter(c => c.userId == 663)[0].userAclList.map(a => a.realmCountryId).toString().trim().replaceAll(',', ';'));
+            data = [];
+            data[0] = userList[j].userId
+            data[1] = userList[j].username
+            data[2] = ([...new Set(userList[j].userAclList.map(a => a.countryName.label_en == "" || a.countryName.label_en == null ? "All" : a.countryName.label_en))]).toString();
+            data[3] = ([...new Set(userList[j].userAclList.map(a => a.healthAreaName.label_en == "" || a.healthAreaName.label_en == null ? "All" : a.healthAreaName.label_en))]).toString();
+            // data[1] = papuList[j].healthAreaList.map(a => a.id).toString().trim().replaceAll(',', ';')
+            data[4] = ([...new Set(userList[j].userAclList.map(a => a.organisationName.label_en == "" || a.organisationName.label_en == null ? "All" : a.organisationName.label_en))]).toString();
+            data[5] = ([...new Set(userList[j].userAclList.map(a => a.programName.label_en == "" || a.programName.label_en == null ? "All" : a.programName.label_en))]).toString();
 
 
+            userArray[count] = data;
+            count++;
+        }
+        // if (userList.length == 0) {
+        //     data = [];
+        //     userArray[0] = data;
+        // }
+        // console.log("userArray---->", userArray);
+        // if (this.state.table1Instance != "" && this.state.table1Instance != undefined) {
+        //     this.state.table1Instance.destroy();
+        // }
+        this.el = jexcel(document.getElementById("tableDiv2"), '');
+        this.el.destroy();
+        var json = [];
+        var data = userArray;
 
+        var options = {
+            data: data,
+            columnDrag: true,
+            colWidths: [50, 50, 50, 50, 120],
+            colHeaderClasses: ["Reqasterisk"],
+            columns: [
+                {
+                    title: 'userId', //0A 
+                    type: 'hidden',
+                },
+                {
+                    title: i18n.t('static.user.username'),
+                    type: 'text',
+                    readOnly: true//2C
+                },
+                {
+                    title: i18n.t('static.program.realmcountry'),
+                    type: 'text',
+                    readOnly: true//3D
+                },
+                {
+                    title: i18n.t('static.dashboard.healthareaheader'),
+                    type: 'text',
+                    readOnly: true//4E
+                },
+                {
+                    title: i18n.t('static.organisation.organisation'),
+                    type: 'text',
+                    readOnly: true,
+                    // filter: this.filterOrganisation
 
-                                                                        let userList = this.state.selUserList;
-                                                                        console.log("userList---->1", userList.filter(c => c.userId == 663));
-                                                                        console.log("userList---->12", countryList);
+                },
+                {
+                    title: i18n.t('static.dashboard.programheader'),
+                    type: 'text',
+                    // filter: this.filterProgram
+                    readOnly: true
 
+                },
 
-                                                                        let userArray = [];
-                                                                        let count = 0;
+            ],
+            // updateTable: function (el, cell, x, y, source, value, id) {
+            //     if (y != null) {
+            //         var elInstance = el.jexcel;
+            //         //left align
+            //         // elInstance.setStyle(`B${parseInt(y) + 1}`, 'text-align', 'left');
 
-                                                                        for (var j = 0; j < userList.length; j++) {
-                                                                            // console.log("userList---->2", userList.filter(c => c.userId == 663)[0].userAclList.map(a => a.realmCountryId).toString().trim().replaceAll(',', ';'));
-                                                                            data = [];
-                                                                            data[0] = userList[j].userId
-                                                                            data[1] = userList[j].userId
-                                                                            data[2] = userList[j].userAclList.map(a => a.realmCountryId).toString().trim().replaceAll(',', ';');
-                                                                            data[3] = userList[j].userAclList.map(a => a.healthAreaId).toString().trim().replaceAll(',', ';');
-                                                                            // data[1] = papuList[j].healthAreaList.map(a => a.id).toString().trim().replaceAll(',', ';')
-                                                                            data[4] = userList[j].userAclList.map(a => a.organisationId).toString().trim().replaceAll(',', ';');
-                                                                            data[5] = userList[j].userAclList.map(a => a.programId).toString().trim().replaceAll(',', ';');
+            //         var rowData = elInstance.getRowData(y);
+            //         var addRowId = rowData[9];
+            //         console.log("addRowId------>", addRowId);
+            //         if (addRowId == 1) {//active grade out
+            //             var cell1 = elInstance.getCell(`F${parseInt(y) + 1}`)
+            //             cell1.classList.add('readonly');
 
+            //             var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
+            //             cell1.classList.remove('readonly');
+            //         } else {
+            //             var cell1 = elInstance.getCell(`F${parseInt(y) + 1}`)
+            //             cell1.classList.remove('readonly');
 
-                                                                            userArray[count] = data;
-                                                                            count++;
-                                                                        }
-                                                                        // if (userList.length == 0) {
-                                                                        //     data = [];
-                                                                        //     userArray[0] = data;
-                                                                        // }
-                                                                        // console.log("userArray---->", userArray);
-                                                                        // if (this.state.table1Instance != "" && this.state.table1Instance != undefined) {
-                                                                        //     this.state.table1Instance.destroy();
-                                                                        // }
-                                                                        this.el = jexcel(document.getElementById("tableDiv2"), '');
-                                                                        this.el.destroy();
-                                                                        var json = [];
-                                                                        var data = userArray;
+            //             var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
+            //             cell1.classList.add('readonly');
+            //         }
+            //     }
+            // },
+            text: {
+                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')} `,
+                show: '',
+                entries: '',
+            },
+            onload: this.loaded2,
+            onselection: this.selected,
+            pagination: localStorage.getItem("sesRecordCount"),
+            search: true,
+            columnSorting: true,
+            tableOverflow: true,
+            wordWrap: true,
+            allowInsertColumn: false,
+            allowManualInsertColumn: false,
+            allowDeleteRow: true,
+            // onselection: this.selected,
+            oneditionend: this.onedit,
+            copyCompatibility: true,
+            allowExport: false,
+            paginationOptions: JEXCEL_PAGINATION_OPTION,
+            position: 'top',
+            filters: true,
+            parseFormulas: true,
+            license: JEXCEL_PRO_KEY,
+            editable: true,
+            contextMenu: function (obj, x, y, e) {
+                var items = [];
 
-                                                                        var options = {
-                                                                            data: data,
-                                                                            columnDrag: true,
-                                                                            colWidths: [50, 50, 50, 50, 120],
-                                                                            colHeaderClasses: ["Reqasterisk"],
-                                                                            columns: [
-                                                                                {
-                                                                                    title: 'userId', //0A 
-                                                                                    type: 'hidden',
-                                                                                },
-                                                                                {
-                                                                                    title: i18n.t('static.user.username'),
-                                                                                    type: 'autocomplete',
-                                                                                    source: userList1,
-                                                                                    // multiple: true,
-                                                                                    readOnly: true//2C
-                                                                                },
-                                                                                {
-                                                                                    title: i18n.t('static.program.realmcountry'),
-                                                                                    type: 'autocomplete',
-                                                                                    source: countryList,
-                                                                                    multiple: true,
-                                                                                    readOnly: true//3D
-                                                                                },
-                                                                                {
-                                                                                    title: i18n.t('static.dashboard.healthareaheader'),
-                                                                                    type: 'autocomplete',
-                                                                                    source: healthAreaList,
-                                                                                    multiple: true,
-                                                                                    readOnly: true//4E
-                                                                                },
-                                                                                {
-                                                                                    title: i18n.t('static.organisation.organisation'),
-                                                                                    type: 'autocomplete',
-                                                                                    source: organisationList,
-                                                                                    readOnly: true,
-                                                                                    multiple: true,
-                                                                                    // filter: this.filterOrganisation
+                if (y != null) {
+                    if (obj.options.allowInsertRow == true) {
+                        // items.push({
+                        //     title: i18n.t('static.user.accessControlText'),
+                        //     onclick: function () {
+                        //         // console.log("onclick------>", this.el.getValueFromCoords(0, y));
+                        //         if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_ACCESS_CONTROL')) {
+                        //             this.props.history.push({
+                        //                 pathname: `/user/accessControl/${this.el.getValueFromCoords(0, y)}`,
+                        //             });
+                        //         }
 
-                                                                                },
-                                                                                {
-                                                                                    title: i18n.t('static.dashboard.programheader'),
-                                                                                    type: 'autocomplete',
-                                                                                    source: programList,
-                                                                                    multiple: true,
-                                                                                    // filter: this.filterProgram
-                                                                                    readOnly: true
+                        //     }.bind(this)
+                        // });
 
-                                                                                },
+                        // if (obj.options.allowInsertRow == true) {
+                        //     items.push({
+                        //         title: i18n.t('static.user.accessControlText'),
+                        //         onclick: function () {
+                        //             // console.log("onclick------>", this.el.getValueFromCoords(0, y));
+                        //             if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_ACCESS_CONTROL')) {
+                        //                 this.props.history.push({
+                        //                     pathname: `/user/accessControl/${this.el.getValueFromCoords(0, y)}`,
+                        //                 });
+                        //             }
 
-
-                                                                            ],
-                                                                            // updateTable: function (el, cell, x, y, source, value, id) {
-                                                                            //     if (y != null) {
-                                                                            //         var elInstance = el.jexcel;
-                                                                            //         //left align
-                                                                            //         // elInstance.setStyle(`B${parseInt(y) + 1}`, 'text-align', 'left');
-
-                                                                            //         var rowData = elInstance.getRowData(y);
-                                                                            //         var addRowId = rowData[9];
-                                                                            //         console.log("addRowId------>", addRowId);
-                                                                            //         if (addRowId == 1) {//active grade out
-                                                                            //             var cell1 = elInstance.getCell(`F${parseInt(y) + 1}`)
-                                                                            //             cell1.classList.add('readonly');
-
-                                                                            //             var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
-                                                                            //             cell1.classList.remove('readonly');
-                                                                            //         } else {
-                                                                            //             var cell1 = elInstance.getCell(`F${parseInt(y) + 1}`)
-                                                                            //             cell1.classList.remove('readonly');
-
-                                                                            //             var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
-                                                                            //             cell1.classList.add('readonly');
-                                                                            //         }
-                                                                            //     }
-                                                                            // },
-                                                                            text: {
-                                                                                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')} `,
-                                                                                show: '',
-                                                                                entries: '',
-                                                                            },
-                                                                            onload: this.loaded2,
-                                                                            onselection: this.selected,
-                                                                            pagination: localStorage.getItem("sesRecordCount"),
-                                                                            search: true,
-                                                                            columnSorting: true,
-                                                                            tableOverflow: true,
-                                                                            wordWrap: true,
-                                                                            allowInsertColumn: false,
-                                                                            allowManualInsertColumn: false,
-                                                                            allowDeleteRow: true,
-                                                                            // onselection: this.selected,
-                                                                            oneditionend: this.onedit,
-                                                                            copyCompatibility: true,
-                                                                            allowExport: false,
-                                                                            paginationOptions: JEXCEL_PAGINATION_OPTION,
-                                                                            position: 'top',
-                                                                            filters: true,
-                                                                            parseFormulas: true,
-                                                                            license: JEXCEL_PRO_KEY,
-                                                                            editable: true,
-                                                                            contextMenu: function (obj, x, y, e) {
-                                                                                var items = [];
-
-                                                                                if (y != null) {
-                                                                                    if (obj.options.allowInsertRow == true) {
-                                                                                        // items.push({
-                                                                                        //     title: i18n.t('static.user.accessControlText'),
-                                                                                        //     onclick: function () {
-                                                                                        //         // console.log("onclick------>", this.el.getValueFromCoords(0, y));
-                                                                                        //         if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_ACCESS_CONTROL')) {
-                                                                                        //             this.props.history.push({
-                                                                                        //                 pathname: `/user/accessControl/${this.el.getValueFromCoords(0, y)}`,
-                                                                                        //             });
-                                                                                        //         }
-
-                                                                                        //     }.bind(this)
-                                                                                        // });
-
-                                                                                        // if (obj.options.allowInsertRow == true) {
-                                                                                        //     items.push({
-                                                                                        //         title: i18n.t('static.user.accessControlText'),
-                                                                                        //         onclick: function () {
-                                                                                        //             // console.log("onclick------>", this.el.getValueFromCoords(0, y));
-                                                                                        //             if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_ACCESS_CONTROL')) {
-                                                                                        //                 this.props.history.push({
-                                                                                        //                     pathname: `/user/accessControl/${this.el.getValueFromCoords(0, y)}`,
-                                                                                        //                 });
-                                                                                        //             }
-
-                                                                                        //         }.bind(this)
-                                                                                        //     });
-                                                                                        // }
-                                                                                    }
-
-                                                                                    // Delete a row                                                                                    
-                                                                                    // if (obj.options.allowDeleteRow == true) {
-                                                                                    //     // region id
-                                                                                    //     console.log("getRowData---------->", obj.getRowData(y));
-                                                                                    //     if (obj.getRowData(y)[0] == 0) {
-                                                                                    //         items.push({
-                                                                                    //             title: i18n.t("static.common.deleterow"),
-                                                                                    //             onclick: function () {
-                                                                                    //                 obj.deleteRow(parseInt(y));
-                                                                                    //             }
-                                                                                    //         });
-                                                                                    //         // Line
-                                                                                    //         // items.push({ type: 'line' });
-                                                                                    //     }
-                                                                                    // }
-                                                                                }
-
-
-                                                                                return items;
-                                                                            }.bind(this)
-                                                                        };
-                                                                        var table2Instance = jexcel(document.getElementById("tableDiv2"), options);
-                                                                        this.el = table2Instance;
-                                                                        this.setState({
-                                                                            table2Instance: table2Instance,
-                                                                            loading: false
-                                                                        })
-
-
-
-
-
-
-
-                                                                    });
-                                                                }
-
-                                                            }).catch(
-                                                                error => {
-                                                                    if (error.message === "Network Error") {
-                                                                        this.setState({
-                                                                            message: 'static.unkownError',
-                                                                            loading: false
-                                                                        });
-                                                                    } else {
-                                                                        switch (error.response ? error.response.status : "") {
-
-                                                                            case 401:
-                                                                                this.props.history.push(`/login/static.message.sessionExpired`)
-                                                                                break;
-                                                                            case 403:
-                                                                                this.props.history.push(`/accessDenied`)
-                                                                                break;
-                                                                            case 500:
-                                                                            case 404:
-                                                                            case 406:
-                                                                                this.setState({
-                                                                                    message: error.response.data.messageCode,
-                                                                                    loading: false
-                                                                                });
-                                                                                break;
-                                                                            case 412:
-                                                                                this.setState({
-                                                                                    message: error.response.data.messageCode,
-                                                                                    loading: false
-                                                                                });
-                                                                                break;
-                                                                            default:
-                                                                                this.setState({
-                                                                                    message: 'static.unkownError',
-                                                                                    loading: false
-                                                                                });
-                                                                                break;
-                                                                        }
-                                                                    }
-                                                                }
-                                                            );
-                                                    } else {
-                                                        this.setState({
-                                                            message: response.data.messageCode
-                                                        },
-                                                            () => {
-                                                                this.hideSecondComponent();
-                                                            })
-                                                    }
-
-                                                }).catch(
-                                                    error => {
-                                                        if (error.message === "Network Error") {
-                                                            this.setState({
-                                                                message: 'static.unkownError',
-                                                                loading: false
-                                                            });
-                                                        } else {
-                                                            switch (error.response ? error.response.status : "") {
-
-                                                                case 401:
-                                                                    this.props.history.push(`/login/static.message.sessionExpired`)
-                                                                    break;
-                                                                case 403:
-                                                                    this.props.history.push(`/accessDenied`)
-                                                                    break;
-                                                                case 500:
-                                                                case 404:
-                                                                case 406:
-                                                                    this.setState({
-                                                                        message: error.response.data.messageCode,
-                                                                        loading: false
-                                                                    });
-                                                                    break;
-                                                                case 412:
-                                                                    this.setState({
-                                                                        message: error.response.data.messageCode,
-                                                                        loading: false
-                                                                    });
-                                                                    break;
-                                                                default:
-                                                                    this.setState({
-                                                                        message: 'static.unkownError',
-                                                                        loading: false
-                                                                    });
-                                                                    break;
-                                                            }
-                                                        }
-                                                    }
-                                                );
-                                        } else {
-                                            this.setState({
-                                                message: response.data.message
-                                            })
-                                        }
-
-                                    }).catch(
-                                        error => {
-                                            if (error.message === "Network Error") {
-                                                this.setState({
-                                                    message: 'static.unkownError',
-                                                    loading: false
-                                                });
-                                            } else {
-                                                switch (error.response ? error.response.status : "") {
-
-                                                    case 401:
-                                                        this.props.history.push(`/login/static.message.sessionExpired`)
-                                                        break;
-                                                    case 403:
-                                                        this.props.history.push(`/accessDenied`)
-                                                        break;
-                                                    case 500:
-                                                    case 404:
-                                                    case 406:
-                                                        this.setState({
-                                                            message: error.response.data.messageCode,
-                                                            loading: false
-                                                        });
-                                                        break;
-                                                    case 412:
-                                                        this.setState({
-                                                            message: error.response.data.messageCode,
-                                                            loading: false
-                                                        });
-                                                        break;
-                                                    default:
-                                                        this.setState({
-                                                            message: 'static.unkownError',
-                                                            loading: false
-                                                        });
-                                                        break;
-                                                }
-                                            }
-                                        }
-                                    );
-                            } else {
-                                this.setState({
-                                    message: response.data.messageCode
-                                },
-                                    () => {
-                                        this.hideSecondComponent();
-                                    })
-                            }
-
-                        }).catch(
-                            error => {
-                                if (error.message === "Network Error") {
-                                    this.setState({
-                                        message: 'static.unkownError',
-                                        loading: false
-                                    });
-                                } else {
-                                    switch (error.response ? error.response.status : "") {
-
-                                        case 401:
-                                            this.props.history.push(`/login/static.message.sessionExpired`)
-                                            break;
-                                        case 403:
-                                            this.props.history.push(`/accessDenied`)
-                                            break;
-                                        case 500:
-                                        case 404:
-                                        case 406:
-                                            this.setState({
-                                                message: error.response.data.messageCode,
-                                                loading: false
-                                            });
-                                            break;
-                                        case 412:
-                                            this.setState({
-                                                message: error.response.data.messageCode,
-                                                loading: false
-                                            });
-                                            break;
-                                        default:
-                                            this.setState({
-                                                message: 'static.unkownError',
-                                                loading: false
-                                            });
-                                            break;
-                                    }
-                                }
-                            }
-                        );
-                } else {
-                    this.setState({
-                        message: response.data.messageCode
-                    },
-                        () => {
-                            this.hideSecondComponent();
-                        })
-                }
-
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({
-                            message: 'static.unkownError',
-                            loading: false
-                        });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-
-                            case 401:
-                                this.props.history.push(`/login/static.message.sessionExpired`)
-                                break;
-                            case 403:
-                                this.props.history.push(`/accessDenied`)
-                                break;
-                            case 500:
-                            case 404:
-                            case 406:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            case 412:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            default:
-                                this.setState({
-                                    message: 'static.unkownError',
-                                    loading: false
-                                });
-                                break;
-                        }
+                        //         }.bind(this)
+                        //     });
+                        // }
                     }
+
+                    // Delete a row                                                                                    
+                    // if (obj.options.allowDeleteRow == true) {
+                    //     // region id
+                    //     console.log("getRowData---------->", obj.getRowData(y));
+                    //     if (obj.getRowData(y)[0] == 0) {
+                    //         items.push({
+                    //             title: i18n.t("static.common.deleterow"),
+                    //             onclick: function () {
+                    //                 obj.deleteRow(parseInt(y));
+                    //             }
+                    //         });
+                    //         // Line
+                    //         // items.push({ type: 'line' });
+                    //     }
+                    // }
                 }
-            );
 
 
+                return items;
+            }.bind(this)
+        };
+        var table2Instance = jexcel(document.getElementById("tableDiv2"), options);
+        this.el = table2Instance;
+        this.setState({
+            table2Instance: table2Instance,
+            loading: false
+        })
 
     }
 
