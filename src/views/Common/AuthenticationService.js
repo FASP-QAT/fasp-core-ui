@@ -1344,7 +1344,7 @@ class AuthenticationService {
                         }
                         break;
                     case "/extrapolation/extrapolateData":
-                        if (bfunction.includes("ROLE_BF_EXTRAPOLATION")) {
+                        if (bfunction.includes("ROLE_BF_EXTRAPOLATION") || bfunction.includes("ROLE_BF_VIEW_EXTRAPOLATION")) {
                             return true;
                         }
                         break;
@@ -1358,7 +1358,7 @@ class AuthenticationService {
                         break;
                     case "/report/compareAndSelectScenario":
                     case "/report/compareAndSelectScenario/:programId/:planningUnitId/:regionId":
-                        if (bfunction.includes("ROLE_BF_COMPARE_AND_SELECT")) {
+                        if (bfunction.includes("ROLE_BF_COMPARE_AND_SELECT") || bfunction.includes("ROLE_BF_VIEW_COMPARE_AND_SELECT")) {
                             return true;
                         }
                         break;
@@ -1385,7 +1385,7 @@ class AuthenticationService {
                     case "/dataentry/consumptionDataEntryAndAdjustment":
                     case "/dataentry/consumptionDataEntryAndAdjustment/:color/:message":
                     case "/dataentry/consumptionDataEntryAndAdjustment/:planningUnitId":
-                        if (bfunction.includes("ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT")) {
+                        if (bfunction.includes("ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT") || bfunction.includes("ROLE_BF_VIEW_CONSUMPTION_DATA_ENTRY_ADJUSTMENT")) {
                             return true;
                         }
                         break;
@@ -1475,7 +1475,7 @@ class AuthenticationService {
 
                     case "/forecastReport/forecastSummary":
                     case "/forecastReport/forecastSummary/:programId/:versionId":
-                        if (bfunction.includes("ROLE_BF_LIST_FORECAST_SUMMARY")) {
+                        if (bfunction.includes("ROLE_BF_LIST_FORECAST_SUMMARY") || bfunction.includes("ROLE_BF_VIEW_FORECAST_SUMMARY")) {
                             return true;
                         }
                         break;
