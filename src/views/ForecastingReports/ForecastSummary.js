@@ -680,10 +680,10 @@ class ForecastSummary extends Component {
                 doc.setFont('helvetica', 'normal')
                 doc.setTextColor("#002f6c");
                 doc.setFont('helvetica', 'bold')
-                doc.fromHTML("<font size = '1' color = '#002f6c'><b>" + i18n.t('static.supplyPlan.runDate') + "</b> " + moment(new Date()).format(`${DATE_FORMAT_CAP}`) + "</font>", doc.internal.pageSize.width - 150, 20)
-                doc.fromHTML("<font size = '1' color = '#002f6c'><b>" + i18n.t('static.supplyPlan.runTime') + "</b> " + moment(new Date()).format('hh:mm A') + "</font>", doc.internal.pageSize.width - 150, 30)
-                doc.fromHTML("<font size = '1' color = '#002f6c'><b>" + i18n.t('static.user.user') + ":</b> " + AuthenticationService.getLoggedInUsername() + "</font>", doc.internal.pageSize.width - 150, 40)
-                doc.fromHTML("<font size = '1' color = '#002f6c'><b>" + this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + " " + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "</b> " + "</font>", doc.internal.pageSize.width - 150, 50)
+                doc.fromHTML("<span style = 'font-family:helvetica;'><font size = '1' color = '#002f6c'><b>" + i18n.t('static.supplyPlan.runDate') + "</b> " + moment(new Date()).format(`${DATE_FORMAT_CAP}`) + "</font></span>", doc.internal.pageSize.width - 150, 20)
+                doc.fromHTML("<span style = 'font-family:helvetica;'><font size = '1' color = '#002f6c'><b>" + i18n.t('static.supplyPlan.runTime') + "</b> " + moment(new Date()).format('hh:mm A') + "</font></span>", doc.internal.pageSize.width - 150, 30)
+                doc.fromHTML("<span style = 'font-family:helvetica;'><font size = '1' color = '#002f6c'><b>" + i18n.t('static.user.user') + ":</b> " + AuthenticationService.getLoggedInUsername() + "</font></span>", doc.internal.pageSize.width - 150, 40)
+                doc.fromHTML("<span style = 'font-family:helvetica;'><font size = '1' color = '#002f6c'><b>" + this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + " " + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "</b> " + "</font></span>", doc.internal.pageSize.width - 150, 50)
                 // doc.text(i18n.t('static.supplyPlan.runDate') + " " + moment(new Date()).format(`${DATE_FORMAT_CAP}`), doc.internal.pageSize.width - 40, 20, {
                 //     align: 'right'
                 // })
@@ -715,8 +715,8 @@ class ForecastSummary extends Component {
                     //     align: 'left'
                     // })
 
-                    doc.fromHTML("<font size = '1' color = '#002f6c'><b>" + i18n.t('static.report.dateRange') + ":</b> " + document.getElementById("forecastPeriod").value + "</font>", (doc.internal.pageSize.width / 8) - 50, 90)
-                    doc.fromHTML("<font size = '1' color = '#002f6c'><b>" + i18n.t('static.forecastReport.display') + ":</b> " + this.state.displayName + "</font>", (doc.internal.pageSize.width / 8) - 50, 100)
+                    doc.fromHTML("<span style = 'font-family:helvetica;'><font size = '1' color = '#002f6c'><b>" + i18n.t('static.report.dateRange') + ":</b> " + document.getElementById("forecastPeriod").value + "</font></span>", (doc.internal.pageSize.width / 8) - 50, 90)
+                    doc.fromHTML("<span style = 'font-family:helvetica;'><font size = '1' color = '#002f6c'><b>" + i18n.t('static.forecastReport.display') + ":</b> " + this.state.displayName + "</font></span>", (doc.internal.pageSize.width / 8) - 50, 100)
 
                     // doc.setFont('helvetica', 'bold')
                     // doc.text(i18n.t('static.report.dateRange') + ': ' + document.getElementById("forecastPeriod").value, doc.internal.pageSize.width / 8, 90, {
@@ -732,7 +732,7 @@ class ForecastSummary extends Component {
                         // doc.text(i18n.t('static.forecastReport.hideCalculations') + ': ' + (this.state.hideCalculation == true ? i18n.t('static.realm.yes') : i18n.t('static.program.no')), doc.internal.pageSize.width / 8, 110, {
                         //     align: 'left'
                         // })
-                        doc.fromHTML("<font size = '1' color = '#002f6c'><b>" + i18n.t('static.forecastReport.hideCalculations') + ":</b> " + (this.state.hideCalculation == true ? i18n.t('static.realm.yes') : i18n.t('static.program.no')) + "</font>", (doc.internal.pageSize.width / 8), 110)
+                        doc.fromHTML("<span style = 'font-family:helvetica;'><font size = '1' color = '#002f6c'><b>" + i18n.t('static.forecastReport.hideCalculations') + ":</b> " + (this.state.hideCalculation == true ? i18n.t('static.realm.yes') : i18n.t('static.program.no')) + "</font></span>", (doc.internal.pageSize.width / 8) - 50, 110)
                     }
 
                 }
@@ -823,7 +823,7 @@ class ForecastSummary extends Component {
 
                 console.log("data------------------>12345 ", data);
 
-                var startY = 130;
+                var startY = 140;
                 let content = {
                     margin: { top: 80, bottom: 90 },
                     startY: startY,
