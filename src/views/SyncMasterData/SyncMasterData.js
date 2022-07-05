@@ -15,7 +15,7 @@ import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import InnerBgImg from '../../../src/assets/img/bg-image/bg-login.jpg';
 import image1 from '../../assets/img/QAT-logo.png';
-import { SECRET_KEY, TOTAL_NO_OF_MASTERS_IN_SYNC, INDEXED_DB_VERSION, INDEXED_DB_NAME, SHIPMENT_MODIFIED, DELIVERED_SHIPMENT_STATUS, BATCH_PREFIX } from '../../Constants.js'
+import { SECRET_KEY, TOTAL_NO_OF_MASTERS_IN_SYNC, INDEXED_DB_VERSION, INDEXED_DB_NAME, SHIPMENT_MODIFIED } from '../../Constants.js'
 import CryptoJS from 'crypto-js'
 import UserService from '../../api/UserService';
 import { qatProblemActions } from '../../CommonComponent/QatProblemActions'
@@ -23,7 +23,7 @@ import { calculateSupplyPlan } from '../SupplyPlan/SupplyPlanCalculations';
 import QatProblemActions from '../../CommonComponent/QatProblemActions';
 import QatProblemActionNew from '../../CommonComponent/QatProblemActionNew'
 import GetLatestProgramVersion from '../../CommonComponent/GetLatestProgramVersion'
-import { generateRandomAplhaNumericCode, isSiteOnline, paddingZero } from '../../CommonComponent/JavascriptCommonFunctions';
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 import { calculateModelingData } from '../DataSet/ModelingDataCalculations.js';
 import ProgramService from '../../api/ProgramService';
 // import ChangeInLocalProgramVersion from '../../CommonComponent/ChangeInLocalProgramVersion'
@@ -224,36 +224,6 @@ export default class SyncMasterData extends Component {
         // console.log("Date", date);
         // console.log('Program List', programList);
         var valid = true;
-        var jsonForNewShipmentSync = [];
-        for (var pl = 0; pl < programList.length; pl++) {
-            var generalDataBytes = CryptoJS.AES.decrypt(programList[pl].programData.generalData, SECRET_KEY);
-            var generalData = generalDataBytes.toString(CryptoJS.enc.Utf8);
-            var generalJson = JSON.parse(generalData);
-            console.log("GeneralJson@@@@@@@@@@@@@@", generalJson)
-            var programQPLListFilter=programQPLDetailsList.filter(c=>c.id==programList[pl].id);
-            var linkedShipmentsList = generalJson.shipmentLinkingList != null && programQPLListFilter[0].doNotFollowLatestShipmentInfo==0 ? generalJson.shipmentLinkingList : [];
-            var listOfRoNoAndRoPrimeLineNo = [];
-            for (var lsl = 0; lsl < linkedShipmentsList.length; lsl++) {
-                if (listOfRoNoAndRoPrimeLineNo.findIndex(c => c.roNo == linkedShipmentsList[lsl].roNo && c.roPrimeLineNo == linkedShipmentsList[lsl].roPrimeLineNo) == -1) {
-                    listOfRoNoAndRoPrimeLineNo.push({
-                        roNo: linkedShipmentsList[lsl].roNo,
-                        roPrimeLineNo: linkedShipmentsList[lsl].roPrimeLineNo
-                    })
-                }
-            }
-            var lastSyncDate=date;
-            if (this.props.location.state != undefined) {
-            if (this.props.location.state.programIds.includes(programList[pl].programId)) {
-                lastSyncDate=moment(generalJson.currentVersion.createdDate).format("YYYY-MM-DD HH:mm:ss")
-            }
-        }
-            jsonForNewShipmentSync.push({
-                roAndRoPrimeLineNoList: listOfRoNoAndRoPrimeLineNo,
-                programId: programList[pl].programId,
-                lastSyncDate:moment(lastSyncDate).format("YYYY-MM-DD HH:mm:ss")
-            })
-        }
-        console.log("jsonForNewShipmentSync@@@@@@@@@@@@@@@@", jsonForNewShipmentSync)
 
         let startDate = '2021-01-01';
         let stopDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD");
@@ -267,8 +237,6 @@ export default class SyncMasterData extends Component {
             .then(commitRequestResponse => {
                 if (commitRequestResponse.status == 200) {
                     var commitRequestResponseData = commitRequestResponse.data;
-                    MasterSyncService.getNewShipmentSyncApi(jsonForNewShipmentSync).then(shipmentSyncResponse => {
-                        console.log("Shipment sync reponse=========================>",shipmentSyncResponse)
                     for (var i = 0; i < programList.length; i++) {
                         AuthenticationService.setupAxiosInterceptors();
                         // this.refs.problemListChild.qatProblemActions(programList[i].id);
@@ -301,42 +269,35 @@ export default class SyncMasterData extends Component {
                                         var problemReportList = generalJson.problemReportList;
                                         // console.log("Shipment data list", shipmentDataList);
                                         // console.log("Batch Info list", batchInfoList);
-                                        var shipArray = shipmentSyncResponse.data[response.data.programId];
+                                        var shipArray = response.data.shipmentList;
                                         var pplModified = programPlanningUnitList.filter(c => moment(c.lastModifiedDate).format("YYYY-MM-DD HH:mm:ss") >= moment(date).format("YYYY-MM-DD HH:mm:ss") && c.program.id == response.data.programId);
-
                                         var rebuild = false;
-                                        if (shipArray.length > 0 || pplModified.length > 0) {
+                                        if (response.data.shipmentList.length > 0 || pplModified.length > 0) {
                                             rebuild = true;
                                         }
-                                        // var shipArray1 = response.data.shipmentList.filter(c => c.receivedDate != null && c.receivedDate != "" && c.receivedDate != "Invalid date" && c.receivedDate != undefined);
+                                        var shipArray1 = response.data.shipmentList.filter(c => c.receivedDate != null && c.receivedDate != "" && c.receivedDate != "Invalid date" && c.receivedDate != undefined);
                                         // console.log("Min Date shiparray", shipArray);
                                         var minDate = moment.min(shipArray.map(d => moment(d.expectedDeliveryDate)));
-                                        // var minDate1 = moment.min(shipArray1.map(d => moment(d.receivedDate)));
-                                        // if (moment(minDate1).format("YYYY-MM") < moment(minDate).format("YYYY-MM")) {
-                                            // minDate = minDate1;
-                                        // }
+                                        var minDate1 = moment.min(shipArray1.map(d => moment(d.receivedDate)));
+                                        if (moment(minDate1).format("YYYY-MM") < moment(minDate).format("YYYY-MM")) {
+                                            minDate = minDate1;
+                                        }
                                         // console.log("Min Date in sync", minDate);
-                                        var batchArray = [];
-                                        var roNoAndRoPrimeLineNoSetFromAPI=[...new Set(shipArray.map(ele => ele.roNo+"|"+ele.roPrimeLineNo))];
-
+                                        var batchArray = response.data.batchInfoList;
                                         var planningUnitList = [];
-                                        // for (var j = 0; j < shipArray.length; j++) {
-                                        //     if (!planningUnitList.includes(shipArray[j].planningUnit.id)) {
-                                        //         planningUnitList.push(shipArray[j].planningUnit.id);
-                                        //     }
-                                        // }
-                                        var linkedShipmentsList=generalJson.shipmentLinkingList!=null?generalJson.shipmentLinkingList:[];
-                                        console.log("LinkedShipmentsList=========================>",linkedShipmentsList)
-                                        var linkedShipmentsListFilter=linkedShipmentsList.filter(c=>roNoAndRoPrimeLineNoSetFromAPI.includes(c.roNo+"|"+c.roPrimeLineNo));
-                                        planningUnitList=[...new Set(linkedShipmentsListFilter).map(ele => ele.qatPlanningUnitId)];
+                                        for (var j = 0; j < shipArray.length; j++) {
+                                            if (!planningUnitList.includes(shipArray[j].planningUnit.id)) {
+                                                planningUnitList.push(shipArray[j].planningUnit.id);
+                                            }
+                                        }
                                         for (var ppl = 0; ppl < pplModified.length; ppl++) {
                                             if (!planningUnitList.includes(pplModified[ppl].planningUnit.id)) {
                                                 planningUnitList.push(pplModified[ppl].planningUnit.id);
                                             }
                                         }
-                                        console.log("planningUnitList=========================>",planningUnitList);
+
                                         for (var pu = 0; pu < planningUnitList.length; pu++) {
-                                            var ppuObject=programPlanningUnitList.filter(c => c.planningUnit.id==planningUnitList[pu] && c.program.id == response.data.programId)[0];
+
                                             var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == planningUnitList[pu]);
                                             var programJson = {}
                                             if (planningUnitDataIndex != -1) {
@@ -356,306 +317,32 @@ export default class SyncMasterData extends Component {
 
                                             var shipmentDataList = programJson.shipmentList;
                                             var batchInfoList = programJson.batchInfoList;
-                                            var shipArrayForPlanningUnit = linkedShipmentsListFilter.filter(c => c.qatPlanningUnitId == planningUnitList[pu]);
-                                            var uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId=[...new Set(shipArrayForPlanningUnit).map(ele => ele.roNo+"|"+ele.roPrimeLineNo)];
-                                            for (var j = 0; j < uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId.length; j++) {
-                                                console.log("Ship Array filter=========================>",shipArray.filter(c=>c.roNo+"|"+c.roPrimeLineNo==uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId[j]))
-                                                var uniqueKnShipmentNo=[...new Set(shipArray.filter(c=>c.roNo+"|"+c.roPrimeLineNo==uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId[j])).map(ele => ele.knShipmentNo)];
-                                                var knShipmentNoThatExistsInLinkedShipmentsList=linkedShipmentsListFilter.filter(x => x.roNo+"|"+x.roPrimeLineNo==uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId[j] && !uniqueKnShipmentNo.includes(x.knShipmentNo));
-
-                                                console.log("knShipmentNoThatExistsInLinkedShipmentsList=========================>",knShipmentNoThatExistsInLinkedShipmentsList);
-                                                console.log("uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId=========================>",uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId[j]);
-                                                console.log("UniqueKnShipmentNo=========================>",uniqueKnShipmentNo);
-                                                for(var u=0;u<uniqueKnShipmentNo.length;u++){
-                                                    var checkIfAlreadyExists=linkedShipmentsList.findIndex(c=>c.roNo+"|"+c.roPrimeLineNo==uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId[j] && c.knShipmentNo==uniqueKnShipmentNo[u]);
-                                                    console.log("checkIfAlreadyExists=========================>",checkIfAlreadyExists)
-                                                    if(checkIfAlreadyExists==-1){
-                                                        var linkedShipmentsListBasedOnRoNoAndRoPrimeLineNo=linkedShipmentsList.filter(c=>c.roNo+"|"+c.roPrimeLineNo==uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId[j]);
-                                                        var index=shipmentDataList.findIndex(c=>linkedShipmentsListBasedOnRoNoAndRoPrimeLineNo[0].childShipmentId>0?linkedShipmentsListBasedOnRoNoAndRoPrimeLineNo[0].childShipmentId==c.shipmentId:linkedShipmentsListBasedOnRoNoAndRoPrimeLineNo[0].tempChildShipmentId==c.tempShipmentId);
-
-                                                        var shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo=shipArray.filter(c=>c.roNo+"|"+c.roPrimeLineNo==uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId[j] && c.knShipmentNo==uniqueKnShipmentNo[u])
-                                                        if(shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].erpShipmentStatus!="Cancelled"){
-                                                        var shipmentQty = 0;
-                                                        var batchInfo = [];
-                                                        var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
-                                                        var curUser = AuthenticationService.getLoggedInUserId();
-                                                        var username = AuthenticationService.getLoggedInUsername();
-                                                        shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo.map(item => {
-                                                            console.log("Item@@@@@@@@@@@@@@@@", item)
-                                                        shipmentQty += Number(item.erpQty) * Number(linkedShipmentsList[checkIfAlreadyExists].conversionFactor);
-                                                        var batchNo = item.batchNo;
-                                                        var expiryDate = item.expiryDate;
-                                                        var autoGenerated = false;
-                                                        var shelfLife = ppuObject.shelfLife;
-                                                        // if (batchNo.toString() == "-99" || batchNo=="") {
-                                                        var programId1 = paddingZero(response.data.programId, 0, 6);
-                                                        var planningUnitId1 = paddingZero(planningUnitList[pu], 0, 8);
-                                                        autoGenerated = (batchNo.toString() == "-99" || batchNo == "") ? true : autoGenerated;
-                                                        batchNo = (batchNo.toString() == "-99" || batchNo == "") ? (BATCH_PREFIX).concat(programId1).concat(planningUnitId1).concat(moment(Date.now()).format("YYMMDD")).concat(generateRandomAplhaNumericCode(3)) : batchNo;
-                                                        expiryDate = expiryDate == "" ? moment(item.expectedDeliveryDate).add(shelfLife, 'months').startOf('month').format("YYYY-MM-DD") : expiryDate;
-
-                                                        // }
-                                                        batchInfo.push({
-                                                            shipmentTransBatchInfoId: 0,
-                                                            batch: {
-                                                                batchNo: batchNo,
-                                                                expiryDate: moment(expiryDate).endOf('month').format("YYYY-MM-DD"),
-                                                                batchId: 0,
-                                                                autoGenerated: autoGenerated,
-                                                                createdDate: curDate
-                                                            },
-                                                            shipmentQty: Number(item.erpQty) * Number(linkedShipmentsList[checkIfAlreadyExists].conversionFactor)
-                                                        })
-                                                        })
-                                                        shipmentDataList.push({
-                                                            accountFlag: true,
-                                                            active: false,
-                                                            dataSource: shipmentDataList[index].dataSource,
-                                                            erpFlag: true,
-                                                            localProcurement: false,
-                                                            freightCost: shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].shippingCost,//Yeh
-                                                            notes: "",
-                                                            planningUnit: shipmentDataList[index].planningUnit,
-                                                            procurementAgent: shipmentDataList[index].procurementAgent,
-                                                            productCost: shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].price * shipmentQty,//Final cost
-                                                            shipmentQty: shipmentQty,
-                                                            rate: shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].price,//Price per planning unit
-                                                            shipmentId: 0,
-                                                            shipmentMode: (shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].shipBy == "Land" || shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].shipBy == "Ship" ? "Sea" : shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0] == "Air" ? "Air" : "Sea"),//Yeh
-                                                            shipmentStatus: shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].qatEquivalentShipmentStatus,
-                                                            suggestedQty: 0,
-                                                            budget: shipmentDataList[index].budget,
-                                                            emergencyOrder: false,
-                                                            currency: shipmentDataList[index].currency,
-                                                            fundingSource: shipmentDataList[index].fundingSource,
-                                                            plannedDate: null,
-                                                            submittedDate: null,
-                                                            approvedDate: null,
-                                                            shippedDate: null,
-                                                            arrivedDate: null,
-                                                            expectedDeliveryDate: shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].expectedDeliveryDate,
-                                                            receivedDate: shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].qatEquivalentShipmentStatus.id == DELIVERED_SHIPMENT_STATUS ? shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].expectedDeliveryDate : null,
-                                                            index: shipmentDataList.length,
-                                                            batchInfoList: batchInfo,
-                                                            orderNo: shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].orderNo,
-                                                            primeLineNo: shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].primeLineNo,
-                                                            parentShipmentId: shipmentDataList[index].parentShipmentId,
-                                                            createdBy: {
-                                                                userId: curUser,
-                                                                username: username
-                                                            },
-                                                            createdDate: curDate,
-                                                            lastModifiedBy: {
-                                                                userId: curUser,
-                                                                username: username
-                                                            },
-                                                            lastModifiedDate: curDate,
-                                                            tempShipmentId: ppuObject.planningUnit.id.toString().concat(shipmentDataList.length),
-                                                            tempParentShipmentId: shipmentDataList[index].tempParentShipmentId,
-                                                        })
-                                                        if(moment(shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].expectedDeliveryDate).format("YYYY-MM")<moment(minDate).format("YYYY-MM")){
-                                                            minDate = shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].expectedDeliveryDate;
-                                                        }
-                                                        for (var bi = 0; bi < batchInfo.length; bi++) {
-                                                            var index = batchInfoList.findIndex(c => c.batchNo == batchInfo[bi].batch.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(batchInfo[bi].batch.expiryDate).format("YYYY-MM") && c.planningUnitId == planningUnitList[pu]);
-                                                            if (index == -1) {
-                                                                var batchDetails = {
-                                                                    batchId: batchInfo[bi].batch.batchId,
-                                                                    batchNo: batchInfo[bi].batch.batchNo,
-                                                                    planningUnitId: planningUnitList[pu],
-                                                                    expiryDate: batchInfo[bi].batch.expiryDate,
-                                                                    createdDate: batchInfo[bi].batch.createdDate,
-                                                                    autoGenerated: batchInfo[bi].batch.autoGenerated
-                                                                }
-                                                                batchInfoList.push(batchDetails);
-                                                            } else {
-                                                                batchInfoList[index].expiryDate = batchInfo[bi].batch.expiryDate;
-                                                                batchInfoList[index].createdDate = batchInfo[bi].batch.createdDate;
-                                                                batchInfoList[index].autoGenerated = batchInfo[bi].batch.autoGenerated;
-                                                            }
-                                                        }
-                                                        linkedShipmentsList.push({
-                                                            shipmentLinkingId: 0,
-                                                            versionId: response.data.versionId,
-                                                            programId:response.data.programId,
-                                                            procurementAgent: shipmentDataList[index].procurementAgent,
-                                                            parentShipmentId: shipmentDataList[index].parentShipmentId,
-                                                            tempParentShipmentId: shipmentDataList[index].tempParentShipmentId,
-                                                            childShipmentId: 0,
-                                                            tempChildShipmentId: shipmentDataList[index].planningUnit.id.toString().concat(shipmentDataList.length),
-                                                            erpPlanningUnit: shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].erpPlanningUnit,
-                                                            roNo: shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].roNo,
-                                                            roPrimeLineNo: shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].roPrimeLineNo,
-                                                            knShipmentNo: shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].knShipmentNo,
-                                                            erpShipmentStatus: shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].erpShipmentStatus,
-                                                            orderNo: shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].orderNo,
-                                                            primeLineNo: shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].primeLineNo,
-                                                            conversionFactor: Number(linkedShipmentsListBasedOnRoNoAndRoPrimeLineNo[0].conversionFactor),
-                                                            qatPlanningUnitId:ppuObject.planningUnit.id,
-                                                            active:true,
-                                                            createdBy: {
-                                                                userId: curUser,
-                                                                username: username
-                                                            },
-                                                            createdDate: curDate,
-                                                            lastModifiedBy: {
-                                                                userId: curUser,
-                                                                username: username
-                                                            },
-                                                            lastModifiedDate: curDate,
-                                                        })
-                                                    }
-                                                        //Insert
-                                                        // var childShipmentId=linkedShipmentsList[checkIfAlreadyExists].childShipmentId>0?linkedShipmentsList[checkIfAlreadyExists].childShipmentId:linkedShipmentsList[checkIfAlreadyExists].tempChildShipmentId;
-                                                    }else{
-                                                        var index=shipmentDataList.findIndex(c=>linkedShipmentsList[checkIfAlreadyExists].childShipmentId>0?linkedShipmentsList[checkIfAlreadyExists].childShipmentId==c.shipmentId:linkedShipmentsList[checkIfAlreadyExists].tempChildShipmentId==c.tempShipmentId);
-                                                        var shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo=shipArray.filter(c=>c.roNo+"|"+c.roPrimeLineNo==uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId[j] && c.knShipmentNo==uniqueKnShipmentNo[u])
-                                                        var linkedShipmentsListIndex=linkedShipmentsList.findIndex(c=>c.roNo+"|"+c.roPrimeLineNo==uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId[j] && c.knShipmentNo==uniqueKnShipmentNo[u]);
-                                                        var shipmentQty = 0;
-                                                        var batchInfo = [];
-                                                        var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
-                                                        var curUser = AuthenticationService.getLoggedInUserId();
-                                                        shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo.map(item => {
-                                                            console.log("Item@@@@@@@@@@@@@@@@", item)
-                                                        shipmentQty += Number(item.erpQty) * Number(linkedShipmentsList[checkIfAlreadyExists].conversionFactor);
-                                                        var batchNo = item.batchNo;
-                                                        var expiryDate = item.expiryDate;
-                                                        var autoGenerated = false;
-                                                        var shelfLife = ppuObject.shelfLife;
-                                                        // if (batchNo.toString() == "-99" || batchNo=="") {
-                                                        var programId1 = paddingZero(response.data.programId, 0, 6);
-                                                        var planningUnitId1 = paddingZero(planningUnitList[pu], 0, 8);
-                                                        autoGenerated = (batchNo.toString() == "-99" || batchNo == "") ? true : autoGenerated;
-                                                        batchNo = (batchNo.toString() == "-99" || batchNo == "") ? (BATCH_PREFIX).concat(programId1).concat(planningUnitId1).concat(moment(Date.now()).format("YYMMDD")).concat(generateRandomAplhaNumericCode(3)) : batchNo;
-                                                        expiryDate = expiryDate == "" ? moment(item.expectedDeliveryDate).add(shelfLife, 'months').startOf('month').format("YYYY-MM-DD") : expiryDate;
-
-                                                        // }
-                                                        batchInfo.push({
-                                                            shipmentTransBatchInfoId: 0,
-                                                            batch: {
-                                                                batchNo: batchNo,
-                                                                expiryDate: moment(expiryDate).endOf('month').format("YYYY-MM-DD"),
-                                                                batchId: 0,
-                                                                autoGenerated: autoGenerated,
-                                                                createdDate: curDate
-                                                            },
-                                                            shipmentQty: Number(item.erpQty) * Number(linkedShipmentsList[checkIfAlreadyExists].conversionFactor)
-                                                        })
-                                                        })
-                                                        linkedShipmentsList[linkedShipmentsListIndex].erpShipmentStatus=shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].erpShipmentStatus;
-                                                        linkedShipmentsList[linkedShipmentsListIndex].lastModifiedBy.userId=curUser;
-                                                        linkedShipmentsList[linkedShipmentsListIndex].lastModifiedBy.username=username;
-                                                        linkedShipmentsList[linkedShipmentsListIndex].lastModifiedDate=curDate;
-                                                        shipmentDataList[index].shipmentQty = shipmentQty;
-                                                        shipmentDataList[index].freightCost = shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].shippingCost;
-                                                        shipmentDataList[index].productCost = shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].price * shipmentQty;
-                                                        shipmentDataList[index].rate = shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].price;
-                                                        shipmentDataList[index].shipmentMode = (shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].shipBy == "Land" || shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].shipBy == "Ship" ? "Sea" : shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0] == "Air" ? "Air" : "Sea");
-                                                        shipmentDataList[index].shipmentStatus = shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].qatEquivalentShipmentStatus;
-                                                        shipmentDataList[index].expectedDeliveryDate = shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].expectedDeliveryDate;
-                                                        shipmentDataList[index].receivedDate = shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].qatEquivalentShipmentStatus.id == DELIVERED_SHIPMENT_STATUS ? shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].expectedDeliveryDate : null
-                                                        shipmentDataList[index].batchInfoList = batchInfo;
-                                                        shipmentDataList[index].orderNo = shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].orderNo;
-                                                        shipmentDataList[index].primeLineNo = shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].primeLineNo;
-                                                        shipmentDataList[index].lastModifiedBy.userId=curUser;
-                                                        shipmentDataList[index].lastModifiedBy.username=username;
-                                                        shipmentDataList[index].lastModifiedDate=curDate;
-                                                        if (moment(shipmentDataList[index].expectedDeliveryDate).format("YYYY-MM") < moment(minDate).format("YYYY-MM")) {
-                                                            minDate = shipmentDataList[index].expectedDeliveryDate;
-                                                        }
-                                                        if (shipmentDataList[index].receivedDate != null && shipmentDataList[index].receivedDate != "" && shipmentDataList[index].receivedDate != "" && shipmentDataList[index].receivedDate != undefined && moment(shipmentDataList[index].receivedDate).format("YYYY-MM") < moment(minDate).format("YYYY-MM")) {
-                                                            minDate = shipmentDataList[index].receivedDate;
-                                                        }
-                                                        if(moment(shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].expectedDeliveryDate).format("YYYY-MM")<moment(minDate).format("YYYY-MM")){
-                                                            minDate = shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].expectedDeliveryDate;
-                                                        }
-
-                                                        for (var bi = 0; bi < batchInfo.length; bi++) {
-                                                            var index = batchInfoList.findIndex(c => c.batchNo == batchInfo[bi].batch.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(batchInfo[bi].batch.expiryDate).format("YYYY-MM") && c.planningUnitId == planningUnitList[pu]);
-                                                            if (index == -1) {
-                                                                var batchDetails = {
-                                                                    batchId: batchInfo[bi].batch.batchId,
-                                                                    batchNo: batchInfo[bi].batch.batchNo,
-                                                                    planningUnitId: planningUnitList[pu],
-                                                                    expiryDate: batchInfo[bi].batch.expiryDate,
-                                                                    createdDate: batchInfo[bi].batch.createdDate,
-                                                                    autoGenerated: batchInfo[bi].batch.autoGenerated
-                                                                }
-                                                                batchInfoList.push(batchDetails);
-                                                            } else {
-                                                                batchInfoList[index].expiryDate = batchInfo[bi].batch.expiryDate;
-                                                                batchInfoList[index].createdDate = batchInfo[bi].batch.createdDate;
-                                                                batchInfoList[index].autoGenerated = batchInfo[bi].batch.autoGenerated;
-                                                            }
-                                                        }
-                                                        //Update
-                                                    }
-                                                }
-                                                for(var u=0;u<knShipmentNoThatExistsInLinkedShipmentsList.length;u++){
-                                                    var linkedShipmentsListIndex = linkedShipmentsList.findIndex(c=>c.roNo+"|"+c.roPrimeLineNo==uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId[j] && c.knShipmentNo==knShipmentNoThatExistsInLinkedShipmentsList[u].knShipmentNo);
-                                                    var linkedShipmentsListFilter = linkedShipmentsList.filter(c=>c.roNo+"|"+c.roPrimeLineNo==uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId[j] && c.knShipmentNo==knShipmentNoThatExistsInLinkedShipmentsList[u].knShipmentNo);
-                                                    linkedShipmentsList[linkedShipmentsListIndex].active=false;
-                                                    linkedShipmentsList[linkedShipmentsListIndex].lastModifiedBy.userId=curUser;
-                                                    linkedShipmentsList[linkedShipmentsListIndex].lastModifiedBy.username=username;
-                                                    linkedShipmentsList[linkedShipmentsListIndex].lastModifiedDate=curDate;
-                                                    var checkIfThereIsOnlyOneChildShipmentOrNot = linkedShipmentsList.filter(c => (linkedShipmentsListFilter[0].parentShipmentId > 0 ? c.parentShipmentId == linkedShipmentsListFilter[0].parentShipmentId : c.tempParentShipmentId == linkedShipmentsListFilter[0].tempParentShipmentId) && c.active==true);
-                                                    var activateParentShipment = false;
-                                                    if (checkIfThereIsOnlyOneChildShipmentOrNot.length == 0) {
-                                                        activateParentShipment = true;
-                                                    }
-                                                    var shipmentIndex = shipmentDataList.findIndex(c => linkedShipmentsList[linkedShipmentsListIndex].childShipmentId > 0 ? c.shipmentId == linkedShipmentsList[linkedShipmentsListIndex].childShipmentId : c.tempShipmentId == linkedShipmentsList[linkedShipmentsListIndex].tempShipmentId);
-                                                    shipmentDataList[shipmentIndex].active = false;
-                                                    shipmentDataList[shipmentIndex].lastModifiedBy.userId=curUser;
-                                                    shipmentDataList[shipmentIndex].lastModifiedBy.username=username;
-                                                    shipmentDataList[shipmentIndex].lastModifiedDate=curDate;
-                                                    if (moment(minDate).format("YYYY-MM-DD") > moment(shipmentDataList[shipmentIndex].expectedDeliveryDate).format("YYYY-MM-DD")) {
-                                                        minDate = moment(shipmentDataList[shipmentIndex].expectedDeliveryDate).format("YYYY-MM-DD");
-                                                    }
-                                                    if (shipmentDataList[shipmentIndex].receivedDate != null && shipmentDataList[shipmentIndex].receivedDate != "" && shipmentDataList[shipmentIndex].receivedDate != undefined && moment(minDate).format("YYYY-MM-DD") > moment(shipmentDataList[shipmentIndex].receivedDate).format("YYYY-MM-DD")) {
-                                                        minDate = moment(shipmentDataList[shipmentIndex].receivedDate).format("YYYY-MM-DD");
-                                                    }
-                                                    if (activateParentShipment) {
-                                                        var parentShipmentIndex = shipmentDataList.findIndex(c => linkedShipmentsListFilter[0].parentShipmentId > 0 ? c.shipmentId == linkedShipmentsListFilter[0].parentShipmentId : c.tempShipmentId == linkedShipmentsListFilter[0].tempParentShipmentId);
-                                                        shipmentDataList[parentShipmentIndex].active = true;
-                                                        shipmentDataList[parentShipmentIndex].erpFlag = false;
-                                                        shipmentDataList[parentShipmentIndex].lastModifiedBy.userId=curUser;
-                                                        shipmentDataList[parentShipmentIndex].lastModifiedBy.username=username;
-                                                        shipmentDataList[parentShipmentIndex].lastModifiedDate=curDate;
-
-                                                        if (moment(minDate).format("YYYY-MM-DD") > moment(shipmentDataList[parentShipmentIndex].expectedDeliveryDate).format("YYYY-MM-DD")) {
-                                                            minDate = moment(shipmentDataList[shipmentIndex].expectedDeliveryDate).format("YYYY-MM-DD");
-                                                        }
-                                                        if (shipmentDataList[parentShipmentIndex].receivedDate != null && shipmentDataList[parentShipmentIndex].receivedDate != "" && shipmentDataList[parentShipmentIndex].receivedDate != undefined && moment(minDate).format("YYYY-MM-DD") > moment(shipmentDataList[parentShipmentIndex].receivedDate).format("YYYY-MM-DD")) {
-                                                            minDate = moment(shipmentDataList[shipmentIndex].receivedDate).format("YYYY-MM-DD");
-                                                        }
-                                                    }
-                                                }
+                                            var shipArrayForPlanningUnit = shipArray.filter(c => c.planningUnit.id == planningUnitList[pu]);
+                                            for (var j = 0; j < shipArrayForPlanningUnit.length; j++) {
                                                 // console.log("In planning unit list", shipArray[j].planningUnit.id);
-                                                // var index = shipmentDataList.findIndex(c => c.shipmentId == shipArrayForPlanningUnit[j].shipmentId)
-                                                // if (index == -1) {
-                                                //     shipmentDataList.push(shipArrayForPlanningUnit[j]);
-                                                // } else {
-                                                //     if (moment(shipmentDataList[index].expectedDeliveryDate).format("YYYY-MM") < moment(minDate).format("YYYY-MM")) {
-                                                //         minDate = shipmentDataList[index].expectedDeliveryDate;
-                                                //     }
-                                                //     if (shipmentDataList[index].receivedDate != null && shipmentDataList[index].receivedDate != "" && shipmentDataList[index].receivedDate != "" && shipmentDataList[index].receivedDate != undefined && moment(shipmentDataList[index].receivedDate).format("YYYY-MM") < moment(minDate).format("YYYY-MM")) {
-                                                //         minDate = shipmentDataList[index].receivedDate;
-                                                //     }
-                                                //     shipmentDataList[index] = shipArrayForPlanningUnit[j];
-                                                // }
+                                                var index = shipmentDataList.findIndex(c => c.shipmentId == shipArrayForPlanningUnit[j].shipmentId)
+                                                if (index == -1) {
+                                                    shipmentDataList.push(shipArrayForPlanningUnit[j]);
+                                                } else {
+                                                    if (moment(shipmentDataList[index].expectedDeliveryDate).format("YYYY-MM") < moment(minDate).format("YYYY-MM")) {
+                                                        minDate = shipmentDataList[index].expectedDeliveryDate;
+                                                    }
+                                                    if (shipmentDataList[index].receivedDate != null && shipmentDataList[index].receivedDate != "" && shipmentDataList[index].receivedDate != "" && shipmentDataList[index].receivedDate != undefined && moment(shipmentDataList[index].receivedDate).format("YYYY-MM") < moment(minDate).format("YYYY-MM")) {
+                                                        minDate = shipmentDataList[index].receivedDate;
+                                                    }
+                                                    shipmentDataList[index] = shipArrayForPlanningUnit[j];
+                                                }
                                             }
                                             // console.log("Shipment data updated", shipmentDataList);
-                                            // var batchArrayForPlanningUnit = batchArray.filter(c => c.planningUnitId && planningUnitList[pu]);
-                                            // for (var j = 0; j < batchArrayForPlanningUnit.length; j++) {
-                                            //     var index = batchInfoList.findIndex(c => c.batchNo == batchArrayForPlanningUnit[j].batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(batchArrayForPlanningUnit[j].expiryDate).format("YYYY-MM"));
-                                            //     if (index == -1) {
-                                            //         batchInfoList.push(batchArrayForPlanningUnit[j]);
-                                            //     } else {
-                                            //         batchInfoList[index] = batchArrayForPlanningUnit[j];
-                                            //     }
-                                            // }
-                                            programJson.shipmentList=shipmentDataList;
-                                            programJson.batchInfoList=batchInfoList;
+                                            var batchArrayForPlanningUnit = batchArray.filter(c => c.planningUnitId && planningUnitList[pu]);
+                                            for (var j = 0; j < batchArrayForPlanningUnit.length; j++) {
+                                                var index = batchInfoList.findIndex(c => c.batchNo == batchArrayForPlanningUnit[j].batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(batchArrayForPlanningUnit[j].expiryDate).format("YYYY-MM"));
+                                                if (index == -1) {
+                                                    batchInfoList.push(batchArrayForPlanningUnit[j]);
+                                                } else {
+                                                    batchInfoList[index] = batchArrayForPlanningUnit[j];
+                                                }
+                                            }
                                             if (planningUnitDataIndex != -1) {
                                                 planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
                                             } else {
@@ -711,7 +398,6 @@ export default class SyncMasterData extends Component {
                                         // programJson.shipmentList = shipmentDataList;
                                         // programJson.batchInfoList = batchInfoList;
                                         generalJson.actionList = actionList;
-                                        generalJson.shipmentLinkingList = linkedShipmentsList;
                                         generalJson.problemReportList = problemReportList;
                                         prgQPLDetails.openCount = (problemReportList.filter(c => c.problemStatus.id == 1 && c.planningUnitActive != false && c.regionActive != false)).length;
                                         prgQPLDetails.addressedCount = (problemReportList.filter(c => c.problemStatus.id == 3 && c.planningUnitActive != false && c.regionActive != false)).length;
@@ -824,10 +510,9 @@ export default class SyncMasterData extends Component {
                             //     })
                             valid = false;
                         }
-                    } 
+                    }
+                }
             })
-        }
-        })
 
         // this.refs.programListChild.checkNewerVersions();
         // this.refs.programChangeChild.checkIfLocalProgramVersionChanged();
