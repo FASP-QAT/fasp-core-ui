@@ -2335,7 +2335,7 @@ class ShipmentGlobalView extends Component {
                     </CardBody>
                 </Card>
 
-            </div >
+            </div>
         );
     }
 }

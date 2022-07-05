@@ -2693,7 +2693,6 @@ class ShipmentGlobalDemandView extends Component {
                                 </div>
                             </div>
 
-
                         </div>
 
                     </CardBody>

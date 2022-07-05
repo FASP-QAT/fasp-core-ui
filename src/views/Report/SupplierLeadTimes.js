@@ -1870,8 +1870,8 @@ class SupplierLeadTimes extends Component {
                             </div>
                         </div>
                         {/* </Form> */}
-                        <div className="ReportSearchMarginTop">
-                            <div id="tableDiv" className="jexcelremoveReadonlybackground" style={{ display: this.state.loading ? "none" : "block" }}>
+                        <div className="ReportSearchMarginTop SupplierLeadTable">
+                            <div id="tableDiv" className="jexcelremoveReadonlybackground consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
                             </div>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>

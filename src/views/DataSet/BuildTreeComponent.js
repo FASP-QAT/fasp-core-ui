@@ -536,8 +536,8 @@ export default class BuildTree extends Component {
         this.pickAMonth5 = React.createRef()
         this.state = {
             isValidError: '',
-            isScenarioChanged: false,
-            isTreeDataChanged: false,
+            isScenarioChanged:false,
+            isTreeDataChanged : false,
             percentForOneMonth: '',
             popoverOpenStartValueModelingTool: false,
             showGuidanceModelingTransfer: false,
@@ -7847,12 +7847,12 @@ export default class BuildTree extends Component {
                             // labelString: this.state.currentItemConfig.context.payload.nodeUnit.label != null ? this.state.currentItemConfig.context.payload.nodeType.id > 3 ? getLabelText(this.state.currentItemConfig.parentItem.payload.nodeUnit.label, this.state.lang) : getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang) : '',
                             // labelString: this.state.currentItemConfig.context.payload.nodeUnit.label != null ? this.state.currentItemConfig.context.payload.nodeType.id > 3 ? getLabelText(this.state.currentItemConfig.parentItem.payload.nodeUnit.label, this.state.lang) : getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang) : '',
                             labelString: this.state.currentItemConfig.context.payload.nodeType.id > 2 ?
-                                this.state.currentItemConfig.context.payload.nodeUnit.id != "" && this.state.currentItemConfig.context.payload.nodeUnit.id != null ?
-                                    getLabelText(this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label, this.state.lang)
+                                this.state.currentItemConfig.context.payload.nodeUnit.id != "" ?
+                                    this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentScenario.fuNode.forecastingUnit.unit.id != "" ? getLabelText(this.state.unitList.filter(c => c.unitId == this.state.currentScenario.fuNode.forecastingUnit.unit.id)[0].label, this.state.lang) : ""
+                                        : this.state.currentItemConfig.context.payload.nodeType.id == 5 ? this.state.currentScenario.puNode.planningUnit.unit.id != "" ? getLabelText(this.state.unitList.filter(c => c.unitId == this.state.currentScenario.puNode.planningUnit.unit.id)[0].label, this.state.lang) : ""
+                                            : getLabelText(this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label, this.state.lang)
                                     : ""
-                                : this.state.currentItemConfig.context.payload.nodeUnit.label != null ?
-                                    getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang)
-                                    : "",
+                                : "",
                             // labelString: "",
                             fontColor: 'black'
                         },

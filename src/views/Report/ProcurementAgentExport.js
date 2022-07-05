@@ -76,6 +76,7 @@ class ProcurementAgentExport extends Component {
             loading: true,
             programId: '',
             versionId: ''
+
         }
         this.formatLabel = this.formatLabel.bind(this);
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
@@ -2794,7 +2795,7 @@ class ProcurementAgentExport extends Component {
                             </div>
                         </div>
                         <div className="ReportSearchMarginTop">
-                            <div id="tableDiv" className="jexcelremoveReadonlybackground" style={{ display: this.state.loading ? "none" : "block" }}>
+                            <div id="tableDiv" className="jexcelremoveReadonlybackground consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
                             </div>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>

@@ -2740,6 +2740,10 @@
     "static.procurementagenttype.procurementtypename": "Nombre del tipo de agente de compras",
     "static.procurementagenttype.procurementagenttypecode": "Nombre para mostrar del tipo de agente de compras",
     "static.procurementagent.procurementagenttypetext": "Se requiere el tipo de agente de compras",
+<<<<<<< HEAD
     "static.procurementagent.programtext": "Se requiere programa",
     "static.procurementAgent.procurementAgentNotMappedWithProgram": "Ningún Agente de Adquisiciones asignado con este Programa"
+=======
+    "static.procurementagent.programtext": "Se requiere programa"
+>>>>>>> dev2ModSeema
 }

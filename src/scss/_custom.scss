@@ -6013,7 +6013,8 @@ font-style: italic!important;
   height: 13px;
 }
 .ExtraCheckboxFieldWidth{
-  width: 115px;
+  // width: 115px;
+  width: 129px;
 }
 .bold{
   font-weight: bold;
@@ -6402,10 +6403,8 @@ top: calc(20em + 3px);
   padding: 10px;
   border-radius: 5px;
 }
-.SupplierLeadTable .jexcel > thead {
-  position: sticky;
-  top: 0;
-}
+
+
   .jexcel > thead.resizable > tr > .arrow-up:not(.AsteriskTheadtrTd)::after {
     content: ""!important;
   }
@@ -6425,9 +6424,7 @@ top: calc(20em + 3px);
     transform: translate3d(0, 14.4rem, 0);
 }
 }
-.ModTransferMonthPickerWidth{
-  width: 467px;
-}
+
 .dataEnteredTable .jexcel>thead>tr>td:nth-child(2) {
   border: none!important;
 }
@@ -6437,3 +6434,12 @@ top: calc(20em + 3px);
 .dataEnteredTable .jexcel>thead>tr>td:nth-child(4) {
   border: none!important;
 }
+.SupplierLeadTable .jexcel > thead {
+  position: sticky;
+  top: 0;
+}
+
+.ModTransferMonthPickerWidth{
+  width: 467px;
+}
+
