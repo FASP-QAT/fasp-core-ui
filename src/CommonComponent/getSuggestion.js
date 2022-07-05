@@ -681,4 +681,9 @@ export default function getSuggestion(row, lang) {
         }
         return getLabelText(label, lang);
     }
+    if (row.realmProblem.problem.problemId == 26) {
+        var obj = JSON.parse(row.data5);
+        var label = obj.suggession;
+        return label;
+    }
 }

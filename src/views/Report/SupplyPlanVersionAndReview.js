@@ -25,7 +25,7 @@ import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import {
-    Button, Card, CardBody, CardHeader, Col, Row, FormGroup, Input, InputGroup, InputGroupAddon, Label, Form, Modal, ModalBody, ModalFooter, ModalHeader, FormFeedback
+    Button, Card, CardBody, CardHeader, Col, Row, FormGroup, Input, InputGroup, InputGroupAddon, Label, Form, 
 } from 'reactstrap';
 import ProgramService from '../../api/ProgramService';
 import ReportService from '../../api/ReportService';
@@ -34,45 +34,6 @@ import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import CryptoJS from 'crypto-js'
-
-const initialValues = {
-    programId: '',
-    // problemId: '',
-    planningUnitId: ''
-}
-
-const validate = (getValidationSchema) => {
-    return (values) => {
-        const validationSchema = getValidationSchema(values)
-        try {
-            validationSchema.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationError(error)
-        }
-    }
-}
-const getErrorsFromValidationError = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
-}
-
-const validationSchema = function (values) {
-    return Yup.object().shape({
-        programId: Yup.string()
-            .required(i18n.t('static.budget.programtext')),
-        // problemId: Yup.string()
-        //   .required(i18n.t('static.addProblem.problemError')),
-        planningUnitId: Yup.string()
-            .required(i18n.t('static.procurementUnit.validPlanningUnitText')),
-
-    })
-}
 
 const entityname = ""
 const options = {
@@ -137,9 +98,6 @@ class SupplyPlanVersionAndReview extends Component {
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() + 1 },
             programId: -1,
-            isModalOpen: false,
-            planningUnitList: [],
-            regionList: [],
 
         };
 
@@ -159,16 +117,7 @@ class SupplyPlanVersionAndReview extends Component {
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.setProgramId = this.setProgramId.bind(this);
-        this.addMannualProblem = this.addMannualProblem.bind(this);
-        this.modelOpenClose = this.modelOpenClose.bind(this);
-        this.getPlanningUnitList = this.getPlanningUnitList.bind(this);
 
-    }
-
-    modelOpenClose() {
-        this.setState({
-            isModalOpen: !this.state.isModalOpen
-        })
     }
 
     setProgramId(event) {
@@ -192,127 +141,6 @@ class SupplyPlanVersionAndReview extends Component {
 
     componentWillUnmount() {
         clearTimeout(this.timeout);
-    }
-
-    addMannualProblem() {
-        console.log("-------------------addNewProblem--------------------");
-        // this.props.history.push("/report/addProblem");
-        this.setState({
-            isModalOpen: !this.state.isModalOpen,
-        }, () => {
-        });
-    }
-
-    getPlanningUnitList(event) {
-        // var db1;
-        // var storeOS;
-        // getDatabase();
-        // var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        // openRequest.onerror = function (event) {
-        //     this.setState({
-        //         message: i18n.t('static.program.errortext'),
-        //         color: '#BA0C2F'
-        //     })
-        // }.bind(this);
-        // openRequest.onsuccess = function (e) {
-        //     db1 = e.target.result;
-        //     var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
-        //     var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
-        //     var planningunitRequest = planningunitOs.getAll();
-        //     var planningList = []
-        //     planningunitRequest.onerror = function (event) {
-        //         this.setState({
-        //             message: i18n.t('static.program.errortext'),
-        //             color: '#BA0C2F'
-        //         })
-        //     }.bind(this);
-        //     planningunitRequest.onsuccess = function (e) {
-        //         var myResult = [];
-        //         myResult = planningunitRequest.result;
-
-        //         var planningUnitTransactionAll = db1.transaction(['planningUnit'], 'readwrite');
-        //         var planningunitOsAll = planningUnitTransactionAll.objectStore('planningUnit');
-        //         var planningunitRequestAll = planningunitOsAll.getAll();
-        //         var planningUnitListAll = []
-        //         planningunitRequestAll.onerror = function (event) {
-        //             this.setState({
-        //                 message: i18n.t('static.program.errortext'),
-        //                 color: '#BA0C2F'
-        //             })
-        //         }.bind(this);
-        //         planningunitRequestAll.onsuccess = function (e) {
-        //             // var myResultAll = [];
-        //             planningUnitListAll = planningunitRequestAll.result;
-        //             // console.log("myResult", myResult);
-        //             // alert((document.getElementById("programId").value).split("_")[0]);
-        //             var programId = (document.getElementById("programId").value).split("_")[0];
-        //             // console.log('programId----->>>', programId)
-        //             // console.log(myResult);
-        //             var proList = []
-        //             for (var i = 0; i < myResult.length; i++) {
-        //                 var pu = planningUnitListAll.filter(c => c.planningUnitId == myResult[i].planningUnit.id)[0];
-
-        //                 if (myResult[i].program.id == programId && myResult[i].active == true && pu.active == true) {
-        //                     var productJson = {
-        //                         name: getLabelText(myResult[i].planningUnit.label, this.state.lang),
-        //                         id: myResult[i].planningUnit.id
-        //                     }
-        //                     proList[i] = productJson
-        //                 }
-        //             }
-        //             console.log("planningUnitList---" + proList);
-        //             this.setState({
-        //                 planningUnitList: proList
-        //             })
-
-        // var programId = document.getElementById('programId').value;
-        // // alert(programId);
-        // this.setState({ programId: programId });
-        // var db1;
-        // getDatabase();
-        // var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        // var regionList = []
-        // openRequest.onerror = function (event) {
-        //     this.setState({
-        //         message: i18n.t('static.program.errortext'),
-        //         color: '#BA0C2F'
-        //     })
-        // }.bind(this);
-        // openRequest.onsuccess = function (e) {
-        //     db1 = e.target.result;
-        //     var transaction = db1.transaction(['programData'], 'readwrite');
-        //     var programTransaction = transaction.objectStore('programData');
-        //     var programRequest = programTransaction.get(programId);
-        //     programRequest.onerror = function (event) {
-        //         this.setState({
-        //             message: i18n.t('static.program.errortext'),
-        //             color: '#BA0C2F'
-        //         })
-        //     }.bind(this);
-        //     programRequest.onsuccess = function (event) {
-        //         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
-        //         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-        //         var programJson = JSON.parse(programData);
-
-
-        //         for (var i = 0; i < programJson.regionList.length; i++) {
-        //             var regionJson = {
-        //                 // name: // programJson.regionList[i].regionId,
-        //                 name: getLabelText(programJson.regionList[i].label, this.state.lang),
-        //                 id: programJson.regionList[i].regionId
-        //             }
-        //             regionList.push(regionJson);
-
-        //         }
-        //         // console.log("regionList---->", regionList);
-        //         this.setState({
-        //             regionList: regionList
-        //         })
-        //     }.bind(this);
-        // }.bind(this);
-        //         }.bind(this);
-        //     }.bind(this);
-        // }.bind(this)
     }
 
     buildJexcel() {
@@ -1192,22 +1020,6 @@ class SupplyPlanVersionAndReview extends Component {
         //     }, this);
 
 
-        const { planningUnitList } = this.state;
-        let planningUnits = planningUnitList.length > 0
-            && planningUnitList.map((item, i) => {
-                return (
-                    <option key={i} value={item.id}>{item.name}</option>
-                )
-            }, this);
-
-        const { regionList } = this.state;
-        let regions = regionList.length > 0
-            && regionList.map((item, i) => {
-                return (
-                    <option key={i} value={item.id}>{item.name}</option>
-                )
-            }, this);
-
         const bar = {
             labels: this.state.matricsList.map((item, index) => (item.date)),
             datasets: [
@@ -1393,11 +1205,6 @@ class SupplyPlanVersionAndReview extends Component {
                                 <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
                             </div>
                         }
-                        {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_PROBLEM') &&
-                            <div className="card-header-actions">
-                                <a className="card-header-action" style={{ height: '25px', width: '25px', cursor: 'pointer' }} href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addMannualProblem}><i className="fa fa-plus-square"></i></a>
-                            </div>
-                        }
                     </div>
                     <CardBody className="pb-lg-5 pt-lg-1">
 
@@ -1508,170 +1315,6 @@ class SupplyPlanVersionAndReview extends Component {
                         </div>
 
                     </CardBody>
-                    <Modal isOpen={this.state.isModalOpen}
-                        className={'modal-lg ' + this.props.className}>
-                        <ModalHeader>
-                            <strong>{i18n.t('static.program.program')}</strong>
-                            <Button size="md" onClick={this.modelOpenClose} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
-                        </ModalHeader>
-                        <ModalBody className='pb-lg-0'>
-                            {/* <h6 className="red" id="div3"></h6> */}
-                            <Col sm={12} style={{ flexBasis: 'auto' }}>
-                                {/* <Card> */}
-                                <Formik
-                                    initialValues={initialValues}
-                                    validate={validate(validationSchema)}
-                                    onSubmit={(values, { setSubmitting, setErrors }) => {
-                                        if (!this.state.isSubmitClicked) {
-                                            this.setState({ loading: true, isSubmitClicked: true }, () => {
-                                                this.setState({
-                                                    isModalOpen: !this.state.isModalOpen,
-                                                })
-                                            })
-                                        }
-
-                                    }}
-
-
-                                    render={
-                                        ({
-                                            values,
-                                            errors,
-                                            touched,
-                                            handleChange,
-                                            handleBlur,
-                                            handleSubmit,
-                                            isSubmitting,
-                                            isValid,
-                                            setTouched,
-                                            handleReset,
-                                            setFieldValue,
-                                            setFieldTouched
-                                        }) => (
-                                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='modalForm' autocomplete="off">
-                                                {/* <CardBody> */}
-                                                <div className="col-md-12">
-                                                    <div style={{ display: this.state.treeFlag ? "none" : "block" }} className="">
-                                                        <div className='row'>
-                                                            <FormGroup className="col-md-6">
-                                                                <Label for="programCode">{i18n.t('static.program.program')}<span className="red Reqasterisk">*</span></Label>
-                                                                <Input
-                                                                    type="select"
-                                                                    name="programId"
-                                                                    id="programId"
-                                                                    bsSize="sm"
-                                                                    valid={!errors.programId}
-                                                                    invalid={touched.programId && !!errors.programId}
-                                                                    onChange={(e) => { handleChange(e); this.getPlanningUnitList() }}
-                                                                    onBlur={handleBlur}
-                                                                    required
-                                                                // value={this.state.budget.program.id}
-                                                                >
-                                                                    <option value="">{i18n.t('static.common.select')}</option>
-                                                                    {programList}
-                                                                </Input>
-
-                                                                <FormFeedback className="red">{errors.programId}</FormFeedback>
-                                                            </FormGroup>
-                                                            <FormGroup className="col-md-6">
-                                                                <Label for="programCode">{i18n.t('static.planningunit.planningunit')}<span className="red Reqasterisk">*</span></Label>
-                                                                <Input
-                                                                    type="select"
-                                                                    name="planningUnitId"
-                                                                    id="planningUnitId"
-                                                                    bsSize="sm"
-                                                                    valid={!errors.planningUnitId}
-                                                                    invalid={touched.planningUnitId && !!errors.planningUnitId}
-                                                                    onChange={(e) => { handleChange(e) }}
-                                                                    onBlur={handleBlur}
-                                                                    required
-                                                                >
-                                                                    <option value="">{i18n.t('static.common.select')}</option>
-                                                                    {planningUnits}
-                                                                </Input>
-                                                                <FormFeedback className="red">{errors.planningUnitId}</FormFeedback>
-                                                            </FormGroup>
-                                                        </div>
-                                                    </div>
-                                                    <div className="row">
-                                                        <FormGroup className="col-md-6">
-                                                            <Label>{i18n.t('static.region.region')}</Label>
-                                                            <Input type="select"
-                                                                bsSize="sm"
-                                                                name="regionId"
-                                                                id="regionId"
-
-                                                            >
-                                                                <option value="0">{i18n.t('static.common.select')}</option>
-                                                                {regions}
-                                                            </Input>
-                                                            <FormFeedback className="red">{errors.createdDate}</FormFeedback>
-                                                        </FormGroup>
-                                                        <FormGroup className="col-md-6">
-                                                            <Label>{i18n.t('static.report.problemDescription')}</Label>
-                                                            <Input type="text"
-                                                                // maxLength={600}
-                                                                bsSize="sm"
-                                                                name="problemDescription"
-                                                                id="problemDescription"
-                                                            // valid={!errors.problemId}
-                                                            // invalid={touched.problemId && !!errors.problemId}
-                                                            // onChange={(e) => { handleChange(e) }}
-                                                            // onBlur={handleBlur}
-                                                            // required
-                                                            >
-                                                            </Input>
-                                                        </FormGroup>
-                                                    </div>
-                                                    <div style={{ display: this.state.treeFlag ? "none" : "block" }} >
-                                                        <div className='row'>
-                                                            <FormGroup className="col-md-6">
-                                                                <Label>{i18n.t('static.report.suggession')}</Label>
-                                                                <Input type="textarea"
-                                                                    // maxLength={600}
-                                                                    bsSize="sm"
-                                                                    name="suggession"
-                                                                    id="suggession"
-                                                                // valid={!errors.problemId}
-                                                                // invalid={touched.problemId && !!errors.problemId}
-                                                                // onChange={(e) => { handleChange(e) }}
-                                                                // onBlur={handleBlur}
-                                                                // required
-                                                                >
-                                                                </Input>
-                                                            </FormGroup>
-                                                            <FormGroup className="col-md-6">
-                                                                <Label>{i18n.t('static.common.notes')}</Label>
-                                                                <Input type="textarea"
-                                                                    // maxLength={600}
-                                                                    bsSize="sm"
-                                                                    name="notes"
-                                                                    id="notes"
-                                                                // valid={!errors.problemId}
-                                                                // invalid={touched.problemId && !!errors.problemId}
-                                                                // onChange={(e) => { handleChange(e) }}
-                                                                // onBlur={handleBlur}
-                                                                // required
-                                                                >
-                                                                </Input>
-                                                            </FormGroup>
-                                                        </div>
-                                                    </div>
-
-
-                                                    <FormGroup className="col-md-12 float-right pt-lg-4 pr-lg-0">
-                                                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.modelOpenClose}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                                        <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                                        &nbsp;
-                                                    </FormGroup>
-                                                </div>
-                                            </Form>
-                                        )} />
-                            </Col>
-                            <br />
-                        </ModalBody>
-                    </Modal>
                 </Card>
 
             </div>
