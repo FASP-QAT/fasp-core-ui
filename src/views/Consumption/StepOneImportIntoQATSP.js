@@ -1600,7 +1600,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
                 </div>
 
-                <div className="table-responsive" style={{ marginTop: '-10px' }}>
+                <div className="table-responsive consumptionDataEntryTable" style={{ display: this.props.items.loading ? "none" : "block" }} >
 
                     <div id="mapPlanningUnit" style={{ display: this.props.items.loading ? "none" : "block" }}>
                     </div>

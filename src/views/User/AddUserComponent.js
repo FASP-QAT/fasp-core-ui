@@ -1867,7 +1867,6 @@ class AddUserComponent extends Component {
         user.emailId = '';
         // user.phoneNumber = '';
         user.orgAndCountry = '';
-        user.realm.realmId = '';
         user.language.languageId = '';
         this.state.roleId = '';
         this.setState(

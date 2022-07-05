@@ -1376,7 +1376,8 @@ export default class QatProblemActionNew extends Component {
                                                         userId: programRequestList[pp].userId,
                                                         programId: programList[pp].generalData.programId,
                                                         programModified: programQPLDetailsGetRequest.result.programModified,
-                                                        readonly: programQPLDetailsGetRequest.result.readonly
+                                                        readonly: programQPLDetailsGetRequest.result.readonly,
+                                                        doNotFollowLatestShipmentInfo:programQPLDetailsGetRequest.result.doNotFollowLatestShipmentInfo
                                                     }
                                                     console.log("open+++", openCount, "addressed+++", addressedCount);
                                                     console.log("@@@ProgramQPLDetailsJson", programQPLDetailsJson);

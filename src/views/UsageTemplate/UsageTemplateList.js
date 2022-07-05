@@ -961,7 +961,8 @@ class usageTemplate extends Component {
                     title: i18n.t('static.usageTemplate.personsUnit'),
                     type: 'autocomplete',
                     width: '130',
-                    source: this.state.dimensionList, //8 I
+                    source: this.state.dimensionList,
+                    readOnly:(this.state.roleArray.includes('ROLE_REALM_ADMIN') || this.state.roleArray.includes('ROLE_DATASET_ADMIN'))?false:true //8 I
                 },
                 {
                     title: i18n.t('static.usageTemplate.fuPerPersonPerTime'),
@@ -1212,7 +1213,7 @@ class usageTemplate extends Component {
             },
             onload: this.loaded,
             onchangepage: this.onchangepage,
-            editable: true,
+            editable: (this.state.roleArray.includes('ROLE_REALM_ADMIN') || this.state.roleArray.includes('ROLE_DATASET_ADMIN'))?true:false,
             license: JEXCEL_PRO_KEY,
             contextMenu: function (obj, x, y, e) {
                 var items = [];
