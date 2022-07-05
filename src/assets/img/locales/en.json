@@ -1379,6 +1379,7 @@
     "static.budget.budgetName": "Budget name",
     "static.dashboard.procurementAgentExport": "Procurement Agent Report",
     "static.procurementAgent.selectProcurementAgent": "Select Procurement Agent",
+    "static.procurementAgent.procurementAgentNotMappedWithProgram": "No Procurement Agent mapped with this Program",
     "static.period.selectPeriod": "Select Date Range",
     "static.common.submit": "Submit",
     "static.tree.calculated": "Recalculate",
@@ -2733,6 +2734,14 @@
     "static.dataentry.conversionToPu": "Conversion to PU",
     "static.dataentry.conversionToFu": "Conversion to FU",
     "static.dataentry.dataEnteredInTableEx": "e.g. If I enter 1,000 units, this will be converted into",
-    "static.common.planningUnits": "planning units"
-
+    "static.common.planningUnits": "planning units",
+    "static.dashboard.procurementagentType": "Procurement Agent Type",
+    "static.dashboard.procurementagenttypeheader": "Procurement Agent Type",
+    "static.dashboard.procurementagenttype": "Procurement Agent Type",
+    "static.procurementagenttype.codetext": "Procurement Agent Type display name is required",
+    "static.procurementAgenTtype.procurementagenttypenametext": "Procurement Agent Type name is required",
+    "static.procurementagenttype.procurementtypename": "Procurement Agent Type Name",
+    "static.procurementagenttype.procurementagenttypecode": "Procurement Agent Type display name",
+    "static.procurementagent.procurementagenttypetext": "Procurement Agent Type is required",
+    "static.procurementagent.programtext": "Program is required"
 }

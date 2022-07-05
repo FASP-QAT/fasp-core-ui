@@ -28,7 +28,7 @@ import BootstrapTable from 'react-bootstrap-table-next';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator';
-import {MultiSelect} from 'react-multi-select-component';
+import { MultiSelect } from 'react-multi-select-component';
 import jexcel from 'jexcel-pro';
 import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
@@ -719,6 +719,7 @@ class SupplierLeadTimes extends Component {
                         programId: localStorage.getItem("sesProgramIdReport")
                     }, () => {
                         this.getPlanningUnit();
+                        this.getProcurementAgent();
                     })
                 } else {
                     this.setState({
@@ -828,8 +829,8 @@ class SupplierLeadTimes extends Component {
             this.setState({
                 planningUnits: [],
                 planningUnitValues: [],
-                // procurementAgents: [],
-                // procurementAgenttValues:[]
+                procurementAgents: [],
+                procurementAgenttValues: []
 
             }, () => {
                 // if (versionId.includes('Local')) {
@@ -974,15 +975,25 @@ class SupplierLeadTimes extends Component {
     }
 
     getProcurementAgent = () => {
+        let programId = document.getElementById("programId").value;
+
         if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors();
             ProcurementAgentService.getProcurementAgentListAll()
                 .then(response => {
                     // console.log(JSON.stringify(response.data))
                     var procurementAgent = response.data
+                    var listArrays = [];
+                    for (var i = 0; i < procurementAgent.length; i++) {
+                        for (var j = 0; j < procurementAgent[i].programList.length; j++) {
+                            if (procurementAgent[i].programList[j].id == programId) {
+                                listArrays.push(procurementAgent[i]);
+                            }
+                        }
+                    }
                     //  procurementAgent.push({ procurementAgentCode: 'No Procurement Agent', procurementAgentId: 0 })
                     this.setState({
-                        procurementAgents: procurementAgent, loading: false
+                        procurementAgents: listArrays, loading: false
                     }, () => { this.consolidatedProcurementAgentList() })
                 }).catch(
                     error => {
@@ -1063,6 +1074,7 @@ class SupplierLeadTimes extends Component {
         const lan = 'en';
         const { procurementAgents } = this.state
         var proList = procurementAgents;
+        let programId = document.getElementById("programId").value;
 
         var db1;
         getDatabase();
@@ -1097,9 +1109,17 @@ class SupplierLeadTimes extends Component {
                     }
 
                 }
-
+                var listArray = proList;
+                var listArrays = [];
+                for (var i = 0; i < listArray.length; i++) {
+                    for (var j = 0; j < listArray[i].programList.length; j++) {
+                        if (listArray[i].programList[j].id == programId) {
+                            listArrays.push(listArray[i]);
+                        }
+                    }
+                }
                 this.setState({
-                    procurementAgents: proList.sort(function (a, b) {
+                    procurementAgents: listArrays.sort(function (a, b) {
                         a = a.procurementAgentCode.toLowerCase();
                         b = b.procurementAgentCode.toLowerCase();
                         return a < b ? -1 : a > b ? 1 : 0;
@@ -1118,7 +1138,9 @@ class SupplierLeadTimes extends Component {
         let programId = document.getElementById("programId").value;
         // let plannedShipments = document.getElementById("shipmentStatusId").value;
         let planningUnitIds = this.state.planningUnitValues.length == this.state.planningUnits.length ? [] : this.state.planningUnitValues.map(ele => (ele.value).toString());
-        let procurementAgentIds = this.state.procurementAgenttValues.length == this.state.procurementAgents.length ? [] : this.state.procurementAgenttValues.map(ele => (ele.value).toString());
+        // let procurementAgentIds = this.state.procurementAgenttValues.length == this.state.procurementAgents.length ? [] : this.state.procurementAgenttValues.map(ele => (ele.value).toString());
+        let procurementAgentIds = this.state.procurementAgenttValues.map(ele => (ele.value).toString());
+
         // let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         // let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
 
@@ -1512,18 +1534,26 @@ class SupplierLeadTimes extends Component {
                 })
         }
         else {
-            this.setState({ message: i18n.t('static.procurementAgent.selectProcurementAgent'), outPutList: [] },
-                () => {
-                    this.el = jexcel(document.getElementById("tableDiv"), '');
-                    this.el.destroy();
-                })
+            if (this.state.procurementAgents.length == 0) {
+                this.setState({ message: i18n.t('static.procurementAgent.procurementAgentNotMappedWithProgram'), outPutList: [] },
+                    () => {
+                        this.el = jexcel(document.getElementById("tableDiv"), '');
+                        this.el.destroy();
+                    })
+            } else {
+                this.setState({ message: i18n.t('static.procurementAgent.selectProcurementAgent'), outPutList: [] },
+                    () => {
+                        this.el = jexcel(document.getElementById("tableDiv"), '');
+                        this.el.destroy();
+                    })
+            }
 
         }
     }
     componentDidMount() {
         // AuthenticationService.setupAxiosInterceptors();
         this.getPrograms();
-        this.getProcurementAgent();
+        // this.getProcurementAgent();
     }
 
     setprogramId(event) {
@@ -1531,6 +1561,7 @@ class SupplierLeadTimes extends Component {
             programId: event.target.value
         }, () => {
             this.getPlanningUnit();
+            this.getProcurementAgent();
         })
 
     }
@@ -1820,7 +1851,7 @@ class SupplierLeadTimes extends Component {
 
                                     </div>
                                 </FormGroup>
-                                <FormGroup className="col-md-3">
+                                {procurementAgentList.length > 0 && <FormGroup className="col-md-3">
                                     {/* <Label htmlFor="appendedInputButton">{i18n.t('static.report.procurementAgentName')}</Label> */}
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.report.procurementAgentName')} </Label>
 
@@ -1835,7 +1866,7 @@ class SupplierLeadTimes extends Component {
                                             disabled={this.state.loading}
                                         />
                                     </div>
-                                </FormGroup>
+                                </FormGroup>}
                             </div>
                         </div>
                         {/* </Form> */}

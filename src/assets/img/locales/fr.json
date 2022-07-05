@@ -2729,9 +2729,18 @@
     "static.supplyPlanFormula.maxMonthOfStockEx2": "Max = MIN ([MAX (4,3) +3], 18)",
     "static.organisation.organisationheader": "Organisation",
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Max = 7",
-    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )",
     "static.dataentry.conversionToPu": "Conversion en PU",
     "static.dataentry.conversionToFu": "Conversion en FU",
     "static.dataentry.dataEnteredInTableEx": "par exemple. Si j`entre 1 000 unités, cela sera converti en",
-    "static.common.planningUnits": "unités de planification"
+    "static.common.planningUnits": "unités de planification",
+    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18)",
+    "static.dashboard.procurementagenttypeheader": "Type d`agent d`approvisionnement",
+    "static.dashboard.procurementagenttype": "Type d`agent d`approvisionnement",
+    "static.procurementagenttype.codetext": "Le nom à afficher du type d`agent d`approvisionnement est requis",
+    "static.procurementAgenTtype.procurementagenttypenametext": "Le nom du type d`agent d`approvisionnement est requis",
+    "static.procurementagenttype.procurementtypename": "Nom du type d`agent d`approvisionnement",
+    "static.procurementagenttype.procurementagenttypecode": "Nom d'affichage du type d`agent d`approvisionnement",
+    "static.procurementagent.procurementagenttypetext": "Le type d`agent d`approvisionnement est requis",
+    "static.procurementagent.programtext": "Le programme est requis",
+    "static.procurementAgent.procurementAgentNotMappedWithProgram": "Aucun agent d`approvisionnement associé à ce programme"
 }
