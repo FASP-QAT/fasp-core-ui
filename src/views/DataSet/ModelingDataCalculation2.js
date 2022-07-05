@@ -580,11 +580,11 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                             var grandParentNodeData = (grandParentFiltered.payload.nodeDataMap[scenarioList[ndm].id])[0];
                                             console.log("grandParentNodeData$$$%%%", grandParentNodeData)
                                             if (grandParentNodeData != undefined) {
-                                                var grandParentPrevMonthMMDValue = grandParentNodeData.nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).subtract(1, 'months').format("YYYY-MM"));
+                                                var grandParentPrevMonthMMDValue = grandParentNodeData.nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") == moment(nodeDataMapForScenario.month).subtract(1, 'months').format("YYYY-MM"));
                                                 if (grandParentPrevMonthMMDValue.length > 0) {
                                                     patients = grandParentPrevMonthMMDValue[0].calculatedValue;
                                                 } else {
-                                                    var grandParentCurMonthMMDValue = grandParentNodeData.nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM"));
+                                                    var grandParentCurMonthMMDValue = grandParentNodeData.nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") == moment(nodeDataMapForScenario.month).format("YYYY-MM"));
                                                     if (grandParentCurMonthMMDValue.length > 0) {
                                                         patients = grandParentCurMonthMMDValue[0].calculatedValue;
                                                     } else {
