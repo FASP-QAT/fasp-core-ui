@@ -5671,6 +5671,10 @@ export default class CreateTreeTemplate extends Component {
             activeTab1: newArray,
             showCalculatorFields: false
         }, () => {
+            var isValid = document.getElementById('isValidError').value;
+            // console.log("isValid 1---", isValid);
+            this.setState({ isValidError: isValid });
+
             if (this.state.currentItemConfig.context.payload.nodeType.id == 1) {
                 this.showMomData();
             }

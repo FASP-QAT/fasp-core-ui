@@ -270,7 +270,6 @@ export default class SyncProgram extends Component {
 
     syncPrograms(programList) {
         var programIdsToLoad = this.state.programIdsToLoad;
-        var programVersionId=[];
         var pIds = [];
         var uniqueProgramList = []
         for (var i = 0; i < programList.length; i++) {
@@ -295,13 +294,12 @@ export default class SyncProgram extends Component {
                     checkIfLatestVersionExists = programList.filter(c => c.programId == programList[i].programId && c.version == latestVersion);
                     // Means user ke pass latest version nhi hai
                     if (checkIfLatestVersionExists.length == 0) {
-                        if (programList[i].readonly && !programList[i].doNotFollowLatestShipmentInfo) {
+                        if (programList[i].readonly) {
                             var index = readonlyProgramToBeDeleted.findIndex(c => c.id == programList[i].id);
                             if (index == -1) {
                                 readonlyProgramToBeDeleted.push(programList[i]);
                             }
                             programIdsToLoad.push(programList[i].programId);
-                            programVersionId.push({programId:programList[i].programId,versionId:programList[i].version,doNotFollowLatestShipmentInfo:programList[i].doNotFollowLatestShipmentInfo});
                             var syncedMasters = this.state.syncedMasters;
                             var syncedProgram = this.state.syncedProgram;
                             this.setState({
@@ -319,7 +317,6 @@ export default class SyncProgram extends Component {
                                         readonlyProgramToBeDeleted.push(programList[i]);
                                     }
                                     programIdsToLoad.push(programList[i].programId);
-                                    programVersionId.push({programId:programList[i].programId,versionId:programList[i].version,doNotFollowLatestShipmentInfo:programList[i].doNotFollowLatestShipmentInfo});
                                     var syncedMasters = this.state.syncedMasters;
                                     var syncedProgram = this.state.syncedProgram;
                                     this.setState({
@@ -345,7 +342,6 @@ export default class SyncProgram extends Component {
                                         readonlyProgramToBeDeleted.push(programList[i]);
                                     }
                                     programIdsToLoad.push(programList[i].programId);
-                                    programVersionId.push({programId:programList[i].programId,versionId:programList[i].version,doNotFollowLatestShipmentInfo:programList[i].doNotFollowLatestShipmentInfo});
                                     var syncedMasters = this.state.syncedMasters;
                                     var syncedProgram = this.state.syncedProgram;
                                     this.setState({
@@ -367,7 +363,7 @@ export default class SyncProgram extends Component {
                     } else {
                         // User ka pass latest version hai
                         // Readonly version ki list lao
-                        var readonlyProgramList = programList.filter(c => c.programId == programList[i].programId && c.readonly && c.version != latestVersion && !c.doNotFollowLatestShipmentInfo);
+                        var readonlyProgramList = programList.filter(c => c.programId == programList[i].programId && c.readonly && c.version != latestVersion);
                         // Sare readonly versions ko delete karo
                         for (var j = 0; j < readonlyProgramList.length; j++) {
                             var index = readonlyProgramToBeDeleted.findIndex(c => c.id == readonlyProgramList[j].id);
@@ -386,7 +382,7 @@ export default class SyncProgram extends Component {
                 }
                 console.log("outside for+++");
                 if (this.state.syncedProgram == this.state.totalProgramList) {
-                    this.loadLatestVersion(programIdsToLoad, readonlyProgramToBeDeleted,programVersionId)
+                    this.loadLatestVersion(programIdsToLoad, readonlyProgramToBeDeleted)
                 }
             } else {
             }
@@ -680,7 +676,7 @@ export default class SyncProgram extends Component {
         }
     }
 
-    loadLatestVersion(programIds, readonlyProgramToBeDeleted,programVersionId) {
+    loadLatestVersion(programIds, readonlyProgramToBeDeleted) {
         console.log("In load latest version+++", programIds.length);
         if (programIds.length > 0) {
             console.log("In if===")
@@ -853,8 +849,7 @@ export default class SyncProgram extends Component {
                                                         openCount: 0,
                                                         addressedCount: 0,
                                                         programModified: 0,
-                                                        readonly: 0,
-                                                        doNotFollowLatestShipmentInfo:programVersionId[r].doNotFollowLatestShipmentInfo
+                                                        readonly: 0
                                                     };
                                                     programIds.push(json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId);
                                                     var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);
