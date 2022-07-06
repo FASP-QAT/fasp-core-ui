@@ -51,13 +51,7 @@ export default class SupplyPlanComponent extends React.Component {
             date = moment(value.year + "-0" + value.month + "-01").format("YYYY-MM-DD");
         }
         var currentDate = moment(Date.now()).startOf('month').format("YYYY-MM-DD");
-        console.log("&&&&&&&&&&&&&&&&&CyrrentDateDate",currentDate);
-        console.log("&&&&&&&&&&&&&&&&&CyrrentDateDate+"+currentDate);
         const monthDifference = moment(new Date(date)).diff(new Date(currentDate), 'months', true) + MONTHS_IN_PAST_FOR_SUPPLY_PLAN;
-        console.log("&&&&&&&&&&&&&&&&&Month Diff",monthDifference);
-        console.log("&&&&&&&&&&&&&&&&&Month Diff"+monthDifference);
-        console.log("&&&&&&&&&&&&&&&&&MONTHS_IN_PAST_FOR_SUPPLY_PLAN",MONTHS_IN_PAST_FOR_SUPPLY_PLAN);
-        console.log("&&&&&&&&&&&&&&&&&MONTHS_IN_PAST_FOR_SUPPLY_PLAN+"+MONTHS_IN_PAST_FOR_SUPPLY_PLAN);
         this.state = {
             planningUnitData: [],
             loading: true,
@@ -2634,8 +2628,6 @@ export default class SupplyPlanComponent extends React.Component {
     }
 
     formSubmit(value, monthCount) {
-        console.log("&&&&&&&&&&&&&&&&&MonthCount in form submit",monthCount);
-        console.log("&&&&&&&&&&&&&&&&&value in form submit",value);
         // this.setState({
         //     showTotalShipment: false,
         //     showManualShipment: false,
@@ -2658,7 +2650,6 @@ export default class SupplyPlanComponent extends React.Component {
             })
         }
         var m = this.getMonthArray(moment(Date.now()).add(monthCount, 'months').utcOffset('-0500'));
-        console.log("&&&&&&&&&&&&&&&&&m",m[0]);
         var planningUnitId = value != "" && value != undefined ? value.value : 0;
         var planningUnitName = "";
         if (planningUnitId != 0) {
@@ -2814,7 +2805,7 @@ export default class SupplyPlanComponent extends React.Component {
                             supplyPlanDataForAllTransDate: supplyPlanData,
                             allShipmentsList: programJson.shipmentList
                         })
-                        // console.log("SupplyPlanData--------------->", supplyPlanData);
+                        console.log("SupplyPlanData--------------->", supplyPlanData);
                         // if (supplyPlanData.length > 0) {
                         var lastClosingBalance = 0;
                         var lastBatchDetails = [];
@@ -2824,7 +2815,7 @@ export default class SupplyPlanComponent extends React.Component {
 
                         for (var n = 0; n < m.length; n++) {
                             var jsonList = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM-DD") == moment(m[n].startDate).format("YYYY-MM-DD"));
-                            // console.log("jsonList@@@@@@@@@@@@", jsonList);
+                            console.log("jsonList@@@@@@@@@@@@",jsonList);
                             var prevMonthJsonList = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM-DD") == moment(m[n].startDate).subtract(1, 'months').format("YYYY-MM-DD"));
                             if (jsonList.length > 0) {
                                 openingBalanceArray.push({ isActual: prevMonthJsonList.length > 0 && prevMonthJsonList[0].regionCountForStock == prevMonthJsonList[0].regionCount ? 1 : 0, balance: jsonList[0].openingBalance });
@@ -3672,9 +3663,7 @@ export default class SupplyPlanComponent extends React.Component {
     }
 
     leftClicked() {
-        console.log("&&&&&&&&&&&&&&&&&MonthCount from state",this.state.monthCount);
         var monthCount = (this.state.monthCount) - NO_OF_MONTHS_ON_LEFT_CLICKED;
-        console.log("&&&&&&&&&&&&&&&&&MonthCount after subtract",monthCount);
         this.setState({
             monthCount: monthCount
         })
@@ -4262,7 +4251,7 @@ export default class SupplyPlanComponent extends React.Component {
         //         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
         //         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
         var programJson = this.state.programJson;
-        // console.log("ProgramJson###", programJson);
+        console.log("ProgramJson###", programJson);
         var planningUnitId = document.getElementById("planningUnitId").value;
         var programPlanningUnit = ((this.state.programPlanningUnitList).filter(p => p.planningUnit.id == planningUnitId))[0];
         var shipmentListUnFiltered = programJson.shipmentList;
@@ -4270,7 +4259,7 @@ export default class SupplyPlanComponent extends React.Component {
             shipmentListUnFiltered: shipmentListUnFiltered
         })
         var shipmentList = programJson.shipmentList.filter(c => c.active.toString() == "true");
-        // console.log("SupplyPlanType###", supplyPlanType);
+        console.log("SupplyPlanType###", supplyPlanType);
         // var tableEditableBasedOnSupplyPlan = true;
         if (supplyPlanType == 'deliveredShipments') {
             shipmentList = shipmentList.filter(c => (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? c.receivedDate >= startDate && c.receivedDate <= endDate : c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate) && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS));
@@ -4283,10 +4272,10 @@ export default class SupplyPlanComponent extends React.Component {
                 document.getElementById("addRowId").style.display = "block"
             }
         } else if (supplyPlanType == 'orderedShipments') {
-            // console.log("In else if###", shipmentList);
-            // console.log("In else if###", startDate);
+            console.log("In else if###", shipmentList);
+            console.log("In else if###", startDate);
             shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS));
-            // console.log("In else if###", shipmentList);
+            console.log("In else if###", shipmentList);
             if (document.getElementById("addRowId") != null) {
                 document.getElementById("addRowId").style.display = "block"
             }

@@ -2276,12 +2276,12 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                           <>
                             <FormGroup className="col-md-4">
                               <Label htmlFor="appendedInputButton">{i18n.t('static.common.for')} {i18n.t('static.dashboard.planningunitheader')}: <b>{getLabelText(this.state.selectedConsumptionUnitObject.planningUnit.label, this.state.lang)}</b>
-                              </Label><br/>
+                              </Label><br />
                               <Label htmlFor="appendedInputButton">{i18n.t('static.common.dataEnteredIn')}: <b>{this.state.tempConsumptionUnitObject.consumptionDataType == 1 ? (this.state.tempConsumptionUnitObject.planningUnit.forecastingUnit.label.label_en) : this.state.tempConsumptionUnitObject.consumptionDataType == 2 ? this.state.tempConsumptionUnitObject.planningUnit.label.label_en : this.state.tempConsumptionUnitObject.otherUnit.label.label_en}</b>
                                 <a className="card-header-action">
                                  {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT') && <span style={{ cursor: 'pointer' }} className="hoverDiv" onClick={() => { this.changeUnit(this.state.selectedConsumptionUnitId) }}>({i18n.t('static.dataentry.change')})</span>}
                                 </a>
-                              </Label><br/>
+                              </Label><br />
                               <Label htmlFor="appendedInputButton">{i18n.t('static.dataentry.conversionToPu')}: <b>{this.state.tempConsumptionUnitObject.consumptionDataType == 1 ? Number(1 / this.state.tempConsumptionUnitObject.planningUnit.multiplier).toFixed(4) : this.state.tempConsumptionUnitObject.consumptionDataType == 2 ? 1 : Number(1 / this.state.tempConsumptionUnitObject.planningUnit.multiplier * this.state.tempConsumptionUnitObject.otherUnit.multiplier).toFixed(4)}</b>
                               </Label>
 
@@ -2541,8 +2541,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                   {/* <CardBody style={{ display: this.state.loading ? "none" : "block" }}> */}
                   <ModalBody>
                     <div className="dataEnteredTable">
-                    <div id="mapPlanningUnit">
-                    </div>
+                      <div id="mapPlanningUnit">
+                      </div>
                     </div>
                     <Label id="dataEnteredInTableExLabel" style={{ display: "none" }} htmlFor="appendedInputButton">{i18n.t('static.dataentry.dataEnteredInTableEx')} <span id="dataEnteredInTableExSpan" /> {i18n.t('static.common.planningUnits')}
                     </Label>

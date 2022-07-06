@@ -833,7 +833,6 @@ class Program extends Component {
                                         </div>
                                     </div>
                                 </div>
-
                             </CardBody>
 
                             <CardFooter>
