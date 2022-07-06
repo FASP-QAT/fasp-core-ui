@@ -3214,7 +3214,7 @@ class EditSupplyPlanStatus extends Component {
                     </Row>
                 </TabPane>
                 <TabPane tabId="2">
-                    <Col md="9 pl-0 mt-3">
+                    <Col md="12 pl-0 mt-3">
                         <div className="d-md-flex Selectdiv2">
                             <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
                                 <Label htmlFor="appendedInputButton">{i18n.t('static.report.problemStatus')}</Label>
@@ -3294,13 +3294,18 @@ class EditSupplyPlanStatus extends Component {
                                     </InputGroup>
                                 </div>
                             </FormGroup> */}
-                            {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_PROBLEM') &&
-                                <div className="card-header-actions">
-                                    <a className="card-header-action" style={{ height: '25px', width: '25px', cursor: 'pointer' }} href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addMannualProblem}><i className="fa fa-plus-square"></i></a>
+                            {/* {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_PROBLEM') &&
+                                <div className="col-md-4 card-header-action">
+                                    <a className="pull-right" href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addMannualProblem}><i className="fa fa-plus-square"></i></a>
                                 </div>
-                            }
+                            } */}
                         </div>
                     </Col>
+                    {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_PROBLEM') &&
+                                <div className="col-md-12 card-header-action">
+                                    <a className="pull-right" style={{marginTop:'-21px'}} href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addMannualProblem}><i className="fa fa-plus-square"></i></a>
+                                </div>
+                            }
                     <br />
                     <FormGroup className="col-md-6 mt-5 pl-0" >
                         <ul className="legendcommitversion list-group">
