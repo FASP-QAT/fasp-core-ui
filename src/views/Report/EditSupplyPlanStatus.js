@@ -2169,7 +2169,7 @@ class EditSupplyPlanStatus extends Component {
 
                 }, () => {
                     this.getPlanningUnit()
-                    this.getDatasource()
+                    // this.getDatasource()
                     this.fetchData();
                     this.buildJExcel()
                     var fields = document.getElementsByClassName("totalShipments");
@@ -3302,10 +3302,10 @@ class EditSupplyPlanStatus extends Component {
                         </div>
                     </Col>
                     {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_PROBLEM') &&
-                                <div className="col-md-12 card-header-action">
-                                    <a className="pull-right" style={{marginTop:'-21px'}} href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addMannualProblem}><i className="fa fa-plus-square"></i></a>
-                                </div>
-                            }
+                        <div className="col-md-12 card-header-action">
+                            <a className="pull-right" style={{ marginTop: '-21px' }} href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addMannualProblem}><i className="fa fa-plus-square"></i></a>
+                        </div>
+                    }
                     <br />
                     <FormGroup className="col-md-6 mt-5 pl-0" >
                         <ul className="legendcommitversion list-group">
