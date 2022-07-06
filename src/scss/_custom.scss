@@ -3952,10 +3952,10 @@ background-color: yellow;
   box-shadow: none!important;
 }
 
-.jtabs{
-  position: inherit!important;
-  max-width: none!important;
-}
+// .jtabs{
+//   position: relative!important;
+//   max-width: none!important;
+// }
 
 /* Global CSS, you probably don't need that */
 
@@ -6443,3 +6443,334 @@ top: calc(20em + 3px);
   width: 467px;
 }
 
+.jss_search_container {
+  display: flex;
+  justify-content: space-between;
+  background-color: transparent!important;
+  margin-left: 1px;
+  margin-right: 2px;
+  border: none!important;
+  border-bottom: 0;
+}
+
+.jss_search {
+  height: calc(1.5em + 0.5rem + 2px);
+  padding: 0.25rem 0.5rem;
+  font-size: 0.76562rem;
+  line-height: 1.5;
+  border-radius: 0.2rem;
+  width: 130px;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid #e4e7ea;
+}
+
+.jss_page_selected {
+  color: #fff;
+  background-color: #002f6c !important;
+  border-color: #002f6c !important;
+}
+.jss_pagination > div > div {
+  text-align: center;
+  width: 30px !important;
+  height: 22px !important;
+  line-height: 22px !important;
+  border: 1px solid #ccc !important;
+  box-sizing: border-box !important;
+  margin-left: 0px !important ;
+  cursor: pointer !important;
+}
+
+.jss_pagination_dropdown {
+  color: #fff !important;
+  background-color: #20a8d8 !important;
+  border-color: #20a8d8 !important;
+  margin-left: 5px;
+  margin-top: -2px;
+  height: calc(1.5em + 0.5rem + 2px);
+  padding: 0.25rem 0.5rem;
+  font-size: 0.76562rem;
+  line-height: 1.5;
+  border-radius: 0.2rem;
+}
+
+.jss_pagination_dropdown option {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1000;
+
+  float: left;
+  min-width: 10rem;
+  padding: 0 0;
+  margin: 0.125rem 0 0;
+  font-size: 0.875rem;
+  color: #23282c;
+  text-align: left;
+  list-style: none;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid #c8ced3 !important;
+  border-radius: 0.25rem;
+}
+
+.jss_pagination_dropdown {
+          
+  margin-left: 0px !important;}
+
+  .jss_pagination_dropdown option {
+    color: #205493 !important;}
+
+    .jss_pagination_dropdown:hover {
+      color: #fff !important;
+      background-color: #4AB7DE !important;
+      border-color: #4AB7DE !important;
+      margin-left: 5px;
+      margin-top: -2px;
+      height: calc(1.5em + 0.5rem + 2px);
+      padding: 0.25rem 0.5rem;
+      font-size: 0.76562rem;
+      line-height: 1.5;
+      border-radius: 0.2rem;
+  }
+
+  .jss_pagination_dropdown:hover {
+    color: #fff !important;
+    background-color: #4AB7DE !important;
+    border-color: #4AB7DE !important;
+    margin-left: 5px;
+    margin-top: -2px;
+    height: calc(1.5em + 0.5rem + 2px);
+    padding: 0.25rem 0.5rem;
+    font-size: 0.76562rem;
+    line-height: 1.5;
+    border-radius: 0.2rem;
+  }
+
+  .jss_search_container div {
+    margin-left: auto;
+  }
+
+  .Consumptionsearchinline .jss_search_container{
+    position: absolute;
+    top: -53px;
+    right: 0%;
+  
+  }
+
+  .jss_search_container{
+    border-top: 0px!important;
+  }
+
+  .jss>thead>tr>td.jss_filters_icon::before{
+    // font-family: "F";
+    // background-image:url('/src/assets/img/filter.png')!important;
+    // content: "\f0b0"!important;
+    font-family: 'FontAwesome'!important;
+    content: '\f0b0'!important;
+    position: absolute;
+    right: 0;
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    color: #ccc;
+  }
+
+  .jss > thead > tr > td {
+    background-color: #fff !important;
+    color: #212721 !important;
+    font-weight: bold;
+    font-style: normal !important;
+  }
+
+  .jss_selectall {
+    background: #fff !important;
+  }
+
+  .jss > thead > tr > td {
+    padding: 6px !important;
+    z-index: 0 !important;
+  }
+
+  .jss > thead > tr > .AsteriskTheadtrTd::after {
+    position: relative;
+     width: 3px;
+     height: 100%;
+     color: #BA0C2F; 
+     top: 0px;
+     left: 2px;
+     cursor: col-resize;
+     content: "*" !important; 
+   font-size: 14px;
+   }
+   
+   .jss > thead > tr > .CalculatorTheadtr::after {
+   //   position: relative;
+   //    width: 3px;
+   //    height: 100%;
+   //    color: #BA0C2F; 
+   //    top: 0px;
+   //    left: 2px;
+   //    cursor: col-resize;
+   //    content: url('https://images.hindustantimes.com/auto/img/2021/08/14/600x338/xuv700_1628942877448_1628943408032.jpg') !important; 
+   //  font-size: 14px;
+   
+   font-family: 'FontAwesome';
+   content: '\f1ec';
+     position: relative;
+      width: 3px;
+      height: 100%;
+     //  color: #BA0C2F; 
+      top: 0px;
+      left: 2px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .jss > thead > tr > .InfoTr::after {
+      font-family: 'FontAwesome';
+      content: '\f05a';
+        position: relative;
+         width: 3px;
+         height: 100%;
+         top: 0px;
+         left: 2px;
+         cursor: pointer;
+         font-size: 14px;
+         color:#002f6c;
+       }
+
+       .jss > thead > tr > .InfoTrAsteriskTheadtrTd::after {
+        font-family: 'FontAwesome';
+        content: '\f05a';
+          position: relative;
+           width: 3px;
+           height: 100%;
+           top: 0px;
+           left: 15px;
+           cursor: pointer;
+           font-size: 14px;
+           color:#002f6c;
+      }
+      .jss > thead > tr > .InfoTrAsteriskTheadtrTd::before {
+        font-family: 'FontAwesome';
+        content: '*';
+          position: relative;
+           width: 3px;
+           height: 100%;
+           top: 0px;
+           left: 69px;
+           cursor: pointer;
+           font-size: 14px;
+           color:#BA0C2F;
+         }
+
+         .jss > thead > tr > .arrow-down:not(.AsteriskTheadtrTd)::after {
+          content: ""!important;
+        }
+      
+        .jss > thead > tr > .arrow-up:not(.AsteriskTheadtrTd)::after {
+          content: ""!important;
+        }
+
+        .RemoveStriped .jss_content .jexcel .draggable {
+          tr:nth-of-type(odd) {
+            background-color: #fff !important;
+          }
+        }
+
+        .jss_content {
+          overflow-y: auto !important;
+          max-height: 100% !important;
+          height: 100%;
+          // max-height: 540px !important;
+          min-height: 70px !important;
+        }
+
+        .jexcelremoveReadonlybackground .jss_content  tr .readonly{
+          background: transparent!important;
+        }
+
+        // supplyplan consumption add new batch tr row height  in table for add batch
+.AddListbatchtrHeight .jss_content .jss tbody tr{
+  height: 30px;
+}
+.RowheightForjexceladdRow .jss_content .jss tbody tr{ 
+  height: 30px;
+}
+
+.RowClickable .jss_content .jss tbody tr{ 
+  cursor: pointer;
+}
+
+.RowClickableExpiredInventory  .jss_content .jss tbody tr td:nth-child(3){
+  cursor: pointer;
+}
+
+.RowClickableExpiredInventory  .jss_content .jss tbody tr td:nth-child(4){
+  cursor: pointer;
+}
+
+.RowheightForaddprogaddRow .jss_content .jss tbody tr{ 
+  height: 30px;
+}
+
+.jss_content::-webkit-scrollbar {
+  width: 10px !important;
+  height: 10px !important;
+}
+
+.RemoveStriped .jss_content .jexcel {
+  tr:nth-of-type(odd) {
+    background-color: #fff !important;
+  }
+}
+
+.jss_content{
+  box-shadow: none!important;
+  padding-right: 3px;
+    padding-bottom: 3px;
+    max-width: unset!important;
+}
+
+.jss_content::-webkit-scrollbar-thumb {
+  background: #c1c1c1!important;
+}
+
+.consumptionDataEntryTable .jss_content{
+  max-height: calc(100vh - 262px)!important;
+  overflow: scroll !important;
+}
+
+.jss{
+  white-space: pre-wrap !important;
+  margin-right: 0px!important;
+  margin-bottom: 0px!important;
+  outline: 0!important;
+  width: 100% !important;
+}
+
+.jss_content .jss tbody tr:nth-of-type(odd) {
+  background-color: #e5edf5;
+}
+
+.jss>thead>tr>td {
+  line-height: unset!important;
+}
+
+.jss>thead>tr>td.jss_filters_icon {
+  padding-right: 0px!important;
+}
+
+.jss>tbody>tr>td {
+  white-space: pre-wrap!important;
+  text-align: center!important;
+}
+
+.jss_controlX{
+  width: 100%!important;
+}
+
+.jss_table_container{
+  overflow-x: auto!important;
+}

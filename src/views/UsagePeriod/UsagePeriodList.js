@@ -8,8 +8,8 @@ import {
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import i18n from '../../i18n'
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import getLabelText from '../../CommonComponent/getLabelText';
@@ -101,7 +101,8 @@ class UsagePeriod extends Component {
         }
 
         this.el = jexcel(document.getElementById("paputableDiv"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("paputableDiv"),true);
         var json = [];
         var data = papuDataArr;
 
@@ -157,7 +158,7 @@ class UsagePeriod extends Component {
             ],
             updateTable: function (el, cell, x, y, source, value, id) {
                 if (y != null) {
-                    var elInstance = el.jexcel;
+                    var elInstance = el;
                     //left align
                     elInstance.setStyle(`B${parseInt(y) + 1}`, 'text-align', 'left');
 
@@ -193,12 +194,12 @@ class UsagePeriod extends Component {
             parseFormulas: true,
             // onpaste: this.onPaste,
             oneditionend: this.oneditionend,
-            text: {
-                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
             onload: this.loaded,
             license: JEXCEL_PRO_KEY,
             editable: ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_PERIOD') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_USAGE_PERIOD')) ? true : false),
@@ -426,7 +427,7 @@ class UsagePeriod extends Component {
 
 
     oneditionend = function (instance, cell, x, y, value) {
-        var elInstance = instance.jexcel;
+        var elInstance = instance;
         var rowData = elInstance.getRowData(y);
 
         if (x == 2 && !isNaN(rowData[2]) && rowData[2].toString().indexOf('.') != -1) {
@@ -456,12 +457,12 @@ class UsagePeriod extends Component {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
-                var index = (instance.jexcel).getValue(`G${parseInt(data[i].y) + 1}`, true);
+                var index = (instance.worksheets[0]).getValue(`G${parseInt(data[i].y) + 1}`, true);
                 if (index === "" || index == null || index == undefined) {
-                    (instance.jexcel).setValueFromCoords(0, 0, true);
-                    (instance.jexcel).setValueFromCoords(3, data[i].y, true, true);
-                    (instance.jexcel).setValueFromCoords(6, 1, true);
-                    (instance.jexcel).setValueFromCoords(7, 1, true);
+                    (instance.worksheets[0]).setValueFromCoords(0, 0, true);
+                    (instance.worksheets[0]).setValueFromCoords(3, data[i].y, true, true);
+                    (instance.worksheets[0]).setValueFromCoords(6, 1, true);
+                    (instance.worksheets[0]).setValueFromCoords(7, 1, true);
                     z = data[i].y;
                 }
             }
@@ -588,7 +589,8 @@ class UsagePeriod extends Component {
 
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
-        var asterisk = document.getElementsByClassName("resizable")[0];
+        // var asterisk = document.getElementsByClassName("resizable")[0];
+        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
         // tr.children[1].classList.add('AsteriskTheadtrTd');
         tr.children[2].classList.add('AsteriskTheadtrTd');
@@ -765,6 +767,11 @@ class UsagePeriod extends Component {
 
 
     render() {
+        jexcel.setDictionary({
+               Show: " ",
+               entries: " ",
+           });
+
         return (
             <div className="animated fadeIn">
                 <Prompt
