@@ -8,13 +8,13 @@ class ManualTaggingSerice {
         });
     }
 
-    getShipmentLinkingNotification(json) {
-        return axios.post(`${API_URL}/api/shipmentLinkingNotification/`, json, {
+    getShipmentLinkingNotification(programId,versionId) {
+        return axios.get(`${API_URL}/api/erpLinking/shipmentLinkingNotification/programId/${programId}/versionId/${versionId}`, {
         });
     }
 
     updateNotification(json) {
-        return axios.post(`${API_URL}/api/updateNotification/`, json, {
+        return axios.put(`${API_URL}/api/erpLinking/updateNotification/`, json, {
         });
     }
 
@@ -29,7 +29,7 @@ class ManualTaggingSerice {
     }
 
     getNotificationCount() {
-        return axios.get(`${API_URL}/api/getNotificationCount`, {
+        return axios.get(`${API_URL}/api/erpLinking/getNotificationCount`, {
         });
     }
     getOrderDetailsByOrderNoAndPrimeLineNo(roNoOrderNo, programId, erpPlanningUnitId, linkingType, parentShipmentId) {
@@ -61,7 +61,7 @@ class ManualTaggingSerice {
     }
 
     getNotificationSummary() {
-        return axios.get(`${API_URL}/api/getNotificationSummary/`, {
+        return axios.get(`${API_URL}/api/erpLinking/getNotificationSummary/`, {
         });
     }
 

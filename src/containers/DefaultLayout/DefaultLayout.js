@@ -976,19 +976,19 @@ class DefaultLayout extends Component {
   getNotificationCount() {
     if (localStorage.getItem("sessionType") === 'Online') {
       AuthenticationService.setupAxiosInterceptors();
-      // ManualTaggingService.getNotificationCount()
-      //   .then(response => {
-      //     console.log("notification response===", response.data);
-      //     this.setState({
-      //       notificationCount: response.data
-      //     })
-      //   }).catch(
-      //     error => {
-      //       this.setState({
-      //         notificationCount: 0
-      //       })
-      //     }
-      //   );
+      ManualTaggingService.getNotificationCount()
+        .then(response => {
+          console.log("notification response===", response.data);
+          this.setState({
+            notificationCount: response.data
+          })
+        }).catch(
+          error => {
+            this.setState({
+              notificationCount: 0
+            })
+          }
+        );
     }
   }
   getProgramData() {
