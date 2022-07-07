@@ -251,5 +251,10 @@ class ProgramService {
         );
     }
 
+    createManualProblem(json) {
+        return axios.post(`${API_URL}/api/problemReport/createManualProblem`, json, {}
+        );
+    }
+
 }
 export default new ProgramService()

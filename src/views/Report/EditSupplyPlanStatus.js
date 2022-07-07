@@ -31,7 +31,7 @@ import { Link } from 'react-router-dom';
 // import { NavLink } from 'react-router-dom';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import AuthenticationService from '../Common/AuthenticationService';
-import {MultiSelect} from 'react-multi-select-component';
+import { MultiSelect } from 'react-multi-select-component';
 import ProblemListFormulas from '../Report/ProblemListFormulas.js'
 import DataSourceService from '../../api/DataSourceService';
 import RealmCountryService from '../../api/RealmCountryService';
@@ -43,6 +43,28 @@ import ProcurementAgentService from '../../api/ProcurementAgentService';
 import CryptoJS from 'crypto-js'
 
 const entityname = i18n.t('static.program.program');
+
+const validationSchemaForAddingProblem = function (values) {
+    return Yup.object().shape({
+        problemDescription: Yup.string()
+            .required(i18n.t('static.editStatus.problemDescText')),
+        modelPlanningUnitId: Yup.string()
+            .required(i18n.t('static.procurementUnit.validPlanningUnitText')),
+    })
+}
+const validateForAddingProblem = (getValidationSchema) => {
+    return (values) => {
+        const validationSchema = getValidationSchema(values)
+        try {
+            validationSchema.validateSync(values, { abortEarly: false })
+            return {}
+        } catch (error) {
+            return getErrorsFromValidationError(error)
+        }
+    }
+}
+
+
 
 const validationSchema = function (values) {
     return Yup.object().shape({
@@ -220,7 +242,11 @@ class EditSupplyPlanStatus extends Component {
             problemCategoryList: [],
             problemReportChanged: 0,
             problemReviewedList: [{ name: i18n.t("static.program.yes"), id: 1 }, { name: i18n.t("static.program.no"), id: 0 }],
-            problemReviewedValues: [{ label: i18n.t("static.program.no"), value: 0 }]
+            problemReviewedValues: [{ label: i18n.t("static.program.no"), value: 0 }],
+            isModalOpen: false,
+            planningUnitList: [],
+            regionList: [],
+            isSubmitClicked: false,
         }
         this.formSubmit = this.formSubmit.bind(this);
         this.consumptionDetailsClicked = this.consumptionDetailsClicked.bind(this);
@@ -236,6 +262,8 @@ class EditSupplyPlanStatus extends Component {
         this.handleProblemReviewedChange = this.handleProblemReviewedChange.bind(this);
         this.buildProblemTransJexcel = this.buildProblemTransJexcel.bind(this);
         this.loaded1 = this.loaded1.bind(this);
+        this.addMannualProblem = this.addMannualProblem.bind(this);
+        this.modelOpenClose = this.modelOpenClose.bind(this);
     }
 
     updateState(parameterName, value) {
@@ -2141,7 +2169,7 @@ class EditSupplyPlanStatus extends Component {
 
                 }, () => {
                     this.getPlanningUnit()
-                    this.getDatasource()
+                    // this.getDatasource()
                     this.fetchData();
                     this.buildJExcel()
                     var fields = document.getElementsByClassName("totalShipments");
@@ -3186,7 +3214,7 @@ class EditSupplyPlanStatus extends Component {
                     </Row>
                 </TabPane>
                 <TabPane tabId="2">
-                    <Col md="9 pl-0 mt-3">
+                    <Col md="12 pl-0 mt-3">
                         <div className="d-md-flex Selectdiv2">
                             <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
                                 <Label htmlFor="appendedInputButton">{i18n.t('static.report.problemStatus')}</Label>
@@ -3266,8 +3294,18 @@ class EditSupplyPlanStatus extends Component {
                                     </InputGroup>
                                 </div>
                             </FormGroup> */}
+                            {/* {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_PROBLEM') &&
+                                <div className="col-md-4 card-header-action">
+                                    <a className="pull-right" href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addMannualProblem}><i className="fa fa-plus-square"></i></a>
+                                </div>
+                            } */}
                         </div>
                     </Col>
+                    {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_PROBLEM') &&
+                        <div className="col-md-12 card-header-action">
+                            <a className="pull-right" style={{ marginTop: '-21px' }} href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addMannualProblem}><i className="fa fa-plus-square"></i></a>
+                        </div>
+                    }
                     <br />
                     <FormGroup className="col-md-6 mt-5 pl-0" >
                         <ul className="legendcommitversion list-group">
@@ -3925,6 +3963,34 @@ class EditSupplyPlanStatus extends Component {
         }
     }
 
+    touchAllForAddingProblem(setTouched, errors) {
+        setTouched({
+            problemDescription: true,
+            modelPlanningUnitId: true
+        }
+        )
+        this.validateFormForAddingProblem(errors)
+    }
+    validateFormForAddingProblem(errors) {
+        this.findFirstError('addProblemForm', (fieldName) => {
+            return Boolean(errors[fieldName])
+        })
+    }
+
+    addMannualProblem() {
+        console.log("-------------------addNewProblem--------------------");
+        this.setState({
+            isModalOpen: !this.state.isModalOpen,
+        }, () => {
+        });
+    }
+
+    modelOpenClose() {
+        this.setState({
+            isModalOpen: !this.state.isModalOpen
+        })
+    }
+
     render() {
         const { statuses } = this.state;
         let statusList = statuses.length > 0
@@ -4012,6 +4078,22 @@ class EditSupplyPlanStatus extends Component {
                 text: 'All', value: this.state.data.length
             }]
         }
+
+        const { planningUnits } = this.state;
+        let planningUnitList = planningUnits.length > 0
+            && planningUnits.map((item, i) => {
+                return (
+                    <option key={i} value={item.planningUnit.id}>{getLabelText(item.planningUnit.label, this.state.lang)}</option>
+                )
+            }, this);
+
+        const { regionList } = this.state;
+        let regions = regionList.length > 0
+            && regionList.map((item, i) => {
+                return (
+                    <option key={i} value={item.id}>{item.name}</option>
+                )
+            }, this);
 
         return (
             <div className="animated fadeIn">
@@ -4627,6 +4709,221 @@ class EditSupplyPlanStatus extends Component {
                             </ModalFooter> */}
                         </Modal>
                         {/* problem trans modal */}
+                        <Modal isOpen={this.state.isModalOpen}
+                            className={'modal-lg ' + this.props.className}>
+                            <ModalHeader>
+                                <strong>{i18n.t('static.dashboard.add.problem')}</strong>
+                                <Button size="md" onClick={this.modelOpenClose} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
+                            </ModalHeader>
+                            <ModalBody className='pb-lg-0'>
+                                {/* <h6 className="red" id="div3"></h6> */}
+                                <Col sm={12} style={{ flexBasis: 'auto' }}>
+                                    {/* <Card> */}
+                                    <Formik
+                                        initialValues={{
+                                            problemDescription: '',
+                                            modelPlanningUnitId: ''
+                                        }}
+                                        validate={validateForAddingProblem(validationSchemaForAddingProblem)}
+                                        onSubmit={(values, { setSubmitting, setErrors }) => {
+                                            if (!this.state.isSubmitClicked) {
+                                                this.setState({ loading: true, isSubmitClicked: true }, () => {
+                                                    var json = {
+                                                        "realmProblem": {
+                                                            "realmProblemId": "25",
+                                                            "problemType": {
+                                                                "id": "2"
+                                                            }
+                                                        },
+                                                        "program": {
+                                                            "id": this.props.match.params.programId
+                                                        },
+                                                        "versionId": this.props.match.params.versionId,
+                                                        "problemStatus": {
+                                                            "id": "1"
+                                                        },
+                                                        "dt": moment(new Date()),
+                                                        "region": {
+                                                            "id": (document.getElementById("modelRegionId").value)
+                                                        },
+                                                        "planningUnit": {
+                                                            "id": (document.getElementById("modelPlanningUnitId").value)
+                                                        },
+                                                        "data5": '{"problemDescription":"' + (document.getElementById("problemDescription").value) + '", "suggession":"' + (document.getElementById("suggession").value) + '"}',
+                                                        "notes": (document.getElementById("notes").value)
+                                                    }
+                                                    ProgramService.createManualProblem(json)
+                                                        .then(response => {
+                                                            if (response.status == 200) {
+                                                                // this.props.history.push('/report/editStatus/' + this.props.match.params.programId + '/' + this.props.match.params.versionId + '/' + false + '/green/' + i18n.t('static.problem.addedSuccessfully'));
+                                                                this.setState({
+                                                                    message: response.data.message,
+                                                                    isModalOpen: !this.state.isModalOpen,
+                                                                })
+                                                                // window.location.reload(false);
+                                                                this.componentDidMount();
+                                                                this.toggle(0, '2');
+
+                                                            } else {
+                                                                this.setState({
+                                                                    message: response.data.message,
+                                                                })
+                                                            }
+                                                        })
+                                                        .catch(
+                                                            error => {
+
+                                                                console.log(error)
+                                                                if (error.message === "Network Error") {
+                                                                    this.setState({ message: error.message });
+                                                                } else {
+                                                                    switch (error.response ? error.response.status : "") {
+                                                                        case 404:
+                                                                            this.props.history.push(`/login/${error.response.data.messageCode}`)
+                                                                            break;
+                                                                        case 500:
+                                                                        case 401:
+                                                                        case 403:
+                                                                        case 406:
+                                                                        case 412:
+                                                                            this.setState({
+                                                                                message: error.response.data.messageCode,
+                                                                                loading: false
+                                                                            });
+                                                                            break;
+                                                                        default:
+                                                                            this.setState({ message: 'static.unkownError' });
+                                                                            break;
+                                                                    }
+                                                                }
+                                                            }
+                                                        );
+                                                })
+                                            }
+
+                                        }}
+
+
+                                        render={
+                                            ({
+                                                values,
+                                                errors,
+                                                touched,
+                                                handleChange,
+                                                handleBlur,
+                                                handleSubmit,
+                                                isSubmitting,
+                                                isValid,
+                                                setTouched,
+                                                handleReset,
+                                                setFieldValue,
+                                                setFieldTouched
+                                            }) => (
+                                                <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='addProblemForm' autocomplete="off">
+                                                    {/* <CardBody> */}
+                                                    <div className="col-md-12">
+                                                        <div style={{ display: this.state.treeFlag ? "none" : "block" }} className="">
+                                                            <div className='row'>
+                                                                <FormGroup className="col-md-6">
+                                                                    <Label for="programCode">{i18n.t('static.planningunit.planningunit')}<span className="red Reqasterisk">*</span></Label>
+                                                                    <Input
+                                                                        type="select"
+                                                                        name="modelPlanningUnitId"
+                                                                        id="modelPlanningUnitId"
+                                                                        bsSize="sm"
+                                                                        valid={!errors.modelPlanningUnitId}
+                                                                        invalid={touched.modelPlanningUnitId && !!errors.modelPlanningUnitId}
+                                                                        onChange={(e) => { handleChange(e) }}
+                                                                        onBlur={handleBlur}
+                                                                        required
+                                                                    >
+                                                                        <option value="">{i18n.t('static.common.select')}</option>
+                                                                        {planningUnitList}
+                                                                    </Input>
+                                                                    <FormFeedback className="red">{errors.modelPlanningUnitId}</FormFeedback>
+                                                                </FormGroup>
+                                                            </div>
+                                                        </div>
+                                                        <div className="row">
+                                                            <FormGroup className="col-md-6">
+                                                                <Label>{i18n.t('static.region.region')}</Label>
+                                                                <Input type="select"
+                                                                    bsSize="sm"
+                                                                    name="modelRegionId"
+                                                                    id="modelRegionId"
+
+                                                                >
+                                                                    <option value="0">{i18n.t('static.common.select')}</option>
+                                                                    {regions}
+                                                                </Input>
+                                                                <FormFeedback className="red">{errors.createdDate}</FormFeedback>
+                                                            </FormGroup>
+                                                            <FormGroup className="col-md-6">
+                                                                <Label>{i18n.t('static.report.problemDescription')}<span className="red Reqasterisk">*</span></Label>
+                                                                <Input type="text"
+                                                                    // maxLength={600}
+                                                                    bsSize="sm"
+                                                                    name="problemDescription"
+                                                                    id="problemDescription"
+                                                                    valid={!errors.problemDescription}
+                                                                    invalid={touched.problemDescription && !!errors.problemDescription}
+                                                                    onChange={(e) => { handleChange(e) }}
+                                                                    onBlur={handleBlur}
+                                                                    required
+                                                                >
+                                                                </Input>
+                                                                <FormFeedback className="red">{errors.problemDescription}</FormFeedback>
+                                                            </FormGroup>
+                                                        </div>
+                                                        <div style={{ display: this.state.treeFlag ? "none" : "block" }} >
+                                                            <div className='row'>
+                                                                <FormGroup className="col-md-6">
+                                                                    <Label>{i18n.t('static.report.suggession')}</Label>
+                                                                    <Input type="textarea"
+                                                                        // maxLength={600}
+                                                                        bsSize="sm"
+                                                                        name="suggession"
+                                                                        id="suggession"
+                                                                    // valid={!errors.problemId}
+                                                                    // invalid={touched.problemId && !!errors.problemId}
+                                                                    // onChange={(e) => { handleChange(e) }}
+                                                                    // onBlur={handleBlur}
+                                                                    // required
+                                                                    >
+                                                                    </Input>
+                                                                </FormGroup>
+                                                                <FormGroup className="col-md-6">
+                                                                    <Label>{i18n.t('static.common.notes')}</Label>
+                                                                    <Input type="textarea"
+                                                                        // maxLength={600}
+                                                                        bsSize="sm"
+                                                                        name="notes"
+                                                                        id="notes"
+                                                                    // valid={!errors.problemId}
+                                                                    // invalid={touched.problemId && !!errors.problemId}
+                                                                    // onChange={(e) => { handleChange(e) }}
+                                                                    // onBlur={handleBlur}
+                                                                    // required
+                                                                    >
+                                                                    </Input>
+                                                                </FormGroup>
+                                                            </div>
+                                                        </div>
+
+
+                                                        <FormGroup className="col-md-12 float-right pt-lg-4 pr-lg-0">
+                                                            <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.modelOpenClose}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                            <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                            <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                            &nbsp;
+                                                        </FormGroup>
+                                                    </div>
+                                                </Form>
+                                            )} />
+                                </Col>
+                                <br />
+                            </ModalBody>
+                        </Modal>
 
                         <Formik
                             enableReinitialize={true}
