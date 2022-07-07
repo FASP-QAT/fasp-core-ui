@@ -1262,11 +1262,26 @@ export default class ManualTagging extends Component {
             var programQPLDetailsFilter = programQPLDetailsList.filter(c => c.id == filterList[v].id);
             versionList.push({ versionId: filterList[v].version + "  (Local)" })
         }
+        var onlineVersionList = versionList.filter(c => !c.versionId.toString().includes("Local")).sort(function (a, b) {
+            a = a.versionId;
+            b = b.versionId;
+            return a > b ? -1 : a < b ? 1 : 0;
+        });
+        var offlineVersionList = versionList.filter(c => c.versionId.toString().includes("Local")).sort(function (a, b) {
+            a = a.versionId.split(" ")[0];
+            b = b.versionId.split(" ")[0];
+            return a > b ? -1 : a < b ? 1 : 0;
+        });
+        var newVList = offlineVersionList.concat(onlineVersionList)
+        var finalVersionList=[]
+        for (var v = 0; v < newVList.length; v++) {
+            finalVersionList.push({ versionId: newVList[v].versionId})
+        }
         console.log("filteredProgramList@@@@@@@@@@@@", versionList)
         console.log("filteredProgramList@@@@@@@@@@@@", this.state.programs)
         console.log("filteredProgramList@@@@@@@@@@@@", this.state.programs)
         this.setState({
-            versionList: versionList,
+            versionList: finalVersionList,
             loading: false
         }, () => {
             if (localStorage.getItem("sesVersionIdReport") != '' && localStorage.getItem("sesVersionIdReport") != undefined && versionList.filter(c => c.versionId == localStorage.getItem("sesVersionIdReport")).length > 0) {
@@ -2253,17 +2268,18 @@ export default class ManualTagging extends Component {
             }
         }
         var shipmentPlanningUnitId = this.state.active1 ? this.state.selectedRowPlanningUnit : (this.state.active3 ? ((this.state.active4 || this.state.active5) && !this.state.checkboxValue ? document.getElementById("planningUnitId1").value : (this.state.active4 || this.state.active5) && this.state.checkboxValue ? this.state.selectedShipment.length > 0 ? this.state.selectedShipment[0].planningUnit.id : 0 : 0) : 0)
+        console.log("erpPlanningUnitIdMohit@@@@@@@@@@@@@@@@@@@",erpPlanningUnitId)
         if ((roNoOrderNo != "" && roNoOrderNo != "0") || (erpPlanningUnitId != 0)) {
             // roNoOrderNo, programId, erpPlanningUnitId, (this.state.active1 ? 1 : (this.state.active2 ? 2 : 3)), (this.state.active2 ? this.state.parentShipmentId : 0)
             var json = {
                 programId: programId,
                 versionId: versionId,
                 shipmentPlanningUnitId: shipmentPlanningUnitId,
-                roNo: roNoOrderNo,
+                roNo: roNoOrderNo==0?"":roNoOrderNo,
                 filterPlanningUnitId: erpPlanningUnitId,
 
             }
-            console.log("In else if json@@@@@@@#########", json)
+            console.log("JsonMohit@@@@@@@@@@@@@@@@@@@", json)
             ManualTaggingService.getOrderDetails(json)
                 .then(response => {
                     console.log("response.data------", response.data)
@@ -3367,7 +3383,7 @@ export default class ManualTagging extends Component {
                 data[7] = manualTaggingList[j].expectedDeliveryDate
                 data[8] = linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].erpShipmentStatus : ""
                 // data[7] = ""
-                data[9] = Math.round((manualTaggingList[j].shipmentQty) / (linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].conversionFactor : 1))
+                data[9] = Math.round((shipmentQty) / (linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].conversionFactor : 1))
                 data[10] = linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].conversionFactor : 1
                 data[11] = `=ROUND(J${parseInt(j) + 1}*K${parseInt(j) + 1},0)`;
                 data[12] = manualTaggingList[j].notes
@@ -3701,7 +3717,7 @@ export default class ManualTagging extends Component {
                                     console.log("primeLineNo@@@@@@@@@@", primeLineNo)
                                     ManualTaggingService.getARTMISHistory(orderNo, primeLineNo)
                                         .then(response => {
-
+                                            console.log("MohitResponse.data@@@@@@@@@@@@@",response.data)
                                             let responseData = response.data.sort(function (a, b) {
                                                 var dateA = new Date(a.receivedOn).getTime();
                                                 var dateB = new Date(b.receivedOn).getTime();
@@ -4493,7 +4509,7 @@ export default class ManualTagging extends Component {
             },
 
             {
-                dataField: 'calculatedExpectedDeliveryDate',
+                dataField: 'expectedDeliveryDate',
                 text: i18n.t('static.supplyPlan.mtexpectedDeliveryDate'),
                 sort: true,
                 align: 'center',
