@@ -6774,3 +6774,7 @@ top: calc(20em + 3px);
 .jss_table_container{
   overflow-x: auto!important;
 }
+.jtabs {
+  position: inherit !important;
+  max-width: none !important;
+}
