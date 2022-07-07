@@ -6438,6 +6438,38 @@ top: calc(20em + 3px);
   font-weight: bold!important;
 }
 
+.jexcel > tbody > tr > td.readonly.commitConflict {
+  background-color: yellow !important;
+}
+
+.jexcel > tbody > tr > td.commitConflict {
+  background-color: yellow !important;
+}
+
+.jexcel > tbody > tr > td.readonly.commitLocal {
+  background-color: #86cd99 !important;
+}
+
+.jexcel > tbody > tr > td.commitLocal {
+  background-color: #86cd99 !important;
+}
+
+.jexcel > tbody > tr > td.readonly.commitServer {
+  background-color: #e5edf5 !important;
+}
+
+.jexcel > tbody > tr > td.commitServer {
+  background-color: #e5edf5 !important;
+}
+
+.jexcel > tbody > tr > td.readonly.commitNoChange {
+  background-color: transparent !important;
+}
+
+.jexcel > tbody > tr > td.commitNoChange {
+  background-color: transparent !important;
+}
+
 .rightClickColors .jcontextmenu > div:nth-of-type(2){
   background-color: #86cd99;
 }

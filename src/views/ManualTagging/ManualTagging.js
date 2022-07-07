@@ -7,7 +7,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import { STRING_TO_DATE_FORMAT, JEXCEL_DATE_FORMAT, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY, SHIPMENT_ID_ARR_MANUAL_TAGGING, PSM_PROCUREMENT_AGENT_ID, DELIVERED_SHIPMENT_STATUS, BATCH_PREFIX, SHIPMENT_MODIFIED, NONE_SELECTED_DATA_SOURCE_ID, USD_CURRENCY_ID } from '../../Constants.js';
+import { STRING_TO_DATE_FORMAT, JEXCEL_DATE_FORMAT, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY, SHIPMENT_ID_ARR_MANUAL_TAGGING, PSM_PROCUREMENT_AGENT_ID, DELIVERED_SHIPMENT_STATUS, BATCH_PREFIX, SHIPMENT_MODIFIED, NONE_SELECTED_DATA_SOURCE_ID, USD_CURRENCY_ID, TBD_FUNDING_SOURCE } from '../../Constants.js';
 import moment from 'moment';
 import BudgetServcie from '../../api/BudgetService';
 import FundingSourceService from '../../api/FundingSourceService';
@@ -649,9 +649,11 @@ export default class ManualTagging extends Component {
                         this.el.setComments(col, "");
                         this.el.setComments(col, "");
                         var json = this.el.getJson(null, false);
+                        this.el.setValueFromCoords(11, y, Math.round(value*this.el.getValueFromCoords(9,y)), true);
                         // var checkboxValue = this.el.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                         for (var j = 0; j < json.length; j++) {
                             if (j != y && json[j][21] == this.el.getValueFromCoords(21, y, true)) {
+                                this.el.setValueFromCoords(11, j, Math.round(value*this.el.getValueFromCoords(9,j)), true);
                                 this.el.setValueFromCoords(10, j, value, true);
                             }
                         }
@@ -700,6 +702,7 @@ export default class ManualTagging extends Component {
                         this.el.setComments(col, "");
                         this.el.setComments(col, "");
                         if (rowData[0].toString() == "true") {
+                            this.state.instance.setValueFromCoords(11, y, Math.round(value*this.state.instance.getValueFromCoords(9,y)), true);
                             for (var j = 0; j < json.length; j++) {
                                 // console.log("J@@@@@@@@################",j)
                                 // console.log("y@@@@@@@@################",y)
@@ -708,13 +711,12 @@ export default class ManualTagging extends Component {
                                 if (json[j][16] == this.state.instance.getValueFromCoords(16, y, true)) {
                                     if (j != y) {
                                         this.state.instance.setValueFromCoords(10, j, value, true);
+                                        this.state.instance.setValueFromCoords(11, j, Math.round(value*this.state.instance.getValueFromCoords(9,j)), true);
                                     }
                                 }
                             }
                         }
 
-                        // `=ROUND(G${parseInt(index) + 1}*H${parseInt(index) + 1},2)`,
-                        // this.state.instance.setValueFromCoords(8, y, `=ROUND(G${parseInt(y) + 1}*H${parseInt(y) + 1},0)`, true);
                     }
 
                 }
@@ -753,8 +755,6 @@ export default class ManualTagging extends Component {
                     }
                 }
 
-                // `=ROUND(G${parseInt(index) + 1}*H${parseInt(index) + 1},2)`,
-                // this.state.instance.setValueFromCoords(8, y, `=ROUND(G${parseInt(y) + 1}*H${parseInt(y) + 1},0)`, true);
                 // }
 
                 // }
@@ -1066,7 +1066,7 @@ export default class ManualTagging extends Component {
         FundingSourceService.getFundingSourceListAll()
             .then(response => {
                 if (response.status == 200) {
-                    let fundingSourceList = response.data.filter(c => c.active == true)
+                    let fundingSourceList = response.data.filter(c => c.active == true && c.fundingSourceId!=TBD_FUNDING_SOURCE)
                     this.setState({
                         fundingSourceList
                     }, () => {
@@ -3128,7 +3128,7 @@ export default class ManualTagging extends Component {
                     data[10] = "";//K
                     // convertedQty = erpDataList[j].quantity * (erpDataList[j].conversionFactor != null && erpDataList[j].conversionFactor != "" ? erpDataList[j].conversionFactor : 1);
                     // data[11] = ``;
-                    data[11] = `=ROUND(J${parseInt(j) + 1}*K${parseInt(j) + 1},0)`
+                    data[11] = "";
                     data[12] = "";
                     data[13] = erpDataArray.filter(c => c[16] == erpDataList[j].roNo + ' | ' + erpDataList[j].roPrimeLineNo).length > 0 ? 1 : 0;
                     data[14] = erpDataList[j].qatEquivalentShipmentStatus;
@@ -4627,7 +4627,8 @@ export default class ManualTagging extends Component {
                             </a>
                         </div>
                     </div>
-                    <CardBody className="pb-lg-5">
+                    <CardBody className="pb-lg-5" >
+                        <div  style={{ display: this.state.loading ? "none" : "block" }}>
                         {/* <Col md="10 ml-0"> */}
                         <b><div className="col-md-11 pl-3" style={{ 'marginLeft': '-15px', 'marginTop': '-13px' }}> <span style={{ 'color': '#002f6c', 'fontSize': '13px' }}>{i18n.t('static.mt.manualTaggingNotePart1')}<a href="#/program/downloadProgram" target="_blank">{i18n.t('static.mt.manualTaggingNotePart2')}</a>{i18n.t('static.mt.manualTaggingNotePart3')}</span></div></b><br />
 
@@ -4841,21 +4842,11 @@ export default class ManualTagging extends Component {
                                     </FormGroup>}
                             </Row>
 
-                            <div className="ReportSearchMarginTop" style={{ display: this.state.loading ? "none" : "block" }}>
+                            <div className="ReportSearchMarginTop">
                                 <div id="tableDiv" className={!this.state.active2 ? "jexcelremoveReadonlybackground RowClickable" : "RowClickable"}>
                                 </div>
                             </div>
-                            <div style={{ display: this.state.loading ? "block" : "none" }}>
-                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                                    <div class="align-items-center">
-                                        <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
-
-                                        <div class="spinner-border blue ml-4" role="status">
-
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            
 
 
                         </div>
@@ -5417,6 +5408,18 @@ export default class ManualTagging extends Component {
                             </div>
 
                         </Modal>
+                        </div>
+                        <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                    <div class="align-items-center">
+                                        <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
+
+                                        <div class="spinner-border blue ml-4" role="status">
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         {/* ARTMIS history modal end */}
                     </CardBody>
                     {this.state.active2 && <CardFooter>

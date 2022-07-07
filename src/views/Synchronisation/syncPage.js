@@ -2589,11 +2589,11 @@ export default class syncPage extends Component {
                                                                             { type: 'text', title: i18n.t('static.dashboard.programheader'), width: 150 },
                                                                             { type: 'text', title: i18n.t('static.report.id'), width: 100, },
                                                                             { type: 'text', title: i18n.t('static.manualTagging.conversionFactor'),width: 120 },
-                                                                            { type: 'checkbox', title: i18n.t('static.common.active'),width: 120 },
+                                                                            { type: 'checkbox', title: i18n.t('static.common.active'),width: 120,readonly:true },
                                                                             { type: 'text', title: i18n.t('static.dashboard.programheader'), width: 100 },
                                                                             { type: 'text', title: i18n.t('static.report.id'), width: 100, },
                                                                             { type: 'text', title: i18n.t('static.manualTagging.conversionFactor'),width: 120 },
-                                                                            { type: 'checkbox', title: i18n.t('static.common.active'),width: 120 },
+                                                                            { type: 'checkbox', title: i18n.t('static.common.active'),width: 120,readonly:true },
                                                                             // { type: 'dropdown', title: i18n.t('static.subfundingsource.fundingsource'), source: fundingSourceList, width: 120 },
                                                                             // { type: 'dropdown', title: i18n.t('static.dashboard.budget'), source: budgetList, width: 120 },
                                                                             // { type: 'text', title: i18n.t('static.supplyPlan.orderNoAndPrimeLineNo'), width: 150 },
@@ -3175,16 +3175,18 @@ export default class syncPage extends Component {
         elInstance.setValueFromCoords(13, c, 1, true);
         for (var j = 0; j < colArr.length; j++) {
           var col = (colArr[j]).concat(parseInt(c) + 1);
-          elInstance.setStyle(col, "background-color", "transparent");
-          elInstance.setStyle(col, "background-color", "yellow");
+          // elInstance.setStyle(col, "background-color", "transparent");
+          // elInstance.setStyle(col, "background-color", "yellow");
+          var cell = elInstance.getCell(col);
+          cell.classList.add('commitConflict');
         }
       }else{
       if ((jsonData[c])[11]==="" && (jsonData[c])[10] ===0) {
         elInstance.setValueFromCoords(13, c, 2, true);
         for (var i = 0; i < colArr.length; i++) {
           var col = (colArr[i]).concat(parseInt(c) + 1);
-          elInstance.setStyle(col, "background-color", "transparent");
-          elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
+          var cell = elInstance.getCell(col);
+          cell.classList.add('commitLocal');
           
         }
         this.setState({
@@ -3195,8 +3197,8 @@ export default class syncPage extends Component {
         elInstance.setValueFromCoords(13, c, 3, true);
         for (var i = 0; i < colArr.length; i++) {
           var col = (colArr[i]).concat(parseInt(c) + 1);
-          elInstance.setStyle(col, "background-color", "transparent");
-          elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
+          var cell = elInstance.getCell(col);
+          cell.classList.add('commitServer');
           
         }
         this.setState({
@@ -3207,8 +3209,8 @@ export default class syncPage extends Component {
           if((jsonData[c])[5]==(jsonData[c])[21]){
             elInstance.setValueFromCoords(13, c, 3, true);
               var col = (colArr[9]).concat(parseInt(c) + 1);
-              elInstance.setStyle(col, "background-color", "transparent");
-              elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
+              var cell = elInstance.getCell(col);
+          cell.classList.add('commitServer');
             this.setState({
               isChanged: true
             })  
@@ -3216,8 +3218,8 @@ export default class syncPage extends Component {
           }else if((jsonData[c])[9]==(jsonData[c])[21]){
             elInstance.setValueFromCoords(13, c, 3, true);
               var col = (colArr[5]).concat(parseInt(c) + 1);
-              elInstance.setStyle(col, "background-color", "transparent");
-              elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
+              var cell = elInstance.getCell(col);
+          cell.classList.add('commitLocal');
             this.setState({
               isChanged: true
             })  
@@ -3225,7 +3227,8 @@ export default class syncPage extends Component {
         }else{
         for (var j = 0; j < colArr.length; j++) {
         var col = (colArr[j]).concat(parseInt(c) + 1);
-        elInstance.setStyle(col, "background-color", "transparent");
+        var cell = elInstance.getCell(col);
+          cell.classList.add('commitNoChange');
         }
       }
       }else if((jsonData[c])[11]!=="" && (jsonData[c])[10]!=="" && (jsonData[c])[10]!==(jsonData[c])[11]){
@@ -3235,8 +3238,8 @@ export default class syncPage extends Component {
         elInstance.setValueFromCoords(13, c, 1, true);
         for (var j = 0; j < colArr.length; j++) {
           var col = (colArr[j]).concat(parseInt(c) + 1);
-          elInstance.setStyle(col, "background-color", "transparent");
-          elInstance.setStyle(col, "background-color", "yellow");
+          var cell = elInstance.getCell(col);
+          cell.classList.add('commitConflict');
         }
       }
     }
