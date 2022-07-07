@@ -1100,7 +1100,7 @@ export default class EditLanguageComponent extends Component {
 
                                             </Form>
 
-                                        )} />
+                                    )} />
 
                         </Card>
                     </Col>

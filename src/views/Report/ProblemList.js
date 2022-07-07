@@ -1677,7 +1677,7 @@ export default class ConsumptionDetails extends React.Component {
                                 {this.state.data.length > 0 && <img style={{ verticalAlign: 'bottom', height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title="Export CSV" onClick={() => this.exportCSV(columns)} />} &nbsp;
                                 {this.state.programId != 0 && <a href="javascript:void();" title={i18n.t('static.qpl.recalculate')} onClick={this.getProblemListAfterCalculation}><i className="fa fa-refresh"></i></a>}
                                 &nbsp;&nbsp;
-                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_PROBLEM') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addMannualProblem}><i className="fa fa-plus-square"></i></a>}
+                                {/* {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_PROBLEM') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addMannualProblem}><i className="fa fa-plus-square"></i></a>} */}
 
                             </div>
                         </div>
