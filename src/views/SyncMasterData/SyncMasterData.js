@@ -301,7 +301,7 @@ export default class SyncMasterData extends Component {
                                         var problemReportList = generalJson.problemReportList;
                                         // console.log("Shipment data list", shipmentDataList);
                                         // console.log("Batch Info list", batchInfoList);
-                                        var shipArray = shipmentSyncResponse.data[response.data.programId].filter(c=>c.shipmentActive==true);
+                                        var shipArray = shipmentSyncResponse.data[response.data.programId].filter(c=>c.shipmentActive==true && c.orderActive==true);
                                         var pplModified = programPlanningUnitList.filter(c => moment(c.lastModifiedDate).format("YYYY-MM-DD HH:mm:ss") >= moment(date).format("YYYY-MM-DD HH:mm:ss") && c.program.id == response.data.programId);
 
                                         var rebuild = false;
