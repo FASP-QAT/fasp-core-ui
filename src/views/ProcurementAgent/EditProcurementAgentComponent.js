@@ -518,7 +518,7 @@ class EditProcurementAgentComponent extends Component {
             && procurementAgentTypes.map((item, i) => {
                 return (
                     <option key={i} value={item.procurementAgentTypeId}>
-                        {item.procurementAgentTypeCode}
+                        {getLabelText(item.label, this.state.lang)} ({item.procurementAgentTypeCode})
                     </option>
                 )
             }, this);
