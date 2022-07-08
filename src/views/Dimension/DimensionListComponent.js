@@ -323,17 +323,17 @@ export default class DimensionListComponent extends Component {
                 {
                     title: i18n.t('static.dimension.dimension'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.common.lastModifiedBy'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.common.lastModifiedDate'),
                     type: 'calendar',
-                    readOnly: true,
+                    // readOnly: true,
                     options: { format: JEXCEL_DATE_FORMAT_SM }
                 },
             ],
@@ -343,6 +343,7 @@ export default class DimensionListComponent extends Component {
             //     show: '',
             //     entries: '',
             // },
+            editable: false,
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,

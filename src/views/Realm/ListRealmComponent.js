@@ -395,58 +395,58 @@ export default class ReactListComponent extends Component {
                                 {
                                     title: i18n.t('static.realm.realmName'),
                                     type: 'text',
-                                    readOnly: true
+                                    // readOnly: true
                                 },
                                 {
                                     title: i18n.t('static.realm.realmCode'),
                                     type: 'text',
-                                    readOnly: true
+                                    // readOnly: true
                                 },
                                 {
                                     title: i18n.t('static.realm.minMosMinGaurdraillabel'),
                                     type: 'numeric', mask: '#,##.00', decimal: '.',
-                                    readOnly: true
+                                    // readOnly: true
                                 },
                                 {
                                     title: i18n.t('static.realm.minMosMaxGaurdraillabel'),
                                     type: 'numeric', mask: '#,##.00', decimal: '.',
-                                    readOnly: true
+                                    // readOnly: true
                                 },
                                 {
                                     title: i18n.t('static.realm.maxMosMaxGaurdraillabel'),
                                     type: 'numeric', mask: '#,##.00', decimal: '.',
-                                    readOnly: true
+                                    // readOnly: true
                                 },
                                 {
                                     title: i18n.t('static.realm.minQplTolerance'),
                                     type: 'numeric', mask: '#,##.00', decimal: '.',
-                                    readOnly: true
+                                    // readOnly: true
                                 },
                                 {
                                     title: i18n.t('static.realm.minQplToleranceCutOff'),
                                     type: 'numeric', mask: '#,##.00', decimal: '.',
-                                    readOnly: true
+                                    // readOnly: true
                                 },
                                 {
                                     title: i18n.t('static.realm.maxQplTolerance'),
                                     type: 'numeric', mask: '#,##.00', decimal: '.',
-                                    readOnly: true
+                                    // readOnly: true
                                 },
                                 {
                                     title: i18n.t('static.common.lastModifiedBy'),
                                     type: 'text',
-                                    readOnly: true
+                                    // readOnly: true
                                 },
                                 {
                                     title: i18n.t('static.common.lastModifiedDate'),
                                     type: 'calendar',
                                     options: { format: JEXCEL_DATE_FORMAT_SM },
-                                    readOnly: true
+                                    // readOnly: true
                                 },
                                 {
                                     type: 'dropdown',
                                     title: i18n.t('static.common.status'),
-                                    readOnly: true,
+                                    // readOnly: true,
                                     source: [
                                         { id: true, name: i18n.t('static.common.active') },
                                         { id: false, name: i18n.t('static.common.disabled') }
@@ -454,6 +454,7 @@ export default class ReactListComponent extends Component {
                                 },
 
                             ],
+                            editable: false,
                             // text: {
                             //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
                             //     show: '',

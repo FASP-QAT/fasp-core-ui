@@ -419,26 +419,26 @@ export default class CurrencyListComponent extends Component {
                                 {
                                     title: i18n.t('static.currency.currency'),
                                     type: 'text',
-                                    readOnly: true
+                                    // readOnly: true
                                 },
                                 {
                                     title: i18n.t('static.currency.currencycode'),
                                     type: 'text',
-                                    readOnly: true
+                                    // readOnly: true
                                 },
                                 {
                                     title: i18n.t('static.currency.conversionrateusd'),
                                     type: 'numeric', mask: '#,##.00', decimal: '.',
-                                    readOnly: true
+                                    // readOnly: true
                                 },
                                 {
                                     title: i18n.t('static.common.lastModifiedBy'),
                                     type: 'text',
-                                    readOnly: true
+                                    // readOnly: true
                                 },
                                 {
                                     title: i18n.t('static.common.lastModifiedDate'),
-                                    readOnly: true,
+                                    // readOnly: true,
                                     type: 'calendar',
                                     options: { format: JEXCEL_DATE_FORMAT_SM },
                                 },
@@ -449,6 +449,7 @@ export default class CurrencyListComponent extends Component {
                             //     show: '',
                             //     entries: '',
                             // },
+                            editable: false,
                             onload: this.loaded,
                             pagination: localStorage.getItem("sesRecordCount"),
                             search: true,

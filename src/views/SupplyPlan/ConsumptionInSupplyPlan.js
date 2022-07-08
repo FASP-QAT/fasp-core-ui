@@ -348,12 +348,12 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         onpaste: this.onPaste,
                         oneditionend: this.oneditionend,
                         onchangepage: this.onchangepage,
-                        text: {
-                            // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                            showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                            show: '',
-                            entries: '',
-                        },
+                        // text: {
+                        //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                        //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                        //     show: '',
+                        //     entries: '',
+                        // },
                         onload: this.loadedConsumption,
                         editable: consumptionEditable,
                         onchange: this.consumptionChanged,
@@ -540,11 +540,11 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             editable: consumptionBatchEditable,
             license: JEXCEL_PRO_KEY,
             onpaste: this.onPasteForBatchInfo,
-            text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
             onload: this.loadedBatchInfoConsumption,
             updateTable: function (el, cell, x, y, source, value, id) {
             }.bind(this),

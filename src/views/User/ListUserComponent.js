@@ -23,8 +23,8 @@ import HealthAreaService from "../../api/HealthAreaService"
 import RealmCountryService from "../../api/RealmCountryService"
 import { Nav, NavItem, NavLink, TabContent, TabPane } from 'reactstrap';
 import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_SM, SPECIAL_CHARECTER_WITH_NUM_NODOUBLESPACE } from '../../Constants.js';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
@@ -443,7 +443,8 @@ class ListUserComponent extends Component {
         // }
         // console.log("userArray---->", userArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("tableDiv"),true);
         var json = [];
         var data = userArray;
 
@@ -460,12 +461,12 @@ class ListUserComponent extends Component {
                 {
                     title: i18n.t('static.realm.realm'),
                     type: (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN') ? 'text' : 'hidden'),
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.user.username'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
                 // {
                 //     title: i18n.t('static.user.phoneNumber'),
@@ -475,40 +476,40 @@ class ListUserComponent extends Component {
                 {
                     title: i18n.t('static.user.orgAndCountry'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.user.emailid'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.user.failedAttempts'),
                     type: 'numeric', mask: '#,##.00', decimal: '.',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.user.lastLoginDate'),
                     type: 'calendar',
                     options: { format: JEXCEL_DATE_FORMAT_SM },
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.common.lastModifiedBy'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.common.lastModifiedDate'),
                     type: 'calendar',
                     options: { format: JEXCEL_DATE_FORMAT_SM },
                     width: 80,
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     type: 'dropdown',
                     title: i18n.t('static.common.status'),
-                    readOnly: true,
+                    // readOnly: true,
                     source: [
                         { id: true, name: i18n.t('static.common.active') },
                         { id: false, name: i18n.t('static.common.disabled') }
@@ -516,16 +517,17 @@ class ListUserComponent extends Component {
                 },
 
             ],
-            text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')} `,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')} `,
+            //     show: '',
+            //     entries: '',
+            // },
+            editable: false,
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
@@ -1227,7 +1229,8 @@ class ListUserComponent extends Component {
         //     this.state.table1Instance.destroy();
         // }
         this.el = jexcel(document.getElementById("tableDiv1"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("tableDiv1"), true);
         var json = [];
         var data = userArray;
 
@@ -1245,12 +1248,12 @@ class ListUserComponent extends Component {
                     title: i18n.t('static.realm.realm'),
                     type: (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN') ? 'text' : 'hidden'),
                     // type: 'hidden',
-                    readOnly: true//1B
+                    // readOnly: true//1B
                 },
                 {
                     title: i18n.t('static.user.username'),
                     type: 'text',
-                    readOnly: true//2C
+                    // readOnly: true//2C
                 },
                 // {
                 //     title: i18n.t('static.user.phoneNumber'),
@@ -1260,12 +1263,12 @@ class ListUserComponent extends Component {
                 {
                     title: i18n.t('static.user.orgAndCountry'),
                     type: 'text',
-                    readOnly: true//3D
+                    // readOnly: true//3D
                 },
                 {
                     title: i18n.t('static.user.emailid'),
                     type: 'text',
-                    readOnly: true//4E
+                    // readOnly: true//4E
                 },
                 {
                     title: i18n.t('static.dashboard.role'),
@@ -1273,36 +1276,36 @@ class ListUserComponent extends Component {
                     source: this.state.roleListJexcel,
                     // filter: this.filterHealthArea,
                     multiple: true,
-                    readOnly: true//5F
+                    // readOnly: true//5F
                 },
                 {
                     title: i18n.t('static.user.failedAttempts'),
                     type: 'numeric', mask: '#,##.00', decimal: '.',
-                    readOnly: true//6G
+                    // readOnly: true//6G
                 },
                 {
                     title: i18n.t('static.user.lastLoginDate'),
                     type: 'calendar',
                     options: { format: JEXCEL_DATE_FORMAT_SM },
-                    readOnly: true//7H
+                    // readOnly: true//7H
                 },
                 {
                     title: i18n.t('static.common.lastModifiedBy'),
                     type: 'text',
-                    readOnly: true//8I
+                    // readOnly: true//8I
                 },
                 {
                     title: i18n.t('static.common.lastModifiedDate'),
                     type: 'calendar',
                     options: { format: JEXCEL_DATE_FORMAT_SM },
                     width: 80,
-                    readOnly: true//9J
+                    // readOnly: true//9J
                 },
                 {
                     type: 'dropdown',
                     // type: 'checkbox',
                     title: i18n.t('static.common.status'),
-                    readOnly: true,
+                    // readOnly: true,
                     source: [
                         { id: true, name: i18n.t('static.common.active') },
                         { id: false, name: i18n.t('static.common.disabled') }
@@ -1334,12 +1337,13 @@ class ListUserComponent extends Component {
             //         }
             //     }
             // },
-            text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')} `,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')} `,
+            //     show: '',
+            //     entries: '',
+            // },
             onload: this.loaded,
+            editable: false,
             onselection: this.selected,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
@@ -2096,7 +2100,8 @@ class ListUserComponent extends Component {
         //     this.state.table1Instance.destroy();
         // }
         this.el = jexcel(document.getElementById("tableDiv2"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("tableDiv2"),true);
         var json = [];
         var data = userArray;
 
@@ -2113,22 +2118,22 @@ class ListUserComponent extends Component {
                 {
                     title: i18n.t('static.user.username'),
                     type: 'text',
-                    readOnly: true//2C
+                    // readOnly: true//2C
                 },
                 {
                     title: i18n.t('static.program.realmcountry'),
                     type: 'text',
-                    readOnly: true//3D
+                    // readOnly: true//3D
                 },
                 {
                     title: i18n.t('static.dashboard.healthareaheader'),
                     type: 'text',
-                    readOnly: true//4E
+                    // readOnly: true//4E
                 },
                 {
                     title: i18n.t('static.organisation.organisation'),
                     type: 'text',
-                    readOnly: true,
+                    // readOnly: true,
                     // filter: this.filterOrganisation
 
                 },
@@ -2136,7 +2141,7 @@ class ListUserComponent extends Component {
                     title: i18n.t('static.dashboard.programheader'),
                     type: 'text',
                     // filter: this.filterProgram
-                    readOnly: true
+                    // readOnly: true
 
                 },
 
@@ -2165,17 +2170,18 @@ class ListUserComponent extends Component {
             //         }
             //     }
             // },
-            text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')} `,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')} `,
+            //     show: '',
+            //     entries: '',
+            // },
+            editable: false,
             onload: this.loaded2,
             onselection: this.selected,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
@@ -2255,6 +2261,11 @@ class ListUserComponent extends Component {
     }
 
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
         const { realms } = this.state;
         const { languages } = this.state;
         let realmList = realms.length > 0

@@ -291,14 +291,15 @@ class ListRoleComponent extends Component {
                 {
                     title: i18n.t('static.role.roleid'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.role.role'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 }
             ],
+            editable: false,
             // text: {
             //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
             //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,

@@ -392,44 +392,45 @@ export default class LanguageListComponent extends Component {
                                     {
                                         title: 'LanguageId',
                                         type: 'hidden',
-                                        readOnly: true
+                                        // readOnly: true
                                     },
                                     {
                                         title: i18n.t('static.language.language'),
                                         type: 'text',
-                                        readOnly: true
+                                        // readOnly: true
                                     },
                                     {
                                         title: i18n.t('static.language.languageCode'),
                                         type: 'text',
-                                        readOnly: true
+                                        // readOnly: true
                                     },
                                     {
                                         title: i18n.t('static.language.countryCode'),
                                         type: 'text',
-                                        readOnly: true
+                                        // readOnly: true
                                     },
                                     {
                                         title: i18n.t('static.common.lastModifiedBy'),
                                         type: 'text',
-                                        readOnly: true
+                                        // readOnly: true
                                     },
                                     {
                                         title: i18n.t('static.common.lastModifiedDate'),
                                         type: 'calendar',
                                         options: { format: JEXCEL_DATE_FORMAT_SM },
-                                        readOnly: true
+                                        // readOnly: true
                                     },
                                     {
                                         type: 'dropdown',
                                         title: i18n.t('static.common.status'),
-                                        readOnly: true,
+                                        // readOnly: true,
                                         source: [
                                             { id: true, name: i18n.t('static.common.active') },
                                             { id: false, name: i18n.t('static.common.disabled') }
                                         ]
                                     },
                                 ],
+                                editable: false,
                                 // text: {
                                 //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
                                 //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,

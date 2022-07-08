@@ -454,7 +454,7 @@ export default class CountryListComponent extends Component {
         // console.log("countryArray---->", countryArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         // this.el.destroy();
-        jexcel.destroy(document.getElementById("tableDiv"),true);
+        jexcel.destroy(document.getElementById("tableDiv"), true);
         var json = [];
         var data = countryArray;
 
@@ -512,6 +512,7 @@ export default class CountryListComponent extends Component {
             //     entries: '',
             // },
             onload: this.loaded,
+            editable: false,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
