@@ -71,8 +71,8 @@ class ManualTaggingSerice {
         });
     }
 
-    autocompleteDataOrderNo(roNo, programId, erpPlanningUnit) {
-        return axios.get(`${API_URL}/api/erpLinking/autoCompleteOrder/${programId}/${erpPlanningUnit}/${roNo}`, {
+    autocompleteDataOrderNo(roNo, programId, erpPlanningUnit,qatPlanningUnit) {
+        return axios.get(`${API_URL}/api/erpLinking/autoCompleteOrder/${programId}/${erpPlanningUnit}/${roNo}/${qatPlanningUnit}`, {
         });
     }
 
