@@ -23,8 +23,8 @@ class ManualTaggingSerice {
         });
     }
 
-    getARTMISHistory(orderNo, primeLineNo) {
-        return axios.get(`${API_URL}/api/erpLinking/artmisHistory/${orderNo}/${primeLineNo}`, {
+    getARTMISHistory(roNo, roPrimeLineNo) {
+        return axios.get(`${API_URL}/api/erpLinking/artmisHistory/${roNo}/${roPrimeLineNo}`, {
         });
     }
 
