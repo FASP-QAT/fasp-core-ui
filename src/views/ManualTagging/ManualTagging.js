@@ -105,7 +105,8 @@ export default class ManualTagging extends Component {
             table1Loader: true,
             versionList: [],
             versionId: -1,
-            changedDataForTab2: false
+            changedDataForTab2: false,
+            roPrimeLineNoForTab3:""
 
         }
 
@@ -2267,6 +2268,7 @@ export default class ManualTagging extends Component {
                 })
             }
         }
+        console.log("linkedRoNoAndRoPrimeLineNoMohit@@@@@@@@@@@@@",linkedRoNoAndRoPrimeLineNo)
         var shipmentPlanningUnitId = this.state.active1 ? this.state.selectedRowPlanningUnit : (this.state.active3 ? ((this.state.active4 || this.state.active5) && !this.state.checkboxValue ? document.getElementById("planningUnitId1").value : (this.state.active4 || this.state.active5) && this.state.checkboxValue ? this.state.selectedShipment.length > 0 ? this.state.selectedShipment[0].planningUnit.id : 0 : 0) : 0)
         console.log("erpPlanningUnitIdMohit@@@@@@@@@@@@@@@@@@@",erpPlanningUnitId)
         if ((roNoOrderNo != "" && roNoOrderNo != "0") || (erpPlanningUnitId != 0)) {
@@ -2279,12 +2281,12 @@ export default class ManualTagging extends Component {
                 filterPlanningUnitId: erpPlanningUnitId,
 
             }
-            console.log("JsonMohit@@@@@@@@@@@@@@@@@@@", json)
+            console.log("JsonMohit@@@@@@@@@@@@@@@@@@@", this.state.roPrimeLineNoForTab3)
             ManualTaggingService.getOrderDetails(json)
                 .then(response => {
                     console.log("response.data------", response.data)
                     this.setState({
-                        artmisList: response.data.filter(c => !linkedRoNoAndRoPrimeLineNo.includes(c.roNo + "|" + c.roPrimeLineNo)),
+                        artmisList: response.data.filter(c => !linkedRoNoAndRoPrimeLineNo.includes(c.roNo + "|" + c.roPrimeLineNo) && (this.state.roPrimeLineNoForTab3!=""?c.roPrimeLineNo==this.state.roPrimeLineNoForTab3:true)),
                         displayButton: false
                     }, () => {
                         this.buildJExcelERP();
@@ -2503,14 +2505,15 @@ export default class ManualTagging extends Component {
             console.log("length2---", this.state.planningUnits1.length);
             console.log("json---", json);
             var localProgramList = this.state.localProgramList;
+            var linkedRoNoAndRoPrimeLineNo = [];
             for (var i = 0; i < localProgramList.length; i++) {
                 var generalProgramDataBytes = CryptoJS.AES.decrypt(localProgramList[i].programData.generalData, SECRET_KEY);
                 var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
                 var generalProgramJson = JSON.parse(generalProgramData);
                 var linkedShipmentsList = generalProgramJson.shipmentLinkingList != null ? generalProgramJson.shipmentLinkingList : [];
-                var linkedRoNoAndRoPrimeLineNo = [];
                 console.log("linkedShipmentsList@@@@@@@@@@@@@@@", linkedShipmentsList);
                 linkedShipmentsList.filter(c => c.shipmentLinkingId == 0 && c.active == true).map(c => {
+                    console.log("In if@@@@@@@@@@@@@@@")
                     linkedRoNoAndRoPrimeLineNo.push(c.roNo + "|" + c.roPrimeLineNo)
                 })
             }
@@ -2853,7 +2856,8 @@ export default class ManualTagging extends Component {
                 });
 
                 this.setState({
-                    tracercategoryPlanningUnit: listArray
+                    tracercategoryPlanningUnit: listArray,
+                    roPrimeLineNoForTab3:""
                 });
                 // this.setState({
                 //     tracercategoryPlanningUnit: response.data
@@ -2922,7 +2926,8 @@ export default class ManualTagging extends Component {
                         autocompleteData[i] = { value: response.data[i], label: response.data[i] }
                     }
                     this.setState({
-                        autocompleteData
+                        autocompleteData,
+                        roPrimeLineNoForTab3:""
                     });
                     // document.getElementById("erpPlanningUnitId").value = planningUnitId;
                 }).catch(
@@ -3940,7 +3945,8 @@ export default class ManualTagging extends Component {
                     outputListAfterSearch,
                     selectedShipment: [],
                     roNoOrderNo: json,
-                    searchedValue: outputListAfterSearch[0].roNo
+                    searchedValue: outputListAfterSearch[0].roNo,
+                    roPrimeLineNoForTab3: outputListAfterSearch[0].roPrimeLineNo,
                     // planningUnitIdUpdated: outputListAfterSearch[0].erpPlanningUnit.id
                 }, () => {
                     this.filterProgramByCountry();
