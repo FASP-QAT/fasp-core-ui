@@ -874,9 +874,9 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                                 var daysPerMonthPast = moment(amcDate).daysInMonth();//days in month
                                                 var daysOfDataPast = daysPerMonthPast - Number(amcFilter[c].dayOfStockOut);//days in stock
                                                 var trueDemandPerDayPast = Math.round(Math.round(amcFilter[c].consumptionRcpuQty) * Number(amcFilter[c].multiplier)) / daysOfDataPast;//Demand/day
-                                                var trueDemandPerMonth = Math.round(trueDemandPerDayPast * daysPerMonthPast);
+                                                var trueDemandPerMonth1 = Math.round(trueDemandPerDayPast * daysPerMonthPast);
                                                                                                 
-                                                actualConsumptionQtyAmc += trueDemandPerMonth;
+                                                actualConsumptionQtyAmc += trueDemandPerMonth1;
                                                 var index = regionsReportingActualConsumptionAmc.findIndex(f => f == amcFilter[c].region.id);
                                                 if (index == -1) {
                                                     regionsReportingActualConsumptionAmc.push(amcFilter[c].region.id);
@@ -915,9 +915,9 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                                 var daysPerMonthPast = moment(amcDate).daysInMonth();//days in month
                                                 var daysOfDataPast = daysPerMonthPast - Number(amcFilter[c].dayOfStockOut);//days in stock
                                                 var trueDemandPerDayPast = Math.round(Math.round(amcFilter[c].consumptionRcpuQty) * Number(amcFilter[c].multiplier)) / daysOfDataPast;//Demand/day
-                                                var trueDemandPerMonth = Math.round(trueDemandPerDayPast * daysPerMonthPast);
+                                                var trueDemandPerMonth1 = Math.round(trueDemandPerDayPast * daysPerMonthPast);
                                                                                                 
-                                                actualConsumptionQtyAmc += trueDemandPerMonth;
+                                                actualConsumptionQtyAmc += trueDemandPerMonth1;
                                                 var index = regionsReportingActualConsumptionAmc.findIndex(f => f == amcFilter[c].region.id);
                                                 if (index == -1) {
                                                     regionsReportingActualConsumptionAmc.push(amcFilter[c].region.id);
