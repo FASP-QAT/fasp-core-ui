@@ -2912,8 +2912,9 @@ export default class ManualTagging extends Component {
         if (term != null && term != "") {
             var erpPlanningUnitId = this.state.planningUnitIdUpdated;
             var programId = this.state.active1 ? this.state.programId : this.state.programId1.split("_")[0];
+            var shipmentPlanningUnitId = this.state.active1 ? this.state.selectedRowPlanningUnit : (this.state.active3 ? ((this.state.active4 || this.state.active5) && !this.state.checkboxValue ? document.getElementById("planningUnitId1").value : (this.state.active4 || this.state.active5) && this.state.checkboxValue ? this.state.selectedShipment.length > 0 ? this.state.selectedShipment[0].planningUnit.id : 0 : 0) : 0)
 
-            ManualTaggingService.autocompleteDataOrderNo(term.toUpperCase(), (programId != null && programId != "" ? programId : 0), (erpPlanningUnitId != null && erpPlanningUnitId != "" ? erpPlanningUnitId : 0))
+            ManualTaggingService.autocompleteDataOrderNo(term.toUpperCase(), (programId != null && programId != "" ? programId : 0), (erpPlanningUnitId != null && erpPlanningUnitId != "" ? erpPlanningUnitId : 0),shipmentPlanningUnitId)
                 .then(response => {
                     console.log("Response@@@@@@@@@@@@@@@@@@@@@", response)
                     var autocompleteData = [];
