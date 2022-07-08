@@ -77,7 +77,11 @@ class ManualTaggingSerice {
     }
 
     autocompletePlanningUnit(planningUnitId, term) {
-        return axios.get(`${API_URL}/api/erpLinking/autoCompletePu/${planningUnitId}/${term}`, {
+        var json={
+            planningUnitId:planningUnitId,
+            puName:term
+        }
+        return axios.post(`${API_URL}/api/erpLinking/autoCompletePu`, json,{
         });
     }
 

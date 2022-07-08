@@ -5,7 +5,7 @@ import BootstrapTable from 'react-bootstrap-table-next';
 import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
 import getLabelText from '../../CommonComponent/getLabelText';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import { STRING_TO_DATE_FORMAT, JEXCEL_DATE_FORMAT, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
+import { STRING_TO_DATE_FORMAT, JEXCEL_DATE_FORMAT, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY } from '../../Constants.js';
 import moment from 'moment';
 import i18n from '../../i18n';
 import ProgramService from '../../api/ProgramService.js';
@@ -18,10 +18,11 @@ import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions.js';
-import {MultiSelect} from 'react-multi-select-component';
+import { MultiSelect } from 'react-multi-select-component';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
-
+import { getDatabase } from '../../CommonComponent/IndexedDbFunctions.js';
+import CryptoJS from 'crypto-js'
 
 
 const entityname = i18n.t('static.mt.shipmentLinkingNotification');
@@ -74,7 +75,7 @@ export default class ShipmentLinkingNotifications extends Component {
         console.log("row length---", row.shipmentList.length);
         if (row.shipmentList.length > 1 || (row.shipmentList.length == 1 && row.shipmentList[0].batchNo != null)) {
             var batchDetails = row.shipmentList.filter(c => (c.fileName === row.maxFilename));
-        
+
             batchDetails.sort(function (a, b) {
                 var dateA = new Date(a.expiryDate).getTime();
                 var dateB = new Date(b.expiryDate).getTime();
@@ -498,7 +499,11 @@ export default class ShipmentLinkingNotifications extends Component {
                 this.setState({
                     outputList: []
                 }, () => {
-                    this.state.languageEl.destroy();
+                    try {
+                        this.state.languageEl.destroy();
+                    } catch (error) {
+
+                    }
                 })
             }
             // else if (programId == -1) {
@@ -530,105 +535,65 @@ export default class ShipmentLinkingNotifications extends Component {
     }
 
     getProgramList() {
-        ProgramService.getProgramList()
-            .then(response => {
-                if (response.status == 200) {
-                    var listArray = response.data;
-                    listArray.sort((a, b) => {
-                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
-                        return itemLabelA > itemLabelB ? 1 : -1;
-                    });
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['programQPLDetails'], 'readwrite');
+            var program = transaction.objectStore('programQPLDetails');
+            var getRequest = program.getAll();
+            var proList = []
+            getRequest.onsuccess = function (event) {
+                var myResult = [];
+                myResult = getRequest.result;
+                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                for (var i = 0; i < myResult.length; i++) {
+                    if (myResult[i].userId == userId) {
+                        // var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+                        // var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+                        // var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                        // var programJson1 = JSON.parse(programData);
+                        var programJson = {
+                            label: myResult[i].programCode + "~v" + myResult[i].version,
+                            value: myResult[i].id,
+                            programId: myResult[i].programId,
+                            version: myResult[i].version
+                        }
+                        proList.push(programJson)
+                    }
+                }
 
-                    if (response.data.length == 1) {
+                if (proList.length == 1) {
+                    this.setState({
+                        programs: proList,
+                        loading: false,
+                        programId: proList[0].id
+                    }, () => {
+                        this.getPlanningUnitList();
+                    })
+                } else {
+                    if (localStorage.getItem("sesProgramId") != '' && localStorage.getItem("sesProgramId") != undefined) {
                         this.setState({
-                            programs: response.data,
+                            programs: proList,
                             loading: false,
-                            programId: response.data[0].programId
+                            programId: localStorage.getItem("sesProgramId")
                         }, () => {
                             this.getPlanningUnitList();
-                        })
-                    } else {
-                        if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
-                            this.setState({
-                                programs: listArray,
-                                loading: false,
-                                programId: localStorage.getItem("sesProgramIdReport")
-                            }, () => {
-                                this.getPlanningUnitList();
-                            });
-                        } else {
-                            this.setState({
-                                programs: listArray,
-                                loading: false
-                            })
-                        }
-                    }
-
-                }
-                else {
-
-                    this.setState({
-                        message: response.data.messageCode,
-                        color: '#BA0C2F',
-                        loading: false
-                    },
-                        () => {
-                            this.hideSecondComponent();
-                        })
-                }
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({
-                            message: 'static.unkownError',
-                            color: '#BA0C2F',
-                            loading: false
-                        }, () => {
-                            this.hideSecondComponent();
                         });
                     } else {
-                        switch (error.response ? error.response.status : "") {
-
-                            case 401:
-                                this.props.history.push(`/login/static.message.sessionExpired`)
-                                break;
-                            case 403:
-                                this.props.history.push(`/accessDenied`)
-                                break;
-                            case 500:
-                            case 404:
-                            case 406:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    color: '#BA0C2F',
-                                    loading: false
-                                }, () => {
-                                    this.hideSecondComponent();
-                                });
-                                break;
-                            case 412:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    color: '#BA0C2F',
-                                    loading: false
-                                }, () => {
-                                    this.hideSecondComponent();
-                                });
-                                break;
-                            default:
-                                this.setState({
-                                    message: 'static.unkownError',
-                                    color: '#BA0C2F',
-                                    loading: false
-                                }, () => {
-                                    this.hideSecondComponent();
-                                });
-                                break;
-                        }
+                        this.setState({
+                            programs: proList,
+                            loading: false
+                        })
                     }
                 }
-            );
+
+            }.bind(this)
+        }.bind(this)
+
     }
 
 
@@ -738,32 +703,37 @@ export default class ShipmentLinkingNotifications extends Component {
 
         for (var j = 0; j < manualTaggingList.length; j++) {
             data = [];
-
+            let linkedShipmentsListForTab2 = this.state.linkedShipmentsList.filter(c => manualTaggingList[j].shipmentId > 0 ? c.childShipmentId == manualTaggingList[j].shipmentId : c.tempChildShipmentId == manualTaggingList[j].tempShipmentId)
             data[0] = manualTaggingList[j].addressed;
             data[1] = getLabelText(manualTaggingList[j].notificationType.label);
-            data[2] = manualTaggingList[j].parentShipmentId
-            data[3] = manualTaggingList[j].shipmentId;
-            data[4] = manualTaggingList[j].roNo + " - " + manualTaggingList[j].roPrimeLineNo + " | " + manualTaggingList[j].orderNo + " - " + manualTaggingList[j].primeLineNo;
-            data[5] = getLabelText(manualTaggingList[j].erpPlanningUnit.label, this.state.lang)
-            data[6] = getLabelText(manualTaggingList[j].planningUnit.label, this.state.lang)
-            data[7] = manualTaggingList[j].expectedDeliveryDate;
-            // data[7] = getLabelText(manualTaggingList[j].shipmentStatus.label, this.state.lang)
-            data[8] = manualTaggingList[j].erpStatus
-            console.log("conversion factor---", manualTaggingList[j].conversionFactor);
-            data[9] = Math.round(manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? (manualTaggingList[j].shipmentQty / manualTaggingList[j].conversionFactor) : manualTaggingList[j].shipmentQty);
-            if ((manualTaggingList[j].addressed && manualTaggingList[j].notificationType.id == 2)) {
-                data[10] = (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? (manualTaggingList[j].conversionFactor) : 1);
-            } else {
-                data[10] = ""
-            }
-            data[11] = Math.round((manualTaggingList[j].addressed && manualTaggingList[j].notificationType.id == 2 ? (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? (manualTaggingList[j].shipmentQty / manualTaggingList[j].conversionFactor) : manualTaggingList[j].shipmentQty) * (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? manualTaggingList[j].conversionFactor : 1) : (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? (manualTaggingList[j].shipmentQty / manualTaggingList[j].conversionFactor) : manualTaggingList[j].shipmentQty)));
-            data[12] = manualTaggingList[j].notes
-            data[13] = 0
+            data[2] = manualTaggingList[j].parentShipmentId + " (" + (manualTaggingList[j].childShipmentId + ")");
+            data[3] = manualTaggingList[j].childShipmentId
+            data[4] = (linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].roNo + " - " + linkedShipmentsListForTab2[0].roPrimeLineNo : "") + " | " + (manualTaggingList[j].orderNo + " - " + manualTaggingList[j].primeLineNo) + (linkedShipmentsListForTab2.length > 0 && linkedShipmentsListForTab2[0].knShipmentNo != "" && linkedShipmentsListForTab2[0].knShipmentNo != null ? " | " + linkedShipmentsListForTab2[0].knShipmentNo : "");
+            data[5] = manualTaggingList[j].orderNo + " | " + manualTaggingList[j].primeLineNo
+            data[6] = linkedShipmentsListForTab2.length > 0 ? getLabelText(linkedShipmentsListForTab2[0].erpPlanningUnit.label, this.state.lang) : ""
+            data[7] = !this.state.versionId.toString().includes("Local") ? getLabelText(manualTaggingList[j].erpPlanningUnit.label, this.state.lang) : getLabelText(manualTaggingList[j].planningUnit.label, this.state.lang)
+            data[8] = manualTaggingList[j].expectedDeliveryDate
+            data[9] = linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].erpShipmentStatus : ""
+            // data[7] = ""
+            data[10] = Math.round((manualTaggingList[j].shipmentQty) / (linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].conversionFactor : 1))
+            data[11] = linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].conversionFactor : 1
+            data[12] = `=ROUND(J${parseInt(j) + 1}*K${parseInt(j) + 1},0)`;
+            data[13] = manualTaggingList[j].notes
             data[14] = manualTaggingList[j].orderNo
             data[15] = manualTaggingList[j].primeLineNo
-
-            data[16] = manualTaggingList[j].notificationId
-            data[17] = manualTaggingList[j].notificationType.id;
+            data[16] = manualTaggingList[j].tempShipmentId;
+            data[17] = manualTaggingList[j];
+            data[18] = linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2 : {}
+            data[19] = linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].roNo : ""
+            data[20] = linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].roPrimeLineNo : ""
+            data[21] = manualTaggingArray.filter(c => (c[18] == (linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].roNo : "")) && (c[19] == (linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].roPrimeLineNo : ""))).length > 0 ? 1 : 0;
+            data[22] = (linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].roNo + " - " + linkedShipmentsListForTab2[0].roPrimeLineNo : "")
+            data[23] = 0;
+            data[24] = linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].conversionFactor : 1;
+            data[25] = manualTaggingList[j].notes;
+            data[26] = this.state.versionId.toString().includes("Local") && linkedShipmentsListForTab2.length > 0 ? this.state.roPrimeNoListOriginal.filter(c => c.roNo == linkedShipmentsListForTab2[0].roNo && c.roPrimeLineNo == linkedShipmentsListForTab2[0].roPrimeLineNo)[0] : {};
+            data[27] = manualTaggingList[j].notificationId
+            data[28] = manualTaggingList[j].notificationType.id;
 
             manualTaggingArray[count] = data;
             count++;
@@ -1298,7 +1268,7 @@ export default class ShipmentLinkingNotifications extends Component {
     }
 
     getPlanningUnitList() {
-        var programId = this.state.programId;
+        var programId = this.state.programId != -1 && this.state.programId != undefined ? this.state.programId.split("_")[0] : -1;
         if (programId != -1) {
             ProgramService.getProgramPlaningUnitListByProgramId(programId)
                 .then(response => {
@@ -1309,11 +1279,49 @@ export default class ShipmentLinkingNotifications extends Component {
                             var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
                             return itemLabelA > itemLabelB ? 1 : -1;
                         });
-                        this.setState({
-                            planningUnits: listArray
-                        }, () => {
-                            this.getPlanningUnitArray();
-                        })
+                        var db1;
+                        var storeOS;
+                        getDatabase();
+                        var thisAsParameter = this;
+                        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                        openRequest.onerror = function (event) {
+                            this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+                            this.props.updateState("color", "#BA0C2F");
+                            this.props.hideFirstComponent();
+                        }.bind(this);
+                        openRequest.onsuccess = function (e) {
+                            db1 = e.target.result;
+                            var transaction;
+                            var programTransaction;
+                            transaction = db1.transaction(['programData'], 'readwrite');
+                            programTransaction = transaction.objectStore('programData');
+                            // Yaha program Id dalna hai actual wala
+                            var curUser = AuthenticationService.getLoggedInUserId();
+                            var programId = (this.state.programId + "_v" + this.state.versionId.split(" ")[0] + "_uId_" + curUser);
+                            console.log("ProgramId@@@@@@@@@@@@", programId)
+                            var programRequest = programTransaction.get(programId);
+                            programRequest.onsuccess = function (event) {
+                                var programDataJson = programRequest.result.programData;
+                                // var planningUnitDataList = programDataJson.planningUnitDataList;
+                                // var minDate = moment(Date.now()).format("YYYY-MM-DD");
+                                // var planningUnitListForSP=[];
+                                // var planningUnitId = this.state.active1 ? this.state.selectedRowPlanningUnit : (this.state.active3 ? (this.state.active4 || this.state.active5 ? document.getElementById("planningUnitId1").value : 0) : 0)
+                                var generalProgramDataBytes = CryptoJS.AES.decrypt(programDataJson.generalData, SECRET_KEY);
+                                var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
+                                var generalProgramJson = JSON.parse(generalProgramData);
+                                var actionList = generalProgramJson.actionList;
+                                var linkedShipmentsList = generalProgramJson.shipmentLinkingList == null ? [] : generalProgramJson.shipmentLinkingList;
+                                if (actionList == undefined) {
+                                    actionList = []
+                                }
+                                this.setState({
+                                    planningUnits: listArray,
+                                    linkedShipmentsList:linkedShipmentsList
+                                }, () => {
+                                    this.getPlanningUnitArray();
+                                })
+                            }.bind(this)
+                        }.bind(this)
                     }
                     else {
 
@@ -1382,7 +1390,11 @@ export default class ShipmentLinkingNotifications extends Component {
                 outputList: [],
                 planningUnits: []
             }, () => {
-                this.state.languageEl.destroy();
+                try {
+                    this.state.languageEl.destroy();
+                } catch (error) {
+
+                }
             })
         }
         // this.filterData();
@@ -1574,9 +1586,9 @@ export default class ShipmentLinkingNotifications extends Component {
         const { programs } = this.state;
         let programList = programs.length > 0 && programs.map((item, i) => {
             return (
-                <option key={i} value={item.programId}>
+                <option key={i} value={item.value}>
                     {/* {getLabelText(item.label, this.state.lang)} */}
-                    {item.programCode}
+                    {item.label}
                 </option>
             )
         }, this);
