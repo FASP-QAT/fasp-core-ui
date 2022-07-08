@@ -3401,6 +3401,8 @@ export default class ManualTagging extends Component {
                 data[23] = linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].conversionFactor : 1;
                 data[24] = manualTaggingList[j].notes;
                 data[25] = this.state.versionId.toString().includes("Local") && linkedShipmentsListForTab2.length > 0 ? this.state.roPrimeNoListOriginal.filter(c => c.roNo == linkedShipmentsListForTab2[0].roNo && c.roPrimeLineNo == linkedShipmentsListForTab2[0].roPrimeLineNo)[0] : {};
+                data[26] = linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].roNo:"";
+                data[27] = linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].roPrimeLineNo:"";
             }
             else {
                 // data[0] = manualTaggingList[j].erpOrderId
@@ -3638,6 +3640,14 @@ export default class ManualTagging extends Component {
                         title: "Original data",
                         type: 'hidden',
                     },
+                    {
+                        title: "Ro No",
+                        type: 'hidden',
+                    },
+                    {
+                        title: "Ro Prime line no",
+                        type: 'hidden',
+                    },
                 ],
                 editable: true,
                 text: {
@@ -3712,36 +3722,13 @@ export default class ManualTagging extends Component {
                                 // title: i18n.t('static.dashboard.linkShipment'),
                                 title: i18n.t('static.mt.viewArtmisHistory'),
                                 onclick: function () {
-                                    let orderNo = this.el.getValueFromCoords(13, y).toString().trim();
-                                    let primeLineNo = this.el.getValueFromCoords(14, y).toString().trim();
-                                    console.log("OrderNo@@@@@@@@@@", orderNo)
-                                    console.log("primeLineNo@@@@@@@@@@", primeLineNo)
-                                    ManualTaggingService.getARTMISHistory(orderNo, primeLineNo)
+                                    let roNo = this.el.getValueFromCoords(26, y).toString().trim();
+                                    let roPrimeLineNo = this.el.getValueFromCoords(27, y).toString().trim();
+                                    ManualTaggingService.getARTMISHistory(roNo, roPrimeLineNo)
                                         .then(response => {
                                             console.log("MohitResponse.data@@@@@@@@@@@@@",response.data)
-                                            let responseData = response.data.sort(function (a, b) {
-                                                var dateA = new Date(a.receivedOn).getTime();
-                                                var dateB = new Date(b.receivedOn).getTime();
-                                                return dateA < dateB ? 1 : -1;
-                                            })
-                                            console.log("history---", response.data);
-                                            responseData = responseData.filter((responseData, index, self) =>
-                                                index === self.findIndex((t) => (
-                                                    t.procurementAgentOrderNo === responseData.procurementAgentOrderNo && t.erpPlanningUnit.id === responseData.erpPlanningUnit.id && t.calculatedExpectedDeliveryDate === responseData.calculatedExpectedDeliveryDate && t.erpStatus === responseData.erpStatus && t.shipmentQty === responseData.shipmentQty && t.totalCost === responseData.totalCost
-                                                    && (t.shipmentList.length > 1 || (t.shipmentList.length == 1 && t.shipmentList[0].batchNo != null)) == (responseData.shipmentList.length > 1 || (responseData.shipmentList.length == 1 && responseData.shipmentList[0].batchNo != null))
-                                                ))
-                                            )
-                                            console.log("history-2--", responseData);
-
-                                            responseData = responseData.sort(function (a, b) {
-                                                var dateA = a.erpOrderId;
-                                                var dateB = b.erpOrderId;
-                                                return dateA < dateB ? 1 : -1;
-                                            })
-                                            console.log("DATA---->3", responseData);
-
                                             this.setState({
-                                                artmisHistory: responseData
+                                                artmisHistory: response.data
                                             }, () => {
                                                 // this.buildARTMISHistory();
                                                 this.toggleArtmisHistoryModal();
@@ -4480,22 +4467,8 @@ export default class ManualTagging extends Component {
 
         const columns1 = [
             {
-                dataField: 'erpOrderId',
-                text: i18n.t('static.mt.viewBatchDetails'),
-                align: 'center',
-                headerAlign: 'center',
-                formatter: (cellContent, row) => {
-                    // return (<i className="fa fa-eye eyeIconFontSize" title={i18n.t('static.mt.viewBatchDetails')} onClick={(event) => this.viewBatchData(event, row)} ></i>
-                    // )
-                    return (
-                        ((row.shipmentList.length > 1 || (row.shipmentList.length == 1 && row.shipmentList[0].batchNo != null)) ? <i className="fa fa-eye eyeIconFontSize" title={i18n.t('static.mt.viewBatchDetails')} onClick={(event) => this.viewBatchData(event, row)} ></i> : "")
-                    )
-                }
-            },
-
-            {
                 dataField: 'procurementAgentOrderNo',
-                text: i18n.t('static.manualTagging.procOrderNo'),
+                text: i18n.t('static.mt.roNoAndRoLineNo'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center'
@@ -4505,8 +4478,7 @@ export default class ManualTagging extends Component {
                 text: i18n.t('static.manualTagging.erpPlanningUnit'),
                 sort: true,
                 align: 'center',
-                headerAlign: 'center',
-                formatter: this.formatLabelHistory
+                headerAlign: 'center'
             },
 
             {
@@ -4518,14 +4490,14 @@ export default class ManualTagging extends Component {
                 formatter: this.formatDate
             },
             {
-                dataField: 'erpStatus',
+                dataField: 'status',
                 text: i18n.t('static.manualTagging.erpStatus'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center'
             },
             {
-                dataField: 'shipmentQty',
+                dataField: 'qty',
                 // text: i18n.t('static.shipment.qty'),
                 text: i18n.t('static.manualTagging.erpShipmentQty'),
                 sort: true,
@@ -4534,7 +4506,7 @@ export default class ManualTagging extends Component {
                 formatter: this.addCommas
             },
             {
-                dataField: 'totalCost',
+                dataField: 'cost',
                 // text: i18n.t('static.shipment.qty'),
                 text: i18n.t('static.shipment.totalCost'),
                 sort: true,
@@ -4543,16 +4515,38 @@ export default class ManualTagging extends Component {
                 formatter: this.addCommas
             },
             {
-                dataField: 'receivedOn',
+                dataField: 'dataReceivedOn',
                 text: i18n.t('static.mt.dataReceivedOn'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
                 formatter: this.formatDate
+            },
+            {
+                dataField: 'changeCode',
+                text: "Change code",
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
             }
 
         ];
         const columns2 = [
+            {
+                dataField: 'procurementAgentShipmentNo',
+                text: i18n.t('static.mt.roNoAndRoLineNo'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'deliveryDate',
+                text: i18n.t('static.supplyPlan.mtexpectedDeliveryDate'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.formatDate
+            },
             {
                 dataField: 'batchNo',
                 text: i18n.t('static.supplyPlan.batchId'),
@@ -4569,12 +4563,27 @@ export default class ManualTagging extends Component {
                 formatter: this.formatExpiryDate
             },
             {
-                dataField: 'batchQty',
+                dataField: 'qty',
                 text: i18n.t('static.supplyPlan.shipmentQty'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
                 formatter: this.addCommas
+            },
+            {
+                dataField: 'dataReceivedOn',
+                text: i18n.t('static.mt.dataReceivedOn'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.formatDate
+            },
+            {
+                dataField: 'changeCode',
+                text: "Change code",
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
             }
 
         ];
@@ -5350,7 +5359,7 @@ export default class ManualTagging extends Component {
 
                                         <ToolkitProvider
                                             keyField="optList"
-                                            data={this.state.artmisHistory}
+                                            data={this.state.artmisHistory.erpOrderList}
                                             columns={columns1}
                                             search={{ searchFormatted: true }}
                                             hover
@@ -5374,10 +5383,13 @@ export default class ManualTagging extends Component {
                                             }
                                         </ToolkitProvider>
                                         <br />
-                                        {this.state.batchDetails.length > 0 &&
+                                        <span><b>{i18n.t('static.supplyPlan.shipmentsDetails')}</b></span>
+                                        <br />
+                                        <br />
+                                        
                                             <ToolkitProvider
                                                 keyField="optList"
-                                                data={this.state.batchDetails}
+                                                data={this.state.artmisHistory.erpShipmentList}
                                                 columns={columns2}
                                                 search={{ searchFormatted: true }}
                                                 hover
@@ -5399,7 +5411,7 @@ export default class ManualTagging extends Component {
                                                         </div>
                                                     )
                                                 }
-                                            </ToolkitProvider>}
+                                            </ToolkitProvider>
 
                                     </div><br />
                                 </ModalBody>
