@@ -137,7 +137,7 @@ export default class ShipmentLinkingNotifications extends Component {
 
         this.setState({ loading: true })
         var validation = true;
-        var changedmtList=[]
+        var changedmtList = []
         if (validation == true) {
             var tableJson = this.el.getJson(null, false).filter(c => c[18] == 1);
             for (var i = 0; i < tableJson.length; i++) {
@@ -758,8 +758,8 @@ export default class ShipmentLinkingNotifications extends Component {
             data[13] = this.state.roPrimeNoListOriginal.filter(c => c.roNo == manualTaggingList[j].roNo && c.roPrimeLineNo == manualTaggingList[j].roPrimeLineNo)[0];
             data[14] = manualTaggingList[j].notificationId;
             data[15] = manualTaggingList[j].shipmentLinkingId;
-            data[16] = manualTaggingList[j].orderNo;
-            data[17] = manualTaggingList[j].primeLineNo;
+            data[16] = manualTaggingList[j].roNo;
+            data[17] = manualTaggingList[j].roPrimeLineNo;
             data[18] = 0;
             manualTaggingArray[count] = data;
             count++;
@@ -948,36 +948,12 @@ export default class ShipmentLinkingNotifications extends Component {
                             // title: i18n.t('static.dashboard.linkShipment'),
                             title: i18n.t('static.mt.viewArtmisHistory'),
                             onclick: function () {
-                                let orderNo = this.el.getValueFromCoords(16, y).toString().trim();
-                                let primeLineNo = this.el.getValueFromCoords(17, y).toString().trim();
-                                console.log("OrderNo@@@@@@@@@@", orderNo)
-                                console.log("primeLineNo@@@@@@@@@@", primeLineNo)
-                                ManualTaggingService.getARTMISHistory(orderNo, primeLineNo)
+                                let roNo = this.el.getValueFromCoords(16, y).toString().trim();
+                                let roPrimeLineNo = this.el.getValueFromCoords(17, y).toString().trim();
+                                ManualTaggingService.getARTMISHistory(roNo, roPrimeLineNo)
                                     .then(response => {
-                                        console.log("MohitResponse.data@@@@@@@@@@@@@", response.data)
-                                        let responseData = response.data.sort(function (a, b) {
-                                            var dateA = new Date(a.receivedOn).getTime();
-                                            var dateB = new Date(b.receivedOn).getTime();
-                                            return dateA < dateB ? 1 : -1;
-                                        })
-                                        console.log("history---", response.data);
-                                        responseData = responseData.filter((responseData, index, self) =>
-                                            index === self.findIndex((t) => (
-                                                t.procurementAgentOrderNo === responseData.procurementAgentOrderNo && t.erpPlanningUnit.id === responseData.erpPlanningUnit.id && t.calculatedExpectedDeliveryDate === responseData.calculatedExpectedDeliveryDate && t.erpStatus === responseData.erpStatus && t.shipmentQty === responseData.shipmentQty && t.totalCost === responseData.totalCost
-                                                && (t.shipmentList.length > 1 || (t.shipmentList.length == 1 && t.shipmentList[0].batchNo != null)) == (responseData.shipmentList.length > 1 || (responseData.shipmentList.length == 1 && responseData.shipmentList[0].batchNo != null))
-                                            ))
-                                        )
-                                        console.log("history-2--", responseData);
-
-                                        responseData = responseData.sort(function (a, b) {
-                                            var dateA = a.erpOrderId;
-                                            var dateB = b.erpOrderId;
-                                            return dateA < dateB ? 1 : -1;
-                                        })
-                                        console.log("DATA---->3", responseData);
-
                                         this.setState({
-                                            artmisHistory: responseData
+                                            artmisHistory: response.data
                                         }, () => {
                                             this.toggleLarge();
                                         });
@@ -1462,79 +1438,7 @@ export default class ShipmentLinkingNotifications extends Component {
                 {i18n.t('static.common.result', { from, to, size })}
             </span>
         );
-        const columns1 = [
-            {
-                dataField: 'erpOrderId',
-                text: i18n.t('static.mt.viewBatchDetails'),
-                align: 'center',
-                headerAlign: 'center',
-                formatter: (cellContent, row) => {
-                    // return (<i className="fa fa-eye eyeIconFontSize" title={i18n.t('static.mt.viewBatchDetails')} onClick={(event) => this.viewBatchData(event, row)} ></i>)
-                    return (
-                        ((row.shipmentList.length > 1 || (row.shipmentList.length == 1 && row.shipmentList[0].batchNo != null)) ? <i className="fa fa-eye eyeIconFontSize" title={i18n.t('static.mt.viewBatchDetails')} onClick={(event) => this.viewBatchData(event, row)} ></i> : "")
-                    )
-                }
-            },
 
-            {
-                dataField: 'procurementAgentOrderNo',
-                text: i18n.t('static.manualTagging.procOrderNo'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
-            },
-            {
-                dataField: 'erpPlanningUnit',
-                text: "ERP Planning Unit",
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: this.formatLabel
-            },
-
-            {
-                dataField: 'calculatedExpectedDeliveryDate',
-                text: i18n.t('static.supplyPlan.mtexpectedDeliveryDate'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: this.formatDate
-            },
-            {
-                dataField: 'erpStatus',
-                text: i18n.t('static.manualTagging.erpStatus'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
-            },
-            {
-                dataField: 'shipmentQty',
-                // text: i18n.t('static.shipment.qty'),
-                text: i18n.t('static.manualTagging.erpShipmentQty'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: this.addCommas
-            },
-            {
-                dataField: 'totalCost',
-                // text: i18n.t('static.shipment.qty'),
-                text: i18n.t('static.shipment.totalCost'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: this.addCommas
-            },
-            {
-                dataField: 'receivedOn',
-                text: i18n.t('static.mt.dataReceivedOn'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: this.formatDate
-            }
-
-        ];
         const options = {
             hidePageListOnlyOnePage: true,
             firstPageText: i18n.t('static.common.first'),
@@ -1562,7 +1466,88 @@ export default class ShipmentLinkingNotifications extends Component {
             }]
         }
 
+        const columns1 = [
+            {
+                dataField: 'procurementAgentOrderNo',
+                text: i18n.t('static.mt.roNoAndRoLineNo'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'erpPlanningUnit',
+                text: i18n.t('static.manualTagging.erpPlanningUnit'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+
+            {
+                dataField: 'expectedDeliveryDate',
+                text: i18n.t('static.supplyPlan.mtexpectedDeliveryDate'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.formatDate
+            },
+            {
+                dataField: 'status',
+                text: i18n.t('static.manualTagging.erpStatus'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'qty',
+                // text: i18n.t('static.shipment.qty'),
+                text: i18n.t('static.manualTagging.erpShipmentQty'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.addCommas
+            },
+            {
+                dataField: 'cost',
+                // text: i18n.t('static.shipment.qty'),
+                text: i18n.t('static.shipment.totalCost'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.addCommas
+            },
+            {
+                dataField: 'dataReceivedOn',
+                text: i18n.t('static.mt.dataReceivedOn'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.formatDate
+            },
+            {
+                dataField: 'changeCode',
+                text: i18n.t('static.manualTagging.changeCode'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            }
+
+        ];
         const columns2 = [
+            {
+                dataField: 'procurementAgentShipmentNo',
+                text: i18n.t('static.mt.roNoAndRoLineNo'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'deliveryDate',
+                text: i18n.t('static.supplyPlan.mtexpectedDeliveryDate'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.formatDate
+            },
             {
                 dataField: 'batchNo',
                 text: i18n.t('static.supplyPlan.batchId'),
@@ -1578,14 +1563,28 @@ export default class ShipmentLinkingNotifications extends Component {
                 headerAlign: 'center',
                 formatter: this.formatExpiryDate
             },
-
             {
-                dataField: 'batchQty',
+                dataField: 'qty',
                 text: i18n.t('static.supplyPlan.shipmentQty'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
                 formatter: this.addCommas
+            },
+            {
+                dataField: 'dataReceivedOn',
+                text: i18n.t('static.mt.dataReceivedOn'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.formatDate
+            },
+            {
+                dataField: 'changeCode',
+                text: i18n.t('static.manualTagging.changeCode'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
             }
 
         ];
@@ -1631,11 +1630,10 @@ export default class ShipmentLinkingNotifications extends Component {
                                 </ModalHeader>
                                 <ModalBody>
                                     <div>
-                                        {/* <div> */}
 
                                         <ToolkitProvider
                                             keyField="optList"
-                                            data={this.state.artmisHistory}
+                                            data={this.state.artmisHistory.erpOrderList}
                                             columns={columns1}
                                             search={{ searchFormatted: true }}
                                             hover
@@ -1643,11 +1641,11 @@ export default class ShipmentLinkingNotifications extends Component {
                                         >
                                             {
                                                 props => (
-                                                    <div className="TableCust FortablewidthMannualtaggingtable3 reactTableNotification ">
+                                                    <div className="TableCust FortablewidthMannualtaggingtable3 reactTableNotification">
                                                         {/* <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
-                                                    <SearchBar {...props.searchProps} />
-                                                    <ClearSearchButton {...props.searchProps} />
-                                                </div> */}
+            <SearchBar {...props.searchProps} />
+            <ClearSearchButton {...props.searchProps} />
+        </div> */}
                                                         <BootstrapTable striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
                                                             // pagination={paginationFactory(options)}
                                                             rowEvents={{
@@ -1658,38 +1656,38 @@ export default class ShipmentLinkingNotifications extends Component {
                                                 )
                                             }
                                         </ToolkitProvider>
-                                    </div>
-                                    <br />
+                                        <br />
+                                        <span><b>{i18n.t('static.supplyPlan.shipmentsDetails')}</b></span>
+                                        <br />
+                                        <br />
 
-                                    {this.state.batchDetails.length > 0 &&
-                                        <div>
-                                            <ToolkitProvider
-                                                keyField="optList"
-                                                data={this.state.batchDetails}
-                                                columns={columns2}
-                                                search={{ searchFormatted: true }}
-                                                hover
-                                                filter={filterFactory()}
-                                            >
-                                                {
-                                                    props => (
-                                                        <div className="TableCust ShipmentNotificationtable">
-                                                            {/* <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
-                                                    <SearchBar {...props.searchProps} />
-                                                    <ClearSearchButton {...props.searchProps} />
-                                                </div> */}
-                                                            <BootstrapTable striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
-                                                                // pagination={paginationFactory(options)}
-                                                                rowEvents={{
-                                                                }}
-                                                                {...props.baseProps}
-                                                            />
-                                                        </div>
-                                                    )
-                                                }
-                                            </ToolkitProvider></div>}
+                                        <ToolkitProvider
+                                            keyField="optList"
+                                            data={this.state.artmisHistory.erpShipmentList}
+                                            columns={columns2}
+                                            search={{ searchFormatted: true }}
+                                            hover
+                                            filter={filterFactory()}
+                                        >
+                                            {
+                                                props => (
+                                                    <div className="TableCust ShipmentNotificationtable ">
+                                                        {/* <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
+            <SearchBar {...props.searchProps} />
+            <ClearSearchButton {...props.searchProps} />
+        </div> */}
+                                                        <BootstrapTable striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                                            // pagination={paginationFactory(options)}
+                                                            rowEvents={{
+                                                            }}
+                                                            {...props.baseProps}
+                                                        />
+                                                    </div>
+                                                )
+                                            }
+                                        </ToolkitProvider>
 
-                                    <br />
+                                    </div><br />
                                 </ModalBody>
                                 <ModalFooter>
                                     <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.toggleLarge()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>

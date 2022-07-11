@@ -1125,7 +1125,7 @@ export default class syncPage extends Component {
           }
         }
       }
-      shipmentData = shipmentData.concat(oldProgramDataShipment.filter(c => c.shipmentId == 0 && c.active.toString() == "true"));
+      shipmentData = shipmentData.concat(oldProgramDataShipment.filter(c => (c.shipmentId == 0 && c.erpFlag==true) || (c.shipmentId == 0 && c.active.toString() == "true")));
 
       var shipmentLinkedJson=this.state.mergedShipmentLinkedJexcel.getJson();
       var linkedShipmentListLocal=this.state.oldProgramData.shipmentLinkingList!=null?this.state.oldProgramData.shipmentLinkingList:[];
@@ -1241,7 +1241,7 @@ export default class syncPage extends Component {
       programJson.inventoryList = inventoryData;
       programJson.shipmentList = shipmentData;
       programJson.actionList = actionList;
-      programJson.shipmentLinkingList= linkedShipmentsList;
+      programJson.shipmentLinkingList= linkedShipmentsList.filter(c=>(c.shipmentLinkingId>0) || (c.shipmentLinkingId==0 && c.active==true));
 
       var planningUnitDataListFromState = this.state.planningUnitDataList;
       var updatedJson = [];
