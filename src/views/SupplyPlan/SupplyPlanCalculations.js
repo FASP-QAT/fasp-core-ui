@@ -90,7 +90,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                             }
                             programPlanningUnitList = ppList;
                         }
-                        if ((page == 'masterDataSync' || page == 'syncPage' || page=='erpDelink') && planningUnitList.length == 0) {
+                        if ((page == 'masterDataSync' || page == 'syncPage') && planningUnitList.length == 0) {
                             programPlanningUnitList = [];
                         }
                         try {
@@ -999,10 +999,9 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                         closingBalanceWps = expectedStockWps + nationalAdjustmentWps;
                                     }
 
-
-                                    // Calculations of unmet demand
                                     var diffBetweenTrueDemandAndConsumption = Number(trueDemandPerMonth) - (consumptionQty !== "" ? Number(consumptionQty) : 0);
                                     console.log("diffBetweenTrueDemandAndConsumption###", diffBetweenTrueDemandAndConsumption, "STart Month", startDate)
+                                    // Calculations of unmet demand
                                     if (closingBalance - diffBetweenTrueDemandAndConsumption < 0) {
                                         unmetDemandQty = 0 - expectedStock + diffBetweenTrueDemandAndConsumption;
                                         closingBalance = 0;
