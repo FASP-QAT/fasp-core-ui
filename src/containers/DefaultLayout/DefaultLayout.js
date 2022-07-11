@@ -500,7 +500,7 @@ const routes = [
 
   // { path: '/dashboard/:message', component: Dashboard },
   { path: '/dashboard/:color/:message', component: Dashboard },
-  { path: '/program/downloadProgram', name: 'static.dashboard.downloadprogram', component: ProgramTree },
+  { path: '/program/downloadProgram', name: 'static.loadDeleteProgram.loadDeleteProgram', component: ProgramTree },
   { path: '/program/syncPage', name: "static.dashboard.commitVersion", component: syncPage },
   { path: '/program/downloadProgram/:message', component: ProgramTree },
   { path: '/program/exportProgram', name: 'static.dashboard.exportprogram', component: ExportProgram },
@@ -1799,17 +1799,17 @@ class DefaultLayout extends Component {
                               }
                             }
                           },
-                          {
-                            name: i18n.t('static.common.loadDeleteDataSet'),
-                            url: '/dataset/loadDeleteDataSet',
-                            icon: 'cui-cloud-download FontBoldIcon',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_LOAD_DELETE_DATASET') && this.state.activeTab == 1 ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
+                          // {
+                          //   name: i18n.t('static.common.loadDeleteDataSet'),
+                          //   url: '/dataset/loadDeleteDataSet',
+                          //   icon: 'cui-cloud-download FontBoldIcon',
+                          //   attributes: {
+                          //     hidden: (this.state.businessFunctions.includes('ROLE_BF_LOAD_DELETE_DATASET') && this.state.activeTab == 1 ? false : true),
+                          //     onClick: e => {
+                          //       this.refreshPage();
+                          //     }
+                          //   }
+                          // },
                           {
                             name: i18n.t('static.commitProgram.commitProgram'),
                             url: '/dataset/commitTree',
@@ -2175,7 +2175,7 @@ class DefaultLayout extends Component {
                             }
                           },
                           {
-                            name: i18n.t('static.dashboard.downloadprogram'),
+                            name: i18n.t('static.loadDeleteProgram.loadDeleteProgram'),
                             url: '/program/downloadProgram',
                             icon: 'cui-cloud-download FontBoldIcon',
                             attributes: {
