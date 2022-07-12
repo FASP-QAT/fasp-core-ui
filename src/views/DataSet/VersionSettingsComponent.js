@@ -780,11 +780,16 @@ class VersionSettingsComponent extends Component {
 
     getOnLineDatasetsVersion() {
         var programId = this.state.programId;
+        var versionTypeId = document.getElementById('versionTypeId').value;
+        var rangeValue = this.state.rangeValue;
+        let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
+        let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
+     
         var inputjson = {
-            programId: 2562,
-            versionTypeId: -1,
-            startDate: "2022-05-04",
-            stopDate: "2022-12-01"
+            programId: programId,
+            versionTypeId: versionTypeId,
+            startDate: startDate,
+            stopDate: stopDate
         }
         ProgramService.getDatasetVersions(inputjson).then(response => {
             if (response.status == 200) {
