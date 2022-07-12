@@ -1056,7 +1056,8 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         // var value = (json[r])[5];
         var value = (this.state.inventoryBatchInfoTableEl.getJson(null, false)[r])[5];
 
-        var date = json[0][7];
+        // var date = json[0][7];
+        var date = (this.state.inventoryBatchInfoTableEl.getJson(null, false)[r])[7]
         // if (value != 0) {
         //     mylist = this.state.batchInfoList.filter(c => c.id != -1 && (moment(c.expiryDate).format("YYYY-MM-DD") > moment(date).format("YYYY-MM-DD") && moment(c.createdDate).format("YYYY-MM-DD") <= moment(date).format("YYYY-MM-DD")));
         // } else {
