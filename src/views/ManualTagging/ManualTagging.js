@@ -106,7 +106,7 @@ export default class ManualTagging extends Component {
             versionList: [],
             versionId: -1,
             changedDataForTab2: false,
-            roPrimeLineNoForTab3:""
+            roPrimeLineNoForTab3: ""
 
         }
 
@@ -155,6 +155,7 @@ export default class ManualTagging extends Component {
     }
 
     versionChange(event) {
+        console.log("Loading 1 Mohit#############")
         this.setState({
             loading: true
         })
@@ -412,7 +413,11 @@ export default class ManualTagging extends Component {
         this.setState({
             finalShipmentId: '',
             tempShipmentId: '',
-            selectedShipment
+            selectedShipment: selectedShipment.sort((a, b) => {
+                var itemLabelA = moment(a.expectedDeliveryDate).format("YYYY-MM-DD"); // ignore upper and lowercase
+                var itemLabelB = moment(b.expectedDeliveryDate).format("YYYY-MM-DD"); // ignore upper and lowercase                   
+                return itemLabelA > itemLabelB ? 1 : -1;
+            })
         }, () => {
             this.getOrderDetails()
         })
@@ -650,11 +655,11 @@ export default class ManualTagging extends Component {
                         this.el.setComments(col, "");
                         this.el.setComments(col, "");
                         var json = this.el.getJson(null, false);
-                        this.el.setValueFromCoords(11, y, Math.round(value*this.el.getValueFromCoords(9,y)), true);
+                        this.el.setValueFromCoords(11, y, Math.round(value * this.el.getValueFromCoords(9, y)), true);
                         // var checkboxValue = this.el.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                         for (var j = 0; j < json.length; j++) {
                             if (j != y && json[j][21] == this.el.getValueFromCoords(21, y, true)) {
-                                this.el.setValueFromCoords(11, j, Math.round(value*this.el.getValueFromCoords(9,j)), true);
+                                this.el.setValueFromCoords(11, j, Math.round(value * this.el.getValueFromCoords(9, j)), true);
                                 this.el.setValueFromCoords(10, j, value, true);
                             }
                         }
@@ -680,6 +685,39 @@ export default class ManualTagging extends Component {
         if (rowData[13] == 0) {
             //conversion factor
             var json = this.state.instance.getJson(null, false);
+            if (x == 0) {
+                if (rowData[0].toString() == "true") {
+                    if (this.state.active4 && this.state.instance.getValueFromCoords(12, y) == "") {
+                        this.state.instance.setValueFromCoords(12, y, i18n.t("static.manualTagging.newShipmentNotes"), true);
+                        for (var j = 0; j < json.length; j++) {
+                            if (json[j][16] == this.state.instance.getValueFromCoords(16, y, true)) {
+                                if (j != y) {
+                                    this.state.instance.setValueFromCoords(12, j, i18n.t("static.manualTagging.newShipmentNotes"), true);
+                                }
+                            }
+                        }
+                    } else {
+                        this.state.instance.setValueFromCoords(12, y, "", true);
+                        for (var j = 0; j < json.length; j++) {
+                            if (json[j][16] == this.state.instance.getValueFromCoords(16, y, true)) {
+                                if (j != y) {
+                                    this.state.instance.setValueFromCoords(12, j, "", true);
+                                }
+                            }
+                        }
+                    }
+
+                } else {
+                    this.state.instance.setValueFromCoords(12, y, "", true);
+                    for (var j = 0; j < json.length; j++) {
+                        if (json[j][16] == this.state.instance.getValueFromCoords(16, y, true)) {
+                            if (j != y) {
+                                this.state.instance.setValueFromCoords(12, j, "", true);
+                            }
+                        }
+                    }
+                }
+            }
             if (x == 10) {
                 var col = ("K").concat(parseInt(y) + 1);
                 value = this.el.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
@@ -703,7 +741,7 @@ export default class ManualTagging extends Component {
                         this.el.setComments(col, "");
                         this.el.setComments(col, "");
                         if (rowData[0].toString() == "true") {
-                            this.state.instance.setValueFromCoords(11, y, Math.round(value*this.state.instance.getValueFromCoords(9,y)), true);
+                            this.state.instance.setValueFromCoords(11, y, Math.round(value * this.state.instance.getValueFromCoords(9, y)), true);
                             for (var j = 0; j < json.length; j++) {
                                 // console.log("J@@@@@@@@################",j)
                                 // console.log("y@@@@@@@@################",y)
@@ -712,7 +750,7 @@ export default class ManualTagging extends Component {
                                 if (json[j][16] == this.state.instance.getValueFromCoords(16, y, true)) {
                                     if (j != y) {
                                         this.state.instance.setValueFromCoords(10, j, value, true);
-                                        this.state.instance.setValueFromCoords(11, j, Math.round(value*this.state.instance.getValueFromCoords(9,j)), true);
+                                        this.state.instance.setValueFromCoords(11, j, Math.round(value * this.state.instance.getValueFromCoords(9, j)), true);
                                     }
                                 }
                             }
@@ -1067,9 +1105,13 @@ export default class ManualTagging extends Component {
         FundingSourceService.getFundingSourceListAll()
             .then(response => {
                 if (response.status == 200) {
-                    let fundingSourceList = response.data.filter(c => c.active == true && c.fundingSourceId!=TBD_FUNDING_SOURCE)
+                    let fundingSourceList = response.data.filter(c => c.active == true && c.fundingSourceId != TBD_FUNDING_SOURCE)
                     this.setState({
-                        fundingSourceList
+                        fundingSourceList: fundingSourceList.sort((a, b) => {
+                            var itemLabelA = a.fundingSourceCode.toUpperCase(); // ignore upper and lowercase
+                            var itemLabelB = b.fundingSourceCode.toUpperCase(); // ignore upper and lowercase                   
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        })
                     }, () => {
                         // this.buildJExcel();
                         // this.filterData();
@@ -1132,73 +1174,73 @@ export default class ManualTagging extends Component {
             );
     }
     getBudgetList = () => {
-        BudgetServcie.getBudgetList()
-            .then(response => {
-                if (response.status == 200) {
-                    // let 
-                    let budgetList = response.data.filter(c => c.active == true)
-                    this.setState({
-                        budgetList
-                    }, () => {
-                        // this.buildJExcel();
-                        // this.filterData();
-                    });
-                } else {
-                    this.setState({
-                        message: response.data.messageCode, loading: false
-                    },
-                        () => {
-                            this.hideSecondComponent();
-                        })
-                }
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({
-                            message: 'static.unkownError',
-                            loading: false
-                        }, () => {
-                            this.hideSecondComponent()
-                        });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
+        // BudgetServcie.getBudgetList()
+        //     .then(response => {
+        //         if (response.status == 200) {
+        //             // let 
+        //             let budgetList = response.data.filter(c => c.active == true)
+        //             this.setState({
+        //                 budgetList
+        //             }, () => {
+        //                 // this.buildJExcel();
+        //                 // this.filterData();
+        //             });
+        //         } else {
+        //             this.setState({
+        //                 message: response.data.messageCode, loading: false
+        //             },
+        //                 () => {
+        //                     this.hideSecondComponent();
+        //                 })
+        //         }
+        //     }).catch(
+        //         error => {
+        //             if (error.message === "Network Error") {
+        //                 this.setState({
+        //                     message: 'static.unkownError',
+        //                     loading: false
+        //                 }, () => {
+        //                     this.hideSecondComponent()
+        //                 });
+        //             } else {
+        //                 switch (error.response ? error.response.status : "") {
 
-                            case 401:
-                                this.props.history.push(`/login/static.message.sessionExpired`)
-                                break;
-                            case 403:
-                                this.props.history.push(`/accessDenied`)
-                                break;
-                            case 500:
-                            case 404:
-                            case 406:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                }, () => {
-                                    this.hideSecondComponent()
-                                });
-                                break;
-                            case 412:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                }, () => {
-                                    this.hideSecondComponent()
-                                });
-                                break;
-                            default:
-                                this.setState({
-                                    message: 'static.unkownError',
-                                    loading: false
-                                }, () => {
-                                    this.hideSecondComponent()
-                                });
-                                break;
-                        }
-                    }
-                }
-            );
+        //                     case 401:
+        //                         this.props.history.push(`/login/static.message.sessionExpired`)
+        //                         break;
+        //                     case 403:
+        //                         this.props.history.push(`/accessDenied`)
+        //                         break;
+        //                     case 500:
+        //                     case 404:
+        //                     case 406:
+        //                         this.setState({
+        //                             message: error.response.data.messageCode,
+        //                             loading: false
+        //                         }, () => {
+        //                             this.hideSecondComponent()
+        //                         });
+        //                         break;
+        //                     case 412:
+        //                         this.setState({
+        //                             message: error.response.data.messageCode,
+        //                             loading: false
+        //                         }, () => {
+        //                             this.hideSecondComponent()
+        //                         });
+        //                         break;
+        //                     default:
+        //                         this.setState({
+        //                             message: 'static.unkownError',
+        //                             loading: false
+        //                         }, () => {
+        //                             this.hideSecondComponent()
+        //                         });
+        //                         break;
+        //                 }
+        //             }
+        //         }
+        //     );
     }
     programChange(event) {
         var programId = event.target.value;
@@ -1232,6 +1274,7 @@ export default class ManualTagging extends Component {
 
     getVersionList() {
         console.log("VersionList@@@@@@@@@@@@")
+        console.log("Loading 2 Mohit#############")
         this.setState({
             loading: true
         })
@@ -1274,9 +1317,9 @@ export default class ManualTagging extends Component {
             return a > b ? -1 : a < b ? 1 : 0;
         });
         var newVList = offlineVersionList.concat(onlineVersionList)
-        var finalVersionList=[]
+        var finalVersionList = []
         for (var v = 0; v < newVList.length; v++) {
-            finalVersionList.push({ versionId: newVList[v].versionId})
+            finalVersionList.push({ versionId: newVList[v].versionId })
         }
         console.log("filteredProgramList@@@@@@@@@@@@", versionList)
         console.log("filteredProgramList@@@@@@@@@@@@", this.state.programs)
@@ -1411,6 +1454,7 @@ export default class ManualTagging extends Component {
     }
 
     delink() {
+        console.log("Loading 3 Mohit#############")
         this.setState({ loading: true })
         var validation = this.checkValidationTab2();
         if (validation == true) {
@@ -1597,11 +1641,11 @@ export default class ManualTagging extends Component {
                 }.bind(this)
             }.bind(this)
             // }
-        }else{
+        } else {
             this.setState({
-                loading:false,
-                message:i18n.t("static.supplyPlan.validationFailed")
-            },()=>{
+                loading: false,
+                message: i18n.t("static.supplyPlan.validationFailed")
+            }, () => {
                 this.hideSecondComponent()
             })
         }
@@ -2268,25 +2312,25 @@ export default class ManualTagging extends Component {
                 })
             }
         }
-        console.log("linkedRoNoAndRoPrimeLineNoMohit@@@@@@@@@@@@@",linkedRoNoAndRoPrimeLineNo)
+        console.log("linkedRoNoAndRoPrimeLineNoMohit@@@@@@@@@@@@@", linkedRoNoAndRoPrimeLineNo)
         var shipmentPlanningUnitId = this.state.active1 ? this.state.selectedRowPlanningUnit : (this.state.active3 ? ((this.state.active4 || this.state.active5) && !this.state.checkboxValue ? document.getElementById("planningUnitId1").value : (this.state.active4 || this.state.active5) && this.state.checkboxValue ? this.state.selectedShipment.length > 0 ? this.state.selectedShipment[0].planningUnit.id : 0 : 0) : 0)
-        console.log("erpPlanningUnitIdMohit@@@@@@@@@@@@@@@@@@@",erpPlanningUnitId)
+        console.log("erpPlanningUnitIdMohit@@@@@@@@@@@@@@@@@@@", erpPlanningUnitId)
         if ((roNoOrderNo != "" && roNoOrderNo != "0") || (erpPlanningUnitId != 0)) {
             // roNoOrderNo, programId, erpPlanningUnitId, (this.state.active1 ? 1 : (this.state.active2 ? 2 : 3)), (this.state.active2 ? this.state.parentShipmentId : 0)
             var json = {
                 programId: programId,
                 versionId: versionId,
-                shipmentPlanningUnitId: shipmentPlanningUnitId,
-                roNo: roNoOrderNo==0?"":roNoOrderNo,
+                shipmentPlanningUnitId: this.state.active3 ? this.state.outputListAfterSearch[0].erpPlanningUnit.id : shipmentPlanningUnitId,
+                roNo: roNoOrderNo == 0 ? "" : roNoOrderNo,
                 filterPlanningUnitId: erpPlanningUnitId,
 
             }
-            console.log("JsonMohit@@@@@@@@@@@@@@@@@@@", this.state.roPrimeLineNoForTab3)
+            console.log("JsonMohit tab 3@@@@@@@@@@@@@@@@@@@", json)
             ManualTaggingService.getOrderDetails(json)
                 .then(response => {
                     console.log("response.data------", response.data)
                     this.setState({
-                        artmisList: response.data.filter(c => !linkedRoNoAndRoPrimeLineNo.includes(c.roNo + "|" + c.roPrimeLineNo) && (this.state.roPrimeLineNoForTab3!=""?c.roPrimeLineNo==this.state.roPrimeLineNoForTab3:true)),
+                        artmisList: response.data.filter(c => !linkedRoNoAndRoPrimeLineNo.includes(c.roNo + "|" + c.roPrimeLineNo) && (this.state.roPrimeLineNoForTab3 != "" ? c.roPrimeLineNo == this.state.roPrimeLineNoForTab3 : true)),
                         displayButton: false
                     }, () => {
                         this.buildJExcelERP();
@@ -2480,6 +2524,7 @@ export default class ManualTagging extends Component {
         var countryId = this.state.countryId;
 
         // if (countryId != -1) {
+        console.log("Loading 4 Mohit#############")
         this.setState({
             loading: true,
             programId1: -1,
@@ -2523,9 +2568,9 @@ export default class ManualTagging extends Component {
                     var outputList = response.data;
                     console.log("output list@@@@@@@@@@@@@@@", outputList)
                     var filterOnLinkedData = outputList.filter(c => !linkedRoNoAndRoPrimeLineNo.includes(c.roNo + "|" + c.roPrimeLineNo));
-                    let resultTrue = Object.values(filterOnLinkedData.reduce((a, { roNo, roPrimeLineNo, knShipmentNo, erpQty, orderNo, primeLineNo, erpShipmentStatus, expectedDeliveryDate, batchNo, expiryDate, erpPlanningUnit, price, shippingCost, shipBy, qatEquivalentShipmentStatus, parentShipmentId, childShipmentId, notes, qatPlanningUnit }) => {
+                    let resultTrue = Object.values(filterOnLinkedData.reduce((a, { roNo, roPrimeLineNo, knShipmentNo, erpQty, orderNo, primeLineNo, erpShipmentStatus, expectedDeliveryDate, batchNo, expiryDate, erpPlanningUnit, price, shippingCost, shipBy, qatEquivalentShipmentStatus, parentShipmentId, childShipmentId, notes, qatPlanningUnit, tracerCategoryId }) => {
                         if (!a[roNo + "|" + roPrimeLineNo + "|" + orderNo + "|" + primeLineNo + "|" + knShipmentNo])
-                            a[roNo + "|" + roPrimeLineNo + "|" + orderNo + "|" + primeLineNo + "|" + knShipmentNo] = Object.assign({}, { roNo, roPrimeLineNo, knShipmentNo, erpQty, orderNo, primeLineNo, erpShipmentStatus, expectedDeliveryDate, batchNo, expiryDate, erpPlanningUnit, price, shippingCost, shipBy, qatEquivalentShipmentStatus, parentShipmentId, childShipmentId, notes, qatPlanningUnit });
+                            a[roNo + "|" + roPrimeLineNo + "|" + orderNo + "|" + primeLineNo + "|" + knShipmentNo] = Object.assign({}, { roNo, roPrimeLineNo, knShipmentNo, erpQty, orderNo, primeLineNo, erpShipmentStatus, expectedDeliveryDate, batchNo, expiryDate, erpPlanningUnit, price, shippingCost, shipBy, qatEquivalentShipmentStatus, parentShipmentId, childShipmentId, notes, qatPlanningUnit, tracerCategoryId });
                         else
                             a[roNo + "|" + roPrimeLineNo + "|" + orderNo + "|" + primeLineNo + "|" + knShipmentNo].erpQty += erpQty;
                         return a;
@@ -2608,6 +2653,7 @@ export default class ManualTagging extends Component {
         }, () => {
             var versionId = this.state.versionId.toString();
             if (programId != -1 && planningUnitIds != null && planningUnitIds != "") {
+                console.log("Loading 5 Mohit#############")
                 this.setState({
                     loading: true,
                     planningUnitIds
@@ -2801,7 +2847,8 @@ export default class ManualTagging extends Component {
             } else {
 
                 this.setState({
-                    outputList: []
+                    outputList: [],
+                    loading: false
                 }, () => {
                     try {
                         this.state.languageEl.destroy();
@@ -2839,7 +2886,8 @@ export default class ManualTagging extends Component {
     }
     getPlanningUnitListByTracerCategory = (term) => {
         this.setState({ planningUnitName: term });
-        ManualTaggingService.autocompletePlanningUnit(this.state.planningUnitId, term.toUpperCase())
+        var programId = this.state.active1 ? this.state.programId : this.state.programId1.split("_")[0];
+        ManualTaggingService.autocompletePlanningUnit(this.state.planningUnitId, term.toUpperCase(), programId)
             .then(response => {
                 console.log("Response@@@@@@@@@@@@@@@@@@", response)
                 var tracercategoryPlanningUnit = [];
@@ -2857,7 +2905,7 @@ export default class ManualTagging extends Component {
 
                 this.setState({
                     tracercategoryPlanningUnit: listArray,
-                    roPrimeLineNoForTab3:""
+                    roPrimeLineNoForTab3: ""
                 });
                 // this.setState({
                 //     tracercategoryPlanningUnit: response.data
@@ -2918,7 +2966,7 @@ export default class ManualTagging extends Component {
             var programId = this.state.active1 ? this.state.programId : this.state.programId1.split("_")[0];
             var shipmentPlanningUnitId = this.state.active1 ? this.state.selectedRowPlanningUnit : (this.state.active3 ? ((this.state.active4 || this.state.active5) && !this.state.checkboxValue ? document.getElementById("planningUnitId1").value : (this.state.active4 || this.state.active5) && this.state.checkboxValue ? this.state.selectedShipment.length > 0 ? this.state.selectedShipment[0].planningUnit.id : 0 : 0) : 0)
 
-            ManualTaggingService.autocompleteDataOrderNo(term.toUpperCase(), (programId != null && programId != "" ? programId : 0), (erpPlanningUnitId != null && erpPlanningUnitId != "" ? erpPlanningUnitId : 0),shipmentPlanningUnitId)
+            ManualTaggingService.autocompleteDataOrderNo(term.toUpperCase(), (programId != null && programId != "" ? programId : 0), (erpPlanningUnitId != null && erpPlanningUnitId != "" ? erpPlanningUnitId : 0), shipmentPlanningUnitId)
                 .then(response => {
                     console.log("Response@@@@@@@@@@@@@@@@@@@@@", response)
                     var autocompleteData = [];
@@ -2927,7 +2975,7 @@ export default class ManualTagging extends Component {
                     }
                     this.setState({
                         autocompleteData,
-                        roPrimeLineNoForTab3:""
+                        roPrimeLineNoForTab3: ""
                     });
                     // document.getElementById("erpPlanningUnitId").value = planningUnitId;
                 }).catch(
@@ -3406,11 +3454,12 @@ export default class ManualTagging extends Component {
                 data[23] = linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].conversionFactor : 1;
                 data[24] = manualTaggingList[j].notes;
                 data[25] = this.state.versionId.toString().includes("Local") && linkedShipmentsListForTab2.length > 0 ? this.state.roPrimeNoListOriginal.filter(c => c.roNo == linkedShipmentsListForTab2[0].roNo && c.roPrimeLineNo == linkedShipmentsListForTab2[0].roPrimeLineNo)[0] : {};
-                data[26] = linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].roNo:"";
-                data[27] = linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].roPrimeLineNo:"";
+                data[26] = linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].roNo : "";
+                data[27] = linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].roPrimeLineNo : "";
             }
             else {
                 // data[0] = manualTaggingList[j].erpOrderId
+                console.log("manualTaggingList[j]@@@@@@@@@@@@", manualTaggingList[j])
                 data[0] = (manualTaggingList[j].roNo + " - " + manualTaggingList[j].roPrimeLineNo) + " | " + (manualTaggingList[j].orderNo + " - " + manualTaggingList[j].primeLineNo) + (manualTaggingList[j].knShipmentNo != "" && manualTaggingList[j].knShipmentNo != null ? " | " + manualTaggingList[j].knShipmentNo : "");
                 data[1] = manualTaggingList[j].orderNo + " - " + manualTaggingList[j].primeLineNo
                 data[2] = manualTaggingList[j].knShipmentNo;
@@ -3419,6 +3468,7 @@ export default class ManualTagging extends Component {
                 data[5] = manualTaggingList[j].erpShipmentStatus
                 data[6] = manualTaggingList[j].erpQty
                 data[7] = j;
+                data[8] = manualTaggingList[j].tracerCategoryId;
 
             }
             manualTaggingArray[count] = data;
@@ -3733,7 +3783,7 @@ export default class ManualTagging extends Component {
                                     let roPrimeLineNo = this.el.getValueFromCoords(27, y).toString().trim();
                                     ManualTaggingService.getARTMISHistory(roNo, roPrimeLineNo)
                                         .then(response => {
-                                            console.log("MohitResponse.data@@@@@@@@@@@@@",response.data)
+                                            console.log("MohitResponse.data@@@@@@@@@@@@@", response.data)
                                             this.setState({
                                                 artmisHistory: response.data
                                             }, () => {
@@ -3840,6 +3890,10 @@ export default class ManualTagging extends Component {
                         title: "Index",
                         type: 'hidden',
                     },
+                    {
+                        title: "TCId",
+                        type: 'hidden',
+                    },
                 ],
                 editable: false,
                 text: {
@@ -3895,6 +3949,7 @@ export default class ManualTagging extends Component {
         if ((x == 0 && value != 0) || (y == 0 && value != 0)) {
             // console.log("HEADER SELECTION--------------------------");
         } else {
+            console.log("Loading 6 Mohit#############")
             this.setState({
                 loading: true
             })
@@ -4022,23 +4077,31 @@ export default class ManualTagging extends Component {
                     var datasetOs2 = datasetTransaction2.objectStore('programQPLDetails');
                     var getRequest2 = datasetOs2.getAll();
                     getRequest2.onsuccess = function (event) {
-                        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                        var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                        var programQPLDetails = getRequest2.result.filter(c => c.userId == userId);
-                        var programList = getRequest1.result;
+
+                        var budgetTransaction2 = db1.transaction(['budget'], 'readwrite');
+                        var budgetOs2 = budgetTransaction2.objectStore('budget');
+                        var budgetRequest2 = budgetOs2.getAll();
+                        budgetRequest2.onsuccess = function (event) {
+                            var budgetList = budgetRequest2.result;
+                            var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                            var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                            var programQPLDetails = getRequest2.result.filter(c => c.userId == userId);
+                            var programList = getRequest1.result;
 
 
-                        var myResult = getRequest.result.filter(c => c.userId == userId);
-                        this.setState({
-                            localProgramList: myResult,
-                            programObjectStoreList: programList,
-                            programQPLDetailsList: programQPLDetails
-                        }, () => {
-                            this.getProgramList();
-                            if (parameter == 1) {
-                                this.filterErpData();
-                            }
-                        })
+                            var myResult = getRequest.result.filter(c => c.userId == userId);
+                            this.setState({
+                                localProgramList: myResult,
+                                programObjectStoreList: programList,
+                                programQPLDetailsList: programQPLDetails,
+                                budgetList: budgetList
+                            }, () => {
+                                this.getProgramList();
+                                if (parameter == 1) {
+                                    this.filterErpData();
+                                }
+                            })
+                        }.bind(this)
                     }.bind(this)
                 }.bind(this)
             }.bind(this)
@@ -4067,6 +4130,10 @@ export default class ManualTagging extends Component {
                         }, () => {
                             if (!this.state.active3) {
                                 this.getPlanningUnitArray();
+                            } else {
+                                this.setState({
+                                    loading: false
+                                })
                             }
                         })
                     }
@@ -4165,7 +4232,8 @@ export default class ManualTagging extends Component {
             // }
         } else {
             this.setState({
-                outputList: []
+                outputList: [],
+                loading: false
             }, () => {
                 try {
                     this.state.languageEl.destroy();
@@ -4482,7 +4550,7 @@ export default class ManualTagging extends Component {
                 headerAlign: 'center'
             },
             {
-                dataField: 'erpPlanningUnit',
+                dataField: 'planningUnitName',
                 text: i18n.t('static.manualTagging.erpPlanningUnit'),
                 sort: true,
                 align: 'center',
@@ -4646,78 +4714,78 @@ export default class ManualTagging extends Component {
                         </div>
                     </div>
                     <CardBody className="pb-lg-5" >
-                        <div  style={{ display: this.state.loading ? "none" : "block" }}>
-                        {/* <Col md="10 ml-0"> */}
-                        <b><div className="col-md-11 pl-3" style={{ 'marginLeft': '-15px', 'marginTop': '-13px' }}> <span style={{ 'color': '#002f6c', 'fontSize': '13px' }}>{i18n.t('static.mt.manualTaggingNotePart1')}<a href="#/program/downloadProgram" target="_blank">{i18n.t('static.mt.manualTaggingNotePart2')}</a>{i18n.t('static.mt.manualTaggingNotePart3')}</span></div></b><br />
+                        <div style={{ display: this.state.loading ? "none" : "block" }}>
+                            {/* <Col md="10 ml-0"> */}
+                            <b><div className="col-md-11 pl-3" style={{ 'marginLeft': '-15px', 'marginTop': '-13px' }}> <span style={{ 'color': '#002f6c', 'fontSize': '13px' }}>{i18n.t('static.mt.manualTaggingNotePart1')}<a href="#/program/downloadProgram" target="_blank">{i18n.t('static.mt.manualTaggingNotePart2')}</a>{i18n.t('static.mt.manualTaggingNotePart3')}</span></div></b><br />
 
-                        <div className="col-md-12 pl-0">
-                            <Row>
+                            <div className="col-md-12 pl-0">
+                                <Row>
 
-                                <FormGroup className="pl-3">
-                                    {/* <Label className="P-absltRadio">{i18n.t('static.common.status')}</Label> */}
-                                    <FormGroup check inline style={{ 'marginLeft': '-52px' }}
-                                    >
-                                        <Input
-                                            className="form-check-input"
-                                            type="radio"
-                                            id="active1"
-                                            name="active"
-                                            value={true}
-                                            title={i18n.t('static.mt.tab1Purpose')}
-                                            checked={this.state.active1 == true}
-                                            onChange={(e) => { this.dataChange(e) }}
-                                        />
-                                        <Label
-                                            className="form-check-label"
-                                            check htmlFor="inline-radio1"
-                                            title={i18n.t('static.mt.tab1Purpose')}>
-                                            {i18n.t('static.mt.notLinkedQAT')}
-                                        </Label>
+                                    <FormGroup className="pl-3">
+                                        {/* <Label className="P-absltRadio">{i18n.t('static.common.status')}</Label> */}
+                                        <FormGroup check inline style={{ 'marginLeft': '-52px' }}
+                                        >
+                                            <Input
+                                                className="form-check-input"
+                                                type="radio"
+                                                id="active1"
+                                                name="active"
+                                                value={true}
+                                                title={i18n.t('static.mt.tab1Purpose')}
+                                                checked={this.state.active1 == true}
+                                                onChange={(e) => { this.dataChange(e) }}
+                                            />
+                                            <Label
+                                                className="form-check-label"
+                                                check htmlFor="inline-radio1"
+                                                title={i18n.t('static.mt.tab1Purpose')}>
+                                                {i18n.t('static.mt.notLinkedQAT')}
+                                            </Label>
+                                        </FormGroup>
+                                        <FormGroup check inline
+                                        >
+                                            <Input
+                                                className="form-check-input"
+                                                type="radio"
+                                                id="active2"
+                                                name="active"
+                                                value={false}
+                                                title={i18n.t('static.mt.tab2Purpose')}
+                                                checked={this.state.active2 === true}
+                                                onChange={(e) => { this.dataChange(e) }}
+                                            />
+                                            <Label
+                                                className="form-check-label"
+                                                check htmlFor="inline-radio2"
+                                                title={i18n.t('static.mt.tab2Purpose')}>
+                                                {i18n.t('static.mt.linked')}
+                                            </Label>
+                                        </FormGroup>
+                                        <FormGroup check inline
+                                        >
+                                            <Input
+                                                className="form-check-input"
+                                                type="radio"
+                                                id="active3"
+                                                name="active"
+                                                value={false}
+                                                title={i18n.t('static.mt.tab3Purpose')}
+                                                checked={this.state.active3 === true}
+                                                onChange={(e) => { this.dataChange(e) }}
+                                            />
+                                            <Label
+                                                className="form-check-label"
+                                                check htmlFor="inline-radio2"
+                                                title={i18n.t('static.mt.tab3Purpose')}>
+                                                {i18n.t('static.mt.notLinkedERP')}
+                                            </Label>
+                                        </FormGroup>
                                     </FormGroup>
-                                    <FormGroup check inline
-                                    >
-                                        <Input
-                                            className="form-check-input"
-                                            type="radio"
-                                            id="active2"
-                                            name="active"
-                                            value={false}
-                                            title={i18n.t('static.mt.tab2Purpose')}
-                                            checked={this.state.active2 === true}
-                                            onChange={(e) => { this.dataChange(e) }}
-                                        />
-                                        <Label
-                                            className="form-check-label"
-                                            check htmlFor="inline-radio2"
-                                            title={i18n.t('static.mt.tab2Purpose')}>
-                                            {i18n.t('static.mt.linked')}
-                                        </Label>
-                                    </FormGroup>
-                                    <FormGroup check inline
-                                    >
-                                        <Input
-                                            className="form-check-input"
-                                            type="radio"
-                                            id="active3"
-                                            name="active"
-                                            value={false}
-                                            title={i18n.t('static.mt.tab3Purpose')}
-                                            checked={this.state.active3 === true}
-                                            onChange={(e) => { this.dataChange(e) }}
-                                        />
-                                        <Label
-                                            className="form-check-label"
-                                            check htmlFor="inline-radio2"
-                                            title={i18n.t('static.mt.tab3Purpose')}>
-                                            {i18n.t('static.mt.notLinkedERP')}
-                                        </Label>
-                                    </FormGroup>
-                                </FormGroup>
-                            </Row>
-                        </div>
-                        {/* </Col> */}
+                                </Row>
+                            </div>
+                            {/* </Col> */}
 
-                        {/* {this.state.active1 &&
+                            {/* {this.state.active1 &&
                             <>
                                 <b><div className="col-md-12 pl-3" style={{ 'marginLeft': '-15px' }}> <span style={{ 'color': '#002f6c', 'fontSize': '13px' }}>{i18n.t('static.mt.tab1Purpose')}</span></div></b><br />
                             </>
@@ -4732,168 +4800,658 @@ export default class ManualTagging extends Component {
                                 <b><div className="col-md-12 pl-3" style={{ 'marginLeft': '-15px' }}> <span style={{ 'color': '#002f6c', 'fontSize': '13px' }}>{i18n.t('static.mt.tab3Purpose')}</span></div></b><br />
                             </>
                         } */}
-                        <div className="col-md-12 pl-0">
-                            <Row>
-                                {this.state.active3 &&
-                                    <>
+                            <div className="col-md-12 pl-0">
+                                <Row>
+                                    {this.state.active3 &&
+                                        <>
+                                            <FormGroup className="col-md-3 ">
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.region.country')}</Label>
+                                                <div className="controls ">
+                                                    <InputGroup>
+                                                        <Input
+                                                            type="select"
+                                                            name="countryId"
+                                                            id="countryId"
+                                                            bsSize="sm"
+                                                            value={this.state.countryId}
+                                                            onChange={(e) => { this.countryChange(e); }}
+                                                        >
+                                                            <option value="-1">{i18n.t('static.common.select')}</option>
+                                                            {countries}
+                                                        </Input>
+                                                    </InputGroup>
+                                                </div>
+                                            </FormGroup>
+                                            <FormGroup className="col-md-3">
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.productcategory')}</Label>
+                                                <div className="controls ">
+                                                    {/* <InMultiputGroup> */}
+                                                    <MultiSelect
+                                                        // type="select"
+                                                        name="productCategoryId"
+                                                        id="productCategoryId"
+                                                        bsSize="sm"
+                                                        value={this.state.productCategoryValues}
+                                                        onChange={(e) => { this.handleProductCategoryChange(e) }}
+                                                        options={productCategoryMultList && productCategoryMultList.length > 0 ? productCategoryMultList : []}
+                                                    />
+
+                                                </div>
+                                            </FormGroup>
+                                        </>}
+                                    {(this.state.active1 || this.state.active2) &&
                                         <FormGroup className="col-md-3 ">
-                                            <Label htmlFor="appendedInputButton">{i18n.t('static.region.country')}</Label>
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.inventory.program')}</Label>
                                             <div className="controls ">
                                                 <InputGroup>
                                                     <Input
                                                         type="select"
-                                                        name="countryId"
-                                                        id="countryId"
+                                                        name="programId"
+                                                        id="programId"
                                                         bsSize="sm"
-                                                        value={this.state.countryId}
-                                                        onChange={(e) => { this.countryChange(e); }}
+                                                        value={this.state.programId}
+                                                        // onChange={this.getPlanningUnitList}
+                                                        onChange={(e) => { this.programChange(e); }}
                                                     >
                                                         <option value="-1">{i18n.t('static.common.select')}</option>
-                                                        {countries}
+                                                        {programList}
                                                     </Input>
                                                 </InputGroup>
                                             </div>
-                                        </FormGroup>
+                                        </FormGroup>}
+                                    {(this.state.active1 || this.state.active2) &&
+                                        <FormGroup className="col-md-3 ">
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
+                                            <div className="controls ">
+                                                <InputGroup>
+                                                    <Input
+                                                        type="select"
+                                                        name="versionId"
+                                                        id="versionId"
+                                                        bsSize="sm"
+                                                        value={this.state.versionId}
+                                                        // onChange={this.getPlanningUnitList}
+                                                        onChange={(e) => { this.versionChange(e); }}
+                                                    >
+                                                        <option value="-1">{i18n.t('static.common.select')}</option>
+                                                        {versions}
+                                                    </Input>
+                                                </InputGroup>
+                                            </div>
+                                        </FormGroup>}
+                                    {this.state.active3 &&
                                         <FormGroup className="col-md-3">
-                                            <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.productcategory')}</Label>
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.procurementUnit.planningUnit')}</Label>
                                             <div className="controls ">
                                                 {/* <InMultiputGroup> */}
                                                 <MultiSelect
                                                     // type="select"
-                                                    name="productCategoryId"
-                                                    id="productCategoryId"
+                                                    name="planningUnitId2"
+                                                    id="planningUnitId2"
                                                     bsSize="sm"
-                                                    value={this.state.productCategoryValues}
-                                                    onChange={(e) => { this.handleProductCategoryChange(e) }}
-                                                    options={productCategoryMultList && productCategoryMultList.length > 0 ? productCategoryMultList : []}
+                                                    value={this.state.planningUnitValues}
+                                                    onChange={(e) => { this.handlePlanningUnitChange(e) }}
+                                                    options={planningUnitMultiList1 && planningUnitMultiList1.length > 0 ? planningUnitMultiList1 : []}
                                                 />
+                                                {/* <option value="0">{i18n.t('static.common.select')}</option> */}
+                                                {/* {planningUnitList} */}
+
+                                                {/* </MultiSelect> */}
+
+                                                {/* </InputMultiGroup> */}
+                                            </div>
+                                        </FormGroup>}
+
+
+                                    {(this.state.active1 || this.state.active2) &&
+                                        <FormGroup className="col-md-3">
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.procurementUnit.planningUnit')}</Label>
+                                            <div className="controls ">
+                                                {/* <InMultiputGroup> */}
+                                                <MultiSelect
+                                                    // type="select"
+                                                    name="planningUnitId"
+                                                    id="planningUnitId"
+                                                    bsSize="sm"
+                                                    value={this.state.hasSelectAll ? planningUnitMultiList : this.state.planningUnitValues}
+                                                    onChange={(e) => { this.filterData(e) }}
+                                                    options={planningUnitMultiList && planningUnitMultiList.length > 0 ? planningUnitMultiList : []}
+                                                    labelledBy={i18n.t('static.common.select')}
+                                                />
+                                                {/* <option value="0">{i18n.t('static.common.select')}</option> */}
+                                                {/* {planningUnitList} */}
+
+                                                {/* </MultiSelect> */}
+
+                                                {/* </InputMultiGroup> */}
+                                            </div>
+                                        </FormGroup>}
+                                </Row>
+
+                                <div className="ReportSearchMarginTop consumptionDataEntryTable">
+                                    <div id="tableDiv" className={!this.state.active2 ? "jexcelremoveReadonlybackground RowClickable" : "RowClickable"}>
+                                    </div>
+                                </div>
+
+
+
+                            </div>
+
+
+                            {/* Consumption modal */}
+                            <Modal isOpen={this.state.manualTag}
+                                className={'modal-lg ' + this.props.className, "modalWidth"}>
+                                <div style={{ display: this.state.loading1 ? "none" : "block" }}>
+                                    <ModalHeader className="modalHeaderSupplyPlan hideCross">
+                                        <strong>{i18n.t('static.manualTagging.searchErpOrders')}</strong>
+                                        <strong>{this.state.duplicateOrderNo && 'Already Linked'}</strong>
+                                        <Button size="md" color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1" onClick={() => this.cancelClicked()} disabled={(this.state.table1Loader ? false : true)}> <i className="fa fa-times"></i></Button>
+                                    </ModalHeader>
+                                    <ModalBody>
+                                        <div>
+                                            {!this.state.active3 && !this.state.active2 && <p><h5><b>{i18n.t('static.manualTagging.qatShipmentTitle')}</b></h5></p>}
+                                            {!this.state.active3 && !this.state.active2 &&
+                                                <ToolkitProvider
+                                                    keyField="optList"
+                                                    data={this.state.outputListAfterSearch}
+                                                    columns={columns}
+                                                    search={{ searchFormatted: true }}
+                                                    hover
+                                                    filter={filterFactory()}
+                                                >
+                                                    {
+                                                        props => (
+                                                            <div className="TableCust FortablewidthMannualtaggingtable2 ">
+                                                                {/* <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
+                                                    <SearchBar {...props.searchProps} />
+                                                    <ClearSearchButton {...props.searchProps} />
+                                                </div> */}
+                                                                <BootstrapTable striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                                                    // pagination={paginationFactory(options)}
+                                                                    rowEvents={{
+                                                                    }}
+                                                                    {...props.baseProps}
+                                                                />
+                                                            </div>
+                                                        )
+                                                    }
+                                                </ToolkitProvider>}
+                                            {this.state.active3 &&
+                                                <>
+                                                    <div className="col-md-12">
+                                                        <Row>
+
+                                                            <FormGroup className="pl-3">
+                                                                {/* <Label className="P-absltRadio">{i18n.t('static.common.status')}</Label> */}
+                                                                <FormGroup check inline style={{ 'marginLeft': '-52px' }}>
+                                                                    <Input
+                                                                        className="form-check-input"
+                                                                        type="radio"
+                                                                        id="active4"
+                                                                        name="active"
+                                                                        value={true}
+                                                                        checked={this.state.active4 === true}
+                                                                        onChange={(e) => { this.dataChange1(e) }}
+                                                                    />
+                                                                    <Label
+                                                                        className="form-check-label"
+                                                                        check htmlFor="inline-radio1">
+                                                                        {i18n.t('static.mt.createNewShipment')}
+                                                                    </Label>
+                                                                </FormGroup>
+                                                                <FormGroup check inline>
+                                                                    <Input
+                                                                        className="form-check-input"
+                                                                        type="radio"
+                                                                        id="active5"
+                                                                        name="active"
+                                                                        value={false}
+                                                                        checked={this.state.active5 === true}
+                                                                        onChange={(e) => { this.dataChange1(e) }}
+                                                                    />
+                                                                    <Label
+                                                                        className="form-check-label"
+                                                                        check htmlFor="inline-radio2">
+                                                                        {i18n.t('static.mt.selectExistingShipment')}
+                                                                    </Label>
+                                                                </FormGroup>
+                                                            </FormGroup>
+
+                                                        </Row>
+                                                        <Row>
+                                                            {(this.state.active4 || this.state.active5) &&
+                                                                <FormGroup className="col-md-3 ">
+                                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.inventory.program')}<span class="red Reqasterisk">*</span></Label>
+                                                                    <div className="controls ">
+                                                                        <InputGroup>
+                                                                            <Input
+                                                                                type="select"
+                                                                                name="programId1"
+                                                                                id="programId1"
+                                                                                bsSize="sm"
+                                                                                value={this.state.programId1}
+                                                                                // onChange={this.getPlanningUnitList}
+                                                                                onChange={(e) => { this.programChangeModal(e); }}
+                                                                            >
+                                                                                <option value="-1">{i18n.t('static.common.select')}</option>
+                                                                                {filteredProgramList}
+                                                                            </Input>
+                                                                        </InputGroup>
+                                                                    </div>
+                                                                </FormGroup>}
+                                                            {this.state.active5 &&
+                                                                <>
+                                                                    <FormGroup check inline>
+                                                                        <Input
+                                                                            className="form-check-input"
+                                                                            type="checkbox"
+                                                                            id="active6"
+                                                                            name="active"
+                                                                            checked={this.state.checkboxValue}
+                                                                            onChange={(e) => { this.dataChangeCheckbox(e) }}
+                                                                        />
+                                                                        <Label
+                                                                            className="form-check-label"
+                                                                            check htmlFor="inline-radio2">
+                                                                            <b>{i18n.t('static.mt.filterByShipmentId')}</b>
+                                                                        </Label>
+                                                                    </FormGroup>
+                                                                    {this.state.checkboxValue &&
+                                                                        <FormGroup className="col-md-3 pl-0">
+                                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.commit.qatshipmentId')}</Label>
+                                                                            <div className="controls ">
+                                                                                <InputGroup>
+                                                                                    <Input
+                                                                                        type="select"
+                                                                                        name="notLinkedShipmentId"
+                                                                                        id="notLinkedShipmentId"
+                                                                                        bsSize="sm"
+                                                                                        onChange={this.displayShipmentData}
+                                                                                    >
+                                                                                        <option value="0">{i18n.t('static.common.select')}</option>
+                                                                                        {shipmentIdList}
+                                                                                    </Input>
+                                                                                </InputGroup>
+                                                                            </div>
+                                                                        </FormGroup>}
+                                                                </>}
+                                                            {(this.state.active4 || (this.state.active5 && !this.state.checkboxValue)) &&
+                                                                <FormGroup className="col-md-6 ">
+                                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.procurementUnit.planningUnit')}{this.state.active4 && <span class="red Reqasterisk">*</span>}</Label>
+                                                                    <div className="controls ">
+                                                                        <InputGroup>
+                                                                            <Input
+                                                                                type="select"
+                                                                                name="planningUnitId1"
+                                                                                id="planningUnitId1"
+                                                                                bsSize="sm"
+                                                                                // value={this.state.programId}
+                                                                                onChange={this.displayShipmentData}
+                                                                            // onChange={(e) => { this.programChange(e); this.getPlanningUnitList(e) }}
+                                                                            >
+                                                                                <option value="-1">{i18n.t('static.common.select')}</option>
+                                                                                {planningUnitList}
+                                                                            </Input>
+                                                                        </InputGroup>
+                                                                    </div>
+                                                                </FormGroup>}
+                                                            {this.state.active4 &&
+                                                                <FormGroup className="col-md-3 ">
+                                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.budget.fundingsource')}<span class="red Reqasterisk">*</span></Label>
+                                                                    <div className="controls ">
+                                                                        <InputGroup>
+                                                                            <Input
+                                                                                type="select"
+                                                                                name="fundingSourceId"
+                                                                                id="fundingSourceId"
+                                                                                bsSize="sm"
+                                                                                value={this.state.fundingSourceId}
+                                                                                // onChange={this.getBudgetListByFundingSourceId}
+                                                                                onChange={(e) => { this.fundingSourceModal(e); }}
+                                                                            >
+                                                                                <option value="-1">{i18n.t('static.common.select')}</option>
+                                                                                {newFundingSourceList}
+                                                                            </Input>
+                                                                        </InputGroup>
+                                                                    </div>
+                                                                </FormGroup>}
+                                                            {this.state.active4 &&
+                                                                <FormGroup className="col-md-3 ">
+                                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.budget')}<span class="red Reqasterisk">*</span></Label>
+                                                                    <div className="controls ">
+                                                                        <InputGroup>
+                                                                            <Input
+                                                                                type="select"
+                                                                                name="budgetId"
+                                                                                id="budgetId"
+                                                                                bsSize="sm"
+                                                                                value={this.state.budgetId}
+                                                                                // onChange={this.getPlanningUnitList}
+                                                                                onChange={(e) => { this.budgetChange(e) }}
+                                                                            >
+                                                                                <option value="-1">{i18n.t('static.common.select')}</option>
+                                                                                {newBudgetList}
+                                                                            </Input>
+                                                                        </InputGroup>
+                                                                    </div>
+                                                                </FormGroup>}
+                                                        </Row>
+                                                    </div>
+                                                    {this.state.active5 &&
+                                                        <ToolkitProvider
+                                                            keyField="tempIndex"
+                                                            data={this.state.selectedShipment}
+                                                            columns={columns}
+                                                            search={{ searchFormatted: true }}
+                                                            hover
+                                                            filter={filterFactory()}
+                                                        >
+                                                            {
+                                                                props => (
+                                                                    <div className="FortablewidthMannualtaggingtable1 height-auto">
+
+                                                                        <BootstrapTable
+                                                                            // keyField='erpOrderId'
+                                                                            ref={n => this.node = n}
+                                                                            selectRow={selectRow}
+                                                                            striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+
+                                                                            rowEvents={{
+
+                                                                            }}
+                                                                            {...props.baseProps}
+                                                                        />
+                                                                    </div>
+                                                                )
+                                                            }
+                                                        </ToolkitProvider>}
+                                                </>
+                                            }
+                                        </div><br />
+                                        <div>
+                                            {!this.state.active2 && <><p><h5><b>{i18n.t('static.manualTagging.erpShipment')}</b></h5></p>
+                                                <Col md="12 pl-0">
+                                                    <div className="d-md-flex">
+                                                        <FormGroup className="col-md-6">
+                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.manualTagging.erpPlanningUnit')}</Label>
+                                                            <div className="controls ">
+                                                                <Autocomplete
+                                                                    id="combo-box-demo1"
+                                                                    // value={this.state.selectedPlanningUnit}
+                                                                    // defaultValue={{ id: this.state.planningUnitIdUpdated, label: this.state.planningUnitName }}
+                                                                    options={this.state.tracercategoryPlanningUnit}
+                                                                    getOptionLabel={(option) => option.label}
+                                                                    style={{ width: 450 }}
+                                                                    disabled={this.state.active3 ? true : false}
+                                                                    onChange={(event, value) => {
+                                                                        // console.log("demo2 value---", value);
+                                                                        if (value != null) {
+                                                                            this.setState({
+                                                                                erpPlanningUnitId: value.value,
+                                                                                planningUnitIdUpdated: value.value,
+                                                                                planningUnitName: value.label
+                                                                            }, () => { this.getOrderDetails() });
+                                                                        } else {
+                                                                            this.setState({
+                                                                                erpPlanningUnitId: '',
+                                                                                planningUnitIdUpdated: '',
+                                                                                planningUnitName: '',
+                                                                                tracercategoryPlanningUnit: []
+                                                                            }, () => { this.getOrderDetails() });
+                                                                        }
+
+                                                                    }} // prints the selected value
+                                                                    renderInput={(params) => <TextField
+                                                                        {...params}
+                                                                        // InputProps={{ style: { fontSize: 12.24992 } }}
+                                                                        variant="outlined"
+                                                                        onChange={(e) => this.getPlanningUnitListByTracerCategory(e.target.value)} />}
+                                                                />
+
+                                                            </div>
+                                                        </FormGroup>
+
+                                                        <FormGroup className="col-md-6 pl-0">
+                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.manualTagging.search')}</Label>
+                                                            <div className="controls "
+                                                            >
+                                                                <Autocomplete
+                                                                    id="combo-box-demo"
+                                                                    // value={this.state.roNoOrderNo}
+                                                                    defaultValue={this.state.roNoOrderNo}
+                                                                    options={this.state.autocompleteData}
+                                                                    getOptionLabel={(option) => option.label}
+                                                                    disabled={this.state.active3 ? true : false}
+                                                                    style={{ width: 450 }}
+                                                                    onChange={(event, value) => {
+                                                                        // console.log("combo 2 ro combo box---", value)
+                                                                        if (value != null) {
+                                                                            this.setState({
+                                                                                searchedValue: value.label
+                                                                                ,
+                                                                                roNoOrderNo: value.label
+                                                                            }, () => { this.getOrderDetails() });
+                                                                        } else {
+                                                                            this.setState({
+                                                                                searchedValue: ''
+                                                                                , autocompleteData: []
+                                                                            }, () => { this.getOrderDetails() });
+                                                                        }
+
+                                                                    }} // prints the selected value
+                                                                    renderInput={(params) => <TextField {...params} variant="outlined"
+                                                                        onChange={(e) => {
+                                                                            this.searchErpOrderData(e.target.value)
+                                                                        }} />}
+                                                                />
+
+                                                            </div>
+                                                        </FormGroup>
+
+                                                    </div>
+                                                </Col></>}
+                                            <div id="tableDiv1" className="RemoveStriped" style={{ display: this.state.table1Loader ? "block" : "none" }}>
+                                            </div>
+                                            <div style={{ display: this.state.table1Loader ? "none" : "block" }}>
+                                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                                    <div class="align-items-center">
+                                                        <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                                        <div class="spinner-border blue ml-4" role="status">
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
+                                        </div><br />
+                                    </ModalBody>
+                                    <ModalFooter>
+                                        <b><h3 className="float-right">{i18n.t('static.mt.originalQty')} : {this.state.active4 ? this.state.totalQuantity : this.addCommas(this.state.originalQty)}</h3></b>
+                                        {this.state.displayTotalQty && <b><h3 className="float-right">{i18n.t('static.mt.totalQty')} : {this.state.totalQuantity}</h3></b>}
+
+                                        {this.state.displaySubmitButton
+                                            && (this.state.active4 || this.state.originalQty > 0)
+                                            && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.link}> <i className="fa fa-check"></i>{(this.state.active2 ? i18n.t('static.common.update') : i18n.t('static.manualTagging.link'))}</Button>}
+
+                                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.cancelClicked()} disabled={(this.state.table1Loader ? false : true)}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}
+                                        </Button>
+
+                                    </ModalFooter>
+                                </div>
+                                <div style={{ display: this.state.loading1 ? "block" : "none" }}>
+                                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                        <div class="align-items-center">
+                                            <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
+
+                                            <div class="spinner-border blue ml-4" role="status">
 
                                             </div>
-                                        </FormGroup>
-                                    </>}
-                                {(this.state.active1 || this.state.active2) &&
-                                    <FormGroup className="col-md-3 ">
-                                        <Label htmlFor="appendedInputButton">{i18n.t('static.inventory.program')}</Label>
-                                        <div className="controls ">
-                                            <InputGroup>
-                                                <Input
-                                                    type="select"
-                                                    name="programId"
-                                                    id="programId"
-                                                    bsSize="sm"
-                                                    value={this.state.programId}
-                                                    // onChange={this.getPlanningUnitList}
-                                                    onChange={(e) => { this.programChange(e); }}
-                                                >
-                                                    <option value="-1">{i18n.t('static.common.select')}</option>
-                                                    {programList}
-                                                </Input>
-                                            </InputGroup>
                                         </div>
-                                    </FormGroup>}
-                                {(this.state.active1 || this.state.active2) &&
-                                    <FormGroup className="col-md-3 ">
-                                        <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
-                                        <div className="controls ">
-                                            <InputGroup>
-                                                <Input
-                                                    type="select"
-                                                    name="versionId"
-                                                    id="versionId"
-                                                    bsSize="sm"
-                                                    value={this.state.versionId}
-                                                    // onChange={this.getPlanningUnitList}
-                                                    onChange={(e) => { this.versionChange(e); }}
-                                                >
-                                                    <option value="-1">{i18n.t('static.common.select')}</option>
-                                                    {versions}
-                                                </Input>
-                                            </InputGroup>
-                                        </div>
-                                    </FormGroup>}
-                                {this.state.active3 &&
-                                    <FormGroup className="col-md-3">
-                                        <Label htmlFor="appendedInputButton">{i18n.t('static.procurementUnit.planningUnit')}</Label>
-                                        <div className="controls ">
-                                            {/* <InMultiputGroup> */}
-                                            <MultiSelect
-                                                // type="select"
-                                                name="planningUnitId2"
-                                                id="planningUnitId2"
-                                                bsSize="sm"
-                                                value={this.state.planningUnitValues}
-                                                onChange={(e) => { this.handlePlanningUnitChange(e) }}
-                                                options={planningUnitMultiList1 && planningUnitMultiList1.length > 0 ? planningUnitMultiList1 : []}
-                                            />
-                                            {/* <option value="0">{i18n.t('static.common.select')}</option> */}
-                                            {/* {planningUnitList} */}
-
-                                            {/* </MultiSelect> */}
-
-                                            {/* </InputMultiGroup> */}
-                                        </div>
-                                    </FormGroup>}
-
-
-                                {(this.state.active1 || this.state.active2) &&
-                                    <FormGroup className="col-md-3">
-                                        <Label htmlFor="appendedInputButton">{i18n.t('static.procurementUnit.planningUnit')}</Label>
-                                        <div className="controls ">
-                                            {/* <InMultiputGroup> */}
-                                            <MultiSelect
-                                                // type="select"
-                                                name="planningUnitId"
-                                                id="planningUnitId"
-                                                bsSize="sm"
-                                                value={this.state.hasSelectAll ? planningUnitMultiList : this.state.planningUnitValues}
-                                                onChange={(e) => { this.filterData(e) }}
-                                                options={planningUnitMultiList && planningUnitMultiList.length > 0 ? planningUnitMultiList : []}
-                                                labelledBy={i18n.t('static.common.select')}
-                                            />
-                                            {/* <option value="0">{i18n.t('static.common.select')}</option> */}
-                                            {/* {planningUnitList} */}
-
-                                            {/* </MultiSelect> */}
-
-                                            {/* </InputMultiGroup> */}
-                                        </div>
-                                    </FormGroup>}
-                            </Row>
-
-                            <div className="ReportSearchMarginTop  consumptionDataEntryTable">
-                                <div id="tableDiv" className={!this.state.active2 ? "jexcelremoveReadonlybackground RowClickable" : "RowClickable"}>
+                                    </div>
                                 </div>
-                            </div>
-                            
-
-
-                        </div>
-
-
-                        {/* Consumption modal */}
-                        <Modal isOpen={this.state.manualTag}
-                            className={'modal-lg ' + this.props.className, "modalWidth"}>
-                            <div style={{ display: this.state.loading1 ? "none" : "block" }}>
-                                <ModalHeader className="modalHeaderSupplyPlan hideCross">
-                                    <strong>{i18n.t('static.manualTagging.searchErpOrders')}</strong>
-                                    <strong>{this.state.duplicateOrderNo && 'Already Linked'}</strong>
-                                    <Button size="md" color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1" onClick={() => this.cancelClicked()} disabled={(this.state.table1Loader ? false : true)}> <i className="fa fa-times"></i></Button>
+                            </Modal>
+                            {/* Consumption modal */}
+                            {/* Details modal start */}
+                            <Modal isOpen={this.state.modal} className={'modal-xl ' + this.props.className} >
+                                <ModalHeader toggle={this.toggle} className="ModalHead modal-info-Headher">
+                                    <strong className="TextWhite" >{i18n.t('static.mt.showDetails')}</strong>
                                 </ModalHeader>
-                                <ModalBody>
-                                    <div>
-                                        {!this.state.active3 && !this.state.active2 && <p><h5><b>{i18n.t('static.manualTagging.qatShipmentTitle')}</b></h5></p>}
-                                        {!this.state.active3 && !this.state.active2 &&
+                                <ModalBody >
+                                    <ListGroup style={{ height: '490px', overflowY: 'scroll' }}>
+                                        <ListGroupItem >
+                                            <ListGroupItemHeading className="formulasheading">{i18n.t('static.mt.purposeOfEachScreen')}</ListGroupItemHeading>
+                                            <ListGroupItemText className="formulastext">
+                                                <p><span className="formulastext-p">{i18n.t("static.mt.notLinkedQAT") + " :"}</span><br></br>
+
+                                                    {i18n.t("static.mt.tab1DetailPurpose")}<br></br>
+                                                </p>
+
+                                                <p><span className="formulastext-p">{i18n.t("static.mt.linked") + " :"}</span><br></br>
+
+                                                    {i18n.t("static.mt.tab2DetailPurpose")}<br></br>
+                                                </p>
+
+                                                <p><span className="formulastext-p">{i18n.t("static.mt.notLinkedERP") + " :"}</span><br></br>
+
+                                                    {i18n.t("static.mt.tab3DetailPurpose")}<br></br>
+                                                </p>
+                                            </ListGroupItemText>
+                                        </ListGroupItem>
+                                        <ListGroupItem >
+                                            <ListGroupItemHeading className="formulasheading">{i18n.t('static.mt.reminders')}</ListGroupItemHeading>
+                                            <ListGroupItemText className="formulastext">
+                                                <ul className="list-group">
+                                                    <li class="list-summery  "> <i class="fa fa-circle list-summer-iconMt " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders1")}
+
+                                                    </p></li>
+                                                    <li class="list-summery  "> <i class="fa fa-circle list-summer-iconMt " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders2")}
+                                                        <br />    <ol className="list-group list-groupMt">
+                                                            <li class="list-summery  "> <i class="fa fa-circle-o  list-summer-iconMt " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders2A")}
+                                                                <br />    <ol className="list-group list-groupMt">
+                                                                    <li class="list-summery  "> <i class="fa fa-square list-summer-iconMt1 " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders2A1")}</p></li>
+                                                                </ol>
+                                                                <ol className="list-group list-groupMt">
+                                                                    <li class="list-summery  "> <i class="fa fa-square list-summer-iconMt1 " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders2A2")}</p></li>
+                                                                </ol>
+                                                                <ol className="list-group list-groupMt">
+                                                                    <li class="list-summery  "> <i class="fa fa-square list-summer-iconMt1 " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders2A3")}</p></li>
+                                                                </ol>
+                                                            </p></li>
+                                                        </ol>
+                                                        <ol className="list-group list-groupMt">
+                                                            <li class="list-summery  "> <i class="fa fa-circle-o list-summer-iconMt " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders2B")}
+                                                                <br />    <ol className="list-group list-groupMt">
+                                                                    <li class="list-summery  "> <i class="fa fa-square list-summer-iconMt1 " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders2B1")}</p></li>
+                                                                </ol>
+                                                                <ol className="list-group list-groupMt">
+                                                                    <li class="list-summery  "> <i class="fa fa-square list-summer-iconMt1 " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders2B2")}</p></li>
+                                                                </ol>
+                                                            </p></li>
+                                                        </ol>
+                                                        <ol className="list-group list-groupMt">
+                                                            <li class="list-summery  "> <i class="fa fa-circle-o list-summer-iconMt " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders2C")}</p></li>
+                                                        </ol>
+                                                        <ol className="list-group list-groupMt">
+                                                            <li class="list-summery  "> <i class="fa fa-circle-o list-summer-iconMt " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders2D")}
+                                                                <ol className="list-group list-groupMt">
+                                                                    <li class="list-summery  "><img src={conversionFormula} className="formula-img-mr img-fluid" /></li>
+                                                                </ol>
+                                                                <ol className="list-group list-groupMt">
+                                                                    <li class="list-summery  "> <i class="fa fa-square list-summer-iconMt1 " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders2D1a")}<b>{i18n.t("static.mt.reminders2D1b")}</b>{i18n.t("static.mt.reminders2D1c")}</p></li>
+                                                                </ol>
+                                                                <ol className="list-group list-groupMt">
+                                                                    <li class="list-summery  "> <i class="fa fa-square list-summer-iconMt1 " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders2D2a")}<b>{i18n.t("static.mt.reminders2D2b")}</b>{i18n.t("static.mt.reminders2D2c")}</p></li>
+                                                                </ol>
+                                                                <ol className="list-group list-groupMt">
+                                                                    <li class="list-summery  ">
+                                                                        <p><b><u><span className="">{i18n.t("static.common.example") + ": "}</span></u></b>{i18n.t("static.mt.reminders2D3")}<br></br>
+
+                                                                        </p>
+
+                                                                    </li>
+                                                                </ol>
+                                                                <ol className="list-group list-groupMt">
+                                                                    <li class="list-summery  "><img src={conversionFormulaExample} className="formula-img-mr img-fluid" /></li>
+                                                                </ol>
+
+                                                                <ol className="list-group list-groupMt">
+                                                                    <li class="list-summery  ">
+                                                                        <Table id="mytable1" responsive className="table-fixed table-bordered text-center mt-2">
+                                                                            <thead>
+                                                                                <tr>
+                                                                                    <th>{i18n.t("static.manualTagging.erpPlanningUnit")}</th>
+                                                                                    <th>{i18n.t("static.manualTagging.erpShipmentQty")}</th>
+                                                                                    <th>{i18n.t("static.manualTagging.conversionFactor")}</th>
+                                                                                    <th>{i18n.t("static.manualTagging.convertedQATShipmentQty")}</th>
+                                                                                    <th>{i18n.t("static.supplyPlan.qatProduct")}</th>
+                                                                                </tr>
+                                                                            </thead>
+                                                                            <tbody>
+                                                                                <tr>
+                                                                                    <td>{i18n.t("static.mt.reminders2D4a")}</td>
+                                                                                    <td>{i18n.t("static.mt.reminders2D4b")}</td>
+                                                                                    <td>{i18n.t("static.mt.reminders2D4c")}</td>
+                                                                                    <td>{i18n.t("static.mt.reminders2D4d")}</td>
+                                                                                    <td>{i18n.t("static.mt.reminders2D4e")}</td>
+                                                                                </tr>
+                                                                            </tbody>
+                                                                        </Table>
+                                                                    </li>
+                                                                </ol>
+
+                                                            </p></li>
+                                                        </ol>
+                                                    </p>
+                                                    </li>
+                                                    <li class="list-summery  "> <i class="fa fa-circle list-summer-iconMt " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders3")}
+                                                        <br />    <ol className="list-group list-groupMt">
+                                                            <li class="list-summery  "> <i class="fa fa-circle-o list-summer-iconMt " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders3A")}</p></li>
+                                                        </ol>
+                                                    </p></li>
+                                                    <li class="list-summery  "> <i class="fa fa-circle list-summer-iconMt " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders4")}
+                                                        <br />    <ol className="list-group list-groupMt">
+                                                            <li class="list-summery  "> <i class="fa fa-circle-o list-summer-iconMt " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders4A")}</p></li>
+                                                        </ol>
+                                                    </p></li>
+                                                </ul>
+                                            </ListGroupItemText>
+                                        </ListGroupItem>
+                                    </ListGroup>
+                                </ModalBody>
+                            </Modal>
+                            {/* Details modal end */}
+
+                            {/* ARTMIS history modal start */}
+                            <Modal isOpen={this.state.artmisHistoryModal}
+                                className={'modal-lg ' + this.props.className, "modalWidth"}>
+                                {/* <div style={{ display: this.state.loading1 ? "none" : "block" }}> */}
+                                <div>
+                                    <ModalHeader className="modalHeaderSupplyPlan hideCross">
+                                        <strong>{i18n.t('static.mt.erpHistoryTitle')}</strong>
+                                        <Button size="md" color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1" onClick={() => this.toggleArtmisHistoryModal()}> <i className="fa fa-times"></i></Button>
+                                    </ModalHeader>
+                                    <ModalBody>
+                                        <div>
+                                            <span><b>{i18n.t('static.manualTagging.orderDetails')}</b></span>
+                                            <br />
+                                            <br />
                                             <ToolkitProvider
                                                 keyField="optList"
-                                                data={this.state.outputListAfterSearch}
-                                                columns={columns}
+                                                data={this.state.artmisHistory.erpOrderList != undefined && this.state.artmisHistory.erpOrderList.sort((a, b) => {
+                                                    var itemLabelA = moment(a.dataReceivedOn); // ignore upper and lowercase
+                                                    var itemLabelB = moment(b.dataReceivedOn);
+                                                    return itemLabelA < itemLabelB ? 1 : -1;
+                                                })}
+                                                columns={columns1}
                                                 search={{ searchFormatted: true }}
                                                 hover
                                                 filter={filterFactory()}
                                             >
                                                 {
                                                     props => (
-                                                        <div className="TableCust FortablewidthMannualtaggingtable2 ">
+                                                        <div className="TableCust FortablewidthMannualtaggingtable3 reactTableNotification">
                                                             {/* <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
                                                     <SearchBar {...props.searchProps} />
                                                     <ClearSearchButton {...props.searchProps} />
@@ -4907,497 +5465,19 @@ export default class ManualTagging extends Component {
                                                         </div>
                                                     )
                                                 }
-                                            </ToolkitProvider>}
-                                        {this.state.active3 &&
-                                            <>
-                                                <div className="col-md-12">
-                                                    <Row>
+                                            </ToolkitProvider>
+                                            <br />
+                                            <span><b>{i18n.t('static.supplyPlan.shipmentsDetails')}</b></span>
+                                            <br />
+                                            <br />
 
-                                                        <FormGroup className="pl-3">
-                                                            {/* <Label className="P-absltRadio">{i18n.t('static.common.status')}</Label> */}
-                                                            <FormGroup check inline style={{ 'marginLeft': '-52px' }}>
-                                                                <Input
-                                                                    className="form-check-input"
-                                                                    type="radio"
-                                                                    id="active4"
-                                                                    name="active"
-                                                                    value={true}
-                                                                    checked={this.state.active4 === true}
-                                                                    onChange={(e) => { this.dataChange1(e) }}
-                                                                />
-                                                                <Label
-                                                                    className="form-check-label"
-                                                                    check htmlFor="inline-radio1">
-                                                                    {i18n.t('static.mt.createNewShipment')}
-                                                                </Label>
-                                                            </FormGroup>
-                                                            <FormGroup check inline>
-                                                                <Input
-                                                                    className="form-check-input"
-                                                                    type="radio"
-                                                                    id="active5"
-                                                                    name="active"
-                                                                    value={false}
-                                                                    checked={this.state.active5 === true}
-                                                                    onChange={(e) => { this.dataChange1(e) }}
-                                                                />
-                                                                <Label
-                                                                    className="form-check-label"
-                                                                    check htmlFor="inline-radio2">
-                                                                    {i18n.t('static.mt.selectExistingShipment')}
-                                                                </Label>
-                                                            </FormGroup>
-                                                        </FormGroup>
-
-                                                    </Row>
-                                                    <Row>
-                                                        {(this.state.active4 || this.state.active5) &&
-                                                            <FormGroup className="col-md-3 ">
-                                                                <Label htmlFor="appendedInputButton">{i18n.t('static.inventory.program')}<span class="red Reqasterisk">*</span></Label>
-                                                                <div className="controls ">
-                                                                    <InputGroup>
-                                                                        <Input
-                                                                            type="select"
-                                                                            name="programId1"
-                                                                            id="programId1"
-                                                                            bsSize="sm"
-                                                                            value={this.state.programId1}
-                                                                            // onChange={this.getPlanningUnitList}
-                                                                            onChange={(e) => { this.programChangeModal(e); }}
-                                                                        >
-                                                                            <option value="-1">{i18n.t('static.common.select')}</option>
-                                                                            {filteredProgramList}
-                                                                        </Input>
-                                                                    </InputGroup>
-                                                                </div>
-                                                            </FormGroup>}
-                                                        {this.state.active5 &&
-                                                            <>
-                                                                <FormGroup check inline>
-                                                                    <Input
-                                                                        className="form-check-input"
-                                                                        type="checkbox"
-                                                                        id="active6"
-                                                                        name="active"
-                                                                        checked={this.state.checkboxValue}
-                                                                        onChange={(e) => { this.dataChangeCheckbox(e) }}
-                                                                    />
-                                                                    <Label
-                                                                        className="form-check-label"
-                                                                        check htmlFor="inline-radio2">
-                                                                        <b>{i18n.t('static.mt.filterByShipmentId')}</b>
-                                                                    </Label>
-                                                                </FormGroup>
-                                                                {this.state.checkboxValue &&
-                                                                    <FormGroup className="col-md-3 pl-0">
-                                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.commit.qatshipmentId')}</Label>
-                                                                        <div className="controls ">
-                                                                            <InputGroup>
-                                                                                <Input
-                                                                                    type="select"
-                                                                                    name="notLinkedShipmentId"
-                                                                                    id="notLinkedShipmentId"
-                                                                                    bsSize="sm"
-                                                                                    onChange={this.displayShipmentData}
-                                                                                >
-                                                                                    <option value="0">{i18n.t('static.common.select')}</option>
-                                                                                    {shipmentIdList}
-                                                                                </Input>
-                                                                            </InputGroup>
-                                                                        </div>
-                                                                    </FormGroup>}
-                                                            </>}
-                                                        {(this.state.active4 || (this.state.active5 && !this.state.checkboxValue)) &&
-                                                            <FormGroup className="col-md-6 ">
-                                                                <Label htmlFor="appendedInputButton">{i18n.t('static.procurementUnit.planningUnit')}{this.state.active4 && <span class="red Reqasterisk">*</span>}</Label>
-                                                                <div className="controls ">
-                                                                    <InputGroup>
-                                                                        <Input
-                                                                            type="select"
-                                                                            name="planningUnitId1"
-                                                                            id="planningUnitId1"
-                                                                            bsSize="sm"
-                                                                            // value={this.state.programId}
-                                                                            onChange={this.displayShipmentData}
-                                                                        // onChange={(e) => { this.programChange(e); this.getPlanningUnitList(e) }}
-                                                                        >
-                                                                            <option value="-1">{i18n.t('static.common.select')}</option>
-                                                                            {planningUnitList}
-                                                                        </Input>
-                                                                    </InputGroup>
-                                                                </div>
-                                                            </FormGroup>}
-                                                        {this.state.active4 &&
-                                                            <FormGroup className="col-md-3 ">
-                                                                <Label htmlFor="appendedInputButton">{i18n.t('static.budget.fundingsource')}<span class="red Reqasterisk">*</span></Label>
-                                                                <div className="controls ">
-                                                                    <InputGroup>
-                                                                        <Input
-                                                                            type="select"
-                                                                            name="fundingSourceId"
-                                                                            id="fundingSourceId"
-                                                                            bsSize="sm"
-                                                                            value={this.state.fundingSourceId}
-                                                                            // onChange={this.getBudgetListByFundingSourceId}
-                                                                            onChange={(e) => { this.fundingSourceModal(e); }}
-                                                                        >
-                                                                            <option value="-1">{i18n.t('static.common.select')}</option>
-                                                                            {newFundingSourceList}
-                                                                        </Input>
-                                                                    </InputGroup>
-                                                                </div>
-                                                            </FormGroup>}
-                                                        {this.state.active4 &&
-                                                            <FormGroup className="col-md-3 ">
-                                                                <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.budget')}<span class="red Reqasterisk">*</span></Label>
-                                                                <div className="controls ">
-                                                                    <InputGroup>
-                                                                        <Input
-                                                                            type="select"
-                                                                            name="budgetId"
-                                                                            id="budgetId"
-                                                                            bsSize="sm"
-                                                                            value={this.state.budgetId}
-                                                                            // onChange={this.getPlanningUnitList}
-                                                                            onChange={(e) => { this.budgetChange(e) }}
-                                                                        >
-                                                                            <option value="-1">{i18n.t('static.common.select')}</option>
-                                                                            {newBudgetList}
-                                                                        </Input>
-                                                                    </InputGroup>
-                                                                </div>
-                                                            </FormGroup>}
-                                                    </Row>
-                                                </div>
-                                                {this.state.active5 &&
-                                                    <ToolkitProvider
-                                                        keyField="tempIndex"
-                                                        data={this.state.selectedShipment}
-                                                        columns={columns}
-                                                        search={{ searchFormatted: true }}
-                                                        hover
-                                                        filter={filterFactory()}
-                                                    >
-                                                        {
-                                                            props => (
-                                                                <div className="FortablewidthMannualtaggingtable1 height-auto">
-
-                                                                    <BootstrapTable
-                                                                        // keyField='erpOrderId'
-                                                                        ref={n => this.node = n}
-                                                                        selectRow={selectRow}
-                                                                        striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
-
-                                                                        rowEvents={{
-
-                                                                        }}
-                                                                        {...props.baseProps}
-                                                                    />
-                                                                </div>
-                                                            )
-                                                        }
-                                                    </ToolkitProvider>}
-                                            </>
-                                        }
-                                    </div><br />
-                                    <div>
-                                        {!this.state.active2 && <><p><h5><b>{i18n.t('static.manualTagging.erpShipment')}</b></h5></p>
-                                            <Col md="12 pl-0">
-                                                <div className="d-md-flex">
-                                                    <FormGroup className="col-md-6">
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.manualTagging.erpPlanningUnit')}</Label>
-                                                        <div className="controls ">
-                                                            <Autocomplete
-                                                                id="combo-box-demo1"
-                                                                // value={this.state.selectedPlanningUnit}
-                                                                // defaultValue={{ id: this.state.planningUnitIdUpdated, label: this.state.planningUnitName }}
-                                                                options={this.state.tracercategoryPlanningUnit}
-                                                                getOptionLabel={(option) => option.label}
-                                                                style={{ width: 450 }}
-                                                                onChange={(event, value) => {
-                                                                    // console.log("demo2 value---", value);
-                                                                    if (value != null) {
-                                                                        this.setState({
-                                                                            erpPlanningUnitId: value.value,
-                                                                            planningUnitIdUpdated: value.value,
-                                                                            planningUnitName: value.label
-                                                                        }, () => { this.getOrderDetails() });
-                                                                    } else {
-                                                                        this.setState({
-                                                                            erpPlanningUnitId: '',
-                                                                            planningUnitIdUpdated: '',
-                                                                            planningUnitName: '',
-                                                                            tracercategoryPlanningUnit: []
-                                                                        }, () => { this.getOrderDetails() });
-                                                                    }
-
-                                                                }} // prints the selected value
-                                                                renderInput={(params) => <TextField
-                                                                    {...params}
-                                                                    // InputProps={{ style: { fontSize: 12.24992 } }}
-                                                                    variant="outlined"
-                                                                    onChange={(e) => this.getPlanningUnitListByTracerCategory(e.target.value)} />}
-                                                            />
-
-                                                        </div>
-                                                    </FormGroup>
-
-                                                    <FormGroup className="col-md-6 pl-0">
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.manualTagging.search')}</Label>
-                                                        <div className="controls "
-                                                        >
-                                                            <Autocomplete
-                                                                id="combo-box-demo"
-                                                                // value={this.state.roNoOrderNo}
-                                                                defaultValue={this.state.roNoOrderNo}
-                                                                options={this.state.autocompleteData}
-                                                                getOptionLabel={(option) => option.label}
-                                                                style={{ width: 450 }}
-                                                                onChange={(event, value) => {
-                                                                    // console.log("combo 2 ro combo box---", value)
-                                                                    if (value != null) {
-                                                                        this.setState({
-                                                                            searchedValue: value.label
-                                                                            ,
-                                                                            roNoOrderNo: value.label
-                                                                        }, () => { this.getOrderDetails() });
-                                                                    } else {
-                                                                        this.setState({
-                                                                            searchedValue: ''
-                                                                            , autocompleteData: []
-                                                                        }, () => { this.getOrderDetails() });
-                                                                    }
-
-                                                                }} // prints the selected value
-                                                                renderInput={(params) => <TextField {...params} variant="outlined"
-                                                                    onChange={(e) => {
-                                                                        this.searchErpOrderData(e.target.value)
-                                                                    }} />}
-                                                            />
-
-                                                        </div>
-                                                    </FormGroup>
-
-                                                </div>
-                                            </Col></>}
-                                        <div id="tableDiv1" className="RemoveStriped" style={{ display: this.state.table1Loader ? "block" : "none" }}>
-                                        </div>
-                                        <div style={{ display: this.state.table1Loader ? "none" : "block" }}>
-                                            <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                                                <div class="align-items-center">
-                                                    <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
-                                                    <div class="spinner-border blue ml-4" role="status">
-
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-
-                                    </div><br />
-                                </ModalBody>
-                                <ModalFooter>
-                                    <b><h3 className="float-right">{i18n.t('static.mt.originalQty')} : {this.state.active4 ? this.state.totalQuantity : this.addCommas(this.state.originalQty)}</h3></b>
-                                    {this.state.displayTotalQty && <b><h3 className="float-right">{i18n.t('static.mt.totalQty')} : {this.state.totalQuantity}</h3></b>}
-
-                                    {this.state.displaySubmitButton
-                                        && (this.state.active4 || this.state.originalQty > 0)
-                                        && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.link}> <i className="fa fa-check"></i>{(this.state.active2 ? i18n.t('static.common.update') : i18n.t('static.manualTagging.link'))}</Button>}
-
-                                    <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.cancelClicked()} disabled={(this.state.table1Loader ? false : true)}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}
-                                    </Button>
-
-                                </ModalFooter>
-                            </div>
-                            <div style={{ display: this.state.loading1 ? "block" : "none" }}>
-                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                                    <div class="align-items-center">
-                                        <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
-
-                                        <div class="spinner-border blue ml-4" role="status">
-
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </Modal>
-                        {/* Consumption modal */}
-                        {/* Details modal start */}
-                        <Modal isOpen={this.state.modal} className={'modal-xl ' + this.props.className} >
-                            <ModalHeader toggle={this.toggle} className="ModalHead modal-info-Headher">
-                                <strong className="TextWhite" >{i18n.t('static.mt.showDetails')}</strong>
-                            </ModalHeader>
-                            <ModalBody >
-                                <ListGroup style={{ height: '490px', overflowY: 'scroll' }}>
-                                    <ListGroupItem >
-                                        <ListGroupItemHeading className="formulasheading">{i18n.t('static.mt.purposeOfEachScreen')}</ListGroupItemHeading>
-                                        <ListGroupItemText className="formulastext">
-                                            <p><span className="formulastext-p">{i18n.t("static.mt.notLinkedQAT") + " :"}</span><br></br>
-
-                                                {i18n.t("static.mt.tab1DetailPurpose")}<br></br>
-                                            </p>
-
-                                            <p><span className="formulastext-p">{i18n.t("static.mt.linked") + " :"}</span><br></br>
-
-                                                {i18n.t("static.mt.tab2DetailPurpose")}<br></br>
-                                            </p>
-
-                                            <p><span className="formulastext-p">{i18n.t("static.mt.notLinkedERP") + " :"}</span><br></br>
-
-                                                {i18n.t("static.mt.tab3DetailPurpose")}<br></br>
-                                            </p>
-                                        </ListGroupItemText>
-                                    </ListGroupItem>
-                                    <ListGroupItem >
-                                        <ListGroupItemHeading className="formulasheading">{i18n.t('static.mt.reminders')}</ListGroupItemHeading>
-                                        <ListGroupItemText className="formulastext">
-                                            <ul className="list-group">
-                                                <li class="list-summery  "> <i class="fa fa-circle list-summer-iconMt " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders1")}
-
-                                                </p></li>
-                                                <li class="list-summery  "> <i class="fa fa-circle list-summer-iconMt " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders2")}
-                                                    <br />    <ol className="list-group list-groupMt">
-                                                        <li class="list-summery  "> <i class="fa fa-circle-o  list-summer-iconMt " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders2A")}
-                                                            <br />    <ol className="list-group list-groupMt">
-                                                                <li class="list-summery  "> <i class="fa fa-square list-summer-iconMt1 " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders2A1")}</p></li>
-                                                            </ol>
-                                                            <ol className="list-group list-groupMt">
-                                                                <li class="list-summery  "> <i class="fa fa-square list-summer-iconMt1 " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders2A2")}</p></li>
-                                                            </ol>
-                                                            <ol className="list-group list-groupMt">
-                                                                <li class="list-summery  "> <i class="fa fa-square list-summer-iconMt1 " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders2A3")}</p></li>
-                                                            </ol>
-                                                        </p></li>
-                                                    </ol>
-                                                    <ol className="list-group list-groupMt">
-                                                        <li class="list-summery  "> <i class="fa fa-circle-o list-summer-iconMt " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders2B")}
-                                                            <br />    <ol className="list-group list-groupMt">
-                                                                <li class="list-summery  "> <i class="fa fa-square list-summer-iconMt1 " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders2B1")}</p></li>
-                                                            </ol>
-                                                            <ol className="list-group list-groupMt">
-                                                                <li class="list-summery  "> <i class="fa fa-square list-summer-iconMt1 " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders2B2")}</p></li>
-                                                            </ol>
-                                                        </p></li>
-                                                    </ol>
-                                                    <ol className="list-group list-groupMt">
-                                                        <li class="list-summery  "> <i class="fa fa-circle-o list-summer-iconMt " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders2C")}</p></li>
-                                                    </ol>
-                                                    <ol className="list-group list-groupMt">
-                                                        <li class="list-summery  "> <i class="fa fa-circle-o list-summer-iconMt " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders2D")}
-                                                            <ol className="list-group list-groupMt">
-                                                                <li class="list-summery  "><img src={conversionFormula} className="formula-img-mr img-fluid" /></li>
-                                                            </ol>
-                                                            <ol className="list-group list-groupMt">
-                                                                <li class="list-summery  "> <i class="fa fa-square list-summer-iconMt1 " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders2D1a")}<b>{i18n.t("static.mt.reminders2D1b")}</b>{i18n.t("static.mt.reminders2D1c")}</p></li>
-                                                            </ol>
-                                                            <ol className="list-group list-groupMt">
-                                                                <li class="list-summery  "> <i class="fa fa-square list-summer-iconMt1 " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders2D2a")}<b>{i18n.t("static.mt.reminders2D2b")}</b>{i18n.t("static.mt.reminders2D2c")}</p></li>
-                                                            </ol>
-                                                            <ol className="list-group list-groupMt">
-                                                                <li class="list-summery  ">
-                                                                    <p><b><u><span className="">{i18n.t("static.common.example") + ": "}</span></u></b>{i18n.t("static.mt.reminders2D3")}<br></br>
-
-                                                                    </p>
-
-                                                                </li>
-                                                            </ol>
-                                                            <ol className="list-group list-groupMt">
-                                                                <li class="list-summery  "><img src={conversionFormulaExample} className="formula-img-mr img-fluid" /></li>
-                                                            </ol>
-
-                                                            <ol className="list-group list-groupMt">
-                                                                <li class="list-summery  ">
-                                                                    <Table id="mytable1" responsive className="table-fixed table-bordered text-center mt-2">
-                                                                        <thead>
-                                                                            <tr>
-                                                                                <th>{i18n.t("static.manualTagging.erpPlanningUnit")}</th>
-                                                                                <th>{i18n.t("static.manualTagging.erpShipmentQty")}</th>
-                                                                                <th>{i18n.t("static.manualTagging.conversionFactor")}</th>
-                                                                                <th>{i18n.t("static.manualTagging.convertedQATShipmentQty")}</th>
-                                                                                <th>{i18n.t("static.supplyPlan.qatProduct")}</th>
-                                                                            </tr>
-                                                                        </thead>
-                                                                        <tbody>
-                                                                            <tr>
-                                                                                <td>{i18n.t("static.mt.reminders2D4a")}</td>
-                                                                                <td>{i18n.t("static.mt.reminders2D4b")}</td>
-                                                                                <td>{i18n.t("static.mt.reminders2D4c")}</td>
-                                                                                <td>{i18n.t("static.mt.reminders2D4d")}</td>
-                                                                                <td>{i18n.t("static.mt.reminders2D4e")}</td>
-                                                                            </tr>
-                                                                        </tbody>
-                                                                    </Table>
-                                                                </li>
-                                                            </ol>
-
-                                                        </p></li>
-                                                    </ol>
-                                                </p>
-                                                </li>
-                                                <li class="list-summery  "> <i class="fa fa-circle list-summer-iconMt " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders3")}
-                                                    <br />    <ol className="list-group list-groupMt">
-                                                        <li class="list-summery  "> <i class="fa fa-circle-o list-summer-iconMt " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders3A")}</p></li>
-                                                    </ol>
-                                                </p></li>
-                                                <li class="list-summery  "> <i class="fa fa-circle list-summer-iconMt " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders4")}
-                                                    <br />    <ol className="list-group list-groupMt">
-                                                        <li class="list-summery  "> <i class="fa fa-circle-o list-summer-iconMt " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders4A")}</p></li>
-                                                    </ol>
-                                                </p></li>
-                                            </ul>
-                                        </ListGroupItemText>
-                                    </ListGroupItem>
-                                </ListGroup>
-                            </ModalBody>
-                        </Modal>
-                        {/* Details modal end */}
-
-                        {/* ARTMIS history modal start */}
-                        <Modal isOpen={this.state.artmisHistoryModal}
-                            className={'modal-lg ' + this.props.className, "modalWidth"}>
-                            {/* <div style={{ display: this.state.loading1 ? "none" : "block" }}> */}
-                            <div>
-                                <ModalHeader className="modalHeaderSupplyPlan hideCross">
-                                    <strong>{i18n.t('static.mt.erpHistoryTitle')}</strong>
-                                    <Button size="md" color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1" onClick={() => this.toggleArtmisHistoryModal()}> <i className="fa fa-times"></i></Button>
-                                </ModalHeader>
-                                <ModalBody>
-                                    <div>
-
-                                        <ToolkitProvider
-                                            keyField="optList"
-                                            data={this.state.artmisHistory.erpOrderList}
-                                            columns={columns1}
-                                            search={{ searchFormatted: true }}
-                                            hover
-                                            filter={filterFactory()}
-                                        >
-                                            {
-                                                props => (
-                                                    <div className="TableCust FortablewidthMannualtaggingtable3 reactTableNotification">
-                                                        {/* <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
-                                                    <SearchBar {...props.searchProps} />
-                                                    <ClearSearchButton {...props.searchProps} />
-                                                </div> */}
-                                                        <BootstrapTable striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
-                                                            // pagination={paginationFactory(options)}
-                                                            rowEvents={{
-                                                            }}
-                                                            {...props.baseProps}
-                                                        />
-                                                    </div>
-                                                )
-                                            }
-                                        </ToolkitProvider>
-                                        <br />
-                                        <span><b>{i18n.t('static.supplyPlan.shipmentsDetails')}</b></span>
-                                        <br />
-                                        <br />
-                                        
                                             <ToolkitProvider
                                                 keyField="optList"
-                                                data={this.state.artmisHistory.erpShipmentList}
+                                                data={this.state.artmisHistory.erpShipmentList != undefined && this.state.artmisHistory.erpShipmentList.sort((a, b) => {
+                                                    var itemLabelA = moment(a.dataReceivedOn); // ignore upper and lowercase
+                                                    var itemLabelB = moment(b.dataReceivedOn);
+                                                    return itemLabelA < itemLabelB ? 1 : -1;
+                                                })}
                                                 columns={columns2}
                                                 search={{ searchFormatted: true }}
                                                 hover
@@ -5421,26 +5501,26 @@ export default class ManualTagging extends Component {
                                                 }
                                             </ToolkitProvider>
 
-                                    </div><br />
-                                </ModalBody>
-                                <ModalFooter>
-                                    <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.toggleArtmisHistoryModal()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                </ModalFooter>
-                            </div>
+                                        </div><br />
+                                    </ModalBody>
+                                    <ModalFooter>
+                                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.toggleArtmisHistoryModal()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                    </ModalFooter>
+                                </div>
 
-                        </Modal>
+                            </Modal>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>
-                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                                    <div class="align-items-center">
-                                        <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
+                            <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                <div class="align-items-center">
+                                    <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
 
-                                        <div class="spinner-border blue ml-4" role="status">
+                                    <div class="spinner-border blue ml-4" role="status">
 
-                                        </div>
                                     </div>
                                 </div>
                             </div>
+                        </div>
                         {/* ARTMIS history modal end */}
                     </CardBody>
                     {this.state.active2 && <CardFooter>
