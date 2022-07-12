@@ -1183,7 +1183,7 @@ export default class BuildTree extends Component {
             puPerVisit = this.round(parseFloat(((parentScenario.fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) * refillMonths) / conversionFactor).toFixed(4));
             console.log("PUPERVISIT puPerVisit---", puPerVisit);
         } else if (parentScenario.fuNode.usageType.id == 1) {
-            console.log("this.state.noOfFUPatient hey---",this.state.noFURequired);
+            console.log("this.state.noOfFUPatient hey---", this.state.noFURequired);
             if (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.sharePlanningUnit == "true" || currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.sharePlanningUnit == true) {
                 puPerVisit = addCommas(this.state.noFURequired / conversionFactor);
             } else {
@@ -1298,7 +1298,7 @@ export default class BuildTree extends Component {
     fetchTracerCategoryList(programData) {
         console.log("programData---%%%%%%%", programData);
         var planningUnitList = programData.planningUnitList.filter(x => x.treeForecast == true && x.active == true);
-        console.log("planningUnitList about to call---",planningUnitList[0].planningUnit.forecastingUnit.id)
+        console.log("planningUnitList about to call---", planningUnitList[0].planningUnit.forecastingUnit.id)
         var updatedPlanningUnitList = [];
         var forecastingUnitList = [];
         var tracerCategoryList = [];
@@ -1330,7 +1330,7 @@ export default class BuildTree extends Component {
         tracerCategoryList = [...new Map(tracerCategoryList.map(v => [v.tracerCategoryId, v])).values()];
         console.log("unique tc list--->", tracerCategoryList);
         var forecastingUnitListNew = JSON.parse(JSON.stringify(forecastingUnitList));
-        console.log("forecasting unit list about to call 1---",forecastingUnitListNew);
+        console.log("forecasting unit list about to call 1---", forecastingUnitListNew);
         let forecastingUnitMultiList = forecastingUnitListNew.length > 0
             && forecastingUnitListNew.map((item, i) => {
                 return ({ value: item.id, label: getLabelText(item.label, this.state.lang) + " | " + item.id })
@@ -5565,7 +5565,7 @@ export default class BuildTree extends Component {
                                 // this.getNoFURequired();
                                 this.qatCalculatedPUPerVisit(1);
                             }, 0);
-                            
+
                         }
                     });
                 }
@@ -5696,14 +5696,15 @@ export default class BuildTree extends Component {
         var repeatUsagePeriodId;
         var oneTimeUsage;
         var repeatCount;
-        console.log("hey nodeTypeId---", nodeTypeId);
+
+        console.log("2023 error---", this.state.currentItemConfig.context);
         if (nodeTypeId == 5) {
             usageTypeId = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.usageType.id;
-            console.log("hey usageTypeId ---", usageTypeId);
+            console.log("usageTypeId 5---", usageTypeId);
             usagePeriodId = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.usagePeriod.usagePeriodId;
-            console.log("hey usagePeriodId---", usagePeriodId);
+            console.log("usagePeriodId 5---", usagePeriodId);
             usageFrequency = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.usageFrequency;
-            console.log("hey usageFrequency---", usageFrequency);
+            console.log("usageFrequency 5---", usageFrequency);
             if (usageTypeId == 1) {
                 oneTimeUsage = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.oneTimeUsage;
                 if (oneTimeUsage != "true" && oneTimeUsage != true) {
@@ -5713,11 +5714,7 @@ export default class BuildTree extends Component {
             }
         } else {
             usageTypeId = (this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.usageType.id;
-            console.log("usageTypeId---", usageTypeId);
-            usagePeriodId = (this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.usagePeriod.usagePeriodId;
-            console.log("usagePeriodId---", usagePeriodId);
-            usageFrequency = (this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.usageFrequency;
-            console.log("usageFrequency---", usageFrequency);
+            console.log("usageTypeId 4---", usageTypeId);
             if (usageTypeId == 1) {
                 oneTimeUsage = (this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.oneTimeUsage;
                 if (oneTimeUsage != "true" && oneTimeUsage != true) {
@@ -5725,6 +5722,13 @@ export default class BuildTree extends Component {
                     repeatUsagePeriodId = this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId][0].fuNode.repeatUsagePeriod.usagePeriodId;
                 }
             }
+            if (usageTypeId == 2 || (oneTimeUsage != null && oneTimeUsage != "" && oneTimeUsage.toString() == "false")) {
+                usagePeriodId = (this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.usagePeriod.usagePeriodId;
+                console.log("usagePeriodId 4---", usagePeriodId);
+            }
+            usageFrequency = (this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.usageFrequency;
+            console.log("usageFrequency 4---", usageFrequency);
+
         }
         console.log("hey usagePeriodId dis---", usagePeriodId);
         var noOfMonthsInUsagePeriod = 0;
@@ -9018,7 +9022,7 @@ export default class BuildTree extends Component {
                                                             id="usagePeriodIdDis"
                                                             name="usagePeriodIdDis"
                                                             bsSize="sm"
-                                                            valid={!errors.usagePeriodIdDis && (this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentScenario.fuNode.usagePeriod.usagePeriodId != "" : false)}
+                                                            valid={!errors.usagePeriodIdDis && (this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentScenario.fuNode.usagePeriod != null && this.state.currentScenario.fuNode.usagePeriod.usagePeriodId != "" : false)}
                                                             invalid={touched.usagePeriodIdDis && !!errors.usagePeriodIdDis}
                                                             onBlur={handleBlur}
                                                             onChange={(e) => {
@@ -9026,7 +9030,7 @@ export default class BuildTree extends Component {
                                                                 this.dataChange(e)
                                                             }}
                                                             required
-                                                            value={this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentScenario.fuNode.usageType.id == 1 && this.state.currentScenario.fuNode.oneTimeUsage != "true" ? this.state.currentScenario.fuNode.usagePeriod.usagePeriodId : ""}
+                                                            value={this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentScenario.fuNode.usageType.id == 1 && this.state.currentScenario.fuNode.oneTimeUsage != "true" ? this.state.currentScenario.fuNode.usagePeriod != null && this.state.currentScenario.fuNode.usagePeriod.usagePeriodId : ""}
                                                         >
                                                             <option value="">{i18n.t('static.common.select')}</option>
                                                             {this.state.usagePeriodList.length > 0
@@ -9119,7 +9123,7 @@ export default class BuildTree extends Component {
                                                         id="usagePeriodIdCon"
                                                         name="usagePeriodIdCon"
                                                         bsSize="sm"
-                                                        valid={!errors.usagePeriodIdCon && (this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentScenario.fuNode.usagePeriod.usagePeriodId != "" : false)}
+                                                        valid={!errors.usagePeriodIdCon && (this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentScenario.fuNode.usagePeriod != null && this.state.currentScenario.fuNode.usagePeriod.usagePeriodId != "" : false)}
                                                         invalid={touched.usagePeriodIdCon && !!errors.usagePeriodIdCon}
                                                         onBlur={handleBlur}
                                                         onChange={(e) => {

@@ -90,7 +90,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                             }
                             programPlanningUnitList = ppList;
                         }
-                        if ((page == 'masterDataSync' || page == 'syncPage' || page=='erpDelink') && planningUnitList.length == 0) {
+                        if ((page == 'masterDataSync' || page == 'syncPage') && planningUnitList.length == 0) {
                             programPlanningUnitList = [];
                         }
                         try {
@@ -515,9 +515,9 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                         if (consumptionList[c].actualFlag.toString() == "true") {
                                             actualConsumptionQty += Math.round(Math.round(consumptionList[c].consumptionRcpuQty) * Number(consumptionList[c].multiplier));
                                             if (consumptionList[c].dayOfStockOut > 0) {
-                                                var daysPerMonth = moment(startDate).daysInMonth();
-                                                var daysOfData = daysPerMonth - consumptionList[c].dayOfStockOut;
-                                                var trueDemandPerDay = (Math.round(consumptionList[c].consumptionRcpuQty) * Number(consumptionList[c].multiplier)) / daysOfData;
+                                                var daysPerMonth = moment(startDate).daysInMonth();//days in month
+                                                var daysOfData = daysPerMonth - consumptionList[c].dayOfStockOut;//days in stock
+                                                var trueDemandPerDay = (Math.round(consumptionList[c].consumptionRcpuQty) * Number(consumptionList[c].multiplier)) / daysOfData;//Demand/day
                                                 trueDemandPerMonth += Math.round(trueDemandPerDay * daysPerMonth);
                                             }
                                             // Adding regions reporting actual consumption

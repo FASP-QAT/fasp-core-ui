@@ -256,5 +256,8 @@ class ProgramService {
         );
     }
 
+    getDatasetVersions(json) {
+        return axios.post(`${API_URL}/api/dataset/versions/`, json, {});
+    }
 }
 export default new ProgramService()
