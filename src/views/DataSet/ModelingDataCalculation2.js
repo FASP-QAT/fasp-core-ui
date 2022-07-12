@@ -569,7 +569,9 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                         var parent = (flatList[fl].parent);
                                         var parentFiltered = (flatListUnsorted.filter(c => c.id == parent))[0];
                                         var parentNodeNodeData = (parentFiltered.payload.nodeDataMap[scenarioList[ndm].id])[0];
-                                        if (parentNodeNodeData.fuNode.usageType.id == 2 && nodeDataMapForScenario.puNode.refillMonths > 1) {
+                                        if (parentNodeNodeData.fuNode.usageType.id == 2
+                                            //  && nodeDataMapForScenario.puNode.refillMonths > 1
+                                        ) {
                                             var daysPerMonth = 365 / 12;
 
                                             var grandParent = parentFiltered.parent;
@@ -578,7 +580,17 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                             var grandParentNodeData = (grandParentFiltered.payload.nodeDataMap[scenarioList[ndm].id])[0];
                                             console.log("grandParentNodeData$$$%%%", grandParentNodeData)
                                             if (grandParentNodeData != undefined) {
-                                                patients = grandParentNodeData.calculatedDataValue != null ? grandParentNodeData.calculatedDataValue : grandParentNodeData.dataValue;
+                                                var grandParentPrevMonthMMDValue = grandParentNodeData.nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") == moment(nodeDataMapForScenario.month).subtract(1, 'months').format("YYYY-MM"));
+                                                if (grandParentPrevMonthMMDValue.length > 0) {
+                                                    patients = grandParentPrevMonthMMDValue[0].calculatedValue;
+                                                } else {
+                                                    var grandParentCurMonthMMDValue = grandParentNodeData.nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") == moment(nodeDataMapForScenario.month).format("YYYY-MM"));
+                                                    if (grandParentCurMonthMMDValue.length > 0) {
+                                                        patients = grandParentCurMonthMMDValue[0].calculatedValue;
+                                                    } else {
+                                                        patients = 0;
+                                                    }
+                                                }
                                             } else {
                                                 patients = 0;
                                             }
