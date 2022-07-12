@@ -696,7 +696,7 @@ export default class ManualTagging extends Component {
                                 }
                             }
                         }
-                    }else{
+                    } else {
                         this.state.instance.setValueFromCoords(12, y, "", true);
                         for (var j = 0; j < json.length; j++) {
                             if (json[j][16] == this.state.instance.getValueFromCoords(16, y, true)) {
@@ -2320,12 +2320,12 @@ export default class ManualTagging extends Component {
             var json = {
                 programId: programId,
                 versionId: versionId,
-                shipmentPlanningUnitId: shipmentPlanningUnitId,
+                shipmentPlanningUnitId: this.state.active3 ? this.state.outputListAfterSearch[0].erpPlanningUnit.id : shipmentPlanningUnitId,
                 roNo: roNoOrderNo == 0 ? "" : roNoOrderNo,
                 filterPlanningUnitId: erpPlanningUnitId,
 
             }
-            console.log("JsonMohit@@@@@@@@@@@@@@@@@@@", this.state.roPrimeLineNoForTab3)
+            console.log("JsonMohit tab 3@@@@@@@@@@@@@@@@@@@", json)
             ManualTaggingService.getOrderDetails(json)
                 .then(response => {
                     console.log("response.data------", response.data)
@@ -2568,9 +2568,9 @@ export default class ManualTagging extends Component {
                     var outputList = response.data;
                     console.log("output list@@@@@@@@@@@@@@@", outputList)
                     var filterOnLinkedData = outputList.filter(c => !linkedRoNoAndRoPrimeLineNo.includes(c.roNo + "|" + c.roPrimeLineNo));
-                    let resultTrue = Object.values(filterOnLinkedData.reduce((a, { roNo, roPrimeLineNo, knShipmentNo, erpQty, orderNo, primeLineNo, erpShipmentStatus, expectedDeliveryDate, batchNo, expiryDate, erpPlanningUnit, price, shippingCost, shipBy, qatEquivalentShipmentStatus, parentShipmentId, childShipmentId, notes, qatPlanningUnit }) => {
+                    let resultTrue = Object.values(filterOnLinkedData.reduce((a, { roNo, roPrimeLineNo, knShipmentNo, erpQty, orderNo, primeLineNo, erpShipmentStatus, expectedDeliveryDate, batchNo, expiryDate, erpPlanningUnit, price, shippingCost, shipBy, qatEquivalentShipmentStatus, parentShipmentId, childShipmentId, notes, qatPlanningUnit, tracerCategoryId }) => {
                         if (!a[roNo + "|" + roPrimeLineNo + "|" + orderNo + "|" + primeLineNo + "|" + knShipmentNo])
-                            a[roNo + "|" + roPrimeLineNo + "|" + orderNo + "|" + primeLineNo + "|" + knShipmentNo] = Object.assign({}, { roNo, roPrimeLineNo, knShipmentNo, erpQty, orderNo, primeLineNo, erpShipmentStatus, expectedDeliveryDate, batchNo, expiryDate, erpPlanningUnit, price, shippingCost, shipBy, qatEquivalentShipmentStatus, parentShipmentId, childShipmentId, notes, qatPlanningUnit });
+                            a[roNo + "|" + roPrimeLineNo + "|" + orderNo + "|" + primeLineNo + "|" + knShipmentNo] = Object.assign({}, { roNo, roPrimeLineNo, knShipmentNo, erpQty, orderNo, primeLineNo, erpShipmentStatus, expectedDeliveryDate, batchNo, expiryDate, erpPlanningUnit, price, shippingCost, shipBy, qatEquivalentShipmentStatus, parentShipmentId, childShipmentId, notes, qatPlanningUnit, tracerCategoryId });
                         else
                             a[roNo + "|" + roPrimeLineNo + "|" + orderNo + "|" + primeLineNo + "|" + knShipmentNo].erpQty += erpQty;
                         return a;
@@ -2886,7 +2886,8 @@ export default class ManualTagging extends Component {
     }
     getPlanningUnitListByTracerCategory = (term) => {
         this.setState({ planningUnitName: term });
-        ManualTaggingService.autocompletePlanningUnit(this.state.planningUnitId, term.toUpperCase())
+        var programId = this.state.active1 ? this.state.programId : this.state.programId1.split("_")[0];
+        ManualTaggingService.autocompletePlanningUnit(this.state.planningUnitId, term.toUpperCase(), programId)
             .then(response => {
                 console.log("Response@@@@@@@@@@@@@@@@@@", response)
                 var tracercategoryPlanningUnit = [];
@@ -3458,6 +3459,7 @@ export default class ManualTagging extends Component {
             }
             else {
                 // data[0] = manualTaggingList[j].erpOrderId
+                console.log("manualTaggingList[j]@@@@@@@@@@@@", manualTaggingList[j])
                 data[0] = (manualTaggingList[j].roNo + " - " + manualTaggingList[j].roPrimeLineNo) + " | " + (manualTaggingList[j].orderNo + " - " + manualTaggingList[j].primeLineNo) + (manualTaggingList[j].knShipmentNo != "" && manualTaggingList[j].knShipmentNo != null ? " | " + manualTaggingList[j].knShipmentNo : "");
                 data[1] = manualTaggingList[j].orderNo + " - " + manualTaggingList[j].primeLineNo
                 data[2] = manualTaggingList[j].knShipmentNo;
@@ -3466,6 +3468,7 @@ export default class ManualTagging extends Component {
                 data[5] = manualTaggingList[j].erpShipmentStatus
                 data[6] = manualTaggingList[j].erpQty
                 data[7] = j;
+                data[8] = manualTaggingList[j].tracerCategoryId;
 
             }
             manualTaggingArray[count] = data;
@@ -3883,6 +3886,10 @@ export default class ManualTagging extends Component {
                     },
                     {
                         title: "Index",
+                        type: 'hidden',
+                    },
+                    {
+                        title: "TCId",
                         type: 'hidden',
                     },
                 ],
@@ -5173,6 +5180,7 @@ export default class ManualTagging extends Component {
                                                                     options={this.state.tracercategoryPlanningUnit}
                                                                     getOptionLabel={(option) => option.label}
                                                                     style={{ width: 450 }}
+                                                                    disabled={this.state.active3 ? true : false}
                                                                     onChange={(event, value) => {
                                                                         // console.log("demo2 value---", value);
                                                                         if (value != null) {
@@ -5211,6 +5219,7 @@ export default class ManualTagging extends Component {
                                                                     defaultValue={this.state.roNoOrderNo}
                                                                     options={this.state.autocompleteData}
                                                                     getOptionLabel={(option) => option.label}
+                                                                    disabled={this.state.active3 ? true : false}
                                                                     style={{ width: 450 }}
                                                                     onChange={(event, value) => {
                                                                         // console.log("combo 2 ro combo box---", value)

@@ -76,11 +76,13 @@ class ManualTaggingSerice {
         });
     }
 
-    autocompletePlanningUnit(planningUnitId, term) {
+    autocompletePlanningUnit(planningUnitId, term,programId) {
         var json={
             planningUnitId:planningUnitId,
-            puName:term
+            puName:term,
+            programId:programId
         }
+        console.log("Planning Unit @@@@@@@@@@@@@@@@",json)
         return axios.post(`${API_URL}/api/erpLinking/autoCompletePu`, json,{
         });
     }
