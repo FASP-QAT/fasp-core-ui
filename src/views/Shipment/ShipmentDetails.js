@@ -810,7 +810,7 @@ export default class ShipmentDetails extends React.Component {
                                 supplyPlan: []
                             }
                         }
-
+                        
                         var generalProgramDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
                         var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
                         var generalProgramJson = JSON.parse(generalProgramData);
@@ -827,6 +827,7 @@ export default class ShipmentDetails extends React.Component {
                             shipmentList = shipmentList.filter(c => c.erpFlag.toString() == "true");
                         }
                         shipmentList = shipmentList.filter(c => c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? moment(c.receivedDate).format("YYYY-MM-DD") >= moment(startDate).format("YYYY-MM-DD") && moment(c.receivedDate).format("YYYY-MM-DD") <= moment(stopDate).format("YYYY-MM-DD") : moment(c.expectedDeliveryDate).format("YYYY-MM-DD") >= moment(startDate).format("YYYY-MM-DD") && moment(c.expectedDeliveryDate).format("YYYY-MM-DD") <= moment(stopDate).format("YYYY-MM-DD"))
+                        console.log("ShipmentList@@@@@@@@@@@@@@",shipmentList)
                         this.setState({
                             shelfLife: programPlanningUnit.shelfLife,
                             catalogPrice: programPlanningUnit.catalogPrice,
@@ -1056,7 +1057,7 @@ export default class ShipmentDetails extends React.Component {
                                         </div>
                                     </Form>
                                 )} />
-                        {(this.state.programQPLDetails.filter(c => c.id == this.state.programId)).length > 0 && (this.state.programQPLDetails.filter(c => c.id == this.state.programId))[0].readonly == 1 && <h5 style={{ color: 'red' }}>{(this.state.programQPLDetails.filter(c => c.id == this.state.programId))[0].doNotFollowLatestShipmentInfo == 1 ? i18n.t('static.dataEntry.doNotFollowLatestShipment') : i18n.t('static.dataentry.readonly')}</h5>}
+                        {(this.state.programQPLDetails.filter(c => c.id == this.state.programId)).length > 0 && (this.state.programQPLDetails.filter(c => c.id == this.state.programId))[0].readonly == 1 && <h5 style={{ color: 'red' }}>{i18n.t('static.dataentry.readonly')}</h5>}
                         <div className="col-md-10 pb-3">
                             <ul className="legendcommitversion">
                                 <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyOrder')}</span></li>

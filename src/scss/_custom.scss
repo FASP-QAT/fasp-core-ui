@@ -6404,19 +6404,7 @@ top: calc(20em + 3px);
   border-radius: 5px;
 }
 
-.dataEnteredTable .jexcel>thead>tr>td:nth-child(2) {
-  border: none!important;
-}
-.dataEnteredTable .jexcel>thead>tr>td:nth-child(3) {
-  border: none!important;
-}
-.dataEnteredTable .jexcel>thead>tr>td:nth-child(4) {
-  border: none!important;
-}
-.SupplierLeadTable .jexcel > thead {
-  position: sticky;
-  top: 0;
-}
+
   .jexcel > thead.resizable > tr > .arrow-up:not(.AsteriskTheadtrTd)::after {
     content: ""!important;
   }
@@ -6436,6 +6424,86 @@ top: calc(20em + 3px);
     transform: translate3d(0, 14.4rem, 0);
 }
 }
+
+.dataEnteredTable .jexcel>thead>tr>td:nth-child(2) {
+  border: none!important;
+}
+.dataEnteredTable .jexcel>thead>tr>td:nth-child(3) {
+  border: none!important;
+}
+.dataEnteredTable .jexcel>thead>tr>td:nth-child(4) {
+  border: none!important;
+}
+.SupplierLeadTable .jexcel > thead {
+  position: sticky;
+  top: 0;
+}
+
 .ModTransferMonthPickerWidth{
   width: 467px;
+}
+
+.jexcel > tbody > tr > td.readonly.commitShipmentAlreadyLinkedToOtherPro {
+  background-color: yellow !important;
+  color: #BA0C2F!important;
+  font-weight: bold!important;
+}
+
+.jexcel > tbody > tr > td.commitShipmentAlreadyLinkedToOtherPro {
+  background-color: yellow !important;
+  color: red!important;
+  font-weight: bold!important;
+}
+
+.jexcel > tbody > tr > td.readonly.commitConflict {
+  background-color: yellow !important;
+}
+
+.jexcel > tbody > tr > td.commitConflict {
+  background-color: yellow !important;
+}
+
+.jexcel > tbody > tr > td.readonly.commitLocal {
+  background-color: #86cd99 !important;
+}
+
+.jexcel > tbody > tr > td.commitLocal {
+  background-color: #86cd99 !important;
+}
+
+.jexcel > tbody > tr > td.readonly.commitServer {
+  background-color: #e5edf5 !important;
+}
+
+.jexcel > tbody > tr > td.commitServer {
+  background-color: #e5edf5 !important;
+}
+
+.jexcel > tbody > tr > td.readonly.commitNoChange {
+  background-color: transparent !important;
+}
+
+.jexcel > tbody > tr > td.commitNoChange {
+  background-color: transparent !important;
+}
+
+.rightClickColors .jcontextmenu > div:nth-of-type(2){
+  background-color: #86cd99;
+}
+
+.rightClickColors .jcontextmenu > div:nth-of-type(3){
+  background-color: #e5edf5;
+}
+
+.RemoveStriped .jexcel_content .jexcel .draggable .jexcel_nested td:nth-child(4) {
+  background-color: #86cd99 !important;
+
+}
+.RemoveStriped .jexcel_content .jexcel .draggable .jexcel_nested td:nth-child(5) {
+  background-color: #e5edf5 !important;
+
+}
+
+.ERPLinkTable .jexcel{
+  width: unset!important;
 }
