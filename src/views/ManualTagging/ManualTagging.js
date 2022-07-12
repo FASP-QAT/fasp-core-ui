@@ -107,7 +107,7 @@ export default class ManualTagging extends Component {
             versionId: -1,
             changedDataForTab2: false,
             roPrimeLineNoForTab3: "",
-            planningUnitsBasedOnTracerCategory:[]
+            planningUnitsBasedOnTracerCategory: []
 
         }
 
@@ -170,8 +170,15 @@ export default class ManualTagging extends Component {
                 this.getPlanningUnitList()
             } else {
                 this.setState({
+                    outputList: [],
                     planningUnits: [],
                     loading: false
+                }, () => {
+                    try {
+                        this.state.languageEl.destroy();
+                    } catch (e) {
+
+                    }
                 })
             }
         })
@@ -429,16 +436,16 @@ export default class ManualTagging extends Component {
         if (programId1 != "") {
             var shipmentList = [];
             var localProgramList = this.state.localProgramList;
-            var setOfPlanningUnitsBasedOnTracerCategory=[...new Set(this.state.planningUnitsBasedOnTracerCategory.map(ele => ele.planningUnit.id))]
+            var setOfPlanningUnitsBasedOnTracerCategory = [...new Set(this.state.planningUnitsBasedOnTracerCategory.map(ele => ele.planningUnit.id))]
             var localProgramListFilter = localProgramList.filter(c => c.id == programId1);
             var planningUnitDataList = localProgramListFilter[0].programData.planningUnitDataList;
             for (var pu = 0; pu < planningUnitDataList.length; pu++) {
-                if(setOfPlanningUnitsBasedOnTracerCategory.includes(planningUnitDataList[pu].planningUnitId)){
-                var planningUnitData = planningUnitDataList[pu];
-                var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
-                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                var planningUnitDataJson = JSON.parse(programData);
-                shipmentList = shipmentList.concat(planningUnitDataJson.shipmentList);
+                if (setOfPlanningUnitsBasedOnTracerCategory.includes(planningUnitDataList[pu].planningUnitId)) {
+                    var planningUnitData = planningUnitDataList[pu];
+                    var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                    var planningUnitDataJson = JSON.parse(programData);
+                    shipmentList = shipmentList.concat(planningUnitDataJson.shipmentList);
                 }
             }
             shipmentList = shipmentList.filter(c => c.erpFlag.toString() == "false" && c.active.toString() == "true" && c.accountFlag.toString() == "true" && c.procurementAgent.id == PSM_PROCUREMENT_AGENT_ID && SHIPMENT_ID_ARR_MANUAL_TAGGING.includes(c.shipmentStatus.id.toString()));
@@ -449,7 +456,7 @@ export default class ManualTagging extends Component {
                 var itemLabelB = b.shipmentId;
                 return itemLabelA > itemLabelB ? 1 : -1;
             });
-            console.log("ListArray.lengthMohit@@@@@@@@@@@",listArray.length)
+            console.log("ListArray.lengthMohit@@@@@@@@@@@", listArray.length)
             this.setState({
                 notLinkedShipments: listArray
             });
@@ -1394,14 +1401,23 @@ export default class ManualTagging extends Component {
 
 
     programChangeModal(event) {
+        var programId1 = event.target.value;
         this.setState({
             programId1: event.target.value,
             planningUnits: []
         }, () => {
-            this.getOrderDetails();
-            this.getNotLinkedShipments();
-            this.getPlanningUnitListBasedOnTracerCategory();
-            this.getBudgetListByProgramId();
+            if (programId1 != -1) {
+                this.getOrderDetails();
+                this.getNotLinkedShipments();
+                this.getPlanningUnitListBasedOnTracerCategory();
+                this.getBudgetListByProgramId();
+            }else{
+                this.setState({
+                    planningUnits:[],
+                    planningUnitsBasedOnTracerCategory:[],
+                    notLinkedShipments:[]
+                })
+            }
         })
     }
 
@@ -3173,7 +3189,7 @@ export default class ManualTagging extends Component {
 
                     // } else {
                     console.log("order no ---", erpDataList[j].orderNo + " active---", erpDataList[j].active)
-                    data[0] = this.state.active3?true:false;//A
+                    data[0] = this.state.active3 ? true : false;//A
                     data[1] = erpDataList[j].roNo + ' - ' + erpDataList[j].roPrimeLineNo + ' | ' + erpDataList[j].orderNo + ' - ' + erpDataList[j].primeLineNo + (erpDataList[j].knShipmentNo != '' && erpDataList[j].knShipmentNo != null ? ' | ' + erpDataList[j].knShipmentNo : "");//B
                     data[2] = erpDataList[j].orderNo + ' | ' + erpDataList[j].primeLineNo;//C
                     data[3] = getLabelText(erpDataList[j].erpPlanningUnit.label);//D
@@ -4111,18 +4127,18 @@ export default class ManualTagging extends Component {
         }.bind(this)
     }
 
-    getPlanningUnitListBasedOnTracerCategory(){
+    getPlanningUnitListBasedOnTracerCategory() {
         var programId = (this.state.active3 ? this.state.programId1.toString().split("_")[0] : this.state.programId);
         var versionId = this.state.versionId.toString();
         console.log("Condition@@@@@@@@@@@@@", programId != -1 && programId != null && programId != "" && (this.state.active3 || ((this.state.active1 || this.state.active2) && versionId != "-1")));
         if (programId != -1 && programId != null && programId != "" && (this.state.active3 || ((this.state.active1 || this.state.active2) && versionId != "-1"))) {
             // if (!versionId.includes("Local")) {
-                console.log("programId@@@@@@@@@@@@@Mohit",programId)
-                console.log("[this.state.outputListAfterSearch[0].tracerCategoryId]@@@@@@@@@@@@@Mohit",[this.state.outputListAfterSearch[0].tracerCategoryId])
-            ProgramService.getPlanningUnitByProgramTracerCategory(programId,[this.state.outputListAfterSearch[0].tracerCategoryId])
+            console.log("programId@@@@@@@@@@@@@Mohit", programId)
+            console.log("[this.state.outputListAfterSearch[0].tracerCategoryId]@@@@@@@@@@@@@Mohit", [this.state.outputListAfterSearch[0].tracerCategoryId])
+            ProgramService.getPlanningUnitByProgramTracerCategory(programId, [this.state.outputListAfterSearch[0].tracerCategoryId])
                 .then(response => {
                     if (response.status == 200) {
-                        console.log("Response.data@@@@@@@@@@@@@Mohit",response.data)
+                        console.log("Response.data@@@@@@@@@@@@@Mohit", response.data)
                         var listArray = response.data;
                         listArray.sort((a, b) => {
                             var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
