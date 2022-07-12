@@ -1,6 +1,6 @@
 import React from "react";
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import i18n from '../../i18n';
 import getLabelText from '../../CommonComponent/getLabelText';
@@ -45,27 +45,27 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
                 var adjustmentType = this.props.items.inventoryType;
-                (instance.jexcel).setValueFromCoords(8, data[i].y, `=ROUND(F${parseInt(data[i].y) + 1}*H${parseInt(data[i].y) + 1},0)`, true);
-                (instance.jexcel).setValueFromCoords(9, data[i].y, `=ROUND(G${parseInt(data[i].y) + 1}*H${parseInt(data[i].y) + 1},0)`, true);
-                (instance.jexcel).setValueFromCoords(4, data[i].y, adjustmentType, true);
-                var index = (instance.jexcel).getValue(`O${parseInt(data[i].y) + 1}`, true);
+                (instance).setValueFromCoords(8, data[i].y, `=ROUND(F${parseInt(data[i].y) + 1}*H${parseInt(data[i].y) + 1},0)`, true);
+                (instance).setValueFromCoords(9, data[i].y, `=ROUND(G${parseInt(data[i].y) + 1}*H${parseInt(data[i].y) + 1},0)`, true);
+                (instance).setValueFromCoords(4, data[i].y, adjustmentType, true);
+                var index = (instance).getValue(`O${parseInt(data[i].y) + 1}`, true);
                 if (index === "" || index == null || index == undefined) {
-                    (instance.jexcel).setValueFromCoords(12, data[i].y, "", true);
-                    (instance.jexcel).setValueFromCoords(13, data[i].y, "", true);
-                    (instance.jexcel).setValueFromCoords(14, data[i].y, -1, true);
-                    (instance.jexcel).setValueFromCoords(15, data[i].y, 1, true);
-                    (instance.jexcel).setValueFromCoords(16, data[i].y, 0, true);
+                    (instance).setValueFromCoords(12, data[i].y, "", true);
+                    (instance).setValueFromCoords(13, data[i].y, "", true);
+                    (instance).setValueFromCoords(14, data[i].y, -1, true);
+                    (instance).setValueFromCoords(15, data[i].y, 1, true);
+                    (instance).setValueFromCoords(16, data[i].y, 0, true);
                     z = data[i].y;
                 }
             }
             if (data[i].x == 0 && data[i].value != "") {
-                (instance.jexcel).setValueFromCoords(0, data[i].y, moment(data[i].value).format("YYYY-MM-DD"), true);
+                (instance).setValueFromCoords(0, data[i].y, moment(data[i].value).format("YYYY-MM-DD"), true);
             }
         }
     }
 
     oneditionend = function (instance, cell, x, y, value) {
-        var elInstance = instance.jexcel;
+        var elInstance = instance;
         var rowData = elInstance.getRowData(y);
 
         if (x == 5 && !isNaN(rowData[5]) && rowData[5].toString().indexOf('.') != -1) {
@@ -86,13 +86,13 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
-                var index = (instance.jexcel).getValue(`F${parseInt(data[i].y) + 1}`, true);
+                var index = (instance).getValue(`F${parseInt(data[i].y) + 1}`, true);
                 if (index === "" || index == null || index == undefined) {
-                    var rowData = (instance.jexcel).getRowData(0);
-                    (instance.jexcel).setValueFromCoords(2, data[i].y, rowData[2], true);
-                    (instance.jexcel).setValueFromCoords(5, data[i].y, 0, true);
-                    (instance.jexcel).setValueFromCoords(6, data[i].y, rowData[6], true);
-                    (instance.jexcel).setValueFromCoords(7, data[i].y, rowData[7], true);
+                    var rowData = (instance).getRowData(0);
+                    (instance).setValueFromCoords(2, data[i].y, rowData[2], true);
+                    (instance).setValueFromCoords(5, data[i].y, 0, true);
+                    (instance).setValueFromCoords(6, data[i].y, rowData[6], true);
+                    (instance).setValueFromCoords(7, data[i].y, rowData[7], true);
                     z = data[i].y;
                 }
             }
@@ -103,7 +103,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         var checkBoxValue = document.getElementById("showErrors");
         var elInstance = this.state.inventoryEl;
         var json = elInstance.getJson(null, false);
-        var showOption = (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+        var showOption = (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
         if (json.length < showOption) {
             showOption = json.length;
         }
@@ -184,7 +184,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     var dataSourceResult = [];
                     dataSourceResult = dataSourceRequest.result;
                     for (var k = 0; k < dataSourceResult.length; k++) {
-                        if (dataSourceResult[k].program==null || dataSourceResult[k].program.id == generalProgramJson.programId || dataSourceResult[k].program.id == 0) {
+                        if (dataSourceResult[k].program == null || dataSourceResult[k].program.id == generalProgramJson.programId || dataSourceResult[k].program.id == 0) {
                             if (dataSourceResult[k].realm.id == generalProgramJson.realmCountry.realm.realmId && dataSourceResult[k].dataSourceType.id == INVENTORY_DATA_SOURCE_TYPE) {
                                 var dataSourceJson = {
                                     name: getLabelText(dataSourceResult[k].label, this.props.items.lang),
@@ -197,10 +197,12 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         }
                     }
                     if (this.state.inventoryEl != "" && this.state.inventoryEl != undefined) {
-                        this.state.inventoryEl.destroy();
+                        // this.state.inventoryEl.destroy();
+                        jexcel.destroy(document.getElementById("adjustmentsTable"), true);
                     }
                     if (this.state.inventoryBatchInfoTableEl != "" && this.state.inventoryBatchInfoTableEl != undefined) {
-                        this.state.inventoryBatchInfoTableEl.destroy();
+                        // this.state.inventoryBatchInfoTableEl.destroy();
+                        jexcel.destroy(document.getElementById("inventoryBatchInfoTable"), true);
                     }
                     if (this.props.useLocalData == 0) {
                         dataSourceList = this.props.items.dataSourceList;
@@ -328,13 +330,13 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         data: inventoryDataArr,
                         columnDrag: true,
                         columns: [
-                            { title: i18n.t('static.inventory.inventoryDate'), type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker',validRange: [moment(MIN_DATE_RESTRICTION_IN_DATA_ENTRY).startOf('month').format("YYYY-MM-DD"), moment(Date.now()).add(MAX_DATE_RESTRICTION_IN_DATA_ENTRY,'years').endOf('month').format("YYYY-MM-DD")] }, width: 80, readOnly: readonlyRegionAndMonth },
+                            { title: i18n.t('static.inventory.inventoryDate'), type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker', validRange: [moment(MIN_DATE_RESTRICTION_IN_DATA_ENTRY).startOf('month').format("YYYY-MM-DD"), moment(Date.now()).add(MAX_DATE_RESTRICTION_IN_DATA_ENTRY, 'years').endOf('month').format("YYYY-MM-DD")] }, width: 80, readOnly: readonlyRegionAndMonth },
                             { title: i18n.t('static.region.region'), type: 'dropdown', readOnly: readonlyRegionAndMonth, source: this.props.items.regionList, width: 100 },
                             { title: i18n.t('static.inventory.dataSource'), type: 'dropdown', source: dataSourceList, width: 180, filter: this.filterDataSource },
                             { title: i18n.t('static.supplyPlan.alternatePlanningUnit'), type: 'dropdown', source: realmCountryPlanningUnitList, filter: this.filterRealmCountryPlanningUnit, width: 180 },
                             { title: i18n.t('static.supplyPlan.inventoryType'), type: 'dropdown', source: [{ id: 1, name: i18n.t('static.inventory.inventory') }, { id: 2, name: i18n.t('static.inventoryType.adjustment') }], readOnly: true, width: 100 },
                             { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: adjustmentColumnType, mask: '[-]#,##', textEditor: true, disabledMaskOnEdition: true, width: 120 },
-                            { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: actualColumnType, mask: '#,##.00', textEditor: true, disabledMaskOnEdition: true, decimal: '.', width: 120 },
+                            { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: actualColumnType, mask: '#,##', textEditor: true, disabledMaskOnEdition: true, decimal: '.', width: 120 },
                             { title: i18n.t('static.unit.multiplierFromARUTOPU'), type: 'numeric', mask: '#,##0.000000', decimal: '.', width: 90, readOnly: true },
                             { title: i18n.t('static.supplyPlan.quantityQATProduct'), type: adjustmentColumnType, mask: '[-]#,##.00', decimal: '.', width: 120, readOnly: true },
                             { title: i18n.t('static.supplyPlan.quantityQATProduct'), type: actualColumnType, mask: '#,##.00', decimal: '.', width: 120, readOnly: true },
@@ -350,7 +352,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         paginationOptions: paginationArray,
                         search: searchOption,
                         columnSorting: true,
-                        tableOverflow: true,
+                        // tableOverflow: true,
                         wordWrap: true,
                         allowInsertColumn: false,
                         allowManualInsertColumn: false,
@@ -364,12 +366,12 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         onpaste: this.onPaste,
                         oneditionend: this.oneditionend,
                         onchangepage: this.onchangepage,
-                        text: {
-                            // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                            showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                            show: '',
-                            entries: '',
-                        },
+                        // text: {
+                        //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                        //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                        //     show: '',
+                        //     entries: '',
+                        // },
                         onload: this.loadedInventory,
                         editable: inventoryEditable,
                         onchange: this.inventoryChanged,
@@ -377,10 +379,10 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
 
                         }.bind(this),
                         onsearch: function (el) {
-                            el.jexcel.updateTable();
+                            // el.jexcel.updateTable();
                         },
                         onfilter: function (el) {
-                            el.jexcel.updateTable();
+                            // el.jexcel.updateTable();
                         },
                         contextMenu: function (obj, x, y, e) {
                             var items = [];
@@ -473,7 +475,8 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             batchInfoList: batchList
         })
         if (this.state.inventoryBatchInfoTableEl != "" && this.state.inventoryBatchInfoTableEl != undefined) {
-            this.state.inventoryBatchInfoTableEl.destroy();
+            // this.state.inventoryBatchInfoTableEl.destroy();
+            jexcel.destroy(document.getElementById("inventoryBatchInfoTable"), true);
         }
         var json = [];
         var inventoryQty = 0;
@@ -578,7 +581,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             pagination: false,
             search: false,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
@@ -592,11 +595,11 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             copyCompatibility: true,
             parseFormulas: true,
             editable: inventoryBatchEditable,
-            text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
             onload: this.loadedBatchInfoInventory,
             license: JEXCEL_PRO_KEY,
             updateTable: function (el, cell, x, y, source, value, id) {
@@ -703,7 +706,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         data[16] = 0;
         obj.insertRow(data);
         if (this.props.inventoryPage == "inventoryDataEntry") {
-            var showOption = (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+            var showOption = (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
             if (showOption != 5000000) {
                 var pageNo = parseInt(parseInt(json.length - 1) / parseInt(showOption));
                 obj.page(pageNo);
@@ -753,7 +756,8 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         } else {
             jExcelLoadedFunction(instance);
         }
-        var asterisk = document.getElementsByClassName("resizable")[0];
+        // var asterisk = document.getElementsByClassName("resizable")[0];
+        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
         tr.children[1].classList.add('AsteriskTheadtrTd');
         tr.children[2].classList.add('AsteriskTheadtrTd');
@@ -765,12 +769,12 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             tr.children[11].classList.add('AsteriskTheadtrTd');
         }
         // (instance.jexcel).orderBy(0, 0);
-        var elInstance = instance.jexcel;
+        var elInstance = instance.worksheets[0];
         var json = elInstance.getJson(null, false);
         var jsonLength;
         if (this.props.inventoryPage == "inventoryDataEntry") {
-            if ((document.getElementsByClassName("jexcel_pagination_dropdown")[0] != undefined)) {
-                jsonLength = 1 * (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+            if ((document.getElementsByClassName("jss_pagination_dropdown")[0] != undefined)) {
+                jsonLength = 1 * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
             }
         } else {
             jsonLength = json.length;
@@ -819,17 +823,17 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
     }
 
     onchangepage(el, pageNo, oldPageNo) {
-        var elInstance = el.jexcel;
+        var elInstance = el;
         var json = elInstance.getJson(null, false);
         var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q']
-        var jsonLength = (pageNo + 1) * (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+        var jsonLength = (pageNo + 1) * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
         if (jsonLength == undefined) {
             jsonLength = 15
         }
         if (json.length < jsonLength) {
             jsonLength = json.length;
         }
-        var start = pageNo * (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+        var start = pageNo * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
         for (var i = start; i < jsonLength; i++) {
             var rowData = elInstance.getRowData(i);
             var lastEditableDate = moment(Date.now()).subtract(INVENTORY_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
@@ -1048,8 +1052,10 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
 
     filterBatchInfoForExistingDataForInventory = function (instance, cell, c, r, source) {
         var mylist = [];
-        var json = instance.jexcel.getJson(null, false);
-        var value = (json[r])[5];
+        // var json = instance.jexcel.getJson(null, false);
+        // var value = (json[r])[5];
+        var value = (this.state.inventoryBatchInfoTableEl.getJson(null, false)[r])[5];
+
         var date = json[0][7];
         // if (value != 0) {
         //     mylist = this.state.batchInfoList.filter(c => c.id != -1 && (moment(c.expiryDate).format("YYYY-MM-DD") > moment(date).format("YYYY-MM-DD") && moment(c.createdDate).format("YYYY-MM-DD") <= moment(date).format("YYYY-MM-DD")));
@@ -1062,7 +1068,8 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
 
     loadedBatchInfoInventory = function (instance, cell, x, y, value) {
         jExcelLoadedFunctionOnlyHideRow(instance);
-        var asterisk = document.getElementsByClassName("resizable")[1];
+        // var asterisk = document.getElementsByClassName("resizable")[1];
+        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
         tr.children[1].classList.add('AsteriskTheadtrTd');
         tr.children[4].classList.add('AsteriskTheadtrTd');
@@ -1382,6 +1389,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     this.props.toggleLarge("submit");
                 }
                 elInstance.destroy();
+                jexcel.destroy(document.getElementById("tableDiv"), true);
             }
             this.props.updateState("loading", false);
 
@@ -1826,5 +1834,12 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         }
     }
 
-    render() { return (<div></div>) }
+    render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
+        return (<div></div>)
+    }
 }

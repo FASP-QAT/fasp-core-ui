@@ -8,8 +8,8 @@ import {
 import { FastField, Formik } from 'formik';
 import * as Yup from 'yup'
 import i18n from '../../i18n'
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js';
 import getLabelText from '../../CommonComponent/getLabelText';
@@ -108,7 +108,8 @@ class EquivalancyUnit extends Component {
     loaded1 = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance, 1);
         jExcelLoadedFunctionOnlyHideRow(instance);
-        var asterisk = document.getElementsByClassName("resizable")[0];
+        // var asterisk = document.getElementsByClassName("resizable")[0];
+        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
         // tr.children[1].classList.add('AsteriskTheadtrTd');
         tr.children[2].classList.add('AsteriskTheadtrTd');
@@ -129,11 +130,11 @@ class EquivalancyUnit extends Component {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
-                var index = (instance.jexcel).getValue(`G${parseInt(data[i].y) + 1}`, true);
+                var index = (instance.worksheets[0]).getValue(`G${parseInt(data[i].y) + 1}`, true);
                 if (index === "" || index == null || index == undefined) {
-                    (instance.jexcel).setValueFromCoords(0, data[i].y, 0, true);
-                    (instance.jexcel).setValueFromCoords(8, data[i].y, 1, true);
-                    (instance.jexcel).setValueFromCoords(9, data[i].y, 1, true);
+                    (instance.worksheets[0]).setValueFromCoords(0, data[i].y, 0, true);
+                    (instance.worksheets[0]).setValueFromCoords(8, data[i].y, 1, true);
+                    (instance.worksheets[0]).setValueFromCoords(9, data[i].y, 1, true);
                     z = data[i].y;
                 }
             }
@@ -252,7 +253,9 @@ class EquivalancyUnit extends Component {
         //     this.state.eqUnitTableEl.destroy();
         // }
         if (this.state.table2Instance != "" && this.state.table2Instance != undefined) {
-            this.state.table2Instance.destroy();
+            // this.state.table2Instance.destroy();
+            jexcel.destroy(document.getElementById("eqUnitInfoTable"), true);
+
         }
         var json = [];
         var data = papuDataArr;
@@ -266,7 +269,7 @@ class EquivalancyUnit extends Component {
                 {
                     title: 'equivalancyUnitId',
                     type: 'hidden',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.program.healtharea'),
@@ -285,7 +288,7 @@ class EquivalancyUnit extends Component {
                 {
                     title: i18n.t('static.healtharea.realm'),
                     type: 'hidden',
-                    readOnly: true
+                    // readOnly: true
                     // textEditor: true,
                 },
                 {
@@ -322,7 +325,7 @@ class EquivalancyUnit extends Component {
             ],
             updateTable: function (el, cell, x, y, source, value, id) {
                 if (y != null) {
-                    var elInstance = el.jexcel;
+                    var elInstance = el;
                     //left align
                     elInstance.setStyle(`B${parseInt(y) + 1}`, 'text-align', 'left');
 
@@ -350,7 +353,7 @@ class EquivalancyUnit extends Component {
             search: true,
             // pagination: false,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
@@ -363,12 +366,12 @@ class EquivalancyUnit extends Component {
             parseFormulas: true,
             // onpaste: this.onPaste1,
             oneditionend: this.oneditionend1,
-            text: {
-                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
             onload: this.loaded1,
             license: JEXCEL_PRO_KEY,
             editable: true,
@@ -582,12 +585,15 @@ class EquivalancyUnit extends Component {
         // }
 
         if (this.state.table1Instance != "" && this.state.table1Instance != undefined) {
-            this.state.table1Instance.destroy();
+            // this.state.table1Instance.destroy();
+            jexcel.destroy(document.getElementById("paputableDiv"), true);
         }
 
-        if (this.state.table2Instance != "" && this.state.table2Instance != undefined) {
-            this.state.table2Instance.destroy();
-        }
+        // if (this.state.table2Instance != "" && this.state.table2Instance != undefined) {
+        //     // this.state.table2Instance.destroy();
+        //     jexcel.destroy(document.getElementById("eqUnitInfoTable"), true);
+
+        // }
         var json = [];
         var data = papuDataArr;
 
@@ -600,7 +606,7 @@ class EquivalancyUnit extends Component {
                 {
                     title: 'equivalancyUnitMappingId',
                     type: 'hidden',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.equivalancyUnit.equivalancyUnitName'),
@@ -699,7 +705,7 @@ class EquivalancyUnit extends Component {
             ],
             updateTable: function (el, cell, x, y, source, value, id) {
                 if (y != null) {
-                    var elInstance = el.jexcel;
+                    var elInstance = el;
                     var rowData = elInstance.getRowData(y);
 
                     //left align
@@ -906,7 +912,7 @@ class EquivalancyUnit extends Component {
             filters: true,
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
@@ -920,12 +926,12 @@ class EquivalancyUnit extends Component {
             parseFormulas: true,
             // onpaste: this.onPaste,
             oneditionend: this.oneditionend,
-            text: {
-                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
             onload: this.loaded,
             editable: true,
             // editable: (( AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_MODELING_TYPE') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_MODELING_TYPE') ) ? true : false),
@@ -981,7 +987,9 @@ class EquivalancyUnit extends Component {
 
     filterForecastingUnitBasedOnTracerCategory = function (instance, cell, c, r, source) {
         var mylist = [];
-        var value = (instance.jexcel.getJson(null, false)[r])[3];
+        // var value = (instance.jexcel.getJson(null, false)[r])[3];
+        var value = (this.state.table1Instance.getJson(null, false)[r])[3];
+
         if (value > 0) {
             mylist = this.state.forecastingUnitList.filter(c => c.tracerCategoryId == value && c.active.toString() == "true");
         }
@@ -1003,7 +1011,9 @@ class EquivalancyUnit extends Component {
 
 
     filterTechnicalAreaList = function (instance, cell, c, r, source) {
-        var selectedEquivalencyUnitId = (instance.jexcel.getJson(null, false)[r])[1];
+        // var selectedEquivalencyUnitId = (instance.jexcel.getJson(null, false)[r])[1];
+        var selectedEquivalencyUnitId = (this.state.table1Instance.getJson(null, false)[r])[1];
+
         let selectedEqObj = this.state.equivalancyUnitList.filter(c => c.id == selectedEquivalencyUnitId)[0];
         // console.log("selectedEqObj-------->", selectedEqObj);
         let mylist = [];
@@ -1021,7 +1031,9 @@ class EquivalancyUnit extends Component {
         // let mylist = this.state.tracerCategoryList.filter(c => c.healthArea.id == selectedHealthAreaId);
         // return mylist;
 
-        var selectedHealthAreaId = (instance.jexcel.getJson(null, false)[r])[2].toString().split(';');
+        // var selectedHealthAreaId = (instance.worksheets[0].getJson(null, false)[r])[2].toString().split(';');
+        var selectedHealthAreaId = (this.state.table1Instance.getJson(null, false)[r])[2].toString().split(';');
+
         let mylist = [];
         // console.log("mylist-------->0", (instance.jexcel.getJson(null, false)[r])[2]);
         // console.log("mylist-------->1", selectedHealthAreaId);
@@ -1882,14 +1894,14 @@ class EquivalancyUnit extends Component {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
-                var index = (instance.jexcel).getValue(`G${parseInt(data[i].y) + 1}`, true);
+                var index = (instance.worksheets[0]).getValue(`G${parseInt(data[i].y) + 1}`, true);
                 if (index === "" || index == null || index == undefined) {
-                    (instance.jexcel).setValueFromCoords(0, data[i].y, 0, true);
-                    (instance.jexcel).setValueFromCoords(8, data[i].y, true, true);
-                    (instance.jexcel).setValueFromCoords(11, data[i].y, 1, true);
-                    (instance.jexcel).setValueFromCoords(12, data[i].y, 0, true);
-                    (instance.jexcel).setValueFromCoords(13, data[i].y, 0, true);
-                    (instance.jexcel).setValueFromCoords(14, data[i].y, 1, true);
+                    (instance.worksheets[0]).setValueFromCoords(0, data[i].y, 0, true);
+                    (instance.worksheets[0]).setValueFromCoords(8, data[i].y, true, true);
+                    (instance.worksheets[0]).setValueFromCoords(11, data[i].y, 1, true);
+                    (instance.worksheets[0]).setValueFromCoords(12, data[i].y, 0, true);
+                    (instance.worksheets[0]).setValueFromCoords(13, data[i].y, 0, true);
+                    (instance.worksheets[0]).setValueFromCoords(14, data[i].y, 1, true);
                     z = data[i].y;
                 }
             }
@@ -2208,7 +2220,8 @@ class EquivalancyUnit extends Component {
 
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
-        var asterisk = document.getElementsByClassName("resizable")[0];
+        // var asterisk = document.getElementsByClassName("resizable")[0];
+        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
         // tr.children[1].classList.add('AsteriskTheadtrTd');
         tr.children[2].classList.add('AsteriskTheadtrTd');
@@ -2797,6 +2810,11 @@ class EquivalancyUnit extends Component {
 
     render() {
 
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
         const { tracerCategoryList1 } = this.state;
         let tracerCategoryTempList = tracerCategoryList1.length > 0
             && tracerCategoryList1.map((item, i) => {
@@ -2932,119 +2950,119 @@ class EquivalancyUnit extends Component {
                     </CardFooter>
 
                     <Modal isOpen={this.state.showGuidance}
-className={'modal-lg ' + this.props.className} >
-<ModalHeader toggle={() => this.toggleShowGuidance()} className="ModalHead modal-info-Headher">
-    <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
-</ModalHeader>
-<div>
-    <ModalBody>
-       <div>
-           <h3 className='ShowGuidanceHeading'>{i18n.t('static.equivalancyUnit.equivalancyUnits')}</h3>
-       </div>
-        <p>
-            <p style={{fontSize:'13px'}}><span className="UnderLineText">{i18n.t('static.listTree.purpose')} :</span> {i18n.t('static.equivalancyUnit.EnableUser')}
-            </p>
-        </p>
-        <p style={{fontSize:'13px'}}>
-            <p style={{fontSize:'13px'}}><span className="UnderLineText">{i18n.t('static.listTree.useThisScreen')}:</span><br></br>
-            <b>{i18n.t('static.equivalancyUnit.MappingEquivalency')}</b><br></br>
-            {i18n.t('static.equivalancyUnit.ManageMappings')} {i18n.t('static.equivalancyUnit.ProgramAdmins')}
-            </p>
-        </p>
-        <p>
-        {i18n.t('static.equivalancyUnit.ForecastingMedicines')}
-        <table className="table table-bordered ">
-                                <thead>
-                                <tr>
-                                    <th>Equivalency Unit</th>
-                                    <th>Forecasting Unit</th>
-                                    <th>Conversion to EU</th>
-                                    <th style={{width:'150px'}}>Average Treatment required to cure QATitis</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr>
-                                    <td>1 Treatment for QATitis </td>
-                                    <td>1 tablet of FASPicillin</td>
-                                    <td>14</td>
-                                    <td>1 tablet a day for 2 weeks</td>
-                                </tr>
-                                <tr>
-                                    <td>1 Treatment for QATitis </td>
-                                    <td>5mL tube of FASPasone (cream)</td>
-                                    <td>1</td>
-                                    <td>0.5mL/day applied on the forehead over 10 days (1 tube total)</td>
-                                </tr>
-                                <tr>
-                                    <td>1 Treatment for QATitis </td>
-                                    <td>2mL vial of FASPicaine (injection)</td>
-                                    <td>0.5</td>
-                                    <td>One injection of 1mL (Two people can share one vial)</td>
-                                </tr>
-                                <tr>
-                                    <td>1 Treatment for QATitis </td>
-                                    <td>1 bar of white chocolate</td>
-                                    <td>2</td>
-                                    <td rowspan="3">2 bars of chocolate. The type of chocolate does not matter, as all chocolate contains the natural form of FASPicillin.  </td>
-                                </tr>
-                                <tr>
-                                    <td>1 Treatment for QATitis  </td>
-                                    <td>1 bar of dark chocolate</td>
-                                    <td>2</td>
-                                    
-                                </tr>
-                                <tr>
-                                    <td>1 Treatment for QATitis </td>
-                                    <td>1 bar of milk chocolate</td>
-                                    <td>2</td>
-                                    
-                                </tr>
-                                </tbody>
-                                </table>
-        </p>
-        <p style={{fontSize:'13px'}}>
-        <b>{i18n.t('static.equivalancyUnit.CreatingManaging')}  </b><br></br>
-        {i18n.t('static.equivalancyUnit.ExistingEquivalency')}
-         </p>
-        <p>
-        <b>{i18n.t('static.equivalancyUnit.EquivalencyUsed')}</b>
-        <ul>
-            <li>{i18n.t('static.equivalancyUnit.InThe')} '<a href="/#/report/compareAndSelectScenario" target="_blank" style={{textDecoration:'underline'}}>{i18n.t('static.dashboard.compareAndSelect')}</a>' {i18n.t('static.equivalancyUnit.ForecastsInEUs')} {i18n.t('static.equivalancyUnit.DisplayTheirForecast')} </li>
-            <li>{i18n.t('static.equivalancyUnit.InThe')} '<a href="/#/forecastReport/forecastOutput" target="_blank" style={{textDecoration:'underline'}}>{i18n.t('static.dashboard.monthlyForecast')}</a>' {i18n.t('static.equivalancyUnit.SelectedForecasts')} {i18n.t('static.equivalancyUnit.UserForecasted')}</li>
-        </ul>
-        </p>
-        <p>
-        <table className="table table-bordered ">
-                                <thead>
-                                <tr>
-                                    <th>Forecast</th>
-                                    <th>Equivalent in "Treatments for QATitis"</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr>
-                                    <td>10,000 bars of dark chocolate </td>
-                                    <td style={{textAlign:'center'}}>5,000</td>
-                                </tr>
-                                <tr>
-                                    <td>10,000 bars of white chocolate </td>
-                                    <td style={{textAlign:'center'}}>5,000</td>
-                                </tr>
-                                <tr>
-                                    <td>14,000 tablets of FASPicillin </td>
-                                    <td style={{textAlign:'center'}}>1,000</td>
-                                </tr>
-                                <tr>
-                                    <td style={{textAlign:'right',borderLeft:'1px solid #fff',borderBottom:'1px solid #fff'}}><b>Total</b></td>
-                                    <td style={{textAlign:'center'}}><b>7,000</b></td>
-                                </tr>
-                                </tbody>
-                                </table>
-        </p>
+                        className={'modal-lg ' + this.props.className} >
+                        <ModalHeader toggle={() => this.toggleShowGuidance()} className="ModalHead modal-info-Headher">
+                            <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
+                        </ModalHeader>
+                        <div>
+                            <ModalBody>
+                                <div>
+                                    <h3 className='ShowGuidanceHeading'>{i18n.t('static.equivalancyUnit.equivalancyUnits')}</h3>
+                                </div>
+                                <p>
+                                    <p style={{ fontSize: '13px' }}><span className="UnderLineText">{i18n.t('static.listTree.purpose')} :</span> {i18n.t('static.equivalancyUnit.EnableUser')}
+                                    </p>
+                                </p>
+                                <p style={{ fontSize: '13px' }}>
+                                    <p style={{ fontSize: '13px' }}><span className="UnderLineText">{i18n.t('static.listTree.useThisScreen')}:</span><br></br>
+                                        <b>{i18n.t('static.equivalancyUnit.MappingEquivalency')}</b><br></br>
+                                        {i18n.t('static.equivalancyUnit.ManageMappings')} {i18n.t('static.equivalancyUnit.ProgramAdmins')}
+                                    </p>
+                                </p>
+                                <p>
+                                    {i18n.t('static.equivalancyUnit.ForecastingMedicines')}
+                                    <table className="table table-bordered ">
+                                        <thead>
+                                            <tr>
+                                                <th>Equivalency Unit</th>
+                                                <th>Forecasting Unit</th>
+                                                <th>Conversion to EU</th>
+                                                <th style={{ width: '150px' }}>Average Treatment required to cure QATitis</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>1 Treatment for QATitis </td>
+                                                <td>1 tablet of FASPicillin</td>
+                                                <td>14</td>
+                                                <td>1 tablet a day for 2 weeks</td>
+                                            </tr>
+                                            <tr>
+                                                <td>1 Treatment for QATitis </td>
+                                                <td>5mL tube of FASPasone (cream)</td>
+                                                <td>1</td>
+                                                <td>0.5mL/day applied on the forehead over 10 days (1 tube total)</td>
+                                            </tr>
+                                            <tr>
+                                                <td>1 Treatment for QATitis </td>
+                                                <td>2mL vial of FASPicaine (injection)</td>
+                                                <td>0.5</td>
+                                                <td>One injection of 1mL (Two people can share one vial)</td>
+                                            </tr>
+                                            <tr>
+                                                <td>1 Treatment for QATitis </td>
+                                                <td>1 bar of white chocolate</td>
+                                                <td>2</td>
+                                                <td rowspan="3">2 bars of chocolate. The type of chocolate does not matter, as all chocolate contains the natural form of FASPicillin.  </td>
+                                            </tr>
+                                            <tr>
+                                                <td>1 Treatment for QATitis  </td>
+                                                <td>1 bar of dark chocolate</td>
+                                                <td>2</td>
 
-    </ModalBody>
-</div>
-</Modal>
+                                            </tr>
+                                            <tr>
+                                                <td>1 Treatment for QATitis </td>
+                                                <td>1 bar of milk chocolate</td>
+                                                <td>2</td>
+
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </p>
+                                <p style={{ fontSize: '13px' }}>
+                                    <b>{i18n.t('static.equivalancyUnit.CreatingManaging')}  </b><br></br>
+                                    {i18n.t('static.equivalancyUnit.ExistingEquivalency')}
+                                </p>
+                                <p>
+                                    <b>{i18n.t('static.equivalancyUnit.EquivalencyUsed')}</b>
+                                    <ul>
+                                        <li>{i18n.t('static.equivalancyUnit.InThe')} '<a href="/#/report/compareAndSelectScenario" target="_blank" style={{ textDecoration: 'underline' }}>{i18n.t('static.dashboard.compareAndSelect')}</a>' {i18n.t('static.equivalancyUnit.ForecastsInEUs')} {i18n.t('static.equivalancyUnit.DisplayTheirForecast')} </li>
+                                        <li>{i18n.t('static.equivalancyUnit.InThe')} '<a href="/#/forecastReport/forecastOutput" target="_blank" style={{ textDecoration: 'underline' }}>{i18n.t('static.dashboard.monthlyForecast')}</a>' {i18n.t('static.equivalancyUnit.SelectedForecasts')} {i18n.t('static.equivalancyUnit.UserForecasted')}</li>
+                                    </ul>
+                                </p>
+                                <p>
+                                    <table className="table table-bordered ">
+                                        <thead>
+                                            <tr>
+                                                <th>Forecast</th>
+                                                <th>Equivalent in "Treatments for QATitis"</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>10,000 bars of dark chocolate </td>
+                                                <td style={{ textAlign: 'center' }}>5,000</td>
+                                            </tr>
+                                            <tr>
+                                                <td>10,000 bars of white chocolate </td>
+                                                <td style={{ textAlign: 'center' }}>5,000</td>
+                                            </tr>
+                                            <tr>
+                                                <td>14,000 tablets of FASPicillin </td>
+                                                <td style={{ textAlign: 'center' }}>1,000</td>
+                                            </tr>
+                                            <tr>
+                                                <td style={{ textAlign: 'right', borderLeft: '1px solid #fff', borderBottom: '1px solid #fff' }}><b>Total</b></td>
+                                                <td style={{ textAlign: 'center' }}><b>7,000</b></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </p>
+
+                            </ModalBody>
+                        </div>
+                    </Modal>
 
                     <Modal isOpen={this.state.isModalOpen}
                         className={'modal-lg ' + this.props.className, "modalWidth"}>

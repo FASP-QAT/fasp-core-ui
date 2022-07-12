@@ -46,18 +46,18 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
                 console.log("+++in data[i and z not equal", data[i].y, "Z------------>", z);
-                (instance.worksheets[0]).setValueFromCoords(7, data[i].y, `=ROUND(F${parseInt(data[i].y) + 1}*G${parseInt(data[i].y) + 1},0)`, true);
-                var index = (instance.worksheets[0]).getValue(`M${parseInt(data[i].y) + 1}`, true);
+                (instance).setValueFromCoords(7, data[i].y, `=ROUND(F${parseInt(data[i].y) + 1}*G${parseInt(data[i].y) + 1},0)`, true);
+                var index = (instance).getValue(`M${parseInt(data[i].y) + 1}`, true);
                 if (index == "" || index == null || index == undefined) {
-                    (instance.worksheets[0]).setValueFromCoords(11, data[i].y, "", true);
-                    (instance.worksheets[0]).setValueFromCoords(12, data[i].y, -1, true);
-                    (instance.worksheets[0]).setValueFromCoords(13, data[i].y, 1, true);
-                    (instance.worksheets[0]).setValueFromCoords(14, data[i].y, 0, true);
+                    (instance).setValueFromCoords(11, data[i].y, "", true);
+                    (instance).setValueFromCoords(12, data[i].y, -1, true);
+                    (instance).setValueFromCoords(13, data[i].y, 1, true);
+                    (instance).setValueFromCoords(14, data[i].y, 0, true);
                     z = data[i].y;
                 }
             }
             if (data[i].x == 0 && data[i].value != "") {
-                (instance.worksheets[0]).setValueFromCoords(0, data[i].y, moment(data[i].value).format("YYYY-MM-DD"), true);
+                (instance).setValueFromCoords(0, data[i].y, moment(data[i].value).format("YYYY-MM-DD"), true);
             }
         }
     }
@@ -66,12 +66,12 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
-                var index = (instance.worksheets[0]).getValue(`D${parseInt(data[i].y) + 1}`, true);
+                var index = (instance).getValue(`D${parseInt(data[i].y) + 1}`, true);
                 if (index == "" || index == null || index == undefined) {
-                    var rowData = (instance.worksheets[0]).getRowData(0);
-                    (instance.worksheets[0]).setValueFromCoords(3, data[i].y, 0, true);
-                    (instance.worksheets[0]).setValueFromCoords(4, data[i].y, rowData[4], true);
-                    (instance.worksheets[0]).setValueFromCoords(5, data[i].y, rowData[5], true);
+                    var rowData = (instance).getRowData(0);
+                    (instance).setValueFromCoords(3, data[i].y, 0, true);
+                    (instance).setValueFromCoords(4, data[i].y, rowData[4], true);
+                    (instance).setValueFromCoords(5, data[i].y, rowData[5], true);
                     z = data[i].y;
                 }
             }
@@ -318,10 +318,10 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                             { type: 'dropdown', title: i18n.t('static.consumption.consumptionType'), source: [{ id: 1, name: i18n.t('static.consumption.actual') }, { id: 2, name: i18n.t('static.consumption.forcast') }], width: 100 },
                             { title: i18n.t('static.inventory.dataSource'), type: 'dropdown', source: dataSourceList, width: 120, filter: this.filterDataSourceBasedOnConsumptionType },
                             { title: i18n.t('static.supplyPlan.alternatePlanningUnit'), type: 'dropdown', source: realmCountryPlanningUnitList, filter: this.filterRealmCountryPlanningUnit, width: 150 },
-                            { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: 'numeric', textEditor: true, mask: '#,##.00', decimal: '.', textEditor: true, disabledMaskOnEdition: true, width: 120, },
+                            { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: 'numeric', textEditor: true, mask: '#,##', decimal: '.', textEditor: true, disabledMaskOnEdition: true, width: 120, },
                             { title: i18n.t('static.unit.multiplierFromARUTOPU'), type: 'numeric', mask: '#,##0.000000', decimal: '.', width: 90, readOnly: true },
                             { title: i18n.t('static.supplyPlan.quantityPU'), type: 'numeric', mask: '#,##.00', decimal: '.', width: 120, readOnly: true },
-                            { title: i18n.t('static.consumption.daysofstockout'), type: 'numeric', mask: '#,##.00', decimal: '.', disabledMaskOnEdition: true, textEditor: true, width: 80 },
+                            { title: i18n.t('static.consumption.daysofstockout'), type: 'numeric', mask: '#,##', decimal: '.', disabledMaskOnEdition: true, textEditor: true, width: 80 },
                             { title: i18n.t('static.program.notes'), type: 'text', width: 400 },
                             { title: i18n.t('static.inventory.active'), type: 'checkbox', width: 100, readOnly: !consumptionEditable },
                             { type: 'hidden', title: i18n.t('static.supplyPlan.batchInfo'), width: 0 },

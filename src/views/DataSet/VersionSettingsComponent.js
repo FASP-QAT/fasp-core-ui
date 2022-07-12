@@ -5,8 +5,8 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
@@ -765,7 +765,7 @@ class VersionSettingsComponent extends Component {
     }
 
     oneditionend = function (instance, cell, x, y, value) {
-        var elInstance = instance.jexcel;
+        var elInstance = instance;
         elInstance.setValueFromCoords(12, y, 1, true);
     }
 
@@ -901,7 +901,8 @@ class VersionSettingsComponent extends Component {
             }
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("tableDiv"), true);
         var json = [];
         var data = versionSettingsArray;
 
@@ -1023,16 +1024,16 @@ class VersionSettingsComponent extends Component {
                 },
 
             ],
-            text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
@@ -1042,7 +1043,7 @@ class VersionSettingsComponent extends Component {
             allowDeleteRow: false,
             onselection: this.selected,
             updateTable: function (el, cell, x, y, source, value, id) {
-                var elInstance = el.jexcel;
+                var elInstance = el;
                 if (y != null) {
                     //left align
                     elInstance.setStyle(`B${parseInt(y) + 1}`, 'text-align', 'left');
@@ -1155,7 +1156,8 @@ class VersionSettingsComponent extends Component {
 
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
-        var asterisk = document.getElementsByClassName("resizable")[0];
+        // var asterisk = document.getElementsByClassName("resizable")[0];
+        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
         tr.children[3].classList.add('InfoTr');
         tr.children[14].classList.add('InfoTrAsteriskTheadtrTd');
@@ -1246,6 +1248,10 @@ class VersionSettingsComponent extends Component {
     }
 
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
 
         const { uniquePrograms } = this.state;
         let programMultiList = uniquePrograms.length > 0
@@ -1405,23 +1411,23 @@ class VersionSettingsComponent extends Component {
                 <h5 className={this.state.color} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
 
-                <div className="card-header-actions">
-            <div className="Card-header-reporticon">
-              <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
-              <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span>
-              <span className="compareAndSelect-larrowText"> {i18n.t('static.common.backTo')} <a href="/#/dataSet/listDataSet" className="supplyplanformulas">{i18n.t('static.dataset.manageProgramInfo')}</a></span>
-              <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')} <a href="/#/planningUnitSetting/listPlanningUnitSetting" className="supplyplanformulas">{i18n.t('static.updatePlanningUnit.updatePlanningUnit')}</a></span><br />
-             
-            </div>
-          </div>
-                
-                        <div className="card-header-actions">
-                            <div className="card-header-action pr-lg-4">
-                            <a style={{float:'right'}}>
+                    <div className="card-header-actions">
+                        <div className="Card-header-reporticon">
+                            <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
+                            <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span>
+                            <span className="compareAndSelect-larrowText"> {i18n.t('static.common.backTo')} <a href="/#/dataSet/listDataSet" className="supplyplanformulas">{i18n.t('static.dataset.manageProgramInfo')}</a></span>
+                            <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')} <a href="/#/planningUnitSetting/listPlanningUnitSetting" className="supplyplanformulas">{i18n.t('static.updatePlanningUnit.updatePlanningUnit')}</a></span><br />
+
+                        </div>
+                    </div>
+
+                    <div className="card-header-actions">
+                        <div className="card-header-action pr-lg-4">
+                            <a style={{ float: 'right' }}>
                                 <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
                             </a>
-                            </div>
                         </div>
+                    </div>
 
                     <CardBody className="pb-lg-5 pt-lg-2">
                         <Col md="9 pl-0">
@@ -1497,12 +1503,12 @@ class VersionSettingsComponent extends Component {
 
                     </CardBody>
                     <CardFooter className="CardFooterVesionsettingMarginTop">
-                    {(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_VERSION_SETTINGS')) &&
-                        <FormGroup>
-                            <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                            {this.state.isChanged && <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
-                            &nbsp;
-                        </FormGroup>
+                        {(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_VERSION_SETTINGS')) &&
+                            <FormGroup>
+                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                {this.state.isChanged && <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
+                                &nbsp;
+                            </FormGroup>
                         }
                     </CardFooter>
                 </Card>
@@ -1513,36 +1519,36 @@ class VersionSettingsComponent extends Component {
                     </ModalHeader>
                     <div>
                         <ModalBody>
-                           <div>
-                               <h3 className='ShowGuidanceHeading'>{i18n.t('static.UpdateversionSettings.UpdateversionSettings')}</h3>
-                           </div>
+                            <div>
+                                <h3 className='ShowGuidanceHeading'>{i18n.t('static.UpdateversionSettings.UpdateversionSettings')}</h3>
+                            </div>
                             <p>
-                                <p style={{fontSize:'13px'}}><span className="UnderLineText">{i18n.t('static.listTree.purpose')}</span> {i18n.t('static.VersionSetting.enableUsersTo')}</p>
+                                <p style={{ fontSize: '13px' }}><span className="UnderLineText">{i18n.t('static.listTree.purpose')}</span> {i18n.t('static.VersionSetting.enableUsersTo')}</p>
                             </p>
                             <p>
-                                <p style={{fontSize:'13px'}}><span className="UnderLineText">{i18n.t('static.listTree.useThisScreen')}:</span></p>
-                                <p style={{fontSize:'13px'}}>
-                                <b>{i18n.t('static.versionSettings.note')}:</b>{i18n.t('static.versionSettings.forecastProgramMustBeLoaded')}
+                                <p style={{ fontSize: '13px' }}><span className="UnderLineText">{i18n.t('static.listTree.useThisScreen')}:</span></p>
+                                <p style={{ fontSize: '13px' }}>
+                                    <b>{i18n.t('static.versionSettings.note')}:</b>{i18n.t('static.versionSettings.forecastProgramMustBeLoaded')}
                                 </p>
                             </p>
-                            <p style={{fontSize:'13px'}}>
-                            {i18n.t('static.versionSettings.OnthisScreen')}:<br></br>
-                            <ol type="1">
-                                <li>{i18n.t('static.versionSettings.Updatethefollowingprogram')}:
-                                <ol type="a">
-                                    <li><b>{i18n.t('static.versionSettings.Forecastperiod')}</b> {i18n.t('static.versionSettings.StartEndDate')}</li>
-                                    <li><b>{i18n.t('static.versionSettings.Freightpercentage')}</b> -{i18n.t('static.versionSettings.usedInThe')} <a href="/#/forecastReport/forecastSummary" target="_blank" style={{textDecoration:'underline'}}> {i18n.t('static.ForecastSummary.ForecastSummary')}</a> {i18n.t('static.versionSettings.ScreenForEstimating')}</li>
-                                    <li><b>{i18n.t('static.versionSettings.Forecastthreshold')} </b> -{i18n.t('static.versionSettings.usedInThe')} <a href="/#/report/compareAndSelectScenario" target="_blank" style={{textDecoration:'underline'}}>{i18n.t('static.dashboard.compareAndSelect')}</a> {i18n.t('static.versionSettings.QATComparesAvailable')}  <span style={{color:'#BA0C2F'}}>{i18n.t('static.versionSettings.RedText')}</span> {i18n.t('static.versionSettings.OutsideThresholdPercentages')} </li>
-                                    <li><b>{i18n.t('static.versionSettings.VersionNotes')}</b> - {i18n.t('static.versionSettings.AlsoVisibleEditable')}</li>
+                            <p style={{ fontSize: '13px' }}>
+                                {i18n.t('static.versionSettings.OnthisScreen')}:<br></br>
+                                <ol type="1">
+                                    <li>{i18n.t('static.versionSettings.Updatethefollowingprogram')}:
+                                        <ol type="a">
+                                            <li><b>{i18n.t('static.versionSettings.Forecastperiod')}</b> {i18n.t('static.versionSettings.StartEndDate')}</li>
+                                            <li><b>{i18n.t('static.versionSettings.Freightpercentage')}</b> -{i18n.t('static.versionSettings.usedInThe')} <a href="/#/forecastReport/forecastSummary" target="_blank" style={{ textDecoration: 'underline' }}> {i18n.t('static.ForecastSummary.ForecastSummary')}</a> {i18n.t('static.versionSettings.ScreenForEstimating')}</li>
+                                            <li><b>{i18n.t('static.versionSettings.Forecastthreshold')} </b> -{i18n.t('static.versionSettings.usedInThe')} <a href="/#/report/compareAndSelectScenario" target="_blank" style={{ textDecoration: 'underline' }}>{i18n.t('static.dashboard.compareAndSelect')}</a> {i18n.t('static.versionSettings.QATComparesAvailable')}  <span style={{ color: '#BA0C2F' }}>{i18n.t('static.versionSettings.RedText')}</span> {i18n.t('static.versionSettings.OutsideThresholdPercentages')} </li>
+                                            <li><b>{i18n.t('static.versionSettings.VersionNotes')}</b> - {i18n.t('static.versionSettings.AlsoVisibleEditable')}</li>
+                                        </ol>
+                                    </li>
+                                    <li>{i18n.t('static.versionSettings.HistoricalLifecycle')}
+                                        <ol type="a">
+                                            <li>{i18n.t('static.versionSettings.ViewAllVersion')} </li>
+                                            <li>{i18n.t('static.versionSettings.ForecastValidationScreen')} <a href="/#/forecastReport/forecastOutput" target="_blank" style={{ textDecoration: 'underline' }}>{i18n.t('static.dashboard.monthlyForecast')}</a>, <a href="/#/forecastReport/forecastSummary" target="_blank" style={{ textDecoration: 'underline' }}>{i18n.t('static.commitTree.forecastSummary')}</a> or <a href="/#/report/compareVersion" target="_blank" style={{ textDecoration: 'underline' }}>{i18n.t('static.dashboard.Versioncomarition')}</a> {i18n.t('static.dashboard.ViewForecastOutputs')} </li>
+                                        </ol>
+                                    </li>
                                 </ol>
-                                </li>
-                                <li>{i18n.t('static.versionSettings.HistoricalLifecycle')}
-                                <ol type="a">
-                                    <li>{i18n.t('static.versionSettings.ViewAllVersion')} </li>
-                                    <li>{i18n.t('static.versionSettings.ForecastValidationScreen')} <a href="/#/forecastReport/forecastOutput" target="_blank" style={{textDecoration:'underline'}}>{i18n.t('static.dashboard.monthlyForecast')}</a>, <a href="/#/forecastReport/forecastSummary" target="_blank" style={{textDecoration:'underline'}}>{i18n.t('static.commitTree.forecastSummary')}</a> or <a href="/#/report/compareVersion" target="_blank" style={{textDecoration:'underline'}}>{i18n.t('static.dashboard.Versioncomarition')}</a> {i18n.t('static.dashboard.ViewForecastOutputs')} </li>
-                                </ol>
-                                </li>
-                            </ol>
                             </p>
                         </ModalBody>
                     </div>

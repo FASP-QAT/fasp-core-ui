@@ -10,8 +10,8 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import RealmCountryService from '../../api/RealmCountryService';
 import PlanningUnitService from "../../api/PlanningUnitService";
 import UnitService from "../../api/UnitService";
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
@@ -146,7 +146,7 @@ export default class RealmCountryPlanningUnitList extends Component {
     };
 
     oneditionend = function (instance, cell, x, y, value) {
-        var elInstance = instance.jexcel;
+        var elInstance = instance;
         var rowData = elInstance.getRowData(y);
 
         if (x == 5 && !isNaN(rowData[5]) && rowData[5].toString().indexOf('.') != -1) {
@@ -160,15 +160,15 @@ export default class RealmCountryPlanningUnitList extends Component {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
-                var index = (instance.jexcel).getValue(`I${parseInt(data[i].y) + 1}`, true);
+                var index = (instance).getValue(`I${parseInt(data[i].y) + 1}`, true);
                 if (index === "" || index == null || index == undefined) {
                     // (instance.jexcel).setValueFromCoords(0, data[i].y, this.state.realmCountry.realm.label.label_en + "-" + this.state.realmCountry.country.label.label_en, true);
                     // (instance.jexcel).setValueFromCoords(0, data[i].y, '', true);
-                    (instance.jexcel).setValueFromCoords(6, data[i].y, true, true);
+                    (instance).setValueFromCoords(6, data[i].y, true, true);
                     // (instance.jexcel).setValueFromCoords(7, data[i].y, document.getElementById("realmCountryId").value, true);
                     // (instance.jexcel).setValueFromCoords(7, data[i].y, '', true);
-                    (instance.jexcel).setValueFromCoords(8, data[i].y, 0, true);
-                    (instance.jexcel).setValueFromCoords(9, data[i].y, 1, true);
+                    (instance).setValueFromCoords(8, data[i].y, 0, true);
+                    (instance).setValueFromCoords(9, data[i].y, 1, true);
                     z = data[i].y;
                 }
             }
@@ -738,7 +738,8 @@ export default class RealmCountryPlanningUnitList extends Component {
 
 
         this.el = jexcel(document.getElementById("tableDiv"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("tableDiv"),true);
         var json = [];
         var data = papuDataArr;
         var options = {
@@ -806,7 +807,7 @@ export default class RealmCountryPlanningUnitList extends Component {
 
             ],
             updateTable: function (el, cell, x, y, source, value, id) {
-                var elInstance = el.jexcel;
+                var elInstance = el;
                 var rowData = elInstance.getRowData(y);
                 var realmCountryPlanningUnitId = rowData[8];
                 if (realmCountryPlanningUnitId == 0) {
@@ -823,16 +824,16 @@ export default class RealmCountryPlanningUnitList extends Component {
 
             },
             onsearch: function (el) {
-                el.jexcel.updateTable();
+                // el.jexcel.updateTable();
             },
             onfilter: function (el) {
-                el.jexcel.updateTable();
+                // el.jexcel.updateTable();
             },
             pagination: localStorage.getItem("sesRecordCount"),
             filters: true,
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
@@ -848,12 +849,12 @@ export default class RealmCountryPlanningUnitList extends Component {
             parseFormulas: true,
             onpaste: this.onPaste,
             oneditionend: this.oneditionend,
-            text: {
-                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
             filters: true,
             license: JEXCEL_PRO_KEY,
             onload: this.loaded,
@@ -1245,7 +1246,8 @@ export default class RealmCountryPlanningUnitList extends Component {
                 loading: false
             }, () => {
                 this.el = jexcel(document.getElementById("tableDiv"), '');
-                this.el.destroy();
+                // this.el.destroy();
+                jexcel.destroy(document.getElementById("tableDiv"),true);
             })
 
         }
@@ -1257,7 +1259,8 @@ export default class RealmCountryPlanningUnitList extends Component {
         // var tr = asterisk.firstChild;
         // tr.children[7].title = i18n.t("static.message.tooltipMultiplier")
         jExcelLoadedFunction(instance);
-        var asterisk = document.getElementsByClassName("resizable")[0];
+        // var asterisk = document.getElementsByClassName("resizable")[0];
+        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
         tr.children[1].classList.add('AsteriskTheadtrTd');
         tr.children[2].classList.add('AsteriskTheadtrTd');
@@ -1345,6 +1348,11 @@ export default class RealmCountryPlanningUnitList extends Component {
     }
 
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
         const { realmCountrys } = this.state;
         let realmCountryList = realmCountrys.length > 0
             && realmCountrys.map((item, i) => {

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n';
@@ -85,7 +85,6 @@ export default class StepOneImportMapPlanningUnits extends Component {
         this.changed = this.changed.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
-        this.oneditionend = this.oneditionend.bind(this);
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
         this.handleRangeChange = this.handleRangeChange.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
@@ -263,20 +262,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
         }
     }
 
-    oneditionend = function (instance, cell, x, y, value) {
-        var elInstance = instance.jexcel;
-        var rowData = elInstance.getRowData(y);
-
-    }
-
     loaded = function (instance, cell, x, y, value) {
-        // jExcelLoadedFunctionWithoutPagination(instance);
         jExcelLoadedFunction(instance);
-        var asterisk = document.getElementsByClassName("resizable")[0];
-        var tr = asterisk.firstChild;
-        // tr.children[1].classList.add('AsteriskTheadtrTd');
-        // tr.children[2].classList.add('AsteriskTheadtrTd');
-        // tr.children[3].classList.add('AsteriskTheadtrTd');
     }
 
     componentDidMount() {
@@ -561,7 +548,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 message: i18n.t('static.importFromQATSupplyPlan.selectSupplyPlanProgram'),
             })
             this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
-            this.el.destroy();
+            // this.el.destroy();
+            jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
             document.getElementById("stepOneBtn").disabled = true;
         } else if (versionId == 0) {
             this.setState({
@@ -570,7 +558,9 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 message: i18n.t('static.importFromQATSupplyPlan.pleaseSelectSupplyPlanVersion'),
             })
             this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
-            this.el.destroy();
+            // this.el.destroy();
+            jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
+
             document.getElementById("stepOneBtn").disabled = true;
         } else if (forecastProgramId == 0) {
             this.setState({
@@ -579,7 +569,9 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 message: i18n.t('static.importFromQATSupplyPlan.pleaseSelectForecastProgram'),
             })
             this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
-            this.el.destroy();
+            // this.el.destroy();
+            jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
+
             document.getElementById("stepOneBtn").disabled = true;
         } else {
             this.setState({
@@ -588,7 +580,9 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 message: ''
             })
             this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
-            this.el.destroy();
+            // this.el.destroy();
+            jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
+
             document.getElementById("stepOneBtn").disabled = true;
         }
 
@@ -749,13 +743,19 @@ export default class StepOneImportMapPlanningUnits extends Component {
         }
 
         this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
+
 
         this.el = jexcel(document.getElementById("mapRegion"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("mapRegion"), true);
+
 
         this.el = jexcel(document.getElementById("mapImport"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("mapImport"), true);
+
 
         var json = [];
 
@@ -781,7 +781,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 {
                     title: 'Supply Plan Planning Unit Id',
                     type: 'hidden',
-                    readOnly: true//1 B
+                    // readOnly: true//1 B
                 },
                 {
                     title: i18n.t('static.importFromQATSupplyPlan.supplyPlanPlanningUnit'),
@@ -791,22 +791,22 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 {
                     title: 'multiplier',
                     type: 'hidden',
-                    readOnly: true//3 D
+                    // readOnly: true//3 D
                 },
                 {
                     title: 'forecastingUnitId',
                     type: 'hidden',
-                    readOnly: true//4 E
+                    // readOnly: true//4 E
                 },
                 {
                     title: 'tracerCategoryId',
                     type: 'hidden',
-                    readOnly: true//5 F
+                    // readOnly: true//5 F
                 },
                 {
                     title: 'Forecast Planning Unit Id',
                     type: 'hidden',
-                    readOnly: true//6 G
+                    // readOnly: true//6 G
                 },
                 {
                     title: i18n.t('static.importFromQATSupplyPlan.forecastPlanningUnit'),
@@ -817,7 +817,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 {
                     title: 'ForecastMultiplier',
                     type: 'hidden',
-                    readOnly: true//8 I
+                    // readOnly: true//8 I
                 },
                 {
                     title: i18n.t('static.importFromQATSupplyPlan.conversionFactor'),
@@ -829,19 +829,19 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 {
                     title: 'Match',
                     type: 'hidden',
-                    readOnly: true//10 K
+                    // readOnly: true//10 K
                 },
                 {
                     title: 'Supply plan Forcast unit id',
                     type: 'hidden',
-                    readOnly: true//11 L
+                    // readOnly: true//11 L
                 }
 
 
             ],
             updateTable: function (el, cell, x, y, source, value, id) {
                 if (y != null) {
-                    var elInstance = el.jexcel;
+                    var elInstance = el;
                     //left align
                     elInstance.setStyle(`C${parseInt(y) + 1}`, 'text-align', 'left');
                     var rowData = elInstance.getRowData(y);
@@ -882,7 +882,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             filters: true,
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
@@ -890,17 +890,14 @@ export default class StepOneImportMapPlanningUnits extends Component {
             allowManualInsertColumn: false,
             // allowDeleteRow: true,
             onchange: this.changed,
-            // oneditionend: this.onedit,
             copyCompatibility: true,
             allowManualInsertRow: false,
             parseFormulas: true,
-            // onpaste: this.onPaste,
-            // oneditionend: this.oneditionend,
-            text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
             onload: this.loaded,
             editable: true,
             license: JEXCEL_PRO_KEY,
@@ -1157,6 +1154,11 @@ export default class StepOneImportMapPlanningUnits extends Component {
     }
 
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
         const { rangeValue } = this.state
 
         const { programs } = this.state;

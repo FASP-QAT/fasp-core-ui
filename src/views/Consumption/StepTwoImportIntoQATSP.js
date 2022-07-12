@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n';
@@ -42,7 +42,6 @@ export default class StepTwoImportMapPlanningUnits extends Component {
         this.changed = this.changed.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
-        this.oneditionend = this.oneditionend.bind(this);
         this.formSubmit = this.formSubmit.bind(this);
         this.filterData = this.filterData.bind(this);
 
@@ -194,18 +193,8 @@ export default class StepTwoImportMapPlanningUnits extends Component {
         }
     }
 
-    oneditionend = function (instance, cell, x, y, value) {
-        var elInstance = instance.jexcel;
-        var rowData = elInstance.getRowData(y);
-
-    }
-
     loaded = function (instance, cell, x, y, value) {
-        // jExcelLoadedFunctionWithoutPagination(instance);
         jExcelLoadedFunction(instance);
-        var asterisk = document.getElementsByClassName("resizable")[0];
-        var tr = asterisk.firstChild;
-        // tr.children[3].classList.add('AsteriskTheadtrTd');
     }
 
     componentDidMount() {
@@ -282,13 +271,16 @@ export default class StepTwoImportMapPlanningUnits extends Component {
         }
 
         this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("mapPlanningUnit"),true);
 
         this.el = jexcel(document.getElementById("mapRegion"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("mapRegion"),true);
 
         this.el = jexcel(document.getElementById("mapImport"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("mapImport"),true);
 
         var json = [];
         var papuList11 = this.state.selSource2;
@@ -335,7 +327,7 @@ export default class StepTwoImportMapPlanningUnits extends Component {
             ],
             updateTable: function (el, cell, x, y, source, value, id) {
                 if (y != null) {
-                    var elInstance = el.jexcel;
+                    var elInstance = el;
                     //left align
                     var rowData = elInstance.getRowData(y);
 
@@ -363,7 +355,7 @@ export default class StepTwoImportMapPlanningUnits extends Component {
             filters: true,
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
@@ -371,17 +363,14 @@ export default class StepTwoImportMapPlanningUnits extends Component {
             allowManualInsertColumn: false,
             // allowDeleteRow: true,
             onchange: this.changed,
-            // oneditionend: this.onedit,
             copyCompatibility: true,
             allowManualInsertRow: false,
             parseFormulas: true,
-            // onpaste: this.onPaste,
-            // oneditionend: this.oneditionend,
-            text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
             onload: this.loaded,
             editable: true,
             license: JEXCEL_PRO_KEY,
@@ -399,6 +388,11 @@ export default class StepTwoImportMapPlanningUnits extends Component {
     }
 
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
         const { rangeValue } = this.state
         return (
             <>

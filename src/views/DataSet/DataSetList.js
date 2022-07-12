@@ -14,8 +14,8 @@ import paginationFactory from 'react-bootstrap-table2-paginator';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import moment from 'moment';
 import RealmCountryService from '../../api/RealmCountryService';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js';
 import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY } from "../../Constants";
@@ -154,7 +154,8 @@ export default class ProgramList extends Component {
         // }
         // console.log("programArray---->", programArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("tableDiv"), true);
         var json = [];
         var data = programArray;
 
@@ -171,77 +172,77 @@ export default class ProgramList extends Component {
                 {
                     title: i18n.t('static.program.realm'),
                     type: 'hidden',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.dataset.forecastingProgram'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.program.datasetDisplayName'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.program.realmcountry'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.program.organisation'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.dashboard.healthareaheader'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.inventory.region'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.program.programmanager'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.program.notes'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.common.lastModifiedBy'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.common.lastModifiedDate'),
                     type: 'calendar',
                     options: { format: JEXCEL_DATE_FORMAT_SM },
-                    readOnly: true
+                    // readOnly: true
                 },
 
             ],
-            text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
             allowDeleteRow: false,
             onselection: this.selected,
-
+            editable: false,
 
             oneditionend: this.onedit,
             copyCompatibility: true,
@@ -615,6 +616,10 @@ export default class ProgramList extends Component {
         return getLabelText(cell, this.state.lang);
     }
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
 
         const { SearchBar, ClearSearchButton } = Search;
         const customTotal = (from, to, size) => (
@@ -648,10 +653,10 @@ export default class ProgramList extends Component {
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 className="red" id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
-                <div className="Card-header-reporticon pb-0">
-                  <span className="compareAndSelect-rarrow">  <i className="cui-arrow-right icons " > </i></span>
-                   <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')} <a href="/#/dataset/loadDeleteDataSet" className="supplyplanformulas">{i18n.t('static.dashboard.downloadprogram')}</a> {i18n.t('static.tree.or')} <a href="/#/dataset/versionSettings" className='supplyplanformulas'>{i18n.t('static.UpdateversionSettings.UpdateversionSettings')}</a></span>
-               </div>
+                    <div className="Card-header-reporticon pb-0">
+                        <span className="compareAndSelect-rarrow">  <i className="cui-arrow-right icons " > </i></span>
+                        <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')} <a href="/#/dataset/loadDeleteDataSet" className="supplyplanformulas">{i18n.t('static.dashboard.downloadprogram')}</a> {i18n.t('static.tree.or')} <a href="/#/dataset/versionSettings" className='supplyplanformulas'>{i18n.t('static.UpdateversionSettings.UpdateversionSettings')}</a></span>
+                    </div>
                     <div className="Card-header-addicon">
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '} */}
                         <div className="card-header-actions">

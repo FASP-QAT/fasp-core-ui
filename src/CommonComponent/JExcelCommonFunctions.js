@@ -237,7 +237,7 @@ export function jExcelLoadedFunctionWithoutPagination(instance, number) {
 }
 
 export function jExcelLoadedFunctionOnlyHideRow(instance) {
-    var elInstance = instance.jexcel;
+    var elInstance = instance.worksheets[0];
     elInstance.hideIndex(0);
 }
 

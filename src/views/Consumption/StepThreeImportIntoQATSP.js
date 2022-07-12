@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n';
@@ -653,13 +653,16 @@ export default class StepThreeImportMapPlanningUnits extends Component {
         }
 
         this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("mapPlanningUnit"),true);
 
         this.el = jexcel(document.getElementById("mapRegion"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("mapRegion"),true);
 
         this.el = jexcel(document.getElementById("mapImport"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("mapImport"),true);
 
         var json = [];
         var data = papuDataArr;
@@ -770,33 +773,24 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             filters: true,
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             allowInsertColumn: false,
             allowManualInsertColumn: false,
             // allowDeleteRow: true,
-            // onchange: this.changed,
-            // oneditionend: this.onedit,
             copyCompatibility: true,
             allowManualInsertRow: false,
             parseFormulas: true,
-            // onpaste: this.onPaste,
-            // oneditionend: this.oneditionend,
-            text: {
-                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
             onload: function (obj, x, y, e) {
-                // jExcelLoadedFunctionWithoutPagination(obj);
                 jExcelLoadedFunction(obj);
-                var asterisk = document.getElementsByClassName("resizable")[0];
-                var tr = asterisk.firstChild;
-                // tr.children[1].classList.add('AsteriskTheadtrTd');
-                // tr.children[2].classList.add('AsteriskTheadtrTd');
             },
             editable: true,
             license: JEXCEL_PRO_KEY,
@@ -815,6 +809,10 @@ export default class StepThreeImportMapPlanningUnits extends Component {
     }
 
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
 
         var { rangeValue } = this.state
         if (this.props.items.startDate != "") {
@@ -848,7 +846,6 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                         name="supplyPlanProgramId"
                                         id="supplyPlanProgramId"
                                         bsSize="sm"
-                                        // onChange={(e) => { this.setForecastProgramId(e); }}
                                         value={supplyPlan == null ? "" : supplyPlan.programCode}
                                         readOnly
                                     >
@@ -867,8 +864,6 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                         name="supplyPlanVersionId"
                                         id="supplyPlanVersionId"
                                         bsSize="sm"
-                                        // onChange={(e) => { this.setVersionId(e); }}
-                                        // value={this.state.versionId}
                                         value={supplyPlan == null ? "" : supplyPlan.programVersion}
                                         readOnly
                                     >

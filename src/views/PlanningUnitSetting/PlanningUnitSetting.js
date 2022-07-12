@@ -21,8 +21,8 @@ import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import CryptoJS from 'crypto-js';
 import csvicon from '../../assets/img/csv.png'
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import TracerCategoryService from '../../api/TracerCategoryService';
 import ProcurementAgentService from "../../api/ProcurementAgentService";
 import PlanningUnitService from '../../api/PlanningUnitService';
@@ -635,7 +635,7 @@ export default class PlanningUnitSetting extends Component {
 
     oneditionend = function (instance, cell, x, y, value) {
         console.log("oneditionend---------Start");
-        var elInstance = instance.jexcel;
+        var elInstance = instance;
         var rowData = elInstance.getRowData(y);
         var reg = /^0[0-9].*$/; //any no start with 0;
 
@@ -659,20 +659,20 @@ export default class PlanningUnitSetting extends Component {
             console.log("-----------------onPaste---------------------1", data[i]);
             if (z != data[i].y) {
                 console.log("-----------------onPaste---------------------2");
-                var index = (instance.jexcel).getValue(`N${parseInt(data[i].y) + 1}`, true);
+                var index = (instance).getValue(`N${parseInt(data[i].y) + 1}`, true);
                 if (index === "" || index == null || index == undefined) {
                     console.log("-----------------onPaste---------------------3");
                     // (instance.jexcel).setValueFromCoords(8, data[i].y, true, true);
-                    (instance.jexcel).setValueFromCoords(2, data[i].y, true, true);
-                    (instance.jexcel).setValueFromCoords(3, data[i].y, true, true);
-                    (instance.jexcel).setValueFromCoords(9, data[i].y, true, true);
-                    (instance.jexcel).setValueFromCoords(10, data[i].y, 1, true);
-                    (instance.jexcel).setValueFromCoords(11, data[i].y, 1, true);
-                    (instance.jexcel).setValueFromCoords(12, data[i].y, {}, true);
-                    (instance.jexcel).setValueFromCoords(13, data[i].y, 0, true);
-                    (instance.jexcel).setValueFromCoords(14, data[i].y, true, true);
+                    (instance).setValueFromCoords(2, data[i].y, true, true);
+                    (instance).setValueFromCoords(3, data[i].y, true, true);
+                    (instance).setValueFromCoords(9, data[i].y, true, true);
+                    (instance).setValueFromCoords(10, data[i].y, 1, true);
+                    (instance).setValueFromCoords(11, data[i].y, 1, true);
+                    (instance).setValueFromCoords(12, data[i].y, {}, true);
+                    (instance).setValueFromCoords(13, data[i].y, 0, true);
+                    (instance).setValueFromCoords(14, data[i].y, true, true);
                     // (instance.jexcel).setValueFromCoords(15, data[i].y, "", true);
-                    (instance.jexcel).setValueFromCoords(16, data[i].y, true, true);
+                    (instance).setValueFromCoords(16, data[i].y, true, true);
                     z = data[i].y;
                 }
             }
@@ -1748,7 +1748,8 @@ export default class PlanningUnitSetting extends Component {
                     loading: false
                 }, () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
-                    this.el.destroy();
+                    // this.el.destroy();
+                    jexcel.destroy(document.getElementById("tableDiv"), true);
                     this.filterData();
                 })
         }
@@ -2088,7 +2089,8 @@ export default class PlanningUnitSetting extends Component {
         }
         // console.log("outPutListArray---->", outPutListArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("tableDiv"), true);
         var json = [];
         var data = outPutListArray;
 
@@ -2260,18 +2262,18 @@ export default class PlanningUnitSetting extends Component {
                 // }
 
             },
-            text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
             onload: this.loaded,
             // selectionCopy: false,
             pagination: localStorage.getItem("sesRecordCount"),
             filters: true,
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
@@ -2408,7 +2410,9 @@ export default class PlanningUnitSetting extends Component {
 
     filterPlanningUnitListByProductCategoryId = function (instance, cell, c, r, source) {
         var mylist = [];
-        var value = (instance.jexcel.getJson(null, false)[r])[0];
+        // var value = (instance.jexcel.getJson(null, false)[r])[0];
+        var value = (this.state.languageEl.getJson(null, false)[r])[0];
+
         console.log("mylist--------->3.2", value);
 
         // if (productCategoryId == -1) {
@@ -2485,19 +2489,19 @@ export default class PlanningUnitSetting extends Component {
     }.bind(this)
 
     onchangepage(el, pageNo, oldPageNo) {
-        var elInstance = el.jexcel;
+        var elInstance = el;
         var json = elInstance.getJson(null, false);
 
         var colArr = ['A', 'B'];
 
-        var jsonLength = (pageNo + 1) * (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+        var jsonLength = (pageNo + 1) * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
         if (jsonLength == undefined) {
             jsonLength = 15
         }
         if (json.length < jsonLength) {
             jsonLength = json.length;
         }
-        var start = pageNo * (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+        var start = pageNo * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
 
         for (var j = start; j < jsonLength; j++) {
             var rowData = elInstance.getRowData(j);
@@ -2524,7 +2528,8 @@ export default class PlanningUnitSetting extends Component {
 
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
-        var asterisk = document.getElementsByClassName("resizable")[0];
+        // var asterisk = document.getElementsByClassName("resizable")[0];
+        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
         tr.children[1].classList.add('AsteriskTheadtrTd');
         tr.children[2].classList.add('AsteriskTheadtrTd');
@@ -2544,14 +2549,14 @@ export default class PlanningUnitSetting extends Component {
         tr.children[8].title = i18n.t('static.tooltip.PriceType');
 
 
-        var elInstance = instance.jexcel;
+        var elInstance = instance.worksheets[0];
         var json = elInstance.getJson();
         var colArr = ['A', 'B'];
 
         var jsonLength;
 
-        if ((document.getElementsByClassName("jexcel_pagination_dropdown")[0] != undefined)) {
-            jsonLength = 1 * (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+        if ((document.getElementsByClassName("jss_pagination_dropdown")[0] != undefined)) {
+            jsonLength = 1 * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
         }
 
         if (jsonLength == undefined) {
@@ -3078,7 +3083,10 @@ export default class PlanningUnitSetting extends Component {
 
 
     render() {
-
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
         const { SearchBar, ClearSearchButton } = Search;
         const customTotal = (from, to, size) => (
             <span className="react-bootstrap-table-pagination-total">

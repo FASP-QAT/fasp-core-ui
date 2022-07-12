@@ -15,8 +15,8 @@ import AuthenticationService from "../Common/AuthenticationService";
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import PlanningUnitService from "../../api/PlanningUnitService";
 import UnitService from "../../api/UnitService";
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import StatusUpdateButtonFeature from "../../CommonComponent/StatusUpdateButtonFeature";
@@ -113,11 +113,11 @@ class PlanningUnitCountry extends Component {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
-                var index = (instance.jexcel).getValue(`I${parseInt(data[i].y) + 1}`, true);
+                var index = (instance).getValue(`I${parseInt(data[i].y) + 1}`, true);
                 if (index === "" || index == null || index == undefined) {
-                    (instance.jexcel).setValueFromCoords(7, data[i].y, this.props.match.params.realmCountryId, true);
-                    (instance.jexcel).setValueFromCoords(8, data[i].y, 0, true);
-                    (instance.jexcel).setValueFromCoords(9, data[i].y, 1, true);
+                    (instance).setValueFromCoords(7, data[i].y, this.props.match.params.realmCountryId, true);
+                    (instance).setValueFromCoords(8, data[i].y, 0, true);
+                    (instance).setValueFromCoords(9, data[i].y, 1, true);
                     z = data[i].y;
                 }
             }
@@ -218,7 +218,8 @@ class PlanningUnitCountry extends Component {
 
 
                                             this.el = jexcel(document.getElementById("paputableDiv"), '');
-                                            this.el.destroy();
+                                            // this.el.destroy();
+                                            jexcel.destroy(document.getElementById("paputableDiv"),true);
                                             var json = [];
                                             var data = papuDataArr;
                                             var options = {
@@ -293,16 +294,16 @@ class PlanningUnitCountry extends Component {
 
                                                 },
                                                 onsearch: function (el) {
-                                                    el.jexcel.updateTable();
+                                                    // el.jexcel.updateTable();
                                                 },
                                                 onfilter: function (el) {
-                                                    el.jexcel.updateTable();
+                                                    // el.jexcel.updateTable();
                                                 },
                                                 pagination: localStorage.getItem("sesRecordCount"),
                                                 filters: true,
                                                 search: true,
                                                 columnSorting: true,
-                                                tableOverflow: true,
+                                                // tableOverflow: true,
                                                 wordWrap: true,
                                                 paginationOptions: JEXCEL_PAGINATION_OPTION,
                                                 position: 'top',
@@ -824,7 +825,8 @@ class PlanningUnitCountry extends Component {
     }
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
-        var asterisk = document.getElementsByClassName("resizable")[0];
+        // var asterisk = document.getElementsByClassName("resizable")[0];
+        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
         tr.children[1].classList.add('AsteriskTheadtrTd');
         tr.children[2].classList.add('AsteriskTheadtrTd');
@@ -1082,6 +1084,11 @@ class PlanningUnitCountry extends Component {
         return valid;
     }
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
