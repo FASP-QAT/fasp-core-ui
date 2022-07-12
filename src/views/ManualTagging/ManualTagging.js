@@ -106,7 +106,8 @@ export default class ManualTagging extends Component {
             versionList: [],
             versionId: -1,
             changedDataForTab2: false,
-            roPrimeLineNoForTab3: ""
+            roPrimeLineNoForTab3: "",
+            planningUnitsBasedOnTracerCategory: []
 
         }
 
@@ -160,17 +161,27 @@ export default class ManualTagging extends Component {
             loading: true
         })
         var versionId = event.target.value;
+        console.log("Loading 1 Mohit version Id#############",versionId)
         localStorage.setItem("sesVersionIdReport", versionId);
         this.setState({
             versionId: versionId,
             hasSelectAll: true
         }, () => {
             if (versionId != -1) {
+                console.log("Loading 1 Mohit in if#############",versionId)
                 this.getPlanningUnitList()
             } else {
+                console.log("Loading 1 Mohit in else#############",versionId)
                 this.setState({
+                    outputList: [],
                     planningUnits: [],
                     loading: false
+                }, () => {
+                    try {
+                        this.state.languageEl.destroy();
+                    } catch (e) {
+
+                    }
                 })
             }
         })
@@ -296,7 +307,7 @@ export default class ManualTagging extends Component {
             }, () => {
                 this.getOrderDetails();
                 this.getNotLinkedShipments();
-                this.getPlanningUnitList();
+                this.getPlanningUnitListBasedOnTracerCategory();
                 this.getBudgetListByProgramId();
             });
         } else {
@@ -428,14 +439,17 @@ export default class ManualTagging extends Component {
         if (programId1 != "") {
             var shipmentList = [];
             var localProgramList = this.state.localProgramList;
+            var setOfPlanningUnitsBasedOnTracerCategory = [...new Set(this.state.planningUnitsBasedOnTracerCategory.map(ele => ele.planningUnit.id))]
             var localProgramListFilter = localProgramList.filter(c => c.id == programId1);
             var planningUnitDataList = localProgramListFilter[0].programData.planningUnitDataList;
             for (var pu = 0; pu < planningUnitDataList.length; pu++) {
-                var planningUnitData = planningUnitDataList[pu];
-                var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
-                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                var planningUnitDataJson = JSON.parse(programData);
-                shipmentList = shipmentList.concat(planningUnitDataJson.shipmentList);
+                if (setOfPlanningUnitsBasedOnTracerCategory.includes(planningUnitDataList[pu].planningUnitId)) {
+                    var planningUnitData = planningUnitDataList[pu];
+                    var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                    var planningUnitDataJson = JSON.parse(programData);
+                    shipmentList = shipmentList.concat(planningUnitDataJson.shipmentList);
+                }
             }
             shipmentList = shipmentList.filter(c => c.erpFlag.toString() == "false" && c.active.toString() == "true" && c.accountFlag.toString() == "true" && c.procurementAgent.id == PSM_PROCUREMENT_AGENT_ID && SHIPMENT_ID_ARR_MANUAL_TAGGING.includes(c.shipmentStatus.id.toString()));
             shipmentList = shipmentList.filter(c => (moment(c.expectedDeliveryDate).format("YYYY-MM-DD") < moment(Date.now()).subtract(6, 'months').format("YYYY-MM-DD") && ([3, 4, 5, 6, 9]).includes(c.shipmentStatus.id.toString())) || (moment(c.expectedDeliveryDate).format("YYYY-MM-DD") >= moment(Date.now()).subtract(6, 'months').format("YYYY-MM-DD") && SHIPMENT_ID_ARR_MANUAL_TAGGING.includes(c.shipmentStatus.id.toString())));
@@ -445,6 +459,7 @@ export default class ManualTagging extends Component {
                 var itemLabelB = b.shipmentId;
                 return itemLabelA > itemLabelB ? 1 : -1;
             });
+            console.log("ListArray.lengthMohit@@@@@@@@@@@", listArray.length)
             this.setState({
                 notLinkedShipments: listArray
             });
@@ -1389,14 +1404,23 @@ export default class ManualTagging extends Component {
 
 
     programChangeModal(event) {
+        var programId1 = event.target.value;
         this.setState({
             programId1: event.target.value,
             planningUnits: []
         }, () => {
-            this.getOrderDetails();
-            this.getNotLinkedShipments();
-            this.getPlanningUnitList();
-            this.getBudgetListByProgramId();
+            if (programId1 != -1) {
+                this.getOrderDetails();
+                this.getNotLinkedShipments();
+                this.getPlanningUnitListBasedOnTracerCategory();
+                this.getBudgetListByProgramId();
+            }else{
+                this.setState({
+                    planningUnits:[],
+                    planningUnitsBasedOnTracerCategory:[],
+                    notLinkedShipments:[]
+                })
+            }
         })
     }
 
@@ -1808,7 +1832,7 @@ export default class ManualTagging extends Component {
                                                         var planningUnitId1 = paddingZero(planningUnitId, 0, 8);
                                                         autoGenerated = (batchNo.toString() == "-99" || batchNo == "") ? true : autoGenerated;
                                                         batchNo = (batchNo.toString() == "-99" || batchNo == "") ? (BATCH_PREFIX).concat(programId1).concat(planningUnitId1).concat(moment(Date.now()).format("YYMMDD")).concat(generateRandomAplhaNumericCode(3)) : batchNo;
-                                                        expiryDate = expiryDate == "" ? moment(tableJson[y][4]).add(shelfLife, 'months').startOf('month').format("YYYY-MM-DD") : expiryDate;
+                                                        expiryDate = expiryDate == "" || expiryDate==null ? moment(tableJson[y][4]).add(shelfLife, 'months').startOf('month').format("YYYY-MM-DD") : expiryDate;
 
                                                         // }
                                                         batchInfo.push({
@@ -3168,7 +3192,7 @@ export default class ManualTagging extends Component {
 
                     // } else {
                     console.log("order no ---", erpDataList[j].orderNo + " active---", erpDataList[j].active)
-                    data[0] = false;//A
+                    data[0] = this.state.active3 ? true : false;//A
                     data[1] = erpDataList[j].roNo + ' - ' + erpDataList[j].roPrimeLineNo + ' | ' + erpDataList[j].orderNo + ' - ' + erpDataList[j].primeLineNo + (erpDataList[j].knShipmentNo != '' && erpDataList[j].knShipmentNo != null ? ' | ' + erpDataList[j].knShipmentNo : "");//B
                     data[2] = erpDataList[j].orderNo + ' | ' + erpDataList[j].primeLineNo;//C
                     data[3] = getLabelText(erpDataList[j].erpPlanningUnit.label);//D
@@ -4096,9 +4120,10 @@ export default class ManualTagging extends Component {
                                 programQPLDetailsList: programQPLDetails,
                                 budgetList: budgetList
                             }, () => {
-                                this.getProgramList();
                                 if (parameter == 1) {
                                     this.filterErpData();
+                                }else{
+                                    this.getProgramList();
                                 }
                             })
                         }.bind(this)
@@ -4108,15 +4133,18 @@ export default class ManualTagging extends Component {
         }.bind(this)
     }
 
-    getPlanningUnitList() {
+    getPlanningUnitListBasedOnTracerCategory() {
         var programId = (this.state.active3 ? this.state.programId1.toString().split("_")[0] : this.state.programId);
         var versionId = this.state.versionId.toString();
         console.log("Condition@@@@@@@@@@@@@", programId != -1 && programId != null && programId != "" && (this.state.active3 || ((this.state.active1 || this.state.active2) && versionId != "-1")));
         if (programId != -1 && programId != null && programId != "" && (this.state.active3 || ((this.state.active1 || this.state.active2) && versionId != "-1"))) {
             // if (!versionId.includes("Local")) {
-            ProgramService.getProgramPlaningUnitListByProgramId(programId)
+            console.log("programId@@@@@@@@@@@@@Mohit", programId)
+            console.log("[this.state.outputListAfterSearch[0].tracerCategoryId]@@@@@@@@@@@@@Mohit", [this.state.outputListAfterSearch[0].tracerCategoryId])
+            ProgramService.getPlanningUnitByProgramTracerCategory(programId, [this.state.outputListAfterSearch[0].tracerCategoryId])
                 .then(response => {
                     if (response.status == 200) {
+                        console.log("Response.data@@@@@@@@@@@@@Mohit", response.data)
                         var listArray = response.data;
                         listArray.sort((a, b) => {
                             var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -4126,7 +4154,7 @@ export default class ManualTagging extends Component {
 
                         listArray = listArray.filter(c => (c.active == true))
                         this.setState({
-                            planningUnits: listArray
+                            planningUnitsBasedOnTracerCategory: listArray
                         }, () => {
                             if (!this.state.active3) {
                                 this.getPlanningUnitArray();
@@ -4150,6 +4178,151 @@ export default class ManualTagging extends Component {
                     }
                 }).catch(
                     error => {
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            }, () => {
+                                this.hideSecondComponent()
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    }, () => {
+                                        this.hideSecondComponent()
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    }, () => {
+                                        this.hideSecondComponent()
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    }, () => {
+                                        this.hideSecondComponent()
+                                    });
+                                    break;
+                            }
+                        }
+                    }
+                );
+            // } else {
+            //     var localProgramList = this.state.localProgramList;
+            //     var localProgramListFilter = localProgramList.filter(c => c.programId == this.state.programId && c.version == versionId.split(" ")[0]);
+            //     var programDataBytes = CryptoJS.AES.decrypt(localProgramListFilter[0].programData.generalData, SECRET_KEY);
+            //     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+            //     var programJson = JSON.parse(programData);
+            //     console.log("ProgramJson@@@@@@@@@@@",programJson)
+            //     var listArray = programJson.planningUnitList;
+            //     var list = []
+            //     for (var l = 0; l < listArray.length; l++) {
+            //         list.push({
+            //             planningUnit: {
+            //                 id: listArray[l].id,
+            //                 label: listArray[l].label,
+            //                 active: listArray[l].active
+            //             }
+            //         })
+            //     }
+            //     list.sort((a, b) => {
+            //         var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+            //         var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+            //         return itemLabelA > itemLabelB ? 1 : -1;
+            //     });
+
+            //     list = list.filter(c => (c.active == true))
+            //     this.setState({
+            //         planningUnits: list
+            //     }, () => {
+            //         if (!this.state.active3) {
+            //             this.getPlanningUnitArray();
+            //         }
+            //     })
+
+            // }
+        } else {
+            this.setState({
+                outputList: [],
+                loading: false
+            }, () => {
+                try {
+                    this.state.languageEl.destroy();
+                } catch (e) {
+
+                }
+            })
+        }
+        // this.filterData();
+    }
+
+    getPlanningUnitList() {
+        console.log("Loading 1 Mohit in planning unit list#############")
+        var programId = (this.state.active3 ? this.state.programId1.toString().split("_")[0] : this.state.programId);
+        var versionId = this.state.versionId.toString();
+        console.log("Loading 1 Mohit programId#############",programId)
+        console.log("Loading 1 Mohit active 3#############",this.state.active3)
+        console.log("Loading 1 Mohit active 1#############",this.state.active1)
+        console.log("Loading 1 Mohit active 2#############",this.state.active2)
+        console.log("Loading 1 Mohit version Id#############",versionId)
+        if (programId != -1 && programId != null && programId != "" && (this.state.active3 || ((this.state.active1 || this.state.active2) && versionId != "-1"))) {
+            console.log("Loading 1 Mohit in before api call#############")
+            // if (!versionId.includes("Local")) {
+            ProgramService.getProgramPlaningUnitListByProgramId(programId)
+                .then(response => {
+                    if (response.status == 200) {
+                        console.log("Loading 1 Mohit in if#############")
+                        var listArray = response.data;
+                        listArray.sort((a, b) => {
+                            var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                            var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        });
+
+                        listArray = listArray.filter(c => (c.active == true))
+                        this.setState({
+                            planningUnits: listArray
+                        }, () => {
+                            if (!this.state.active3) {
+                                this.getPlanningUnitArray();
+                            } else {
+                                this.setState({
+                                    loading: false
+                                })
+                            }
+                        })
+                    }
+                    else {
+                        console.log("Loading 1 Mohit in else#############")
+                        this.setState({
+                            message: response.data.messageCode,
+                            loading: false,
+                            color: '#BA0C2F'
+                        },
+                            () => {
+                                this.hideSecondComponent();
+                            })
+                    }
+                }).catch(
+                    error => {
+                        console.log("Loading 1 Mohit in catch#############",error)
                         if (error.message === "Network Error") {
                             this.setState({
                                 message: 'static.unkownError',
@@ -4380,8 +4553,9 @@ export default class ManualTagging extends Component {
         }, this);
 
 
+        const { planningUnitsBasedOnTracerCategory } = this.state;
         const { planningUnits } = this.state;
-        let planningUnitList = planningUnits.length > 0 && planningUnits.map((item, i) => {
+        let planningUnitList = planningUnitsBasedOnTracerCategory.length > 0 && planningUnitsBasedOnTracerCategory.map((item, i) => {
             return (
                 <option key={i} value={item.planningUnit.id}>
                     {getLabelText(item.planningUnit.label, this.state.lang)}
@@ -4423,6 +4597,7 @@ export default class ManualTagging extends Component {
         let productCategoryMultList = productCategories.length > 0 && productCategories.map((item, i) => {
             return ({ label: getLabelText(item.payload.label, this.state.lang), value: item.payload.productCategoryId })
         }, this);
+
 
         let planningUnitMultiList = planningUnits.length > 0
             && planningUnits.map((item, i) => {
