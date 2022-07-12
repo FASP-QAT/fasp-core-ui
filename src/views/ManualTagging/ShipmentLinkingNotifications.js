@@ -1438,7 +1438,7 @@ export default class ShipmentLinkingNotifications extends Component {
                 {i18n.t('static.common.result', { from, to, size })}
             </span>
         );
-        
+
         const options = {
             hidePageListOnlyOnePage: true,
             firstPageText: i18n.t('static.common.first'),
@@ -1475,7 +1475,7 @@ export default class ShipmentLinkingNotifications extends Component {
                 headerAlign: 'center'
             },
             {
-                dataField: 'erpPlanningUnit',
+                dataField: 'planningUnitName',
                 text: i18n.t('static.manualTagging.erpPlanningUnit'),
                 sort: true,
                 align: 'center',
@@ -1630,10 +1630,16 @@ export default class ShipmentLinkingNotifications extends Component {
                                 </ModalHeader>
                                 <ModalBody>
                                     <div>
-
+                                        <span><b>{i18n.t('static.manualTagging.orderDetails')}</b></span>
+                                        <br />
+                                        <br />
                                         <ToolkitProvider
                                             keyField="optList"
-                                            data={this.state.artmisHistory.erpOrderList}
+                                            data={this.state.artmisHistory.erpOrderList != undefined && this.state.artmisHistory.erpOrderList.sort((a, b) => {
+                                                var itemLabelA = moment(a.dataReceivedOn); // ignore upper and lowercase
+                                                var itemLabelB = moment(b.dataReceivedOn);
+                                                return itemLabelA < itemLabelB ? 1 : -1;
+                                            })}
                                             columns={columns1}
                                             search={{ searchFormatted: true }}
                                             hover
@@ -1663,7 +1669,11 @@ export default class ShipmentLinkingNotifications extends Component {
 
                                         <ToolkitProvider
                                             keyField="optList"
-                                            data={this.state.artmisHistory.erpShipmentList}
+                                            data={this.state.artmisHistory.erpShipmentList != undefined && this.state.artmisHistory.erpShipmentList.sort((a, b) => {
+                                                var itemLabelA = moment(a.dataReceivedOn); // ignore upper and lowercase
+                                                var itemLabelB = moment(b.dataReceivedOn);
+                                                return itemLabelA < itemLabelB ? 1 : -1;
+                                            })}
                                             columns={columns2}
                                             search={{ searchFormatted: true }}
                                             hover
