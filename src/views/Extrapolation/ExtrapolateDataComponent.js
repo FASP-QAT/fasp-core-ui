@@ -564,7 +564,9 @@ export default class ExtrapolateDataComponent extends React.Component {
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
         try {
-            this.el.destroy();
+            // this.el.destroy();
+            jexcel.destroy(document.getElementById("tableDiv"), true);
+
         } catch (error) { }
         var options = {
             data: dataArray,
@@ -970,7 +972,9 @@ export default class ExtrapolateDataComponent extends React.Component {
     loaded = function (instance, cell, x, y, value) {
         // jExcelLoadedFunctionWithoutPagination(instance);
         jExcelLoadedFunctionOnlyHideRow(instance);
-        var asterisk = document.getElementsByClassName("resizable")[0];
+        // var asterisk = document.getElementsByClassName("resizable")[0];
+        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
+
         var tr = asterisk.firstChild;
 
         tr.children[2].classList.add('InfoTr');
@@ -1064,7 +1068,9 @@ export default class ExtrapolateDataComponent extends React.Component {
                 })
             } else {
                 this.el = jexcel(document.getElementById("tableDiv"), '');
-                this.el.destroy();
+                // this.el.destroy();
+                jexcel.destroy(document.getElementById("tableDiv"), true);
+
                 this.setState({
                     forecastProgramId: forecastProgramId,
                     planningUnitList: [],
@@ -1304,7 +1310,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                 "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 4)[0],
                                 "jsonProperties": {
                                     confidenceLevel: this.state.confidenceLevelIdArima,
-                                    seasonality: this.state.seasonality,                            
+                                    seasonality: this.state.seasonality,
                                     p: this.state.p,
                                     d: this.state.d,
                                     q: this.state.q,
@@ -1381,7 +1387,9 @@ export default class ExtrapolateDataComponent extends React.Component {
             var planningUnitId = e.target.value;
             localStorage.setItem("sesDatasetPlanningUnitId", e.target.value);
             this.el = jexcel(document.getElementById("tableDiv"), '');
-            this.el.destroy();
+            // this.el.destroy();
+            jexcel.destroy(document.getElementById("tableDiv"), true);
+
             this.setState({
                 planningUnitId: planningUnitId,
                 showData: false,
@@ -1410,7 +1418,9 @@ export default class ExtrapolateDataComponent extends React.Component {
             var regionId = e.target.value;
             localStorage.setItem("sesDatasetRegionId", e.target.value);
             this.el = jexcel(document.getElementById("tableDiv"), '');
-            this.el.destroy();
+            // this.el.destroy();
+            jexcel.destroy(document.getElementById("tableDiv"), true);
+
             this.setState({
                 regionId: regionId,
                 showData: false,
@@ -1848,7 +1858,9 @@ export default class ExtrapolateDataComponent extends React.Component {
                 })
             } else {
                 this.el = jexcel(document.getElementById("tableDiv"), '');
-                this.el.destroy();
+                // this.el.destroy();
+                jexcel.destroy(document.getElementById("tableDiv"), true);
+
                 this.setState({
                     showData: false,
                     dataEl: "",
@@ -1858,7 +1870,9 @@ export default class ExtrapolateDataComponent extends React.Component {
             }
         } else {
             this.el = jexcel(document.getElementById("tableDiv"), '');
-            this.el.destroy();
+            // this.el.destroy();
+            jexcel.destroy(document.getElementById("tableDiv"), true);
+
             this.setState({
                 dataEl: "",
                 showData: false,
@@ -3748,7 +3762,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                             />
                                                             <FormFeedback>{errors.qId}</FormFeedback>
                                                         </div>
-                                                        <div className="tab-ml-1 ml-lg-5 ExtraCheckboxFieldWidth" style={{marginTop:'38px'}}>
+                                                        <div className="tab-ml-1 ml-lg-5 ExtraCheckboxFieldWidth" style={{ marginTop: '38px' }}>
                                                             <Input
                                                                 className="form-check-input checkboxMargin"
                                                                 type="checkbox"
@@ -3763,7 +3777,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                 check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
                                                                 <b>{i18n.t('static.extrapolation.seasonality')}</b>
                                                             </Label>
-                                                        </div>                 
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </FormGroup>
@@ -4021,7 +4035,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                 <li>{i18n.t('static.extrapolation.OrderMovingAverage')}: {i18n.t('static.extrapolation.OrderMovingAverageText')}</li><br></br>
                                                 <p>{i18n.t('static.extrapolation.ManyPrograms')} <br></br>
 
-                                                {i18n.t('static.extrapolation.ConfidenceInterval')}: {i18n.t('static.extrapolation.ConfidenceIntervalText')}</p>
+                                                    {i18n.t('static.extrapolation.ConfidenceInterval')}: {i18n.t('static.extrapolation.ConfidenceIntervalText')}</p>
                                             </ul>
                                         </li>
                                     </li>
@@ -4043,7 +4057,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                             </ul>
                                         </li>
                                         <li>
-                                        {i18n.t('static.extrapolation.Trending')}
+                                            {i18n.t('static.extrapolation.Trending')}
                                             <ul>
                                                 <li>{i18n.t('static.extrapolation.SemiAveragesProjection')}</li>
                                                 <li>{i18n.t('static.extrapolation.SimpleLinear')}</li>
@@ -4071,15 +4085,15 @@ export default class ExtrapolateDataComponent extends React.Component {
                                         <li>{i18n.t('static.extrapolation.WAPE')}</li>
                                         <li>{i18n.t('static.extrapolation.RMSE')}</li>
                                         <li>{i18n.t('static.extrapolation.MAE')}<br></br>
-                                        {i18n.t('static.extrapolation.LowerTheError')} {i18n.t('static.extrapolation.LowErrorValue')} 
+                                            {i18n.t('static.extrapolation.LowerTheError')} {i18n.t('static.extrapolation.LowErrorValue')}
                                         </li>
                                         <p>
-                                        {i18n.t('static.extrapolation.SelectionBetween')} {i18n.t('static.extrapolation.Organized')}
+                                            {i18n.t('static.extrapolation.SelectionBetween')} {i18n.t('static.extrapolation.Organized')}
                                             <ul>
                                                 <li>{i18n.t('static.extrapolation.MoreSensitive')} </li>
-                                                <li>{i18n.t('static.extrapolation.PoorerData')} <i class="fa fa-angle-left" aria-hidden="true">12</i> {i18n.t('static.extrapolation.MonthsOfData')} 
+                                                <li>{i18n.t('static.extrapolation.PoorerData')} <i class="fa fa-angle-left" aria-hidden="true">12</i> {i18n.t('static.extrapolation.MonthsOfData')}
                                                     <br></br>
-                                                    {i18n.t('static.extrapolation.SecondStep')} {i18n.t('static.extrapolation.ChoosingToDisregard')} 
+                                                    {i18n.t('static.extrapolation.SecondStep')} {i18n.t('static.extrapolation.ChoosingToDisregard')}
                                                 </li>
                                             </ul>
                                         </p>

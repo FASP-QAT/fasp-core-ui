@@ -168,7 +168,9 @@ class CountrySpecificPrices extends Component {
                                     papuDataArr[0] = data;
                                 }
                                 this.el = jexcel(document.getElementById("paputableDiv"), '');
-                                this.el.destroy();
+                                // this.el.destroy();
+                                jexcel.destroy(document.getElementById("paputableDiv"), true);
+
                                 var json = [];
                                 var data = papuDataArr;
                                 var options = {
@@ -565,7 +567,7 @@ class CountrySpecificPrices extends Component {
     }
 
     oneditionend = function (instance, cell, x, y, value) {
-        var elInstance = instance.jexcel;
+        var elInstance = instance;
         var rowData = elInstance.getRowData(y);
 
         if (x == 3 && !isNaN(rowData[3]) && rowData[3].toString().indexOf('.') != -1) {
@@ -598,12 +600,12 @@ class CountrySpecificPrices extends Component {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
-                var index = (instance.jexcel).getValue(`F${parseInt(data[i].y) + 1}`, true);
+                var index = (instance).getValue(`F${parseInt(data[i].y) + 1}`, true);
                 if (index === "" || index == null || index == undefined) {
-                    (instance.jexcel).setValueFromCoords(0, data[i].y, this.state.programPlanningUnit.program.label.label_en, true);
-                    (instance.jexcel).setValueFromCoords(1, data[i].y, this.state.programPlanningUnit.planningUnit.label.label_en, true);
-                    (instance.jexcel).setValueFromCoords(6, data[i].y, 0, true);
-                    (instance.jexcel).setValueFromCoords(7, data[i].y, 1, true);
+                    (instance).setValueFromCoords(0, data[i].y, this.state.programPlanningUnit.program.label.label_en, true);
+                    (instance).setValueFromCoords(1, data[i].y, this.state.programPlanningUnit.planningUnit.label.label_en, true);
+                    (instance).setValueFromCoords(6, data[i].y, 0, true);
+                    (instance).setValueFromCoords(7, data[i].y, 1, true);
                     z = data[i].y;
                 }
             }
@@ -704,7 +706,9 @@ class CountrySpecificPrices extends Component {
 
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
-        var asterisk = document.getElementsByClassName("resizable")[0];
+        // var asterisk = document.getElementsByClassName("resizable")[0];
+        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
+
         var tr = asterisk.firstChild;
         tr.children[3].classList.add('AsteriskTheadtrTd');
         tr.children[4].classList.add('AsteriskTheadtrTd');

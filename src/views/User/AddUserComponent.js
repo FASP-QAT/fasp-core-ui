@@ -168,6 +168,7 @@ class AddUserComponent extends Component {
             isValid: false,
             loading1: true,
             programListForFilter: [],
+            addUserEL: ''
         }
         this.cancelClicked = this.cancelClicked.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
@@ -776,7 +777,9 @@ class AddUserComponent extends Component {
     filterProgramByCountryId = function (instance, cell, c, r, source) {
 
         var mylist = [];
-        var value = (instance.jexcel.getJson(null, false)[r])[1];
+        // var value = (instance.jexcel.getJson(null, false)[r])[1];
+        var value = (this.state.addUserEL.getJson(null, false)[r])[1];
+
         console.log("mylist--------->3.2", value);
 
         // const { selProgram } = this.state;
@@ -918,7 +921,9 @@ class AddUserComponent extends Component {
             papuDataArr[0] = data;
         }
         this.el = jexcel(document.getElementById("paputableDiv"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("paputableDiv"), true);
+
         var json = [];
         var data = papuDataArr;
 
@@ -1140,6 +1145,7 @@ class AddUserComponent extends Component {
 
         this.el = jexcel(document.getElementById("paputableDiv"), options);
         this.setState({
+            addUserEL: jexcel(document.getElementById("paputableDiv"), options),
             loading: false,
             loading1: false
         })
@@ -1147,7 +1153,9 @@ class AddUserComponent extends Component {
 
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
-        var asterisk = document.getElementsByClassName("resizable")[0];
+        // var asterisk = document.getElementsByClassName("resizable")[0];
+        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
+
         var tr = asterisk.firstChild;
         // tr.children[1].classList.add('AsteriskTheadtrTd');
         tr.children[2].classList.add('AsteriskTheadtrTd');
@@ -1172,7 +1180,7 @@ class AddUserComponent extends Component {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
-                (instance.jexcel).setValueFromCoords(0, data[i].y, this.state.user.username, true);
+                (instance).setValueFromCoords(0, data[i].y, this.state.user.username, true);
                 z = data[i].y;
             }
         }

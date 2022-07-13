@@ -367,7 +367,9 @@ export default class QunatimedImportStepFive extends Component {
         })
 
         this.el = jexcel(document.getElementById("recordsDiv"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("recordsDiv"), true);
+
         var myVar = "";
         var json = this.props.items.importData.records;
         console.log("Json+++", json);

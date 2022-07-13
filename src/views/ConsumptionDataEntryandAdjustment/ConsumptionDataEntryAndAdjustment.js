@@ -16,8 +16,8 @@ import 'react-select/dist/react-select.min.css';
 import AuthenticationService from "../Common/AuthenticationService.js";
 import '../Forms/ValidationForms/ValidationForms.css';
 import moment from "moment"
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import csvicon from '../../assets/img/csv.png';
 import { JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
@@ -207,7 +207,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       }, () => {
         var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN']
         var consumptionList = isInterpolate == 1 ? this.state.tempConsumptionList : this.state.consumptionList;
-        console.log("consumptionList All--->", consumptionList)
+        console.log("consumptionList All--->", this.state.tempConsumptionList)
         var consumptionUnit = {};
         var consumptionNotes = "";
         if (consumptionUnitId > 0) {
@@ -367,18 +367,20 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         //   languageArray[count] = data;
         //   count++;
         // }
-        this.el = jexcel(document.getElementById("tableDiv"), '');
-        this.el.destroy();
+        // this.el = jexcel(document.getElementById("tableDiv"), '');
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById('tableDiv'), true);
         var options = {
           data: dataArray,
           columnDrag: true,
           columns: columns,
-          text: {
-            // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-            showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-            show: '',
-            entries: '',
-          },
+          colWidths: [10, 50, 100, 100, 100, 100, 50, 100],
+          // text: {
+          //   // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+          //   showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+          //   show: '',
+          //   entries: '',
+          // },
           updateTable: function (el, cell, x, y, source, value, id) {
           },
           onload: this.loaded,
@@ -393,7 +395,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           pagination: false,
           search: false,
           columnSorting: false,
-          tableOverflow: true,
+          // tableOverflow: true,
           wordWrap: true,
           allowInsertColumn: false,
           allowManualInsertColumn: false,
@@ -408,7 +410,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           freezeColumns: 1,
           license: JEXCEL_PRO_KEY,
           parseFormulas: true,
-          editable:AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT')?true:false,
+          editable: AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT') ? true : false,
           contextMenu: function (obj, x, y, e) {
             return [];
           }.bind(this),
@@ -974,9 +976,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
   }
 
   loadedJexcel = function (instance, cell, x, y, value) {
-    jExcelLoadedFunctionOnlyHideRow(instance);
+    // jExcelLoadedFunctionOnlyHideRow(instance);
 
-    var elInstance = instance.jexcel;
+    var elInstance = instance.worksheets[0];
     var consumptionDataType = this.state.tempConsumptionUnitObject.consumptionDataType;
 
     var cell1 = elInstance.getCell(`C1`)//other name
@@ -1011,7 +1013,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
   loaded = function (instance, cell, x, y, value) {
     jExcelLoadedFunctionOnlyHideRow(instance);
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM'];
-    var elInstance = instance.jexcel;
+    var elInstance = instance.worksheets[0];
     var json = elInstance.getJson(null, false);
     var arr = [];
     var count = 1;
@@ -1440,7 +1442,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       }, () => {
         try {
           this.el = jexcel(document.getElementById("tableDiv"), '');
-          this.el.destroy();
+          // this.el.destroy();
+          jexcel.destroy(document.getElementById("tableDiv"), true);
         } catch (error) {
 
         }
@@ -1923,6 +1926,10 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
   }
 
   render() {
+    jexcel.setDictionary({
+      Show: " ",
+      entries: " ",
+    });
 
     const pickerLang = {
       months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -2279,7 +2286,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                               </Label><br />
                               <Label htmlFor="appendedInputButton">{i18n.t('static.common.dataEnteredIn')}: <b>{this.state.tempConsumptionUnitObject.consumptionDataType == 1 ? (this.state.tempConsumptionUnitObject.planningUnit.forecastingUnit.label.label_en) : this.state.tempConsumptionUnitObject.consumptionDataType == 2 ? this.state.tempConsumptionUnitObject.planningUnit.label.label_en : this.state.tempConsumptionUnitObject.otherUnit.label.label_en}</b>
                                 <a className="card-header-action">
-                                 {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT') && <span style={{ cursor: 'pointer' }} className="hoverDiv" onClick={() => { this.changeUnit(this.state.selectedConsumptionUnitId) }}>({i18n.t('static.dataentry.change')})</span>}
+                                  {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT') && <span style={{ cursor: 'pointer' }} className="hoverDiv" onClick={() => { this.changeUnit(this.state.selectedConsumptionUnitId) }}>({i18n.t('static.dataentry.change')})</span>}
                                 </a>
                               </Label><br />
                               <Label htmlFor="appendedInputButton">{i18n.t('static.dataentry.conversionToPu')}: <b>{this.state.tempConsumptionUnitObject.consumptionDataType == 1 ? Number(1 / this.state.tempConsumptionUnitObject.planningUnit.multiplier).toFixed(4) : this.state.tempConsumptionUnitObject.consumptionDataType == 2 ? 1 : Number(1 / this.state.tempConsumptionUnitObject.planningUnit.multiplier * this.state.tempConsumptionUnitObject.otherUnit.multiplier).toFixed(4)}</b>
@@ -2295,7 +2302,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                                 name="consumptionNotes"
                                 id="consumptionNotes"
                                 bsSize="sm"
-                                readOnly={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT')?false:true}
+                                readOnly={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT') ? false : true}
                                 onChange={(e) => this.setState({ consumptionChanged: true })}
                               >
                               </Input>
@@ -2303,7 +2310,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                           </div>
                         </FormGroup>
                         <FormGroup className="col-md-4" style={{ paddingTop: '30px', display: this.state.showDetailTable ? 'block' : 'none' }}>
-                         {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT') && <Button type="button" id="formSubmitButton" size="md" color="success" className="float-right mr-1" onClick={() => this.interpolationMissingActualConsumption()}>
+                          {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT') && <Button type="button" id="formSubmitButton" size="md" color="success" className="float-right mr-1" onClick={() => this.interpolationMissingActualConsumption()}>
                             <i className="fa fa-check"></i>{i18n.t('static.pipeline.interpolateMissingValues')}</Button>}
                         </FormGroup>
                       </div>
@@ -2854,7 +2861,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     }
 
     this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
-    this.el.destroy();
+    // this.el.destroy();
+    jexcel.destroy(document.getElementById("mapPlanningUnit"));
 
     var data = dataArray1;
     var options = {
@@ -2869,12 +2877,13 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         { title: i18n.t('static.dataentry.conversionToPu'), type: 'numeric', decimal: '.', readOnly: true },//4 E
         { title: 'Conversion Type', type: 'hidden' }//5 F
       ],
-      text: {
-        // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-        show: '',
-        entries: '',
-      },
+      // text: {
+      //   // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+      //   showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+      //   show: '',
+      //   entries: '',
+      // },
+      editable: true,
       updateTable: function (el, cell, x, y, source, value, id) {
       },
       onload: this.loadedJexcel,
@@ -2882,7 +2891,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       pagination: false,
       search: false,
       columnSorting: false,
-      tableOverflow: true,
+      // tableOverflow: true,
       wordWrap: true,
       allowInsertColumn: false,
       allowManualInsertColumn: false,

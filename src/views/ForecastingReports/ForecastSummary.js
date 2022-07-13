@@ -29,8 +29,8 @@ import "jspdf-autotable";
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { Prompt } from 'react-router';
 import ReportService from '../../api/ReportService';
@@ -1086,7 +1086,8 @@ class ForecastSummary extends Component {
                 this.setState({ message: i18n.t('static.program.validversion'), summeryData: [], dataArray: [], versionId: '', forecastPeriod: '', });
                 try {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
-                    this.el.destroy();
+                    // this.el.destroy();
+                    jexcel.destroy(document.getElementById("tableDiv"), true);
                 }
                 catch (err) {
                     // document.getElementById("demo").innerHTML = err.message;
@@ -1598,7 +1599,8 @@ class ForecastSummary extends Component {
                                     // console.log("languageArray---->", languageArray);
                                     try {
                                         this.el = jexcel(document.getElementById("tableDiv"), '');
-                                        this.el.destroy();
+                                        // this.el.destroy();
+                                        jexcel.destroy(document.getElementById("tableDiv"), true);
                                     }
                                     catch (err) {
                                         // document.getElementById("demo").innerHTML = err.message;
@@ -1616,21 +1618,21 @@ class ForecastSummary extends Component {
                                         nestedHeaders: [nestedHeaders],
                                         updateTable: function (el, cell, x, y, source, value, id) {
                                             if (y != null) {
-                                                var elInstance = el.jexcel;
+                                                var elInstance = el;
                                                 var rowData = elInstance.getRowData(y);
                                                 elInstance.setStyle(`C${parseInt(y) + 1}`, 'text-align', 'left');
                                             }
                                         }.bind(this),
-                                        text: {
-                                            // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                                            showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                                            show: '',
-                                            entries: '',
-                                        },
+                                        // text: {
+                                        //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                                        //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                                        //     show: '',
+                                        //     entries: '',
+                                        // },
                                         pagination: false,
                                         search: false,
                                         columnSorting: true,
-                                        tableOverflow: true,
+                                        // tableOverflow: true,
                                         wordWrap: true,
                                         allowInsertColumn: false,
                                         allowManualInsertColumn: false,
@@ -1643,10 +1645,10 @@ class ForecastSummary extends Component {
                                         position: 'top',
                                         filters: true,
                                         onchange: this.forecastChanged,
-                                        editable:AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_LIST_FORECAST_SUMMARY')?true:false,
+                                        editable: AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_LIST_FORECAST_SUMMARY') ? true : false,
                                         onload: function (instance, cell, x, y, value) {
                                             jExcelLoadedFunctionOnlyHideRow(instance);
-                                            var elInstance = instance.jexcel;
+                                            var elInstance = instance.worksheets[0];
                                             var json = elInstance.getJson(null, false);
                                             var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF']
                                             for (var y = 0; y < json.length; y++) {
@@ -1899,7 +1901,8 @@ class ForecastSummary extends Component {
 
                             try {
                                 this.el = jexcel(document.getElementById("tableDiv"), '');
-                                this.el.destroy();
+                                // this.el.destroy();
+                                jexcel.destroy(document.getElementById("tableDiv"), true);
                             }
                             catch (err) {
                                 // document.getElementById("demo").innerHTML = err.message;
@@ -1950,7 +1953,7 @@ class ForecastSummary extends Component {
                                 // onchange: this.forecastChanged,
                                 onload: function (instance, cell, x, y, value) {
                                     jExcelLoadedFunctionOnlyHideRow(instance);
-                                    var elInstance = instance.jexcel;
+                                    var elInstance = instance.worksheets[0];
                                     var json = elInstance.getJson(null, false);
                                     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF']
                                     for (var y = 0; y < json.length; y++) {
@@ -2043,7 +2046,8 @@ class ForecastSummary extends Component {
             this.setState({ message: i18n.t('static.common.selectProgram'), summeryData: [], dataArray: [], programId: '', versionId: '', forecastPeriod: '', });
             try {
                 this.el = jexcel(document.getElementById("tableDiv"), '');
-                this.el.destroy();
+                // this.el.destroy();
+                jexcel.destroy(document.getElementById("tableDiv"), true);
             }
             catch (err) {
                 // document.getElementById("demo").innerHTML = err.message;
@@ -2054,7 +2058,8 @@ class ForecastSummary extends Component {
             this.setState({ message: i18n.t('static.program.validversion'), summeryData: [], dataArray: [], versionId: '', forecastPeriod: '', });
             try {
                 this.el = jexcel(document.getElementById("tableDiv"), '');
-                this.el.destroy();
+                // this.el.destroy();
+                jexcel.destroy(document.getElementById("tableDiv"), true);
             }
             catch (err) {
                 // document.getElementById("demo").innerHTML = err.message;
@@ -2132,7 +2137,8 @@ class ForecastSummary extends Component {
         // console.log("x---------------->2 2", r);
         var tsList = this.state.tsList;
         var mylist = [];
-        var value = (instance.jexcel.getJson(null, false)[r])[1].id;
+        // var value = (instance.jexcel.getJson(null, false)[r])[1].id;
+        var value = (this.state.dataEl.getJson(null, false)[r])[1].id;
 
         var regionList = this.state.regRegionList;
         // var planningUniObj = this.state.regPlanningUnitList.filter(c => c.planningUnit.id == value);
@@ -3008,6 +3014,11 @@ class ForecastSummary extends Component {
     }
 
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
         const { programs } = this.state;
         let programList = programs.length > 0
             && programs.map((item, i) => {
@@ -3614,7 +3625,7 @@ class ForecastSummary extends Component {
                                 </ul>
                             </p>
                             <p>
-                            {i18n.t('static.ForecastSummary.ForExample')}
+                                {i18n.t('static.ForecastSummary.ForExample')}
                                 <table className="table table-bordered ">
                                     <thead>
                                         <tr>
@@ -3656,7 +3667,7 @@ class ForecastSummary extends Component {
                                 </ul>
                             </p>
                             <p>
-                            {i18n.t('static.ForecastSummary.AssumingUnitCost')}:
+                                {i18n.t('static.ForecastSummary.AssumingUnitCost')}:
                                 <ul>
                                     <li>{i18n.t('static.ForecastSummary.ProductCost')} = -385,000 * 0.10 = $38,500</li>
                                     <li>{i18n.t('static.ForecastSummary.FreightCost')} = $38,500 * 7% = $2,695</li>

@@ -24,20 +24,20 @@ export default class PipelineProgramProcurementAgent extends Component {
         this.checkValidation = this.checkValidation.bind(this);
         this.saveProcurementAgent = this.saveProcurementAgent.bind(this);
         //this.dropdownFilter = this.dropdownFilter.bind(this);
-        this.startLoading=this.startLoading.bind(this);
-        this.stopLoading=this.stopLoading.bind(this);
+        this.startLoading = this.startLoading.bind(this);
+        this.stopLoading = this.stopLoading.bind(this);
     }
 
-    startLoading(){
-        this.setState({loading:true});
+    startLoading() {
+        this.setState({ loading: true });
     }
-    stopLoading(){
-        this.setState({loading:false});
+    stopLoading() {
+        this.setState({ loading: false });
     }
 
     loaded() {
         var list = this.state.procurementAgentList;
-        var json = this.el.getJson(null,false);
+        var json = this.el.getJson(null, false);
 
         for (var y = 0; y < json.length; y++) {
             var col = ("B").concat(parseInt(y) + 1);
@@ -60,7 +60,7 @@ export default class PipelineProgramProcurementAgent extends Component {
 
         //Planning Unit
         if (x == 1) {
-            var json = this.el.getJson(null,false);
+            var json = this.el.getJson(null, false);
             var col = ("B").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -85,14 +85,14 @@ export default class PipelineProgramProcurementAgent extends Component {
         var regDec = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
 
         var valid = true;
-        var json = this.el.getJson(null,false);
+        var json = this.el.getJson(null, false);
         for (var y = 0; y < json.length; y++) {
             var col = ("B").concat(parseInt(y) + 1);
             var value = this.el.getValue(`B${parseInt(y) + 1}`, true);
 
             var currentProcurementAgent = this.el.getRowData(y)[1];
 
-            if (value == "" || value==undefined) {
+            if (value == "" || value == undefined) {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
@@ -108,7 +108,7 @@ export default class PipelineProgramProcurementAgent extends Component {
 
     saveProcurementAgent() {
         var list = this.state.procurementAgentList;
-        var json = this.el.getJson(null,false);
+        var json = this.el.getJson(null, false);
         var procurementAgentArray = []
         console.log(json.length)
         console.log(json)
@@ -185,7 +185,9 @@ export default class PipelineProgramProcurementAgent extends Component {
                                     }
 
                                     this.el = jexcel(document.getElementById("mapProcurementAgent"), '');
-                                    this.el.destroy();
+                                    // this.el.destroy();
+                                    jexcel.destroy(document.getElementById("mapProcurementAgent"), true);
+
                                     var json = [];
                                     var data = productDataArr;
                                     // var data = []

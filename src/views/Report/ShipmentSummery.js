@@ -62,8 +62,8 @@ import { MultiSelect } from 'react-multi-select-component';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 import { filter } from 'jszip';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { red } from '@material-ui/core/colors';
 
@@ -825,7 +825,9 @@ class ShipmentSummery extends Component {
         }
 
         this.el = jexcel(document.getElementById("shipmentDetailsListTableDiv"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("shipmentDetailsListTableDiv"), true);
+
         var json = [];
         var data = shipmentDetailsListArray;
         var options = {
@@ -852,12 +854,12 @@ class ShipmentSummery extends Component {
                 {
                     title: i18n.t('static.report.erpOrder'),
                     type: 'checkbox',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.report.localprocurement'),
                     type: 'checkbox',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.report.orderNo'),
@@ -935,16 +937,16 @@ class ShipmentSummery extends Component {
             editable: false,
             license: JEXCEL_PRO_KEY,
             filters: true,
-            text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
@@ -968,7 +970,7 @@ class ShipmentSummery extends Component {
     }
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
-        var elInstance = instance.jexcel;
+        var elInstance = instance.worksheets[0];
         var json = elInstance.getJson();
         for (var j = 0; j < json.length; j++) {
             var colArr = ['A', 'B', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P']
@@ -1951,19 +1953,22 @@ class ShipmentSummery extends Component {
             this.setState(
                 { message: i18n.t('static.common.selectProgram'), data: [], shipmentDetailsList: [], shipmentDetailsFundingSourceList: [], shipmentDetailsMonthList: [] }, () => {
                     this.el = jexcel(document.getElementById("shipmentDetailsListTableDiv"), '');
-                    this.el.destroy();
+                    // this.el.destroy();
+                    jexcel.destroy(document.getElementById("shipmentDetailsListTableDiv"), true);
                 });
 
         } else if (versionId == 0) {
             this.setState({ message: i18n.t('static.program.validversion'), data: [], shipmentDetailsList: [], shipmentDetailsFundingSourceList: [], shipmentDetailsMonthList: [] }, () => {
                 this.el = jexcel(document.getElementById("shipmentDetailsListTableDiv"), '');
-                this.el.destroy();
+                // this.el.destroy();
+                jexcel.destroy(document.getElementById("shipmentDetailsListTableDiv"), true);
             });
 
         } else if (this.state.planningUnitValues.length == 0) {
             this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: [], shipmentDetailsList: [], shipmentDetailsFundingSourceList: [], shipmentDetailsMonthList: [] }, () => {
                 this.el = jexcel(document.getElementById("shipmentDetailsListTableDiv"), '');
-                this.el.destroy();
+                // this.el.destroy();
+                jexcel.destroy(document.getElementById("shipmentDetailsListTableDiv"), true);
 
             });
         }
@@ -2024,6 +2029,11 @@ class ShipmentSummery extends Component {
     }
 
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
         const { programs } = this.state
 
         const { versions } = this.state;

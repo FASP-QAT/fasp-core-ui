@@ -4,8 +4,8 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import { Card, CardHeader, CardBody, Button, Col, FormGroup, Label, InputGroup, Input, Modal, ModalBody, ModalFooter, ModalHeader, CardFooter, FormFeedback, Form } from 'reactstrap';
 import getLabelText from '../../CommonComponent/getLabelText'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import i18n from '../../i18n';
@@ -282,7 +282,8 @@ export default class ListTreeTemplate extends Component {
 
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("tableDiv"), true);
         var json = [];
         var data = treeTemplateArray;
 
@@ -299,27 +300,27 @@ export default class ListTreeTemplate extends Component {
                 {
                     title: i18n.t('static.listTreeTemp.templateName'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.forecastMethod.forecastMethod'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.program.monthsInPast'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.program.monthsInFuture'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     type: 'dropdown',
                     title: i18n.t('static.common.status'),
-                    readOnly: true,
+                    // readOnly: true,
                     source: [
                         { id: true, name: i18n.t('static.common.active') },
                         { id: false, name: i18n.t('static.common.disabled') }
@@ -328,27 +329,28 @@ export default class ListTreeTemplate extends Component {
                 {
                     title: i18n.t('static.common.lastModifiedBy'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.common.lastModifiedDate'),
                     type: 'calendar',
                     options: { format: JEXCEL_DATE_FORMAT_SM },
-                    readOnly: true
+                    // readOnly: true
                 },
 
             ],
-            text: {
-                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
+            editable: false,
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
@@ -365,18 +367,18 @@ export default class ListTreeTemplate extends Component {
                 var items = [];
                 if (y != null) {
                     if (obj.options.allowInsertRow == true) {
-                        if(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_TREE_TEMPLATE')){
-                        items.push({
-                            title: i18n.t('static.common.duplicateTemplate'),
-                            onclick: function () {
-                                this.setState({
-                                    treeTemplateId: this.el.getValueFromCoords(0, y),
-                                    isModalOpen: !this.state.isModalOpen,
-                                    treeTemplateName: this.el.getValueFromCoords(1, y) + " (copy)"
-                                })
-                            }.bind(this)
-                        });
-                    }
+                        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_TREE_TEMPLATE')) {
+                            items.push({
+                                title: i18n.t('static.common.duplicateTemplate'),
+                                onclick: function () {
+                                    this.setState({
+                                        treeTemplateId: this.el.getValueFromCoords(0, y),
+                                        isModalOpen: !this.state.isModalOpen,
+                                        treeTemplateName: this.el.getValueFromCoords(1, y) + " (copy)"
+                                    })
+                                }.bind(this)
+                            });
+                        }
                     }
                 }
 
@@ -465,6 +467,11 @@ export default class ListTreeTemplate extends Component {
     // }
 
     render() {
+
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
 
         return (
             <div className="animated">

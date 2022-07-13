@@ -1389,7 +1389,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 if (this.props.inventoryPage == "inventoryDataEntry") {
                     this.props.toggleLarge("submit");
                 }
-                elInstance.destroy();
+                // elInstance.destroy();
                 jexcel.destroy(document.getElementById("tableDiv"), true);
             }
             this.props.updateState("loading", false);

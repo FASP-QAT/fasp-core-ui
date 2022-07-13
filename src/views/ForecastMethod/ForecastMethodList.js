@@ -757,13 +757,13 @@ class forecastMethod extends Component {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
-                var index = (instance.worksheets[0]).getValue(`G${parseInt(data[i].y) + 1}`, true);
+                var index = (instance).getValue(`G${parseInt(data[i].y) + 1}`, true);
                 if (index === "" || index == null || index == undefined) {
-                    (instance.worksheets[0]).setValueFromCoords(0, data[i].y, 0, true);
-                    (instance.worksheets[0]).setValueFromCoords(3, data[i].y, true, true);
-                    (instance.worksheets[0]).setValueFromCoords(6, data[i].y, 0, true);
-                    (instance.worksheets[0]).setValueFromCoords(7, data[i].y, 1, true);
-                    (instance.worksheets[0]).setValueFromCoords(8, data[i].y, 1, true);
+                    (instance).setValueFromCoords(0, data[i].y, 0, true);
+                    (instance).setValueFromCoords(3, data[i].y, true, true);
+                    (instance).setValueFromCoords(6, data[i].y, 0, true);
+                    (instance).setValueFromCoords(7, data[i].y, 1, true);
+                    (instance).setValueFromCoords(8, data[i].y, 1, true);
                     z = data[i].y;
                 }
             }

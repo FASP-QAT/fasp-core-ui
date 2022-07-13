@@ -337,7 +337,9 @@ export function buildJxl1(props) {
             }
             try {
                 props.el = jexcel(document.getElementById("tableDiv" + tsl), '');
-                props.el.destroy();
+                // props.el.destroy();
+                jexcel.destroy(document.getElementById("tableDiv" + tsl), true);
+
             } catch (err) {
 
             }
@@ -396,7 +398,9 @@ export function buildJxl(props) {
             }
             try {
                 props.el = jexcel(document.getElementById("tableDiv" + tsl), '');
-                props.el.destroy();
+                // props.el.destroy();
+                jexcel.destroy(document.getElementById("tableDiv" + tsl), true);
+
             } catch (err) {
 
             }

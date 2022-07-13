@@ -948,7 +948,9 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                         papuDataArr[0] = data;
                                                     }
                                                     this.el = jexcel(document.getElementById("paputableDiv"), '');
-                                                    this.el.destroy();
+                                                    // this.el.destroy();
+                                                    jexcel.destroy(document.getElementById("paputableDiv"), true);
+
                                                     var json = [];
                                                     var data = papuDataArr;
 
@@ -1417,7 +1419,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
     }
 
     oneditionend = function (instance, cell, x, y, value) {
-        var elInstance = instance.jexcel;
+        var elInstance = instance;
         var rowData = elInstance.getRowData(y);
 
         if (x == 3 && !isNaN(rowData[3]) && rowData[3].toString().indexOf('.') != -1) {
@@ -1466,11 +1468,11 @@ export default class AddProcurementAgentPlanningUnit extends Component {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
-                var index = (instance.jexcel).getValue(`L${parseInt(data[i].y) + 1}`, true);
+                var index = (instance).getValue(`L${parseInt(data[i].y) + 1}`, true);
                 if (index === "" || index == null || index == undefined) {
-                    (instance.jexcel).setValueFromCoords(0, data[i].y, this.props.match.params.procurementAgentId, true);
-                    (instance.jexcel).setValueFromCoords(11, data[i].y, 0, true);
-                    (instance.jexcel).setValueFromCoords(12, data[i].y, 1, true);
+                    (instance).setValueFromCoords(0, data[i].y, this.props.match.params.procurementAgentId, true);
+                    (instance).setValueFromCoords(11, data[i].y, 0, true);
+                    (instance).setValueFromCoords(12, data[i].y, 1, true);
                     z = data[i].y;
                 }
             }
@@ -1634,7 +1636,9 @@ export default class AddProcurementAgentPlanningUnit extends Component {
 
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
-        var asterisk = document.getElementsByClassName("resizable")[0];
+        // var asterisk = document.getElementsByClassName("resizable")[0];
+        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
+
         var tr = asterisk.firstChild;
 
         tr.children[2].classList.add('AsteriskTheadtrTd');

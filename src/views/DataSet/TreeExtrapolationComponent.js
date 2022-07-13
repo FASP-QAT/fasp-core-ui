@@ -448,7 +448,7 @@ export default class TreeExtrapolationComponent extends React.Component {
         })
     }
     buildExtrapolationMom() {
-        console.log("is valid result start---",this.props.items.isValidError);
+        console.log("is valid result start---", this.props.items.isValidError);
         var movingAveragesData = [];
         var semiAveragesData = [];
         var linearRegressionData = [];
@@ -625,7 +625,7 @@ export default class TreeExtrapolationComponent extends React.Component {
             currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].dataValue = mom.length > 0 ? mom[0].calculatedValue : '0';
             currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].calculatedDataValue = mom.length > 0 ? mom[0].calculatedValue : '0';
             // }
-            console.log("is valid result ---",this.props.items.isValidError);
+            console.log("is valid result ---", this.props.items.isValidError);
             if (this.props.items.isValidError.toString() == "false") {
                 this.props.updateState("currentItemConfig", currentItemConfig);
             } else {
@@ -1575,7 +1575,9 @@ export default class TreeExtrapolationComponent extends React.Component {
         console.log("### inside jexcel")
 
         this.el = jexcel(document.getElementById("tableDiv"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("tableDiv"), true);
+
         console.log("this.state.forecastNestedHeader---", this.state.forecastNestedHeader)
         let nestedHeaders = [];
         if (this.state.forecastNestedHeader > 0) {
@@ -1953,10 +1955,10 @@ export default class TreeExtrapolationComponent extends React.Component {
         jExcelLoadedFunctionOnlyHideRow(instance);
         console.log("my instance---", instance)
         // if (this.state.dataExtrapolation != "") {
-        var asterisk = document.getElementsByClassName("resizable")[0];
-        var tr = asterisk.firstChild.nextSibling;
-        console.log("asterisk", asterisk.firstChild.nextSibling)
-
+        // var asterisk = document.getElementsByClassName("resizable")[0];
+        // var tr = asterisk.firstChild.nextSibling;
+        // console.log("asterisk", asterisk.firstChild.nextSibling)
+        var tr = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         tr.children[3].classList.add('InfoTr');
         tr.children[5].classList.add('InfoTr');
         tr.children[6].classList.add('InfoTr');
@@ -3929,7 +3931,7 @@ export default class TreeExtrapolationComponent extends React.Component {
 
                                                 <div className="col-md-6 pl-lg-0">
                                                     {!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && <><Button type="button" color="success" className="float-left mr-1" size="md" onClick={this.interpolate}>Interpolate</Button>
-                                                    <Button type="submit" id="extrapolateButton" size="md" color="info" className="float-left mr-1" onClick={() => this.touchAllExtrapolation(setTouched, errors, 0)}><i className="fa fa-calculator"></i> Extrapolate</Button></>}
+                                                        <Button type="submit" id="extrapolateButton" size="md" color="info" className="float-left mr-1" onClick={() => this.touchAllExtrapolation(setTouched, errors, 0)}><i className="fa fa-calculator"></i> Extrapolate</Button></>}
                                                 </div>
                                                 <div className="col-md-6 pr-lg-0">
                                                     <Button className="btn btn-info btn-md float-right" onClick={this.toggleJexcelData}>
@@ -4190,7 +4192,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                 <h3 className='ShowGuidanceHeading'>{i18n.t('static.extrapolation.ExtrapolationNode')}</h3>
                             </div>
                             <p>
-                                <p style={{ fontSize: '14px' }}><span className="UnderLineText">{i18n.t('static.listTree.purpose')} :</span>{i18n.t('static.extrapolation.ExtrapolationTabAllowUser')} '<a href="/#/Extrapolation/extrapolateData" target="_blank" style={{textDecoration:'underline'}}>{i18n.t('static.dashboard.extrapolation')}</a>' {i18n.t('static.extrapolation.ExtrapolationMethods')}
+                                <p style={{ fontSize: '14px' }}><span className="UnderLineText">{i18n.t('static.listTree.purpose')} :</span>{i18n.t('static.extrapolation.ExtrapolationTabAllowUser')} '<a href="/#/Extrapolation/extrapolateData" target="_blank" style={{ textDecoration: 'underline' }}>{i18n.t('static.dashboard.extrapolation')}</a>' {i18n.t('static.extrapolation.ExtrapolationMethods')}
                                 </p>
 
                             </p>

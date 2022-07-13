@@ -185,7 +185,9 @@ export default class PipelineProgramFundingSource extends Component {
                                     }
 
                                     this.el = jexcel(document.getElementById("mapFundingSource"), '');
-                                    this.el.destroy();
+                                    // this.el.destroy();
+                                    jexcel.destroy(document.getElementById("mapFundingSource"), true);
+
                                     var json = [];
                                     var data = productDataArr;
                                     // var data = []

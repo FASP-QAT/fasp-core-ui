@@ -451,7 +451,9 @@ export default class PipelineProgramInventory extends Component {
                                 }
 
                                 this.el = jexcel(document.getElementById("inventorytableDiv"), '');
-                                this.el.destroy();
+                                // this.el.destroy();
+                                jexcel.destroy(document.getElementById("inventorytableDiv"), true);
+
                                 var json = [];
                                 var data = inventoryDataArr;
                                 var options = {

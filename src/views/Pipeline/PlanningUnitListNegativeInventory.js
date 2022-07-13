@@ -31,7 +31,9 @@ export default class PlanningUnitListNegativeInventory extends Component {
                 }
 
                 this.el = jexcel(document.getElementById("planningUnitList"), '');
-                this.el.destroy();
+                // this.el.destroy();
+                jexcel.destroy(document.getElementById("planningUnitList"), true);
+
                 var json = [];
                 var data = dataArray;
                 var options = {

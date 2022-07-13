@@ -25,15 +25,15 @@ export default class PipelineProgramDataSource extends Component {
         this.checkValidation = this.checkValidation.bind(this);
         this.saveDataSource = this.saveDataSource.bind(this);
         this.dropdownFilter = this.dropdownFilter.bind(this);
-        this.startLoading=this.startLoading.bind(this);
-        this.stopLoading=this.stopLoading.bind(this);
+        this.startLoading = this.startLoading.bind(this);
+        this.stopLoading = this.stopLoading.bind(this);
     }
 
-    startLoading(){
-        this.setState({loading:true});
+    startLoading() {
+        this.setState({ loading: true });
     }
-    stopLoading(){
-        this.setState({loading:false});
+    stopLoading() {
+        this.setState({ loading: false });
     }
 
     dropdownFilter = function (instance, cell, c, r, source) {
@@ -216,7 +216,7 @@ export default class PipelineProgramDataSource extends Component {
                 DataSourceService.getAllDataSourceList()
                     .then(response => {
                         if (response.status == 200) {
-                            console.log("data source====>",response.data);
+                            console.log("data source====>", response.data);
 
                             // dataSourceListQat = response.data
                             this.setState({ activeDataSourceList: response.data });
@@ -258,7 +258,9 @@ export default class PipelineProgramDataSource extends Component {
                                             }
 
                                             this.el = jexcel(document.getElementById("mapDataSource"), '');
-                                            this.el.destroy();
+                                            // this.el.destroy();
+                                            jexcel.destroy(document.getElementById("mapDataSource"), true);
+
                                             var json = [];
                                             var data = productDataArr;
                                             // var data = []
