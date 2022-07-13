@@ -4132,7 +4132,8 @@ z-index:999;
 
 .consumptionDataEntryTable .jexcel_content{
   max-height: calc(100vh - 262px)!important;
-  overflow: scroll !important;
+  // overflow: scroll !important;
+  overflow-x: auto;
 }
 
 .inventoryDataEntryTable .jexcel_content{

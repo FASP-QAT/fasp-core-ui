@@ -1092,8 +1092,9 @@ class PlanningUnitCountry extends Component {
                         <CardBody className="p-0">
 
                             <Col xs="12" sm="12">
-
+                            <div className='consumptionDataEntryTable'>
                                 <div id="paputableDiv" style={{ display: this.state.loading ? "none" : "block" }}>
+                                </div>
                                 </div>
                                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
