@@ -2883,7 +2883,7 @@ class DefaultLayout extends Component {
                                 }
                               },
                               {
-                                name: i18n.t('static.report.forecasterrorovertime'),
+                                name: 'Forecast Error (Monthly) (New)',
                                 url: '/report/consumptionForecastErrorSupplyPlan',
                                 icon: 'fa fa-line-chart',
                                 attributes: {
@@ -3950,7 +3950,7 @@ class DefaultLayout extends Component {
                                 }
                               },
                               {
-                                name: i18n.t('static.report.forecasterrorovertime'),
+                                name: 'Forecast Error (Monthly) (New)',
                                 url: '/report/consumptionForecastErrorSupplyPlan',
                                 icon: 'fa fa-line-chart',
                                 attributes: {
