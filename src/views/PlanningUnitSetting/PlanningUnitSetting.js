@@ -2432,8 +2432,8 @@ export default class PlanningUnitSetting extends Component {
             }
             console.log("in if=====>1.1", pcIdArray);
             console.log("in if=====>1.2", this.state.planningUnitList);
-            console.log("in if=====>1.3", this.state.planningUnitList.filter(c => c.productCategory.id == 21));
-            puList = (this.state.planningUnitList).filter(c => pcIdArray.includes(c.productCategory.id));
+            // console.log("in if=====>1.3", this.state.planningUnitList.filter(c => c.productCategory.id == 21));
+            puList = (this.state.planningUnitList).filter(c => pcIdArray.includes(c.forecastingUnit.productCategory.id));
             console.log("in if=====>1.4", puList);
         } else {
             console.log("in else=====>2");
