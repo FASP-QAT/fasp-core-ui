@@ -2825,6 +2825,7 @@ export default class ManualTagging extends Component {
                     var gprogramData = gprogramDataBytes.toString(CryptoJS.enc.Utf8);
                     var gprogramJson = JSON.parse(gprogramData);
                     var linkedShipmentsList = gprogramJson.shipmentLinkingList != null ? gprogramJson.shipmentLinkingList : []
+                    console.log("Linked Shipments List@@@@@@@@@@@",linkedShipmentsList)
                     for (var pu = 0; pu < planningUnitIds.length; pu++) {
                         var planningUnitData = planningUnitDataList.filter(c => c.planningUnitId == planningUnitIds[pu].value)[0];
                         var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
@@ -3457,7 +3458,7 @@ export default class ManualTagging extends Component {
                 data[3] = (linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].roNo + " - " + linkedShipmentsListForTab2[0].roPrimeLineNo : "") + " | " + (manualTaggingList[j].orderNo + " - " + manualTaggingList[j].primeLineNo) + (linkedShipmentsListForTab2.length > 0 && linkedShipmentsListForTab2[0].knShipmentNo != "" && linkedShipmentsListForTab2[0].knShipmentNo != null ? " | " + linkedShipmentsListForTab2[0].knShipmentNo : "");
                 data[4] = manualTaggingList[j].orderNo + " | " + manualTaggingList[j].primeLineNo
                 data[5] = linkedShipmentsListForTab2.length > 0 ? getLabelText(linkedShipmentsListForTab2[0].erpPlanningUnit.label, this.state.lang) : ""
-                data[6] = !this.state.versionId.toString().includes("Local") ? getLabelText(manualTaggingList[j].erpPlanningUnit.label, this.state.lang) : getLabelText(manualTaggingList[j].planningUnit.label, this.state.lang)
+                data[6] = !this.state.versionId.toString().includes("Local") ? getLabelText(manualTaggingList[j].qatPlanningUnit.label, this.state.lang) : getLabelText(manualTaggingList[j].planningUnit.label, this.state.lang)
                 data[7] = manualTaggingList[j].expectedDeliveryDate
                 data[8] = linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].erpShipmentStatus : ""
                 // data[7] = ""
