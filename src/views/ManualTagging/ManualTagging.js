@@ -89,8 +89,8 @@ export default class ManualTagging extends Component {
             procurementAgentId: '',
             displayButton: false,
             programId: '',
-            active1: true,
-            active2: false,
+            active1: this.props.match.params.tab==2?false:true,
+            active2: this.props.match.params.tab==2?true:false,
             active3: false,
             planningUnitValues: [],
             planningUnitIds: [],
@@ -4077,11 +4077,8 @@ export default class ManualTagging extends Component {
 
     }
     componentDidMount() {
-        this.setState({ active1: true }, () => {
             this.hideFirstComponent();
             this.getLocalProgramList();
-        });
-
     }
 
     getLocalProgramList(parameter) {

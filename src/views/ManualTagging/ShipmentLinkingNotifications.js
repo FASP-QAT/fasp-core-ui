@@ -67,6 +67,7 @@ export default class ShipmentLinkingNotifications extends Component {
         this.buildNotificationSummaryJExcel = this.buildNotificationSummaryJExcel.bind(this);
         this.viewBatchData = this.viewBatchData.bind(this);
         this.oneditionend = this.oneditionend.bind(this);
+        this.selectedForNotification = this.selectedForNotification.bind(this)
     }
 
     viewBatchData(event, row) {
@@ -168,6 +169,7 @@ export default class ShipmentLinkingNotifications extends Component {
 
                 }).catch(
                     error => {
+                        console.log("Error@@@@@@@@@@", error)
                         if (error.message === "Network Error") {
                             this.setState({
                                 message: 'static.unkownError',
@@ -419,7 +421,9 @@ export default class ShipmentLinkingNotifications extends Component {
                 ManualTaggingService.getShipmentLinkingNotification(this.state.programDataJson.programId, this.state.programDataJson.version)
                     .then(response => {
                         let list = (addressed != -1 ? response.data.filter(c => (c.addressed == (addressed == 1 ? true : false))) : response.data);
+                        console.log("List@@@@@@@", list)
                         var programDataJson = this.state.programDataJson;
+                        console.log("programDataJson@@@@@@@@@@@", programDataJson)
                         var shipmentList = [];
                         var roPrimeNoList = [];
                         var planningUnitDataList = programDataJson.programData.planningUnitDataList;
@@ -427,6 +431,7 @@ export default class ShipmentLinkingNotifications extends Component {
                         var gprogramData = gprogramDataBytes.toString(CryptoJS.enc.Utf8);
                         var gprogramJson = JSON.parse(gprogramData);
                         var linkedShipmentsList = gprogramJson.shipmentLinkingList != null ? gprogramJson.shipmentLinkingList : []
+                        console.log("linkedShipmentsList@@@@@@@@@", linkedShipmentsList);
                         for (var pu = 0; pu < planningUnitIds.length; pu++) {
                             var planningUnitData = planningUnitDataList.filter(c => c.planningUnitId == planningUnitIds[pu].value)[0];
                             var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
@@ -484,6 +489,7 @@ export default class ShipmentLinkingNotifications extends Component {
                             );
                     }).catch(
                         error => {
+                            console.log("Error@@@@@@@@@@", error)
                             if (error.message === "Network Error") {
                                 this.setState({
                                     message: 'static.unkownError',
@@ -890,8 +896,7 @@ export default class ShipmentLinkingNotifications extends Component {
             allowInsertColumn: false,
             allowManualInsertColumn: false,
             allowDeleteRow: false,
-            onchange: this.changed,
-            // onselection: this.selected,
+            onselection: this.selectedForNotification,
 
 
             // oneditionend: this.onedit,
@@ -959,6 +964,7 @@ export default class ShipmentLinkingNotifications extends Component {
                                         });
                                     }).catch(
                                         error => {
+                                            console.log("Error@@@@@@@@@@", error)
                                             if (error.message === "Network Error") {
                                                 this.setState({
                                                     message: 'static.unkownError',
@@ -1080,7 +1086,7 @@ export default class ShipmentLinkingNotifications extends Component {
             allowInsertColumn: false,
             allowManualInsertColumn: false,
             allowDeleteRow: false,
-            onselection: this.selected,
+            // onselection: this.selected,
             // onchange: this.changed,
             oneditionend: this.onedit,
             copyCompatibility: true,
@@ -1101,6 +1107,16 @@ export default class ShipmentLinkingNotifications extends Component {
             instance, loading: false
         })
     }
+
+    selectedForNotification = function (instance, x1, y1, x2, y2, origin) {
+        console.log("ProgramId@@@@@@@", this.state.programId.split("_")[0]);
+        console.log("VersionId@@@@@@@", this.state.programId.split("_")[1].substring(1) + "  (Local)");
+        localStorage.setItem("sesProgramIdReport", this.state.programId.split("_")[0]);
+        localStorage.setItem("sesVersionIdReport", this.state.programId.split("_")[1].substring(1) + "  (Local)");
+
+        window.open(window.location.origin + `/#/shipment/manualTagging/2`);
+    }
+
     selected = function (instance, x1, y1, x2, y2, origin) {
         var instance = (instance).jexcel;
         console.log("RESP------>x1", x1);
@@ -1320,6 +1336,7 @@ export default class ShipmentLinkingNotifications extends Component {
                     }
                 }).catch(
                     error => {
+                        console.log("Error@@@@@@@@@@", error)
                         if (error.message === "Network Error") {
                             this.setState({
                                 message: 'static.unkownError',

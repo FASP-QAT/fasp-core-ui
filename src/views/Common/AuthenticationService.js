@@ -961,6 +961,7 @@ class AuthenticationService {
                         }
                         break;
                     case "/shipment/manualTagging":
+                    case "/shipment/manualTagging/:tab":
                     case "/shipmentLinkingNotification":
                         if (bfunction.includes("ROLE_BF_MANUAL_TAGGING")) {
                             return true;
