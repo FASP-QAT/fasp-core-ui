@@ -306,7 +306,6 @@ export default class ManualTagging extends Component {
                 countryWisePrograms: localProgramList
             }, () => {
                 this.getOrderDetails();
-                this.getNotLinkedShipments();
                 this.getPlanningUnitListBasedOnTracerCategory();
                 this.getBudgetListByProgramId();
             });
@@ -327,6 +326,8 @@ export default class ManualTagging extends Component {
             this.setState({
                 countryWisePrograms: localProgramList,
                 planningUnits: []
+            }, () => {
+                this.getOrderDetails(1);
             });
             // }
         }
@@ -407,8 +408,13 @@ export default class ManualTagging extends Component {
 
     }
     displayShipmentData() {
+        console.log("In display shipment Data@@@@@@@@@@@@@@@@Mohit")
         let selectedShipmentId = (this.state.checkboxValue ? parseInt(document.getElementById("notLinkedShipmentId").value) : 0);
         let selectedPlanningUnitId = (!this.state.checkboxValue ? parseInt(document.getElementById("planningUnitId1").value) : 0);
+        console.log("In display shipment Data Shipment Id@@@@@@@@@@@@@@@@Mohit", selectedShipmentId)
+        console.log("In display shipment Data planning Unit Id@@@@@@@@@@@@@@@@Mohit", selectedPlanningUnitId)
+        console.log("In display shipment Data checkbox value@@@@@@@@@@@@@@@@Mohit", this.state.checkboxValue)
+        console.log("notLinkedShipments@@@@@@@@@@@@@@@@Mohit", this.state.notLinkedShipments);
         let selectedShipment;
         if (selectedShipmentId != null && selectedShipmentId != 0 && this.state.checkboxValue) {
             selectedShipment = this.state.notLinkedShipments.filter(c => (c.shipmentId == selectedShipmentId));
@@ -418,6 +424,7 @@ export default class ManualTagging extends Component {
         for (var ss = 0; ss < selectedShipment.length; ss++) {
             selectedShipment[ss].tempIndex = selectedShipment[ss].shipmentId > 0 ? selectedShipment[ss].shipmentId : selectedShipment[ss].tempShipmentId;
         }
+        console.log("In display shipment Data selectedShipment value@@@@@@@@@@@@@@@@Mohit", selectedShipment)
         // if(this.state.checkboxValue){
 
         // }
@@ -430,7 +437,7 @@ export default class ManualTagging extends Component {
                 return itemLabelA > itemLabelB ? 1 : -1;
             })
         }, () => {
-            this.getOrderDetails()
+            // this.getOrderDetails()
         })
     }
     getNotLinkedShipments() {
@@ -440,6 +447,7 @@ export default class ManualTagging extends Component {
             var shipmentList = [];
             var localProgramList = this.state.localProgramList;
             var setOfPlanningUnitsBasedOnTracerCategory = [...new Set(this.state.planningUnitsBasedOnTracerCategory.map(ele => ele.planningUnit.id))]
+            console.log("setOfPlanningUnitsBasedOnTracerCategory@@@@@@@@@@@@@", setOfPlanningUnitsBasedOnTracerCategory)
             var localProgramListFilter = localProgramList.filter(c => c.id == programId1);
             var planningUnitDataList = localProgramListFilter[0].programData.planningUnitDataList;
             for (var pu = 0; pu < planningUnitDataList.length; pu++) {
@@ -711,7 +719,7 @@ export default class ManualTagging extends Component {
                                 }
                             }
                         }
-                    } else {
+                    } else if (this.state.active5 && this.state.instance.getValueFromCoords(12, y) == i18n.t("static.manualTagging.newShipmentNotes")) {
                         this.state.instance.setValueFromCoords(12, y, "", true);
                         for (var j = 0; j < json.length; j++) {
                             if (json[j][16] == this.state.instance.getValueFromCoords(16, y, true)) {
@@ -919,7 +927,7 @@ export default class ManualTagging extends Component {
                 checkboxValue: false,
                 tempNotes: ''
             }, () => {
-                // this.displayButton();
+                this.changed("", "", 0, 0, true)
             });
         } else if (event.target.id == 'active5') {
             this.setState({
@@ -930,6 +938,7 @@ export default class ManualTagging extends Component {
                 checkboxValue: false,
                 tempNotes: ''
             }, () => {
+                this.changed("", "", 0, 0, true)
                 // this.displayButton();
             });
         }
@@ -1411,7 +1420,6 @@ export default class ManualTagging extends Component {
         }, () => {
             if (programId1 != -1) {
                 this.getOrderDetails();
-                this.getNotLinkedShipments();
                 this.getPlanningUnitListBasedOnTracerCategory();
                 this.getBudgetListByProgramId();
             } else {
@@ -2304,10 +2312,11 @@ export default class ManualTagging extends Component {
     }
 
 
-    getOrderDetails = () => {
+    getOrderDetails = (takeFromLocalProgram) => {
         var roNoOrderNo = (this.state.searchedValue != null && this.state.searchedValue != "" ? this.state.searchedValue : "0");
-        var programId = (this.state.active3 ? this.state.programId1.split("_")[0] : document.getElementById("programId").value);
-        var versionId = this.state.active1 ? this.state.versionId.toString().split(" ")[0] : this.state.localProgramList.filter(c => c.id == this.state.programId1)[0].version;
+        console.log("this.state.programId1@@@@@@@@@@", this.state.programId1)
+        var programId = (this.state.active3 ? (takeFromLocalProgram != undefined && takeFromLocalProgram == 1 ? this.state.localProgramList[0].programId : this.state.programId1.split("_")[0]) : document.getElementById("programId").value);
+        var versionId = this.state.active1 ? this.state.versionId.toString().split(" ")[0] : 0;
         var erpPlanningUnitId = (this.state.planningUnitIdUpdated != null && this.state.planningUnitIdUpdated != "" ? this.state.planningUnitIdUpdated : 0);
         var linkedRoNoAndRoPrimeLineNo = [];
         if (this.state.active1) {
@@ -4157,6 +4166,7 @@ export default class ManualTagging extends Component {
                         this.setState({
                             planningUnitsBasedOnTracerCategory: listArray
                         }, () => {
+                            this.getNotLinkedShipments();
                             if (!this.state.active3) {
                                 this.getPlanningUnitArray();
                             } else {
@@ -5357,7 +5367,7 @@ export default class ManualTagging extends Component {
                                                                     // defaultValue={{ id: this.state.planningUnitIdUpdated, label: this.state.planningUnitName }}
                                                                     options={this.state.tracercategoryPlanningUnit}
                                                                     getOptionLabel={(option) => option.label}
-                                                                    style={{ width: 450 }}
+                                                                    style={{ width: 450, backgroundColor: this.state.active3 ? "#cfcdc9" : "transparent" }}
                                                                     disabled={this.state.active3 ? true : false}
                                                                     onChange={(event, value) => {
                                                                         // console.log("demo2 value---", value);
@@ -5398,7 +5408,7 @@ export default class ManualTagging extends Component {
                                                                     options={this.state.autocompleteData}
                                                                     getOptionLabel={(option) => option.label}
                                                                     disabled={this.state.active3 ? true : false}
-                                                                    style={{ width: 450 }}
+                                                                    style={{ width: 450, backgroundColor: this.state.active3 ? "#cfcdc9" : "transparent" }}
                                                                     onChange={(event, value) => {
                                                                         // console.log("combo 2 ro combo box---", value)
                                                                         if (value != null) {

@@ -1230,7 +1230,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     console.log("ProgramJson@@@@@@@@@@@@@@@@", props)
                                     props.updateState("message", (props.state.active2 ? i18n.t('static.mt.linkingUpdateSuccess') : i18n.t('static.shipment.linkingsuccess')))
                                     props.updateState("color", "green");
-                                    props.updateState("changedDataForTab2",0);
+                                    props.updateState("changedDataForTab2",false);
                                     props.updateState("loading", false);
                                     props.updateState("planningUnitIdUpdated", "");
                                     props.hideSecondComponent();
