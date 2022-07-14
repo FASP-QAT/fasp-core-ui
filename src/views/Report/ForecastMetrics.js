@@ -58,9 +58,9 @@ import "jspdf-autotable";
 import ReportService from '../../api/ReportService';
 import ProgramService from '../../api/ProgramService';
 import TracerCategoryService from '../../api/TracerCategoryService';
-import {MultiSelect} from "react-multi-select-component";
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import { MultiSelect } from "react-multi-select-component";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { contrast, isSiteOnline } from "../../CommonComponent/JavascriptCommonFunctions";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
@@ -669,7 +669,8 @@ class ForecastMetrics extends Component {
     // }
     // console.log("consumptionArray---->", consumptionArray);
     this.el = jexcel(document.getElementById("tableDiv"), '');
-    this.el.destroy();
+    // this.el.destroy();
+    jexcel.destroy(document.getElementById("tableDiv"), true);
     var json = [];
     var data = consumptionArray;
 
@@ -702,11 +703,11 @@ class ForecastMetrics extends Component {
         },
       ],
       editable: false,
-      text: {
-        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-        show: '',
-        entries: '',
-      },
+      // text: {
+      //   showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+      //   show: '',
+      //   entries: '',
+      // },
 
       // updateTable: function (el, cell, x, y, source, value, id) {
       //   if (y != null) {
@@ -731,16 +732,16 @@ class ForecastMetrics extends Component {
       //   }
       // }.bind(this),
       onsearch: function (el) {
-        el.jexcel.updateTable();
+        // el.jexcel.updateTable();
       },
       onfilter: function (el) {
-        el.jexcel.updateTable();
+        // el.jexcel.updateTable();
       },
       onload: this.loaded,
       pagination: localStorage.getItem("sesRecordCount"),
       search: true,
       columnSorting: true,
-      tableOverflow: true,
+      // tableOverflow: true,
       wordWrap: true,
       allowInsertColumn: false,
       allowManualInsertColumn: false,
@@ -770,7 +771,7 @@ class ForecastMetrics extends Component {
     jExcelLoadedFunction(instance);
     console.log("INSIDE UPDATE TABLE");
 
-    var elInstance = instance.jexcel;
+    var elInstance = instance.worksheets[0];
     var json = elInstance.getJson();
 
     var colArr = ['A', 'B', 'C', 'D', 'E']
@@ -829,7 +830,8 @@ class ForecastMetrics extends Component {
               consumptions: [], loading: false
             }, () => {
               this.el = jexcel(document.getElementById("tableDiv"), '');
-              this.el.destroy();
+              // this.el.destroy();
+              jexcel.destroy(document.getElementById("tableDiv"), true);
             });
             if (error.message === "Network Error") {
               this.setState({
@@ -910,7 +912,8 @@ class ForecastMetrics extends Component {
         tracerCategoryLabels: [],
       }, () => {
         this.el = jexcel(document.getElementById("tableDiv"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("tableDiv"), true);
       });
 
     } else if (this.state.programValues.length == 0) {
@@ -926,7 +929,8 @@ class ForecastMetrics extends Component {
 
       }, () => {
         this.el = jexcel(document.getElementById("tableDiv"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("tableDiv"), true);
       });
 
     } else if (this.state.tracerCategoryValues.length == 0) {
@@ -938,13 +942,15 @@ class ForecastMetrics extends Component {
         planningUnitLabels: [],
       }, () => {
         this.el = jexcel(document.getElementById("tableDiv"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("tableDiv"), true);
       });
 
     } else if (this.state.planningUnitValues.length == 0) {
       this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), consumptions: [] }, () => {
         this.el = jexcel(document.getElementById("tableDiv"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("tableDiv"), true);
       });
 
     }
@@ -1390,6 +1396,11 @@ class ForecastMetrics extends Component {
     return color;
   }
   render() {
+    jexcel.setDictionary({
+      Show: " ",
+      entries: " ",
+    });
+
     const { planningUnits } = this.state;
     let planningUnitList = [];
     planningUnitList = planningUnits.length > 0

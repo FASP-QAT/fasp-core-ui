@@ -4,8 +4,8 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import { Card, CardHeader, CardBody, Button, Col, FormGroup, Label, InputGroup, Input, Modal, ModalBody, ModalFooter, ModalHeader, CardFooter, FormFeedback, ButtonDropdown, DropdownItem, DropdownMenu, DropdownToggle, Form } from 'reactstrap';
 import getLabelText from '../../CommonComponent/getLabelText'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutSearch } from '../../CommonComponent/JExcelCommonFunctions.js'
 import i18n from '../../i18n';
@@ -309,7 +309,8 @@ export default class ListTreeComponent extends Component {
             }
         }
         this.el = jexcel(document.getElementById("missingPUJexcel"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("missingPUJexcel"), true);
         var data = dataArray;
         console.log("DataArray>>>", dataArray);
 
@@ -323,28 +324,29 @@ export default class ListTreeComponent extends Component {
                     // 0
                     title: i18n.t('static.productCategory.productCategory'),
                     type: 'test',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     // 1
                     title: i18n.t('static.product.product'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
 
                 }
 
             ],
-            text: {
-                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
+            editable: false,
             onload: this.loadedMissingPU,
             pagination: localStorage.getItem("sesRecordCount"),
             search: false,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
@@ -667,7 +669,7 @@ export default class ListTreeComponent extends Component {
                     nodeDataMap[1] = tempArray;
                     flatList[i].payload.nodeDataMap = nodeDataMap;
                 }
-                console.log("treeTemplate@@@@@@@@@@@@@@",treeTemplate)
+                console.log("treeTemplate@@@@@@@@@@@@@@", treeTemplate)
                 tempTree = {
                     treeId: treeId,
                     active: this.state.active,
@@ -817,7 +819,7 @@ export default class ListTreeComponent extends Component {
 
             treeList.push(tempTree);
         }
-        console.log("TreeList@@@@@@@@@@@@@@",treeList)
+        console.log("TreeList@@@@@@@@@@@@@@", treeList)
         tempProgram.programData.treeList = treeList;
         var programCopy = JSON.parse(JSON.stringify(tempProgram));
         var programData = (CryptoJS.AES.encrypt(JSON.stringify(tempProgram.programData), SECRET_KEY)).toString();
@@ -1066,7 +1068,9 @@ export default class ListTreeComponent extends Component {
             })
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("tableDiv"), true);
+
         var json = [];
         var data = treeArray;
 
@@ -1083,53 +1087,53 @@ export default class ListTreeComponent extends Component {
                 {
                     title: i18n.t('static.dashboard.programheader'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.common.treeName'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.common.region'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.forecastMethod.forecastMethod'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
 
                 {
                     title: i18n.t('static.common.scenarioName'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.program.notes'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: 'ProgramId',
                     type: 'hidden',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: 'id',
                     type: 'hidden',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: 'versionId',
                     type: 'hidden',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     type: 'dropdown',
                     title: i18n.t('static.common.status'),
-                    readOnly: true,
+                    // readOnly: true,
                     source: [
                         { id: true, name: i18n.t('static.common.active') },
                         { id: false, name: i18n.t('static.common.disabled') }
@@ -1137,17 +1141,18 @@ export default class ListTreeComponent extends Component {
                 }
 
             ],
-            text: {
-                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
+            editable: false,
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
@@ -1337,6 +1342,11 @@ export default class ListTreeComponent extends Component {
     }
 
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
         const { datasetList } = this.state;
         let datasets = datasetList.length > 0
             && datasetList.map((item, i) => {
@@ -1518,7 +1528,7 @@ export default class ListTreeComponent extends Component {
                                             <li>{i18n.t('static.listTree.manuallySelectAddTree')}</li>
                                             <li>{i18n.t('static.listTree.nameOfDesiredTemplate')}</li>
                                         </ul>
-                                   </ol>
+                                    </ol>
                                 </p>
                                 <p>{i18n.t('static.listTree.NoteTableOnListTree')} </p>
                                 <p>
@@ -1532,7 +1542,7 @@ export default class ListTreeComponent extends Component {
                                         </ul>
                                     </p>
                                 </p>
-                               
+
                             </ModalBody>
                         </div>
                     </Modal>

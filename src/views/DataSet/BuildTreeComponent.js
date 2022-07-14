@@ -24,8 +24,8 @@ import SelectSearch from 'react-select-search';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import { NUMBER_NODE_ID, JEXCEL_DECIMAL_CATELOG_PRICE_SHIPMENT, PERCENTAGE_NODE_ID, FU_NODE_ID, PU_NODE_ID, ROUNDING_NUMBER, INDEXED_DB_NAME, INDEXED_DB_VERSION, TREE_DIMENSION_ID, SECRET_KEY, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DECIMAL_NO_REGEX_LONG, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_MONTHLY_CHANGE_4_DECIMAL_POSITIVE, JEXCEL_DECIMAL_MONTHLY_CHANGE, DATE_FORMAT_CAP, TITLE_FONT } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
 import Autocomplete from '@material-ui/lab/Autocomplete';
@@ -536,8 +536,8 @@ export default class BuildTree extends Component {
         this.pickAMonth5 = React.createRef()
         this.state = {
             isValidError: '',
-            isScenarioChanged:false,
-            isTreeDataChanged : false,
+            isScenarioChanged: false,
+            isTreeDataChanged: false,
             percentForOneMonth: '',
             popoverOpenStartValueModelingTool: false,
             showGuidanceModelingTransfer: false,
@@ -624,7 +624,7 @@ export default class BuildTree extends Component {
             currentTargetChangeNumberEdit: false,
             currentRowIndex: '',
             currentEndValue: '',
-            currentTransferData : '',
+            currentTransferData: '',
             currentEndValueEdit: false,
             momListPer: [],
             modelingTypeList: [],
@@ -2476,7 +2476,8 @@ export default class BuildTree extends Component {
             count++;
         }
         this.el = jexcel(document.getElementById("momJexcelPer"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("momJexcelPer"), true);
         var data = dataArray;
         console.log("DataArray>>>", dataArray);
 
@@ -2581,17 +2582,18 @@ export default class BuildTree extends Component {
                 },
 
             ],
-            text: {
-                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
+            editable: true,
             onload: this.loadedMomPer,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
@@ -2620,8 +2622,8 @@ export default class BuildTree extends Component {
 
     loadedMomPer = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance, 1);
-        if (instance.jexcel.getJson(null, false).length > 0) {
-            var cell = instance.jexcel.getCell("D1");
+        if (instance.worksheets[0].getJson(null, false).length > 0) {
+            var cell = instance.worksheets[0].getCell("D1");
             cell.classList.add('readonly');
         }
     }
@@ -2646,7 +2648,9 @@ export default class BuildTree extends Component {
             count++;
         }
         this.el = jexcel(document.getElementById("momJexcel"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("momJexcel"), true);
+
         var data = dataArray;
         console.log("DataArray>>>", dataArray);
 
@@ -2718,17 +2722,18 @@ export default class BuildTree extends Component {
 
 
             ],
-            text: {
-                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
+            editable: true,
             onload: this.loadedMom,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
@@ -2770,15 +2775,15 @@ export default class BuildTree extends Component {
         );
     };
 
-    loadedMom = function (instance, cell, x, y, value) {
-        jExcelLoadedFunction(instance, 1);
-        if (instance.jexcel.getJson(null, false).length > 0) {
-            var cell = instance.jexcel.getCell("E1");
-            cell.classList.add('readonly');
-            var cell = instance.jexcel.getCell("F1");
-            cell.classList.add('readonly');
-        }
-    }
+    // loadedMom = function (instance, cell, x, y, value) {
+    //     jExcelLoadedFunction(instance, 1);
+    //     if (instance.jexcel.getJson(null, false).length > 0) {
+    //         var cell = instance.jexcel.getCell("E1");
+    //         cell.classList.add('readonly');
+    //         var cell = instance.jexcel.getCell("F1");
+    //         cell.classList.add('readonly');
+    //     }
+    // }
 
     showMomData() {
         console.log("show mom data---", this.state.currentScenario);
@@ -3790,7 +3795,9 @@ export default class BuildTree extends Component {
         this.setState({ scalingTotal }, () => {
         });
         this.el = jexcel(document.getElementById("modelingJexcel"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("modelingJexcel"), true);
+
         var data = dataArray;
 
         var options = {
@@ -3881,17 +3888,18 @@ export default class BuildTree extends Component {
                 },
 
             ],
-            text: {
-                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
+            editable: true,
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
@@ -4055,7 +4063,8 @@ export default class BuildTree extends Component {
 
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
-        var asterisk = document.getElementsByClassName("resizable")[0];
+        // var asterisk = document.getElementsByClassName("resizable")[0];
+        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
         tr.children[4].classList.add('InfoTr');
         tr.children[5].classList.add('InfoTr');
@@ -4441,10 +4450,10 @@ export default class BuildTree extends Component {
     }.bind(this);
     loadedMom = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance, 1);
-        if (instance.jexcel.getJson(null, false).length > 0) {
-            var cell = instance.jexcel.getCell("E1");
+        if (instance.worksheets[0].getJson(null, false).length > 0) {
+            var cell = instance.worksheets[0].getCell("E1");
             cell.classList.add('readonly');
-            var cell = instance.jexcel.getCell("F1");
+            var cell = instance.worksheets[0].getCell("F1");
             cell.classList.add('readonly');
         }
     }
@@ -6986,7 +6995,7 @@ export default class BuildTree extends Component {
             console.log("currentItemConfig before tc---", currentItemConfig);
             var fuNode = (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode;
 
-            currentItemConfig.context.payload.nodeDataMap[scenarioId][0].fuNode.forecastingUnit.tracerCategory.id = event.target.value;        
+            currentItemConfig.context.payload.nodeDataMap[scenarioId][0].fuNode.forecastingUnit.tracerCategory.id = event.target.value;
             this.filterUsageTemplateList(event.target.value);
         }
 
@@ -9233,32 +9242,32 @@ export default class BuildTree extends Component {
                     </div>
                     <div className="row pl-lg-2 pr-lg-2">
                         <div style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 1 ? "none" : "block" }}>
-                        <div className="row pl-lg-2 pr-lg-2">
-                            <div>
-                                <Popover placement="top" isOpen={this.state.popoverOpenMonth} target="Popover24" trigger="hover" toggle={this.toggleMonth}>
-                                    <PopoverBody>{i18n.t('static.tooltip.ModelingTransferMonth')}</PopoverBody>
-                                </Popover>
+                            <div className="row pl-lg-2 pr-lg-2">
+                                <div>
+                                    <Popover placement="top" isOpen={this.state.popoverOpenMonth} target="Popover24" trigger="hover" toggle={this.toggleMonth}>
+                                        <PopoverBody>{i18n.t('static.tooltip.ModelingTransferMonth')}</PopoverBody>
+                                    </Popover>
+                                </div>
+                                {/* <div className='row'> */}
+                                <FormGroup className="col-md-2 pt-lg-1">
+                                    <Label htmlFor="">{i18n.t('static.common.month')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover24" onClick={this.toggleMonth} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                </FormGroup>
+                                <FormGroup className="col-md-8 pl-lg-0 ModTransferMonthPickerWidth">
+                                    <Picker
+                                        ref={this.pickAMonth2}
+                                        years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                        value={this.state.scalingMonth}
+                                        key={JSON.stringify(this.state.scalingMonth)}
+                                        lang={pickerLang.months}
+                                        onChange={this.handleAMonthChange2}
+                                        onDismiss={this.handleAMonthDissmis2}
+                                    >
+                                        <MonthBox value={this.makeText(this.state.scalingMonth)}
+                                            onClick={this.handleClickMonthBox2} />
+                                    </Picker>
+                                </FormGroup>
+                                {/* </div> */}
                             </div>
-                            {/* <div className='row'> */}
-                            <FormGroup className="col-md-2 pt-lg-1">
-                                <Label htmlFor="">{i18n.t('static.common.month')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover24" onClick={this.toggleMonth} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
-                            </FormGroup>
-                            <FormGroup className="col-md-8 pl-lg-0 ModTransferMonthPickerWidth">
-                                <Picker
-                                    ref={this.pickAMonth2}
-                                    years={{ min: this.state.minDate, max: this.state.maxDate }}
-                                    value={this.state.scalingMonth}
-                                    key={JSON.stringify(this.state.scalingMonth)}
-                                    lang={pickerLang.months}
-                                    onChange={this.handleAMonthChange2}
-                                    onDismiss={this.handleAMonthDissmis2}
-                                >
-                                    <MonthBox value={this.makeText(this.state.scalingMonth)}
-                                        onClick={this.handleClickMonthBox2} />
-                                </Picker>
-                            </FormGroup>
-                            {/* </div> */}
-                        </div>
                         </div>
                         <div className="col-md-12">
                             {this.state.showModelingJexcelNumber &&
@@ -9958,6 +9967,11 @@ export default class BuildTree extends Component {
 
 
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
         const { datasetList } = this.state;
         const { items } = this.state;
         let datasets = datasetList.length > 0
@@ -11153,7 +11167,7 @@ export default class BuildTree extends Component {
                                     <br></br>
                                     <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0" src={ModelingTransferScreenshot3} style={{ border: '1px solid #fff' }} /></span>
                                 </li>
-                                <li><b>{i18n.t('static.ModelingTransfer.SimpleGrowth')}</b> {i18n.t('static.ModelingTransfer.SimpleGrowthExponential')} 
+                                <li><b>{i18n.t('static.ModelingTransfer.SimpleGrowth')}</b> {i18n.t('static.ModelingTransfer.SimpleGrowthExponential')}
                                     <ul>
                                         <li>{i18n.t('static.ModelingTransfer.calculatesJanMonth')} </li>
                                         <li>{i18n.t('static.ModelingTransfer.calculatesFebMonth')} </li>
@@ -11162,7 +11176,7 @@ export default class BuildTree extends Component {
 
                                     <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0 ml-lg-4" src={ModelingTransferScreenshot4} style={{ border: '1px solid #fff' }} /></span>
                                 </li>
-                                <li><b>{i18n.t('static.ModelingTransfer.MultiYearLoss')}</b> - {i18n.t('static.ModelingTransfer.MultiYearLossText')} 
+                                <li><b>{i18n.t('static.ModelingTransfer.MultiYearLoss')}</b> - {i18n.t('static.ModelingTransfer.MultiYearLossText')}
                                     <br></br>
                                     <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0 ml-lg-4" src={ModelingTransferScreenshot5} style={{ border: '1px solid #fff' }} /></span>
                                 </li>
@@ -11239,7 +11253,7 @@ export default class BuildTree extends Component {
                         </p>
 
                         <p><span style={{ fontSize: '14px', fontWeight: 'bold' }}>{i18n.t('static.ManageTree.ChangesOverTime')}</span><br></br>
-                        {i18n.t('static.NodeData.TreeStructure')}:
+                            {i18n.t('static.NodeData.TreeStructure')}:
                             <ul>
                                 <li><b>{i18n.t('static.NodeData.ModelingTransferTab')}</b> </li>
                                 <ul>
@@ -11255,7 +11269,7 @@ export default class BuildTree extends Component {
                         </p>
 
                         <p><span style={{ fontSize: '14px', fontWeight: 'bold' }}>{i18n.t('static.ManageTree.UsingScenarios')} :</span>
-                        {i18n.t('static.NodeData.ScenariosSameTree')}
+                            {i18n.t('static.NodeData.ScenariosSameTree')}
                             <div className='pl-lg-4 pr-lg-4 pt-lg-4'>
                                 <table className="table table-bordered ">
                                     <thead>
@@ -11386,7 +11400,7 @@ export default class BuildTree extends Component {
                         </p>
 
                         <p><span style={{ fontSize: '14px', fontWeight: 'bold' }}>{i18n.t('static.ManageTree.ChangesOverTime')}</span><br></br>
-                        {i18n.t('static.ManageTree.TreeStructure')} :
+                            {i18n.t('static.ManageTree.TreeStructure')} :
                             <ul>
                                 <li><b><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i> {i18n.t('static.ManageTree.Modeling')}:</b> {i18n.t('static.ManageTree.RateOfChange')}</li>
                                 <li><b><i className='fa fa-link'></i> {i18n.t('static.ManageTree.Transfer')}:</b> {i18n.t('static.ManageTree.AllowsUsersTransfer')}</li>
@@ -11395,7 +11409,7 @@ export default class BuildTree extends Component {
                         </p>
 
                         <p><span style={{ fontSize: '14px', fontWeight: 'bold' }}>{i18n.t('static.ManageTree.UsingScenarios')} :</span><br></br>
-                        {i18n.t('static.ManageTree.ScenariosModel')} <i class="fa fa-cog" aria-hidden="true"></i> {i18n.t('static.ManageTree.IconScenario')}.
+                            {i18n.t('static.ManageTree.ScenariosModel')} <i class="fa fa-cog" aria-hidden="true"></i> {i18n.t('static.ManageTree.IconScenario')}.
                             <div className='pl-lg-4 pr-lg-4 pt-lg-4'>
                                 <table className="table table-bordered ">
                                     <thead>

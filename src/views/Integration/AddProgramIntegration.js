@@ -208,7 +208,9 @@ class ProgramIntegration extends Component {
                                                         papuDataArr[0] = data;
                                                     }
                                                     this.el = jexcel(document.getElementById("paputableDiv"), '');
-                                                    this.el.destroy();
+                                                    // this.el.destroy();
+                                                    jexcel.destroy(document.getElementById("paputableDiv"), true);
+
                                                     var json = [];
                                                     var data = papuDataArr;
                                                     var options = {
@@ -255,7 +257,7 @@ class ProgramIntegration extends Component {
                                                         ],
                                                         updateTable: function (el, cell, x, y, source, value, id) {
                                                             if (y != null) {
-                                                                var elInstance = el.jexcel;
+                                                                var elInstance = el;
                                                                 var rowData = elInstance.getRowData(y);
                                                                 // var productCategoryId = rowData[0];
                                                                 var integrationProgramId = rowData[5];
@@ -279,10 +281,10 @@ class ProgramIntegration extends Component {
                                                             }
                                                         },
                                                         onsearch: function (el) {
-                                                            el.jexcel.updateTable();
+                                                            // el.jexcel.updateTable();
                                                         },
                                                         onfilter: function (el) {
-                                                            el.jexcel.updateTable();
+                                                            // el.jexcel.updateTable();
                                                         },
                                                         pagination: localStorage.getItem("sesRecordCount"),
                                                         filters: true,
@@ -743,11 +745,11 @@ class ProgramIntegration extends Component {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
-                var index = (instance.jexcel).getValue(`F${parseInt(data[i].y) + 1}`, true);
+                var index = (instance).getValue(`F${parseInt(data[i].y) + 1}`, true);
                 if (index === "" || index == null || index == undefined) {
-                    (instance.jexcel).setValueFromCoords(0, data[i].y, this.state.program.label.label_en, true);
-                    (instance.jexcel).setValueFromCoords(5, data[i].y, 0, true);
-                    (instance.jexcel).setValueFromCoords(6, data[i].y, 1, true);
+                    (instance).setValueFromCoords(0, data[i].y, this.state.program.label.label_en, true);
+                    (instance).setValueFromCoords(5, data[i].y, 0, true);
+                    (instance).setValueFromCoords(6, data[i].y, 1, true);
                     z = data[i].y;
                 }
             }
@@ -847,7 +849,9 @@ class ProgramIntegration extends Component {
 
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
-        var asterisk = document.getElementsByClassName("resizable")[0];
+        // var asterisk = document.getElementsByClassName("resizable")[0];
+        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
+
         var tr = asterisk.firstChild;
         // tr.children[].classList.add('AsteriskTheadtrTd');
         tr.children[2].classList.add('AsteriskTheadtrTd');
@@ -915,7 +919,7 @@ class ProgramIntegration extends Component {
         console.log("------------onedit called")
         this.el.setValueFromCoords(6, y, 1, true);
 
-        var elInstance = instance.jexcel;
+        var elInstance = instance;
         var rowData = elInstance.getRowData(y);
         if (x == 2 && rowData[2] == 1) {
             elInstance.setValueFromCoords(3, y, 1, true);
@@ -1007,7 +1011,7 @@ class ProgramIntegration extends Component {
                                 <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                 <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>
                                 &nbsp;
-</FormGroup>
+                            </FormGroup>
                         </CardFooter>
                     </Card>
                 </div>

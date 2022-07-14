@@ -662,7 +662,7 @@ export default class PlanningUnitSetting extends Component {
                 var index = (instance).getValue(`N${parseInt(data[i].y) + 1}`, true);
                 if (index === "" || index == null || index == undefined) {
                     console.log("-----------------onPaste---------------------3");
-                    // (instance.jexcel).setValueFromCoords(8, data[i].y, true, true);
+                    // (instance).setValueFromCoords(8, data[i].y, true, true);
                     (instance).setValueFromCoords(2, data[i].y, true, true);
                     (instance).setValueFromCoords(3, data[i].y, true, true);
                     (instance).setValueFromCoords(9, data[i].y, true, true);
@@ -671,7 +671,7 @@ export default class PlanningUnitSetting extends Component {
                     (instance).setValueFromCoords(12, data[i].y, {}, true);
                     (instance).setValueFromCoords(13, data[i].y, 0, true);
                     (instance).setValueFromCoords(14, data[i].y, true, true);
-                    // (instance.jexcel).setValueFromCoords(15, data[i].y, "", true);
+                    // (instance).setValueFromCoords(15, data[i].y, "", true);
                     (instance).setValueFromCoords(16, data[i].y, true, true);
                     z = data[i].y;
                 }
@@ -2141,7 +2141,7 @@ export default class PlanningUnitSetting extends Component {
                     type: 'numeric',
                     textEditor: true,
                     decimal: '.',
-                    mask: '#,##',
+                    mask: '#,##.00',
                     width: '150',
                     disabledMaskOnEdition: true
                     // readOnly: true //4E
@@ -2151,7 +2151,7 @@ export default class PlanningUnitSetting extends Component {
                     type: 'numeric',
                     textEditor: true,
                     decimal: '.',
-                    mask: '#,##',
+                    mask: '#,##.00',
                     width: '150',
                     disabledMaskOnEdition: true
                     // readOnly: true //5F
@@ -2161,7 +2161,7 @@ export default class PlanningUnitSetting extends Component {
                     type: 'numeric',
                     textEditor: true,
                     decimal: '.',
-                    mask: '#,##',
+                    mask: '#,##.00',
                     disabledMaskOnEdition: true,
                     width: '150'
                     // readOnly: true //6G
@@ -2375,38 +2375,38 @@ export default class PlanningUnitSetting extends Component {
     // }.bind(this)
 
 
-    filterPlanningUnitListByTracerCategoryId = function (instance, cell, c, r, source) {
-        var mylist = [];
-        var tracerCategoryId = (instance.jexcel.getJson(null, false)[r])[0];
-        // let planningUnitId = this.getPlanningUnitByTracerCategoryId(tracerCategoryId);
-        // let allPlanningUnitList = this.state.allPlanningUnitList;
+    // filterPlanningUnitListByTracerCategoryId = function (instance, cell, c, r, source) {
+    //     var mylist = [];
+    //     var tracerCategoryId = (instance.jexcel.getJson(null, false)[r])[0];
+    //     // let planningUnitId = this.getPlanningUnitByTracerCategoryId(tracerCategoryId);
+    //     // let allPlanningUnitList = this.state.allPlanningUnitList;
 
-        // for (var i = 0; i < planningUnitId.length; i++) {
-        //     let list = allPlanningUnitList.filter(c => c.id == planningUnitId[i].id)[0];
-        //     mylist.push(list);
-        // }
-        if (tracerCategoryId == -1) {
-            mylist = this.state.allPlanningUnitList
-        } else {
-            mylist = this.state.allPlanningUnitList.filter(c => c.forecastingUnit.tracerCategory.id == tracerCategoryId);
-        }
+    //     // for (var i = 0; i < planningUnitId.length; i++) {
+    //     //     let list = allPlanningUnitList.filter(c => c.id == planningUnitId[i].id)[0];
+    //     //     mylist.push(list);
+    //     // }
+    //     if (tracerCategoryId == -1) {
+    //         mylist = this.state.allPlanningUnitList
+    //     } else {
+    //         mylist = this.state.allPlanningUnitList.filter(c => c.forecastingUnit.tracerCategory.id == tracerCategoryId);
+    //     }
 
-        console.log("mylist--------->32", mylist);
+    //     console.log("mylist--------->32", mylist);
 
-        // var tableJson = this.el.getJson(null, false);
-        // let tempList = [];
-        // for (var i = 0; i < tableJson.length; i++) {
-        //     var map1 = new Map(Object.entries(tableJson[i]));
-        //     tempList.push(parseInt(map1.get("1")));
-        // }
+    //     // var tableJson = this.el.getJson(null, false);
+    //     // let tempList = [];
+    //     // for (var i = 0; i < tableJson.length; i++) {
+    //     //     var map1 = new Map(Object.entries(tableJson[i]));
+    //     //     tempList.push(parseInt(map1.get("1")));
+    //     // }
 
-        // for (var i = 0; i < tempList.length; i++) {
-        //     mylist = mylist.filter(c => c.id != tempList[i]);
-        // }
+    //     // for (var i = 0; i < tempList.length; i++) {
+    //     //     mylist = mylist.filter(c => c.id != tempList[i]);
+    //     // }
 
-        return mylist;
+    //     return mylist;
 
-    }.bind(this)
+    // }.bind(this)
 
     filterPlanningUnitListByProductCategoryId = function (instance, cell, c, r, source) {
         var mylist = [];

@@ -228,7 +228,9 @@ export default class DatabaseTranslations extends React.Component {
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
 
-        var asterisk = document.getElementsByClassName("resizable")[0];
+        // var asterisk = document.getElementsByClassName("resizable")[0];
+        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
+
         var tr = asterisk.firstChild;
         tr.children[3].classList.add('AsteriskTheadtrTd');
     }

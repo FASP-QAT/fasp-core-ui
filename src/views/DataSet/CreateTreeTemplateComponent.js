@@ -666,7 +666,7 @@ export default class CreateTreeTemplate extends Component {
             activeTab1: new Array(2).fill('1'),
             momListPer: [],
             currentModelingType: '',
-            currentTransferData : '',
+            currentTransferData: '',
             currentCalculatorStartDate: '',
             currentCalculatorStopDate: '',
             currentCalculatorStartValue: '',
@@ -2776,7 +2776,8 @@ export default class CreateTreeTemplate extends Component {
             count++;
         }
         this.el = jexcel(document.getElementById("momJexcelPer"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("momJexcelPer"), true);
         var data = dataArray;
         console.log("DataArray>>>", dataArray);
 
@@ -2946,7 +2947,9 @@ export default class CreateTreeTemplate extends Component {
             count++;
         }
         this.el = jexcel(document.getElementById("momJexcel"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("momJexcel"), true);
+
         var data = dataArray;
         console.log("DataArray>>>", dataArray);
 
@@ -3218,7 +3221,9 @@ export default class CreateTreeTemplate extends Component {
         }
         this.setState({ scalingTotal });
         this.el = jexcel(document.getElementById("modelingJexcel"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("modelingJexcel"), true);
+
         var data = dataArray;
         console.log("DataArray>>>", dataArray);
 
@@ -3499,7 +3504,8 @@ export default class CreateTreeTemplate extends Component {
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
 
-        var asterisk = document.getElementsByClassName("resizable")[0];
+        // var asterisk = document.getElementsByClassName("resizable")[0];
+        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
         console.log("tr.children[9]---", tr.children[9]);
         tr.children[4].classList.add('InfoTr');
@@ -3857,7 +3863,9 @@ export default class CreateTreeTemplate extends Component {
             count++;
         }
         this.el = jexcel(document.getElementById("modelingJexcelPercent"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("modelingJexcelPercent"), true);
+
         var data = dataArray;
         console.log("DataArray>>>", dataArray);
 

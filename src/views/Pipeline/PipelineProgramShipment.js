@@ -1014,7 +1014,9 @@ export default class PipelineProgramShipment extends Component {
         setTimeout('', 10000);
         console.log('initialiseshipment' + JSON.stringify(this.state.pipelineShipmentData))
         this.el = jexcel(document.getElementById("shipmenttableDiv"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("shipmenttableDiv"), true);
+
 
         var data = this.state.pipelineShipmentData.map((item, index) => [
             item.planningUnit,

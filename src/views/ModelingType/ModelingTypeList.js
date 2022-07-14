@@ -98,7 +98,9 @@ class ScaleUpType extends Component {
         }
 
         this.el = jexcel(document.getElementById("paputableDiv"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("paputableDiv"), true);
+        
         var json = [];
         var data = papuDataArr;
 
@@ -148,7 +150,7 @@ class ScaleUpType extends Component {
             ],
             updateTable: function (el, cell, x, y, source, value, id) {
                 if (y != null) {
-                    var elInstance = el.jexcel;
+                    var elInstance = el;
                     //left align
                     elInstance.setStyle(`B${parseInt(y) + 1}`, 'text-align', 'left');
 
@@ -438,7 +440,7 @@ class ScaleUpType extends Component {
     }
 
     oneditionend = function (instance, cell, x, y, value) {
-        var elInstance = instance.jexcel;
+        var elInstance = instance;
         var rowData = elInstance.getRowData(y);
 
         // if (x == 2 && !isNaN(rowData[2]) && rowData[2].toString().indexOf('.') != -1) {
@@ -468,12 +470,12 @@ class ScaleUpType extends Component {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
-                var index = (instance.jexcel).getValue(`G${parseInt(data[i].y) + 1}`, true);
+                var index = (instance).getValue(`G${parseInt(data[i].y) + 1}`, true);
                 if (index === "" || index == null || index == undefined) {
-                    (instance.jexcel).setValueFromCoords(0, data[i].y, 0, true);
-                    (instance.jexcel).setValueFromCoords(2, data[i].y, true, true);
-                    (instance.jexcel).setValueFromCoords(5, data[i].y, 1, true);
-                    (instance.jexcel).setValueFromCoords(6, data[i].y, 1, true);
+                    (instance).setValueFromCoords(0, data[i].y, 0, true);
+                    (instance).setValueFromCoords(2, data[i].y, true, true);
+                    (instance).setValueFromCoords(5, data[i].y, 1, true);
+                    (instance).setValueFromCoords(6, data[i].y, 1, true);
                     z = data[i].y;
                 }
             }
@@ -591,7 +593,9 @@ class ScaleUpType extends Component {
 
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
-        var asterisk = document.getElementsByClassName("resizable")[0];
+        // var asterisk = document.getElementsByClassName("resizable")[0];
+        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
+
         var tr = asterisk.firstChild;
         // tr.children[1].classList.add('AsteriskTheadtrTd');
         tr.children[2].classList.add('AsteriskTheadtrTd');

@@ -576,7 +576,9 @@ export default class MapPlanningUnits extends Component {
                                 // }
 
                                 this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
-                                this.el.destroy();
+                                // this.el.destroy();
+                                jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
+
                                 var json = [];
                                 var data = productDataArr;
                                 var options = {
@@ -966,7 +968,9 @@ export default class MapPlanningUnits extends Component {
 
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunctionWithoutPagination(instance);
-        var asterisk = document.getElementsByClassName("resizable")[0];
+        // var asterisk = document.getElementsByClassName("resizable")[0];
+        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
+
         var tr = asterisk.firstChild;
         tr.children[1].classList.add('AsteriskTheadtrTd');
         tr.children[2].classList.add('AsteriskTheadtrTd');

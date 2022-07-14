@@ -141,7 +141,9 @@ export default class QunatimedImportStepTwo extends Component {
 
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunctionWithoutPagination(instance);
-        var asterisk = document.getElementsByClassName("resizable")[0];
+        // var asterisk = document.getElementsByClassName("resizable")[0];
+        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
+
         var tr = asterisk.firstChild;
         tr.children[3].classList.add('AsteriskTheadtrTd');
         tr.children[5].title = `${i18n.t('static.quantimed.conversionFactor')} = 1 / ${i18n.t('static.unit.multiplier')}`
@@ -493,7 +495,9 @@ export default class QunatimedImportStepTwo extends Component {
                         }
 
                         this.el = jexcel(document.getElementById("paputableDiv"), '');
-                        this.el.destroy();
+                        // this.el.destroy();
+                        jexcel.destroy(document.getElementById("paputableDiv"), true);
+
 
                         var json = this.props.items.importData.products;
                         var data = [];

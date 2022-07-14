@@ -14,8 +14,8 @@ import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 
 import i18n from '../../i18n'
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import getLabelText from '../../CommonComponent/getLabelText';
@@ -115,7 +115,8 @@ class usageTemplate extends Component {
             usagePeriodListLong: [],
             usagePeriodDisplayList: [],
             dimensionList: [],
-            isChanged1: false
+            isChanged1: false,
+            dataEl: ''
         }
         // this.setTextAndValue = this.setTextAndValue.bind(this);
         // this.disableRow = this.disableRow.bind(this);
@@ -889,10 +890,11 @@ class usageTemplate extends Component {
         }
 
         this.el = jexcel(document.getElementById("paputableDiv"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("paputableDiv"), true);
         var json = [];
         var data = papuDataArr;
-
+        console.log("data-->", data)
         var options = {
             data: data,
             columnDrag: true,
@@ -962,7 +964,7 @@ class usageTemplate extends Component {
                     type: 'autocomplete',
                     width: '130',
                     source: this.state.dimensionList,
-                    readOnly:(this.state.roleArray.includes('ROLE_REALM_ADMIN') || this.state.roleArray.includes('ROLE_DATASET_ADMIN'))?false:true //8 I
+                    readOnly: (this.state.roleArray.includes('ROLE_REALM_ADMIN') || this.state.roleArray.includes('ROLE_DATASET_ADMIN')) ? false : true //8 I
                 },
                 {
                     title: i18n.t('static.usageTemplate.fuPerPersonPerTime'),
@@ -1191,7 +1193,7 @@ class usageTemplate extends Component {
             search: true,
             freezeColumns: 3,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
@@ -1205,15 +1207,15 @@ class usageTemplate extends Component {
             parseFormulas: true,
             // onpaste: this.onPaste,
             oneditionend: this.oneditionend,
-            text: {
-                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
             onload: this.loaded,
             onchangepage: this.onchangepage,
-            editable: (this.state.roleArray.includes('ROLE_REALM_ADMIN') || this.state.roleArray.includes('ROLE_DATASET_ADMIN'))?true:false,
+            editable: (this.state.roleArray.includes('ROLE_REALM_ADMIN') || this.state.roleArray.includes('ROLE_DATASET_ADMIN')) ? true : false,
             license: JEXCEL_PRO_KEY,
             contextMenu: function (obj, x, y, e) {
                 var items = [];
@@ -1300,8 +1302,8 @@ class usageTemplate extends Component {
             }.bind(this)
         };
 
-        this.el = jexcel(document.getElementById("paputableDiv"), options);
         this.setState({
+            dataEl: jexcel(document.getElementById("paputableDiv"), options),
             loading: false
         })
     }
@@ -1941,7 +1943,9 @@ class usageTemplate extends Component {
     filterTracerCategoryByProgramId = function (instance, cell, c, r, source) {
         var mylist = this.state.tracerCategoryList;
         var programList = this.state.typeList;
-        var value = (instance.jexcel.getJson(null, false)[r])[1];
+        // var value = (instance.jexcel.getJson(null, false)[r])[1];
+        var value = (this.state.dataEl.getJson(null, false)[r])[1];
+
         value = Number(value);
         if (value != -1 && value != 0) {
             let programObj = this.state.typeList.filter(c => c.id == parseInt(value))[0];
@@ -1961,7 +1965,9 @@ class usageTemplate extends Component {
 
     filterForecastingUnitBasedOnTracerCategory = function (instance, cell, c, r, source) {
         var mylist = [];
-        var value = (instance.jexcel.getJson(null, false)[r])[3];
+        // var value = (instance.jexcel.getJson(null, false)[r])[3];
+        var value = (this.state.dataEl.getJson(null, false)[r])[3];
+
         if (value > 0) {
             mylist = this.state.forecastingUnitList.filter(c => c.tracerCategoryId == value && c.active.toString() == "true");
         }
@@ -1997,7 +2003,9 @@ class usageTemplate extends Component {
         if (mylist[0].id == -1) {
             mylist.splice(0, 1);
         }
-        var value = (instance.jexcel.getJson(null, false)[r])[12];
+        // var value = (instance.jexcel.getJson(null, false)[r])[12];
+        var value = (this.state.dataEl.getJson(null, false)[r])[12];
+
         let tempUsagePeriodList = [];
         if (value > 0) {
             let selectedPickerConvertTOMonth = mylist.filter(c => c.id == value)[0].convertToMonth;
@@ -2153,7 +2161,7 @@ class usageTemplate extends Component {
     }
 
     oneditionend = function (instance, cell, x, y, value) {
-        var elInstance = instance.jexcel;
+        var elInstance = instance;
         var rowData = elInstance.getRowData(y);
 
         // if (x == 2 && !isNaN(rowData[2]) && rowData[2].toString().indexOf('.') != -1) {
@@ -2242,12 +2250,12 @@ class usageTemplate extends Component {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
-                var index = (instance.jexcel).getValue(`G${parseInt(data[i].y) + 1}`, true);
+                var index = (instance).getValue(`G${parseInt(data[i].y) + 1}`, true);
                 if (index === "" || index == null || index == undefined) {
-                    (instance.jexcel).setValueFromCoords(0, data[i].y, 0, true);
-                    (instance.jexcel).setValueFromCoords(2, data[i].y, true, true);
-                    (instance.jexcel).setValueFromCoords(5, data[i].y, 1, true);
-                    (instance.jexcel).setValueFromCoords(6, data[i].y, 1, true);
+                    (instance).setValueFromCoords(0, data[i].y, 0, true);
+                    (instance).setValueFromCoords(2, data[i].y, true, true);
+                    (instance).setValueFromCoords(5, data[i].y, 1, true);
+                    (instance).setValueFromCoords(6, data[i].y, 1, true);
                     z = data[i].y;
                 }
             }
@@ -2380,19 +2388,19 @@ class usageTemplate extends Component {
     }
 
     onchangepage(el, pageNo, oldPageNo) {
-        var elInstance = el.jexcel;
+        var elInstance = el;
         var json = elInstance.getJson(null, false);
 
         var colArr = ['A', 'B'];
 
-        var jsonLength = (pageNo + 1) * (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+        var jsonLength = (pageNo + 1) * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
         if (jsonLength == undefined) {
             jsonLength = 15
         }
         if (json.length < jsonLength) {
             jsonLength = json.length;
         }
-        var start = pageNo * (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+        var start = pageNo * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
 
         for (var y = start; y < jsonLength; y++) {
             var rowData = elInstance.getRowData(y);
@@ -2518,8 +2526,9 @@ class usageTemplate extends Component {
 
 
     loaded = function (instance, cell, x, y, value) {
-        jExcelLoadedFunction(instance);
-        var asterisk = document.getElementsByClassName("resizable")[0];
+        // jExcelLoadedFunction(instance);
+        // var asterisk = document.getElementsByClassName("resizable")[0];
+        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
         // tr.children[1].classList.add('AsteriskTheadtrTd');
         // tr.children[2].classList.add('AsteriskTheadtrTd');
@@ -2530,24 +2539,24 @@ class usageTemplate extends Component {
         // tr.children[7].classList.add('AsteriskTheadtrTd');
 
         // tr.children[16].classList.add('CalculatorTheadtr');
-        tr.children[12].classList.add('CalculatorTheadtr');
+        // tr.children[12].classList.add('CalculatorTheadtr');
         // tr.children[18].classList.add('CalculatorTheadtr');
 
 
         tr.children[2].classList.add('InfoTrAsteriskTheadtrTd');
         tr.children[3].classList.add('InfoTrAsteriskTheadtrTd');
-        tr.children[6].classList.add('InfoTrAsteriskTheadtrTd');
-        tr.children[7].classList.add('InfoTrAsteriskTheadtrTd');
-        tr.children[8].classList.add('InfoTr');
-        tr.children[9].classList.add('InfoTr');
-        tr.children[10].classList.add('InfoTr');
-        tr.children[11].classList.add('InfoTr');
-        tr.children[12].classList.add('InfoTr');
-        tr.children[13].classList.add('InfoTr');
-        tr.children[14].classList.add('InfoTr');
-        tr.children[15].classList.add('InfoTr');
-        tr.children[16].classList.add('InfoTr');
-        tr.children[17].classList.add('InfoTr');
+        // tr.children[6].classList.add('InfoTrAsteriskTheadtrTd');
+        // tr.children[7].classList.add('InfoTrAsteriskTheadtrTd');
+        // tr.children[8].classList.add('InfoTr');
+        // tr.children[9].classList.add('InfoTr');
+        // tr.children[10].classList.add('InfoTr');
+        // tr.children[11].classList.add('InfoTr');
+        // tr.children[12].classList.add('InfoTr');
+        // tr.children[13].classList.add('InfoTr');
+        // tr.children[14].classList.add('InfoTr');
+        // tr.children[15].classList.add('InfoTr');
+        // tr.children[16].classList.add('InfoTr');
+        // tr.children[17].classList.add('InfoTr');
         // tr.children[18].classList.add('InfoTr');
         // tr.children[19].classList.add('InfoTr');
         // tr.children[20].classList.add('InfoTr');
@@ -2558,31 +2567,27 @@ class usageTemplate extends Component {
 
         tr.children[2].title = i18n.t('static.tooltip.ForecastProgram');
         tr.children[3].title = i18n.t('static.tooltip.UsageName');
-        tr.children[6].title = i18n.t('static.tooltip.LagInMonth');
-        tr.children[7].title = i18n.t('static.tooltip.UsageType');
-        tr.children[8].title = i18n.t('static.tooltip.Persons');
-        tr.children[9].title = i18n.t('static.tooltip.PersonsUnit');
-        tr.children[10].title = i18n.t('static.tooltip.FUPersonTime');
-        tr.children[11].title = i18n.t('static.tooltip.OneTimeUsage');
-        tr.children[12].title = i18n.t('static.tooltip.OfTimeFreqwency');
-        tr.children[13].title = i18n.t('static.tooltip.Freqwency');
-        tr.children[14].title = i18n.t('static.tooltip.UsagePeriod');
-        tr.children[15].title = i18n.t('static.tooltip.PeriodUnit');
-        tr.children[16].title = i18n.t('static.tooltip.OfFuRequired');
-        tr.children[17].title = i18n.t('static.tooltip.UsageInWords');
+        // tr.children[6].title = i18n.t('static.tooltip.LagInMonth');
+        // tr.children[7].title = i18n.t('static.tooltip.UsageType');
+        // tr.children[8].title = i18n.t('static.tooltip.Persons');
+        // tr.children[9].title = i18n.t('static.tooltip.PersonsUnit');
+        // tr.children[10].title = i18n.t('static.tooltip.FUPersonTime');
+        // tr.children[11].title = i18n.t('static.tooltip.OneTimeUsage');
+        // tr.children[12].title = i18n.t('static.tooltip.OfTimeFreqwency');
+        // tr.children[13].title = i18n.t('static.tooltip.Freqwency');
+        // tr.children[14].title = i18n.t('static.tooltip.UsagePeriod');
+        // tr.children[15].title = i18n.t('static.tooltip.PeriodUnit');
+        // tr.children[16].title = i18n.t('static.tooltip.OfFuRequired');
+        // tr.children[17].title = i18n.t('static.tooltip.UsageInWords');
 
-
-
-
-
-        var elInstance = instance.jexcel;
+        var elInstance = instance.worksheets[0];
         var json = elInstance.getJson();
         let roleArray = this.state.roleArray;
 
         var jsonLength;
 
-        if ((document.getElementsByClassName("jexcel_pagination_dropdown")[0] != undefined)) {
-            jsonLength = 1 * (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+        if ((document.getElementsByClassName("jss_pagination_dropdown")[0] != undefined)) {
+            jsonLength = 1 * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
         }
 
         if (jsonLength == undefined) {
@@ -4528,6 +4533,11 @@ class usageTemplate extends Component {
 
 
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
 
         const { usagePeriodListLong } = this.state;
         let usageList = usagePeriodListLong.length > 0
@@ -4886,4 +4896,3 @@ class usageTemplate extends Component {
 }
 
 export default usageTemplate
-

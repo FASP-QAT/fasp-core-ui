@@ -82,7 +82,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         // var checkBoxValue = document.getElementById("showErrors");
         // var elInstance = this.state.consumptionEl;
         // var json = elInstance.getJson(null, false);
-        // var showOption = (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+        // var showOption = (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
         // if (json.length < showOption) {
         //     showOption = json.length;
         // }
@@ -211,7 +211,9 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         jexcel.destroy(document.getElementById("consumptionTable"), true);
                     }
                     if (this.state.consumptionBatchInfoTableEl != "" && this.state.consumptionBatchInfoTableEl != undefined) {
-                        this.state.consumptionBatchInfoTableEl.destroy();
+                        // this.state.consumptionBatchInfoTableEl.destroy();
+                        jexcel.destroy(document.getElementById("consumptionBatchInfoTable"), true);
+
                     }
                     var data = [];
                     var consumptionDataArr = [];
@@ -456,7 +458,8 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             batchInfoList: batchList
         })
         if (this.state.consumptionBatchInfoTableEl != "" && this.state.consumptionBatchInfoTableEl != undefined) {
-            this.state.consumptionBatchInfoTableEl.destroy();
+            // this.state.consumptionBatchInfoTableEl.destroy();
+            jexcel.destroy(document.getElementById("consumptionBatchInfoTable"), true);
         }
         var json = [];
         var consumptionQty = 0;
@@ -1310,7 +1313,9 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                 if (this.props.consumptionPage == "consumptionDataEntry") {
                     this.props.toggleLarge("submit");
                 }
-                elInstance.destroy();
+                // elInstance.destroy();
+                jexcel.destroy(document.getElementById("consumptionTable"), true);
+
             }
             this.props.updateState("loading", false);
         } else {
@@ -1741,10 +1746,10 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
     }
 
     render() {
-            jexcel.setDictionary({
-                Show: " ",
-                entries: " ",
-            });
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
         return (<div></div>)
     }
 }

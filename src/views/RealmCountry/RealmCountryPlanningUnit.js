@@ -281,7 +281,7 @@ class PlanningUnitCountry extends Component {
                                                 ],
                                                 onpaste: this.onPaste,
                                                 updateTable: function (el, cell, x, y, source, value, id) {
-                                                    var elInstance = el.jexcel;
+                                                    var elInstance = el;
                                                     var rowData = elInstance.getRowData(y);
                                                     var realmCountryPlanningUnitId = rowData[8];
                                                     if (realmCountryPlanningUnitId == 0) {

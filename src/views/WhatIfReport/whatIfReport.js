@@ -38,6 +38,9 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 // import SupplyPlanFormulas from "./SupplyPlanFormulas";
 import { Prompt } from 'react-router'
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
+
 
 const entityname = i18n.t('static.dashboard.whatIf')
 
@@ -98,7 +101,7 @@ export default class WhatIfReportComponent extends React.Component {
         dt.setMonth(dt.getMonth() - 10);
         var value = JSON.parse(localStorage.getItem("sesStartDate"));
         var date = moment(value.year + "-" + value.month + "-01").format("YYYY-MM-DD");
-        if(value.month<=9){
+        if (value.month <= 9) {
             date = moment(value.year + "-0" + value.month + "-01").format("YYYY-MM-DD");
         }
         var currentDate = moment(Date.now()).startOf('month').format("YYYY-MM-DD");
@@ -252,7 +255,7 @@ export default class WhatIfReportComponent extends React.Component {
     }
     handleRangeDissmis1(value) {
         var date = moment(value.year + "-" + value.month + "-01").format("YYYY-MM-DD");
-        if(value.month<=9){
+        if (value.month <= 9) {
             date = moment(value.year + "-0" + value.month + "-01").format("YYYY-MM-DD");
         }
         var currentDate = moment(Date.now()).startOf('month').format("YYYY-MM-DD");
@@ -2376,7 +2379,7 @@ export default class WhatIfReportComponent extends React.Component {
                                     var dataSourceResult = [];
                                     dataSourceResult = dataSourceRequest.result;
                                     for (var k = 0; k < dataSourceResult.length; k++) {
-                                        if (dataSourceResult[k].program==null || dataSourceResult[k].program.id == programJson.programId || dataSourceResult[k].program.id == 0 && dataSourceResult[k].active == true) {
+                                        if (dataSourceResult[k].program == null || dataSourceResult[k].program.id == programJson.programId || dataSourceResult[k].program.id == 0 && dataSourceResult[k].active == true) {
                                             if (dataSourceResult[k].realm.id == programJson.realmCountry.realm.realmId) {
                                                 dataSourceListAll.push(dataSourceResult[k]);
 
@@ -3579,7 +3582,9 @@ export default class WhatIfReportComponent extends React.Component {
             this.setState({ loading: true, consumptionStartDateClicked: startDate });
             var elInstance = this.state.consumptionBatchInfoTableEl;
             if (elInstance != undefined && elInstance != "") {
-                elInstance.destroy();
+                // elInstance.destroy();
+                jexcel.destroy(document.getElementById("consumptionBatchInfoTable"), true);
+
             }
             var planningUnitId = document.getElementById("planningUnitId").value;
             var programId = document.getElementById("programId").value;
@@ -3676,7 +3681,9 @@ export default class WhatIfReportComponent extends React.Component {
             this.setState({ loading: true, inventoryStartDateClicked: moment(endDate).startOf('month').format("YYYY-MM-DD") });
             var elInstance = this.state.inventoryBatchInfoTableEl;
             if (elInstance != undefined && elInstance != "") {
-                elInstance.destroy();
+                // elInstance.destroy();
+                jexcel.destroy(document.getElementById("inventoryBatchInfoTable"), true);
+
             }
             var planningUnitId = document.getElementById("planningUnitId").value;
             var programId = document.getElementById("programId").value;
@@ -5592,8 +5599,11 @@ export default class WhatIfReportComponent extends React.Component {
             }
             if (cont == true) {
                 document.getElementById("showSaveQtyButtonDiv").style.display = 'none';
-                (this.refs.shipmentChild.state.qtyCalculatorTableEl).destroy();
-                (this.refs.shipmentChild.state.qtyCalculatorTableEl1).destroy();
+                // (this.refs.shipmentChild.state.qtyCalculatorTableEl).destroy();
+                // (this.refs.shipmentChild.state.qtyCalculatorTableEl1).destroy();
+                jexcel.destroy(document.getElementById("qtyCalculatorTable"), true);
+                jexcel.destroy(document.getElementById("qtyCalculatorTable1"), true);
+
                 this.refs.shipmentChild.state.shipmentQtyChangedFlag = 0;
                 this.setState({
                     qtyCalculatorValidationError: "",
@@ -5614,7 +5624,9 @@ export default class WhatIfReportComponent extends React.Component {
             }
             if (cont == true) {
                 document.getElementById("showSaveShipmentsDatesButtonsDiv").style.display = 'none';
-                (this.refs.shipmentChild.state.shipmentDatesTableEl).destroy();
+                // (this.refs.shipmentChild.state.shipmentDatesTableEl).destroy();
+                jexcel.destroy(document.getElementById("shipmentDatesTable"), true);
+
                 this.refs.shipmentChild.state.shipmentDatesChangedFlag = 0;
                 this.setState({
                     shipmentDatesChangedFlag: 0,
@@ -5635,7 +5647,9 @@ export default class WhatIfReportComponent extends React.Component {
             }
             if (cont == true) {
                 document.getElementById("showShipmentBatchInfoButtonsDiv").style.display = 'none';
-                (this.refs.shipmentChild.state.shipmentBatchInfoTableEl).destroy();
+                // (this.refs.shipmentChild.state.shipmentBatchInfoTableEl).destroy();
+                jexcel.destroy(document.getElementById("shipmentBatchInfoTable"), true);
+
                 this.refs.shipmentChild.state.shipmentBatchInfoChangedFlag = 0;
                 this.setState({
                     shipmentBatchInfoChangedFlag: 0,
@@ -5660,7 +5674,9 @@ export default class WhatIfReportComponent extends React.Component {
         }
         if (cont == true) {
             document.getElementById("showInventoryBatchInfoButtonsDiv").style.display = 'none';
-            (this.refs.inventoryChild.state.inventoryBatchInfoTableEl).destroy();
+            // (this.refs.inventoryChild.state.inventoryBatchInfoTableEl).destroy();
+            jexcel.destroy(document.getElementById("inventoryBatchInfoTable"), true);
+
             this.refs.inventoryChild.state.inventoryBatchInfoChangedFlag = 0;
             this.setState({
                 inventoryBatchInfoChangedFlag: 0,
@@ -5685,7 +5701,9 @@ export default class WhatIfReportComponent extends React.Component {
         }
         if (cont == true) {
             document.getElementById("showConsumptionBatchInfoButtonsDiv").style.display = 'none';
-            (this.refs.consumptionChild.state.consumptionBatchInfoTableEl).destroy();
+            // (this.refs.consumptionChild.state.consumptionBatchInfoTableEl).destroy();
+            jexcel.destroy(document.getElementById("consumptionBatchInfoTable"), true);
+
             this.refs.consumptionChild.state.consumptionBatchInfoChangedFlag = 0;
             this.setState({
                 consumptionBatchInfoChangedFlag: 0,

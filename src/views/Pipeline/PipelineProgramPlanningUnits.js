@@ -712,7 +712,9 @@ export default class PipelineProgramPlanningUnits extends Component {
                                             }
 
                                             this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
-                                            this.el.destroy();
+                                            // this.el.destroy();
+                                            jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
+
                                             var json = [];
                                             var data = productDataArr;
                                             // var data = []

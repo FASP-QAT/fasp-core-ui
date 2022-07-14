@@ -46,10 +46,10 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import ReportService from '../../api/ReportService';
 import RealmCountryService from '../../api/RealmCountryService';
 import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
-import {MultiSelect} from 'react-multi-select-component';
+import { MultiSelect } from 'react-multi-select-component';
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 
@@ -637,7 +637,8 @@ class warehouseCapacity extends Component {
                                 data: [], loading: false
                             }, () => {
                                 this.el = jexcel(document.getElementById("tableDiv"), '');
-                                this.el.destroy();
+                                // this.el.destroy();
+                                jexcel.destroy(document.getElementById("tableDiv"), true);
                             })
                             if (error.message === "Network Error") {
                                 this.setState({
@@ -707,12 +708,14 @@ class warehouseCapacity extends Component {
             } else if (this.state.programValues.length == 0) {
                 this.setState({ message: i18n.t('static.common.selectProgram'), data: [] }, () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
-                    this.el.destroy();
+                    // this.el.destroy();
+                    jexcel.destroy(document.getElementById("tableDiv"), true);
                 });
             } else if (this.state.countryValues.length == 0) {
                 this.setState({ message: i18n.t('static.healtharea.countrytext'), data: [] }, () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
-                    this.el.destroy();
+                    // this.el.destroy();
+                    jexcel.destroy(document.getElementById("tableDiv"), true);
                 });
             }
 
@@ -746,7 +749,8 @@ class warehouseCapacity extends Component {
                             loading: false
                         }, () => {
                             this.el = jexcel(document.getElementById("tableDiv"), '');
-                            this.el.destroy();
+                            // this.el.destroy();
+                            jexcel.destroy(document.getElementById("tableDiv"), true);
                         })
                     }.bind(this);
                     programRequest.onsuccess = function (event) {
@@ -798,7 +802,8 @@ class warehouseCapacity extends Component {
                     loading: false
                 }, () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
-                    this.el.destroy();
+                    // this.el.destroy();
+                    jexcel.destroy(document.getElementById("tableDiv"), true);
                 });
             }
 
@@ -830,7 +835,8 @@ class warehouseCapacity extends Component {
         // }
         // console.log("regionListArray---->", regionListArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("tableDiv"), true);
         var json = [];
         var data = regionListArray;
         var options = {
@@ -843,40 +849,41 @@ class warehouseCapacity extends Component {
                 {
                     title: i18n.t('static.region.country'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 }
                 ,
                 {
                     title: i18n.t('static.region.region'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 }
                 , {
                     title: i18n.t('static.program.program'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
 
                 {
                     title: i18n.t('static.region.gln'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 }, {
                     title: i18n.t('static.region.capacitycbm'),
                     type: 'numeric', mask: '#,##.00', decimal: '.',
-                    readOnly: true
+                    // readOnly: true
                 }
             ],
-            text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
+            editable: false,
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
@@ -905,6 +912,11 @@ class warehouseCapacity extends Component {
     }
 
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
         const checkOnline = localStorage.getItem('sessionType');
         // const { programLst } = this.state;
         // let programList = programLst.length > 0

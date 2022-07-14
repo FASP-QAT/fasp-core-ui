@@ -353,7 +353,7 @@ export default class ShipmentLinkingNotifications extends Component {
     }.bind(this);
 
     oneditionend = function (instance, cell, x, y, value) {
-        var elInstance = instance.jexcel;
+        var elInstance = instance;
         var rowData = elInstance.getRowData(y);
 
         if (x == 10 && !isNaN(rowData[10]) && rowData[10].toString().indexOf('.') != -1) {
@@ -366,11 +366,11 @@ export default class ShipmentLinkingNotifications extends Component {
 
     onPaste(instance, data) {
         if (data.length == 1 && Object.keys(data[0])[2] == "value") {
-            (instance.jexcel).setValueFromCoords(10, data[0].y, parseFloat(data[0].value), true);
+            (instance).setValueFromCoords(10, data[0].y, parseFloat(data[0].value), true);
         }
         else {
             for (var i = 0; i < data.length; i++) {
-                (instance.jexcel).setValueFromCoords(13, data[i].y, 1, true);
+                (instance).setValueFromCoords(13, data[i].y, 1, true);
             }
         }
     }
@@ -895,7 +895,7 @@ export default class ShipmentLinkingNotifications extends Component {
             // onselection: this.selected,
             onchange: this.changed,
             updateTable: function (el, cell, x, y, source, value, id) {
-                var elInstance = el.jexcel;
+                var elInstance = el;
                 if (y != null) {
                     var rowData = elInstance.getRowData(y);
                     if (rowData[0] && parseInt(rowData[13]) != 1) {
@@ -935,10 +935,10 @@ export default class ShipmentLinkingNotifications extends Component {
                 }
             }.bind(this),
             onsearch: function (el) {
-                el.jexcel.updateTable();
+                // el.jexcel.updateTable();
             },
             onfilter: function (el) {
-                el.jexcel.updateTable();
+                // el.jexcel.updateTable();
             },
             oneditionend: this.oneditionend,
             copyCompatibility: true,

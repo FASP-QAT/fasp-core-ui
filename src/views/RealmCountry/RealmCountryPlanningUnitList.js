@@ -162,11 +162,11 @@ export default class RealmCountryPlanningUnitList extends Component {
             if (z != data[i].y) {
                 var index = (instance).getValue(`I${parseInt(data[i].y) + 1}`, true);
                 if (index === "" || index == null || index == undefined) {
-                    // (instance.jexcel).setValueFromCoords(0, data[i].y, this.state.realmCountry.realm.label.label_en + "-" + this.state.realmCountry.country.label.label_en, true);
-                    // (instance.jexcel).setValueFromCoords(0, data[i].y, '', true);
+                    // (instance).setValueFromCoords(0, data[i].y, this.state.realmCountry.realm.label.label_en + "-" + this.state.realmCountry.country.label.label_en, true);
+                    // (instance).setValueFromCoords(0, data[i].y, '', true);
                     (instance).setValueFromCoords(6, data[i].y, true, true);
-                    // (instance.jexcel).setValueFromCoords(7, data[i].y, document.getElementById("realmCountryId").value, true);
-                    // (instance.jexcel).setValueFromCoords(7, data[i].y, '', true);
+                    // (instance).setValueFromCoords(7, data[i].y, document.getElementById("realmCountryId").value, true);
+                    // (instance).setValueFromCoords(7, data[i].y, '', true);
                     (instance).setValueFromCoords(8, data[i].y, 0, true);
                     (instance).setValueFromCoords(9, data[i].y, 1, true);
                     z = data[i].y;
@@ -1259,7 +1259,6 @@ export default class RealmCountryPlanningUnitList extends Component {
         // var tr = asterisk.firstChild;
         // tr.children[7].title = i18n.t("static.message.tooltipMultiplier")
         jExcelLoadedFunction(instance);
-        // var asterisk = document.getElementsByClassName("resizable")[0];
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
         tr.children[1].classList.add('AsteriskTheadtrTd');
