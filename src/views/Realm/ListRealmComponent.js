@@ -643,7 +643,7 @@ export default class ReactListComponent extends Component {
                             </div>
                         </div>
                     </div>
-                    <CardBody className=" pt-md-1 pb-md-1 table-responsive">
+                    <CardBody className=" pt-md-1 pb-md-1">
                         <div className='consumptionDataEntryTable'>
                             {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_REALM') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
                             </div>

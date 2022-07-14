@@ -263,7 +263,7 @@ export default class IntegrationListComponent extends Component {
                         </div>
 
                     </div>
-                    <CardBody className="table-responsive pt-md-1 pb-md-1">
+                    <CardBody className="pt-md-1 pb-md-1">
                         {/* <div id="loader" className="center"></div> */}
                         <div className='consumptionDataEntryTable'>
                             <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_INTEGRATION') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
