@@ -1073,6 +1073,10 @@ export default class ShipmentLinkingNotifications extends Component {
                 {
                     title: "programId",
                     type: 'hidden',
+                },
+                {
+                    title: "programId",
+                    type: 'hidden',
                 }
             ],
             editable: false,
