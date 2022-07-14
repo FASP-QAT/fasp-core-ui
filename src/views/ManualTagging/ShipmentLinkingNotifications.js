@@ -1038,7 +1038,11 @@ export default class ShipmentLinkingNotifications extends Component {
             data[0] = getLabelText(notificationSummaryList[j].label);
             data[1] = notificationSummaryList[j].notificationCount;
             data[2] = notificationSummaryList[j].programId;
-
+            data[3] = this.state.programs.filter(c=>c.programId==notificationSummaryList[j].programId).sort((a, b) => {
+                var itemLabelA = a.version;
+                var itemLabelB = b.version
+                return itemLabelA < itemLabelB ? 1 : -1;
+            })[0].value
             notificationSummaryArray[count] = data;
             count++;
         }
@@ -1069,6 +1073,10 @@ export default class ShipmentLinkingNotifications extends Component {
                 {
                     title: "programId",
                     type: 'hidden',
+                },
+                {
+                    title: "programId",
+                    type: 'hidden',
                 }
             ],
             editable: false,
@@ -1086,7 +1094,7 @@ export default class ShipmentLinkingNotifications extends Component {
             allowInsertColumn: false,
             allowManualInsertColumn: false,
             allowDeleteRow: false,
-            // onselection: this.selected,
+            onselection: this.selected,
             // onchange: this.changed,
             oneditionend: this.onedit,
             copyCompatibility: true,
@@ -1143,7 +1151,7 @@ export default class ShipmentLinkingNotifications extends Component {
         } else {
             console.log("RESP------>not Header");
             this.setState({
-                programId: instance.getValueFromCoords(2, y1)
+                programId: instance.getValueFromCoords(3, y1)
             }, () => {
                 document.getElementById("addressed").value = 0;
                 this.getPlanningUnitList();
