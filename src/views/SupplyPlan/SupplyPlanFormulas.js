@@ -15,6 +15,7 @@ import costOfinventory from '../../assets/img/Cost-Of-Inventory.png';
 import Inventoryturns from '../../assets/img/Inventory Turns.png';
 import forcasterror from '../../assets/img/ForecastError-Formula.png';
 import shipmentcost from '../../assets/img/Shipment-cost-formula.png';
+import adjustedConsumption from '../../assets/img/AdjustedConsumption.png';
 import i18n from '../../i18n';
 
 class SupplyPlanFormulas extends Component {
@@ -154,6 +155,26 @@ class SupplyPlanFormulas extends Component {
           <ModalHeader toggle={this.toggle} className="ModalHead modal-info-Headher"><strong className="TextWhite" >{i18n.t('static.common.formulae')}</strong></ModalHeader>
           <ModalBody >
             <ListGroup style={{ height: '490px', overflowY: 'scroll' }}>
+            <ListGroupItem >
+                <ListGroupItemHeading className="formulasheading">{i18n.t('static.dataentry.adjustedConsumption')}</ListGroupItemHeading>
+                <ListGroupItemText className="formulastext">
+                  <img src={adjustedConsumption} className="formula-img-mr img-fluid" />
+
+                  <p><span className="formulastext-p">{i18n.t("static.common.example") + " :"}</span><br></br>
+
+                    {i18n.t("static.supplyPlanFormula.forecastConsumption") + " = 10,000"}<br></br>
+                    {i18n.t("static.dataentry.adjustedConsumption") + " = 10,000"}<br></br></p>
+                    <p><span className="formulastext-p">{i18n.t("static.common.example") + " :"}</span><br></br>
+                    {i18n.t("static.report.actualConsumption") + " = 10,000"}<br></br>
+                    {i18n.t("static.consumption.daysofstockout") + " = 10"}<br></br>
+                    {i18n.t("static.supplyPlanFormula.noOfDaysInMonth") + " = 30"}<br></br>
+                    {i18n.t("static.dataentry.adjustedConsumption") + " = "+ i18n.t("static.report.actualConsumption")+ " * "+i18n.t("static.supplyPlanFormula.noOfDaysInMonth")+" / ("+i18n.t("static.supplyPlanFormula.noOfDaysInMonth")+" - "+i18n.t("static.consumption.daysofstockout")+")"}<br></br>
+                    {i18n.t("static.dataentry.adjustedConsumption") + " = 1000 * 30 / (30-10)"}<br></br>
+                    {i18n.t("static.dataentry.adjustedConsumption") + " = 30000 / 20"}<br></br>
+                    {i18n.t("static.dataentry.adjustedConsumption") + " = 1500"}<br></br>
+                    </p>
+                </ListGroupItemText>
+              </ListGroupItem>
               <ListGroupItem >
                 <ListGroupItemHeading className="formulasheading">{i18n.t('static.supplyPlan.openingBalance')}</ListGroupItemHeading>
                 <ListGroupItemText className="formulastext">
@@ -175,7 +196,7 @@ class SupplyPlanFormulas extends Component {
                     {i18n.t("static.supplyPlanFormula.openingBalanceFormula") + " = 1,653"}<br></br>
                     {i18n.t("static.supplyPlan.adjustments") + " = -100"}<br></br>
                     {i18n.t("static.dashboard.shipments") + " = 5,176"}<br></br>
-                    {i18n.t("static.supplyPlan.consumption") + " =7,087"}<br></br>
+                    {i18n.t("static.dataentry.adjustedConsumption") + " =7,087"}<br></br>
                     {i18n.t("static.supplyPlanFormula.expiredStock") + " = 642"}<br></br>
                     <br></br>
                     {i18n.t("static.supplyPlanFormula.endingBalance1")}<br></br>
@@ -189,7 +210,7 @@ class SupplyPlanFormulas extends Component {
                     {i18n.t("static.supplyPlanFormula.openingBalanceFormula") + " = 9,999"}<br></br>
                     {i18n.t("static.supplyPlan.adjustments") + " = -100"}<br></br>
                     {i18n.t("static.dashboard.shipments") + " = 5,176"}<br></br>
-                    {i18n.t("static.supplyPlan.consumption") + " =7,087"}<br></br>
+                    {i18n.t("static.dataentry.adjustedConsumption") + " =7,087"}<br></br>
                     {i18n.t("static.supplyPlanFormula.expiredStock") + " = 642"}<br></br>
                     <br></br>
                     {i18n.t("static.supplyPlanFormula.endingBalance1")}<br></br>
