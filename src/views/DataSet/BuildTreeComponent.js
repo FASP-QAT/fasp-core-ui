@@ -1296,7 +1296,7 @@ export default class BuildTree extends Component {
     fetchTracerCategoryList(programData) {
         console.log("programData---%%%%%%%", programData);
         var planningUnitList = programData.planningUnitList.filter(x => x.treeForecast == true && x.active == true);
-        console.log("planningUnitList about to call---", planningUnitList[0].planningUnit.forecastingUnit.id)
+        // console.log("planningUnitList about to call---", planningUnitList[0].planningUnit.forecastingUnit.id)
         var updatedPlanningUnitList = [];
         var forecastingUnitList = [];
         var tracerCategoryList = [];
