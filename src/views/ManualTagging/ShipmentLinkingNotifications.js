@@ -67,6 +67,7 @@ export default class ShipmentLinkingNotifications extends Component {
         this.buildNotificationSummaryJExcel = this.buildNotificationSummaryJExcel.bind(this);
         this.viewBatchData = this.viewBatchData.bind(this);
         this.oneditionend = this.oneditionend.bind(this);
+        this.selectedForNotification = this.selectedForNotification.bind(this)
     }
 
     viewBatchData(event, row) {
@@ -168,6 +169,7 @@ export default class ShipmentLinkingNotifications extends Component {
 
                 }).catch(
                     error => {
+                        console.log("Error@@@@@@@@@@", error)
                         if (error.message === "Network Error") {
                             this.setState({
                                 message: 'static.unkownError',
@@ -419,7 +421,9 @@ export default class ShipmentLinkingNotifications extends Component {
                 ManualTaggingService.getShipmentLinkingNotification(this.state.programDataJson.programId, this.state.programDataJson.version)
                     .then(response => {
                         let list = (addressed != -1 ? response.data.filter(c => (c.addressed == (addressed == 1 ? true : false))) : response.data);
+                        console.log("List@@@@@@@", list)
                         var programDataJson = this.state.programDataJson;
+                        console.log("programDataJson@@@@@@@@@@@", programDataJson)
                         var shipmentList = [];
                         var roPrimeNoList = [];
                         var planningUnitDataList = programDataJson.programData.planningUnitDataList;
@@ -427,6 +431,7 @@ export default class ShipmentLinkingNotifications extends Component {
                         var gprogramData = gprogramDataBytes.toString(CryptoJS.enc.Utf8);
                         var gprogramJson = JSON.parse(gprogramData);
                         var linkedShipmentsList = gprogramJson.shipmentLinkingList != null ? gprogramJson.shipmentLinkingList : []
+                        console.log("linkedShipmentsList@@@@@@@@@", linkedShipmentsList);
                         for (var pu = 0; pu < planningUnitIds.length; pu++) {
                             var planningUnitData = planningUnitDataList.filter(c => c.planningUnitId == planningUnitIds[pu].value)[0];
                             var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
@@ -484,6 +489,7 @@ export default class ShipmentLinkingNotifications extends Component {
                             );
                     }).catch(
                         error => {
+                            console.log("Error@@@@@@@@@@", error)
                             if (error.message === "Network Error") {
                                 this.setState({
                                     message: 'static.unkownError',
@@ -890,9 +896,8 @@ export default class ShipmentLinkingNotifications extends Component {
             allowInsertColumn: false,
             allowManualInsertColumn: false,
             allowDeleteRow: false,
+            onselection: this.selectedForNotification,
             onchange: this.changed,
-            // onselection: this.selected,
-
 
             // oneditionend: this.onedit,
             copyCompatibility: true,
@@ -959,6 +964,7 @@ export default class ShipmentLinkingNotifications extends Component {
                                         });
                                     }).catch(
                                         error => {
+                                            console.log("Error@@@@@@@@@@", error)
                                             if (error.message === "Network Error") {
                                                 this.setState({
                                                     message: 'static.unkownError',
@@ -1032,7 +1038,11 @@ export default class ShipmentLinkingNotifications extends Component {
             data[0] = getLabelText(notificationSummaryList[j].label);
             data[1] = notificationSummaryList[j].notificationCount;
             data[2] = notificationSummaryList[j].programId;
-
+            data[3] = this.state.programs.filter(c => c.programId == notificationSummaryList[j].programId).sort((a, b) => {
+                var itemLabelA = a.version;
+                var itemLabelB = b.version
+                return itemLabelA < itemLabelB ? 1 : -1;
+            })[0].value
             notificationSummaryArray[count] = data;
             count++;
         }
@@ -1059,6 +1069,10 @@ export default class ShipmentLinkingNotifications extends Component {
                     type: 'numeric',
                     mask: '#,##.00', decimal: '.',
                     readOnly: true
+                },
+                {
+                    title: "programId",
+                    type: 'hidden',
                 },
                 {
                     title: "programId",
@@ -1101,6 +1115,18 @@ export default class ShipmentLinkingNotifications extends Component {
             instance, loading: false
         })
     }
+
+    selectedForNotification = function (instance, cell, x, y, value) {
+        if (y != 0) {
+            console.log("ProgramId@@@@@@@", this.state.programId.split("_")[0]);
+            console.log("VersionId@@@@@@@", this.state.programId.split("_")[1].substring(1) + "  (Local)");
+            localStorage.setItem("sesProgramIdReport", this.state.programId.split("_")[0]);
+            localStorage.setItem("sesVersionIdReport", this.state.programId.split("_")[1].substring(1) + "  (Local)");
+
+            window.open(window.location.origin + `/#/shipment/manualTagging/2`);
+        }
+    }
+
     selected = function (instance, x1, y1, x2, y2, origin) {
         var instance = (instance).jexcel;
         console.log("RESP------>x1", x1);
@@ -1127,7 +1153,7 @@ export default class ShipmentLinkingNotifications extends Component {
         } else {
             console.log("RESP------>not Header");
             this.setState({
-                programId: instance.getValueFromCoords(2, y1)
+                programId: instance.getValueFromCoords(3, y1)
             }, () => {
                 document.getElementById("addressed").value = 0;
                 this.getPlanningUnitList();
@@ -1320,6 +1346,7 @@ export default class ShipmentLinkingNotifications extends Component {
                     }
                 }).catch(
                     error => {
+                        console.log("Error@@@@@@@@@@", error)
                         if (error.message === "Network Error") {
                             this.setState({
                                 message: 'static.unkownError',
