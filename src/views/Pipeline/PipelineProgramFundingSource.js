@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import PipelineService from '../../api/PipelineService.js';
 import AuthenticationService from '../Common/AuthenticationService.js';
@@ -24,20 +24,20 @@ export default class PipelineProgramFundingSource extends Component {
         this.checkValidation = this.checkValidation.bind(this);
         this.saveFundingSource = this.saveFundingSource.bind(this);
         //this.dropdownFilter = this.dropdownFilter.bind(this);
-        this.startLoading=this.startLoading.bind(this);
-        this.stopLoading=this.stopLoading.bind(this);
+        this.startLoading = this.startLoading.bind(this);
+        this.stopLoading = this.stopLoading.bind(this);
     }
 
-    startLoading(){
-        this.setState({loading:true});
+    startLoading() {
+        this.setState({ loading: true });
     }
-    stopLoading(){
-        this.setState({loading:false});
+    stopLoading() {
+        this.setState({ loading: false });
     }
 
     loaded() {
         var list = this.state.fundingSourceList;
-        var json = this.el.getJson(null,false);
+        var json = this.el.getJson(null, false);
 
         for (var y = 0; y < json.length; y++) {
             var col = ("B").concat(parseInt(y) + 1);
@@ -60,7 +60,7 @@ export default class PipelineProgramFundingSource extends Component {
 
         //Planning Unit
         if (x == 1) {
-            var json = this.el.getJson(null,false);
+            var json = this.el.getJson(null, false);
             var col = ("B").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -85,14 +85,14 @@ export default class PipelineProgramFundingSource extends Component {
         var regDec = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
 
         var valid = true;
-        var json = this.el.getJson(null,false);
+        var json = this.el.getJson(null, false);
         for (var y = 0; y < json.length; y++) {
             var col = ("B").concat(parseInt(y) + 1);
             var value = this.el.getValue(`B${parseInt(y) + 1}`, true);
 
             var currentFundingSource = this.el.getRowData(y)[1];
 
-            if (value == "" || value==undefined) {
+            if (value == "" || value == undefined) {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
@@ -108,7 +108,7 @@ export default class PipelineProgramFundingSource extends Component {
 
     saveFundingSource() {
         var list = this.state.fundingSourceList;
-        var json = this.el.getJson(null,false);
+        var json = this.el.getJson(null, false);
         var fundingSourceArray = []
         console.log(json.length)
         console.log(json)
@@ -214,6 +214,7 @@ export default class PipelineProgramFundingSource extends Component {
                                                 readonly: true
                                             }
                                         ],
+                                        editable: true,
                                         pagination: localStorage.getItem("sesRecordCount"),
                                         filters: true,
                                         contextMenu: function (obj, x, y, e) {
@@ -221,7 +222,7 @@ export default class PipelineProgramFundingSource extends Component {
                                         }.bind(this),
                                         search: true,
                                         columnSorting: true,
-                                        tableOverflow: true,
+                                        // tableOverflow: true,
                                         wordWrap: true,
                                         paginationOptions: JEXCEL_PAGINATION_OPTION,
                                         // position: 'top',
@@ -232,11 +233,11 @@ export default class PipelineProgramFundingSource extends Component {
                                         oneditionend: this.onedit,
                                         copyCompatibility: true,
                                         // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                                        text: {
-                                            showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')} `,
-                                            show: '',
-                                            entries: '',
-                                        },
+                                        // text: {
+                                        //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')} `,
+                                        //     show: '',
+                                        //     entries: '',
+                                        // },
                                         onload: this.loadedJexcelCommonFunction,
                                         license: JEXCEL_PRO_KEY,
                                         // onload: this.loaded
@@ -349,6 +350,11 @@ export default class PipelineProgramFundingSource extends Component {
     }
 
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
         return (
             <>
                 <AuthenticationServiceComponent history={this.props.history} />

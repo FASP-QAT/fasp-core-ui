@@ -13,7 +13,6 @@ import { DATE_FORMAT_CAP_WITHOUT_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXC
 import i18n from '../../i18n';
 import CryptoJS from 'crypto-js'
 import getLabelText from "../../CommonComponent/getLabelText";
-import jexcel from 'jexcel-pro';
 import { DATE_FORMAT_CAP, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY } from '../../Constants.js';
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination } from '../../CommonComponent/JExcelCommonFunctions.js';
 import csvicon from '../../assets/img/csv.png';

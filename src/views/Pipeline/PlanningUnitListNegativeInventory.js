@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import i18n from '../../i18n';
 import PipelineService from '../../api/PipelineService.js';
@@ -44,20 +44,21 @@ export default class PlanningUnitListNegativeInventory extends Component {
                         {
                             title: i18n.t('static.report.planningUnit'),
                             type: 'text',
-                            readOnly: true
+                            // readOnly: true
                         },
                         {
                             title: i18n.t('static.inventory.totalInvontory'),
                             type: 'numeric',
-                            readOnly: true
+                            // readOnly: true
 
                         }
 
                     ],
+                    editable: false,
                     pagination: false,
                     search: true,
                     columnSorting: true,
-                    tableOverflow: true,
+                    // tableOverflow: true,
                     wordWrap: true,
                     // paginationOptions: [10, 25, 50, 100],
                     // position: 'top',
@@ -67,11 +68,11 @@ export default class PlanningUnitListNegativeInventory extends Component {
                     onchange: this.changed,
                     oneditionend: this.onedit,
                     copyCompatibility: true,
-                    text: {
-                        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                        show: '',
-                        entries: '',
-                    },
+                    // text: {
+                    //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                    //     show: '',
+                    //     entries: '',
+                    // },
                     onload: this.loaded,
                     filters: true,
                     contextMenu: function (obj, x, y, e) {
@@ -130,6 +131,11 @@ export default class PlanningUnitListNegativeInventory extends Component {
     }
 
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
         return (
             <>
                 <Card>

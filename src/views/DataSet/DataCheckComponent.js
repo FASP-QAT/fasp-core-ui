@@ -2,7 +2,8 @@ import moment from "moment";
 import getLabelText from "../../CommonComponent/getLabelText";
 import { DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PAGINATION_OPTION, TITLE_FONT } from "../../Constants";
 import i18n from '../../i18n';
-import jexcel from 'jexcel-pro';
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import { DATE_FORMAT_CAP, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY } from '../../Constants.js';
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination } from '../../CommonComponent/JExcelCommonFunctions.js';
 import { LOGO } from "../../CommonComponent/Logo";
@@ -427,18 +428,18 @@ export function buildJxl(props) {
                 colWidths: [0, 150, 150, 150, 100, 100, 100],
                 colHeaderClasses: ["Reqasterisk"],
                 columns: columnsArray,
-                text: {
-                    showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                    show: '',
-                    entries: '',
-                },
+                // text: {
+                //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                //     show: '',
+                //     entries: '',
+                // },
                 onload: function (instance, cell, x, y, value) {
                     jExcelLoadedFunctionOnlyHideRow(instance);
                 },
                 updateTable: function (el, cell, x, y, source, value, id) {
                     if (y != null && x != 0) {
                         if (value != "100.00%") {
-                            var elInstance = el.jexcel;
+                            var elInstance = el;
                             cell.classList.add('red');
                         }
                     }
@@ -448,7 +449,7 @@ export function buildJxl(props) {
                 pagination: false,
                 search: false,
                 columnSorting: true,
-                tableOverflow: true,
+                // tableOverflow: true,
                 wordWrap: true,
                 allowInsertColumn: false,
                 allowManualInsertColumn: false,

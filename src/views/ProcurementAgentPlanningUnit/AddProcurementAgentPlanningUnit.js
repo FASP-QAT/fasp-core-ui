@@ -18,8 +18,8 @@ import { Formik } from "formik";
 import getLabelText from '../../CommonComponent/getLabelText';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import CryptoJS from 'crypto-js';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import moment from "moment";
 import { JEXCEL_DECIMAL_NO_REGEX_NEW, JEXCEL_INTEGER_REGEX, JEXCEL_DECIMAL_CATELOG_PRICE, DECIMAL_NO_REGEX, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
@@ -1046,11 +1046,12 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                             }
 
                                                         ],
+                                                        editable: true,
                                                         pagination: localStorage.getItem("sesRecordCount"),
                                                         filters: true,
                                                         search: true,
                                                         columnSorting: true,
-                                                        tableOverflow: true,
+                                                        // tableOverflow: true,
                                                         wordWrap: true,
                                                         paginationOptions: JEXCEL_PAGINATION_OPTION,
                                                         position: 'top',
@@ -1063,12 +1064,12 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                         parseFormulas: true,
                                                         onpaste: this.onPaste,
                                                         oneditionend: this.oneditionend,
-                                                        text: {
-                                                            // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                                                            showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                                                            show: '',
-                                                            entries: '',
-                                                        },
+                                                        // text: {
+                                                        //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                                                        //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                                                        //     show: '',
+                                                        //     entries: '',
+                                                        // },
                                                         onload: this.loaded,
                                                         license: JEXCEL_PRO_KEY,
                                                         contextMenu: function (obj, x, y, e) {
@@ -2099,6 +2100,11 @@ export default class AddProcurementAgentPlanningUnit extends Component {
 
 
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
         return (
 
             <div className="animated fadeIn">

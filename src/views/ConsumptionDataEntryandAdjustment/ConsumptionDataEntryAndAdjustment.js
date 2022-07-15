@@ -981,33 +981,42 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     var elInstance = instance.worksheets[0];
     var consumptionDataType = this.state.tempConsumptionUnitObject.consumptionDataType;
 
-    var cell1 = elInstance.getCell(`C1`)//other name
-    var cell2 = elInstance.getCell(`C2`)//other name
-    cell1.classList.add('readonly');
-    cell2.classList.add('readonly');
+    var json = elInstance.getJson();
 
-    var cell1 = elInstance.getCell(`D1`)//other name
-    var cell2 = elInstance.getCell(`D2`)//other multiplier
-    cell1.classList.add('readonly');
-    cell2.classList.add('readonly');
+    var colArr = ['A', 'B', 'C', 'D', , 'E', 'F']
+    for (var j = 0; j < json.length; j++) {
+      for (var i = 0; i < colArr.length; i++) {
+        var cell = elInstance.getCell("C1")
+        cell.classList.add('readonly');
+        var cell = elInstance.getCell("C2")
+        cell.classList.add('readonly');
 
-    if (consumptionDataType == 3) {// grade out
-      // console.log("other consumptionDataType")
-      var cell1 = elInstance.getCell(`C3`)//other name
-      var cell2 = elInstance.getCell(`D3`)//other multiplier
-      cell1.classList.remove('readonly');
-      cell2.classList.remove('readonly');
-      document.getElementById("dataEnteredInTableExLabel").style.display = "block";
-      document.getElementById("dataEnteredInTableExSpan").innerHTML = Math.round(Number(1 / this.state.tempConsumptionUnitObject.planningUnit.multiplier * this.state.tempConsumptionUnitObject.otherUnit.multiplier).toFixed(4) * 1000);
-    } else {
-      // console.log("consumptionDataType", consumptionDataType)
-      var cell1 = elInstance.getCell(`C3`)//other name
-      var cell2 = elInstance.getCell(`D3`)//other multiplier
-      cell1.classList.add('readonly');
-      cell2.classList.add('readonly');
-      document.getElementById("dataEnteredInTableExLabel").style.display = "none";
+        var cell = elInstance.getCell("D1")
+        cell.classList.add('readonly');
+        var cell = elInstance.getCell("D2")
+        cell.classList.add('readonly');
 
+        if (consumptionDataType == 3) {// grade out
+          // console.log("other consumptionDataType")
+
+          var cell = elInstance.getCell("C3")
+          cell.classList.remove('readonly');
+          var cell = elInstance.getCell("D3")
+          cell.classList.remove('readonly');
+          document.getElementById("dataEnteredInTableExLabel").style.display = "block";
+          document.getElementById("dataEnteredInTableExSpan").innerHTML = Math.round(Number(1 / this.state.tempConsumptionUnitObject.planningUnit.multiplier * this.state.tempConsumptionUnitObject.otherUnit.multiplier).toFixed(4) * 1000);
+        } else {
+          // console.log("consumptionDataType", consumptionDataType)
+          var cell = elInstance.getCell("C3")
+          cell.classList.add('readonly');
+          var cell = elInstance.getCell("D3")
+          cell.classList.add('readonly');
+          document.getElementById("dataEnteredInTableExLabel").style.display = "none";
+        }
+      }
     }
+    // }
+
   }
 
   loaded = function (instance, cell, x, y, value) {
@@ -2862,7 +2871,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
 
     this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
     // this.el.destroy();
-    jexcel.destroy(document.getElementById("mapPlanningUnit"));
+    jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
 
     var data = dataArray1;
     var options = {

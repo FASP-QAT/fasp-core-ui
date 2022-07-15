@@ -11,8 +11,8 @@ import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import pdfIcon from '../../assets/img/pdf.png';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import '../../views/Forms/ValidationForms/ValidationForms.css'
@@ -2922,8 +2922,8 @@ export default class CreateTreeTemplate extends Component {
 
     loadedMomPer = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance, 1);
-        if (instance.jexcel.getJson(null, false).length > 0) {
-            var cell = instance.jexcel.getCell("D1");
+        if (instance.worksheets[0].getJson(null, false).length > 0) {
+            var cell = instance.worksheets[0].getCell("D1");
             cell.classList.add('readonly');
         }
     }
@@ -3039,7 +3039,7 @@ export default class CreateTreeTemplate extends Component {
             allowDeleteRow: false,
             onchange: this.changed1,
             updateTable: function (el, cell, x, y, source, value, id) {
-                var elInstance = el.jexcel;
+                var elInstance = el;
                 if (y != null) {
                     // var rowData = elInstance.getRowData(y);
                     // console.log("this.state.seasonality---", this.state.seasonality);
@@ -3084,10 +3084,10 @@ export default class CreateTreeTemplate extends Component {
 
     loadedMom = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance, 1);
-        if (instance.jexcel.getJson(null, false).length > 0) {
-            var cell = instance.jexcel.getCell("E1");
+        if (instance.worksheets[0].getJson(null, false).length > 0) {
+            var cell = instance.worksheets[0].getCell("E1");
             cell.classList.add('readonly');
-            var cell = instance.jexcel.getCell("F1");
+            var cell = instance.worksheets[0].getCell("F1");
             cell.classList.add('readonly');
         }
     }
@@ -3337,7 +3337,7 @@ export default class CreateTreeTemplate extends Component {
             allowDeleteRow: true,
             onchange: this.changed,
             updateTable: function (el, cell, x, y, source, value, id) {
-                var elInstance = el.jexcel;
+                var elInstance = el;
                 if (y != null) {
                     var rowData = elInstance.getRowData(y);
                     if (rowData[4] != "") {
@@ -3921,17 +3921,18 @@ export default class CreateTreeTemplate extends Component {
                 }
 
             ],
-            text: {
-                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
+            editable: true,
             onload: this.loadedPer,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
@@ -8812,6 +8813,11 @@ export default class CreateTreeTemplate extends Component {
     }
 
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
         const Node = ({ itemConfig, isDragging, connectDragSource, canDrop, isOver, connectDropTarget }) => {
             const opacity = isDragging ? 0.4 : 1
             let itemTitleColor = Colors.RoyalBlue;

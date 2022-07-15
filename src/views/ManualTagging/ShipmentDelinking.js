@@ -399,8 +399,8 @@ import ProgramService from '../../api/ProgramService.js';
 import ManualTaggingService from '../../api/ManualTaggingService.js';
 import PlanningUnitService from '../../api/PlanningUnitService.js';
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
 import { confirmAlert } from 'react-confirm-alert'; // Import
@@ -561,7 +561,9 @@ export default class ShipmentDelinking extends Component {
         // }
         // console.log("outputArray---->", outputArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("tableDiv"), true);
+
         var json = [];
         var data = outputArray;
 
@@ -574,63 +576,63 @@ export default class ShipmentDelinking extends Component {
                 {
                     title: i18n.t('static.commit.qatshipmentId'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.commit.shipmentTransId'),
                     type: 'hidden',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.supplyPlan.mtexpectedDeliveryDate'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.supplyPlan.mtshipmentStatus'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.report.procurementagentcode'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
 
                 {
                     title: i18n.t('static.fundingsource.fundingsourceCode'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.dashboard.budget'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.supplyPlan.shipmentQty'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 }
 
             ],
-            text: {
-                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
             allowDeleteRow: false,
             onselection: this.selected,
-
+            editable: false,
 
             oneditionend: this.onedit,
             copyCompatibility: true,
@@ -829,7 +831,9 @@ export default class ShipmentDelinking extends Component {
                 color: '#BA0C2F'
             }, () => {
                 this.el = jexcel(document.getElementById("tableDiv"), '');
-                this.el.destroy();
+                // this.el.destroy();
+                jexcel.destroy(document.getElementById("tableDiv"), true);
+
             });
         } else if (planningUnitId == 0) {
             console.log("3-programId------>", programId);
@@ -839,7 +843,9 @@ export default class ShipmentDelinking extends Component {
                 color: '#BA0C2F'
             }, () => {
                 this.el = jexcel(document.getElementById("tableDiv"), '');
-                this.el.destroy();
+                // this.el.destroy();
+                jexcel.destroy(document.getElementById("tableDiv"), true);
+
             });
         }
 
@@ -1038,6 +1044,11 @@ export default class ShipmentDelinking extends Component {
     }
 
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
         const { programs } = this.state;
         let programList = programs.length > 0 && programs.map((item, i) => {
             return (
@@ -1244,7 +1255,7 @@ export default class ShipmentDelinking extends Component {
                                                         id="notesTxt"
                                                         bsSize="sm"
                                                         autocomplete="off"
-                                                        // maxLength={600}
+                                                    // maxLength={600}
                                                     >
                                                     </Input>
                                                 </InputGroup>

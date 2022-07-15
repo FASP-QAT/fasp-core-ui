@@ -1090,7 +1090,7 @@ class VersionSettingsComponent extends Component {
             }.bind(this),
             onchange: this.changed,
             oneditionend: this.oneditionend,
-            oncreateeditor: this.oncreateeditor,
+            // oncreateeditor: this.oncreateeditor,
             editable: ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_VERSION_SETTINGS')) ? true : false),
             copyCompatibility: true,
             allowExport: false,
@@ -1181,7 +1181,7 @@ class VersionSettingsComponent extends Component {
     }
     oncreateeditor = function (el, cell, x, y) {
         if (x == 4) {
-            var config = el.jexcel.options.columns[x].maxlength;
+            var config = el.options.columns[x].maxlength;
             cell.children[0].setAttribute('maxlength', config);
         }
     }

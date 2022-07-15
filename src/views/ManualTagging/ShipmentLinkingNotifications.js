@@ -12,13 +12,13 @@ import ProgramService from '../../api/ProgramService.js';
 import ProductService from '../../api/ProductService';
 import ManualTaggingService from '../../api/ManualTaggingService.js';
 import PlanningUnitService from '../../api/PlanningUnitService.js';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions.js';
-import {MultiSelect} from 'react-multi-select-component';
+import { MultiSelect } from 'react-multi-select-component';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 
@@ -74,7 +74,7 @@ export default class ShipmentLinkingNotifications extends Component {
         console.log("row length---", row.shipmentList.length);
         if (row.shipmentList.length > 1 || (row.shipmentList.length == 1 && row.shipmentList[0].batchNo != null)) {
             var batchDetails = row.shipmentList.filter(c => (c.fileName === row.maxFilename));
-        
+
             batchDetails.sort(function (a, b) {
                 var dateA = new Date(a.expiryDate).getTime();
                 var dateB = new Date(b.expiryDate).getTime();
@@ -498,7 +498,9 @@ export default class ShipmentLinkingNotifications extends Component {
                 this.setState({
                     outputList: []
                 }, () => {
-                    this.state.languageEl.destroy();
+                    // this.state.languageEl.destroy();
+                    jexcel.destroy(document.getElementById("tableDiv"), true);
+
                 })
             }
             // else if (programId == -1) {
@@ -770,7 +772,9 @@ export default class ShipmentLinkingNotifications extends Component {
         }
 
         this.el = jexcel(document.getElementById("tableDiv"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("tableDiv"), true);
+
         var json = [];
         var data = manualTaggingArray;
 
@@ -878,16 +882,16 @@ export default class ShipmentLinkingNotifications extends Component {
                 },
             ],
             editable: true,
-            text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
@@ -1073,7 +1077,9 @@ export default class ShipmentLinkingNotifications extends Component {
         }
 
         this.el = jexcel(document.getElementById("tableDiv1"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("tableDiv1"), true);
+
         var json = [];
         var data = notificationSummaryArray;
 
@@ -1086,14 +1092,14 @@ export default class ShipmentLinkingNotifications extends Component {
                 {
                     title: i18n.t('static.program.programName'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
 
                 {
                     title: i18n.t('static.mt.notificationCount'),
                     type: 'numeric',
                     mask: '#,##.00', decimal: '.',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: "programId",
@@ -1101,16 +1107,16 @@ export default class ShipmentLinkingNotifications extends Component {
                 }
             ],
             editable: false,
-            text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
             onload: this.loaded1,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
@@ -1382,7 +1388,9 @@ export default class ShipmentLinkingNotifications extends Component {
                 outputList: [],
                 planningUnits: []
             }, () => {
-                this.state.languageEl.destroy();
+                // this.state.languageEl.destroy();
+                jexcel.destroy(document.getElementById("tableDiv"), true);
+
             })
         }
         // this.filterData();
@@ -1434,6 +1442,11 @@ export default class ShipmentLinkingNotifications extends Component {
 
 
     render() {
+
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
 
         const { SearchBar, ClearSearchButton } = Search;
         const customTotal = (from, to, size) => (

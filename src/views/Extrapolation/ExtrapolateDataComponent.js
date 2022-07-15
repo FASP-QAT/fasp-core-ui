@@ -8,12 +8,12 @@ import {
     CardFooter, Button, Col, Form, InputGroup, Modal, FormFeedback, ModalHeader, ModalFooter, ModalBody, Row, Table, PopoverBody, Popover
 } from 'reactstrap';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, SECRET_KEY, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_MONTH_PICKER_FORMAT, TITLE_FONT } from "../../Constants";
+import { INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, SECRET_KEY, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_MONTH_PICKER_FORMAT, TITLE_FONT, JEXCEL_PRO_KEY, DATE_FORMAT_CAP } from "../../Constants";
 import i18n from '../../i18n';
 import CryptoJS from 'crypto-js'
 import getLabelText from "../../CommonComponent/getLabelText";
-import jexcel from 'jexcel-pro';
-import { DATE_FORMAT_CAP, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY } from '../../Constants.js';
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination } from '../../CommonComponent/JExcelCommonFunctions.js';
 import csvicon from '../../assets/img/csv.png';
 import { Bar, Line, Pie } from 'react-chartjs-2';
@@ -652,15 +652,15 @@ export default class ExtrapolateDataComponent extends React.Component {
                         mask: '#,##.00', decimal: '.'
                     },
                 ],
-            text: {
-                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
             updateTable: function (el, cell, x, y, source, value, id) {
                 if (y != null) {
-                    var elInstance = el.jexcel;
+                    var elInstance = el;
                     var rowData = elInstance.getRowData(y);
                     if (moment(rowData[0]).format("YYYY-MM") < moment(this.state.datasetJson.currentVersion.forecastStartDate).format("YYYY-MM")) {
                         // var cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
@@ -714,7 +714,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             pagination: false,
             search: false,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             defaultColWidth: 130,
             wordWrap: true,
             allowInsertColumn: false,
@@ -2707,6 +2707,12 @@ export default class ExtrapolateDataComponent extends React.Component {
     }
 
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
+
         const pickerLang = {
             months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
             from: 'From', to: 'To',

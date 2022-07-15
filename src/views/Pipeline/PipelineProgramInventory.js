@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import i18n from '../../i18n';
 import PipelineService from '../../api/PipelineService.js';
@@ -109,30 +109,30 @@ export default class PipelineProgramInventory extends Component {
                  this.el.setComments(col, "");
              }*/
 
-             var reg = JEXCEL_INTEGER_REGEX_LONG;
-             var col = ("G").concat(parseInt(y) + 1);
-             var col1 = ("H").concat(parseInt(y) + 1);
-             var value = (this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "")).trim();
-             var value1=(this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "")).trim();
-             // value = value.toString().replaceAll("\,", "");
-             if (value == "" && value1=="") {
-                 this.el.setStyle(col, "background-color", "transparent");
-                 this.el.setStyle(col, "background-color", "yellow");
-                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                 valid=false;
-             } else {
-                 if (isNaN(Number(value)) || !(reg.test(value))) {
-                     this.el.setStyle(col, "background-color", "transparent");
-                     this.el.setStyle(col, "background-color", "yellow");
-                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                     valid=false;
-                 } else {
-                     this.el.setStyle(col, "background-color", "transparent");
-                     this.el.setComments(col, "");
-                     this.el.setStyle(col1, "background-color", "transparent");
-                     this.el.setComments(col1, "");
-                 }
-             }
+            var reg = JEXCEL_INTEGER_REGEX_LONG;
+            var col = ("G").concat(parseInt(y) + 1);
+            var col1 = ("H").concat(parseInt(y) + 1);
+            var value = (this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "")).trim();
+            var value1 = (this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "")).trim();
+            // value = value.toString().replaceAll("\,", "");
+            if (value == "" && value1 == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                if (isNaN(Number(value)) || !(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                    this.el.setStyle(col1, "background-color", "transparent");
+                    this.el.setComments(col1, "");
+                }
+            }
 
 
             var reg = JEXCEL_NEGATIVE_INTEGER_NO_REGEX_FOR_DATA_ENTRY;
@@ -141,17 +141,17 @@ export default class PipelineProgramInventory extends Component {
             var value = (this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "")).trim();
             var value1 = (this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "")).trim();
             // value = value.toString().replaceAll("\,", "");
-            if (value == "" && value1=="") {
+            if (value == "" && value1 == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                valid=false;
+                valid = false;
             } else {
                 if (isNaN(Number(value)) || !(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                    valid=false;
+                    valid = false;
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
@@ -226,10 +226,10 @@ export default class PipelineProgramInventory extends Component {
         if (x == 6) {
             var reg = JEXCEL_INTEGER_REGEX_LONG;
             var col = ("G").concat(parseInt(y) + 1);
-            var col1=("H").concat(parseInt(y) + 1);
+            var col1 = ("H").concat(parseInt(y) + 1);
             value = (this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "")).trim();
-            var value1=(this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "")).trim();
-            if (value == "" && value1=="") {
+            var value1 = (this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "")).trim();
+            if (value == "" && value1 == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
@@ -251,10 +251,10 @@ export default class PipelineProgramInventory extends Component {
 
             var reg = JEXCEL_NEGATIVE_INTEGER_NO_REGEX_FOR_DATA_ENTRY;
             var col = ("H").concat(parseInt(y) + 1);
-            var col1=("G").concat(parseInt(y) + 1);
+            var col1 = ("G").concat(parseInt(y) + 1);
             value = (this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "")).trim();
-            var value1=(this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "")).trim();
-            if (value == "" && value1=="") {
+            var value1 = (this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "")).trim();
+            if (value == "" && value1 == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
@@ -529,7 +529,7 @@ export default class PipelineProgramInventory extends Component {
                                     }.bind(this),
                                     search: true,
                                     columnSorting: true,
-                                    tableOverflow: true,
+                                    // tableOverflow: true,
                                     wordWrap: true,
                                     allowInsertColumn: false,
                                     allowManualInsertColumn: false,
@@ -539,11 +539,12 @@ export default class PipelineProgramInventory extends Component {
                                     copyCompatibility: true,
                                     paginationOptions: JEXCEL_PAGINATION_OPTION,
                                     position: 'top',
-                                    text: {
-                                        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')} `,
-                                        show: '',
-                                        entries: '',
-                                    },
+                                    // text: {
+                                    //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')} `,
+                                    //     show: '',
+                                    //     entries: '',
+                                    // },
+                                    editable: true,
                                     onload: this.loadedJexcelCommonFunction,
                                     oneditionend: this.oneditionend,
                                     license: JEXCEL_PRO_KEY,
@@ -759,7 +760,7 @@ export default class PipelineProgramInventory extends Component {
     }
 
     oneditionend = function (instance, cell, x, y, value) {
-        var elInstance = instance.jexcel;
+        var elInstance = instance;
         var rowData = elInstance.getRowData(y);
 
         if (x == 4 && !isNaN(rowData[4]) && rowData[4].toString().indexOf('.') != -1) {
@@ -778,6 +779,11 @@ export default class PipelineProgramInventory extends Component {
     }
 
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
         return (
             <>
                 <AuthenticationServiceComponent history={this.props.history} />

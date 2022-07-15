@@ -14,8 +14,8 @@ import IntegrationService from '../../api/IntegrationService.js';
 import AuthenticationService from "../Common/AuthenticationService";
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import ProgramService from "../../api/ProgramService.js";
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import { JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from "../../Constants";
@@ -37,7 +37,8 @@ class ProgramIntegration extends Component {
                 label: {
                     label_en: ''
                 }
-            }
+            },
+            dataEL: ""
         }
         this.cancelClicked = this.cancelClicked.bind(this);
         this.addRow = this.addRow.bind(this);
@@ -55,9 +56,11 @@ class ProgramIntegration extends Component {
     }
 
     filterVersionStatus = function (instance, cell, c, r, source) {
-        var elInstance = instance.jexcel;
-        var rowData = elInstance.getRowData(r);
-        console.log("RESPO---------2", rowData[2]);
+        // var elInstance = instance.jexcel;
+        // var rowData = elInstance.getRowData(r);
+        // console.log("RESPO---------2", rowData[2]);
+        var rowData = (this.state.dataEL.getJson(null, false)[r]);
+
         // return this.state.countryArr.filter(c => c.active.toString() == "true");
         // if (rowData[2] == 1) {
         //     elInstance.setValueFromCoords(3, r, 1, true);
@@ -290,7 +293,7 @@ class ProgramIntegration extends Component {
                                                         filters: true,
                                                         search: true,
                                                         columnSorting: true,
-                                                        tableOverflow: true,
+                                                        // tableOverflow: true,
                                                         wordWrap: true,
                                                         paginationOptions: JEXCEL_PAGINATION_OPTION,
                                                         parseFormulas: true,
@@ -306,12 +309,13 @@ class ProgramIntegration extends Component {
                                                         onpaste: this.onPaste,
                                                         allowManualInsertRow: false,
                                                         license: JEXCEL_PRO_KEY,
-                                                        text: {
-                                                            // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                                                            showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                                                            show: '',
-                                                            entries: '',
-                                                        },
+                                                        editable: true,
+                                                        // text: {
+                                                        //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                                                        //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                                                        //     show: '',
+                                                        //     entries: '',
+                                                        // },
                                                         onload: this.loaded,
                                                         contextMenu: function (obj, x, y, e) {
                                                             var items = [];
@@ -466,9 +470,11 @@ class ProgramIntegration extends Component {
                                                             return items;
                                                         }.bind(this)
                                                     };
-
+                                                    var varEL = ""
                                                     this.el = jexcel(document.getElementById("paputableDiv"), options);
+                                                    varEL = this.el
                                                     this.setState({
+                                                        dataEL: varEL,
                                                         loading: false
                                                     })
 
@@ -978,6 +984,11 @@ class ProgramIntegration extends Component {
         return valid;
     }
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />

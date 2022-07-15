@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import PipelineService from '../../api/PipelineService.js';
 import AuthenticationService from '../Common/AuthenticationService.js';
@@ -214,6 +214,7 @@ export default class PipelineProgramProcurementAgent extends Component {
                                                 readonly: true
                                             }
                                         ],
+                                        editable: true,
                                         pagination: localStorage.getItem("sesRecordCount"),
                                         filters: true,
                                         contextMenu: function (obj, x, y, e) {
@@ -221,7 +222,7 @@ export default class PipelineProgramProcurementAgent extends Component {
                                         }.bind(this),
                                         search: true,
                                         columnSorting: true,
-                                        tableOverflow: true,
+                                        // tableOverflow: true,
                                         wordWrap: true,
                                         paginationOptions: JEXCEL_PAGINATION_OPTION,
                                         // position: 'top',
@@ -232,11 +233,11 @@ export default class PipelineProgramProcurementAgent extends Component {
                                         oneditionend: this.onedit,
                                         copyCompatibility: true,
                                         // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                                        text: {
-                                            showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')} `,
-                                            show: '',
-                                            entries: '',
-                                        },
+                                        // text: {
+                                        //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')} `,
+                                        //     show: '',
+                                        //     entries: '',
+                                        // },
                                         onload: this.loadedJexcelCommonFunction,
                                         license: JEXCEL_PRO_KEY,
                                         // onload: this.loaded
@@ -347,6 +348,11 @@ export default class PipelineProgramProcurementAgent extends Component {
     }
 
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
         return (
             <>
                 <AuthenticationServiceComponent history={this.props.history} />

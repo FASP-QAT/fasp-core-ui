@@ -31,9 +31,9 @@ import CardBody from 'reactstrap/lib/CardBody';
 import CardFooter from 'reactstrap/lib/CardFooter';
 import { Nav, NavItem, NavLink, TabContent, TabPane } from 'reactstrap';
 import 'react-tabs/style/react-tabs.css';
-import jexcel from 'jexcel-pro';
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import * as Yup from 'yup';
-import "../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../node_modules/jsuites/dist/jsuites.css";
 import moment from 'moment';
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../CommonComponent/JExcelCommonFunctions.js'
@@ -652,7 +652,7 @@ export default class DemographicScenarioOne extends Component {
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
@@ -661,11 +661,11 @@ export default class DemographicScenarioOne extends Component {
             onload: this.loadedFunctionForMergeProblemList,
             filters: true,
             license: JEXCEL_PRO_KEY,
-            text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
         }
 
         var forecastOutPutJexcelVar = jexcel(document.getElementById("forecastOutPutDiv"), options);
@@ -718,7 +718,8 @@ export default class DemographicScenarioOne extends Component {
         // }
         // console.log("dataSourceArray---->", dataSourceArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("tableDiv"), true);
         var json = [];
         var data = treeArray;
 
@@ -860,7 +861,8 @@ export default class DemographicScenarioOne extends Component {
         // }
         // console.log("dataSourceArray---->", dataSourceArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("tableDiv"), true);
         var json = [];
         var data = treeArray;
 
@@ -1518,7 +1520,7 @@ export default class DemographicScenarioOne extends Component {
                             <div className="mb-lg-0 ">
                                 <div className="Card-header-addicon" style={{ padding: '0px 0px 10px 24px' }}>
                                     {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong> */}
-                                    <div className="card-header-actions" style={{display:'flex'}}>
+                                    <div className="card-header-actions" style={{ display: 'flex' }}>
                                         <div className="card-header-action">
                                             {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_DATA_SOURCE') && <a href="javascript:void();" title={'Create Manual Tree'} onClick={this.createNewTree}><i className="fa fa-plus-square"></i></a>}
                                         </div>
@@ -1569,6 +1571,11 @@ export default class DemographicScenarioOne extends Component {
     }
 
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
         return <div className="animated fadeIn">
             <Card className="mt-lg-2">
                 <div className="pt-lg-2">

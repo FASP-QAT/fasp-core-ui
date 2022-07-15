@@ -1301,9 +1301,11 @@ class usageTemplate extends Component {
                 return items;
             }.bind(this)
         };
-
+        var dataEL = "";
+        this.el = jexcel(document.getElementById("paputableDiv"), options);
+        dataEL = this.el
         this.setState({
-            dataEl: jexcel(document.getElementById("paputableDiv"), options),
+            dataEl: dataEL,
             loading: false
         })
     }
@@ -2526,7 +2528,7 @@ class usageTemplate extends Component {
 
 
     loaded = function (instance, cell, x, y, value) {
-        // jExcelLoadedFunction(instance);
+        jExcelLoadedFunction(instance);
         // var asterisk = document.getElementsByClassName("resizable")[0];
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
@@ -2539,24 +2541,24 @@ class usageTemplate extends Component {
         // tr.children[7].classList.add('AsteriskTheadtrTd');
 
         // tr.children[16].classList.add('CalculatorTheadtr');
-        // tr.children[12].classList.add('CalculatorTheadtr');
+        tr.children[12].classList.add('CalculatorTheadtr');
         // tr.children[18].classList.add('CalculatorTheadtr');
 
 
         tr.children[2].classList.add('InfoTrAsteriskTheadtrTd');
         tr.children[3].classList.add('InfoTrAsteriskTheadtrTd');
-        // tr.children[6].classList.add('InfoTrAsteriskTheadtrTd');
-        // tr.children[7].classList.add('InfoTrAsteriskTheadtrTd');
-        // tr.children[8].classList.add('InfoTr');
-        // tr.children[9].classList.add('InfoTr');
-        // tr.children[10].classList.add('InfoTr');
-        // tr.children[11].classList.add('InfoTr');
-        // tr.children[12].classList.add('InfoTr');
-        // tr.children[13].classList.add('InfoTr');
-        // tr.children[14].classList.add('InfoTr');
-        // tr.children[15].classList.add('InfoTr');
-        // tr.children[16].classList.add('InfoTr');
-        // tr.children[17].classList.add('InfoTr');
+        tr.children[6].classList.add('InfoTrAsteriskTheadtrTd');
+        tr.children[7].classList.add('InfoTrAsteriskTheadtrTd');
+        tr.children[8].classList.add('InfoTr');
+        tr.children[9].classList.add('InfoTr');
+        tr.children[10].classList.add('InfoTr');
+        tr.children[11].classList.add('InfoTr');
+        tr.children[12].classList.add('InfoTr');
+        tr.children[13].classList.add('InfoTr');
+        tr.children[14].classList.add('InfoTr');
+        tr.children[15].classList.add('InfoTr');
+        tr.children[16].classList.add('InfoTr');
+        tr.children[17].classList.add('InfoTr');
         // tr.children[18].classList.add('InfoTr');
         // tr.children[19].classList.add('InfoTr');
         // tr.children[20].classList.add('InfoTr');
@@ -2567,18 +2569,18 @@ class usageTemplate extends Component {
 
         tr.children[2].title = i18n.t('static.tooltip.ForecastProgram');
         tr.children[3].title = i18n.t('static.tooltip.UsageName');
-        // tr.children[6].title = i18n.t('static.tooltip.LagInMonth');
-        // tr.children[7].title = i18n.t('static.tooltip.UsageType');
-        // tr.children[8].title = i18n.t('static.tooltip.Persons');
-        // tr.children[9].title = i18n.t('static.tooltip.PersonsUnit');
-        // tr.children[10].title = i18n.t('static.tooltip.FUPersonTime');
-        // tr.children[11].title = i18n.t('static.tooltip.OneTimeUsage');
-        // tr.children[12].title = i18n.t('static.tooltip.OfTimeFreqwency');
-        // tr.children[13].title = i18n.t('static.tooltip.Freqwency');
-        // tr.children[14].title = i18n.t('static.tooltip.UsagePeriod');
-        // tr.children[15].title = i18n.t('static.tooltip.PeriodUnit');
-        // tr.children[16].title = i18n.t('static.tooltip.OfFuRequired');
-        // tr.children[17].title = i18n.t('static.tooltip.UsageInWords');
+        tr.children[6].title = i18n.t('static.tooltip.LagInMonth');
+        tr.children[7].title = i18n.t('static.tooltip.UsageType');
+        tr.children[8].title = i18n.t('static.tooltip.Persons');
+        tr.children[9].title = i18n.t('static.tooltip.PersonsUnit');
+        tr.children[10].title = i18n.t('static.tooltip.FUPersonTime');
+        tr.children[11].title = i18n.t('static.tooltip.OneTimeUsage');
+        tr.children[12].title = i18n.t('static.tooltip.OfTimeFreqwency');
+        tr.children[13].title = i18n.t('static.tooltip.Freqwency');
+        tr.children[14].title = i18n.t('static.tooltip.UsagePeriod');
+        tr.children[15].title = i18n.t('static.tooltip.PeriodUnit');
+        tr.children[16].title = i18n.t('static.tooltip.OfFuRequired');
+        tr.children[17].title = i18n.t('static.tooltip.UsageInWords');
 
         var elInstance = instance.worksheets[0];
         var json = elInstance.getJson();

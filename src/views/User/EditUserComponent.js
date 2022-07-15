@@ -20,8 +20,8 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import { LABEL_REGEX, SPECIAL_CHARECTER_WITH_NUM, SPECIAL_CHARECTER_WITH_NUM_NODOUBLESPACE } from '../../Constants.js';
 import { ALPHABET_NUMBER_REGEX, SPACE_REGEX } from '../../Constants.js';
 import classNames from 'classnames';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import { JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from "../../Constants";
@@ -751,6 +751,7 @@ class EditUserComponent extends Component {
         let countryList = [];
         let organisationList = [];
         let healthAreaList = [];
+        var varEL = "";
 
         if (selProgram.length > 0) {
             for (var i = 0; i < selProgram.length; i++) {
@@ -917,7 +918,8 @@ class EditUserComponent extends Component {
             filters: true,
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
+            editable: true,
             wordWrap: true,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
@@ -929,12 +931,12 @@ class EditUserComponent extends Component {
             copyCompatibility: true,
             parseFormulas: true,
             onpaste: this.onPaste,
-            text: {
-                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
             onload: this.loaded,
             license: JEXCEL_PRO_KEY,
             contextMenu: function (obj, x, y, e) {
@@ -1088,8 +1090,9 @@ class EditUserComponent extends Component {
         };
 
         this.el = jexcel(document.getElementById("paputableDiv"), options);
+        varEL = this.el
         this.setState({
-            addUserEL: jexcel(document.getElementById("paputableDiv"), options),
+            addUserEL: varEL,
             loading: false,
             loading1: false
         })
@@ -1451,6 +1454,11 @@ class EditUserComponent extends Component {
     }
 
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
         const { realms } = this.state;
         const { languages } = this.state;
 
