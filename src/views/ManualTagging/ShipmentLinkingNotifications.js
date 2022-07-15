@@ -897,7 +897,7 @@ export default class ShipmentLinkingNotifications extends Component {
             allowManualInsertColumn: false,
             allowDeleteRow: false,
             onselection: this.selectedForNotification,
-
+            onchange: this.changed,
 
             // oneditionend: this.onedit,
             copyCompatibility: true,
@@ -1038,7 +1038,7 @@ export default class ShipmentLinkingNotifications extends Component {
             data[0] = getLabelText(notificationSummaryList[j].label);
             data[1] = notificationSummaryList[j].notificationCount;
             data[2] = notificationSummaryList[j].programId;
-            data[3] = this.state.programs.filter(c=>c.programId==notificationSummaryList[j].programId).sort((a, b) => {
+            data[3] = this.state.programs.filter(c => c.programId == notificationSummaryList[j].programId).sort((a, b) => {
                 var itemLabelA = a.version;
                 var itemLabelB = b.version
                 return itemLabelA < itemLabelB ? 1 : -1;
@@ -1116,13 +1116,15 @@ export default class ShipmentLinkingNotifications extends Component {
         })
     }
 
-    selectedForNotification = function (instance, x1, y1, x2, y2, origin) {
-        console.log("ProgramId@@@@@@@", this.state.programId.split("_")[0]);
-        console.log("VersionId@@@@@@@", this.state.programId.split("_")[1].substring(1) + "  (Local)");
-        localStorage.setItem("sesProgramIdReport", this.state.programId.split("_")[0]);
-        localStorage.setItem("sesVersionIdReport", this.state.programId.split("_")[1].substring(1) + "  (Local)");
+    selectedForNotification = function (instance, cell, x, y, value) {
+        if (y != 0) {
+            console.log("ProgramId@@@@@@@", this.state.programId.split("_")[0]);
+            console.log("VersionId@@@@@@@", this.state.programId.split("_")[1].substring(1) + "  (Local)");
+            localStorage.setItem("sesProgramIdReport", this.state.programId.split("_")[0]);
+            localStorage.setItem("sesVersionIdReport", this.state.programId.split("_")[1].substring(1) + "  (Local)");
 
-        window.open(window.location.origin + `/#/shipment/manualTagging/2`);
+            window.open(window.location.origin + `/#/shipment/manualTagging/2`);
+        }
     }
 
     selected = function (instance, x1, y1, x2, y2, origin) {
