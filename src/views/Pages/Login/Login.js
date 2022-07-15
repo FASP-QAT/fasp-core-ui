@@ -251,7 +251,29 @@ class Login extends Component {
     console.log("timeout going to change language")
     this.getLanguageList();
     i18n.changeLanguage(AuthenticationService.getDefaultUserLanguage())
-    this.checkIfApiIsActive()
+    this.checkIfApiIsActive();
+    this.getLatestCoreuiVersion();
+  }
+
+  getLatestCoreuiVersion(){
+    LoginService.getLatestCoreuiVersion()
+        .then(response => {
+          console.log("--------version api success----------->", response)
+          // if (response != null && response != "") {
+          //   this.setState({
+          //     apiVersionForDisplay: response.data.app.version,
+          //     apiVersion:response.data.app.version,
+
+          //   },()=>{
+          //     setTimeout(function () {
+          //       this.checkIfApiIsActive();
+          //     }.bind(this), 10000);
+          //   })
+          //   // console.log("response---", response.data.app.version)
+          // }
+        }).catch(error => {
+          // console.log("--------version api error----------->", error)
+        }) 
   }
 
   checkIfApiIsActive() {
