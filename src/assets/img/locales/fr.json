@@ -2355,5 +2355,6 @@
     "static.organisation.organisationheader": "Organisation",
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Max = 7",
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18)",
-    "static.editStatus.problemDescText": "Enter Problem Description"
+    "static.editStatus.problemDescText": "Entrez la description du problème",
+    "static.editStatus.problemSuggestionText": "Entrez la suggestion de problème"
 }
