@@ -74,7 +74,7 @@ class Login extends Component {
       message: '',
       loading: false,
       apiVersion: '',
-      apiVersionForDisplay:'',
+      apiVersionForDisplay: '',
       dropdownOpen: new Array(19).fill(false),
       icon: AuthenticationService.getIconAndStaticLabel("icon"),
       staticLabel: AuthenticationService.getIconAndStaticLabel("label"),
@@ -89,6 +89,7 @@ class Login extends Component {
     this.changeLanguage = this.changeLanguage.bind(this);
     this.getLanguageList = this.getLanguageList.bind(this);
     this.getAllLanguages = this.getAllLanguages.bind(this);
+    this.getLatestCoreuiVersion = this.getLatestCoreuiVersion.bind(this);
   }
   getAllLanguages() {
     var db1;
@@ -255,25 +256,38 @@ class Login extends Component {
     this.getLatestCoreuiVersion();
   }
 
-  getLatestCoreuiVersion(){
+  getLatestCoreuiVersion() {
+    console.log("version inside api success----------->")
     LoginService.getLatestCoreuiVersion()
-        .then(response => {
-          console.log("--------version api success----------->", response)
-          // if (response != null && response != "") {
-          //   this.setState({
-          //     apiVersionForDisplay: response.data.app.version,
-          //     apiVersion:response.data.app.version,
+      .then(response => {
+        console.log("version api success----------->",`${APP_VERSION_REACT}`.replace(/[\[\]']+/g,''))
+        if (response != null && response.data != null) {
+          if (`${APP_VERSION_REACT}`.replace(/[\[\]']+/g,'') != response.data) {
+            confirmAlert({
+              message: i18n.t('static.coreui.oldVersion'),
+              buttons: [
+                {
+                  label: i18n.t('static.report.ok')
+                }
+              ]
+            });
+            // alert("You are using an older version of the application.");
+          }
+        }
+        //   this.setState({
+        //     apiVersionForDisplay: response.data.app.version,
+        //     apiVersion:response.data.app.version,
 
-          //   },()=>{
-          //     setTimeout(function () {
-          //       this.checkIfApiIsActive();
-          //     }.bind(this), 10000);
-          //   })
-          //   // console.log("response---", response.data.app.version)
-          // }
-        }).catch(error => {
-          // console.log("--------version api error----------->", error)
-        }) 
+        //   },()=>{
+        //     setTimeout(function () {
+        //       this.checkIfApiIsActive();
+        //     }.bind(this), 10000);
+        //   })
+        //   // console.log("response---", response.data.app.version)
+        // }
+      }).catch(error => {
+        console.log("--------version api error----------->", error)
+      })
   }
 
   checkIfApiIsActive() {
@@ -290,9 +304,9 @@ class Login extends Component {
           if (response != null && response != "") {
             this.setState({
               apiVersionForDisplay: response.data.app.version,
-              apiVersion:response.data.app.version,
+              apiVersion: response.data.app.version,
 
-            },()=>{
+            }, () => {
               setTimeout(function () {
                 this.checkIfApiIsActive();
               }.bind(this), 10000);
@@ -437,7 +451,7 @@ class Login extends Component {
                                 var decoded = jwt_decode(response.data.token);
                                 // console.log("decoded token---", decoded);
 
-                                let keysToRemove = ["token-" + decoded.userId, "user-" + decoded.userId, "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "lastLoggedInUsersLanguage","sessionType"];
+                                let keysToRemove = ["token-" + decoded.userId, "user-" + decoded.userId, "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "lastLoggedInUsersLanguage", "sessionType"];
                                 keysToRemove.forEach(k => localStorage.removeItem(k))
                                 decoded.user.syncExpiresOn = moment().format("YYYY-MM-DD HH:mm:ss");
                                 decoded.user.apiVersion = this.state.apiVersion;
@@ -509,7 +523,7 @@ class Login extends Component {
                                   // console.log("offline tempuser---", tempUser)
                                   let user = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + tempUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
                                   // console.log("offline user next---", user)
-                                  let keysToRemove = ["curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "lastLoggedInUsersLanguage","sessionType"];
+                                  let keysToRemove = ["curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "lastLoggedInUsersLanguage", "sessionType"];
                                   keysToRemove.forEach(k => localStorage.removeItem(k))
 
                                   localStorage.setItem('typeOfSession', "Offline");
@@ -552,63 +566,63 @@ class Login extends Component {
                             isValid,
                             setTouched
                           }) => (
-                              <Form onSubmit={handleSubmit} noValidate name="loginForm">
-                                <h5 id="div1">{i18n.t(this.props.match.params.message)}</h5>
-                                <h5 id="div2">{i18n.t(this.state.message)}</h5>
+                            <Form onSubmit={handleSubmit} noValidate name="loginForm">
+                              <h5 id="div1">{i18n.t(this.props.match.params.message)}</h5>
+                              <h5 id="div2">{i18n.t(this.state.message)}</h5>
 
-                                {/* <h1>{i18n.t('static.login.login')}</h1> */}
+                              {/* <h1>{i18n.t('static.login.login')}</h1> */}
 
-                                <p className="text-muted login-text">{i18n.t('static.login.signintext')}</p>
+                              <p className="text-muted login-text">{i18n.t('static.login.signintext')}</p>
 
-                                <InputGroup className="mb-3">
-                                  <InputGroupAddon addonType="prepend">
-                                    <InputGroupText>
-                                      <i className="cui-user Loginicon"></i>
-                                    </InputGroupText>
-                                  </InputGroupAddon>
-                                  <Input
-                                    type="text"
-                                    placeholder={i18n.t('static.login.emailId')}
-                                    autoComplete="emailId"
-                                    name="emailId"
-                                    id="emailId"
-                                    valid={!errors.emailId}
-                                    invalid={touched.emailId && !!errors.emailId}
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    required />
-                                  <FormFeedback>{errors.emailId}</FormFeedback>
-                                </InputGroup>
-                                <InputGroup className="mb-4">
-                                  <InputGroupAddon addonType="prepend">
-                                    <InputGroupText>
-                                      <i className="cui-lock-locked Loginicon"></i>
-                                    </InputGroupText>
-                                  </InputGroupAddon>
-                                  <Input
-                                    type="password"
-                                    placeholder={i18n.t('static.login.password')}
-                                    autoComplete="current-password"
-                                    name="password"
-                                    id="password"
-                                    valid={!errors.password}
-                                    invalid={touched.password && !!errors.password}
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    required />
-                                  <FormFeedback>{errors.password}</FormFeedback>
-                                </InputGroup>
-                                <Row>
-                                  <Col xs="6">
-                                    <Button type="submit" color="primary" className="px-4" onClick={() => { this.touchAll(setTouched, errors); this.incorrectPassmessageHide() }} >{i18n.t('static.login.login')}</Button>
-                                  </Col>
-                                  <Col xs="6" className="text-right">
-                                    <Button type="button" color="link" className="px-0" onClick={this.forgotPassword}>{i18n.t('static.login.forgotpassword')}?</Button>
-                                  </Col>
+                              <InputGroup className="mb-3">
+                                <InputGroupAddon addonType="prepend">
+                                  <InputGroupText>
+                                    <i className="cui-user Loginicon"></i>
+                                  </InputGroupText>
+                                </InputGroupAddon>
+                                <Input
+                                  type="text"
+                                  placeholder={i18n.t('static.login.emailId')}
+                                  autoComplete="emailId"
+                                  name="emailId"
+                                  id="emailId"
+                                  valid={!errors.emailId}
+                                  invalid={touched.emailId && !!errors.emailId}
+                                  onChange={handleChange}
+                                  onBlur={handleBlur}
+                                  required />
+                                <FormFeedback>{errors.emailId}</FormFeedback>
+                              </InputGroup>
+                              <InputGroup className="mb-4">
+                                <InputGroupAddon addonType="prepend">
+                                  <InputGroupText>
+                                    <i className="cui-lock-locked Loginicon"></i>
+                                  </InputGroupText>
+                                </InputGroupAddon>
+                                <Input
+                                  type="password"
+                                  placeholder={i18n.t('static.login.password')}
+                                  autoComplete="current-password"
+                                  name="password"
+                                  id="password"
+                                  valid={!errors.password}
+                                  invalid={touched.password && !!errors.password}
+                                  onChange={handleChange}
+                                  onBlur={handleBlur}
+                                  required />
+                                <FormFeedback>{errors.password}</FormFeedback>
+                              </InputGroup>
+                              <Row>
+                                <Col xs="6">
+                                  <Button type="submit" color="primary" className="px-4" onClick={() => { this.touchAll(setTouched, errors); this.incorrectPassmessageHide() }} >{i18n.t('static.login.login')}</Button>
+                                </Col>
+                                <Col xs="6" className="text-right">
+                                  <Button type="button" color="link" className="px-0" onClick={this.forgotPassword}>{i18n.t('static.login.forgotpassword')}?</Button>
+                                </Col>
 
-                                </Row>
-                              </Form>
-                            )} />
+                              </Row>
+                            </Form>
+                          )} />
                     </CardBody>
 
                   </div>
@@ -622,16 +636,16 @@ class Login extends Component {
                 <CardBody>
 
                   <p className="Login-p">The USAID Global Health Supply Chain Program-Procurement and Supply
-                  Management (GHSC-PSM) project is funded under USAID Contract No. AID-OAA-I-15-0004. GHSC-PSM connects
-                  technical solutions and proven commercial processes to promote efficient and cost-effective
-                  health supply chains worldwide. Our goal is to ensure uninterrupted supplies of health
-                  commodities to save lives and create a healthier future for all. The project purchases
-                  and delivers health commodities, offers comprehensive technical assistance to strengthen
-                  national supply chain systems, and provides global supply chain leadership. For more
-                  information, visit <a href="https://www.ghsupplychain.org/" target="_blank">ghsupplychain.org</a>. The information provided in this tool is not
-                                                                                                                                                                                    official U.S. government information and does not represent the views or positions of the
-                                                                                                                                                                                    Agency for International Development or the U.S. government.
-              </p>
+                    Management (GHSC-PSM) project is funded under USAID Contract No. AID-OAA-I-15-0004. GHSC-PSM connects
+                    technical solutions and proven commercial processes to promote efficient and cost-effective
+                    health supply chains worldwide. Our goal is to ensure uninterrupted supplies of health
+                    commodities to save lives and create a healthier future for all. The project purchases
+                    and delivers health commodities, offers comprehensive technical assistance to strengthen
+                    national supply chain systems, and provides global supply chain leadership. For more
+                    information, visit <a href="https://www.ghsupplychain.org/" target="_blank">ghsupplychain.org</a>. The information provided in this tool is not
+                    official U.S. government information and does not represent the views or positions of the
+                    Agency for International Development or the U.S. government.
+                  </p>
                 </CardBody>
                 <Row className="text-center Login-bttom-logo">
                   <Col md="4">
