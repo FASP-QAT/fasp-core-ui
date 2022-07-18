@@ -2892,8 +2892,16 @@ export default class WhatIfReportComponent extends React.Component {
                     papuRequest.onsuccess = function (event) {
                         var papuResult = [];
                         papuResult = papuRequest.result;
+                        var listArrays = [];
+                        for (var i = 0; i < papuResult.length; i++) {
+                            for (var j = 0; j < papuResult[i].programList.length; j++) {
+                                if (papuResult[i].programList[j].id == generalProgramJson.programId) {
+                                    listArrays.push(paResult[i]);
+                                }
+                            }
+                        }
                         this.setState({
-                            procurementAgentListForWhatIf: papuResult
+                            procurementAgentListForWhatIf: listArrays
                         })
 
                         var fsTransaction = db1.transaction(['fundingSource'], 'readwrite');
