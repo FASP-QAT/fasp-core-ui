@@ -3009,8 +3009,9 @@ className={'modal-lg ' + this.props.className} >
         <p>
         <b>{i18n.t('static.equivalancyUnit.EquivalencyUsed')}</b>
         <ul>
-            <li>{i18n.t('static.equivalancyUnit.InThe')} '<a href="/#/report/compareAndSelectScenario" target="_blank" style={{textDecoration:'underline'}}>{i18n.t('static.dashboard.compareAndSelect')}</a>' {i18n.t('static.equivalancyUnit.ForecastsInEUs')} {i18n.t('static.equivalancyUnit.DisplayTheirForecast')} </li>
-            <li>{i18n.t('static.equivalancyUnit.InThe')} '<a href="/#/forecastReport/forecastOutput" target="_blank" style={{textDecoration:'underline'}}>{i18n.t('static.dashboard.monthlyForecast')}</a>' {i18n.t('static.equivalancyUnit.SelectedForecasts')} {i18n.t('static.equivalancyUnit.UserForecasted')}</li>
+            <li>{i18n.t('static.equivalancyUnit.InThe')} Forecasting Module '<a href="/#/report/compareAndSelectScenario" target="_blank" style={{textDecoration:'underline'}}>{i18n.t('static.dashboard.compareAndSelect')}</a>' {i18n.t('static.equivalancyUnit.ForecastsInEUs')} {i18n.t('static.equivalancyUnit.DisplayTheirForecast')} </li>
+            <li>{i18n.t('static.equivalancyUnit.InThe')} Forecasting Module '<a href="/#/forecastReport/forecastOutput" target="_blank" style={{textDecoration:'underline'}}>{i18n.t('static.dashboard.monthlyForecast')}</a>' {i18n.t('static.equivalancyUnit.SelectedForecasts')} {i18n.t('static.equivalancyUnit.UserForecasted')}</li>
+            <li>In the Supply Planning Module '<a href="/#/report/consumptionForecastErrorSupplyPlan" target="_blank" style={{textDecoration:'underline'}}>Forecast Error (Monthly)</a> Report'  screen, users can also view the actual and forecasted consumption in Equivalency Units. </li>
         </ul>
         </p>
         <p>
