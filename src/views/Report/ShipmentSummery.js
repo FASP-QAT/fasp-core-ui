@@ -2543,7 +2543,8 @@ class ShipmentSummery extends Component {
                                         <div className="row">
                                             <div className="col-md-12 pl-0 pr-0">
                                                 {this.state.shipmentDetailsFundingSourceList.length > 0 &&
-                                                    <Table id="mytable1" responsive className="table-bordered table-striped text-center mt-2">
+                                                <div className='fixTableHead'>
+                                                    <Table id="mytable1" responsive className="table-bordered table-striped text-center ">
                                                         <thead>
                                                             <tr>
                                                                 <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'center' }}>{i18n.t('static.budget.fundingsource')}</th>
@@ -2578,7 +2579,9 @@ class ShipmentSummery extends Component {
                                                                 )}
                                                         </tbody>
 
-                                                    </Table>}
+                                                    </Table>
+                                                    </div>
+                                                    }
                                             </div>
                                         </div>
 

@@ -4322,9 +4322,9 @@ export default class WhatIfReportComponent extends React.Component {
                             </div>
                         </Row>
 
-                        <div className="table-scroll">
-                            <div className="table-wrap table-responsive">
-                                <Table className="table-bordered text-center mt-2 overflowhide" bordered size="sm" options={this.options}>
+                        <div className="table-scroll mt-2">
+                            <div className="table-wrap table-responsive fixTableHeadSupplyPlan">
+                                <Table className="table-bordered text-center overflowhide" size="sm" options={this.options}>
                                     <thead>
                                         <tr>
                                             <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th>

@@ -1342,9 +1342,9 @@ export default class SupplyPlanComponent extends React.Component {
                             <span className="supplyplan-rarrow" onClick={this.rightClicked}> {i18n.t('static.supplyPlan.scrollToRight')} <i className="cui-arrow-right icons" ></i> </span>
                         </div>
                         {/* </Row> */}
-                        <div className="table-scroll">
-                            <div className="table-wrap table-responsive">
-                                <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" options={this.options}>
+                        <div className="table-scroll mt-2">
+                            <div className="table-wrap table-responsive fixTableHeadSupplyPlan">
+                                <Table className="table-bordered text-center overflowhide main-table "  size="sm" options={this.options}>
                                     <thead>
                                         <tr>
                                             <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th>

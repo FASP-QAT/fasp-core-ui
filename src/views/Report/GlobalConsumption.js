@@ -1410,11 +1410,11 @@ class GlobalConsumption extends Component {
 
                   </div>
                   <div className="row">
-                    <div className="col-md-12 mt-3">
+                    <div className="col-md-12 mt-lg-2">
                       {this.state.show && this.state.consumptions.length > 0 &&
-                        <div className="table-responsive fixTableHead">
+                        <div className="fixTableHead">
 
-                          <Table className="table-striped table-fixed table-bordered text-center">
+                          <Table className="table-striped  table-fixed table-bordered text-center">
 
                             <thead>
                               <tr>

@@ -939,7 +939,9 @@ class ListUserComponent extends Component {
                     {/* <Card> */}
                     <CardBody className="pl-lg-1 pr-lg-1 pt-lg-0">
                         {/* <div id="tableDiv2" className="table-responsive consumptionDataEntryTable"> */}
+                        <div className='consumptionDataEntryTable'>
                         <div id="tableDiv2" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USER') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
+                        </div>
                         </div>
                     </CardBody>
                     {/* <CardFooter> */}
