@@ -2893,7 +2893,7 @@ export default class WhatIfReportComponent extends React.Component {
                         for (var i = 0; i < papuResult.length; i++) {
                             for (var j = 0; j < papuResult[i].programList.length; j++) {
                                 if (papuResult[i].programList[j].id == generalProgramJson.programId) {
-                                    listArrays.push(paResult[i]);
+                                    listArrays.push(papuResult[i]);
                                 }
                             }
                         }
