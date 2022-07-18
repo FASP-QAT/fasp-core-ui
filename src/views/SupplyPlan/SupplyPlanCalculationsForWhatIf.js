@@ -13,10 +13,8 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
     var startDate1 = moment(startDate).format("YYYY-MM-DD");
     for (var s = 0; moment(curDate).format("YYYY-MM") <= moment(stopDate).add(-1, 'months').format("YYYY-MM"); s++) {
         var supplyPlanData = programJson.supplyPlan;
-        console.log("SupplyPlanData MohitPooja", supplyPlanData)
         curDate = moment(startDate1).add(s, 'months').format("YYYY-MM-DD");
         var jsonList = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM-DD") == moment(curDate).format("YYYY-MM-DD"));
-        console.log("CurDateFirstForLoop MohitPooja", curDate);
         var currentMonth = moment(Date.now()).utcOffset('-0500').startOf('month').format("YYYY-MM-DD");
         var compare = (curDate >= currentMonth);
         // var stockInHand = jsonList[0].closingBalance;
@@ -75,7 +73,7 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                 var pa = props.state.procurementAgentListForWhatIf.filter(c => c.procurementAgentId == props.state.procurementAgentIdSingle)[0];
                 var programPlanningUnit = ((props.state.programPlanningUnitList).filter(p => p.planningUnit.id == planningUnitId))[0];
                 var programPriceList = programPlanningUnit.programPlanningUnitProcurementAgentPrices.filter(c => c.program.id == programId && c.procurementAgent.id == props.state.procurementAgentIdSingle && c.planningUnit.id == planningUnitId && c.active);
-                var pricePerUnit=0;
+                var pricePerUnit = 0;
                 if (programPriceList.length > 0) {
                     pricePerUnit = Number(programPriceList[0].price);
                 } else {
@@ -89,7 +87,7 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                 // var conversionRateToUsd = Number((this.state.currencyListAll.filter(c => c.currencyId == rowData[14])[0]).conversionRateToUsd);
                 pricePerUnit = Number(pricePerUnit / 1).toFixed(2);
                 var rate = pricePerUnit;
-                var productCost=Number(Number(rate) * Number(suggestedOrd)).toFixed(2);
+                var productCost = Number(Number(rate) * Number(suggestedOrd)).toFixed(2);
                 var seaFreightPercentage = generalProgramJson.seaFreightPerc;
                 var freightCost = Number(productCost) * (Number(Number(seaFreightPercentage) / 100));
                 var b = props.state.budgetListForWhatIf.filter(c => c.budgetId == props.state.budgetIdSingle)[0];
@@ -161,9 +159,8 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                         username: username
                     },
                     lastModifiedDate: curDate1,
-                    isAddedViaScenario:true
+                    isAddedViaScenario: true
                 }
-                console.log("SHipmentList MohitPooja",shipmentJson)
                 // -> Need to make this dynamic till here
                 // if (shipmentStatusId == DELIVERED_SHIPMENT_STATUS) {
                 // var shipmentBatchInfoList = map.get("25");
@@ -213,13 +210,11 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                 programJson.shipmentList = shipmentList;
                 //Do calculations for supply plan
                 var coreBatchDetails = programJson.batchInfoList;
-                console.log("Core batch details initial MohitPooja", coreBatchDetails)
                 var supplyPlanData = programJson.supplyPlan;
                 if (supplyPlanData == undefined) {
                     supplyPlanData = []
                 }
                 var lastDataEntryDate = moment(stopDate).add(2, 'months').format("YYYY-MM-DD");
-                console.log("lastDataEntryDate MohitPooja", lastDataEntryDate)
                 supplyPlanData = supplyPlanData.filter(c => (c.planningUnitId != planningUnitId) || (c.planningUnitId == planningUnitId && (moment(c.transDate).format("YYYY-MM") < moment(curDate).format("YYYY-MM") || moment(c.transDate).format("YYYY-MM") > moment(lastDataEntryDate).format("YYYY-MM"))));
                 var createdDate = moment(curDate).startOf('month').format("YYYY-MM");
                 var firstDataEntryDate = moment(curDate).startOf('month').format("YYYY-MM");
@@ -228,7 +223,6 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                 for (var i = 0; createdDate < lastDataEntryDate; i++) {
                     // Adding months to created date and getting start date and end date
                     createdDate = moment(firstDataEntryDate).add(i, 'months').format("YYYY-MM-DD");
-                    console.log("CreatedDate MohitPooja", createdDate);
                     var startDate = moment(createdDate).startOf('month').format('YYYY-MM-DD');
                     var endDate = moment(createdDate).endOf('month').format('YYYY-MM-DD');
                     // Getting prev month date
@@ -461,7 +455,6 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                             }
                         }
                     }
-                    console.log("Trans Date+++", startDate)
 
                     // Inventory part
                     // Filtering inventory for planning unit and that particular month
@@ -1103,18 +1096,15 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
 
                 }
                 programJson.supplyPlan = supplyPlanData
-                console.log("SupplyPlanData MohitPooja at end", supplyPlanData)
             }
         } else {
         }
 
     }
-    console.log("coreBatchDetails MohitPooja", coreBatchDetails)
     programJsonForStoringTheResult.batchInfoList = programJson.batchInfoList;
     programJsonForStoringTheResult.supplyPlan = programJson.supplyPlan;
     programJsonForStoringTheResult.shipmentList = programJson.shipmentList;
     var planningUnitDataList = programDataJson.planningUnitDataList;
-    console.log("programJsonForStoringTheResult MohitPooja", programJsonForStoringTheResult)
     var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == planningUnitId);
     if (planningUnitDataIndex != -1) {
         planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJsonForStoringTheResult), SECRET_KEY)).toString();
