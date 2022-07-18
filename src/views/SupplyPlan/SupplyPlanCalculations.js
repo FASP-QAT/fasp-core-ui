@@ -4,6 +4,7 @@ import moment from "moment";
 import i18n from '../../i18n';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { generateRandomAplhaNumericCode } from '../../CommonComponent/JavascriptCommonFunctions.js';
+import {convertSuggestedShipmentsIntoPlannedShipments} from '../SupplyPlan/SupplyPlanCalculationsForWhatIf.js';
 
 export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, page, props, planningUnitList, minimumDate, problemListChild, rebuild, rebuildQPL) {
     console.log("###Started with calculations of supply plan", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
@@ -1092,7 +1093,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                 }
                             }
                         } catch (err) {
-                            console.log("@@@ in error in calculate")
+                            console.log("@@@ in error in calculate",err)
                             props.fetchData(1, programId)
                         }
                         programDataJson.planningUnitDataList = planningUnitDataList;
@@ -1188,11 +1189,19 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     props.updateState("loading", false);
                                     props.hideFirstComponent()
                                 } else if (page == "whatIf") {
+                                    console.log("In WHat If Mohit Pooja",props.state.scenarioId)
+                                    if(props.state.scenarioId!=7){
                                     props.updateState("programJson", programJsonForStoringTheResult);
                                     props.updateState("planningUnitDataList", planningUnitDataList);
                                     props.updateState("message", i18n.t('static.whatIf.scenarioAdded'));
                                     props.formSubmit(props.state.planningUnit, props.state.monthCount);
                                     props.updateState("loading", false);
+                                    }else{
+                                        var rangeValue = props.state.rangeValue1;
+                    let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
+                    let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
+                                        convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDate, programJsonForStoringTheResult, generalProgramJson, props, planningUnitId,programPlanningUnitList.filter(c => c.planningUnit.id == planningUnitId)[0], regionListFiltered,programId,programJsonForStoringTheResult,programDataJson,programRequest) 
+                                    }
                                 } else if (page == "supplyPlan") {
                                     props.formSubmit(props.state.planningUnit, props.state.monthCount);
                                 } else if (page == "supplyPlanCompare") {
