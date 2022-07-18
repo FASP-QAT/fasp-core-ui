@@ -143,7 +143,7 @@ export default class ShipmentLinkingNotifications extends Component {
             var tableJson = this.el.getJson(null, false).filter(c => c[18] == 1);
             for (var i = 0; i < tableJson.length; i++) {
                 let json = {
-                    addressed: tableJson[i][1],
+                    addressed: tableJson[i][0],
                     notificationType: {},
                     notificationId: tableJson[i][14],
                     shipmentLinkingId: 0
