@@ -346,7 +346,7 @@ export default class DatabaseTranslations extends React.Component {
                             </CardHeader> */}
                             <CardBody className="table-responsive pt-md-1 pb-md-1">
                                 {/* <div id="loader" className="center"></div> */}
-                                <div id="labelTranslationTable" style={{ display: this.state.loading ? "none" : "block" }}></div>
+                                <div id="labelTranslationTable consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}></div>
                                 <Row style={{ display: this.state.loading ? "block" : "none" }}>
                                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                                         <div class="align-items-center">
