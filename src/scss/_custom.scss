@@ -4131,7 +4131,8 @@ z-index:999;
 }
 
 .consumptionDataEntryTable .jexcel_content{
-  max-height: calc(100vh - 262px)!important;
+  // max-height: calc(100vh - 262px)!important;
+  max-height: calc(100vh - 300px)!important;
   // overflow: scroll !important;
   overflow-x: auto;
 }
@@ -5827,6 +5828,11 @@ font-style: italic!important;
 .table-scroll1 .table thead th {
    border-bottom: 0px solid #c8ced3!important;
 }
+.Firstcolum1{
+  width: 120px;
+  left: 0;
+  z-index: 3;
+}
 .Firstcolum{
   // position: sticky;
   //   left: 0;
@@ -6406,4 +6412,21 @@ top: calc(20em + 3px);
 .SupplierLeadTable .jexcel > thead {
   position: sticky;
   top: 0;
+}
+.ARUMarginTop{
+  margin-top: -22px;
+}
+.Theadtablesticky{
+    position: sticky;
+    top: 0;
+}
+.fixTableHead1 {
+  // overflow-y: auto;
+  max-height: calc(100vh - 100px)!important;
+  overflow-x: auto;
+  border-top: 1px solid #c8ced3;
+}
+.fixTableHeadSupplyPlan{
+  max-height: calc(100vh - 300px)!important;
+  overflow: scroll;
 }

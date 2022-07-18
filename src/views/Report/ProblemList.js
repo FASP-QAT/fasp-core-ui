@@ -1689,7 +1689,7 @@ export default class ConsumptionDetails extends React.Component {
                             <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title="Export CSV" onClick={() => this.exportCSV(columns)} />
                         </div>
                     </div>} */}
-                    <CardBody className="pb-lg-5 pt-lg-0">
+                    <CardBody className="pb-lg-0 pt-lg-0">
                         <Col md="9 pl-1">
                             <div className="d-md-flex Selectdiv2">
                                 <FormGroup className="mt-md-2 mb-md-0 ">

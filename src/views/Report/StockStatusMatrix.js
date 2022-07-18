@@ -1958,8 +1958,9 @@ export default class StockStatusMatrix extends React.Component {
             </div>
             <div class="TableCust" style={{ display: this.state.loading ? "none" : "block" }}>
               {this.state.data.length > 0 &&
+              <div className='fixTableHead1'>
                 <Table striped bordered responsive="md" style={{ width: "100%" }}>
-                  <thead>
+                  <thead className='Theadtablesticky'>
                     <tr>
                       <th rowSpan="2" className="text-center" style={{ width: "20%" }}>{i18n.t('static.planningunit.planningunit')}</th>
                       <th rowSpan="2" className="text-center" style={{ width: "5%" }}>{i18n.t('static.dashboard.unit')}</th>
@@ -2007,6 +2008,7 @@ export default class StockStatusMatrix extends React.Component {
 
                   </tbody>
                 </Table>
+                </div>
               }
 
 

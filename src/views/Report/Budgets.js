@@ -1506,6 +1506,7 @@ class Budgets extends Component {
                                                         {/*<SearchBar {...props.searchProps} />
                                                         <ClearSearchButton {...props.searchProps} />*/}
                                                     </div>
+                                                    <div className='fixTableHead'>
                                                     <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
                                                         // pagination={paginationFactory(options)}
                                                         rowEvents={{
@@ -1516,6 +1517,7 @@ class Budgets extends Component {
                                                         }}
                                                         {...props.baseProps}
                                                     />
+                                                    </div>
                                                 </div>
                                             )
                                         }

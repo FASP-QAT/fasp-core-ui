@@ -3564,9 +3564,11 @@ class StockStatus extends Component {
                       </ul>
                     </FormGroup>
                   }
-                  {this.state.show && this.state.stockStatusList.length > 0 && <Table responsive className="table-striped table-bordered text-center mt-2">
+                  {this.state.show && this.state.stockStatusList.length > 0 && 
+                 <div className='fixTableHead1'>
+                  <Table className="table-striped table-bordered text-center">
 
-                    <thead>
+                    <thead className='Theadtablesticky'>
                       <tr>
                         <th rowSpan="2" style={{ width: "200px" }}>{i18n.t('static.common.month')}</th>  
                       <th className="text-center" colSpan="1"> {i18n.t('static.report.stock')} </th>
@@ -3644,7 +3646,9 @@ class StockStatus extends Component {
                       }
                     </tbody>
 
-                  </Table>}
+                  </Table>
+               </div>
+                  }
                 </Col>
 
                 <div style={{ display: this.state.loading ? "block" : "none" }}>

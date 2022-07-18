@@ -1828,7 +1828,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
 
                                             {/* } */}
                                             {this.state.show && this.state.dataList.length > 0 &&
-                                                <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm">
+                                                <Table className="table-bordered text-center mt-2 overflowhide main-table responsive" bordered size="sm">
                                                     <thead>
                                                         <tr>
                                                             <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th>

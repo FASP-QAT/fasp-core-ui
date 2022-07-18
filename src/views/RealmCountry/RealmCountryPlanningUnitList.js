@@ -1428,7 +1428,7 @@ export default class RealmCountryPlanningUnitList extends Component {
                         </div>
                     } */}
 
-                    <CardBody className="pb-lg-2 pt-lg-0">
+                    <CardBody className="pb-lg-2 pt-lg-1">
 
 
                         {/* <FormGroup className="Selectdiv mt-md-2 mb-md-0">
@@ -1475,7 +1475,7 @@ export default class RealmCountryPlanningUnitList extends Component {
                             </div>
                         </Form>
 
-                        <div className='consumptionDataEntryTable'>
+                        <div className='consumptionDataEntryTable ARUMarginTop'>
                         <div id="tableDiv" style={{ display: this.state.loading ? "none" : "block" }}>
                         </div>
                         </div>

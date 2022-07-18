@@ -1567,7 +1567,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                             </a>
                         </div>
                     </div>
-                    <CardBody className="pb-lg-5 pt-lg-0 ">
+                    <CardBody className="pb-lg-0 pt-lg-0 ">
                         <div className="" >
                             <div ref={ref}>
 
