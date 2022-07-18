@@ -649,12 +649,10 @@ export default class WhatIfReportComponent extends React.Component {
                 var addLeadTimes = Math.round(parseFloat(this.state.generalProgramJson.plannedToSubmittedLeadTime) + parseFloat(this.state.generalProgramJson.submittedToApprovedLeadTime) +
                     parseFloat(this.state.generalProgramJson.approvedToShippedLeadTime) + parseFloat(this.state.generalProgramJson.shippedToArrivedBySeaLeadTime) +
                     parseFloat(this.state.generalProgramJson.arrivedToDeliveredLeadTime));
-                console.log("AddLeadTimes MohitPooja", addLeadTimes)
                 var dt1 = new Date();
                 dt1.setMonth(dt.getMonth() + addLeadTimes);
                 var procurementAgentTBD = this.state.procurementAgentListForWhatIf.filter(c => c.procurementAgentId == TBD_PROCUREMENT_AGENT_ID)[0];
                 var fundingSourceTBD = this.state.fundingSourceListForWhatIf.filter(c => c.fundingSourceId == TBD_FUNDING_SOURCE)[0];
-                console.log("this.state.budgetListForWhatIf@@@@@@@@@@", this.state.budgetListForWhatIf)
                 var budgetList = this.state.budgetListForWhatIf.filter(c => c.fundingSource.fundingSourceId == TBD_FUNDING_SOURCE)
                 this.setState({
                     rangeValue1: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
@@ -1814,7 +1812,6 @@ export default class WhatIfReportComponent extends React.Component {
                     }
                     var procurementAgentIds = [...new Set(this.state.procurementAgents.map(ele => ele.value))];
                     var fundingSourceIds = [...new Set(this.state.fundingSources.map(ele => ele.value))];
-                    console.log("MohitPooja  shipmentList", shipmentList.filter(c => c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS && c.planningUnit.id == planningUnitId && moment(c.expectedDeliveryDate).format("YYYY-MM") >= moment(startDate).format("YYYY-MM") && moment(c.expectedDeliveryDate).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM") && procurementAgentIds.includes(c.procurementAgent.id)))
                     var shipmentUnFundedList = shipmentList.filter(c => c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS && c.planningUnit.id == planningUnitId && moment(c.expectedDeliveryDate).format("YYYY-MM") >= moment(startDate).format("YYYY-MM") && moment(c.expectedDeliveryDate).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM") && procurementAgentIds.includes(c.procurementAgent.id) && fundingSourceIds.includes(c.fundingSource.id));
                     var minDate = moment.min(shipmentUnFundedList.map(d => moment(d.expectedDeliveryDate)))
                     for (var i = 0; i < shipmentUnFundedList.length; i++) {
@@ -5001,8 +4998,6 @@ export default class WhatIfReportComponent extends React.Component {
                                             {
                                                 this.state.plannedShipmentsTotalData.map(item1 => {
                                                     if (item1.toString() != "") {
-                                                        console.log("Item1 MohitPooja", item1)
-                                                        console.log("Condition MohitPooja", item1.isEmergencyOrder == true ? item1.isLocalProcurementAgent == true ? "localProcurement1EmergencyComment hoverTd" : item1.isNewlyAddedShipment ? "emergencyCommentNewlyAddedShipment hoverTd" : "emergencyComment hoverTd" : item1.isLocalProcurementAgent == true ? "localProcurementAgent1 hoverTd" : item1.isNewlyAddedShipment ? "newlyAddedShipment hoverTd" : "hoverTd")
                                                         if (item1.textColor == "#fff") {
                                                             return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className={item1.isEmergencyOrder == true ? item1.isLocalProcurementAgent == true ? "localProcurement1EmergencyComment hoverTd" : item1.isNewlyAddedShipment ? "emergencyCommentNewlyAddedShipment hoverTd" : "emergencyComment hoverTd" : item1.isLocalProcurementAgent == true ? "localProcurementAgent1 hoverTd" : item1.isNewlyAddedShipment ? "newlyAddedShipment hoverTd" : "hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'plannedShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                                         } else {
