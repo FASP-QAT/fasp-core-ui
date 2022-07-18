@@ -680,10 +680,10 @@ class ForecastSummary extends Component {
                 doc.setFont('helvetica', 'normal')
                 doc.setTextColor("#002f6c");
                 doc.setFont('helvetica', 'bold')
-                doc.fromHTML("<font size = '1' color = '#002f6c'><b>" + i18n.t('static.supplyPlan.runDate') + "</b> " + moment(new Date()).format(`${DATE_FORMAT_CAP}`) + "</font>", doc.internal.pageSize.width - 150, 20)
-                doc.fromHTML("<font size = '1' color = '#002f6c'><b>" + i18n.t('static.supplyPlan.runTime') + "</b> " + moment(new Date()).format('hh:mm A') + "</font>", doc.internal.pageSize.width - 150, 30)
-                doc.fromHTML("<font size = '1' color = '#002f6c'><b>" + i18n.t('static.user.user') + ":</b> " + AuthenticationService.getLoggedInUsername() + "</font>", doc.internal.pageSize.width - 150, 40)
-                doc.fromHTML("<font size = '1' color = '#002f6c'><b>" + this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + " " + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "</b> " + "</font>", doc.internal.pageSize.width - 150, 50)
+                doc.fromHTML("<span style = 'font-family:helvetica;'><font size = '1' color = '#002f6c'><b>" + i18n.t('static.supplyPlan.runDate') + "</b> " + moment(new Date()).format(`${DATE_FORMAT_CAP}`) + "</font></span>", doc.internal.pageSize.width - 150, 20)
+                doc.fromHTML("<span style = 'font-family:helvetica;'><font size = '1' color = '#002f6c'><b>" + i18n.t('static.supplyPlan.runTime') + "</b> " + moment(new Date()).format('hh:mm A') + "</font></span>", doc.internal.pageSize.width - 150, 30)
+                doc.fromHTML("<span style = 'font-family:helvetica;'><font size = '1' color = '#002f6c'><b>" + i18n.t('static.user.user') + ":</b> " + AuthenticationService.getLoggedInUsername() + "</font></span>", doc.internal.pageSize.width - 150, 40)
+                doc.fromHTML("<span style = 'font-family:helvetica;'><font size = '1' color = '#002f6c'><b>" + this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + " " + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "</b> " + "</font></span>", doc.internal.pageSize.width - 150, 50)
                 // doc.text(i18n.t('static.supplyPlan.runDate') + " " + moment(new Date()).format(`${DATE_FORMAT_CAP}`), doc.internal.pageSize.width - 40, 20, {
                 //     align: 'right'
                 // })
@@ -715,8 +715,8 @@ class ForecastSummary extends Component {
                     //     align: 'left'
                     // })
 
-                    doc.fromHTML("<font size = '1' color = '#002f6c'><b>" + i18n.t('static.report.dateRange') + ":</b> " + document.getElementById("forecastPeriod").value + "</font>", (doc.internal.pageSize.width / 8) - 50, 90)
-                    doc.fromHTML("<font size = '1' color = '#002f6c'><b>" + i18n.t('static.forecastReport.display') + ":</b> " + this.state.displayName + "</font>", (doc.internal.pageSize.width / 8) - 50, 100)
+                    doc.fromHTML("<span style = 'font-family:helvetica;'><font size = '1' color = '#002f6c'><b>" + i18n.t('static.report.dateRange') + ":</b> " + document.getElementById("forecastPeriod").value + "</font></span>", (doc.internal.pageSize.width / 8) - 50, 90)
+                    doc.fromHTML("<span style = 'font-family:helvetica;'><font size = '1' color = '#002f6c'><b>" + i18n.t('static.forecastReport.display') + ":</b> " + this.state.displayName + "</font></span>", (doc.internal.pageSize.width / 8) - 50, 100)
 
                     // doc.setFont('helvetica', 'bold')
                     // doc.text(i18n.t('static.report.dateRange') + ': ' + document.getElementById("forecastPeriod").value, doc.internal.pageSize.width / 8, 90, {
@@ -732,7 +732,7 @@ class ForecastSummary extends Component {
                         // doc.text(i18n.t('static.forecastReport.hideCalculations') + ': ' + (this.state.hideCalculation == true ? i18n.t('static.realm.yes') : i18n.t('static.program.no')), doc.internal.pageSize.width / 8, 110, {
                         //     align: 'left'
                         // })
-                        doc.fromHTML("<font size = '1' color = '#002f6c'><b>" + i18n.t('static.forecastReport.hideCalculations') + ":</b> " + (this.state.hideCalculation == true ? i18n.t('static.realm.yes') : i18n.t('static.program.no')) + "</font>", (doc.internal.pageSize.width / 8), 110)
+                        doc.fromHTML("<span style = 'font-family:helvetica;'><font size = '1' color = '#002f6c'><b>" + i18n.t('static.forecastReport.hideCalculations') + ":</b> " + (this.state.hideCalculation == true ? i18n.t('static.realm.yes') : i18n.t('static.program.no')) + "</font></span>", (doc.internal.pageSize.width / 8) - 50, 110)
                     }
 
                 }
@@ -823,7 +823,7 @@ class ForecastSummary extends Component {
 
                 console.log("data------------------>12345 ", data);
 
-                var startY = 130;
+                var startY = 140;
                 let content = {
                     margin: { top: 80, bottom: 90 },
                     startY: startY,
@@ -1643,6 +1643,7 @@ class ForecastSummary extends Component {
                                         position: 'top',
                                         filters: true,
                                         onchange: this.forecastChanged,
+                                        editable:AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_LIST_FORECAST_SUMMARY')?true:false,
                                         onload: function (instance, cell, x, y, value) {
                                             jExcelLoadedFunctionOnlyHideRow(instance);
                                             var elInstance = instance.jexcel;
@@ -3564,48 +3565,48 @@ class ForecastSummary extends Component {
                 <Modal isOpen={this.state.showGuidance}
                     className={'modal-lg ' + this.props.className} >
                     <ModalHeader toggle={() => this.toggleShowGuidance()} className="ModalHead modal-info-Headher">
-                        <strong className="TextWhite">Show Guidance</strong>
+                        <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
                     </ModalHeader>
                     <div>
                         <ModalBody>
                             <div>
-                                <h3 className='ShowGuidanceHeading'>Forecast Summary</h3>
+                                <h3 className='ShowGuidanceHeading'>{i18n.t('static.ForecastSummary.ForecastSummary')}</h3>
                             </div>
                             <p>
-                                <p style={{ fontSize: '13px' }}><span className="UnderLineText">Purpose :</span> Enable users to see a summary of their final (selected) forecasts for the entire forecast period. To view the forecasts by month, use the '<a href='/#/forecastReport/forecastOutput' target="_blank" style={{ textDecoration: 'underline' }}>Monthly Forecast</a>' screen.
+                                <p style={{ fontSize: '13px' }}><span className="UnderLineText">{i18n.t('static.listTree.purpose')} :</span> {i18n.t('static.ForecastSummary.EnableUser')} '<a href='/#/forecastReport/forecastOutput' target="_blank" style={{ textDecoration: 'underline' }}>{i18n.t('static.dashboard.monthlyForecast')}</a>' screen.
                                     <ul>
-                                        <li><b>Regional View:</b>  Use this view to see your forecast across planning units and regions. Directly update the forecast method for every region-planning unit combination and add notes in the table, if desired. Forecast selections can also be updated in the '<a href='/#/report/compareAndSelectScenario' target="_blank" style={{ textDecoration: 'underline' }}>Compare and Select Forecast</a>' screen.</li>
-                                        <li><b>National View:</b> Use this view to see your forecast at a <span style={{ textDecoration: 'underline' }}>national level</span> and evaluate your <span style={{ textDecoration: 'underline' }}>procurement surplus or gaps</span>. </li>
+                                        <li><b>{i18n.t('static.ForecastSummary.RegionalView')}:</b>  {i18n.t('static.ForecastSummary.RegionalViewText')} '<a href='/#/report/compareAndSelectScenario' target="_blank" style={{ textDecoration: 'underline' }}>{i18n.t('static.dashboard.compareAndSelect')}</a>' screen.</li>
+                                        <li><b>{i18n.t('static.ForecastSummary.NationalView')}:</b> {i18n.t('static.ForecastSummary.NationalViewText')} <span style={{ textDecoration: 'underline' }}>{i18n.t('static.ForecastSummary.NationalLevel')}</span> {i18n.t('static.ForecastSummary.EvaluateYour')} <span style={{ textDecoration: 'underline' }}>{i18n.t('static.ForecastSummary.ProcurementSurplus')}</span>. </li>
                                     </ul>
                                 </p>
                             </p>
                             <p style={{ fontSize: '13px' }}>
-                                <p style={{ fontSize: '13px' }}><span className="UnderLineText">Using this screen (National View) :</span><br></br>
-                                    <b>Note:</b> This is not a full supply plan, but a high-level procurement surplus/gap analysis. We recommend importing your forecast into the supply planning module for granular supply planning.
+                                <p style={{ fontSize: '13px' }}><span className="UnderLineText">{i18n.t('static.ForecastSummary.UsingNationalView')} :</span><br></br>
+                                    <b>{i18n.t('static.versionSettings.note')}:</b> {i18n.t('static.ForecastSummary.FullSupplyPlan')}
                                 </p>
-                                <p>For the data to display here properly, enter the following data:
+                                <p>{i18n.t('static.ForecastSummary.DataToDisplay')}
                                     <ul>
-                                        <li>Under <a href='/#/planningUnitSetting/listPlanningUnitSetting' target="_blank" style={{ textDecoration: 'underline' }}>Update Planning Unit</a>:
+                                        <li>{i18n.t('static.ForecastSummary.Under')} <a href='/#/planningUnitSetting/listPlanningUnitSetting' target="_blank" style={{ textDecoration: 'underline' }}>{i18n.t('static.updatePlanningUnit.updatePlanningUnit')}</a>:
                                             <ul>
-                                                <li><b>Stock</b> - at the beginning of your forecast period</li>
-                                                <li><b>Existing shipments</b> - during your forecast period</li>
-                                                <li><b>Desired Months of stock</b> - at the end of your forecast period</li>
-                                                <li><b>Price Type</b> and <b>Unit Prices</b></li>
+                                                <li><b>{i18n.t('static.ForecastSummary.Stock')}</b> - {i18n.t('static.ForecastSummary.BeginningForecast')}</li>
+                                                <li><b>{i18n.t('static.ForecastSummary.ExistingShipments')}</b> - {i18n.t('static.ForecastSummary.DuringForecast')}</li>
+                                                <li><b>{i18n.t('static.ForecastSummary.DesiredMonthsStock')}</b> - {i18n.t('static.ForecastSummary.EndForecastPeriod')}</li>
+                                                <li><b>{i18n.t('static.ForecastSummary.PriceType')}</b> and <b>{i18n.t('static.ForecastSummary.UnitPrices')}</b></li>
                                             </ul>
                                         </li>
-                                        <li>Under <a href='/#/dataset/versionSettings' target="_blank" style={{ textDecoration: 'underline' }}>Update Version Settings</a>:
+                                        <li>{i18n.t('static.ForecastSummary.Under')} <a href='/#/dataset/versionSettings' target="_blank" style={{ textDecoration: 'underline' }}>{i18n.t('static.UpdateversionSettings.UpdateversionSettings')}</a>:
                                             <ul>
-                                                <li><b>Freight %</b> - Freight cost is calculated as a percentage of product cost</li>
+                                                <li><b>{i18n.t('static.ForecastSummary.Freight')} %</b> - {i18n.t('static.ForecastSummary.FreightCalculated')}</li>
                                             </ul>
                                         </li>
                                     </ul>
                                 </p>
                             </p>
                             <p style={{ fontSize: '13px' }}>
-                                <b>Calculating the Procurement Surplus/Gap </b>
+                                <b>{i18n.t('static.ForecastSummary.CalculatingProcurement')} </b>
                                 <ul>
                                     <li><img className="formula-img-mr-showGuidance" src={ProjectStockatForecastend} /><br></br></li>
-                                    <li><img className="formula-img-mr-showGuidance" src={DesiredStockatForecasend} /><br></br></li>
+                                    <li><img style={{border:'1px solid #fff',padding:'10px',borderRadius:'5px'}} src={DesiredStockatForecasend} /><br></br></li>
                                     <li><img className="formula-img-mr-showGuidance" src={ProcurementSurplusGap} /><br></br></li>
                                     {/* <li>Project Stock at Forecast end = (Starting Stock) + (Existing Shipments) - (Forecasted Quantity) </li>
             <li>Desired Stock at Forecast end = (Forecasted Quantity) / (Forecast Period) * (Desired Months of Stock) </li>
@@ -3613,17 +3614,17 @@ class ForecastSummary extends Component {
                                 </ul>
                             </p>
                             <p>
-                                For example, a forecast from Jan 2021 to Dec 2023 (36 month forecast)
+                            {i18n.t('static.ForecastSummary.ForExample')}
                                 <table className="table table-bordered ">
                                     <thead>
                                         <tr>
-                                            <th>Total Forecasted Quantity</th>
-                                            <th>Stock(end of Dec 2020)</th>
-                                            <th>Existing Shipments (Jan 2021 - Dec 2023)</th>
-                                            <th>Stock(end of Dec 2023)</th>
-                                            <th>Desired Months of Stock (end of Dec 2023)</th>
-                                            <th>Desired Stock(end of Dec 2023)</th>
-                                            <th>Procurement Surplus/Gap</th>
+                                            <th>{i18n.t('static.ForecastSummary.ForecastedQuantity')}</th>
+                                            <th>{i18n.t('static.ForecastSummary.StockEnd')}</th>
+                                            <th>{i18n.t('static.ForecastSummary.ExistingShipments')}</th>
+                                            <th>{i18n.t('static.ForecastSummary.StockDecEnd')}</th>
+                                            <th>{i18n.t('static.ForecastSummary.DesiredMonthsofStock')}</th>
+                                            <th>{i18n.t('static.ForecastSummary.DesiredStockDec')}</th>
+                                            <th>{i18n.t('static.ForecastSummary.ProcurementSurplusGap')}</th>
 
                                         </tr>
                                     </thead>
@@ -3634,7 +3635,7 @@ class ForecastSummary extends Component {
                                             <td>20,000</td>
                                             <td>5,000 + 20,000 - 360,000 = -335,000</td>
                                             <td>5</td>
-                                            <td>360,000 / 36 * 5 = 50,000</td>
+                                            <td>(360,000 * 5 )/ 36 = 50,000</td>
                                             <td>-335,000 -50,000 = -385,000</td>
 
                                         </tr>
@@ -3642,8 +3643,8 @@ class ForecastSummary extends Component {
                                 </table>
                             </p>
                             <p style={{ fontSize: '13px' }}>
-                                <b>Calculating the Procurement Costs  </b><br></br>
-                                Note: the cost is only calculated if there is a procurement gap, not if there is a surplus
+                                <b>{i18n.t('static.ForecastSummary.ProcurementCosts')}  </b><br></br>
+                                {i18n.t('static.versionSettings.note')} : {i18n.t('static.ForecastSummary.CostCalculated')}
 
                                 <ul>
                                     <li><img className="formula-img-mr-showGuidance1 img-fluid" src={ProductCost} /><br></br></li>
@@ -3655,11 +3656,11 @@ class ForecastSummary extends Component {
                                 </ul>
                             </p>
                             <p>
-                                For the example above, assuming a unit cost of 0.10 USD and a freight % of 7%:
+                            {i18n.t('static.ForecastSummary.AssumingUnitCost')}:
                                 <ul>
-                                    <li>Product Cost = -385,000 * 0.10 = $38,500</li>
-                                    <li>Freight Cost = $38,500 * 7% = $2,695</li>
-                                    <li>Total Cost = $38,500 + $2,695 = $41,195</li>
+                                    <li>{i18n.t('static.ForecastSummary.ProductCost')} = -385,000 * 0.10 = $38,500</li>
+                                    <li>{i18n.t('static.ForecastSummary.FreightCost')} = $38,500 * 7% = $2,695</li>
+                                    <li>{i18n.t('static.ForecastSummary.TotalCost')} = $38,500 + $2,695 = $41,195</li>
                                 </ul>
                             </p>
 

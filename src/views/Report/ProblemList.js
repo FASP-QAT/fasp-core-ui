@@ -598,7 +598,6 @@ export default class ConsumptionDetails extends React.Component {
         problemList = problemList.filter(c => c.planningUnitActive != false && c.regionActive != false);
         // we set this in state becasue we need to use it on modal popup
         this.setState({ problemList: problemList });
-        console.log("problemList====>",problemList);
         let problemArray = [];
         let count = 0;
         for (var j = 0; j < problemList.length; j++) {
@@ -1809,7 +1808,7 @@ export default class ConsumptionDetails extends React.Component {
                             {this.state.showProblemDashboard == 1 && <ProblemListDashboard problemListUnFilttered={this.state.problemReportListUnFiltered} problemCategoryList={this.state.problemCategoryList} problemStatusList={this.state.problemStatusList} />}
 
                             {/* <div className="ProgramListSearch"> */}
-                            <div id="tableDiv" style={{ display: this.state.loading ? "none" : "block" }}>
+                            <div id="tableDiv" className='consumptionDataEntryTable' style={{ display: this.state.loading ? "none" : "block" }}>
                             </div>
                             {/* </div> */}
                         </div>

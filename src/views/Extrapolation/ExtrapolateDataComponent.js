@@ -3934,8 +3934,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                         </Table>
                                                     </div>
                                                 </div>}
-                                            {this.state.dataChanged && this.state.extrapolateClicked && <div className="row float-right mt-lg-3 mr-0 pb-2 pt-2 "> <Button type="submit" id="formSubmitButton" size="md" color="success" className="float-right mr-0" onClick={() => this.touchAllExtrapolation(setTouched, errors, 1)}><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>&nbsp;</div>}
-                                            {this.state.forecastProgramId != "" && this.state.planningUnitId > 0 && this.state.regionId > 0 && <div className="row float-right mt-lg-3 mr-3 pb-2 pt-2 "><Button type="submit" id="extrapolateButton" size="md" color="info" className="float-right mr-1" onClick={() => this.touchAllExtrapolation(setTouched, errors, 0)}><i className="fa fa-check"></i>Extrapolate</Button></div>}
+                                            {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EXTRAPOLATION') && this.state.dataChanged && this.state.extrapolateClicked && <div className="row float-right mt-lg-3 mr-0 pb-2 pt-2 "> <Button type="submit" id="formSubmitButton" size="md" color="success" className="float-right mr-0" onClick={() => this.touchAllExtrapolation(setTouched, errors, 1)}><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>&nbsp;</div>}
+                                            {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EXTRAPOLATION') && this.state.forecastProgramId != "" && this.state.planningUnitId > 0 && this.state.regionId > 0 && <div className="row float-right mt-lg-3 mr-3 pb-2 pt-2 "><Button type="submit" id="extrapolateButton" size="md" color="info" className="float-right mr-1" onClick={() => this.touchAllExtrapolation(setTouched, errors, 0)}><i className="fa fa-check"></i>Extrapolate</Button></div>}
                                             {/* {this.state.showData && <div id="tableDiv" className="extrapolateTable pt-lg-5"></div>} */}
                                             <div className="row" style={{ display: this.state.show ? "block" : "none" }}>
                                                 <div className="col-md-10 pt-4 pb-3">
@@ -3980,107 +3980,106 @@ export default class ExtrapolateDataComponent extends React.Component {
                 <Modal isOpen={this.state.showGuidance}
                     className={'modal-lg ' + this.props.className} >
                     <ModalHeader toggle={() => this.toggleShowGuidance()} className="ModalHead modal-info-Headher">
-                        <strong className="TextWhite">Show Guidance</strong>
+                        <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
                     </ModalHeader>
                     <div>
                         <ModalBody>
                             <div>
-                                <h3 className='ShowGuidanceHeading'>Extrapolation</h3>
+                                <h3 className='ShowGuidanceHeading'>{i18n.t('static.commitTree.extrapolation')}</h3>
                             </div>
                             <p>
-                                <p style={{ fontSize: '13px' }}><span className="UnderLineText">Purpose :</span>Enable users to create a forecast by identifying trends and seasons from historical time series data entered by the user in the '<a href="/#/dataentry/consumptionDataEntryAndAdjustment" target="_blank" style={{ textDecoration: 'underline' }}>Data Entry and Adjustment</a>' screen. Several statistical extrapolation options are available and will be described below. Extrapolations from consumption data are made on a planning unit-by-planning unit basis. </p>
+                                <p style={{ fontSize: '13px' }}><span className="UnderLineText">{i18n.t('static.listTree.purpose')} :</span>{i18n.t('static.extrapolation.EnableUsers')} '<a href="/#/dataentry/consumptionDataEntryAndAdjustment" target="_blank" style={{ textDecoration: 'underline' }}>{i18n.t('static.dashboard.dataEntryAndAdjustments')}</a>' {i18n.t('static.extrapolation.SeveralStatistical')} </p>
                             </p>
                             <p>
-                                <p style={{ fontSize: '13px' }}><span className="UnderLineText">Using this screen :</span></p>
-                                <b>1.Getting started on extrapolation:</b>
+                                <p style={{ fontSize: '13px' }}><span className="UnderLineText">{i18n.t('static.listTree.useThisScreen')} :</span></p>
+                                <b>1.{i18n.t('static.extrapolation.GettingStarted')}:</b>
                                 <ul>
-                                    <li>Before you use this screen, please ensure you have completed the '<a href="/#/dataentry/consumptionDataEntryAndAdjustment" target="_blank" style={{ textDecoration: 'underline' }}>Data entry and Adjustment</a>' screen for each planning unit and region you would like to extrapolate</li>
-                                    <li>Use the filters at the top of this screen to select the planning unit and region to extrapolate. </li>
-                                    <li>Along the left-hand margin are the different extrapolation methods available in QAT. The user may select one -or several, as appropriate to the general consumption pattern and available data as will be discussed below. See sections 3 and 4 below for an explanation of the extrapolation methods and how to best choose methods for your forecast</li>
-                                    <li> Note that changes in this screen are optional - the user makes the final forecast selection in the '<a href="/#/dataentry/consumptionDataEntryAndAdjustment" target="_blank" style={{ textDecoration: 'underline' }}>Compare and select</a>'  screen.
+                                    <li>{i18n.t('static.extrapolation.BeforeYou')} '<a href="/#/dataentry/consumptionDataEntryAndAdjustment" target="_blank" style={{ textDecoration: 'underline' }}>{i18n.t('static.dashboard.dataEntryAndAdjustments')}</a>' {i18n.t('static.extrapolation.EachPlanningUnit')}</li>
+                                    <li>{i18n.t('static.extrapolation.UseFilters')} </li>
+                                    <li>{i18n.t('static.extrapolation.AlongLeftHand')} {i18n.t('static.extrapolation.SeeSections')}</li>
+                                    <li> {i18n.t('static.extrapolation.NoteThatChanges')} '<a href="/#/dataentry/consumptionDataEntryAndAdjustment" target="_blank" style={{ textDecoration: 'underline' }}>{i18n.t('static.dashboard.compareAndSelect')}</a>'  screen.
                                     </li>
                                 </ul>
-                                <b>2.Extrapolation methods available in QAT</b>
-                                <p className="pl-lg-3">Forecast methods in QAT are organized from simple to sophisticated.</p>
+                                <b>2.{i18n.t('static.extrapolation.ExtrapolationMethods')}</b>
+                                <p className="pl-lg-3">{i18n.t('static.extrapolation.ForecastMethods')}</p>
                                 <ol type="a">
-                                    <li><b>Moving Average:</b> Moving average is an average that moves along time, dropping older data as it incorporates newer data. For QAT to calculate the moving average, enter the number months in the past that you would like to use in the calculation of the average. The user may select any positive integer for this field. Entering 5 for example would mean that the projection for the next month in the series would be the average of the preceding five months' average. This method is most useful for short-term forecasts and is sensitive to trends. It is not appropriate for seasonal data</li>
-                                    <li><b>Semi-Averages:</b>Semi-average estimates trends based on two halves of a series. QAT divides the actual data into two equal parts (halves) and the arithmetic mean of the values of each part (half) is calculated as the y values of two points on a line. The slope of the trend line is determined by the difference between these y values over time as defined by the difference of the midpoints of the two halves of the series, or x values, of the points. This method is sensitive to trends and useful for short- and medium-term forecasts but is not appropriate for seasonal data. </li>
-                                    <li><b>Linear Regression:</b> Linear regression models the relationship between two variables by fitting a linear equation to observed data. Confidence interval:  between 0% and 100% (exclusive) e.g. 90% confidence level indicates 90% of possible future points are to fall within this radius from prediction represented by the regression line.  This method is not appropriate for seasonal data.</li>
-                                    <li><b>Triple Exponential Smoothing (Holt-Winters):</b>  Raw data is usually spiky. In statistics, different types of smoothing are used to filter out the noise so that we can see patterns in a time series dataset more clearly. Forecasts using triple exponential smoothing have three parameters. Exponential smoothing uses older data at exponentially decreasing weights over time. Forecasts have parameters. Parameters in exponential smoothing are set between 0 and 1, with values close to 1 favoring recent values and values close to 0 favoring older values. Triple exponential smoothing applies three smoothing parameters:
+                                    <li><b>{i18n.t('static.extrapolation.MovingAverage')}:</b> {i18n.t('static.extrapolation.MovingAverageTextOne')} {i18n.t('static.extrapolation.MovingAverageTextTwo')} {i18n.t('static.extrapolation.MovingAverageTextThree')}</li>
+                                    <li><b>{i18n.t('static.extrapolation.SemiAverages')}:</b>{i18n.t('static.extrapolation.SemiAveragesTextOne')} {i18n.t('static.extrapolation.SemiAveragesTextTwo')} {i18n.t('static.extrapolation.SemiAveragesTextThree')} </li>
+                                    <li><b>{i18n.t('static.extrapolation.LinearRegression')}:</b> {i18n.t('static.extrapolation.LinearRegressionTextOne')} :  {i18n.t('static.extrapolation.LinearRegressionTextTwo')}</li>
+                                    <li><b>{i18n.t('static.extrapolation.TripleExponential')}:</b>  {i18n.t('static.extrapolation.TripleExponentialTextOne')} {i18n.t('static.extrapolation.TripleExponentialTextTwo')} {i18n.t('static.extrapolation.TripleExponentialTextThree')} :
                                         <ul>
-                                            <li>alpha, applies to the level or baseline of the dataset. Higher alpha values give more weight to the more recent data</li>
-                                            <li>beta, determines how strongly recent trends should be valued as compared to older trends</li>
-                                            <li>gamma, reflects the seasonal component of the forecast. Seasonal generally refers to repeating patterns within a year. The higher the gamma, the more weight will be applied to the most recent seasonal component of the data.</li>
-                                            <li>Seasonality: In QAT, a season can be described as the expected length (in months) of any repetitive pattern in the consumption</li>
-                                            <li>Confidence interval:  between 0% and 100% (exclusive) e.g. 90% confidence level indicates 90% of future points are to fall within this radius from prediction.</li>
+                                            <li>{i18n.t('static.extrapolation.alpha')}</li>
+                                            <li>{i18n.t('static.extrapolation.beta')}</li>
+                                            <li>{i18n.t('static.extrapolation.gamma')}</li>
+                                            <li>{i18n.t('static.extrapolation.Seasonality')}: {i18n.t('static.extrapolation.SeasonalityText')}</li>
+                                            <li>{i18n.t('static.extrapolation.ConfidenceInterval')}:  {i18n.t('static.extrapolation.ConfidenceIntervalText')}</li>
                                         </ul>
-                                        <li><b>ARIMA:</b> ARIMA modeling enables two statistical models designed for stationary time series to be integrated and applied to non-stationary time series, that is, time series that have trends or seasons. It is often applied to short term forecasts. "Auto-regressive" means each point in the regression is influenced by its previous values and "moving average" implies that each point is an average, a linear combination of one or more adjacent points. Both the auto-regression and the moving average are "integrated" together to fit a best model for the series through differencing, or literally using the difference between points on a time series for the analysis instead of the raw values. ARIMA models have three parameters:
+                                        <li><b>{i18n.t('static.extrapolation.ARIMA')}:</b> {i18n.t('static.extrapolation.ARIMATextOne')} {i18n.t('static.extrapolation.ARIMATextTwo')} {i18n.t('static.extrapolation.ARIMATextThree')}:
                                             <ul>
-                                                <li>p or AR (lag order): the number of lag observations in the model</li>
-                                                <li>d or I (degree of differencing): the number of times that the raw observations are differenced.  This value is normally 1 (if there is a trend) or 0 (no trend).  Other higher values are possible but not expected.</li>
-                                                <li>q or MA (order of the moving average): the size of the moving average window or the number of differenced observations to be averaged.</li><br></br>
-                                                <p>Many programs use default values for ARIMA parameters. SAP, for example uses 0.2 for alpha, 0.1 for beta and 0,3 for gamma. <br></br>
+                                                <li>{i18n.t('static.extrapolation.LagOrder')}: {i18n.t('static.extrapolation.LagOrderText')}</li>
+                                                <li>{i18n.t('static.extrapolation.DegreeOfDifferencing')}: {i18n.t('static.extrapolation.DegreeOfDifferencingText')}</li>
+                                                <li>{i18n.t('static.extrapolation.OrderMovingAverage')}: {i18n.t('static.extrapolation.OrderMovingAverageText')}</li><br></br>
+                                                <p>{i18n.t('static.extrapolation.ManyPrograms')} <br></br>
 
-                                                    Confidence interval:  between 0% and 100% (exclusive) e.g. 90% confidence level indicates 90% of future points are to fall within this radius from prediction.</p>
+                                                {i18n.t('static.extrapolation.ConfidenceInterval')}: {i18n.t('static.extrapolation.ConfidenceIntervalText')}</p>
                                             </ul>
                                         </li>
                                     </li>
                                 </ol>
-                                <b>3.Which extrapolation method should I use?</b>
-                                <p className="pl-lg-3">Below are some considerations for selecting a forecast method. Forecast methods in QAT are organized from simple to sophisticated. In general,
+                                <b>3.{i18n.t('static.extrapolation.WhichExtrapolation')}</b>
+                                <p className="pl-lg-3">{i18n.t('static.extrapolation.Considerations')}
                                     <ul>
-                                        <li>More sophisticated models are more sensitive to problems in the data </li>
-                                        <li>If you have poorer data (missing data points, variable reporting rates, <i class="fa fa-angle-left" aria-hidden="true">12</i> months of data), simpler forecast methods are recommended</li>
+                                        <li>{i18n.t('static.extrapolation.MoreSophisticated')} </li>
+                                        <li>{i18n.t('static.extrapolation.PoorerData')} <i class="fa fa-angle-left" aria-hidden="true">12</i> {i18n.t('static.extrapolation.MonthsOfData')}</li>
                                     </ul>
                                 </p>
-                                <p className="pl-lg-3">The choice of extrapolation method depends on the expected pattern in the data. Some typical patterns include:
+                                <p className="pl-lg-3">{i18n.t('static.extrapolation.ChoiceOfExtrapolation')}:
                                     <ul>
-                                        <li>Stationary, where the range of observed values over time hover around an average. Models applied to such datasets may include
+                                        <li>{i18n.t('static.extrapolation.RangeOfObserved')}
                                             <ul>
-                                                <li>Moving Average</li>
-                                                <li>Single Exponential Smoothing</li>
-                                                <li>ARIMA</li>
+                                                <li>{i18n.t('static.extrapolation.MovingAverage')}</li>
+                                                <li>{i18n.t('static.extrapolation.ExponentialSmoothing')}</li>
+                                                <li>{i18n.t('static.extrapolation.ARIMA')}</li>
                                             </ul>
                                         </li>
                                         <li>
-                                            Trending with no seasonal component, where the observed values have an increasing or decreasing trend. Models applied to such datasets may include
+                                        {i18n.t('static.extrapolation.Trending')}
                                             <ul>
-                                                <li>Semi-averages projection</li>
-                                                <li>Simple Linear Regression</li>
+                                                <li>{i18n.t('static.extrapolation.SemiAveragesProjection')}</li>
+                                                <li>{i18n.t('static.extrapolation.SimpleLinear')}</li>
                                             </ul>
                                         </li>
-                                        <li>Trending and Seasonal, where the observed values in a dataset have both trend and seasonal components. Models applied to such datasets may include
+                                        <li>{i18n.t('static.extrapolation.TrendingSeasonal')}
                                             <ul>
-                                                <li>Seasonal ARIMA Model</li>
-                                                <li>Winters Exponential Smoothing</li>
+                                                <li>{i18n.t('static.extrapolation.ARIMAModel')}</li>
+                                                <li>{i18n.t('static.extrapolation.WintersExponential')}</li>
                                             </ul>
                                         </li>
-                                        <li>Seasonal without trend, where the observed values have a seasonal component but no trend. Models applied to such datasets may include
+                                        <li>{i18n.t('static.extrapolation.SeasonalWithout')}
                                             <ul>
-                                                <li>Holt-Winters Multiplicative Model Without Trend
-                                                    The models suggested here are neither exhaustive nor exclusive. QAT enables the user to apply a variety of extrapolation methods and then to compare them using best fit or forecast error metrics.</li><br></br>
+                                                <li>{i18n.t('static.extrapolation.Multiplicative')}</li><br></br>
 
-                                                <p>The second step is to consider whether the forecast values are expected to reflect closely the historical patterns in your data and so whether you will use the error metrics to inform your selection. However, when choosing to disregard the error metric, it will be important to document your rationale for doing so to inform discussions or reviews of your forecast and to help future forecasters to support their decisions. </p>
+                                                <p>{i18n.t('static.extrapolation.SecondStep')} {i18n.t('static.extrapolation.ChoosingToDisregard')} </p>
                                             </ul>
                                         </li>
                                     </ul>
                                 </p>
-                                <b>4.How do I interpret errors?</b>
-                                <p className="pl-lg-3">QAT automatically calculates forecast error metrics using several methods. These include:
+                                <b>4.{i18n.t('static.extrapolation.InterpretErrors')}</b>
+                                <p className="pl-lg-3">{i18n.t('static.extrapolation.AutomaticallyCalculates')}:
                                     <ul>
-                                        <li>MAPE (Mean Absolute Percentage Error)</li>
-                                        <li>WAPE (Weighted Absolute Percentage Error)</li>
-                                        <li>RMSE (Root Mean Squared Error)</li>
-                                        <li>MAE (Mean Absolute Error)<br></br>
-                                            In general, the lower the error score, the more closely the forecast method result fits the historical data. In models where historical patterns in a data set are expected to be reflected in the future values, a low error value could be used to help select a preferred extrapolation method, and QAT will highlight these best fits in a table. However, if substantial changes are anticipated, the best fit extrapolation may not be the forecast the user selects.
+                                        <li>{i18n.t('static.extrapolation.MAPE')}</li>
+                                        <li>{i18n.t('static.extrapolation.WAPE')}</li>
+                                        <li>{i18n.t('static.extrapolation.RMSE')}</li>
+                                        <li>{i18n.t('static.extrapolation.MAE')}<br></br>
+                                        {i18n.t('static.extrapolation.LowerTheError')} {i18n.t('static.extrapolation.LowErrorValue')} 
                                         </li>
                                         <p>
-                                            To make the best selection between extrapolation methods for your purpose, the most important thing is first understanding which method of extrapolation is most appropriate for the expected pattern in the data. Forecast methods in QAT are organized from simple to sophisticated. In general,
+                                        {i18n.t('static.extrapolation.SelectionBetween')} {i18n.t('static.extrapolation.Organized')}
                                             <ul>
-                                                <li>More sophisticated models are more sensitive to problems in the data </li>
-                                                <li>If you have poorer data (missing data points, variable reporting rates, <i class="fa fa-angle-left" aria-hidden="true">12</i> months of data), simpler forecast methods are recommended
+                                                <li>{i18n.t('static.extrapolation.MoreSensitive')} </li>
+                                                <li>{i18n.t('static.extrapolation.PoorerData')} <i class="fa fa-angle-left" aria-hidden="true">12</i> {i18n.t('static.extrapolation.MonthsOfData')} 
                                                     <br></br>
-                                                    The second step is to consider whether the forecast values are expected to reflect closely the historical patterns in your data and so whether you will use the error metrics to inform your selection. However, when choosing to disregard the error metric, it will be important to document your rationale for doing so to inform discussions or reviews of your forecast and to help future forecasters to support their decisions.
+                                                    {i18n.t('static.extrapolation.SecondStep')} {i18n.t('static.extrapolation.ChoosingToDisregard')} 
                                                 </li>
                                             </ul>
                                         </p>
@@ -4094,10 +4093,10 @@ export default class ExtrapolateDataComponent extends React.Component {
                                 If you have poorer data (missing data points, variable reporting rates, less than 12 months of data), use simpler forecast methods
                             </p> */}
                             <p>
-                                <b>NOTE:  You have {this.state.planningUnitId > 0 && this.state.regionId > 0 ? this.state.actualConsumptionList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId).length : 0} months of acutal consumption data. The minimum values needed for the various features are below: <br></br>
-                                    <span className="ml-lg-5">* TES, Holt-Winters: At least 24 months of actual consumption data<br></br></span>
-                                    <span className="ml-lg-5">* ARIMA:  At least 14 months of actual consumption data<br></br></span>
-                                    <span className="ml-lg-5">* Moving Average, Semi-Averages, and Linear Regression: At least 3 months of actual consumption data</span>
+                                <b>{i18n.t('static.versionSettings.note')} :  {i18n.t('static.extrapolation.YouHave')} {this.state.planningUnitId > 0 && this.state.regionId > 0 ? this.state.actualConsumptionList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId).length : 0} {i18n.t('static.extrapolation.MinimumValues')}: <br></br>
+                                    <span className="ml-lg-5">* {i18n.t('static.extrapolation.TESHoltWinters')}: {i18n.t('static.extrapolation.LeastMonths')}<br></br></span>
+                                    <span className="ml-lg-5">* {i18n.t('static.extrapolation.ARIMA')}:  {i18n.t('static.extrapolation.LeastFourteenMonths')}<br></br></span>
+                                    <span className="ml-lg-5">* {i18n.t('static.extrapolation.MASALR')}: {i18n.t('static.extrapolation.LeastThreeMonths')}</span>
                                 </b>
                             </p>
                         </ModalBody>
