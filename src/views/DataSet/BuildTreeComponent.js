@@ -536,8 +536,8 @@ export default class BuildTree extends Component {
         this.pickAMonth5 = React.createRef()
         this.state = {
             isValidError: '',
-            isScenarioChanged:false,
-            isTreeDataChanged : false,
+            isScenarioChanged: false,
+            isTreeDataChanged: false,
             percentForOneMonth: '',
             popoverOpenStartValueModelingTool: false,
             showGuidanceModelingTransfer: false,
@@ -624,7 +624,7 @@ export default class BuildTree extends Component {
             currentTargetChangeNumberEdit: false,
             currentRowIndex: '',
             currentEndValue: '',
-            currentTransferData : '',
+            currentTransferData: '',
             currentEndValueEdit: false,
             momListPer: [],
             modelingTypeList: [],
@@ -5686,26 +5686,30 @@ export default class BuildTree extends Component {
         var scenarioId = this.state.selectedScenario;
         var repeatUsagePeriodId;
         var oneTimeUsage;
+        console.log("2023 error---", this.state.currentItemConfig.context);
         if (nodeTypeId == 5) {
             usageTypeId = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.usageType.id;
-            console.log("usageTypeId---", usageTypeId);
+            console.log("usageTypeId 5---", usageTypeId);
             usagePeriodId = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.usagePeriod.usagePeriodId;
-            console.log("usagePeriodId---", usagePeriodId);
+            console.log("usagePeriodId 5---", usagePeriodId);
             usageFrequency = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.usageFrequency;
-            console.log("usageFrequency---", usageFrequency);
+            console.log("usageFrequency 5---", usageFrequency);
             if (usageTypeId == 1) {
                 oneTimeUsage = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.oneTimeUsage;
             }
         } else {
             usageTypeId = (this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.usageType.id;
-            console.log("usageTypeId---", usageTypeId);
-            usagePeriodId = (this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.usagePeriod.usagePeriodId;
-            console.log("usagePeriodId---", usagePeriodId);
-            usageFrequency = (this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.usageFrequency;
-            console.log("usageFrequency---", usageFrequency);
+            console.log("usageTypeId 4---", usageTypeId);
             if (usageTypeId == 1) {
                 oneTimeUsage = (this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.oneTimeUsage;
             }
+            if (usageTypeId == 2 || (oneTimeUsage != null && oneTimeUsage != "" && oneTimeUsage.toString() == "false")) {
+                usagePeriodId = (this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.usagePeriod.usagePeriodId;
+                console.log("usagePeriodId 4---", usagePeriodId);
+            }
+            usageFrequency = (this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.usageFrequency;
+            console.log("usageFrequency 4---", usageFrequency);
+
         }
         console.log("usagePeriodId dis---", usagePeriodId);
         var noOfMonthsInUsagePeriod = 0;
@@ -6986,7 +6990,7 @@ export default class BuildTree extends Component {
             console.log("currentItemConfig before tc---", currentItemConfig);
             var fuNode = (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode;
 
-            currentItemConfig.context.payload.nodeDataMap[scenarioId][0].fuNode.forecastingUnit.tracerCategory.id = event.target.value;        
+            currentItemConfig.context.payload.nodeDataMap[scenarioId][0].fuNode.forecastingUnit.tracerCategory.id = event.target.value;
             this.filterUsageTemplateList(event.target.value);
         }
 
@@ -8994,7 +8998,7 @@ export default class BuildTree extends Component {
                                                             id="usagePeriodIdDis"
                                                             name="usagePeriodIdDis"
                                                             bsSize="sm"
-                                                            valid={!errors.usagePeriodIdDis && (this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentScenario.fuNode.usagePeriod.usagePeriodId != "" : false)}
+                                                            valid={!errors.usagePeriodIdDis && (this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentScenario.fuNode.usagePeriod != null && this.state.currentScenario.fuNode.usagePeriod.usagePeriodId != "" : false)}
                                                             invalid={touched.usagePeriodIdDis && !!errors.usagePeriodIdDis}
                                                             onBlur={handleBlur}
                                                             onChange={(e) => {
@@ -9002,7 +9006,7 @@ export default class BuildTree extends Component {
                                                                 this.dataChange(e)
                                                             }}
                                                             required
-                                                            value={this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentScenario.fuNode.usageType.id == 1 && this.state.currentScenario.fuNode.oneTimeUsage != "true" ? this.state.currentScenario.fuNode.usagePeriod.usagePeriodId : ""}
+                                                            value={this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentScenario.fuNode.usageType.id == 1 && this.state.currentScenario.fuNode.oneTimeUsage != "true" ? this.state.currentScenario.fuNode.usagePeriod != null && this.state.currentScenario.fuNode.usagePeriod.usagePeriodId : ""}
                                                         >
                                                             <option value="">{i18n.t('static.common.select')}</option>
                                                             {this.state.usagePeriodList.length > 0
@@ -9095,7 +9099,7 @@ export default class BuildTree extends Component {
                                                         id="usagePeriodIdCon"
                                                         name="usagePeriodIdCon"
                                                         bsSize="sm"
-                                                        valid={!errors.usagePeriodIdCon && (this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentScenario.fuNode.usagePeriod.usagePeriodId != "" : false)}
+                                                        valid={!errors.usagePeriodIdCon && (this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentScenario.fuNode.usagePeriod != null && this.state.currentScenario.fuNode.usagePeriod.usagePeriodId != "" : false)}
                                                         invalid={touched.usagePeriodIdCon && !!errors.usagePeriodIdCon}
                                                         onBlur={handleBlur}
                                                         onChange={(e) => {
@@ -9233,32 +9237,32 @@ export default class BuildTree extends Component {
                     </div>
                     <div className="row pl-lg-2 pr-lg-2">
                         <div style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 1 ? "none" : "block" }}>
-                        <div className="row pl-lg-2 pr-lg-2">
-                            <div>
-                                <Popover placement="top" isOpen={this.state.popoverOpenMonth} target="Popover24" trigger="hover" toggle={this.toggleMonth}>
-                                    <PopoverBody>{i18n.t('static.tooltip.ModelingTransferMonth')}</PopoverBody>
-                                </Popover>
+                            <div className="row pl-lg-2 pr-lg-2">
+                                <div>
+                                    <Popover placement="top" isOpen={this.state.popoverOpenMonth} target="Popover24" trigger="hover" toggle={this.toggleMonth}>
+                                        <PopoverBody>{i18n.t('static.tooltip.ModelingTransferMonth')}</PopoverBody>
+                                    </Popover>
+                                </div>
+                                {/* <div className='row'> */}
+                                <FormGroup className="col-md-2 pt-lg-1">
+                                    <Label htmlFor="">{i18n.t('static.common.month')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover24" onClick={this.toggleMonth} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                </FormGroup>
+                                <FormGroup className="col-md-8 pl-lg-0 ModTransferMonthPickerWidth">
+                                    <Picker
+                                        ref={this.pickAMonth2}
+                                        years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                        value={this.state.scalingMonth}
+                                        key={JSON.stringify(this.state.scalingMonth)}
+                                        lang={pickerLang.months}
+                                        onChange={this.handleAMonthChange2}
+                                        onDismiss={this.handleAMonthDissmis2}
+                                    >
+                                        <MonthBox value={this.makeText(this.state.scalingMonth)}
+                                            onClick={this.handleClickMonthBox2} />
+                                    </Picker>
+                                </FormGroup>
+                                {/* </div> */}
                             </div>
-                            {/* <div className='row'> */}
-                            <FormGroup className="col-md-2 pt-lg-1">
-                                <Label htmlFor="">{i18n.t('static.common.month')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover24" onClick={this.toggleMonth} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
-                            </FormGroup>
-                            <FormGroup className="col-md-8 pl-lg-0 ModTransferMonthPickerWidth">
-                                <Picker
-                                    ref={this.pickAMonth2}
-                                    years={{ min: this.state.minDate, max: this.state.maxDate }}
-                                    value={this.state.scalingMonth}
-                                    key={JSON.stringify(this.state.scalingMonth)}
-                                    lang={pickerLang.months}
-                                    onChange={this.handleAMonthChange2}
-                                    onDismiss={this.handleAMonthDissmis2}
-                                >
-                                    <MonthBox value={this.makeText(this.state.scalingMonth)}
-                                        onClick={this.handleClickMonthBox2} />
-                                </Picker>
-                            </FormGroup>
-                            {/* </div> */}
-                        </div>
                         </div>
                         <div className="col-md-12">
                             {this.state.showModelingJexcelNumber &&
@@ -11136,11 +11140,15 @@ export default class BuildTree extends Component {
                                 <li>The order of operations for calculating a transfer occurs from the left to the right in the forecast tree. A transfer cannot be made from right to left, thus a user should be careful when designing their tree and determining where each node should be placed. </li>
                                 <li>Transfers are always negative from the source node and positive to the destination node.</li> */}
                                 <li>{i18n.t('static.ModelingTransfer.NumberNode')}</li>
-                                <li>{i18n.t('static.ModelingTransfer.PercentageFUPU')}</li>
+                                <li>Percentage nodes can only transfer to other percentage nodes and must belong to the same parent. </li>
+                                <li>The order of operations for calculating a transfer occurs from the left to the right in the forecast tree. A transfer cannot be made from right to left, thus a user should be careful when designing their tree and determining where each node should be placed. </li>
+                                <li>Transfers are always negative from the source node and positive to the destination node. </li>
+                                <li>Extrapolation is not allowed on a node that also has a transfer, whether that be to/from another node. </li>
+                                {/* <li>{i18n.t('static.ModelingTransfer.PercentageFUPU')}</li> */}
                                 {/* <li>{i18n.t('static.ModelingTransfer.DataTransferred')}</li> */}
-                                <li>{i18n.t('static.ModelingTransfer.OrderOfOperations')}</li>
+                                {/* <li>{i18n.t('static.ModelingTransfer.OrderOfOperations')}</li>
                                 <li>{i18n.t('static.ModelingTransfer.TransferDestination')}</li>
-                                <li>{i18n.t('static.ModelingTransfer.ExtrapolationNotAllowed')}</li>
+                                <li>{i18n.t('static.ModelingTransfer.ExtrapolationNotAllowed')}</li> */}
                             </ul>
                         </p>
                         <p><span style={{ fontSize: '14px' }} className="UnderLineText">{i18n.t('static.ModelingTransfer.Examples')} :</span>
@@ -11158,14 +11166,16 @@ export default class BuildTree extends Component {
                                     <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0" src={ModelingTransferScreenshot3} style={{ border: '1px solid #fff' }} /></span>
                                 </li>
                                 <li><b>{i18n.t('static.ModelingTransfer.SimpleGrowth')}</b> {i18n.t('static.ModelingTransfer.SimpleGrowthExponential')} 
+                                    
+                                    <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0 ml-lg-2" src={ModelingTransferScreenshot4} style={{ border: '1px solid #fff' }} /></span>
                                     <ul>
                                         <li>{i18n.t('static.ModelingTransfer.calculatesJanMonth')} </li>
                                         <li>{i18n.t('static.ModelingTransfer.calculatesFebMonth')} </li>
                                         <li>{i18n.t('static.ModelingTransfer.calculatesMarMonth')}  </li>
                                     </ul>
 
-                                    <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0 ml-lg-2" src={ModelingTransferScreenshot4} style={{ border: '1px solid #fff' }} /></span>
                                 </li>
+                                <br></br>
                                 <li><b>{i18n.t('static.ModelingTransfer.MultiYearLoss')}</b> - {i18n.t('static.ModelingTransfer.MultiYearLossText')} 
                                     <br></br>
                                     <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0 ml-lg-2" src={ModelingTransferScreenshot5} style={{ border: '1px solid #fff' }} /></span>
@@ -11243,7 +11253,7 @@ export default class BuildTree extends Component {
                         </p>
 
                         <p><span style={{ fontSize: '14px', fontWeight: 'bold' }}>{i18n.t('static.ManageTree.ChangesOverTime')}</span><br></br>
-                        {i18n.t('static.NodeData.TreeStructure')}:
+                            {i18n.t('static.NodeData.TreeStructure')}:
                             <ul>
                                 <li><b>{i18n.t('static.NodeData.ModelingTransferTab')}</b> </li>
                                 <ul>
@@ -11259,7 +11269,7 @@ export default class BuildTree extends Component {
                         </p>
 
                         <p><span style={{ fontSize: '14px', fontWeight: 'bold' }}>{i18n.t('static.ManageTree.UsingScenarios')} :</span>
-                        {i18n.t('static.NodeData.ScenariosSameTree')}
+                            {i18n.t('static.NodeData.ScenariosSameTree')}
                             <div className='pl-lg-4 pr-lg-4 pt-lg-4'>
                                 <table className="table table-bordered ">
                                     <thead>
@@ -11390,7 +11400,7 @@ export default class BuildTree extends Component {
                         </p>
 
                         <p><span style={{ fontSize: '14px', fontWeight: 'bold' }}>{i18n.t('static.ManageTree.ChangesOverTime')}</span><br></br>
-                        {i18n.t('static.ManageTree.TreeStructure')} :
+                            {i18n.t('static.ManageTree.TreeStructure')} :
                             <ul>
                                 <li><b><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i> {i18n.t('static.ManageTree.Modeling')}:</b> {i18n.t('static.ManageTree.RateOfChange')}</li>
                                 <li><b><i className='fa fa-link'></i> {i18n.t('static.ManageTree.Transfer')}:</b> {i18n.t('static.ManageTree.AllowsUsersTransfer')}</li>
@@ -11399,7 +11409,7 @@ export default class BuildTree extends Component {
                         </p>
 
                         <p><span style={{ fontSize: '14px', fontWeight: 'bold' }}>{i18n.t('static.ManageTree.UsingScenarios')} :</span><br></br>
-                        {i18n.t('static.ManageTree.ScenariosModel')} <i class="fa fa-cog" aria-hidden="true"></i> {i18n.t('static.ManageTree.IconScenario')}.
+                            {i18n.t('static.ManageTree.ScenariosModel')} <i class="fa fa-cog" aria-hidden="true"></i> {i18n.t('static.ManageTree.IconScenario')}.
                             <div className='pl-lg-4 pr-lg-4 pt-lg-4'>
                                 <table className="table table-bordered ">
                                     <thead>

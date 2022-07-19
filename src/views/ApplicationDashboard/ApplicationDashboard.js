@@ -273,7 +273,7 @@ class ApplicationDashboard extends Component {
 
     // console.log(">>>", changed);
     confirmAlert({
-      title: i18n.t('static.program.confirmsubmit'),
+      title: i18n.t('static.program.confirm'),
       message: "Delete this program",
       buttons: [
         {
@@ -340,7 +340,7 @@ class ApplicationDashboard extends Component {
   deleteProgram(programId, versionId) {
     // console.log(">>>", changed);
     confirmAlert({
-      title: i18n.t('static.program.confirmsubmit'),
+      title: i18n.t('static.program.confirm'),
       message: "Delete this program",
       buttons: [
         {
