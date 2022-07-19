@@ -1963,6 +1963,7 @@ export default class PlanningUnitSetting extends Component {
             let selectedForecastProgram = this.state.datasetList.filter(c => c.programId == this.state.forecastProgramId && c.versionId == this.state.forecastProgramVersionId)[0];
             console.log("selectedForecastProgram---------->", selectedForecastProgram);
             let planningUnitList = selectedForecastProgram.planningUnitList;
+            console.log("planningUnitList---------->", planningUnitList);
             planningUnitList.sort((a, b) => {
                 var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
                 var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
@@ -2643,12 +2644,12 @@ export default class PlanningUnitSetting extends Component {
                             "unit": planningUnitObj.unit,
                             "multiplier": planningUnitObj.multiplier,
                             "forecastingUnit": {
-                                "id": planningUnitObj.forecastingUnit.forecastingUnitId,
+                                "id": planningUnitObj.forecastingUnit.id,
                                 "label": planningUnitObj.forecastingUnit.label,
                                 "unit": planningUnitObj.forecastingUnit.unit,
                                 "productCategory": planningUnitObj.forecastingUnit.productCategory,
                                 "tracerCategory": planningUnitObj.forecastingUnit.tracerCategory,
-                                "idString": "" + planningUnitObj.forecastingUnit.forecastingUnitId
+                                "idString": "" + planningUnitObj.forecastingUnit.id
                             },
                             "idString": "" + parseInt(map1.get("1"))
                         },
@@ -2692,12 +2693,12 @@ export default class PlanningUnitSetting extends Component {
                             "unit": planningUnitObj.unit,
                             "multiplier": planningUnitObj.multiplier,
                             "forecastingUnit": {
-                                "id": planningUnitObj.forecastingUnit.forecastingUnitId,
+                                "id": planningUnitObj.forecastingUnit.id,
                                 "label": planningUnitObj.forecastingUnit.label,
                                 "unit": planningUnitObj.forecastingUnit.unit,
                                 "productCategory": planningUnitObj.forecastingUnit.productCategory,
                                 "tracerCategory": planningUnitObj.forecastingUnit.tracerCategory,
-                                "idString": "" + planningUnitObj.forecastingUnit.forecastingUnitId
+                                "idString": "" + planningUnitObj.forecastingUnit.id
                             },
                             "idString": "" + parseInt(map1.get("1"))
                         },

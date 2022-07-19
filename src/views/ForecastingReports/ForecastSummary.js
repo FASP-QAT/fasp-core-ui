@@ -3617,7 +3617,7 @@ class ForecastSummary extends Component {
                                 <b>{i18n.t('static.ForecastSummary.CalculatingProcurement')} </b>
                                 <ul>
                                     <li><img className="formula-img-mr-showGuidance" src={ProjectStockatForecastend} /><br></br></li>
-                                    <li><img className="formula-img-mr-showGuidance" src={DesiredStockatForecasend} /><br></br></li>
+                                    <li><img style={{border:'1px solid #fff',padding:'10px',borderRadius:'5px'}} src={DesiredStockatForecasend} /><br></br></li>
                                     <li><img className="formula-img-mr-showGuidance" src={ProcurementSurplusGap} /><br></br></li>
                                     {/* <li>Project Stock at Forecast end = (Starting Stock) + (Existing Shipments) - (Forecasted Quantity) </li>
             <li>Desired Stock at Forecast end = (Forecasted Quantity) / (Forecast Period) * (Desired Months of Stock) </li>

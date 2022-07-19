@@ -2950,6 +2950,7 @@ class EquivalancyUnit extends Component {
                     </CardFooter>
 
                     <Modal isOpen={this.state.showGuidance}
+<<<<<<< HEAD
                         className={'modal-lg ' + this.props.className} >
                         <ModalHeader toggle={() => this.toggleShowGuidance()} className="ModalHead modal-info-Headher">
                             <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
@@ -3063,6 +3064,122 @@ class EquivalancyUnit extends Component {
                             </ModalBody>
                         </div>
                     </Modal>
+=======
+className={'modal-lg ' + this.props.className} >
+<ModalHeader toggle={() => this.toggleShowGuidance()} className="ModalHead modal-info-Headher">
+    <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
+</ModalHeader>
+<div>
+    <ModalBody>
+       <div>
+           <h3 className='ShowGuidanceHeading'>{i18n.t('static.equivalancyUnit.equivalancyUnits')}</h3>
+       </div>
+        <p>
+            <p style={{fontSize:'13px'}}><span className="UnderLineText">{i18n.t('static.listTree.purpose')} :</span> {i18n.t('static.equivalancyUnit.EnableUser')}
+            </p>
+        </p>
+        <p style={{fontSize:'13px'}}>
+            <p style={{fontSize:'13px'}}><span className="UnderLineText">{i18n.t('static.listTree.useThisScreen')}:</span><br></br>
+            <b>{i18n.t('static.equivalancyUnit.MappingEquivalency')}</b><br></br>
+            {i18n.t('static.equivalancyUnit.ManageMappings')} {i18n.t('static.equivalancyUnit.ProgramAdmins')}
+            </p>
+        </p>
+        <p>
+        {i18n.t('static.equivalancyUnit.ForecastingMedicines')}
+        <table className="table table-bordered ">
+                                <thead>
+                                <tr>
+                                    <th>Equivalency Unit</th>
+                                    <th>Forecasting Unit</th>
+                                    <th>Conversion to EU</th>
+                                    <th style={{width:'150px'}}>Average Treatment required to cure QATitis</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>1 Treatment for QATitis </td>
+                                    <td>1 tablet of FASPicillin</td>
+                                    <td>14</td>
+                                    <td>1 tablet a day for 2 weeks</td>
+                                </tr>
+                                <tr>
+                                    <td>1 Treatment for QATitis </td>
+                                    <td>5mL tube of FASPasone (cream)</td>
+                                    <td>1</td>
+                                    <td>0.5mL/day applied on the forehead over 10 days (1 tube total)</td>
+                                </tr>
+                                <tr>
+                                    <td>1 Treatment for QATitis </td>
+                                    <td>2mL vial of FASPicaine (injection)</td>
+                                    <td>0.5</td>
+                                    <td>One injection of 1mL (Two people can share one vial)</td>
+                                </tr>
+                                <tr>
+                                    <td>1 Treatment for QATitis </td>
+                                    <td>1 bar of white chocolate</td>
+                                    <td>2</td>
+                                    <td rowspan="3">2 bars of chocolate. The type of chocolate does not matter, as all chocolate contains the natural form of FASPicillin.  </td>
+                                </tr>
+                                <tr>
+                                    <td>1 Treatment for QATitis  </td>
+                                    <td>1 bar of dark chocolate</td>
+                                    <td>2</td>
+                                    
+                                </tr>
+                                <tr>
+                                    <td>1 Treatment for QATitis </td>
+                                    <td>1 bar of milk chocolate</td>
+                                    <td>2</td>
+                                    
+                                </tr>
+                                </tbody>
+                                </table>
+        </p>
+        <p style={{fontSize:'13px'}}>
+        <b>{i18n.t('static.equivalancyUnit.CreatingManaging')}  </b><br></br>
+        {i18n.t('static.equivalancyUnit.ExistingEquivalency')}
+         </p>
+        <p>
+        <b>{i18n.t('static.equivalancyUnit.EquivalencyUsed')}</b>
+        <ul>
+            <li>{i18n.t('static.equivalancyUnit.InThe')} Forecasting Module '<a href="/#/report/compareAndSelectScenario" target="_blank" style={{textDecoration:'underline'}}>{i18n.t('static.dashboard.compareAndSelect')}</a>' {i18n.t('static.equivalancyUnit.ForecastsInEUs')} {i18n.t('static.equivalancyUnit.DisplayTheirForecast')} </li>
+            <li>{i18n.t('static.equivalancyUnit.InThe')} Forecasting Module '<a href="/#/forecastReport/forecastOutput" target="_blank" style={{textDecoration:'underline'}}>{i18n.t('static.dashboard.monthlyForecast')}</a>' {i18n.t('static.equivalancyUnit.SelectedForecasts')} {i18n.t('static.equivalancyUnit.UserForecasted')}</li>
+            <li>In the Supply Planning Module '<a href="/#/report/consumptionForecastErrorSupplyPlan" target="_blank" style={{textDecoration:'underline'}}>Forecast Error (Monthly)</a> Report'  screen, users can also view the actual and forecasted consumption in Equivalency Units. </li>
+        </ul>
+        </p>
+        <p>
+        <table className="table table-bordered ">
+                                <thead>
+                                <tr>
+                                    <th>Forecast</th>
+                                    <th>Equivalent in "Treatments for QATitis"</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>10,000 bars of dark chocolate </td>
+                                    <td style={{textAlign:'center'}}>5,000</td>
+                                </tr>
+                                <tr>
+                                    <td>10,000 bars of white chocolate </td>
+                                    <td style={{textAlign:'center'}}>5,000</td>
+                                </tr>
+                                <tr>
+                                    <td>14,000 tablets of FASPicillin </td>
+                                    <td style={{textAlign:'center'}}>1,000</td>
+                                </tr>
+                                <tr>
+                                    <td style={{textAlign:'right',borderLeft:'1px solid #fff',borderBottom:'1px solid #fff'}}><b>Total</b></td>
+                                    <td style={{textAlign:'center'}}><b>7,000</b></td>
+                                </tr>
+                                </tbody>
+                                </table>
+        </p>
+
+    </ModalBody>
+</div>
+</Modal>
+>>>>>>> devMod2
 
                     <Modal isOpen={this.state.isModalOpen}
                         className={'modal-lg ' + this.props.className, "modalWidth"}>

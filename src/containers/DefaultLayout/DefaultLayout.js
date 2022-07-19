@@ -2072,12 +2072,12 @@ class DefaultLayout extends Component {
                               }
                             }
                           },
-                          {
-                            name: 'Consumption Forecast Error',
-                            url: '/forecastReport/consumptionForecastError',
-                            icon: 'fa fa-signal',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_FORECAST_ERROR') && this.state.activeTab == 1 ? false : true) }
-                          },
+                          // {
+                          //   name: 'Consumption Forecast Error',
+                          //   url: '/forecastReport/consumptionForecastError',
+                          //   icon: 'fa fa-signal',
+                          //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_FORECAST_ERROR') && this.state.activeTab == 1 ? false : true) }
+                          // },
                         ]
                       },
                       // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
@@ -2883,7 +2883,7 @@ class DefaultLayout extends Component {
                                 }
                               },
                               {
-                                name: i18n.t('static.report.forecasterrorovertime'),
+                                name: 'Forecast Error (Monthly) (New)',
                                 url: '/report/consumptionForecastErrorSupplyPlan',
                                 icon: 'fa fa-line-chart',
                                 attributes: {
@@ -3590,17 +3590,17 @@ class DefaultLayout extends Component {
                               }
                             }
                           },
-                          {
-                            name: 'Consumption Forecast Error',
-                            url: '/forecastReport/consumptionForecastError',
-                            icon: 'fa fa-signal',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_FORECAST_ERROR') && this.state.activeTab == 1 ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
+                          // {
+                          //   name: 'Consumption Forecast Error',
+                          //   url: '/forecastReport/consumptionForecastError',
+                          //   icon: 'fa fa-signal',
+                          //   attributes: {
+                          //     hidden: (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_FORECAST_ERROR') && this.state.activeTab == 1 ? false : true),
+                          //     onClick: e => {
+                          //       this.refreshPage();
+                          //     }
+                          //   }
+                          // },
                           // {
                           //   name: i18n.t('static.dashboard.Versioncomarition'),
                           //   url: '/report/compareVersion',
@@ -3950,7 +3950,7 @@ class DefaultLayout extends Component {
                                 }
                               },
                               {
-                                name: i18n.t('static.report.forecasterrorovertime'),
+                                name: 'Forecast Error (Monthly) (New)',
                                 url: '/report/consumptionForecastErrorSupplyPlan',
                                 icon: 'fa fa-line-chart',
                                 attributes: {

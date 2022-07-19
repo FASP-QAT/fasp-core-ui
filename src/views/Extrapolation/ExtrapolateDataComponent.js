@@ -4072,16 +4072,22 @@ export default class ExtrapolateDataComponent extends React.Component {
                                         <li>{i18n.t('static.extrapolation.TrendingSeasonal')}
                                             <ul>
                                                 <li>{i18n.t('static.extrapolation.ARIMAModel')}</li>
-                                                <li>{i18n.t('static.extrapolation.WintersExponential')}</li>
+                                                {/* <li>{i18n.t('static.extrapolation.WintersExponential')}</li> */}
+                                                <li>Triple Exponential Smoothing (Holt-Winters) <br></br> 
+
+Seasonal without trend, where the observed values have a seasonal component but no trend. Models applied to such datasets may include </li>
+<li>Triple Exponential Smoothing (Holt-Winters)<br></br>  
+
+The models suggested here are neither exhaustive nor exclusive. QAT enables the user to apply a variety of extrapolation methods and then to compare them using best fit or forecast error metrics. </li>
                                             </ul>
-                                        </li>
-                                        <li>{i18n.t('static.extrapolation.SeasonalWithout')}
+                                        </li><br></br>
+                                        {/* <li>{i18n.t('static.extrapolation.SeasonalWithout')}
                                             <ul>
-                                                <li>{i18n.t('static.extrapolation.Multiplicative')}</li><br></br>
+                                                <li>{i18n.t('static.extrapolation.Multiplicative')}</li><br></br> */}
 
                                                 <p>{i18n.t('static.extrapolation.SecondStep')} {i18n.t('static.extrapolation.ChoosingToDisregard')} </p>
-                                            </ul>
-                                        </li>
+                                            {/* </ul>
+                                        </li> */}
                                     </ul>
                                 </p>
                                 <b>4.{i18n.t('static.extrapolation.InterpretErrors')}</b>
@@ -4093,6 +4099,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                         <li>{i18n.t('static.extrapolation.MAE')}<br></br>
                                             {i18n.t('static.extrapolation.LowerTheError')} {i18n.t('static.extrapolation.LowErrorValue')}
                                         </li>
+                                        <br></br>
                                         <p>
                                             {i18n.t('static.extrapolation.SelectionBetween')} {i18n.t('static.extrapolation.Organized')}
                                             <ul>
