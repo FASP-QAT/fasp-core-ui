@@ -2626,12 +2626,12 @@ class ShipmentGlobalDemandView extends Component {
                                 <Col md="12 pl-0 pb-lg-1">
                                     <div className="globalviwe-scroll">
                                         <div className="row">
-                                            <div className="col-md-12">
+                                            <div className="col-md-12 mt-2">
                                                 {this.state.procurementAgentSplit.length > 0 &&
-                                                    <div className="table-responsive ">
-                                                        <Table id="mytable1" responsive className="table-striped  table-fixed table-bordered text-center mt-2">
+                                                    <div className="fixTableHead">
+                                                        <Table id="mytable1" className="table-striped table-bordered text-center">
 
-                                                            <thead>
+                                                            <thead className='Theadtablesticky'>
                                                                 <tr>
                                                                     <th rowSpan={2}>{i18n.t('static.dashboard.planningunitheader')}</th>
                                                                     <th colSpan={this.state.table1Headers.length} align='center'>{i18n.t('static.report.procurementAgentName')}</th>

@@ -3757,7 +3757,7 @@ class ForecastOutput extends Component {
                                         <div className="col-md-12 pl-3 pr-3">
                                             {this.state.show &&
                                                 <div className="table-scroll1">
-                                                    <div className="table-wrap table-responsive">
+                                                    <div className="table-wrap table-responsive fixTableHeadSupplyPlan">
                                                         {this.state.consumptionData.length > 0 &&
                                                             <Table className="table-bordered table-bordered1 text-center mt-2 overflowhide main-table " bordered size="sm" options={this.options} id="forecastOutputId">
                                                                 <thead>
