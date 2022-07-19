@@ -20,7 +20,7 @@ import { buildJxl, buildJxl1, dataCheck } from "./DataCheckComponent";
 import { Prompt } from 'react-router';
 import { exportPDF, noForecastSelectedClicked, missingMonthsClicked, missingBranchesClicked, nodeWithPercentageChildrenClicked } from '../DataSet/DataCheckComponent.js';
 import pdfIcon from '../../assets/img/pdf.png';
-
+import ProgramService from '../../api/ProgramService';
 const ref = React.createRef();
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -82,10 +82,12 @@ class VersionSettingsComponent extends Component {
             treeScenarioListNotHaving100PerChild: [],
             isChanged1: false,
             includeOnlySelectedForecasts: true,
-            datasetPlanningUnitNotes: []
+            datasetPlanningUnitNotes: [],
+            dataList: []
         }
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.getOnLineDatasetsVersion = this.getOnLineDatasetsVersion.bind(this);
         this.buildJExcel = this.buildJExcel.bind(this);
         this.getDatasetList = this.getDatasetList.bind(this);
         this.getVersionTypeList = this.getVersionTypeList.bind(this);
@@ -122,7 +124,7 @@ class VersionSettingsComponent extends Component {
     }
     handleRangeDissmis(value) {
         this.setState({ rangeValue: value }, () => {
-            this.buildJExcel()
+            this.getOnLineDatasetsVersion()
         })
 
     }
@@ -612,7 +614,7 @@ class VersionSettingsComponent extends Component {
                             isChanged: false
                         }, () => {
                             this.hideSecondComponent();
-                            this.buildJExcel();
+                            this.getOnLineDatasetsVersion();
                         });
                         console.log("Data update success");
                     }.bind(this);
@@ -644,7 +646,7 @@ class VersionSettingsComponent extends Component {
                 versionSettingsListForOther.push(dataset);
             }
         })
-        this.setState({ versionSettingsList, versionSettingsListForOther }, () => { this.buildJExcel() });
+        this.setState({ versionSettingsList, versionSettingsListForOther }, () => { this.getOnLineDatasetsVersion() });
     }
     getVersionTypeList() {
         var db1;
@@ -776,6 +778,79 @@ class VersionSettingsComponent extends Component {
         return config;
     }
 
+    getOnLineDatasetsVersion() {
+        var programId = this.state.programId;
+        var versionTypeId = document.getElementById('versionTypeId').value;
+        var rangeValue = this.state.rangeValue;
+        let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
+        let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
+     
+        var inputjson = {
+            programId: programId,
+            versionTypeId: versionTypeId,
+            startDate: startDate,
+            stopDate: stopDate
+        }
+        ProgramService.getDatasetVersions(inputjson).then(response => {
+            if (response.status == 200) {
+                var responseData = response.data;
+                console.log("responseData------->", responseData);
+                var dataList1 = [];
+                for (var i = 0; i < responseData.length; i++) {
+                    var data = [];
+                    data[0] = responseData[i].programId
+                    data[1] = responseData[i].programCode
+                    data[2] = responseData[i].versionId + "(Live)"
+                    data[3] = getLabelText(responseData[i].versionType.label, this.state.lang);
+                    data[4] = responseData[i].notes
+                    data[5] = responseData[i].createdDate
+                    data[6] = responseData[i].createdBy.username
+                    data[7] = responseData[i].forecastStartDate
+                    if (responseData[i].forecastStartDate != null && responseData[i].forecastStopDate != null) {
+                        let d1 = new Date(responseData[i].forecastStartDate);
+                        let d2 = new Date(responseData[i].forecastStopDate)
+                        var months;
+                        months = (d2.getFullYear() - d1.getFullYear()) * 12;
+                        months += d2.getMonth() - d1.getMonth();
+                        data[8] = months + 1
+                    } else {
+                        data[8] = 0
+                    }
+                    data[9] = responseData[i].forecastStopDate
+                    data[10] = responseData[i].daysInMonth != null ? responseData[i].daysInMonth : '0'
+                    data[11] = responseData[i].versionId
+                    data[12] = 0
+                    data[13] = responseData[i].daysInMonth
+                    data[14] = responseData[i].freightPerc
+                    data[15] = responseData[i].forecastThresholdHighPerc
+                    data[16] = responseData[i].forecastThresholdLowPerc
+                    data[17] = 0;
+                    data[18] = {};
+                    console.log("data---------->", data)
+                    dataList1.push(data);
+                }
+                console.log("dataList1---------->", dataList1)
+
+                this.setState({
+                    dataList: dataList1
+                },
+                    () => {
+                        this.buildJExcel();
+                    })
+            }
+        }).catch(
+            error => {
+                this.setState({
+                    dataList: []
+                },
+                () => {
+                    this.buildJExcel();
+                })
+            }
+        );
+    }
+
+
     buildJExcel() {
         let versionSettingsListUnSorted = this.state.versionSettingsList;
         let versionSettingsListForOther = this.state.versionSettingsListForOther;
@@ -900,13 +975,21 @@ class VersionSettingsComponent extends Component {
                 }
             }
         }
+        var dataList = this.state.dataList;
+        console.log("dataList------->1", dataList);
+        for(var i = 0;i<dataList.length;i++){
+            count = (versionSettingsArray.length);
+            versionSettingsArray[count] = dataList[i] ;
+            count++;
+        }
+
+        console.log("versionSettingsArray------->1", versionSettingsArray);
+
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();
         var json = [];
         var data = versionSettingsArray;
-
-
-        // console.log("versionSettingsArray------->1", data);
+        console.log("versionSettingsArray------->2", data);
         var options = {
             data: data,
             columnDrag: true,
@@ -1405,23 +1488,23 @@ class VersionSettingsComponent extends Component {
                 <h5 className={this.state.color} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
 
-                <div className="card-header-actions">
-            <div className="Card-header-reporticon">
-              <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
-              <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span>
-              <span className="compareAndSelect-larrowText"> {i18n.t('static.common.backTo')} <a href="/#/dataSet/listDataSet" className="supplyplanformulas">{i18n.t('static.dataset.manageProgramInfo')}</a></span>
-              <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')} <a href="/#/planningUnitSetting/listPlanningUnitSetting" className="supplyplanformulas">{i18n.t('static.updatePlanningUnit.updatePlanningUnit')}</a></span><br />
-             
-            </div>
-          </div>
-                
-                        <div className="card-header-actions">
-                            <div className="card-header-action pr-lg-4">
-                            <a style={{float:'right'}}>
+                    <div className="card-header-actions">
+                        <div className="Card-header-reporticon">
+                            <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
+                            <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span>
+                            <span className="compareAndSelect-larrowText"> {i18n.t('static.common.backTo')} <a href="/#/dataSet/listDataSet" className="supplyplanformulas">{i18n.t('static.dataset.manageProgramInfo')}</a></span>
+                            <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')} <a href="/#/planningUnitSetting/listPlanningUnitSetting" className="supplyplanformulas">{i18n.t('static.updatePlanningUnit.updatePlanningUnit')}</a></span><br />
+
+                        </div>
+                    </div>
+
+                    <div className="card-header-actions">
+                        <div className="card-header-action pr-lg-4">
+                            <a style={{ float: 'right' }}>
                                 <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
                             </a>
-                            </div>
                         </div>
+                    </div>
 
                     <CardBody className="pb-lg-5 pt-lg-2">
                         <Col md="9 pl-0">
@@ -1450,7 +1533,7 @@ class VersionSettingsComponent extends Component {
                                                 name="versionTypeId"
                                                 id="versionTypeId"
                                                 bsSize="sm"
-                                                onChange={(e) => { this.buildJExcel() }}
+                                                onChange={(e) => { this.getOnLineDatasetsVersion() }}
                                             >
                                                 <option value="">{i18n.t('static.common.all')}</option>
                                                 {versionTypes}
@@ -1497,12 +1580,12 @@ class VersionSettingsComponent extends Component {
 
                     </CardBody>
                     <CardFooter className="CardFooterVesionsettingMarginTop">
-                    {(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_VERSION_SETTINGS')) &&
-                        <FormGroup>
-                            <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                            {this.state.isChanged && <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
-                            &nbsp;
-                        </FormGroup>
+                        {(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_VERSION_SETTINGS')) &&
+                            <FormGroup>
+                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                {this.state.isChanged && <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
+                                &nbsp;
+                            </FormGroup>
                         }
                     </CardFooter>
                 </Card>
