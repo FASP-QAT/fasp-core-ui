@@ -21,8 +21,8 @@ import { SPECIAL_CHARECTER_WITH_NUM, LABEL_REGEX, SPECIAL_CHARECTER_WITH_NUM_NOD
 import { ALPHABET_NUMBER_REGEX, SPACE_REGEX } from '../../Constants.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import classNames from 'classnames';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import { JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from "../../Constants";
@@ -969,11 +969,12 @@ class AddUserComponent extends Component {
                 },
 
             ],
+            editable: true,
             pagination: localStorage.getItem("sesRecordCount"),
             filters: true,
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
@@ -985,12 +986,12 @@ class AddUserComponent extends Component {
             copyCompatibility: true,
             parseFormulas: true,
             onpaste: this.onPaste,
-            text: {
-                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
             onload: this.loaded,
             license: JEXCEL_PRO_KEY,
             contextMenu: function (obj, x, y, e) {
@@ -1459,6 +1460,11 @@ class AddUserComponent extends Component {
     }
 
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
         const { realms } = this.state;
         const { languages } = this.state;
 

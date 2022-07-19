@@ -1756,7 +1756,7 @@ export default class TreeExtrapolationComponent extends React.Component {
             oneditionend: this.onedit,
             onchange: this.extrapolationChanged,
             updateTable: function (el, cell, x, y, source, value, id) {
-                var elInstance = el.jexcel;
+                var elInstance = el;
                 if (y != null) {
                     var rowData = elInstance.getRowData(y);
                     // if (rowData[0] != "") {
@@ -1958,7 +1958,9 @@ export default class TreeExtrapolationComponent extends React.Component {
         // var asterisk = document.getElementsByClassName("resizable")[0];
         // var tr = asterisk.firstChild.nextSibling;
         // console.log("asterisk", asterisk.firstChild.nextSibling)
-        var tr = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
+        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
+        var tr = asterisk.firstChild.nextSibling;
+
         tr.children[3].classList.add('InfoTr');
         tr.children[5].classList.add('InfoTr');
         tr.children[6].classList.add('InfoTr');
@@ -1983,49 +1985,49 @@ export default class TreeExtrapolationComponent extends React.Component {
             console.log("population value---", value)
             this.setState({ dataChanged: true })
             if (value != "" && !(reg.test(value.toString().replaceAll(",", "")))) {
-                instance.jexcel.setStyle(col, "background-color", "transparent");
-                instance.jexcel.setStyle(col, "background-color", "yellow");
-                instance.jexcel.setComments(col, i18n.t('static.message.invalidnumber'));
+                instance.setStyle(col, "background-color", "transparent");
+                instance.setStyle(col, "background-color", "yellow");
+                instance.setComments(col, i18n.t('static.message.invalidnumber'));
             }
             else {
-                instance.jexcel.setStyle(col, "background-color", "transparent");
-                instance.jexcel.setComments(col, "");
-                var reportingRate = instance.jexcel.getValue(`C${parseInt(y) + 1}`, true).toString().replaceAll(",", "").split("%")[0];
+                instance.setStyle(col, "background-color", "transparent");
+                instance.setComments(col, "");
+                var reportingRate = instance.getValue(`C${parseInt(y) + 1}`, true).toString().replaceAll(",", "").split("%")[0];
                 var col1 = ("C").concat(parseInt(y) + 1);
                 if (reportingRate == "") {
-                    instance.jexcel.setStyle(col1, "background-color", "transparent");
-                    instance.jexcel.setStyle(col1, "background-color", "yellow");
-                    instance.jexcel.setComments(col1, i18n.t('static.label.fieldRequired'));
+                    instance.setStyle(col1, "background-color", "transparent");
+                    instance.setStyle(col1, "background-color", "yellow");
+                    instance.setComments(col1, i18n.t('static.label.fieldRequired'));
                 } else if (reportingRate > 100) {
-                    instance.jexcel.setStyle(col1, "background-color", "transparent");
-                    instance.jexcel.setStyle(col1, "background-color", "yellow");
-                    instance.jexcel.setComments(col1, i18n.t('static.message.invalidnumber'));
+                    instance.setStyle(col1, "background-color", "transparent");
+                    instance.setStyle(col1, "background-color", "yellow");
+                    instance.setComments(col1, i18n.t('static.message.invalidnumber'));
                 }
                 else if (!(reg.test(reportingRate))) {
-                    instance.jexcel.setStyle(col1, "background-color", "transparent");
-                    instance.jexcel.setStyle(col1, "background-color", "yellow");
-                    instance.jexcel.setComments(col1, i18n.t('static.message.invalidnumber'));
+                    instance.setStyle(col1, "background-color", "transparent");
+                    instance.setStyle(col1, "background-color", "yellow");
+                    instance.setComments(col1, i18n.t('static.message.invalidnumber'));
                 } else {
                     // data[3] = `=IF(B${parseInt(j) + 1} == '','',IF(B${parseInt(j) + 1} == 0,0,ROUND((B${parseInt(j) + 1}/(C${parseInt(j) + 1}/100)),4)))`
                     if (value === '') {
-                        instance.jexcel.setValueFromCoords(3, y, '', true);
+                        instance.setValueFromCoords(3, y, '', true);
                     } else if (value == 0) {
-                        instance.jexcel.setValueFromCoords(3, y, 0, true);
+                        instance.setValueFromCoords(3, y, 0, true);
                     } else {
-                        instance.jexcel.setValueFromCoords(3, y, `=ROUND((B${parseInt(y) + 1}/(C${parseInt(y) + 1}/100)),4)`, true);
+                        instance.setValueFromCoords(3, y, `=ROUND((B${parseInt(y) + 1}/(C${parseInt(y) + 1}/100)),4)`, true);
                     }
                 }
-                var manualChange = instance.jexcel.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll(",", "").split("%")[0];
+                var manualChange = instance.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll(",", "").split("%")[0];
                 var col2 = ("K").concat(parseInt(y) + 1);
                 var reg1 = JEXCEL_DECIMAL_MONTHLY_CHANGE_4_DECIMAL;
                 if (manualChange != "" && !(reg1.test(manualChange))) {
-                    instance.jexcel.setStyle(col2, "background-color", "transparent");
-                    instance.jexcel.setStyle(col2, "background-color", "yellow");
-                    instance.jexcel.setComments(col2, i18n.t('static.message.invalidnumber'));
+                    instance.setStyle(col2, "background-color", "transparent");
+                    instance.setStyle(col2, "background-color", "yellow");
+                    instance.setComments(col2, i18n.t('static.message.invalidnumber'));
                 }
                 else {
-                    instance.jexcel.setStyle(col2, "background-color", "transparent");
-                    instance.jexcel.setComments(col2, "");
+                    instance.setStyle(col2, "background-color", "transparent");
+                    instance.setComments(col2, "");
                 }
 
             }
@@ -2036,26 +2038,26 @@ export default class TreeExtrapolationComponent extends React.Component {
             var reg = JEXCEL_DECIMAL_NO_REGEX_LONG_4_DECIMAL;
             console.log("reporting rate value---", value)
             this.setState({ dataChanged: true })
-            var actualValue = instance.jexcel.getValue(`B${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            var actualValue = instance.getValue(`B${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             // value.split("%")[0];
             value = value.toString().replaceAll(",", "").split("%")[0];
             if (actualValue != "" && value == "") {
-                instance.jexcel.setStyle(col, "background-color", "transparent");
-                instance.jexcel.setStyle(col, "background-color", "yellow");
-                instance.jexcel.setComments(col, i18n.t('static.label.fieldRequired'));
+                instance.setStyle(col, "background-color", "transparent");
+                instance.setStyle(col, "background-color", "yellow");
+                instance.setComments(col, i18n.t('static.label.fieldRequired'));
             } else if (value > 100) {
-                instance.jexcel.setStyle(col, "background-color", "transparent");
-                instance.jexcel.setStyle(col, "background-color", "yellow");
-                instance.jexcel.setComments(col, i18n.t('static.message.invalidnumber'));
+                instance.setStyle(col, "background-color", "transparent");
+                instance.setStyle(col, "background-color", "yellow");
+                instance.setComments(col, i18n.t('static.message.invalidnumber'));
             }
             else if (!(reg.test(value))) {
-                instance.jexcel.setStyle(col, "background-color", "transparent");
-                instance.jexcel.setStyle(col, "background-color", "yellow");
-                instance.jexcel.setComments(col, i18n.t('static.message.invalidnumber'));
+                instance.setStyle(col, "background-color", "transparent");
+                instance.setStyle(col, "background-color", "yellow");
+                instance.setComments(col, i18n.t('static.message.invalidnumber'));
             }
             else {
-                instance.jexcel.setStyle(col, "background-color", "transparent");
-                instance.jexcel.setComments(col, "");
+                instance.setStyle(col, "background-color", "transparent");
+                instance.setComments(col, "");
             }
         }
         // Manual change
@@ -2063,15 +2065,15 @@ export default class TreeExtrapolationComponent extends React.Component {
             var col = ("K").concat(parseInt(y) + 1);
             var reg = JEXCEL_DECIMAL_MONTHLY_CHANGE_4_DECIMAL;
             value = value.toString().replaceAll(",", "");
-            var actualValue = instance.jexcel.getValue(`B${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            var actualValue = instance.getValue(`B${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             if (actualValue != "" && value != "" && !(reg.test(value))) {
-                instance.jexcel.setStyle(col, "background-color", "transparent");
-                instance.jexcel.setStyle(col, "background-color", "yellow");
-                instance.jexcel.setComments(col, i18n.t('static.message.invalidnumber'));
+                instance.setStyle(col, "background-color", "transparent");
+                instance.setStyle(col, "background-color", "yellow");
+                instance.setComments(col, i18n.t('static.message.invalidnumber'));
             }
             else {
-                instance.jexcel.setStyle(col, "background-color", "transparent");
-                instance.jexcel.setComments(col, "");
+                instance.setStyle(col, "background-color", "transparent");
+                instance.setComments(col, "");
             }
         }
         console.log("x value for data change---", x);

@@ -781,11 +781,9 @@ export default class CompareVersion extends Component {
         else {
             // var asterisk = document.getElementsByClassName("resizable")[0];
             // var tr = asterisk.firstChild;
-            var asterisk = document.getElementsByClassName("jss")[0];
-
+            var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
             var tr = asterisk.firstChild.nextSibling;
-            console.log("asterisk", asterisk.firstChild.nextSibling)
-
+            console.log("trrrr", tr)
             tr.children[3].classList.add('InfoTr');
             tr.children[4].classList.add('InfoTr');
             tr.children[6].classList.add('InfoTr');

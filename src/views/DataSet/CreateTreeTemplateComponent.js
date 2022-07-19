@@ -3679,9 +3679,9 @@ export default class CreateTreeTemplate extends Component {
         if (x == 4) {
             var col = ("E").concat(parseInt(y) + 1);
             if (value == "") {
-                instance.jexcel.setStyle(col, "background-color", "transparent");
-                instance.jexcel.setStyle(col, "background-color", "yellow");
-                instance.jexcel.setComments(col, i18n.t('static.label.fieldRequired'));
+                instance.setStyle(col, "background-color", "transparent");
+                instance.setStyle(col, "background-color", "yellow");
+                instance.setComments(col, i18n.t('static.label.fieldRequired'));
                 this.state.modelingEl.setValueFromCoords(6, y, "", true);
                 this.state.modelingEl.setValueFromCoords(7, y, "", true);
                 // this.state.modelingEl.setValueFromCoords(8, y, '', true);
@@ -3694,8 +3694,8 @@ export default class CreateTreeTemplate extends Component {
                     this.state.modelingEl.setValueFromCoords(7, y, "", true);
                     // this.state.modelingEl.setValueFromCoords(8, y, '', true);
                 }
-                instance.jexcel.setStyle(col, "background-color", "transparent");
-                instance.jexcel.setComments(col, "");
+                instance.setStyle(col, "background-color", "transparent");
+                instance.setComments(col, "");
             }
         }
         // Transfer to/from node
@@ -3712,35 +3712,35 @@ export default class CreateTreeTemplate extends Component {
             var col = ("F").concat(parseInt(y) + 1);
             // var value = this.el.getValueFromCoords(5, y);
             if (value == "") {
-                instance.jexcel.setStyle(col, "background-color", "transparent");
-                instance.jexcel.setStyle(col, "background-color", "yellow");
-                instance.jexcel.setComments(col, i18n.t('static.label.fieldRequired'));
+                instance.setStyle(col, "background-color", "transparent");
+                instance.setStyle(col, "background-color", "yellow");
+                instance.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                instance.jexcel.setStyle(col, "background-color", "transparent");
-                instance.jexcel.setComments(col, "");
+                instance.setStyle(col, "background-color", "transparent");
+                instance.setComments(col, "");
             }
         }
-        var startDate = instance.jexcel.getValue(`B${parseInt(y) + 1}`, true);
-        var stopDate = instance.jexcel.getValue(`C${parseInt(y) + 1}`, true);
+        var startDate = instance.getValue(`B${parseInt(y) + 1}`, true);
+        var stopDate = instance.getValue(`C${parseInt(y) + 1}`, true);
         // Start date
         if (x == 1) {
             var col = ("B").concat(parseInt(y) + 1);
             // var diff1 = moment(stopDate).diff(moment(startDate), 'months');
             if (value == "") {
-                instance.jexcel.setStyle(col, "background-color", "transparent");
-                instance.jexcel.setStyle(col, "background-color", "yellow");
-                instance.jexcel.setComments(col, i18n.t('static.label.fieldRequired'));
+                instance.setStyle(col, "background-color", "transparent");
+                instance.setStyle(col, "background-color", "yellow");
+                instance.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                instance.jexcel.setStyle(col, "background-color", "transparent");
-                instance.jexcel.setComments(col, "");
+                instance.setStyle(col, "background-color", "transparent");
+                instance.setComments(col, "");
                 var col1 = ("C").concat(parseInt(y) + 1)
                 if (stopDate <= startDate) {
-                    instance.jexcel.setStyle(col1, "background-color", "transparent");
-                    instance.jexcel.setStyle(col1, "background-color", "yellow");
-                    instance.jexcel.setComments(col1, 'Please enter valid date');
+                    instance.setStyle(col1, "background-color", "transparent");
+                    instance.setStyle(col1, "background-color", "yellow");
+                    instance.setComments(col1, 'Please enter valid date');
                 } else {
-                    instance.jexcel.setStyle(col1, "background-color", "transparent");
-                    instance.jexcel.setComments(col1, "");
+                    instance.setStyle(col1, "background-color", "transparent");
+                    instance.setComments(col1, "");
                 }
             }
             // this.state.modelingEl.setValueFromCoords(4, y, '', true);
@@ -3751,18 +3751,18 @@ export default class CreateTreeTemplate extends Component {
             var col = ("C").concat(parseInt(y) + 1);
             // var diff = moment(stopDate).diff(moment(startDate), 'months');
             if (value == "") {
-                instance.jexcel.setStyle(col, "background-color", "transparent");
-                instance.jexcel.setStyle(col, "background-color", "yellow");
-                instance.jexcel.setComments(col, i18n.t('static.label.fieldRequired'));
+                instance.setStyle(col, "background-color", "transparent");
+                instance.setStyle(col, "background-color", "yellow");
+                instance.setComments(col, i18n.t('static.label.fieldRequired'));
             }
             else if (stopDate <= startDate) {
-                instance.jexcel.setStyle(col, "background-color", "transparent");
-                instance.jexcel.setStyle(col, "background-color", "yellow");
-                instance.jexcel.setComments(col, 'Please enter valid date');
+                instance.setStyle(col, "background-color", "transparent");
+                instance.setStyle(col, "background-color", "yellow");
+                instance.setComments(col, 'Please enter valid date');
             }
             else {
-                instance.jexcel.setStyle(col, "background-color", "transparent");
-                instance.jexcel.setComments(col, "");
+                instance.setStyle(col, "background-color", "transparent");
+                instance.setComments(col, "");
             }
         }
         var elInstance = this.state.modelingEl;
@@ -3778,18 +3778,18 @@ export default class CreateTreeTemplate extends Component {
                 var col = ("G").concat(parseInt(y) + 1);
                 value = value.toString().replaceAll(",", "").split("%")[0];
                 if (value == "") {
-                    instance.jexcel.setStyle(col, "background-color", "transparent");
-                    instance.jexcel.setStyle(col, "background-color", "yellow");
-                    instance.jexcel.setComments(col, i18n.t('static.label.fieldRequired'));
+                    instance.setStyle(col, "background-color", "transparent");
+                    instance.setStyle(col, "background-color", "yellow");
+                    instance.setComments(col, i18n.t('static.label.fieldRequired'));
                 }
                 else if (!(reg.test(value))) {
-                    instance.jexcel.setStyle(col, "background-color", "transparent");
-                    instance.jexcel.setStyle(col, "background-color", "yellow");
-                    instance.jexcel.setComments(col, i18n.t('static.message.invalidnumber'));
+                    instance.setStyle(col, "background-color", "transparent");
+                    instance.setStyle(col, "background-color", "yellow");
+                    instance.setComments(col, i18n.t('static.message.invalidnumber'));
                 }
                 else {
-                    instance.jexcel.setStyle(col, "background-color", "transparent");
-                    instance.jexcel.setComments(col, "");
+                    instance.setStyle(col, "background-color", "transparent");
+                    instance.setComments(col, "");
                     if (rowData[4] != 5) {
                         calculatedChangeForMonth = parseFloat((nodeValue * value) / 100).toFixed(4);
                     } else {
@@ -3800,8 +3800,8 @@ export default class CreateTreeTemplate extends Component {
 
             }
             if (x == 4 && rowData[4] != 2 && rowData[6] != "") {
-                instance.jexcel.setStyle(col, "background-color", "transparent");
-                instance.jexcel.setComments(col, "");
+                instance.setStyle(col, "background-color", "transparent");
+                instance.setComments(col, "");
                 if (rowData[4] != 5) {
                     calculatedChangeForMonth = parseFloat((nodeValue * rowData[5]) / 100).toFixed(4);
                 } else {
@@ -3815,25 +3815,25 @@ export default class CreateTreeTemplate extends Component {
                 var reg = JEXCEL_DECIMAL_MONTHLY_CHANGE_4_DECIMAL_POSITIVE;
                 value = value.toString().replaceAll(",", "");
                 if (value == "") {
-                    instance.jexcel.setStyle(col, "background-color", "transparent");
-                    instance.jexcel.setStyle(col, "background-color", "yellow");
-                    instance.jexcel.setComments(col, i18n.t('static.label.fieldRequired'));
+                    instance.setStyle(col, "background-color", "transparent");
+                    instance.setStyle(col, "background-color", "yellow");
+                    instance.setComments(col, i18n.t('static.label.fieldRequired'));
                 }
                 else if (!(reg.test(value))) {
-                    instance.jexcel.setStyle(col, "background-color", "transparent");
-                    instance.jexcel.setStyle(col, "background-color", "yellow");
-                    instance.jexcel.setComments(col, i18n.t('static.message.invalidnumber'));
+                    instance.setStyle(col, "background-color", "transparent");
+                    instance.setStyle(col, "background-color", "yellow");
+                    instance.setComments(col, i18n.t('static.message.invalidnumber'));
                 }
                 else {
-                    instance.jexcel.setStyle(col, "background-color", "transparent");
-                    instance.jexcel.setComments(col, "");
+                    instance.setStyle(col, "background-color", "transparent");
+                    instance.setComments(col, "");
                     // this.state.modelingEl.setValueFromCoords(8, y, parseFloat(value).toFixed(4), true);
                 }
 
             }
         }
         if (x != 11) {
-            instance.jexcel.setValueFromCoords(11, y, 1, true);
+            instance.setValueFromCoords(11, y, 1, true);
             this.setState({ isChanged: true });
         }
         // this.calculateScalingTotal();

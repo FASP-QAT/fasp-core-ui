@@ -18,8 +18,8 @@ import PlanningUnitService from "../../api/PlanningUnitService";
 import UnitService from "../../api/UnitService";
 import StatusUpdateButtonFeature from "../../CommonComponent/StatusUpdateButtonFeature";
 import UpdateButtonFeature from '../../CommonComponent/UpdateButtonFeature'
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import { JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DECIMAL_CATELOG_PRICE } from "../../Constants";
@@ -223,11 +223,12 @@ class CountrySpecificPrices extends Component {
                                         },
 
                                     ],
+                                    editable: true,
                                     pagination: localStorage.getItem("sesRecordCount"),
                                     filters: true,
                                     search: true,
                                     columnSorting: true,
-                                    tableOverflow: true,
+                                    // tableOverflow: true,
                                     wordWrap: true,
                                     paginationOptions: JEXCEL_PAGINATION_OPTION,
                                     parseFormulas: true,
@@ -243,12 +244,12 @@ class CountrySpecificPrices extends Component {
                                     onpaste: this.onPaste,
                                     allowManualInsertRow: false,
                                     license: JEXCEL_PRO_KEY,
-                                    text: {
-                                        // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                                        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                                        show: '',
-                                        entries: '',
-                                    },
+                                    // text: {
+                                    //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                                    //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                                    //     show: '',
+                                    //     entries: '',
+                                    // },
                                     onload: this.loaded,
                                     contextMenu: function (obj, x, y, e) {
                                         var items = [];
@@ -823,6 +824,11 @@ class CountrySpecificPrices extends Component {
         return valid;
     }
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
@@ -856,7 +862,7 @@ class CountrySpecificPrices extends Component {
                                 <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                 <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>
                                 &nbsp;
-</FormGroup>
+                            </FormGroup>
                         </CardFooter>
                     </Card>
                 </div>

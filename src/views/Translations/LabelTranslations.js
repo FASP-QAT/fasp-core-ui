@@ -1,6 +1,6 @@
 import React from "react";
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import "../ProductCategory/style.css"
 import {
@@ -83,16 +83,17 @@ export default class DatabaseTranslations extends React.Component {
                             data: label,
                             colWidths: [80, 80, 80, 80, 80],
                             columns: colHeadersArray,
-                            text: {
-                                // showingPage: 'Showing {0} to {1} of {1}',
-                                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                                show: '',
-                                entries: '',
-                            },
+                            // text: {
+                            //     // showingPage: 'Showing {0} to {1} of {1}',
+                            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                            //     show: '',
+                            //     entries: '',
+                            // },
+                            editable: true,
                             pagination: localStorage.getItem("sesRecordCount"),
                             search: true,
                             columnSorting: true,
-                            tableOverflow: true,
+                            // tableOverflow: true,
                             wordWrap: true,
                             paginationOptions: JEXCEL_PAGINATION_OPTION,
                             allowInsertColumn: false,
@@ -100,7 +101,7 @@ export default class DatabaseTranslations extends React.Component {
                             onchange: this.changed,
                             oneditionstart: this.editStart,
                             allowDeleteRow: false,
-                            tableOverflow: false,
+                            // tableOverflow: false,
                             onload: this.loaded,
                             filters: true,
                             license: JEXCEL_PRO_KEY,
@@ -334,6 +335,11 @@ export default class DatabaseTranslations extends React.Component {
     };
 
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
@@ -366,7 +372,7 @@ export default class DatabaseTranslations extends React.Component {
                                     <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                     <Button type="button" size="md" color="success" className="float-right mr-1" onClick={() => this.saveData()} ><i className="fa fa-check"></i>{i18n.t('static.common.submit')} </Button>
                                     &nbsp;
-                            </FormGroup>
+                                </FormGroup>
                             </CardFooter>
                         </Card>
                     </Col>
@@ -394,8 +400,8 @@ export default class DatabaseTranslations extends React.Component {
                 this.el.setComments(col, "");
             }
         }
-         
-         if (x != 2) {
+
+        if (x != 2) {
             this.el.setValueFromCoords(2, y, 1, true);
         }
     }.bind(this)

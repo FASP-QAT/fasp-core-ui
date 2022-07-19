@@ -6,8 +6,8 @@ import {
     Form, FormGroup, Label, Input, CardFooter, Col, Card
 } from 'reactstrap';
 import getLabelText from '../../CommonComponent/getLabelText';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import "../ProductCategory/style.css"
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination } from '../../CommonComponent/JExcelCommonFunctions.js';
@@ -552,12 +552,12 @@ export default class QunatimedImportStepTwo extends Component {
                                 { type: 'hidden' },
                                 { type: 'numeric', mask: '#,##.00', decimal: '.', readOnly: true },
                             ],
-                            text: {
-                                // showingPage: 'Showing {0} to {1} of {1}',
-                                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
-                                show: '',
-                                entries: '',
-                            },
+                            // text: {
+                            //     // showingPage: 'Showing {0} to {1} of {1}',
+                            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
+                            //     show: '',
+                            //     entries: '',
+                            // },
                             pagination: false,
                             search: true,
                             columnSorting: false,
@@ -568,10 +568,11 @@ export default class QunatimedImportStepTwo extends Component {
                             onchange: this.programPlanningUnitChanged,
                             // oneditionstart: this.editStart,
                             allowDeleteRow: false,
-                            tableOverflow: true,
+                            // tableOverflow: true,
                             onload: this.loaded,
                             license: JEXCEL_PRO_KEY,
-                            filters: true
+                            filters: true,
+                            editable: true,
                             // tableHeight: '500px',
                         };
                         myVar = jexcel(document.getElementById("paputableDiv"), options);
@@ -597,7 +598,10 @@ export default class QunatimedImportStepTwo extends Component {
 
 
     render() {
-
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
 
         return (
             <div className="animated fadeIn">

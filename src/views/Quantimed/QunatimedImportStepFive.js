@@ -6,8 +6,8 @@ import {
     Form, FormGroup, Label, Input, CardFooter, Col, Card, Row
 } from 'reactstrap';
 import getLabelText from '../../CommonComponent/getLabelText';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import "../ProductCategory/style.css"
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionQuantimed, jExcelLoadedFunctionWithoutPagination } from '../../CommonComponent/JExcelCommonFunctions.js';
@@ -101,7 +101,7 @@ export default class QunatimedImportStepFive extends Component {
 
         jExcelLoadedFunctionQuantimed(instance);
 
-        var asterisk = document.getElementsByClassName("resizable")[2];
+        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
         tr.children[7].title = `${i18n.t('static.quantimed.conversionFactor')} = 1 / ${i18n.t('static.unit.multiplier')}`
         tr.children[8].title = `${i18n.t('static.quantimed.quantimedForecastConsumptionQty')} * ${i18n.t('static.quantimed.importpercentage')} * ${i18n.t('static.quantimed.conversionFactor')} = ${i18n.t('static.quantimed.newconsupmtionqty')}`
@@ -513,17 +513,17 @@ export default class QunatimedImportStepFive extends Component {
                         { type: 'numeric', mask: '#,##', readOnly: true },
                         { type: 'checkbox' }
                     ],
-                    // editable: false,
-                    text: {
-                        // showingPage: 'Showing {0} to {1} of {1}',
-                        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
-                        show: '',
-                        entries: '',
-                    },
+                    editable: true,
+                    // text: {
+                    //     // showingPage: 'Showing {0} to {1} of {1}',
+                    //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
+                    //     show: '',
+                    //     entries: '',
+                    // },
                     pagination: localStorage.getItem("sesRecordCount"),
                     search: true,
                     columnSorting: true,
-                    tableOverflow: true,
+                    // tableOverflow: true,
                     wordWrap: true,
                     paginationOptions: JEXCEL_PAGINATION_OPTION,
                     allowInsertColumn: false,
@@ -555,7 +555,10 @@ export default class QunatimedImportStepFive extends Component {
     }
 
     render() {
-
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
 
         return (
 

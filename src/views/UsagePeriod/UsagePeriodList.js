@@ -125,9 +125,10 @@ class UsagePeriod extends Component {
                 },
                 {
                     title: i18n.t('static.usagePeriod.conversionFactor'),
-                    type: 'text',
+                    // type: 'text',
+                    type: 'numeric', mask: '#,##.00000000', decimal: '.'
                     // readOnly: true
-                    textEditor: true,
+                    // textEditor: true,
                 },
                 {
                     title: i18n.t('static.checkbox.active'),

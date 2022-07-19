@@ -1164,8 +1164,8 @@ import i18n from '../../i18n'
 import getLabelText from '../../CommonComponent/getLabelText';
 
 import CryptoJS from 'crypto-js';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import moment from "moment";
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
@@ -1432,11 +1432,12 @@ class AccessControlComponent extends Component {
                 },
 
             ],
+            editable: true,
             pagination: localStorage.getItem("sesRecordCount"),
             filters: true,
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
@@ -1448,12 +1449,12 @@ class AccessControlComponent extends Component {
             copyCompatibility: true,
             parseFormulas: true,
             onpaste: this.onPaste,
-            text: {
-                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
             onload: this.loaded,
             license: JEXCEL_PRO_KEY,
             contextMenu: function (obj, x, y, e) {
@@ -2234,6 +2235,11 @@ class AccessControlComponent extends Component {
     }
 
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
         return (
 
             <div className="animated fadeIn">

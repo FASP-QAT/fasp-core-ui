@@ -1,6 +1,6 @@
 import React from "react";
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import "../ProductCategory/style.css"
 import {
@@ -43,14 +43,14 @@ export default class DatabaseTranslations extends React.Component {
         LabelsService.getDatabaseLabelsList().then(response => {
             if (response.status == 200) {
                 var json = response.data;
-                console.log("Json@@@@@@@@@@@@",json)
+                console.log("Json@@@@@@@@@@@@", json)
                 var data = [];
                 var label = [];
                 for (var i = 0; i < json.length; i++) {
                     data = [];
                     data[0] = json[i].labelId;// A
                     data[1] = `${i18n.t(json[i].labelFor)}`;//B
-                    data[2] = json[i].relatedTo!=null?getLabelText(json[i].relatedTo,this.state.lang):""
+                    data[2] = json[i].relatedTo != null ? getLabelText(json[i].relatedTo, this.state.lang) : ""
                     data[3] = json[i].label_en;//C
                     data[4] = json[i].label_fr;//D
                     data[5] = json[i].label_pr;//E
@@ -71,13 +71,14 @@ export default class DatabaseTranslations extends React.Component {
                     colWidths: [80, 80, 80, 80, 80],
                     columns: [
                         { type: 'hidden' },
-                        { type: 'text', readOnly: true },
-                        { type: 'text', readOnly: true }
+                        { type: 'text' },
+                        { type: 'text' }
                     ],
+                    editable: false,
                     pagination: localStorage.getItem("sesRecordCount"),
                     search: true,
                     columnSorting: true,
-                    tableOverflow: true,
+                    // tableOverflow: true,
                     wordWrap: true,
                     paginationOptions: JEXCEL_PAGINATION_OPTION,
                     position: 'top',
@@ -86,13 +87,13 @@ export default class DatabaseTranslations extends React.Component {
                     onchange: this.changed,
                     oneditionstart: this.editStart,
                     allowDeleteRow: false,
-                    tableOverflow: false,
-                    text: {
-                        // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                        show: '',
-                        entries: '',
-                    },
+                    // tableOverflow: false,
+                    // text: {
+                    //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                    //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                    //     show: '',
+                    //     entries: '',
+                    // },
                     onload: this.loaded,
                     filters: true,
                     license: JEXCEL_PRO_KEY,
@@ -115,7 +116,7 @@ export default class DatabaseTranslations extends React.Component {
             }
         }).catch(
             error => {
-                console.log("Error@@@@@@@@",error)
+                console.log("Error@@@@@@@@", error)
                 if (error.message === "Network Error") {
                     this.setState({
                         message: 'static.unkownError',
@@ -197,7 +198,7 @@ export default class DatabaseTranslations extends React.Component {
                 }
             }).catch(
                 error => {
-                    console.log("Error@@@@@@@@@",error)
+                    console.log("Error@@@@@@@@@", error)
                     if (error.message === "Network Error") {
                         this.setState({
                             message: 'static.unkownError',
@@ -242,6 +243,11 @@ export default class DatabaseTranslations extends React.Component {
     };
 
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
@@ -274,7 +280,7 @@ export default class DatabaseTranslations extends React.Component {
                                     <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                     <Button type="button" size="md" color="success" className="float-right mr-1" onClick={() => this.saveData()} ><i className="fa fa-check"></i>{i18n.t('static.common.submit')} </Button>
                                     &nbsp;
-                            </FormGroup>
+                                </FormGroup>
                             </CardFooter>
                         </Card>
                     </Col>

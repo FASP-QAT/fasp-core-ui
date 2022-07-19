@@ -21,8 +21,6 @@ import getLabelText from '../../CommonComponent/getLabelText'
 import CryptoJS from 'crypto-js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import ProgramService from '../../api/ProgramService';
 import DatasetService from '../../api/DatasetService';

@@ -5,7 +5,7 @@ import {
     Card,
     CardBody,
     Col,
-    Table, FormGroup, Input, InputGroup,PopoverBody, Popover, Label, Form
+    Table, FormGroup, Input, InputGroup, PopoverBody, Popover, Label, Form
 } from 'reactstrap';
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import i18n from '../../i18n'
@@ -21,8 +21,8 @@ import getLabelText from '../../CommonComponent/getLabelText'
 import CryptoJS from 'crypto-js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import ProgramService from '../../api/ProgramService';
 import DatasetService from '../../api/DatasetService';
@@ -154,7 +154,9 @@ class ModelingValidation extends Component {
             })
         } else {
             this.el = jexcel(document.getElementById("tableDiv"), '');
-            this.el.destroy();
+            // this.el.destroy();
+            jexcel.destroy(document.getElementById("tableDiv"), true);
+
             this.setState({
                 versionId: versionId,
                 datasetData: {},
@@ -233,7 +235,9 @@ class ModelingValidation extends Component {
             }).catch(
                 error => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
-                    this.el.destroy();
+                    // this.el.destroy();
+                    jexcel.destroy(document.getElementById("tableDiv"), true);
+
                     this.setState({
                         datasetData: {},
                         treeList: [],
@@ -254,7 +258,9 @@ class ModelingValidation extends Component {
             );
         } else {
             this.el = jexcel(document.getElementById("tableDiv"), '');
-            this.el.destroy();
+            // this.el.destroy();
+            jexcel.destroy(document.getElementById("tableDiv"), true);
+
             this.setState({
                 datasetData: {},
                 treeList: [],
@@ -321,7 +327,9 @@ class ModelingValidation extends Component {
             })
         } else {
             this.el = jexcel(document.getElementById("tableDiv"), '');
-            this.el.destroy();
+            // this.el.destroy();
+            jexcel.destroy(document.getElementById("tableDiv"), true);
+
             this.setState({
                 treeId: treeId,
                 scenarioList: [],
@@ -396,7 +404,9 @@ class ModelingValidation extends Component {
             })
         } else {
             this.el = jexcel(document.getElementById("tableDiv"), '');
-            this.el.destroy();
+            // this.el.destroy();
+            jexcel.destroy(document.getElementById("tableDiv"), true);
+
             this.setState({
                 scenarioList: [],
                 scenarioId: "",
@@ -426,7 +436,9 @@ class ModelingValidation extends Component {
             })
         } else {
             this.el = jexcel(document.getElementById("tableDiv"), '');
-            this.el.destroy();
+            // this.el.destroy();
+            jexcel.destroy(document.getElementById("tableDiv"), true);
+
             this.setState({
                 scenarioId: scenarioId,
                 loading: false,
@@ -452,7 +464,9 @@ class ModelingValidation extends Component {
             })
         } else {
             this.el = jexcel(document.getElementById("tableDiv"), '');
-            this.el.destroy();
+            // this.el.destroy();
+            jexcel.destroy(document.getElementById("tableDiv"), true);
+
             this.setState({
                 datasetId: datasetId,
                 scenarioList: [],
@@ -499,16 +513,16 @@ class ModelingValidation extends Component {
                 monthList.push(curDate)
             }
             let columns = [];
-            columns.push({ title: i18n.t('static.inventoryDate.inventoryReport'), type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' }, readOnly: true });
+            columns.push({ title: i18n.t('static.inventoryDate.inventoryReport'), type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' } });
             var nodeVal = [...new Set(this.state.nodeVal.map(ele => (ele.label)))];
             for (var k = 0; k < nodeVal.length; k++) {
-                columns.push({ title: nodeVal[k], readOnly: true, type: displayBy == 1 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,##.00 %', decimal: '.' });
+                columns.push({ title: nodeVal[k], type: displayBy == 1 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,##.00 %', decimal: '.' });
             }
-            columns.push({ title: i18n.t('static.supplyPlan.total'), readOnly: true, type: displayBy == 1 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,## %' });
+            columns.push({ title: i18n.t('static.supplyPlan.total'), type: displayBy == 1 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,## %' });
             for (var k = 0; k < nodeVal.length; k++) {
-                columns.push({ title: nodeVal[k], readOnly: true, type: displayBy == 2 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,##.00 %', decimal: '.' });
+                columns.push({ title: nodeVal[k], type: displayBy == 2 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,##.00 %', decimal: '.' });
             }
-            columns.push({ title: i18n.t('static.supplyPlan.total'), readOnly: true, type: displayBy == 2 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,## %' });
+            columns.push({ title: i18n.t('static.supplyPlan.total'), type: displayBy == 2 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,## %' });
             var data = [];
             var dataArr = [];
             var nodeVal = [...new Set(this.state.nodeVal.map(ele => (ele.label)))];
@@ -559,7 +573,9 @@ class ModelingValidation extends Component {
                 dataArr.push(data);
             }
             this.el = jexcel(document.getElementById("tableDiv"), '');
-            this.el.destroy();
+            // this.el.destroy();
+            jexcel.destroy(document.getElementById("tableDiv"), true);
+
             var json = [];
             var options = {
                 data: dataArr,
@@ -567,19 +583,20 @@ class ModelingValidation extends Component {
                 // colWidths: [0, 150, 150, 150, 100, 100, 100],
                 colHeaderClasses: ["Reqasterisk"],
                 columns: columns,
-                text: {
-                    // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                    showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                    show: '',
-                    entries: '',
-                },
+                // text: {
+                //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                //     show: '',
+                //     entries: '',
+                // },
                 onload: this.loaded,
                 pagination: false,
                 search: false,
                 defaultColWidth: 120,
                 columnSorting: false,
-                tableOverflow: true,
+                // tableOverflow: true,
                 // tableWidth: "100%",
+                editable: false,
                 wordWrap: true,
                 allowInsertColumn: false,
                 allowManualInsertColumn: false,
@@ -607,7 +624,9 @@ class ModelingValidation extends Component {
             })
         } else {
             this.el = jexcel(document.getElementById("tableDiv"), '');
-            this.el.destroy();
+            // this.el.destroy();
+            jexcel.destroy(document.getElementById("tableDiv"), true);
+
             this.setState({
                 nodeDataModelingList: [],
                 loading: false,
@@ -735,7 +754,9 @@ class ModelingValidation extends Component {
             })
         } else {
             this.el = jexcel(document.getElementById("tableDiv"), '');
-            this.el.destroy();
+            // this.el.destroy();
+            jexcel.destroy(document.getElementById("tableDiv"), true);
+
             this.setState({
                 versionList: [],
                 versionId: "",
@@ -1247,6 +1268,11 @@ class ModelingValidation extends Component {
     }
 
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
         var chartOptions = {
             title: {
                 display: true,
@@ -1500,14 +1526,14 @@ class ModelingValidation extends Component {
                         {/* } */}
                     </div>
                     <div className="card-header-actions pr-lg-3">
-                            <a className="card-header-action" style={{float:'right'}}>
+                        <a className="card-header-action" style={{ float: 'right' }}>
 
-                                {this.state.monthList.length > 0 && this.state.dataEl != undefined && this.state.dataEl != "" && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF()} />}
+                            {this.state.monthList.length > 0 && this.state.dataEl != undefined && this.state.dataEl != "" && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF()} />}
 
 
-                            </a>
-                            {this.state.monthList.length > 0 && this.state.dataEl != undefined && this.state.dataEl != "" && <img style={{ height: '25px', width: '25px', cursor: 'pointer',float:'right',marginTop:'3px' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />}
-                        </div>
+                        </a>
+                        {this.state.monthList.length > 0 && this.state.dataEl != undefined && this.state.dataEl != "" && <img style={{ height: '25px', width: '25px', cursor: 'pointer', float: 'right', marginTop: '3px' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />}
+                    </div>
                     <CardBody className="pb-lg-2 pt-lg-0 ">
                         <div>
                             <div ref={ref}>
@@ -1617,10 +1643,10 @@ class ModelingValidation extends Component {
                                                 </div>
                                             </FormGroup>
                                             <div>
-                                            <Popover placement="top" isOpen={this.state.popoverOpenLevelFeild} target="Popover5" trigger="hover" toggle={this.toggleLevelFeild}>
-                                                <PopoverBody>{i18n.t('static.Tooltip.levelModelingValdation')}</PopoverBody>
-                                            </Popover>
-                                        </div>
+                                                <Popover placement="top" isOpen={this.state.popoverOpenLevelFeild} target="Popover5" trigger="hover" toggle={this.toggleLevelFeild}>
+                                                    <PopoverBody>{i18n.t('static.Tooltip.levelModelingValdation')}</PopoverBody>
+                                                </Popover>
+                                            </div>
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.common.level')}<i class="fa fa-info-circle icons pl-lg-2" id="Popover5" onClick={this.toggleLevelFeild} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                 <div className="controls ">

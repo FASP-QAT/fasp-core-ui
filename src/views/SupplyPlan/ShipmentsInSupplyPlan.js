@@ -1,6 +1,6 @@
 import React from "react";
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import i18n from '../../i18n';
 import getLabelText from '../../CommonComponent/getLabelText';
@@ -630,11 +630,12 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                 { type: 'hidden' },
                                                 { type: 'hidden' }
                                             ],
+                                            editable: true,
                                             pagination: paginationOption,
                                             paginationOptions: paginationArray,
                                             search: searchOption,
                                             columnSorting: true,
-                                            tableOverflow: true,
+                                            // tableOverflow: true,
                                             wordWrap: true,
                                             allowInsertColumn: false,
                                             allowManualInsertColumn: false,
@@ -661,11 +662,11 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                 // }
                                             }.bind(this),
                                             onpaste: this.onPaste,
-                                            text: {
-                                                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')} `,
-                                                show: '',
-                                                entries: '',
-                                            },
+                                            // text: {
+                                            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')} `,
+                                            //     show: '',
+                                            //     entries: '',
+                                            // },
                                             onload: this.loadedShipments,
                                             updateTable: function (el, cell, x, y, source, value, id) {
                                                 if (y != null) {
@@ -1046,10 +1047,11 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                                     readOnly: true
                                                                                 },
                                                                             ],
+                                                                            editable: true,
                                                                             pagination: false,
                                                                             search: false,
                                                                             columnSorting: true,
-                                                                            tableOverflow: true,
+                                                                            // tableOverflow: true,
                                                                             wordWrap: true,
                                                                             allowInsertColumn: false,
                                                                             allowManualInsertColumn: false,
@@ -1067,11 +1069,11 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                                 return false;
                                                                             },
                                                                             license: JEXCEL_PRO_KEY,
-                                                                            text: {
-                                                                                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} `,
-                                                                                show: '',
-                                                                                entries: '',
-                                                                            },
+                                                                            // text: {
+                                                                            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} `,
+                                                                            //     show: '',
+                                                                            //     entries: '',
+                                                                            // },
                                                                             onload: this.loadedShipmentDates,
                                                                             updateTable: function (el, cell, x, y, source, value, id) {
                                                                                 var elInstance = el;
@@ -1551,7 +1553,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
 
     loadedQtyCalculator = function (instance, cell, x, y, value) {
         jExcelLoadedFunctionOnlyHideRow(instance);
-        var asterisk = document.getElementsByClassName("resizable")[1];
+        var asterisk = document.getElementsByClassName("jss")[1].firstChild.nextSibling;
         var tr = asterisk.firstChild;
         tr.children[1].classList.add('AsteriskTheadtrTd');
         tr.children[4].classList.add('AsteriskTheadtrTd');
@@ -1707,10 +1709,11 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 { type: 'hidden' },
                 { type: 'hidden' }
             ],
+            editable: true,
             pagination: false,
             search: false,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
@@ -1723,12 +1726,12 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             onchange: this.batchInfoChangedShipment,
             allowExport: false,
             parseFormulas: true,
-            text: {
-                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
+            //     show: '',
+            //     entries: '',
+            // },
             onload: this.loadedBatchInfoShipment,
             license: JEXCEL_PRO_KEY,
             updateTable: function (el, cell, x, y, source, value, id) {
@@ -2500,7 +2503,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
 
     loadedBatchInfoShipment = function (instance, cell, x, y, value) {
         jExcelLoadedFunctionOnlyHideRow(instance);
-        var asterisk = document.getElementsByClassName("resizable")[1];
+        var asterisk = document.getElementsByClassName("jss")[1].firstChild.nextSibling;
         var tr = asterisk.firstChild;
         tr.children[1].classList.add('AsteriskTheadtrTd');
         tr.children[2].classList.add('AsteriskTheadtrTd');
@@ -2737,7 +2740,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
 
     loadedShipmentDates = function (instance, cell, x, y, value) {
         jExcelLoadedFunctionOnlyHideRow(instance);
-        var asterisk = document.getElementsByClassName("resizable")[1];
+        var asterisk = document.getElementsByClassName("jss")[1].firstChild.nextSibling;
         var tr = asterisk.firstChild;
         tr.children[2].classList.add('AsteriskTheadtrTd');
         tr.children[3].classList.add('AsteriskTheadtrTd');
@@ -3918,7 +3921,14 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         }
     }
 
-    render() { return (<div></div>) }
+    render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
+        return (<div></div>)
+    }
 
     shipmentEditStart = function (instance, cell, x, y, value) {
         var papuResult = this.state.procurementAgentPlanningUnitListAll;
@@ -4051,7 +4061,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 pagination: false,
                 search: false,
                 columnSorting: true,
-                tableOverflow: true,
+                // tableOverflow: true,
                 wordWrap: true,
                 allowInsertColumn: false,
                 allowManualInsertColumn: false,
@@ -4066,11 +4076,11 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     return false;
                 },
                 onchange: this.shipmentQtyChanged,
-                text: {
-                    showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                    show: '',
-                    entries: '',
-                },
+                // text: {
+                //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                //     show: '',
+                //     entries: '',
+                // },
                 onload: this.loadedQtyCalculator,
                 updateTable: function (el, cell, x, y, source, value, id) {
                     var elInstance = el;
@@ -4107,13 +4117,13 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     data: json1,
                     columnDrag: true,
                     columns: [
-                        { type: 'numeric', readOnly: true, title: i18n.t('static.procurementAgentPlanningUnit.moq'), mask: '#,##.00', decimal: '.', width: 120 },
-                        { type: 'numeric', readOnly: true, title: i18n.t('static.procurementAgentPlanningUnit.unitPerPalletEuro1'), mask: '#,##.00', decimal: '.', width: 120 },
-                        { type: 'numeric', readOnly: true, title: i18n.t('static.procurementAgentPlanningUnit.unitPerPalletEuro2'), mask: '#,##.00', decimal: '.', width: 120 },
-                        { type: 'numeric', readOnly: true, title: i18n.t('static.procurementUnit.unitsPerContainer'), mask: '#,##.00', decimal: '.', width: 120 },
-                        { type: 'numeric', readOnly: true, title: i18n.t('static.supplyPlan.noOfPalletsEuro1'), mask: '#,##.00', decimal: '.', width: 120 },
-                        { type: 'numeric', readOnly: true, title: i18n.t('static.supplyPlan.noOfPalletsEuro2'), mask: '#,##.00', decimal: '.', width: 120 },
-                        { type: 'numeric', readOnly: true, title: i18n.t('static.supplyPlan.noOfContainers'), mask: '#,##.00', decimal: '.', width: 120 },
+                        { type: 'numeric', title: i18n.t('static.procurementAgentPlanningUnit.moq'), mask: '#,##.00', decimal: '.', width: 120 },
+                        { type: 'numeric', title: i18n.t('static.procurementAgentPlanningUnit.unitPerPalletEuro1'), mask: '#,##.00', decimal: '.', width: 120 },
+                        { type: 'numeric', title: i18n.t('static.procurementAgentPlanningUnit.unitPerPalletEuro2'), mask: '#,##.00', decimal: '.', width: 120 },
+                        { type: 'numeric', title: i18n.t('static.procurementUnit.unitsPerContainer'), mask: '#,##.00', decimal: '.', width: 120 },
+                        { type: 'numeric', title: i18n.t('static.supplyPlan.noOfPalletsEuro1'), mask: '#,##.00', decimal: '.', width: 120 },
+                        { type: 'numeric', title: i18n.t('static.supplyPlan.noOfPalletsEuro2'), mask: '#,##.00', decimal: '.', width: 120 },
+                        { type: 'numeric', title: i18n.t('static.supplyPlan.noOfContainers'), mask: '#,##.00', decimal: '.', width: 120 },
                         { type: 'hidden' },
                         { type: 'hidden' },
                         { type: 'hidden' },
@@ -4122,7 +4132,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     pagination: false,
                     search: false,
                     columnSorting: true,
-                    tableOverflow: true,
+                    // tableOverflow: true,
                     wordWrap: true,
                     allowInsertColumn: false,
                     allowManualInsertColumn: false,
@@ -4131,12 +4141,12 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     allowInsertRow: false,
                     allowManualInsertRow: false,
                     allowExport: false,
-                    editable: true,
-                    text: {
-                        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                        show: '',
-                        entries: '',
-                    },
+                    editable: false,
+                    // text: {
+                    //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                    //     show: '',
+                    //     entries: '',
+                    // },
                     onload: this.loadedQtyCalculator1,
                     license: JEXCEL_PRO_KEY,
                     contextMenu: function (obj, x, y, e) {
