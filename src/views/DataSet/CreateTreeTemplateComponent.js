@@ -4878,6 +4878,7 @@ export default class CreateTreeTemplate extends Component {
     }
 
     componentDidMount() {
+        console.log("my business functions---",AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE_TEMPLATE') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_TREE_TEMPLATE'));
         this.getNodeTyeList();
         this.getUsageTemplateList(0);
         ForecastMethodService.getActiveForecastMethodList().then(response => {
@@ -7858,7 +7859,7 @@ export default class CreateTreeTemplate extends Component {
                                                             id="usagePeriodIdDis"
                                                             name="usagePeriodIdDis"
                                                             bsSize="sm"
-                                                            valid={!errors.usagePeriodIdDis && (this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usagePeriod.usagePeriodId != "" : false)}
+                                                            valid={!errors.usagePeriodIdDis && (this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usagePeriod != null && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usagePeriod.usagePeriodId != "" : false)}
                                                             invalid={touched.usagePeriodIdDis && !!errors.usagePeriodIdDis}
                                                             onBlur={handleBlur}
                                                             onChange={(e) => {
@@ -7960,7 +7961,7 @@ export default class CreateTreeTemplate extends Component {
                                                         id="usagePeriodIdCon"
                                                         name="usagePeriodIdCon"
                                                         bsSize="sm"
-                                                        valid={!errors.usagePeriodIdCon && (this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usagePeriod.usagePeriodId != "" : false)}
+                                                        valid={!errors.usagePeriodIdCon && (this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usagePeriod != null && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usagePeriod.usagePeriodId != "" : false)}
                                                         invalid={touched.usagePeriodIdCon && !!errors.usagePeriodIdCon}
                                                         onBlur={handleBlur}
                                                         onChange={(e) => {
@@ -9775,11 +9776,15 @@ export default class CreateTreeTemplate extends Component {
                                                                 </Input>
                                                             </FormGroup>
                                                         </div>
-                                                        {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE_TEMPLATE') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_TREE_TEMPLATE') && <CardFooter className="col-md-6 pt-lg-0 pr-lg-0 float-right MarginTopCreateTreeBtn" style={{ backgroundColor: 'transparent', borderTop: '0px solid #c8ced3' }}>
+
+                                                        {(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE_TEMPLATE') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_TREE_TEMPLATE')) && 
+                                                        <CardFooter className="col-md-6 pt-lg-0 pr-lg-0 float-right MarginTopCreateTreeBtn" style={{ backgroundColor: 'transparent', borderTop: '0px solid #c8ced3' }}>
+                                                            {/* ---hehehe */}
                                                             {/* <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
                                                             <Button type="button" size="md" color="warning" className="float-right mr-1 mb-lg-2" onClick={this.resetTree}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                             <Button type="submit" color="success" className="mr-1 mb-lg-2 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"> </i>{i18n.t('static.pipeline.save')}</Button>
                                                         </CardFooter>}
+                                                        
                                                     </CardBody>
 
                                                     <div style={{ display: !this.state.loading ? "block" : "none" }} class="sample">
