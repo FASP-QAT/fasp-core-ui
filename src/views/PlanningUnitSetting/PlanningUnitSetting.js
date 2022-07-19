@@ -2950,23 +2950,59 @@ export default class PlanningUnitSetting extends Component {
                     let listContainNodeType5 = flatlist.filter(c => c.payload.nodeType.id == 5);
                     console.log("Test---------------->2", listContainNodeType5);
                     for (var l = 0; l < listContainNodeType5.length; l++) {
+                        // Begin logic
                         let nodeDataMap = listContainNodeType5[l].payload.nodeDataMap;
+                        //Fetch transfer nodes
                         let nodeDataMapKeys = Object.keys(listContainNodeType5[l].payload.nodeDataMap);
                         console.log("Test---------------->3", listContainNodeType5[l].id + '-------' + nodeDataMap + ' ----- ' + nodeDataMapKeys);
                         for (var m = 0; m < nodeDataMapKeys.length; m++) {
                             let insideArrayOfNodeDataMap = nodeDataMap[nodeDataMapKeys[m]];
-                            console.log("Test---------------->4", insideArrayOfNodeDataMap);
-                            for (var n = 0; n < insideArrayOfNodeDataMap.length; n++) {
-                                if (insideArrayOfNodeDataMap[n].puNode != null) {
-                                    if (insideArrayOfNodeDataMap[n].puNode.planningUnit.id == parseInt(listOfDisablePuNode[j])) {
-                                        console.log("Test---------------->5", insideArrayOfNodeDataMap[n]);
-                                        console.log("Test---------------->6", insideArrayOfNodeDataMap[n].puNode.planningUnit.id);
-                                        insideArrayOfNodeDataMap[n].puNode.planningUnit.id = null;
-                                    }
-                                }
+                            // find transfer row
+                            if (insideArrayOfNodeDataMap[0].puNode.planningUnit.id == parseInt(listOfDisablePuNode[j])) {
+                                var sameParentList = flatlist.filter(c => c.parent == listContainNodeType5[l].parent);
+                                console.log("sameParentList---", sameParentList);
+                                for (let l = 0; l < sameParentList.length; l++) {
+                                    var nodeDataModelingList = sameParentList[l].payload.nodeDataMap[nodeDataMapKeys[m]][0].nodeDataModelingList;
+                                    var result = nodeDataModelingList.filter(c => c.transferNodeDataId == nodeDataMap[nodeDataMapKeys[m]][0].nodeDataId);
+                                    if (result.length > 0) {
+                                        //Remove transfer
+                                        console.log("result---", result);
+                                        for (let r = 0; r < result.length; r++) {
+                                            var findNodeDataIdIndex = nodeDataModelingList.findIndex(n => n.transferNodeDataId == result[r].transferNodeDataId);
+                                            // Remove entry final
+                                            nodeDataModelingList.splice(findNodeDataIdIndex, 1);
+                                        }
 
+                                    }
+
+                                }
+                                // Delete node itself
+                                console.log("listContainNodeType5[l].id---", listContainNodeType5[l].id);
+                                var findNodeIndex = flatlist.findIndex(n => n.id == listContainNodeType5[l].id);
+                                console.log("flatlist---", flatlist);
+                                console.log("findNodeIndex---", findNodeIndex);
+                                if (findNodeIndex != -1) {
+                                    flatlist.splice(findNodeIndex, 1);
+                                }
                             }
+                            // console.log("Test---------------->4", insideArrayOfNodeDataMap);
+                            // for (var n = 0; n < insideArrayOfNodeDataMap.length; n++) {
+                            //     if (insideArrayOfNodeDataMap[n].puNode != null) {
+                            //         if (insideArrayOfNodeDataMap[n].puNode.planningUnit.id == parseInt(listOfDisablePuNode[j])) {
+                            //             // console.log("Test---------------->5", insideArrayOfNodeDataMap[n]);
+                            //             // console.log("Test---------------->6", insideArrayOfNodeDataMap[n].puNode.planningUnit.id);
+                            //             // insideArrayOfNodeDataMap[n].puNode.planningUnit.id = null;
+                            //             var findNodeIndex = flatlist.findIndex(n => n.payload.nodeDataMap[nodeDataMapKeys[m]][0].puNode.planningUnit.id == listOfDisablePuNode[j]);
+                            //             // Remove entry final
+                            //             flatlist.splice(findNodeIndex, 1);
+                            //         }
+                            //     }
+
+                            // }
                         }
+
+                        //Delete PU node logic
+                        // End logic
                     }
                 }
             }
