@@ -2253,6 +2253,7 @@
     "static.procurementUnit.supplier": "Fabricant",
     "static.loadDelDataset.versionNotLoaded": "La version n est pas chargée",
     "static.common.forecastPeriod": "Période de prévision",
+    "static.program.confirm": "Confirmer",
     "static.uploadfile.Browse": "Rechercher",
     "static.ManageTree.DefinedNode": "Défini à ce nœud",
     "static.dashboard.regionreport": "Région",

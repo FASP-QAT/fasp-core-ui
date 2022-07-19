@@ -2254,6 +2254,7 @@
     "static.procurementUnit.supplier": "Manufacturer",
     "static.loadDelDataset.versionNotLoaded": "Version is not loaded",
     "static.common.forecastPeriod": "Forecast Period",
+    "static.program.confirm": "Confirm",
     "static.uploadfile.Browse": "Browse",
     "static.ManageTree.DefinedNode": "Defined at this node",
     "static.dashboard.regionreport": "Region",

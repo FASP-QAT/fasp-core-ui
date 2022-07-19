@@ -937,7 +937,7 @@ class LoadDeleteDataSet extends Component {
 
     deleteLocalVersionUsingProgramId(programId) {
         confirmAlert({
-            title: i18n.t('static.program.confirmsubmit'),
+            title: i18n.t('static.program.confirm'),
             message: i18n.t('static.loadDelDataset.deleteAllOlderVersion'),
             buttons: [
                 {
@@ -1014,7 +1014,7 @@ class LoadDeleteDataSet extends Component {
     deleteLocalVersion(programId, versionId, changed) {
         console.log(">>>", changed);
         confirmAlert({
-            title: i18n.t('static.program.confirmsubmit'),
+            title: i18n.t('static.program.confirm'),
             message: changed == 1 ? i18n.t('static.loadDelDataset.changesNotSaved') : i18n.t('static.loadDelDataset.deleteThisLocalVersion'),
             buttons: [
                 {
