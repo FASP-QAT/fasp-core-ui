@@ -2449,7 +2449,7 @@ export default class syncPage extends Component {
 
                                                                         // Shipment Linked part
                                                                         var latestProgramDataShipmentLinked = latestProgramData.shipmentLinkingList!=null?latestProgramData.shipmentLinkingList:[];
-                                                                        var oldProgramDataShipmentLinked = oldProgramData.shipmentLinkingList!=null?oldProgramData.shipmentLinkingList:[];
+                                                                        var oldProgramDataShipmentLinked = oldProgramData.shipmentLinkingList!=null?oldProgramData.shipmentLinkingList.filter(c=>c.shipmentLinkingId>0 || (c.shipmentLinkingId==0 && c.active==true)):[];
                                                                         console.log("latestProgramDataShipmentLinked@@@@@@@@@@@@@",latestProgramDataShipmentLinked)
                                                                         console.log("oldProgramDataShipmentLinked@@@@@@@@@@@@@",oldProgramDataShipmentLinked)
                                                                         var downloadedProgramDataShipmentLinked = downloadedProgramData.shipmentLinkingList!=null?downloadedProgramData.shipmentLinkingList:[];
