@@ -2275,6 +2275,7 @@
     "static.procurementUnit.supplier": "Manufacturer",
     "static.loadDelDataset.versionNotLoaded": "Version is not loaded",
     "static.common.forecastPeriod": "Forecast Period",
+    "static.program.confirm": "Confirm",
     "static.uploadfile.Browse": "Browse",
     "static.ManageTree.DefinedNode": "Defined at this node",
     "static.dashboard.regionreport": "Region",
@@ -2771,5 +2772,6 @@
     "static.supplyPlanFormula.maxMonthOfStockEx2": "Max = MIN ([ MAX(4,3)+3 ] ,18 )",
     "static.organisation.organisationheader": "Organization",
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Max = 7",
-    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )"
+    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )",
+    "static.accesscontrol.duplicateAccessControl": "Error: Duplicated access controls"
 }
