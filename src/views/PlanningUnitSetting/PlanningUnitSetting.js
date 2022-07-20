@@ -2978,10 +2978,13 @@ export default class PlanningUnitSetting extends Component {
                                 }
                                 // Delete node itself
                                 console.log("listContainNodeType5[l].id---", listContainNodeType5[l].id);
+                                // listContainNodeType5[l].generateMom = 1;
                                 var findNodeIndex = flatlist.findIndex(n => n.id == listContainNodeType5[l].id);
                                 console.log("flatlist---", flatlist);
                                 console.log("findNodeIndex---", findNodeIndex);
                                 if (findNodeIndex != -1) {
+                                    console.log("treeListForSelectedProgram[k]",treeListForSelectedProgram[k]);
+                                    treeListForSelectedProgram[k].generateMom = 1;
                                     flatlist.splice(findNodeIndex, 1);
                                 }
                             }
