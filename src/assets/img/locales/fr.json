@@ -2277,6 +2277,7 @@
     "static.procurementUnit.supplier": "Fabricant",
     "static.loadDelDataset.versionNotLoaded": "La version n est pas chargée",
     "static.common.forecastPeriod": "Période de prévision",
+    "static.program.confirm": "Confirmer",
     "static.uploadfile.Browse": "Rechercher",
     "static.ManageTree.DefinedNode": "Défini à ce nœud",
     "static.dashboard.regionreport": "Région",
@@ -2774,5 +2775,7 @@
     "static.supplyPlanFormula.maxMonthOfStockEx2": "Max = MIN ([MAX (4,3) +3], 18)",
     "static.organisation.organisationheader": "Organisation",
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Max = 7",
-    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18)"
+    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18)",
+    "static.accesscontrol.duplicateAccessControl": "Erreur : Contrôles d'accès en double",
+    "static.loadDeleteProgram.loadDeleteProgram": "Charger/Supprimer le programme"
 }

@@ -2276,6 +2276,7 @@
     "static.procurementUnit.supplier": "Fabricante",
     "static.loadDelDataset.versionNotLoaded": "A versão não está carregada",
     "static.common.forecastPeriod": "Período de previsão",
+    "static.program.confirm": "Confirme",
     "static.uploadfile.Browse": "Navegar",
     "static.ManageTree.DefinedNode": "Definido neste nó",
     "static.dashboard.regionreport": "Região",
@@ -2773,5 +2774,7 @@
     "static.supplyPlanFormula.maxMonthOfStockEx2": "Máx = Menor entre ([Maior entre (4,3) +3], 18)",
     "static.organisation.organisationheader": "Organização",
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Máx = 7",
-    "static.supplyPlanFormula.maxMonthOfStockEx4": "Máx = Menor entre (7,18)"
+    "static.supplyPlanFormula.maxMonthOfStockEx4": "Máx = Menor entre (7,18)",
+    "static.accesscontrol.duplicateAccessControl": "Erro: controles de acesso duplicados",
+    "static.loadDeleteProgram.loadDeleteProgram": "Carregar/Excluir Programa"
 }
