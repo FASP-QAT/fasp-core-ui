@@ -2773,5 +2773,6 @@
     "static.organisation.organisationheader": "Organization",
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Max = 7",
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )",
-    "static.accesscontrol.duplicateAccessControl": "Error: Duplicated access controls"
+    "static.accesscontrol.duplicateAccessControl": "Error: Duplicated access controls",
+    "static.loadDeleteProgram.loadDeleteProgram": "Load/Delete Program"
 }
