@@ -1352,9 +1352,11 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
                   </div>
                   <div className="row" style={{ display: this.state.loading ? "none" : "block" }}>
                     <div className="col-md-12 mt-3">
-                      <div className="fixTableHead1">
+                      
 
-                        {this.state.data.length > 0 && <Table className="table-striped  table-fixed  table-bordered text-center ">
+                        {this.state.data.length > 0 && 
+                        <div className="fixTableHead1">
+                        <Table className="table-striped  table-fixed  table-bordered text-center ">
 
 
                           <thead>
@@ -1385,14 +1387,16 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
 
 
                           </tbody>
-                        </Table>}
+                        </Table>
+                        </div>
+                        }
 
-                      </div>
+                     
                       </div>
 
 
                     </div>
-                  </div>
+                  {/* </div> */}
                   <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                       <div class="align-items-center">
