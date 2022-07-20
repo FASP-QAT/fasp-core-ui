@@ -2778,5 +2778,8 @@
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Max = 7",
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )",
     "static.accesscontrol.duplicateAccessControl": "Error: Duplicated access controls",
-    "static.loadDeleteProgram.loadDeleteProgram": "Load/Delete Program"
+    "static.loadDeleteProgram.loadDeleteProgram": "Load/Delete Program",
+    "static.tree.duplicateScenarioName":"This scenario name already exists. Please choose a name that is not a duplicate.",
+    "static.tree.addScenario":"Add Scenario",
+    "static.tree.editScenario":"Edit/Update Scenario"
 }
