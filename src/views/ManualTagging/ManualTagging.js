@@ -5452,9 +5452,7 @@ export default class ManualTagging extends Component {
 
                                                     </div>
                                                 </Col></>}
-                                                <div className='ErpLinkBoldRowTable'>
                                             <div id="tableDiv1" className="RemoveStriped" style={{ display: this.state.table1Loader ? "block" : "none" }}>
-                                            </div>
                                             </div>
                                             <div style={{ display: this.state.table1Loader ? "none" : "block" }}>
                                                 <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
@@ -5655,7 +5653,7 @@ export default class ManualTagging extends Component {
                                             >
                                                 {
                                                     props => (
-                                                        <div className="TableCust FortablewidthMannualtaggingtable3 reactTableNotification">
+                                                        <div className="TableCust FortablewidthMannualtaggingtable3 ErpLinkBoldRowTable reactTableNotification">
                                                             {/* <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
                                                     <SearchBar {...props.searchProps} />
                                                     <ClearSearchButton {...props.searchProps} />
@@ -5689,7 +5687,7 @@ export default class ManualTagging extends Component {
                                             >
                                                 {
                                                     props => (
-                                                        <div className="TableCust ShipmentNotificationtable ">
+                                                        <div className="TableCust ShipmentNotificationtable ErpLinkBoldRowTable ">
                                                             {/* <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
                                                     <SearchBar {...props.searchProps} />
                                                     <ClearSearchButton {...props.searchProps} />

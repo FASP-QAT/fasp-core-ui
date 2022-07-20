@@ -1694,7 +1694,7 @@ export default class ShipmentLinkingNotifications extends Component {
                                         >
                                             {
                                                 props => (
-                                                    <div className="TableCust FortablewidthMannualtaggingtable3 reactTableNotification">
+                                                    <div className="TableCust FortablewidthMannualtaggingtable3 reactTableNotification ErpLinkBoldRowTable">
                                                         {/* <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
             <SearchBar {...props.searchProps} />
             <ClearSearchButton {...props.searchProps} />
@@ -1728,7 +1728,7 @@ export default class ShipmentLinkingNotifications extends Component {
                                         >
                                             {
                                                 props => (
-                                                    <div className="TableCust ShipmentNotificationtable ">
+                                                    <div className="TableCust ShipmentNotificationtable ErpLinkBoldRowTable">
                                                         {/* <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
             <SearchBar {...props.searchProps} />
             <ClearSearchButton {...props.searchProps} />
