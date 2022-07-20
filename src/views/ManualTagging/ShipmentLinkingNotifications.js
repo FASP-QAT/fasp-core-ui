@@ -1286,7 +1286,27 @@ export default class ShipmentLinkingNotifications extends Component {
         this.setState({
             manualTag: !this.state.manualTag,
             batchDetails: []
+        },()=>{
+            this.addTitle()
         })
+    }
+
+    addTitle() {
+        try {
+            var classList = document.getElementsByClassName("FortablewidthMannualtaggingtable3");
+            var tr = classList[0].firstChild.firstChild.firstChild.firstChild;
+            console.log("Tr@@@@@@@", tr);
+            tr.children[7].title = i18n.t('static.manualTagging.changeOrderOrder');
+            var classList = document.getElementsByClassName("ShipmentNotificationtable");
+            var tr = classList[0].firstChild.firstChild.firstChild.firstChild;
+            console.log("Tr@@@@@@@", tr);
+            tr.children[6].title = i18n.t('static.manualTagging.changeOrderShipment');
+        } catch (err) {
+            setTimeout(function () {
+                this.addTitle();
+            }.bind(this), 1000);
+        }
+
     }
 
     getPlanningUnitList() {
