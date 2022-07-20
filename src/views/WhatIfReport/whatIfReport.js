@@ -634,16 +634,16 @@ export default class WhatIfReportComponent extends React.Component {
         if (event.target.name === 'scenarioId') {
             this.setState({ scenarioId: event.target.value });
             if (event.target.value == 1 || event.target.value == 2) {
-                document.getElementById("consumptionScenariosFields1").style.display = "inline-flex";
-                document.getElementById("consumptionScenariosFields2").style.display = "inline-flex";
+                document.getElementById("consumptionScenariosFields1").style.display = "contents";
+                document.getElementById("consumptionScenariosFields2").style.display = "contents";
             } else if (event.target.value == 3) {
                 document.getElementById("consumptionScenariosFields1").style.display = "none";
-                document.getElementById("consumptionScenariosFields2").style.display = "inline-flex";
+                document.getElementById("consumptionScenariosFields2").style.display = "contents";
 
             } else if (event.target.value == 7) {
                 document.getElementById("consumptionScenariosFields1").style.display = "none";
                 document.getElementById("consumptionScenariosFields2").style.display = "none";
-                document.getElementById("scenariosFields2").style.display = "inline-flex";
+                document.getElementById("scenariosFields2").style.display = "contents";
                 var dt = new Date();
                 dt.setMonth(dt.getMonth());
                 var addLeadTimes = Math.round(parseFloat(this.state.generalProgramJson.plannedToSubmittedLeadTime) + parseFloat(this.state.generalProgramJson.submittedToApprovedLeadTime) +
@@ -4538,10 +4538,10 @@ export default class WhatIfReportComponent extends React.Component {
                             }) => (
                                 <Form onSubmit={handleSubmit} noValidate name='whatIfForm'>
 
-                                    <Col md="12 pl-0">
-                                        <div className="d-md-flex">
-                                            <div className="controls WhatifInputFeild">
-                                                <FormGroup className="">
+                                    <div className="row">
+                                        <div className="col-md-12 pl-0" style={{display:'contents'}}>
+                                            {/* <div className="controls WhatifInputFeild"> */}
+                                                <FormGroup className="col-md-3">
                                                     <Label htmlFor="select">{i18n.t('static.whatIf.scenario')}</Label>
                                                     <Input
                                                         type="select"
@@ -4565,7 +4565,7 @@ export default class WhatIfReportComponent extends React.Component {
                                                     </Input>
                                                     <FormFeedback className="red">{errors.scenarioId}</FormFeedback>
                                                 </FormGroup>
-                                            </div>
+                                            {/* </div> */}
                                             <Input
                                                 type="hidden"
                                                 name="needPercentageValidation"
@@ -4573,8 +4573,8 @@ export default class WhatIfReportComponent extends React.Component {
                                                 value={(this.state.scenarioId == 1 || this.state.scenarioId == 2 ? true : false)}
                                             />
                                             <div id="consumptionScenariosFields1" style={{ display: 'none' }}>
-                                                <div className="controls WhatifInputFeild">
-                                                    <FormGroup className="tab-ml-1">
+                                                {/* <div className="controls WhatifInputFeild"> */}
+                                                    <FormGroup className="col-md-3">
                                                         <Label htmlFor="select">{i18n.t('static.whatIf.percentage')}</Label>
                                                         <Input
                                                             type="text"
@@ -4590,11 +4590,11 @@ export default class WhatIfReportComponent extends React.Component {
                                                         </Input>
                                                         <FormFeedback className="red">{errors.percentage}</FormFeedback>
                                                     </FormGroup>
-                                                </div>
+                                                {/* </div> */}
                                             </div>
                                             <div id="consumptionScenariosFields2" style={{ display: 'none' }}>
-                                                <div className="controls WhatifInputFeild">
-                                                    <FormGroup className="tab-ml-1">
+                                                {/* <div className="controls WhatifInputFeild"> */}
+                                                    <FormGroup className="col-md-3">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}</Label>
                                                         <div className="controls edit">
                                                             <Picker
@@ -4610,7 +4610,7 @@ export default class WhatIfReportComponent extends React.Component {
                                                             </Picker>
                                                         </div>
                                                     </FormGroup>
-                                                </div>
+                                                {/* </div> */}
                                                 {/* <div className="controls WhatifInputFeild">
                                                         <FormGroup className="tab-ml-1">
                                                             <Label for="stopDate">{i18n.t('static.common.stopdate')}</Label>
@@ -4630,9 +4630,9 @@ export default class WhatIfReportComponent extends React.Component {
                                                         </FormGroup>
                                                     </div> */}
                                             </div>
-                                            <div id="scenariosFields2" style={{ display: 'none' }}>
-                                                <div className="controls WhatifInputFeild">
-                                                    <FormGroup className="tab-ml-1">
+                                            <div id="scenariosFields2" className="col-md-12" style={{ display: 'none' }}>
+                                                {/* <div className="controls WhatifInputFeild"> */}
+                                                    <FormGroup className="col-md-3">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}</Label>
                                                         <div className="controls edit">
                                                             <Picker
@@ -4649,11 +4649,11 @@ export default class WhatIfReportComponent extends React.Component {
                                                             </Picker>
                                                         </div>
                                                     </FormGroup>
-                                                </div>
-                                                <div className="controls WhatifInputFeild">
-                                                    <FormGroup className="tab-ml-1">
+                                                {/* </div> */}
+                                                {/* <div className="controls WhatifInputFeild"> */}
+                                                <FormGroup className="col-md-3">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.report.procurementAgentName')}</Label>
-                                                        <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                                                        {/* <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span> */}
                                                         <div className="controls edit">
                                                             {/* <InputGroup className="box"> */}
                                                             <MultiSelect
@@ -4668,9 +4668,9 @@ export default class WhatIfReportComponent extends React.Component {
 
                                                         </div>
                                                     </FormGroup>
-                                                </div>
-                                                <div className="controls WhatifInputFeild">
-                                                    <FormGroup className="tab-ml-1">
+                                                {/* </div> */}
+                                                {/* <div className="controls WhatifInputFeild"> */}
+                                                <FormGroup className="col-md-3">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.budget.fundingsource')}</Label>
                                                         <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                                                         <div className="controls edit">
@@ -4687,9 +4687,9 @@ export default class WhatIfReportComponent extends React.Component {
 
                                                         </div>
                                                     </FormGroup>
-                                                </div>
-                                                <div className="controls WhatifInputFeild">
-                                                    <FormGroup className="tab-ml-1">
+                                                {/* </div> */}
+                                                {/* <div className="controls WhatifInputFeild"> */}
+                                                <FormGroup className="col-md-3">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.report.procurementAgentName')}</Label>
                                                         <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                                                         <div className="controls edit">
@@ -4721,9 +4721,9 @@ export default class WhatIfReportComponent extends React.Component {
 
                                                         </div>
                                                     </FormGroup>
-                                                </div>
-                                                <div className="controls WhatifInputFeild">
-                                                    <FormGroup className="tab-ml-1">
+                                                {/* </div> */}
+                                                {/* <div className="controls WhatifInputFeild"> */}
+                                                <FormGroup className="col-md-3">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.budget.fundingsource')}</Label>
                                                         <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                                                         <div className="controls edit">
@@ -4746,9 +4746,9 @@ export default class WhatIfReportComponent extends React.Component {
 
                                                         </div>
                                                     </FormGroup>
-                                                </div>
-                                                <div className="controls WhatifInputFeild">
-                                                    <FormGroup className="tab-ml-1">
+                                                {/* </div> */}
+                                                {/* <div className="controls"> */}
+                                                <FormGroup className="col-md-3">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.budgetHead.budget')}</Label>
                                                         <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                                                         <div className="controls edit">
@@ -4771,14 +4771,14 @@ export default class WhatIfReportComponent extends React.Component {
 
                                                         </div>
                                                     </FormGroup>
-                                                </div>
+                                                {/* </div> */}
                                             </div>
-                                            <FormGroup className="tab-ml-1 mt-4">
+                                            <FormGroup className="col-md-2 mt-4">
                                                 <Button type="submit" size="md" color="success" onClick={() => this.touchAll(errors)} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
                                                 &nbsp;
                                             </FormGroup>
                                         </div>
-                                    </Col>
+                                    </div>
 
                                 </Form>
                             )} />
