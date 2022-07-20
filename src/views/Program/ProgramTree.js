@@ -662,7 +662,7 @@ class Program extends Component {
                         <Card>
                             <CardBody> */}
                                 <div style={{ display: this.state.loading ? "none" : "block" }}>
-                                    <div className="table-responsive" id="treeDiv" style={{ display: "none",height:'540px' }}>
+                                    <div className="table-responsive loadProgramHeight" id="treeDiv" style={{ display: "none"}}>
                                         <ul className="tree">
                                             <li>
                                                 <input type="checkbox" id="c1" />
