@@ -2210,10 +2210,10 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               <div style={{ display: this.state.loading ? "none" : "block" }}>
                 {this.state.showSmallTable &&
                   <div className="row">
-                    <div className="col-md-12">
+                    <div className="col-md-12 mt-2">
                       <div className="table-scroll">
-                        <div className="table-wrap DataEntryTable table-responsive">
-                          <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" options={this.options}>
+                        <div className="table-wrap DataEntryTable table-responsive fixTableHeadSupplyPlan">
+                          <Table className="table-bordered text-center overflowhide main-table " bordered size="sm" options={this.options}>
                             <thead>
                               <tr>
                                 <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th>
@@ -2340,7 +2340,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                       {/* <br></br> */}
                       {/* <br></br> */}
                       <div className="row">
-                        <div className="col-md-12 pl-2 pr-2 datdEntryRow">
+                        <div className="col-md-12 pl-2 pr-2 datdEntryRow consumptionDataEntryTable">
                           <div id="tableDiv" className="leftAlignTable">
                           </div>
                         </div>

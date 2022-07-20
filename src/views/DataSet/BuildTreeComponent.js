@@ -11184,11 +11184,15 @@ export default class BuildTree extends Component {
                                 <li>The order of operations for calculating a transfer occurs from the left to the right in the forecast tree. A transfer cannot be made from right to left, thus a user should be careful when designing their tree and determining where each node should be placed. </li>
                                 <li>Transfers are always negative from the source node and positive to the destination node.</li> */}
                                 <li>{i18n.t('static.ModelingTransfer.NumberNode')}</li>
-                                <li>{i18n.t('static.ModelingTransfer.PercentageFUPU')}</li>
+                                <li>Percentage nodes can only transfer to other percentage nodes and must belong to the same parent. </li>
+                                <li>The order of operations for calculating a transfer occurs from the left to the right in the forecast tree. A transfer cannot be made from right to left, thus a user should be careful when designing their tree and determining where each node should be placed. </li>
+                                <li>Transfers are always negative from the source node and positive to the destination node. </li>
+                                <li>Extrapolation is not allowed on a node that also has a transfer, whether that be to/from another node. </li>
+                                {/* <li>{i18n.t('static.ModelingTransfer.PercentageFUPU')}</li> */}
                                 {/* <li>{i18n.t('static.ModelingTransfer.DataTransferred')}</li> */}
-                                <li>{i18n.t('static.ModelingTransfer.OrderOfOperations')}</li>
+                                {/* <li>{i18n.t('static.ModelingTransfer.OrderOfOperations')}</li>
                                 <li>{i18n.t('static.ModelingTransfer.TransferDestination')}</li>
-                                <li>{i18n.t('static.ModelingTransfer.ExtrapolationNotAllowed')}</li>
+                                <li>{i18n.t('static.ModelingTransfer.ExtrapolationNotAllowed')}</li> */}
                             </ul>
                         </p>
                         <p><span style={{ fontSize: '14px' }} className="UnderLineText">{i18n.t('static.ModelingTransfer.Examples')} :</span>
@@ -11205,16 +11209,18 @@ export default class BuildTree extends Component {
                                     <br></br>
                                     <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0" src={ModelingTransferScreenshot3} style={{ border: '1px solid #fff' }} /></span>
                                 </li>
-                                <li><b>{i18n.t('static.ModelingTransfer.SimpleGrowth')}</b> {i18n.t('static.ModelingTransfer.SimpleGrowthExponential')}
+                                <li><b>{i18n.t('static.ModelingTransfer.SimpleGrowth')}</b> {i18n.t('static.ModelingTransfer.SimpleGrowthExponential')} 
+                                    
+                                    <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0 ml-lg-2" src={ModelingTransferScreenshot4} style={{ border: '1px solid #fff' }} /></span>
                                     <ul>
                                         <li>{i18n.t('static.ModelingTransfer.calculatesJanMonth')} </li>
                                         <li>{i18n.t('static.ModelingTransfer.calculatesFebMonth')} </li>
                                         <li>{i18n.t('static.ModelingTransfer.calculatesMarMonth')}  </li>
                                     </ul>
 
-                                    <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0 ml-lg-2" src={ModelingTransferScreenshot4} style={{ border: '1px solid #fff' }} /></span>
                                 </li>
-                                <li><b>{i18n.t('static.ModelingTransfer.MultiYearLoss')}</b> - {i18n.t('static.ModelingTransfer.MultiYearLossText')}
+                                <br></br>
+                                <li><b>{i18n.t('static.ModelingTransfer.MultiYearLoss')}</b> - {i18n.t('static.ModelingTransfer.MultiYearLossText')} 
                                     <br></br>
                                     <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0 ml-lg-2" src={ModelingTransferScreenshot5} style={{ border: '1px solid #fff' }} /></span>
                                 </li>
