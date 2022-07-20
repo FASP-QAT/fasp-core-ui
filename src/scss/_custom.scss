@@ -6490,3 +6490,6 @@ top: calc(20em + 3px);
 .ERPLinkTable .jexcel{
   width: unset!important;
 }
+.ErpLinkBoldRowTable .RemoveStriped .jexcel_content .jexcel .draggable tr:first-child {
+  font-weight: bold;
+}
