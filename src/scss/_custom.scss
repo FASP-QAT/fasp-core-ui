@@ -6559,3 +6559,6 @@ top: calc(20em + 3px);
     overflow-x: hidden;
     overflow-y: scroll;
 }
+.ErpLinkBoldRowTable .react-bootstrap-table table tbody tr:first-child {
+  font-weight: bold;
+}

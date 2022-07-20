@@ -89,8 +89,8 @@ export default class ManualTagging extends Component {
             procurementAgentId: '',
             displayButton: false,
             programId: '',
-            active1: this.props.match.params.tab==2?false:true,
-            active2: this.props.match.params.tab==2?true:false,
+            active1: this.props.match.params.tab == 2 ? false : true,
+            active2: this.props.match.params.tab == 2 ? true : false,
             active3: false,
             planningUnitValues: [],
             planningUnitIds: [],
@@ -107,7 +107,8 @@ export default class ManualTagging extends Component {
             versionId: -1,
             changedDataForTab2: false,
             roPrimeLineNoForTab3: "",
-            planningUnitsBasedOnTracerCategory: []
+            planningUnitsBasedOnTracerCategory: [],
+            test: 0
 
         }
 
@@ -215,7 +216,27 @@ export default class ManualTagging extends Component {
         this.setState({
             artmisHistoryModal: !this.state.artmisHistoryModal,
             batchDetails: []
+        }, () => {
+            this.addTitle()
         })
+    }
+
+    addTitle() {
+        try {
+            var classList = document.getElementsByClassName("FortablewidthMannualtaggingtable3");
+            var tr = classList[0].firstChild.firstChild.firstChild.firstChild;
+            console.log("Tr@@@@@@@", tr);
+            tr.children[7].title = i18n.t('static.manualTagging.changeOrderOrder');
+            var classList = document.getElementsByClassName("ShipmentNotificationtable");
+            var tr = classList[0].firstChild.firstChild.firstChild.firstChild;
+            console.log("Tr@@@@@@@", tr);
+            tr.children[6].title = i18n.t('static.manualTagging.changeOrderShipment');
+        } catch (err) {
+            setTimeout(function () {
+                this.addTitle();
+            }.bind(this), 1000);
+        }
+
     }
     toggleDetailsModal() {
         this.setState({
@@ -4079,8 +4100,8 @@ export default class ManualTagging extends Component {
 
     }
     componentDidMount() {
-            this.hideFirstComponent();
-            this.getLocalProgramList();
+        this.hideFirstComponent();
+        this.getLocalProgramList();
     }
 
     getLocalProgramList(parameter) {
@@ -5634,7 +5655,7 @@ export default class ManualTagging extends Component {
                                             >
                                                 {
                                                     props => (
-                                                        <div className="TableCust FortablewidthMannualtaggingtable3 reactTableNotification">
+                                                        <div className="TableCust FortablewidthMannualtaggingtable3 ErpLinkBoldRowTable reactTableNotification">
                                                             {/* <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
                                                     <SearchBar {...props.searchProps} />
                                                     <ClearSearchButton {...props.searchProps} />
@@ -5668,7 +5689,7 @@ export default class ManualTagging extends Component {
                                             >
                                                 {
                                                     props => (
-                                                        <div className="TableCust ShipmentNotificationtable ">
+                                                        <div className="TableCust ShipmentNotificationtable ErpLinkBoldRowTable ">
                                                             {/* <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
                                                     <SearchBar {...props.searchProps} />
                                                     <ClearSearchButton {...props.searchProps} />
