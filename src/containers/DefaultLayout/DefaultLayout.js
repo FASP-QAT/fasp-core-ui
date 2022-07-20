@@ -2198,17 +2198,17 @@ class DefaultLayout extends Component {
                               }
                             }
                           },
-                          {
-                            name: i18n.t('static.loadDeleteProgram.loadDeleteProgram'),
-                            url: '/program/downloadProgram',
-                            icon: 'cui-cloud-download FontBoldIcon',
-                            attributes: {
-                              hidden: ((this.state.businessFunctions.includes('ROLE_BF_DOWNLOAD_PROGARM') && this.state.activeTab == 2) ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
+                          // {
+                          //   name: i18n.t('static.loadDeleteProgram.loadDeleteProgram'),
+                          //   url: '/program/downloadProgram',
+                          //   icon: 'cui-cloud-download FontBoldIcon',
+                          //   attributes: {
+                          //     hidden: ((this.state.businessFunctions.includes('ROLE_BF_DOWNLOAD_PROGARM') && this.state.activeTab == 2) ? false : true),
+                          //     onClick: e => {
+                          //       this.refreshPage();
+                          //     }
+                          //   }
+                          // },
                           {
                             name: i18n.t('static.program.deleteLocalProgram'),
                             url: '/program/deleteLocalProgram',
