@@ -5431,7 +5431,9 @@ export default class ManualTagging extends Component {
 
                                                     </div>
                                                 </Col></>}
+                                                <div className='ErpLinkBoldRowTable'>
                                             <div id="tableDiv1" className="RemoveStriped" style={{ display: this.state.table1Loader ? "block" : "none" }}>
+                                            </div>
                                             </div>
                                             <div style={{ display: this.state.table1Loader ? "none" : "block" }}>
                                                 <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
