@@ -1199,7 +1199,7 @@ export default class CommitTreeComponent extends React.Component {
                             <span>b. {i18n.t('static.commitTree.treeScenarios')}:</span>
                             <div className="">
                                 {treeScenarioNotes.length > 0 ? <div className="table-wrap table-responsive fixTableHead">
-                                    <Table className="table-bordered text-center mt-2 overflowhide main-table table-striped1" bordered size="sm" >
+                                    <Table className="table-bordered text-center  overflowhide main-table table-striped1" bordered size="sm" >
                                         <thead>
                                             <tr>
                                                 <th style={{ width: '15%' }}><b>{i18n.t('static.forecastMethod.tree')}</b></th>
