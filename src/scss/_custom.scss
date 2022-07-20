@@ -6554,3 +6554,8 @@ top: calc(20em + 3px);
   width: 16px;
   height: 16px;
 }
+.loadProgramHeight{
+    max-height: calc(100vh - 100px)!important;
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
