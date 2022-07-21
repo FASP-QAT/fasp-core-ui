@@ -1286,7 +1286,27 @@ export default class ShipmentLinkingNotifications extends Component {
         this.setState({
             manualTag: !this.state.manualTag,
             batchDetails: []
+        },()=>{
+            this.addTitle()
         })
+    }
+
+    addTitle() {
+        try {
+            var classList = document.getElementsByClassName("FortablewidthMannualtaggingtable3");
+            var tr = classList[0].firstChild.firstChild.firstChild.firstChild;
+            console.log("Tr@@@@@@@", tr);
+            tr.children[7].title = i18n.t('static.manualTagging.changeOrderOrder');
+            var classList = document.getElementsByClassName("ShipmentNotificationtable");
+            var tr = classList[0].firstChild.firstChild.firstChild.firstChild;
+            console.log("Tr@@@@@@@", tr);
+            tr.children[6].title = i18n.t('static.manualTagging.changeOrderShipment');
+        } catch (err) {
+            setTimeout(function () {
+                this.addTitle();
+            }.bind(this), 1000);
+        }
+
     }
 
     getPlanningUnitList() {
@@ -1674,7 +1694,7 @@ export default class ShipmentLinkingNotifications extends Component {
                                         >
                                             {
                                                 props => (
-                                                    <div className="TableCust FortablewidthMannualtaggingtable3 reactTableNotification">
+                                                    <div className="TableCust FortablewidthMannualtaggingtable3 reactTableNotification ErpLinkBoldRowTable">
                                                         {/* <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
             <SearchBar {...props.searchProps} />
             <ClearSearchButton {...props.searchProps} />
@@ -1708,7 +1728,7 @@ export default class ShipmentLinkingNotifications extends Component {
                                         >
                                             {
                                                 props => (
-                                                    <div className="TableCust ShipmentNotificationtable ">
+                                                    <div className="TableCust ShipmentNotificationtable ErpLinkBoldRowTable">
                                                         {/* <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
             <SearchBar {...props.searchProps} />
             <ClearSearchButton {...props.searchProps} />

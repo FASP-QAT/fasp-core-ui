@@ -16,6 +16,7 @@
     "static.mt.notAddressed": "Not Addressed",
     "static.message.updateSuccess": "{{entityname}} updated successfully",
     "static.report.veruploaddate": "Date Version Uploaded",
+    "static.manualTagging.changeOrderOrder": "Created = New order line created by ERP system.\nUpdated = Order line updated by ERP system.\nDeleted = Order line deleted by ERP system",
     "static.healtharea.realm": "Realm",
     "static.report.validShipmentStatusText": "Select Shipment Status",
     "static.extrapolation.TripleExponentialTextThree": "Forecasts have parameters. Parameters in exponential smoothing are set between 0 and 1, with values close to 1 favoring recent values and values close to 0 favoring older values. Triple exponential smoothing applies three smoothing parameters",
@@ -2442,6 +2443,7 @@
     "static.extrapolation.LagOrderText": "the number of lag observations in the model",
     "static.procurementAgent.procurementAgentNotMappedWithProgram": "No Procurement Agent mapped with this Program",
     "static.tooltip.Stock": "Enter your actual or projected stock at the beginning of your forecast period This is used for calculating the procurement gap in the Forecast Summary screen",
+    "static.manualTagging.changeOrderShipment": "Created = New shipment or batch line created by ERP system.\nUpdated = Shipment or batch line updated by ERP system\nDeleted = Shipment or batch line deleted by ERP system",
     "static.commitTree.treeForecast": "Tree Forecast(s)",
     "static.dataset.manageProgram": "Manage Program",
     "static.planningUnitSetting.max10Digit4AfterDecimal": "Max 10 digit number and 4 digits after decimal are allowed.",
@@ -2778,5 +2780,8 @@
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Max = 7",
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )",
     "static.accesscontrol.duplicateAccessControl": "Error: Duplicated access controls",
-    "static.loadDeleteProgram.loadDeleteProgram": "Load/Delete Program"
+    "static.loadDeleteProgram.loadDeleteProgram": "Load/Delete Program",
+    "static.tree.duplicateScenarioName":"This scenario name already exists. Please choose a name that is not a duplicate.",
+    "static.tree.addScenario":"Add Scenario",
+    "static.tree.editScenario":"Edit/Update Scenario"
 }
