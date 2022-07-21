@@ -17,6 +17,7 @@ class DefaultFooter extends Component {
     return (
       <React.Fragment>
         {/* <span><a href=""></a> &copy; </span>*/}
+        <span className="mr-auto footerlink" >Full Master Data Sync</span>
         <span className="ml-auto footerlink">Copyright © 2020 {i18n.t('static.footer')}</span>
       </React.Fragment>
     );
