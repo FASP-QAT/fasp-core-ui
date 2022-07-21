@@ -1607,6 +1607,7 @@
     "static.programOnboarding.programCode": "Program Code",
     "static.message.user.emailIdExists": "Email address already exists",
     "static.dashboard.datasync": "Master data sync",
+    "static.dashboard.fullMasterDataSync": "Full Master Data Sync",
     "static.product.minMonthOfStock": "Min Month Of Stock",
     "static.report.stockstatusovertimeReport": "Stock Status Over Time",
     "static.problemReport.reviewed": "Reviewed",
