@@ -898,7 +898,7 @@ class usageTemplate extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            freezeColumns: 2,
+            // freezeColumns: 2,
             // colWidths: [100, 100, 100, 100, 150, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 120],
             columns: [
 
@@ -1192,7 +1192,7 @@ class usageTemplate extends Component {
             pagination: localStorage.getItem("sesRecordCount"),
             filters: true,
             search: true,
-            freezeColumns: 3,
+            // freezeColumns: 3,
             columnSorting: true,
             // tableOverflow: true,
             wordWrap: true,
@@ -2512,7 +2512,9 @@ class usageTemplate extends Component {
 
 
     loaded = function (instance, cell, x, y, value) {
-        jExcelLoadedFunction(instance);
+        jExcelLoadedFunction(instance, 0);
+
+
         // var asterisk = document.getElementsByClassName("resizable")[0];
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;

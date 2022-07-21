@@ -11142,12 +11142,12 @@ export default class BuildTree extends Component {
                         </p>
 
                         <p><b><i class="fa fa-calculator" aria-hidden="true"></i></b> {i18n.t('static.ModelingTransfer.CalculatorTool')}<br>
-                        </br>Additionally, by clicking on “Show Monthly Data,” users can see how their modelling and transfer inputs have affected the monthly data in both a graphical and tabular form. In the tabular data, users may add a manual change for a specific month or input a seasonality index percentage (only available for # nodes), as needed. If a user checks “Manual Change affects future month,” the manual amount added to the end of the month will carry over to the beginning of the next month. If neither of these fields are relevant, users can uncheck “Show (seasonality &) manual change” to hide these columns. 
+                        </br>Additionally, by clicking on “Show Monthly Data,” users can see how their modelling and transfer inputs have affected the monthly data in both a graphical and tabular form. In the tabular data, users may add a manual change for a specific month or input a seasonality index percentage (only available for # nodes), as needed. If a user checks “Manual Change affects future month,” the manual amount added to the end of the month will carry over to the beginning of the next month. If neither of these fields are relevant, users can uncheck “Show (seasonality &) manual change” to hide these columns.
                         </p>
 
                         <p><span style={{ fontSize: '14px' }} className="UnderLineText">{i18n.t('static.ModelingTransfer.RulesTransfer')}:</span>
                             <ul>
-                                
+
                                 {/* <li>Transfers must occur between nodes be on the same level</li>
                                 <li>Users can only transfer to nodes that are of the same type (i.e. a forecasting unit may transfer node data to another forecasting unit, but not a planning unit as they are not the same node type).</li>
                                 <li>The order of operations for calculating a transfer occurs from the left to the right in the forecast tree. A transfer cannot be made from right to left, thus a user should be careful when designing their tree and determining where each node should be placed. </li>
@@ -11178,8 +11178,8 @@ export default class BuildTree extends Component {
                                     <br></br>
                                     <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0" src={ModelingTransferScreenshot3} style={{ border: '1px solid #fff' }} /></span>
                                 </li>
-                                <li><b>{i18n.t('static.ModelingTransfer.SimpleGrowth')}</b> {i18n.t('static.ModelingTransfer.SimpleGrowthExponential')} 
-                                    
+                                <li><b>{i18n.t('static.ModelingTransfer.SimpleGrowth')}</b> {i18n.t('static.ModelingTransfer.SimpleGrowthExponential')}
+
                                     <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0 ml-lg-2" src={ModelingTransferScreenshot4} style={{ border: '1px solid #fff' }} /></span>
                                     <ul>
                                         <li>{i18n.t('static.ModelingTransfer.calculatesJanMonth')} </li>
@@ -11189,7 +11189,7 @@ export default class BuildTree extends Component {
 
                                 </li>
                                 <br></br>
-                                <li><b>{i18n.t('static.ModelingTransfer.MultiYearLoss')}</b> - {i18n.t('static.ModelingTransfer.MultiYearLossText')} 
+                                <li><b>{i18n.t('static.ModelingTransfer.MultiYearLoss')}</b> - {i18n.t('static.ModelingTransfer.MultiYearLossText')}
                                     <br></br>
                                     <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0 ml-lg-2" src={ModelingTransferScreenshot5} style={{ border: '1px solid #fff' }} /></span>
                                 </li>

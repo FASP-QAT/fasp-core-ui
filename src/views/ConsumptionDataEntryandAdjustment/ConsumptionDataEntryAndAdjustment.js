@@ -21,7 +21,7 @@ import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import csvicon from '../../assets/img/csv.png';
 import { JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
-import { jExcelLoadedFunctionOnlyHideRow, checkValidtion, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
+import { jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination, checkValidtion, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
 import NumberFormat from 'react-number-format';
 import { CustomTooltips } from "@coreui/coreui-plugin-chartjs-custom-tooltips";
 import { Prompt } from "react-router-dom";
@@ -407,7 +407,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           paginationOptions: JEXCEL_PAGINATION_OPTION,
           position: 'top',
           filters: false,
-          freezeColumns: 1,
+          // freezeColumns: 1,
           license: JEXCEL_PRO_KEY,
           parseFormulas: true,
           editable: AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT') ? true : false,
@@ -977,6 +977,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
 
   loadedJexcel = function (instance, cell, x, y, value) {
     // jExcelLoadedFunctionOnlyHideRow(instance);
+    jExcelLoadedFunction(instance, 0);
 
     var elInstance = instance.worksheets[0];
     var consumptionDataType = this.state.tempConsumptionUnitObject.consumptionDataType;
@@ -2730,7 +2731,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     // console.log("this.state.tempConsumptionUnitObject", this.el.getValueFromCoords(1, y))
     // console.log("start----", new Date())
 
-    var elInstance = instance.jexcel;
+    var elInstance = instance;
     var rowData = elInstance.getRowData(y);
 
     var consumptionDataType = rowData[5];
@@ -2829,7 +2830,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     var options = {
       data: data,
       columnDrag: true,
-      colWidths: [20, 100, 200, 50, 50, 50],
+      // colWidths: [20, 100, 200, 50, 50, 50],
       columns: [
         { title: ' ', type: 'radio' },//0 A
         { title: ' ', type: 'text', readOnly: true },//1 B
@@ -2844,29 +2845,23 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       //   show: '',
       //   entries: '',
       // },
-      editable: true,
-      updateTable: function (el, cell, x, y, source, value, id) {
-      },
       onload: this.loadedJexcel,
-      onchange: this.changed,
-      pagination: false,
+      pagination: localStorage.getItem("sesRecordCount"),
+      filters: false,
       search: false,
-      columnSorting: false,
-      // tableOverflow: true,
+      columnSorting: true,
       wordWrap: true,
-      allowInsertColumn: false,
-      allowManualInsertColumn: false,
-      allowInsertRow: false,
-      allowManualInsertRow: false,
-      allowDeleteRow: false,
-      copyCompatibility: true,
-      allowExport: false,
       paginationOptions: JEXCEL_PAGINATION_OPTION,
       position: 'top',
-      filters: false,
-      freezeColumns: 1,
-      license: JEXCEL_PRO_KEY,
+      allowInsertColumn: false,
+      allowManualInsertColumn: false,
+      allowDeleteRow: false,
+      onchange: this.changed,
+      copyCompatibility: true,
+      allowManualInsertRow: false,
       parseFormulas: true,
+      editable: true,
+      license: JEXCEL_PRO_KEY,
       contextMenu: function (obj, x, y, e) {
         return [];
       }.bind(this),
