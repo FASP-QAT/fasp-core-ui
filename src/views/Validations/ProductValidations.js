@@ -440,7 +440,7 @@ class ProductValidation extends Component {
                 // selectedText = this.state.currentItemConfig.parentItem.payload.nodeUnit.label.label_en
                 selectedText = getLabelText(unitList.filter(c=>c.unitId==nodeDataList.filter(c => c.flatItem.id == finalData[i].parentNodeFlatItem.parent)[0].flatItem.payload.nodeUnit.id)[0].label, this.state.lang);
                 // console.log("+++UNit Label", getLabelText(nodeDataList.filter(c => c.flatItem.id == finalData[i].parentNodeFlatItem.parent)[0].flatItem.payload.nodeUnit.label, this.state.lang));
-                selectedText1 = getLabelText(unitList.filter(c=>c.unitId==nodeDataList.filter(c => c.flatItem.id == finalData[i].parentNodeFlatItem.parent)[0].flatItem.payload.nodeUnit.id)[0].label, this.state.lang)
+                selectedText1 = getLabelText(unitList.filter(c=>c.unitId==finalData[i].parentNodeNodeDataMap.fuNode.forecastingUnit.unit.id)[0].label, this.state.lang)
                 if (finalData[i].parentNodeNodeDataMap.fuNode.usageType.id == 2 || finalData[i].parentNodeNodeDataMap.fuNode.oneTimeUsage != "true") {
                     console.log("finalData[i].parentNodeNodeDataMap.fuNode+++", finalData[i].parentNodeNodeDataMap.fuNode)
                     var upListFiltered = this.state.upList.filter(c => c.usagePeriodId == finalData[i].parentNodeNodeDataMap.fuNode.usagePeriod.usagePeriodId);
