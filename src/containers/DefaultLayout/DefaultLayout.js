@@ -915,6 +915,11 @@ class DefaultLayout extends Component {
     // AuthenticationService.setupAxiosInterceptors();
     this.props.history.push(`/changePassword`);
   }
+
+  goToMasterDataSync(e){
+    e.preventDefault();
+    this.props.history.push({ pathname: `/syncProgram`, state: { "isFullSync": true } })
+  }
   signOut(e) {
     e.preventDefault();
     confirmAlert({
@@ -4230,7 +4235,7 @@ class DefaultLayout extends Component {
         </div>
         <AppFooter>
           <Suspense fallback={this.loading()}>
-            <DefaultFooter />
+            <DefaultFooter syncProgram={e => this.goToMasterDataSync(e)}/>
           </Suspense>
         </AppFooter>
       </div>
