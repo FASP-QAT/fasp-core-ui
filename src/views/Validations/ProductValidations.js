@@ -440,7 +440,12 @@ class ProductValidation extends Component {
                 // selectedText = this.state.currentItemConfig.parentItem.payload.nodeUnit.label.label_en
                 selectedText = getLabelText(unitList.filter(c=>c.unitId==nodeDataList.filter(c => c.flatItem.id == finalData[i].parentNodeFlatItem.parent)[0].flatItem.payload.nodeUnit.id)[0].label, this.state.lang);
                 // console.log("+++UNit Label", getLabelText(nodeDataList.filter(c => c.flatItem.id == finalData[i].parentNodeFlatItem.parent)[0].flatItem.payload.nodeUnit.label, this.state.lang));
-                selectedText1 = getLabelText(unitList.filter(c=>c.unitId==finalData[i].parentNodeNodeDataMap.fuNode.forecastingUnit.unit.id)[0].label, this.state.lang)
+                console.log("finalData[i].parentNodeNodeDataMap.fuNode.forecastingUnit",finalData[i].parentNodeNodeDataMap.fuNode.forecastingUnit);
+                try{
+                    selectedText1 = getLabelText(this.state.fuList.filter(c=>c.forecastingUnitId==finalData[i].parentNodeNodeDataMap.fuNode.forecastingUnit.id)[0].unit.label, this.state.lang)
+                }catch(error){
+                    selectedText1="";
+                }
                 if (finalData[i].parentNodeNodeDataMap.fuNode.usageType.id == 2 || finalData[i].parentNodeNodeDataMap.fuNode.oneTimeUsage != "true") {
                     console.log("finalData[i].parentNodeNodeDataMap.fuNode+++", finalData[i].parentNodeNodeDataMap.fuNode)
                     var upListFiltered = this.state.upList.filter(c => c.usagePeriodId == finalData[i].parentNodeNodeDataMap.fuNode.usagePeriod.usagePeriodId);
@@ -824,6 +829,14 @@ class ProductValidation extends Component {
                             currencyRequest.onerror = function (event) {
                             }.bind(this);
                             currencyRequest.onsuccess = function (event) {
+
+                                var fuTransaction = db1.transaction(['forecastingUnit'], 'readwrite');
+                            var fuOs = fuTransaction.objectStore('forecastingUnit');
+                            var fuRequest = fuOs.getAll();
+                            fuRequest.onerror = function (event) {
+                            }.bind(this);
+                            fuRequest.onsuccess = function (event) {
+                                var fuList=fuRequest.result;
                                 var unitList = unitRequest.result;
                                 var upList = upRequest.result;
                                 var utList = utRequest.result;
@@ -883,6 +896,7 @@ class ProductValidation extends Component {
                                     unitList: unitList,
                                     upList: upList,
                                     utList: utList,
+                                    fuList:fuList,
                                     loading: false
                                 }, () => {
                                     // if (datasetId != "") {
@@ -895,6 +909,7 @@ class ProductValidation extends Component {
                 }.bind(this)
             }.bind(this)
         }.bind(this)
+    }.bind(this)
     }
 
     addDoubleQuoteToRowContent = (arr) => {
