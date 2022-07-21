@@ -976,8 +976,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
   }
 
   loadedJexcel = function (instance, cell, x, y, value) {
-    // jExcelLoadedFunctionOnlyHideRow(instance);
-    jExcelLoadedFunction(instance, 0);
+    jExcelLoadedFunctionOnlyHideRow(instance);
 
     var elInstance = instance.worksheets[0];
     var consumptionDataType = this.state.tempConsumptionUnitObject.consumptionDataType;
@@ -2672,12 +2671,11 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       multiplier = 1;
       // changedConsumptionDataDesc = getLabelText(consumptionUnit.planningUnit.label, this.state.lang) + ' | ' + consumptionUnit.planningUnit.id;;
     } else {
-      multiplier = (1 / Number((elInstance1.D3).toString().replaceAll(",", ""))) * consumptionUnitTemp.planningUnit.multiplier;
-      // multiplier = 1 / (document.getElementById('otherUnitMultiplier').value / consumptionUnitTemp.planningUnit.multiplier);
-
-      // changedConsumptionDataDesc = getLabelText(consumptionUnit.otherUnit.label, this.state.lang);
+      var conversionToFuOtherUnit = elInstance1.getValue(`D3`, true);
+      var descOtherUnit = elInstance1.getValue(`C3`, true);
+      multiplier = (1 / Number(conversionToFuOtherUnit.toString().replaceAll(",", ""))) * consumptionUnitTemp.planningUnit.multiplier;
     }
-    console.log("test", multiplier, "======", Number((elInstance1.D3).toString().replaceAll(",", "")), "======", consumptionUnitTemp.planningUnit.multiplier)
+    // console.log("test", multiplier, "======", Number(conversionToFuOtherUnit.toString().replaceAll(",", "")), "======", consumptionUnitTemp.planningUnit.multiplier)
 
     var consumptionUnitForUpdate = {};
     consumptionUnitForUpdate = {
@@ -2686,14 +2684,14 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       otherUnit: this.state.dataEnteredIn == 3 ? {
         label: {
           labelId: null,
-          label_en: elInstance1.C3,
+          label_en: descOtherUnit,
           // label_en: this.state.otherUnitName,
           label_fr: "",
           label_sp: "",
           label_pr: ""
         },
         // multiplier: this.state.selectedPlanningUnitMultiplier
-        multiplier: Number((elInstance1.D3).toString().replaceAll(",", ""))
+        multiplier: Number(conversionToFuOtherUnit.toString().replaceAll(",", ""))
 
       } : null
     }
@@ -2816,7 +2814,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       data[0] = this.state.tempConsumptionUnitObject.consumptionDataType == 3 ? true : false;
       data[1] = 'Other Unit';
       data[2] = this.state.tempConsumptionUnitObject.consumptionDataType == 3 ? this.state.otherUnitName : "";
-      data[3] = this.state.tempConsumptionUnitObject.consumptionDataType == 3 ? this.state.selectedPlanningUnitMultiplier : "";
+      data[3] = this.state.tempConsumptionUnitObject.consumptionDataType == 3 ? this.state.selectedPlanningUnitMultiplier : Number(0);
       data[4] = `=ROUND(1/D1*ROUND(D3,4),4)`;
       data[5] = 3
       dataArray1.push(data);
@@ -2846,7 +2844,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       //   entries: '',
       // },
       onload: this.loadedJexcel,
-      pagination: localStorage.getItem("sesRecordCount"),
+      pagination: false,
       filters: false,
       search: false,
       columnSorting: true,

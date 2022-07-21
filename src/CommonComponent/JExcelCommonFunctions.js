@@ -213,7 +213,7 @@ export function jExcelLoadedFunctionWithoutPagination(instance, number) {
     }
     var obj = {};
     obj.options = {};
-    var elInstance = instance.jexcel;
+    var elInstance = instance.worksheets[0];
     elInstance.hideIndex(0);
     var searchContainer = document.getElementsByClassName('jexcel_filter')[number];
     var searchDiv = (document.getElementsByClassName('jexcel_filter')[number]).childNodes[1];
