@@ -132,7 +132,7 @@ export default class PipelineProgramPlanningUnits extends Component {
                 this.el.setComments(col, "");
             }
             var columnName = jexcel.getColumnNameFromId([parseInt(x) + 1, y]);
-            instance.jexcel.setValue(columnName, '');
+            instance.worksheets[0].setValue(columnName, '');
         }
 
         //Planning Unit

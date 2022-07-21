@@ -1198,7 +1198,7 @@ class AddprogramPlanningUnit extends Component {
                 valid = true;
             }
             var columnName = jexcel.getColumnNameFromId([parseInt(x) + 1, y]);
-            instance.jexcel.setValue(columnName, '');
+            instance.worksheets[0].setValue(columnName, '');
         }
 
         //Planning Unit

@@ -257,7 +257,7 @@ export default class MapPlanningUnits extends Component {
                 this.el.setComments(col, "");
             }
             var columnName = jexcel.getColumnNameFromId([x + 1, y]);
-            instance.jexcel.setValue(columnName, '');
+            instance.worksheets[0].setValue(columnName, '');
         }
         if (x == 1) {
             var json = this.el.getJson(null, false);
