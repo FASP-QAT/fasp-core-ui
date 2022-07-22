@@ -1358,16 +1358,20 @@ export default class syncPage extends Component {
       mergedProblemListJexcel: ""
     })
     if (this.state.mergedConsumptionJexcel != "" && this.state.mergedConsumptionJexcel != undefined) {
-      this.state.mergedConsumptionJexcel.destroy();
+      // this.state.mergedConsumptionJexcel.destroy();
+      jexcel.destroy(document.getElementById('mergedVersionConsumption'), true);
     }
     if (this.state.mergedInventoryJexcel != "" && this.state.mergedInventoryJexcel != undefined) {
-      this.state.mergedInventoryJexcel.destroy();
+      // this.state.mergedInventoryJexcel.destroy();
+      jexcel.destroy(document.getElementById('mergedVersionInventory'), true);
     }
     if (this.state.mergedShipmentJexcel != "" && this.state.mergedShipmentJexcel != undefined) {
-      this.state.mergedShipmentJexcel.destroy();
+      // this.state.mergedShipmentJexcel.destroy();
+      jexcel.destroy(document.getElementById('mergedVersionShipment'), true);
     }
     if (this.state.mergedProblemListJexcel != "" && this.state.mergedProblemListJexcel != undefined) {
-      this.state.mergedProblemListJexcel.destroy();
+      // this.state.mergedProblemListJexcel.destroy();
+      jexcel.destroy(document.getElementById('mergedVersionProblemList'), true);
     }
 
     var programId = value != "" && value != undefined ? value.value : 0;

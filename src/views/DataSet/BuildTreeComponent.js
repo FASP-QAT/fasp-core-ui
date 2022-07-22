@@ -2920,12 +2920,18 @@ export default class BuildTree extends Component {
                 console.log("extrapolate current scenario---", this.state.currentScenario);
                 if (this.state.activeTab1[0] == '3') {
                     if (this.state.modelingEl != "") {
-                        this.state.modelingEl.destroy();
+                        // this.state.modelingEl.destroy();
+                        jexcel.destroy(document.getElementById('modelingJexcel'), true);
+
                         if (this.state.momEl != "") {
-                            this.state.momEl.destroy();
+                            // this.state.momEl.destroy();
+                            jexcel.destroy(document.getElementById('momJexcel'), true);
+
                         }
                         else if (this.state.momElPer != "") {
-                            this.state.momElPer.destroy();
+                            // this.state.momElPer.destroy();
+                            jexcel.destroy(document.getElementById('momJexcelPer'), true);
+
                         }
                     }
 
@@ -6693,12 +6699,17 @@ export default class BuildTree extends Component {
             if (tab == 3) {
                 // this.refs.extrapolationChild.buildJexcel();
                 if (this.state.modelingEl != "") {
-                    this.state.modelingEl.destroy();
+                    // this.state.modelingEl.destroy();
+                    jexcel.destroy(document.getElementById('modelingJexcel'), true);
+
                     if (this.state.momEl != "") {
-                        this.state.momEl.destroy();
+                        // this.state.momEl.destroy();
+                        jexcel.destroy(document.getElementById('momJexcel'), true);
+
                     }
                     else if (this.state.momElPer != "") {
-                        this.state.momElPer.destroy();
+                        // this.state.momElPer.destroy();
+                        jexcel.destroy(document.getElementById('momJexcelPer'), true);
                     }
                 }
 
