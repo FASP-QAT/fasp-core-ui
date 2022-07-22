@@ -785,9 +785,9 @@ class AddUserComponent extends Component {
         var proList = [];
         if (value != -1) {
             console.log("mylist--------->3.11");
-            proList = this.state.programListForFilter.filter(c => c.realmCountryId == value);
+            proList = this.state.programListForFilter.filter(c => c.id == -1 || c.realmCountryId == value);
 
-        } else {
+        } else {//All
             console.log("mylist--------->3.22");
             proList = this.state.programListForFilter;
         }
