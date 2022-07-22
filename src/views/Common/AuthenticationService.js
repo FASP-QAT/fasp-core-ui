@@ -462,13 +462,15 @@ class AuthenticationService {
     }
 
     getLoggedInUserRoleBusinessFunctionArray() {
+        try{
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != '') {
             let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-            // console.log("decryptedCurUser---", decryptedCurUser);
+            if(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser))!=undefined && CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser))!='' && CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser)!=null)){
+            console.log("decryptedCurUser---", decryptedCurUser);
             let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
-            // console.log("decryptedUser---", decryptedUser);
+            console.log("decryptedUser---", decryptedUser);
             let businessFunctionList = decryptedUser.businessFunctionList;
-            // console.log("decryptedUser.businessfunctions---" + decryptedUser.businessFunctionList);
+            console.log("decryptedUser.businessfunctions---" + decryptedUser.businessFunctionList);
 
             var bfunction = [];
             for (let i = 0; i < businessFunctionList.length; i++) {
@@ -476,9 +478,16 @@ class AuthenticationService {
             }
             // console.log("bfuntion---", bfunction);
             return bfunction;
+        }else{
+            return [];
+        }
         } else {
             return [];
         }
+    }catch(err){
+        console.log("err------",err);
+        return [];
+    }
     }
     authenticatedRoute(route, url) {
         if (url == "") {
