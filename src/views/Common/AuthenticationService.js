@@ -451,14 +451,23 @@ class AuthenticationService {
     }
 
     getLoggedInUserRoleBusinessFunction() {
+        try{
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != '') {
             let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+            if(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser))!=undefined && CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser))!='' && CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser)!=null)){
             let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
             let businessFunctions = decryptedUser.businessFunctionList;
             // console.log("decryptedUser.businessfunctions--->>>>" + decryptedUser.businessFunctionList);
             return businessFunctions;
+            }else{
+                return "";
+            }
         }
         return "";
+    }catch(err){
+        console.log("err------",err);
+        return "";
+    }
     }
 
     getLoggedInUserRoleBusinessFunctionArray() {
