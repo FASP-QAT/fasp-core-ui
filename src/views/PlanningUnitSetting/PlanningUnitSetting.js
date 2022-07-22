@@ -1615,7 +1615,7 @@ export default class PlanningUnitSetting extends Component {
 
             // PlanningUnitService.getPlanningUnitByRealmId(AuthenticationService.getRealmId())
             // PlanningUnitService.getActivePlanningUnitList()
-            PlanningUnitService.getPlanningUnitForProductCategoryAndProgram(-1, programId)
+            PlanningUnitService.getPlanningUnitForProductCategory(-1)
                 .then(response => {
                     console.log("RESP----->pu", response.data);
 
