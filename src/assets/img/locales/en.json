@@ -589,6 +589,7 @@
     "static.supplyPlan.fefo": "FEFO",
     "static.message.budget.notFound": "Could not find budget ${budget}",
     "static.forecastReport.freight": "Freight",
+    "static.tree.duplicateScenarioName": "This scenario name already exists. Please choose a name that is not a duplicate.",
     "static.message.shipmentsSaved": "Shipments data saved",
     "static.tree.willClientsShareOnePU?": "Will Clients share one PU?",
     "static.ModelingTransfer.SimpleGrowth": "Simple Growth",
