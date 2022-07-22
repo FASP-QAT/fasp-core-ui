@@ -589,6 +589,7 @@
     "static.supplyPlan.fefo": "PEPS",
     "static.message.budget.notFound": "Impossible de trouver le budget $ {budget}",
     "static.forecastReport.freight": "Cargaison",
+    "static.tree.duplicateScenarioName": "Ce nom de scénario existe déjà. Veuillez choisir un nom qui nest pas un doublon.",
     "static.message.shipmentsSaved": "Données d`expédition enregistrées",
     "static.tree.willClientsShareOnePU?": "Les clients partageront-ils une seule unité centrale ?",
     "static.ModelingTransfer.SimpleGrowth": "Croissance simple",
