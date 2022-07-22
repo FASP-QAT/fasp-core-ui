@@ -2821,10 +2821,10 @@ export default class PlanningUnitSetting extends Component {
                     // });
 
                     this.setState({
-                        // loading: false,
+                        loading: false,
                         message: i18n.t('static.mt.dataUpdateSuccess'),
                         color: "green",
-                        isChanged1: false,
+                        // isChanged1: false,
                         // allowAdd: false
                     }, () => {
                         listOfDisablePuNode = [...new Set(listOfDisablePuNode)];
@@ -2837,7 +2837,7 @@ export default class PlanningUnitSetting extends Component {
                         this.hideSecondComponent();
                         // this.filterData();
                         // this.setProgramId();
-                        this.getDatasetList();
+                        // this.getDatasetList();
                     });
                     console.log("Data update success1");
                     // alert("success");
