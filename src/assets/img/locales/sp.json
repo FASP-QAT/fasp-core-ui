@@ -997,6 +997,7 @@
     "static.ManageTree.PlanningUnitParameters": "Definido como un porcentaje de los parámetros de la unidad principal y de planificación",
     "static.procurementAgentPlanningUnit.validWeight": "Ingresar el peso (kg)",
     "static.tooltip.HashOfDaysInMonth": "Se utiliza en las previsiones de consumo para ajustar el consumo real frente a los días de desabastecimiento",
+    "static.accesscontrol.duplicateAccessControl": "Error: controles de acceso duplicados",
     "static.importFromQATSupplyPlan.Range": "Rango para Importar Consumo Real",
     "static.consumption.daysofstockout": "Número de días sin existencias",
     "static.program.region": "Región",
@@ -1146,6 +1147,7 @@
     "static.dataEntryAndAdjustments.DataValues": "Donde los valores de datos conocidos son (x0, y0) y (x1, y1)",
     "static.procurementUnit.weightUnit": "Unidad de medida de peso",
     "static.loadDelDataset.allOlderModifiedVersion": "Todas las versiones anteriores modificadas/no modificadas, incluida la última versión, se eliminarán y se cargará la nueva versión más reciente. ¿Desea continuar?",
+    "static.tree.editScenario": "Editar/Actualizar Escenario",
     "static.subFundingSource.subFundingSourceName": "Nombre de la Sub-fuente de financiamiento",
     "static.report.procurementagentcode": "Código del agente de compras",
     "static.report.lastmodifiedby": "Última modificacion hecha por",
@@ -1193,6 +1195,7 @@
     "static.versionSettings.AlsoVisibleEditable": "también visible y editable al enviar un programa.",
     "static.user.updateExpiredPassword": "Actualizar contraseña caducada",
     "static.expiryReport.batchInfoNote": "Haga clic en 'Cantidad vencida / vencida' para mostrar el libro mayor de lotes",
+    "static.tree.addScenario": "Agregar escenario",
     "static.listTree.submitHelpDeskTicket": "Envíe un ticket de HelpDesk si falta una plantilla que beneficiaría a la comunidad de QAT.",
     "static.program.validRegionstext": "Seleccionar regiones",
     "static.message.oldPassword": "Ingresar la contraseña anterior",
@@ -2745,6 +2748,5 @@
     "static.supplyPlanFormula.maxMonthOfStockEx2": "Max = MIN ([MAX (4,3) +3], 18)",
     "static.organisation.organisationheader": "Organización",
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Max = 7",
-    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18)",
-    "static.accesscontrol.duplicateAccessControl": "Error: controles de acceso duplicados"
+    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18)"
 }

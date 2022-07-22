@@ -997,6 +997,7 @@
     "static.ManageTree.PlanningUnitParameters": "Definido como uma porcentagem dos parâmetros da unidade pai e de planejamento",
     "static.procurementAgentPlanningUnit.validWeight": "Insira o peso (kg)",
     "static.tooltip.HashOfDaysInMonth": "Usado em previsões de consumo para ajustar o consumo real em relação aos dias de falta de estoque",
+    "static.accesscontrol.duplicateAccessControl": "Erro: controles de acesso duplicados",
     "static.importFromQATSupplyPlan.Range": "Intervalo para importar o consumo real",
     "static.consumption.daysofstockout": "Número de dias com ruptura de stock",
     "static.program.region": "Região",
@@ -1146,6 +1147,7 @@
     "static.dataEntryAndAdjustments.DataValues": "Onde os valores de dados conhecidos são (x0 , y0) e (x1 , y1)",
     "static.procurementUnit.weightUnit": "Unidade de peso",
     "static.loadDelDataset.allOlderModifiedVersion": "Todas as versões mais antigas modificadas/não modificadas, incluindo a versão mais recente, serão excluídas e a nova versão mais recente será carregada. Deseja continuar?",
+    "static.tree.editScenario": "Editar/atualizar cenário",
     "static.subFundingSource.subFundingSourceName": "Nome da fonte de sub-financiamento",
     "static.report.procurementagentcode": "Código do agente de compras",
     "static.report.lastmodifiedby": "Última alteração por",
@@ -1193,6 +1195,7 @@
     "static.versionSettings.AlsoVisibleEditable": "também visível e editável ao submeter um programa.",
     "static.user.updateExpiredPassword": "Atualizar a senha expirada",
     "static.expiryReport.batchInfoNote": "Clique em 'Quantidade Expirada / prestes a espirar' para exibir o registro do lote",
+    "static.tree.addScenario": "Adicionar cenário",
     "static.listTree.submitHelpDeskTicket": "Envie um tíquete de HelpDesk se houver um modelo ausente que beneficie a comunidade QAT.",
     "static.program.validRegionstext": "Selecione as regiões",
     "static.message.oldPassword": "Insira a sua senha antiga",
@@ -2745,6 +2748,5 @@
     "static.supplyPlanFormula.maxMonthOfStockEx2": "Máx = Menor entre ([Maior entre (4,3) +3], 18)",
     "static.organisation.organisationheader": "Organização",
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Máx = 7",
-    "static.supplyPlanFormula.maxMonthOfStockEx4": "Máx = Menor entre (7,18)",
-    "static.accesscontrol.duplicateAccessControl": "Erro: controles de acesso duplicados"
+    "static.supplyPlanFormula.maxMonthOfStockEx4": "Máx = Menor entre (7,18)"
 }
