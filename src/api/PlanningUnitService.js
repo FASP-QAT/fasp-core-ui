@@ -91,8 +91,9 @@ class PlanningUnitService {
         );
     }
 
-    getPlanningUnitForProductCategoryAndProgram(productCategoryId,programId){
-        return axios.get(`${API_URL}/api/planningUnit/productCategory/${productCategoryId}/programId/${programId}`, {}
+    getPlanningUnitForProductCategory(productCategoryId){
+        // return axios.get(`${API_URL}/api/planningUnit/productCategory/${productCategoryId}/programId/${programId}`, {}
+        return axios.get(`${API_URL}/api/planningUnit/withPricing/productCategory/${productCategoryId}`, {}
         );
     }
 }
