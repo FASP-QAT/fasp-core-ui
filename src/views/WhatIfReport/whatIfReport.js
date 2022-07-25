@@ -192,6 +192,8 @@ export default class WhatIfReportComponent extends React.Component {
             procurementAgents: [],
             fundingSources: [],
             procurementAgentListForWhatIf: [],
+            procurementAgentsUsed:[],
+            fundingSourceUsed:[],
             fundingSourceListForWhatIf: [],
             procurementAgentIdSingle: TBD_PROCUREMENT_AGENT_ID,
             fundingSourceIdSingle: TBD_FUNDING_SOURCE,
@@ -644,13 +646,15 @@ export default class WhatIfReportComponent extends React.Component {
                 document.getElementById("consumptionScenariosFields1").style.display = "none";
                 document.getElementById("consumptionScenariosFields2").style.display = "none";
                 document.getElementById("scenariosFields2").style.display = "contents";
+                console.log("this.state.generalProgramJson@@@@@@@@@@@@@@@",this.state.generalProgramJson)
+                var localProcurementLeadTime = ((this.state.programPlanningUnitList).filter(p => p.program.id == this.state.generalProgramJson.programId && p.planningUnit.id == this.state.planningUnitId))[0].localProcurementLeadTime;
                 var dt = new Date();
-                dt.setMonth(dt.getMonth());
-                var addLeadTimes = Math.round(parseFloat(this.state.generalProgramJson.plannedToSubmittedLeadTime) + parseFloat(this.state.generalProgramJson.submittedToApprovedLeadTime) +
-                    parseFloat(this.state.generalProgramJson.approvedToShippedLeadTime) + parseFloat(this.state.generalProgramJson.shippedToArrivedBySeaLeadTime) +
-                    parseFloat(this.state.generalProgramJson.arrivedToDeliveredLeadTime));
+                dt.setMonth(dt.getMonth() + localProcurementLeadTime);
+                // var addLeadTimes = Math.round(parseFloat(this.state.generalProgramJson.plannedToSubmittedLeadTime) + parseFloat(this.state.generalProgramJson.submittedToApprovedLeadTime) +
+                //     parseFloat(this.state.generalProgramJson.approvedToShippedLeadTime) + parseFloat(this.state.generalProgramJson.shippedToArrivedBySeaLeadTime) +
+                //     parseFloat(this.state.generalProgramJson.arrivedToDeliveredLeadTime));
                 var dt1 = new Date();
-                dt1.setMonth(dt.getMonth() + addLeadTimes);
+                dt1.setMonth(dt.getMonth() + 18);
                 var procurementAgentTBD = this.state.procurementAgentListForWhatIf.filter(c => c.procurementAgentId == TBD_PROCUREMENT_AGENT_ID)[0];
                 var fundingSourceTBD = this.state.fundingSourceListForWhatIf.filter(c => c.fundingSourceId == TBD_FUNDING_SOURCE)[0];
                 var budgetList = this.state.budgetListForWhatIf.filter(c => c.fundingSource.fundingSourceId == TBD_FUNDING_SOURCE)
@@ -2806,6 +2810,7 @@ export default class WhatIfReportComponent extends React.Component {
             var invList = (programJson.inventoryList).filter(c => c.planningUnit.id == planningUnitId && (moment(c.inventoryDate) >= moment(m[0].startDate) && moment(c.inventoryDate) <= moment(m[17].endDate)) && c.active == 1)
             var conList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && (moment(c.consumptionDate) >= moment(m[0].startDate) && moment(c.consumptionDate) <= moment(m[17].endDate)) && c.active == 1)
             var shiList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag == true && (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? (c.receivedDate >= m[0].startDate && c.receivedDate <= m[17].endDate) : (c.expectedDeliveryDate >= m[0].startDate && c.expectedDeliveryDate <= m[17].endDate)))
+            
             this.setState({
                 allShipmentsList: programJson.shipmentList
             })
@@ -2898,7 +2903,8 @@ export default class WhatIfReportComponent extends React.Component {
                             }
                         }
                         this.setState({
-                            procurementAgentListForWhatIf: listArrays
+                            procurementAgentListForWhatIf: listArrays,
+                            procurementAgentsUsed:[...new Set((programJson.shipmentList).filter(c=>c.active.toString()=="true" && c.accountFlag.toString()=="true").map(ele1 => (ele1.procurementAgent.id)))]
                         })
 
                         var fsTransaction = db1.transaction(['fundingSource'], 'readwrite');
@@ -2908,7 +2914,8 @@ export default class WhatIfReportComponent extends React.Component {
                             var fsResult = [];
                             fsResult = fsRequest.result.filter(c => c.realm.id == generalProgramJson.realmCountry.realm.realmId);
                             this.setState({
-                                fundingSourceListForWhatIf: fsResult
+                                fundingSourceListForWhatIf: fsResult,
+                                fundingSourceUsed:[...new Set((programJson.shipmentList).filter(c=>c.active.toString()=="true" && c.accountFlag.toString()=="true").map(ele1 => (ele1.fundingSource.id)))]
                             })
 
                             var cTransaction = db1.transaction(['currency'], 'readwrite');
@@ -2936,7 +2943,7 @@ export default class WhatIfReportComponent extends React.Component {
                                     var bRequest = bOs.getAll();
                                     bRequest.onsuccess = function (event) {
                                         var bResult = [];
-                                        bResult = bRequest.result
+                                        bResult = bRequest.result.filter(c => c.program.id == generalProgramJson.programId);
                                         this.setState({
                                             budgetListForWhatIf: bResult
                                         })
@@ -4454,7 +4461,7 @@ export default class WhatIfReportComponent extends React.Component {
                 a = a.procurementAgentCode.toLowerCase();
                 b = b.procurementAgentCode.toLowerCase();
                 return a < b ? -1 : a > b ? 1 : 0;
-            }).filter(c => c.active).map((item, i) => {
+            }).filter(c => c.active && this.state.procurementAgentsUsed.includes(c.procurementAgentId)).map((item, i) => {
                 return ({ label: item.procurementAgentCode, value: item.procurementAgentId })
 
             }, this);
@@ -4465,7 +4472,7 @@ export default class WhatIfReportComponent extends React.Component {
                 a = a.fundingSourceCode.toLowerCase();
                 b = b.fundingSourceCode.toLowerCase();
                 return a < b ? -1 : a > b ? 1 : 0;
-            }).filter(c => c.active).map((item, i) => {
+            }).filter(c => c.active && this.state.fundingSourceUsed.includes(c.fundingSourceId)).map((item, i) => {
                 return ({ label: item.fundingSourceCode, value: item.fundingSourceId })
 
             }, this);
@@ -4539,32 +4546,32 @@ export default class WhatIfReportComponent extends React.Component {
                                 <Form onSubmit={handleSubmit} noValidate name='whatIfForm'>
 
                                     <div className="row">
-                                        <div className="col-md-12 pl-0" style={{display:'contents'}}>
+                                        <div className="col-md-12 pl-0" style={{ display: 'contents' }}>
                                             {/* <div className="controls WhatifInputFeild"> */}
-                                                <FormGroup className="col-md-3">
-                                                    <Label htmlFor="select">{i18n.t('static.whatIf.scenario')}</Label>
-                                                    <Input
-                                                        type="select"
-                                                        name="scenarioId"
-                                                        id="scenarioId"
-                                                        bsSize="sm"
-                                                        valid={!errors.scenarioId && this.state.scenarioId != ''}
-                                                        invalid={touched.scenarioId && !!errors.scenarioId}
-                                                        onBlur={handleBlur}
-                                                        value={this.state.scenarioId}
-                                                        onChange={event => { handleChange(event); this.setTextAndValue(event) }}
-                                                    >
-                                                        <option value="">{i18n.t('static.common.select')}</option>
-                                                        <option value="1">{i18n.t('static.whatIf.increaseConsumption')}</option>
-                                                        <option value="2">{i18n.t('static.whatIf.decreaseConsumption')}</option>
-                                                        <option value="3">{i18n.t('static.whatIf.removeUnFundedShipments')}</option>
-                                                        <option value="4">{i18n.t('static.whatIf.removePlannedShipmentsNotInLeadTimes')}</option>
-                                                        <option value="5">{i18n.t('static.whatIf.removeApprovedShipmentsNotInLeadTimes')}</option>
-                                                        <option value="6">{i18n.t('static.whatIf.removeShippedShipmentsNotInLeadTimes')}</option>
-                                                        <option value="7">{i18n.t('static.scenarioPlanning.replanSupplyPlan')}</option>
-                                                    </Input>
-                                                    <FormFeedback className="red">{errors.scenarioId}</FormFeedback>
-                                                </FormGroup>
+                                            <FormGroup className="col-md-3">
+                                                <Label htmlFor="select">{i18n.t('static.whatIf.scenario')}</Label>
+                                                <Input
+                                                    type="select"
+                                                    name="scenarioId"
+                                                    id="scenarioId"
+                                                    bsSize="sm"
+                                                    valid={!errors.scenarioId && this.state.scenarioId != ''}
+                                                    invalid={touched.scenarioId && !!errors.scenarioId}
+                                                    onBlur={handleBlur}
+                                                    value={this.state.scenarioId}
+                                                    onChange={event => { handleChange(event); this.setTextAndValue(event) }}
+                                                >
+                                                    <option value="">{i18n.t('static.common.select')}</option>
+                                                    <option value="1">{i18n.t('static.whatIf.increaseConsumption')}</option>
+                                                    <option value="2">{i18n.t('static.whatIf.decreaseConsumption')}</option>
+                                                    <option value="3">{i18n.t('static.whatIf.removeUnFundedShipments')}</option>
+                                                    <option value="4">{i18n.t('static.whatIf.removePlannedShipmentsNotInLeadTimes')}</option>
+                                                    <option value="5">{i18n.t('static.whatIf.removeApprovedShipmentsNotInLeadTimes')}</option>
+                                                    <option value="6">{i18n.t('static.whatIf.removeShippedShipmentsNotInLeadTimes')}</option>
+                                                    <option value="7">{i18n.t('static.scenarioPlanning.replanSupplyPlan')}</option>
+                                                </Input>
+                                                <FormFeedback className="red">{errors.scenarioId}</FormFeedback>
+                                            </FormGroup>
                                             {/* </div> */}
                                             <Input
                                                 type="hidden"
@@ -4574,42 +4581,42 @@ export default class WhatIfReportComponent extends React.Component {
                                             />
                                             <div id="consumptionScenariosFields1" style={{ display: 'none' }}>
                                                 {/* <div className="controls WhatifInputFeild"> */}
-                                                    <FormGroup className="col-md-3">
-                                                        <Label htmlFor="select">{i18n.t('static.whatIf.percentage')}</Label>
-                                                        <Input
-                                                            type="text"
-                                                            name="percentage"
-                                                            id="percentage"
-                                                            bsSize="sm"
-                                                            valid={!errors.percentage && this.state.percentage != ''}
-                                                            invalid={touched.percentage && !!errors.percentage}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.percentage}
-                                                            onChange={event => { handleChange(event); this.setTextAndValue(event) }}
-                                                        >
-                                                        </Input>
-                                                        <FormFeedback className="red">{errors.percentage}</FormFeedback>
-                                                    </FormGroup>
+                                                <FormGroup className="col-md-3">
+                                                    <Label htmlFor="select">{i18n.t('static.whatIf.percentage')}</Label>
+                                                    <Input
+                                                        type="text"
+                                                        name="percentage"
+                                                        id="percentage"
+                                                        bsSize="sm"
+                                                        valid={!errors.percentage && this.state.percentage != ''}
+                                                        invalid={touched.percentage && !!errors.percentage}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.percentage}
+                                                        onChange={event => { handleChange(event); this.setTextAndValue(event) }}
+                                                    >
+                                                    </Input>
+                                                    <FormFeedback className="red">{errors.percentage}</FormFeedback>
+                                                </FormGroup>
                                                 {/* </div> */}
                                             </div>
                                             <div id="consumptionScenariosFields2" style={{ display: 'none' }}>
                                                 {/* <div className="controls WhatifInputFeild"> */}
-                                                    <FormGroup className="col-md-3">
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}</Label>
-                                                        <div className="controls edit">
-                                                            <Picker
-                                                                years={{ min: this.state.minDate, max: this.state.maxDate }}
-                                                                ref={this.pickRange}
-                                                                value={this.state.rangeValue}
-                                                                lang={pickerLang}
-                                                                //theme="light"
-                                                                onChange={this.handleRangeChange}
-                                                                onDismiss={this.handleRangeDissmis}
-                                                            >
-                                                                <MonthBox value={makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to)} onClick={this._handleClickRangeBox} />
-                                                            </Picker>
-                                                        </div>
-                                                    </FormGroup>
+                                                <FormGroup className="col-md-3">
+                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}</Label>
+                                                    <div className="controls edit">
+                                                        <Picker
+                                                            years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                                            ref={this.pickRange}
+                                                            value={this.state.rangeValue}
+                                                            lang={pickerLang}
+                                                            //theme="light"
+                                                            onChange={this.handleRangeChange}
+                                                            onDismiss={this.handleRangeDissmis}
+                                                        >
+                                                            <MonthBox value={makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to)} onClick={this._handleClickRangeBox} />
+                                                        </Picker>
+                                                    </div>
+                                                </FormGroup>
                                                 {/* </div> */}
                                                 {/* <div className="controls WhatifInputFeild">
                                                         <FormGroup className="tab-ml-1">
@@ -4632,69 +4639,69 @@ export default class WhatIfReportComponent extends React.Component {
                                             </div>
                                             <div id="scenariosFields2" className="col-md-12" style={{ display: 'none' }}>
                                                 {/* <div className="controls WhatifInputFeild"> */}
-                                                    <FormGroup className="col-md-3">
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}</Label>
-                                                        <div className="controls edit">
-                                                            <Picker
-                                                                years={{ min: this.state.minDate1, max: this.state.maxDate1 }}
-                                                                ref={this.pickRange2}
-                                                                value={this.state.rangeValue1}
-                                                                key={JSON.stringify(this.state.rangeValue1)}
-                                                                lang={pickerLang}
-                                                                //theme="light"
-                                                                onChange={this.handleRangeChange2}
-                                                                onDismiss={this.handleRangeDissmis2}
-                                                            >
-                                                                <MonthBox value={makeText(this.state.rangeValue1.from) + ' ~ ' + makeText(this.state.rangeValue1.to)} onClick={this._handleClickRangeBox2} />
-                                                            </Picker>
-                                                        </div>
-                                                    </FormGroup>
+                                                <FormGroup className="col-md-3">
+                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}</Label>
+                                                    <div className="controls edit">
+                                                        <Picker
+                                                            years={{ min: this.state.minDate1, max: this.state.maxDate1 }}
+                                                            ref={this.pickRange2}
+                                                            value={this.state.rangeValue1}
+                                                            key={JSON.stringify(this.state.rangeValue1)}
+                                                            lang={pickerLang}
+                                                            //theme="light"
+                                                            onChange={this.handleRangeChange2}
+                                                            onDismiss={this.handleRangeDissmis2}
+                                                        >
+                                                            <MonthBox value={makeText(this.state.rangeValue1.from) + ' ~ ' + makeText(this.state.rangeValue1.to)} onClick={this._handleClickRangeBox2} />
+                                                        </Picker>
+                                                    </div>
+                                                </FormGroup>
                                                 {/* </div> */}
                                                 {/* <div className="controls WhatifInputFeild"> */}
                                                 <FormGroup className="col-md-3">
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.report.procurementAgentName')}</Label>
-                                                        {/* <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span> */}
-                                                        <div className="controls edit">
-                                                            {/* <InputGroup className="box"> */}
-                                                            <MultiSelect
-                                                                name="procurementAgentId"
-                                                                id="procurementAgentId"
-                                                                options={procurementAgentList && procurementAgentList.length > 0 ? procurementAgentList : []}
-                                                                value={this.state.procurementAgents}
-                                                                onChange={(e) => { this.setProcurementAgents(e) }}
-                                                                // onChange={(e) => { this.handlePlanningUnitChange(e) }}
-                                                                labelledBy={i18n.t('static.common.select')}
-                                                            />
+                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.report.procurementAgentName')}</Label>
+                                                    {/* <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span> */}
+                                                    <div className="controls edit">
+                                                        {/* <InputGroup className="box"> */}
+                                                        <MultiSelect
+                                                            name="procurementAgentId"
+                                                            id="procurementAgentId"
+                                                            options={procurementAgentList && procurementAgentList.length > 0 ? procurementAgentList : []}
+                                                            value={this.state.procurementAgents}
+                                                            onChange={(e) => { this.setProcurementAgents(e) }}
+                                                            // onChange={(e) => { this.handlePlanningUnitChange(e) }}
+                                                            labelledBy={i18n.t('static.common.select')}
+                                                        />
 
-                                                        </div>
-                                                    </FormGroup>
+                                                    </div>
+                                                </FormGroup>
                                                 {/* </div> */}
                                                 {/* <div className="controls WhatifInputFeild"> */}
                                                 <FormGroup className="col-md-3">
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.budget.fundingsource')}</Label>
-                                                        <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
-                                                        <div className="controls edit">
-                                                            {/* <InputGroup className="box"> */}
-                                                            <MultiSelect
-                                                                name="fundingSourceId"
-                                                                id="fundingSourceId"
-                                                                options={fundingSourceList && fundingSourceList.length > 0 ? fundingSourceList : []}
-                                                                value={this.state.fundingSources}
-                                                                onChange={(e) => { this.setFundingSources(e) }}
-                                                                // onChange={(e) => { this.handlePlanningUnitChange(e) }}
-                                                                labelledBy={i18n.t('static.common.select')}
-                                                            />
+                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.budget.fundingsource')}</Label>
+                                                    <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                                                    <div className="controls edit">
+                                                        {/* <InputGroup className="box"> */}
+                                                        <MultiSelect
+                                                            name="fundingSourceId"
+                                                            id="fundingSourceId"
+                                                            options={fundingSourceList && fundingSourceList.length > 0 ? fundingSourceList : []}
+                                                            value={this.state.fundingSources}
+                                                            onChange={(e) => { this.setFundingSources(e) }}
+                                                            // onChange={(e) => { this.handlePlanningUnitChange(e) }}
+                                                            labelledBy={i18n.t('static.common.select')}
+                                                        />
 
-                                                        </div>
-                                                    </FormGroup>
+                                                    </div>
+                                                </FormGroup>
                                                 {/* </div> */}
                                                 {/* <div className="controls WhatifInputFeild"> */}
                                                 <FormGroup className="col-md-3">
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.report.procurementAgentName')}</Label>
-                                                        <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
-                                                        <div className="controls edit">
-                                                            {/* <InputGroup className="box"> */}
-                                                            {/* <MultiSelect
+                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.report.procurementAgentName')}</Label>
+                                                    <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                                                    <div className="controls edit">
+                                                        {/* <InputGroup className="box"> */}
+                                                        {/* <MultiSelect
                                                                 name="procurementAgentId"
                                                                 id="procurementAgentId"
                                                                 options={procurementAgentList && procurementAgentList.length > 0 ? procurementAgentList : []}
@@ -4703,74 +4710,74 @@ export default class WhatIfReportComponent extends React.Component {
                                                                 // onChange={(e) => { this.handlePlanningUnitChange(e) }}
                                                                 labelledBy={i18n.t('static.common.select')}
                                                             /> */}
-                                                            <InputGroup>
-                                                                <Input
-                                                                    type="select"
-                                                                    name="procurementAgentIdSingle"
-                                                                    id="procurementAgentIdSingle"
-                                                                    bsSize="sm"
-                                                                    onChange={(e) => { this.setProcurementAgent(e) }}
-                                                                    value={this.state.procurementAgentIdSingle}
+                                                        <InputGroup>
+                                                            <Input
+                                                                type="select"
+                                                                name="procurementAgentIdSingle"
+                                                                id="procurementAgentIdSingle"
+                                                                bsSize="sm"
+                                                                onChange={(e) => { this.setProcurementAgent(e) }}
+                                                                value={this.state.procurementAgentIdSingle}
 
-                                                                >
-                                                                    {/* <option value="">{i18n.t('static.common.select')}</option> */}
-                                                                    {procurementAgentListSingleSelect}
-                                                                </Input>
+                                                            >
+                                                                {/* <option value="">{i18n.t('static.common.select')}</option> */}
+                                                                {procurementAgentListSingleSelect}
+                                                            </Input>
 
-                                                            </InputGroup>
+                                                        </InputGroup>
 
-                                                        </div>
-                                                    </FormGroup>
+                                                    </div>
+                                                </FormGroup>
                                                 {/* </div> */}
                                                 {/* <div className="controls WhatifInputFeild"> */}
                                                 <FormGroup className="col-md-3">
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.budget.fundingsource')}</Label>
-                                                        <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
-                                                        <div className="controls edit">
-                                                            {/* <InputGroup className="box"> */}
-                                                            <InputGroup>
-                                                                <Input
-                                                                    type="select"
-                                                                    name="fundingSourceIdSingle"
-                                                                    id="fundingSourceIdSingle"
-                                                                    bsSize="sm"
-                                                                    value={this.state.fundingSourceIdSingle}
-                                                                    onChange={(e) => { this.setFundingSource(e) }}
+                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.budget.fundingsource')}</Label>
+                                                    <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                                                    <div className="controls edit">
+                                                        {/* <InputGroup className="box"> */}
+                                                        <InputGroup>
+                                                            <Input
+                                                                type="select"
+                                                                name="fundingSourceIdSingle"
+                                                                id="fundingSourceIdSingle"
+                                                                bsSize="sm"
+                                                                value={this.state.fundingSourceIdSingle}
+                                                                onChange={(e) => { this.setFundingSource(e) }}
 
-                                                                >
-                                                                    {/* <option value="">{i18n.t('static.common.select')}</option> */}
-                                                                    {fundingSourceListSingleSelect}
-                                                                </Input>
+                                                            >
+                                                                {/* <option value="">{i18n.t('static.common.select')}</option> */}
+                                                                {fundingSourceListSingleSelect}
+                                                            </Input>
 
-                                                            </InputGroup>
+                                                        </InputGroup>
 
-                                                        </div>
-                                                    </FormGroup>
+                                                    </div>
+                                                </FormGroup>
                                                 {/* </div> */}
                                                 {/* <div className="controls"> */}
                                                 <FormGroup className="col-md-3">
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.budgetHead.budget')}</Label>
-                                                        <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
-                                                        <div className="controls edit">
-                                                            {/* <InputGroup className="box"> */}
-                                                            <InputGroup>
-                                                                <Input
-                                                                    type="select"
-                                                                    name="budgetIdSingle"
-                                                                    id="budgetIdSingle"
-                                                                    bsSize="sm"
-                                                                    value={this.state.budgetIdSingle}
-                                                                    onChange={(e) => { this.setBudget(e) }}
+                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.budgetHead.budget')}</Label>
+                                                    <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                                                    <div className="controls edit">
+                                                        {/* <InputGroup className="box"> */}
+                                                        <InputGroup>
+                                                            <Input
+                                                                type="select"
+                                                                name="budgetIdSingle"
+                                                                id="budgetIdSingle"
+                                                                bsSize="sm"
+                                                                value={this.state.budgetIdSingle}
+                                                                onChange={(e) => { this.setBudget(e) }}
 
-                                                                >
-                                                                    <option value="">{i18n.t('static.common.select')}</option>
-                                                                    {budgetListSingleSelect}
-                                                                </Input>
+                                                            >
+                                                                <option value="">{i18n.t('static.common.select')}</option>
+                                                                {budgetListSingleSelect}
+                                                            </Input>
 
-                                                            </InputGroup>
+                                                        </InputGroup>
 
-                                                        </div>
-                                                    </FormGroup>
+                                                    </div>
+                                                </FormGroup>
                                                 {/* </div> */}
                                             </div>
                                             <FormGroup className="col-md-2 mt-4">
