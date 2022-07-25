@@ -1615,7 +1615,7 @@ export default class PlanningUnitSetting extends Component {
 
             // PlanningUnitService.getPlanningUnitByRealmId(AuthenticationService.getRealmId())
             // PlanningUnitService.getActivePlanningUnitList()
-            PlanningUnitService.getPlanningUnitForProductCategoryAndProgram(-1, programId)
+            PlanningUnitService.getPlanningUnitForProductCategory(-1)
                 .then(response => {
                     console.log("RESP----->pu", response.data);
 
@@ -2432,8 +2432,8 @@ export default class PlanningUnitSetting extends Component {
             }
             console.log("in if=====>1.1", pcIdArray);
             console.log("in if=====>1.2", this.state.planningUnitList);
-            console.log("in if=====>1.3", this.state.planningUnitList.filter(c => c.productCategory.id == 21));
-            puList = (this.state.planningUnitList).filter(c => pcIdArray.includes(c.productCategory.id));
+            // console.log("in if=====>1.3", this.state.planningUnitList.filter(c => c.productCategory.id == 21));
+            puList = (this.state.planningUnitList).filter(c => pcIdArray.includes(c.forecastingUnit.productCategory.id));
             console.log("in if=====>1.4", puList);
         } else {
             console.log("in else=====>2");
@@ -2821,10 +2821,10 @@ export default class PlanningUnitSetting extends Component {
                     // });
 
                     this.setState({
-                        // loading: false,
+                        loading: false,
                         message: i18n.t('static.mt.dataUpdateSuccess'),
                         color: "green",
-                        isChanged1: false,
+                        // isChanged1: false,
                         // allowAdd: false
                     }, () => {
                         listOfDisablePuNode = [...new Set(listOfDisablePuNode)];
@@ -2837,7 +2837,7 @@ export default class PlanningUnitSetting extends Component {
                         this.hideSecondComponent();
                         // this.filterData();
                         // this.setProgramId();
-                        this.getDatasetList();
+                        // this.getDatasetList();
                     });
                     console.log("Data update success1");
                     // alert("success");
