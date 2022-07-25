@@ -11,9 +11,12 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
     props.updateState("scenarioId", '');
     var curDate = moment(startDate).format("YYYY-MM-DD");
     var startDate1 = moment(startDate).format("YYYY-MM-DD");
-    for (var s = 0; moment(curDate).format("YYYY-MM") <= moment(stopDate).add(-1, 'months').format("YYYY-MM"); s++) {
+    console.log("CurDate mohit",curDate)
+    console.log("Stop date mohit",stopDate)
+    console.log("compare mohit",moment(curDate).format("YYYY-MM") < moment(stopDate).format("YYYY-MM"))
+    for (var s = 1; moment(curDate).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM"); s++) {
         var supplyPlanData = programJson.supplyPlan;
-        curDate = moment(startDate1).add(s, 'months').format("YYYY-MM-DD");
+        console.log("In loop for curDate mohit",curDate)
         var jsonList = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM-DD") == moment(curDate).format("YYYY-MM-DD"));
         var currentMonth = moment(Date.now()).utcOffset('-0500').startOf('month').format("YYYY-MM-DD");
         var compare = (curDate >= currentMonth);
@@ -223,6 +226,7 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                 for (var i = 0; createdDate < lastDataEntryDate; i++) {
                     // Adding months to created date and getting start date and end date
                     createdDate = moment(firstDataEntryDate).add(i, 'months').format("YYYY-MM-DD");
+                    console.log("Trans Date@@@@@@ mohit",createdDate);
                     var startDate = moment(createdDate).startOf('month').format('YYYY-MM-DD');
                     var endDate = moment(createdDate).endOf('month').format('YYYY-MM-DD');
                     // Getting prev month date
@@ -1146,7 +1150,7 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
             }
         } else {
         }
-
+        curDate = moment(startDate1).add(s, 'months').format("YYYY-MM-DD");
     }
     programJsonForStoringTheResult.batchInfoList = programJson.batchInfoList;
     programJsonForStoringTheResult.supplyPlan = programJson.supplyPlan;
