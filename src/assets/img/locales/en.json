@@ -593,6 +593,7 @@
     "static.supplyPlan.fefo": "FEFO",
     "static.message.budget.notFound": "Could not find budget ${budget}",
     "static.forecastReport.freight": "Freight",
+    "static.tree.duplicateScenarioName": "This scenario name already exists. Please choose a name that is not a duplicate.",
     "static.message.shipmentsSaved": "Shipments data saved",
     "static.tree.willClientsShareOnePU?": "Will Clients share one PU?",
     "static.ModelingTransfer.SimpleGrowth": "Simple Growth",
@@ -1005,6 +1006,7 @@
     "static.ManageTree.PlanningUnitParameters": "Defined as a percentage of the parent and planning unit parameters",
     "static.procurementAgentPlanningUnit.validWeight": "Enter Weight (kg)",
     "static.tooltip.HashOfDaysInMonth": "Used in Consumption Forecasts for adjusting actual consumption against stock out days",
+    "static.accesscontrol.duplicateAccessControl": "Error: Duplicated access controls",
     "static.importFromQATSupplyPlan.Range": "Range to Import Actual Consumption",
     "static.consumption.daysofstockout": "Number of Days Stocked Out",
     "static.program.region": "Region",
@@ -1156,6 +1158,7 @@
     "static.dataEntryAndAdjustments.DataValues": "Where known data values are (x0 , y0) and (x1 , y1)",
     "static.procurementUnit.weightUnit": "Weight Unit",
     "static.loadDelDataset.allOlderModifiedVersion": "All the older modified/non modified versions including latest version will get deleted and new latest version will get loaded do you want to continue?",
+    "static.tree.editScenario": "Edit/Update Scenario",
     "static.subFundingSource.subFundingSourceName": "Sub-funding source name",
     "static.report.procurementagentcode": "Procurement Agent Code",
     "static.report.lastmodifiedby": "Last modified by",
@@ -1203,6 +1206,7 @@
     "static.versionSettings.AlsoVisibleEditable": "also visible and editable when committing a program.",
     "static.user.updateExpiredPassword": "Update expired password",
     "static.expiryReport.batchInfoNote": "Click on 'Expired/Expiring Quantity' to display batch ledger",
+    "static.tree.addScenario": "Add Scenario",
     "static.listTree.submitHelpDeskTicket": "Submit a HelpDesk ticket if there is a missing template that would benefit the QAT community.",
     "static.program.validRegionstext": "Select regions",
     "static.message.oldPassword": "Enter old password",
@@ -2780,9 +2784,5 @@
     "static.organisation.organisationheader": "Organization",
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Max = 7",
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )",
-    "static.accesscontrol.duplicateAccessControl": "Error: Duplicated access controls",
-    "static.loadDeleteProgram.loadDeleteProgram": "Load/Delete Program",
-    "static.tree.duplicateScenarioName":"This scenario name already exists. Please choose a name that is not a duplicate.",
-    "static.tree.addScenario":"Add Scenario",
-    "static.tree.editScenario":"Edit/Update Scenario"
+    "static.loadDeleteProgram.loadDeleteProgram": "Load/Delete Program"
 }

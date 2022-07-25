@@ -605,7 +605,7 @@ class Program extends Component {
     deleteLocalVersion(programId, versionId, changed) {
         console.log(">>>", changed);
         confirmAlert({
-            title: i18n.t('static.program.confirmsubmit'),
+            title: i18n.t('static.program.confirm'),
             message: changed == 1 ? "Changes are not saved still do you want to delete this version." : "Delete this version",
             buttons: [
                 {
@@ -1205,7 +1205,7 @@ class Program extends Component {
                                 }
                                 if (isExists > 0) {
                                     confirmAlert({
-                                        title: i18n.t('static.program.confirmsubmit'),
+                                        title: i18n.t('static.program.confirm'),
                                         message: i18n.t('static.program.programwithsameversion'),
                                         buttons: [
                                             {
