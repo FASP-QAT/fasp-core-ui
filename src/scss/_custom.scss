@@ -6560,6 +6560,6 @@ top: calc(20em + 3px);
     overflow-x: hidden;
     overflow-y: scroll;
 }
-.ErpLinkBoldRowTable .react-bootstrap-table table tbody tr:first-child {
+.jexcel > tbody > tr > td.historyBold {
   font-weight: bold;
 }
