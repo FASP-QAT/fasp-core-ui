@@ -1099,11 +1099,13 @@ export default class StepOneImportMapPlanningUnits extends Component {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
                         this.el.setComments(col, i18n.t('static.planningUnitSetting.max10Digit4AfterDecimal'));
+                        valid = false;
                     } else {
                         if (isNaN(Number.parseInt(value)) || value <= 0) {
                             this.el.setStyle(col, "background-color", "transparent");
                             this.el.setStyle(col, "background-color", "yellow");
                             this.el.setComments(col, i18n.t('static.program.validvaluetext'));
+                            valid = false;
                         } else {
                             this.el.setStyle(col, "background-color", "transparent");
                             this.el.setComments(col, "");
