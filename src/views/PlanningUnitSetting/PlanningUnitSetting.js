@@ -2829,7 +2829,7 @@ export default class PlanningUnitSetting extends Component {
                         loading: false,
                         message: i18n.t('static.mt.dataUpdateSuccess'),
                         color: "green",
-                        // isChanged1: false,
+                        isChanged1: false,
                         // allowAdd: false
                     }, () => {
                         listOfDisablePuNode = [...new Set(listOfDisablePuNode)];
