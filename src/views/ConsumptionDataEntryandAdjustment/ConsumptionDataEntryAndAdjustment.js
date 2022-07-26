@@ -922,6 +922,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
 
           datasetJson.actualConsumptionList = fullConsumptionList;
           datasetJson.planningUnitList = planningUnitList;
+          datasetJson.consumptionExtrapolation=[];
+          console.log("datasetJson----------->925",datasetJson);
           datasetData = (CryptoJS.AES.encrypt(JSON.stringify(datasetJson), SECRET_KEY)).toString()
           myResult.programData = datasetData;
           var putRequest = datasetTransaction.put(myResult);
