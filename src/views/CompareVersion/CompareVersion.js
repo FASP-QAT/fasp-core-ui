@@ -27,6 +27,9 @@ import "../../../node_modules/jsuites/dist/jsuites.css";
 import ProgramService from '../../api/ProgramService';
 import DatasetService from '../../api/DatasetService';
 import CompareVersionTable from '../CompareVersion/CompareVersionTable.js';
+import PlanningUnitService from '../../api/PlanningUnitService';
+import ReportService from '../../api/ReportService';
+import CompareVersionTableCompareVersion from './CompareVersionTableCompareVersion';
 
 class CompareVersion extends Component {
     constructor(props) {
@@ -288,7 +291,9 @@ class CompareVersion extends Component {
                         id: responseData[rd].programId,
                         name: getLabelText(responseData[rd].label, this.state.lang),
                         code: responseData[rd].programCode,
-                        versionList: responseData[rd].versionList
+                        versionList: responseData[rd].versionList,
+                        regionList: responseData[rd].regionList,
+                        label:responseData[rd].label
                     }
                     datasetList.push(json);
                 }
@@ -413,8 +418,64 @@ class CompareVersion extends Component {
                     var datasetDataBytes = CryptoJS.AES.decrypt(myResult.programData, SECRET_KEY);
                     var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
                     var datasetJson = JSON.parse(datasetData);
+                    var planningUnitList = datasetJson.planningUnitList;
+                    var regionList = datasetJson.regionList
+                    var list = [];
+                    var treeList = datasetJson.treeList;
+                    var consumptionExtrapolation = datasetJson.consumptionExtrapolation;
+                    for (var pu = 0; pu < planningUnitList.length; pu++) {
+                        for (var r = 0; r < regionList.length; r++) {
+                            if (planningUnitList[pu].selectedForecastMap != undefined && planningUnitList[pu].selectedForecastMap[regionList[r].regionId] != undefined) {
+                                var label = "";
+                                if (planningUnitList[pu].selectedForecastMap[regionList[r].regionId].scenarioId != null && planningUnitList[pu].selectedForecastMap[regionList[r].regionId].scenarioId != "") {
+                                    var selectedTree = treeList.filter(c => planningUnitList[pu].selectedForecastMap[regionList[r].regionId].treeId == c.treeId)[0];
+                                    var scenarioLabel = selectedTree.scenarioList.filter(c => c.id == planningUnitList[pu].selectedForecastMap[regionList[r].regionId].scenarioId)[0];
+                                    label = {
+                                        label_en: getLabelText(selectedTree.label, this.state.lang) + " - " + getLabelText(scenarioLabel.label, this.state.lang),
+                                        label_sp: getLabelText(selectedTree.label, this.state.lang) + " - " + getLabelText(scenarioLabel.label, this.state.lang),
+                                        label_pr: getLabelText(selectedTree.label, this.state.lang) + " - " + getLabelText(scenarioLabel.label, this.state.lang),
+                                        label_fr: getLabelText(selectedTree.label, this.state.lang) + " - " + getLabelText(scenarioLabel.label, this.state.lang),
+                                    };
+                                } else if (planningUnitList[pu].selectedForecastMap[regionList[r].regionId].consumptionExtrapolationId != null && planningUnitList[pu].selectedForecastMap[regionList[r].regionId].consumptionExtrapolationId != "") {
+                                    label = {
+                                        label_en: getLabelText(consumptionExtrapolation.filter(c => c.consumptionExtrapolationId == planningUnitList[pu].selectedForecastMap[regionList[r].regionId].consumptionExtrapolationId)[0].extrapolationMethod.label, this.state.lang),
+                                        label_sp: getLabelText(consumptionExtrapolation.filter(c => c.consumptionExtrapolationId == planningUnitList[pu].selectedForecastMap[regionList[r].regionId].consumptionExtrapolationId)[0].extrapolationMethod.label, this.state.lang),
+                                        label_pr: getLabelText(consumptionExtrapolation.filter(c => c.consumptionExtrapolationId == planningUnitList[pu].selectedForecastMap[regionList[r].regionId].consumptionExtrapolationId)[0].extrapolationMethod.label, this.state.lang),
+                                        label_fr: getLabelText(consumptionExtrapolation.filter(c => c.consumptionExtrapolationId == planningUnitList[pu].selectedForecastMap[regionList[r].regionId].consumptionExtrapolationId)[0].extrapolationMethod.label, this.state.lang),
+
+                                    }
+                                }
+                            }
+                            // var selectedForecastMap=planningUnitList[pu].selectedForecastMap;
+                            // planningUnitList[pu].selectedForecastMap != undefined ? planningUnitList[pu].selectedForecastMap[regionList[r].regionId] != undefined && planningUnitList[pu].selectedForecastMap[regionList[r].regionId].scenarioId != null && planningUnitList[pu].selectedForecastMap[regionList[r].regionId].scenarioId != "" ? treeScenarioList.filter(c => c.scenario.id == selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].scenarioId && c.tree.treeId == selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].treeId).length > 0 ? treeScenarioList.filter(c => c.scenario.id == selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].scenarioId && c.tree.treeId == selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].treeId)[0].id : 0 : selectedPlanningUnit[0].selectedForecastMap[this.state.regionId] != undefined ? selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].consumptionExtrapolationId : 0 : 0
+                            // planningUnitList[puList].totalForecast=
+                            list.push({
+                                selectedForecast: label,
+                                totalForecast: planningUnitList[pu].selectedForecastMap != undefined && planningUnitList[pu].selectedForecastMap[regionList[r].regionId] != undefined ? planningUnitList[pu].selectedForecastMap[regionList[r].regionId].totalForecast : "",
+                                notes: {label_en:planningUnitList[pu].selectedForecastMap != undefined && planningUnitList[pu].selectedForecastMap[regionList[r].regionId] != undefined ? planningUnitList[pu].selectedForecastMap[regionList[r].regionId].notes : ""},
+                                planningUnit: planningUnitList[pu].planningUnit,
+                                region: {
+                                    id:regionList[r].regionId,
+                                    label:regionList[r].label
+                                }
+                            })
+
+                        }
+                    }
+                    var json = {
+                        currentVersion: {
+                            forecastStartDate: datasetJson.currentVersion.forecastStartDate,
+                            forecastStopDate: datasetJson.currentVersion.forecastStopDate,
+                            notes: datasetJson.currentVersion.notes,
+                        },
+                        planningUnitList: list,
+                        regionList: datasetJson.regionList,
+                        programCode:datasetJson.programCode,
+                        label:datasetJson.label
+                    }
+                    console.log("Json@@@@@@@@",json);
                     this.setState({
-                        datasetData: datasetJson,
+                        datasetData: json,
                         firstDataSet: 1,
                         loading: false
                     }, () => {
@@ -423,13 +484,30 @@ class CompareVersion extends Component {
                 }.bind(this)
             }.bind(this)
         } else if (versionId != "" && !versionId.includes("Local")) {
-            var json = [{ programId: this.state.datasetId, versionId: versionId }]
-            DatasetService.getAllDatasetData(json).then(response => {
+            var datasetFiltered = this.state.datasetList.filter(c => c.id == this.state.datasetId)[0];
+            var versonListFilter = datasetFiltered.versionList.filter(c => c.versionId == versionId)[0];
+            let inputJson = {
+                "programId": this.state.datasetId,
+                "versionId": versionId,
+                "reportView": 1//2-National 1-Regional
+            }
+            ReportService.forecastSummary(inputJson).then(response => {
                 if (response.status == 200) {
                     console.log("resp--------------------", response.data);
-                    var responseData = response.data[0];
+                    var responseData = response.data;
+                    var json = {
+                        currentVersion: {
+                            forecastStartDate: versonListFilter.forecastStartDate,
+                            forecastStopDate: versonListFilter.forecastStopDate,
+                            notes: versonListFilter.notes,
+                        },
+                        planningUnitList: responseData,
+                        regionList: datasetFiltered.regionList,
+                        programCode:datasetFiltered.code,
+                        label:datasetFiltered.label
+                    }
                     this.setState({
-                        datasetData: responseData,
+                        datasetData: json,
                         firstDataSet: 1,
                         loading: false,
                     }, () => {
@@ -444,6 +522,7 @@ class CompareVersion extends Component {
                 }
             }).catch(
                 error => {
+                    console.log("Error", error)
                     this.setState({
                         datasetData: {},
                         firstDataSet: 0,
@@ -490,8 +569,63 @@ class CompareVersion extends Component {
                     var datasetDataBytes = CryptoJS.AES.decrypt(myResult.programData, SECRET_KEY);
                     var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
                     var datasetJson = JSON.parse(datasetData);
+                    var planningUnitList = datasetJson.planningUnitList;
+                    var regionList = datasetJson.regionList
+                    var list = [];
+                    var treeList = datasetJson.treeList;
+                    var consumptionExtrapolation = datasetJson.consumptionExtrapolation;
+                    for (var pu = 0; pu < planningUnitList.length; pu++) {
+                        for (var r = 0; r < regionList.length; r++) {
+                            if (planningUnitList[pu].selectedForecastMap != undefined && planningUnitList[pu].selectedForecastMap[regionList[r].regionId] != undefined) {
+                                var label = "";
+                                if (planningUnitList[pu].selectedForecastMap[regionList[r].regionId].scenarioId != null && planningUnitList[pu].selectedForecastMap[regionList[r].regionId].scenarioId != "") {
+                                    var selectedTree = treeList.filter(c => planningUnitList[pu].selectedForecastMap[regionList[r].regionId].treeId == c.treeId)[0];
+                                    var scenarioLabel = selectedTree.scenarioList.filter(c => c.id == planningUnitList[pu].selectedForecastMap[regionList[r].regionId].scenarioId)[0];
+                                    label = {
+                                        label_en: getLabelText(selectedTree.label, this.state.lang) + " - " + getLabelText(scenarioLabel.label, this.state.lang),
+                                        label_sp: getLabelText(selectedTree.label, this.state.lang) + " - " + getLabelText(scenarioLabel.label, this.state.lang),
+                                        label_pr: getLabelText(selectedTree.label, this.state.lang) + " - " + getLabelText(scenarioLabel.label, this.state.lang),
+                                        label_fr: getLabelText(selectedTree.label, this.state.lang) + " - " + getLabelText(scenarioLabel.label, this.state.lang),
+                                    };
+                                } else if (planningUnitList[pu].selectedForecastMap[regionList[r].regionId].consumptionExtrapolationId != null && planningUnitList[pu].selectedForecastMap[regionList[r].regionId].consumptionExtrapolationId != "") {
+                                    label = {
+                                        label_en: getLabelText(consumptionExtrapolation.filter(c => c.consumptionExtrapolationId == planningUnitList[pu].selectedForecastMap[regionList[r].regionId].consumptionExtrapolationId)[0].extrapolationMethod.label, this.state.lang),
+                                        label_sp: getLabelText(consumptionExtrapolation.filter(c => c.consumptionExtrapolationId == planningUnitList[pu].selectedForecastMap[regionList[r].regionId].consumptionExtrapolationId)[0].extrapolationMethod.label, this.state.lang),
+                                        label_pr: getLabelText(consumptionExtrapolation.filter(c => c.consumptionExtrapolationId == planningUnitList[pu].selectedForecastMap[regionList[r].regionId].consumptionExtrapolationId)[0].extrapolationMethod.label, this.state.lang),
+                                        label_fr: getLabelText(consumptionExtrapolation.filter(c => c.consumptionExtrapolationId == planningUnitList[pu].selectedForecastMap[regionList[r].regionId].consumptionExtrapolationId)[0].extrapolationMethod.label, this.state.lang),
+
+                                    }
+                                }
+                            }
+                            // var selectedForecastMap=planningUnitList[pu].selectedForecastMap;
+                            // planningUnitList[pu].selectedForecastMap != undefined ? planningUnitList[pu].selectedForecastMap[regionList[r].regionId] != undefined && planningUnitList[pu].selectedForecastMap[regionList[r].regionId].scenarioId != null && planningUnitList[pu].selectedForecastMap[regionList[r].regionId].scenarioId != "" ? treeScenarioList.filter(c => c.scenario.id == selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].scenarioId && c.tree.treeId == selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].treeId).length > 0 ? treeScenarioList.filter(c => c.scenario.id == selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].scenarioId && c.tree.treeId == selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].treeId)[0].id : 0 : selectedPlanningUnit[0].selectedForecastMap[this.state.regionId] != undefined ? selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].consumptionExtrapolationId : 0 : 0
+                            // planningUnitList[puList].totalForecast=
+                            list.push({
+                                selectedForecast: label,
+                                totalForecast: planningUnitList[pu].selectedForecastMap != undefined && planningUnitList[pu].selectedForecastMap[regionList[r].regionId] != undefined ? planningUnitList[pu].selectedForecastMap[regionList[r].regionId].totalForecast : "",
+                                notes: {label_en:planningUnitList[pu].selectedForecastMap != undefined && planningUnitList[pu].selectedForecastMap[regionList[r].regionId] != undefined ? planningUnitList[pu].selectedForecastMap[regionList[r].regionId].notes : ""},
+                                planningUnit: planningUnitList[pu].planningUnit,
+                                region: {
+                                    id:regionList[r].regionId,
+                                    label:regionList[r].label
+                                }
+                            })
+
+                        }
+                    }
+                    var json = {
+                        currentVersion: {
+                            forecastStartDate: datasetJson.currentVersion.forecastStartDate,
+                            forecastStopDate: datasetJson.currentVersion.forecastStopDate,
+                            notes: datasetJson.currentVersion.notes,
+                        },
+                        planningUnitList: list,
+                        regionList: datasetJson.regionList,
+                        programCode:datasetJson.programCode,
+                        label:datasetJson.label
+                    }
                     this.setState({
-                        datasetData1: datasetJson,
+                        datasetData1: json,
                         secondDataSet: 1,
                         loading: false
                     }, () => {
@@ -499,13 +633,30 @@ class CompareVersion extends Component {
                 }.bind(this)
             }.bind(this)
         } else if (versionId != "" && !versionId.includes("Local")) {
-            var json = [{ programId: this.state.datasetId, versionId: versionId }]
-            DatasetService.getAllDatasetData(json).then(response => {
+            var datasetFiltered = this.state.datasetList.filter(c => c.id == this.state.datasetId)[0];
+            var versonListFilter = datasetFiltered.versionList.filter(c => c.versionId == versionId)[0];
+            let inputJson = {
+                "programId": this.state.datasetId,
+                "versionId": versionId,
+                "reportView": 1//2-National 1-Regional
+            }
+            ReportService.forecastSummary(inputJson).then(response => {
                 if (response.status == 200) {
                     console.log("resp--------------------", response.data);
-                    var responseData = response.data[0];
+                    var responseData = response.data;
+                    var json = {
+                        currentVersion: {
+                            forecastStartDate: versonListFilter.forecastStartDate,
+                            forecastStopDate: versonListFilter.forecastStopDate,
+                            notes: versonListFilter.notes,
+                        },
+                        planningUnitList: responseData,
+                        regionList: datasetFiltered.regionList,
+                        programCode:datasetFiltered.code,
+                        label:datasetFiltered.label
+                    }
                     this.setState({
-                        datasetData1: responseData,
+                        datasetData1: json,
                         secondDataSet: 1,
                         loading: false
                     })
@@ -736,9 +887,9 @@ class CompareVersion extends Component {
                             <div style={{ display: !this.state.loading ? "block" : "none" }}>
                                 {(this.state.firstDataSet == 1 && this.state.secondDataSet == 1) &&
                                     <>
-                                        <CompareVersionTable ref="compareVersionTable" datasetData={this.state.datasetData} datasetData1={this.state.datasetData1} datasetData2={this.state.datasetData} page="compareVersion" versionLabel={"V" + document.getElementById("versionId").selectedOptions[0].text} versionLabel1={"V" + document.getElementById("versionId1").selectedOptions[0].text} updateState={this.updateState} />
+                                        <CompareVersionTableCompareVersion ref="compareVersionTable" datasetData={this.state.datasetData} datasetData1={this.state.datasetData1} datasetData2={this.state.datasetData} page="compareVersion" versionLabel={"V" + document.getElementById("versionId").selectedOptions[0].text} versionLabel1={"V" + document.getElementById("versionId1").selectedOptions[0].text} updateState={this.updateState} />
                                         <div className="table-responsive consumptionDataEntryTable ForecastSummaryTable">
-                                            <div id="tableDiv" className="compareVersion" style={{ display: this.state.loading ? "block" : "none" }}/>
+                                            <div id="tableDiv" className="compareVersion" style={{ display: !this.state.loading ? "block" : "none" }} />
                                         </div>
                                     </>
                                 }
