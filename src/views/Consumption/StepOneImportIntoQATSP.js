@@ -1085,8 +1085,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
         }
         if (isForecastAlreadyStarted) {
 
-            defaultForecastStartYear = new Date().getFullYear();
-            defaultForecastStartMonth = new Date().getMonth() + 1;
+            defaultForecastStartYear = forecastStartDate.getFullYear();
+            defaultForecastStartMonth = forecastStartDate.getMonth() + 1;
 
             // updatedForecastStartYear = formattedDate.getFullYear();
             // updatedForecastStartMonth = formattedDate.getMonth() + 1;
