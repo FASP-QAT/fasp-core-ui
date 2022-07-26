@@ -2120,7 +2120,13 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     } else {
                                         var rangeValue = props.state.rangeValue1;
                                         let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
+                                        if(rangeValue.from.month<=9){
+                                            startDate = rangeValue.from.year + '-0' + rangeValue.from.month + '-01';
+                                        }
                                         let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
+                                        if(rangeValue.to.month<=9){
+                                            stopDate = rangeValue.to.year + '-0' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
+                                        }
                                         convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDate, programJsonForStoringTheResult, generalProgramJson, props, planningUnitId, programPlanningUnitList.filter(c => c.planningUnit.id == planningUnitId)[0], regionListFiltered, programId, programJsonForStoringTheResult, programDataJson, programRequest)
                                     }
                                 } else if (page == "supplyPlan") {
