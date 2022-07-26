@@ -6490,6 +6490,10 @@ top: calc(20em + 3px);
 .ERPLinkTable .jexcel{
   width: unset!important;
 }
-.ErpLinkBoldRowTable .react-bootstrap-table table tbody tr:first-child {
+// .ErpLinkBoldRowTable .react-bootstrap-table table tbody tr:first-child {
+//   font-weight: bold;
+// }
+
+.jexcel > tbody > tr > td.historyBold {
   font-weight: bold;
 }

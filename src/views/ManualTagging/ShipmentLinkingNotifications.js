@@ -5,7 +5,7 @@ import BootstrapTable from 'react-bootstrap-table-next';
 import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
 import getLabelText from '../../CommonComponent/getLabelText';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import { STRING_TO_DATE_FORMAT, JEXCEL_DATE_FORMAT, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY } from '../../Constants.js';
+import { STRING_TO_DATE_FORMAT, JEXCEL_DATE_FORMAT, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY, JEXCEL_DATE_FORMAT_WITHOUT_DATE } from '../../Constants.js';
 import moment from 'moment';
 import i18n from '../../i18n';
 import ProgramService from '../../api/ProgramService.js';
@@ -953,8 +953,8 @@ export default class ShipmentLinkingNotifications extends Component {
                             // title: i18n.t('static.dashboard.linkShipment'),
                             title: i18n.t('static.mt.viewArtmisHistory'),
                             onclick: function () {
-                                let roNo = this.el.getValueFromCoords(16, y).toString().trim();
-                                let roPrimeLineNo = this.el.getValueFromCoords(17, y).toString().trim();
+                                let roNo = obj.getValueFromCoords(16, y).toString().trim();
+                                let roPrimeLineNo = obj.getValueFromCoords(17, y).toString().trim();
                                 ManualTaggingService.getARTMISHistory(roNo, roPrimeLineNo)
                                     .then(response => {
                                         this.setState({
@@ -1286,27 +1286,189 @@ export default class ShipmentLinkingNotifications extends Component {
         this.setState({
             manualTag: !this.state.manualTag,
             batchDetails: []
-        },()=>{
-            this.addTitle()
+        }, () => {
+            this.sampleFunction();
         })
     }
 
-    addTitle() {
-        try {
-            var classList = document.getElementsByClassName("FortablewidthMannualtaggingtable3");
-            var tr = classList[0].firstChild.firstChild.firstChild.firstChild;
-            console.log("Tr@@@@@@@", tr);
-            tr.children[7].title = i18n.t('static.manualTagging.changeOrderOrder');
-            var classList = document.getElementsByClassName("ShipmentNotificationtable");
-            var tr = classList[0].firstChild.firstChild.firstChild.firstChild;
-            console.log("Tr@@@@@@@", tr);
-            tr.children[6].title = i18n.t('static.manualTagging.changeOrderShipment');
-        } catch (err) {
-            setTimeout(function () {
-                this.addTitle();
-            }.bind(this), 1000);
-        }
+    sampleFunction() {
+        this.setState({
+            test: 10
+        }, () => {
+            this.buildJexcel()
+        })
+    }
 
+    buildJexcel() {
+        try {
+            this.el = jexcel(document.getElementById("tableDivOrderDetails"), '');
+            this.el.destroy();
+        } catch (err) {
+
+        }
+        var json = [];
+        var orderHistory = this.state.artmisHistory.erpOrderList.sort((a, b) => {
+            var itemLabelA = moment(a.dataReceivedOn); // ignore upper and lowercase
+            var itemLabelB = moment(b.dataReceivedOn);
+            return itemLabelA < itemLabelB ? 1 : -1;
+        })
+        console.log("Order History", this.state.artmisHistory);
+        for (var sb = 0; sb < orderHistory.length; sb++) {
+            var data = [];
+            data[0] = orderHistory[sb].procurementAgentOrderNo;
+            data[1] = orderHistory[sb].planningUnitName;
+            data[2] = moment(orderHistory[sb].expectedDeliveryDate).format("YYYY-MM-DD");
+            data[3] = orderHistory[sb].status;
+            data[4] = orderHistory[sb].qty;
+            data[5] = orderHistory[sb].cost;
+            data[6] = moment(orderHistory[sb].dataReceivedOn).format("YYYY-MM-DD");
+            data[7] = orderHistory[sb].changeCode;
+            data[8] = sb;
+            json.push(data);
+        }
+        var options = {
+            data: json,
+            columnDrag: true,
+            columns: [
+                { title: i18n.t('static.mt.roNoAndRoLineNo'), type: 'text', width: 150 },
+                { title: i18n.t('static.manualTagging.erpPlanningUnit'), type: 'text', width: 200 },
+                { title: i18n.t('static.supplyPlan.mtexpectedDeliveryDate'), type: 'calendar', options: { format: JEXCEL_DATE_FORMAT }, width: 100 },
+                { title: i18n.t('static.manualTagging.erpStatus'), type: 'text', width: 150 },
+                { title: i18n.t('static.manualTagging.erpShipmentQty'), type: 'numeric', mask: '#,##.00', disabledMaskOnEdition: true, textEditor: true, decimal: '.', width: 100 },
+                { title: i18n.t('static.shipment.totalCost'), type: 'numeric', mask: '#,##.00', disabledMaskOnEdition: true, textEditor: true, decimal: '.', width: 100 },
+                { title: i18n.t('static.mt.dataReceivedOn'), type: 'calendar', options: { format: JEXCEL_DATE_FORMAT }, width: 100 },
+                { title: i18n.t('static.manualTagging.changeCode'), type: 'text', width: 100 },
+                { type: 'hidden' }
+            ],
+            pagination: false,
+            search: false,
+            columnSorting: true,
+            tableOverflow: true,
+            wordWrap: true,
+            allowInsertColumn: false,
+            allowManualInsertColumn: false,
+            allowDeleteRow: true,
+            copyCompatibility: true,
+            allowInsertRow: true,
+            allowManualInsertRow: false,
+            allowExport: false,
+            editable: false,
+            license: JEXCEL_PRO_KEY,
+            text: {
+                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                show: '',
+                entries: '',
+            },
+            onload: this.loadedOrderHistory,
+            updateTable: function (el, cell, x, y, source, value, id) {
+                var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+                var elInstance = el.jexcel;
+                var index = elInstance.getJson(null, false).findIndex(c => c[8] == 0);
+                for (var j = 0; j < colArr.length; j++) {
+                    var col = (colArr[j]).concat(parseInt(index) + 1);
+                    var cell = elInstance.getCell(col);
+                    cell.classList.add('historyBold');
+                }
+            }.bind(this),
+            contextMenu: function (obj, x, y, e) {
+                return false;
+            }.bind(this)
+
+        };
+        var elVar = jexcel(document.getElementById("tableDivOrderDetails"), options);
+        this.el = elVar;
+
+        try {
+            this.el = jexcel(document.getElementById("tableDivShipmentDetails"), '');
+            this.el.destroy();
+        } catch (err) {
+
+        }
+        var json = [];
+        var shipmentHistory = this.state.artmisHistory.erpShipmentList.sort((a, b) => {
+            var itemLabelA = moment(a.dataReceivedOn); // ignore upper and lowercase
+            var itemLabelB = moment(b.dataReceivedOn);
+            return itemLabelA < itemLabelB ? 1 : -1;
+        })
+        console.log("Order History")
+        for (var sb = 0; sb < shipmentHistory.length; sb++) {
+            var data = [];
+            data[0] = shipmentHistory[sb].procurementAgentShipmentNo;
+            data[1] = moment(shipmentHistory[sb].deliveryDate).format("YYYY-MM-DD");
+            data[2] = shipmentHistory[sb].batchNo;
+            data[3] = moment(shipmentHistory[sb].expiryDate).format("YYYY-MM-DD");
+            data[4] = shipmentHistory[sb].qty;
+            data[5] = moment(shipmentHistory[sb].dataReceivedOn).format("YYYY-MM-DD");
+            data[6] = shipmentHistory[sb].changeCode;
+            data[7] = sb;
+            json.push(data);
+        }
+        var options = {
+            data: json,
+            columnDrag: true,
+            columns: [
+                { title: i18n.t('static.mt.roNoAndRoLineNo'), type: 'text', width: 150 },
+                { title: i18n.t('static.supplyPlan.mtexpectedDeliveryDate'), type: 'calendar', options: { format: JEXCEL_DATE_FORMAT }, width: 100 },
+                { title: i18n.t('static.supplyPlan.batchId'), type: 'text', width: 150 },
+                { title: i18n.t('static.supplyPlan.expiryDate'), type: 'calendar', options: { format: JEXCEL_DATE_FORMAT_WITHOUT_DATE }, width: 100 },
+                { title: i18n.t('static.supplyPlan.shipmentQty'), type: 'numeric', mask: '#,##.00', disabledMaskOnEdition: true, textEditor: true, decimal: '.', width: 100 },
+                { title: i18n.t('static.mt.dataReceivedOn'), type: 'calendar', options: { format: JEXCEL_DATE_FORMAT }, width: 100 },
+                { title: i18n.t('static.manualTagging.changeCode'), type: 'text', width: 100 },
+                { type: 'hidden' }
+            ],
+            pagination: false,
+            search: false,
+            columnSorting: true,
+            tableOverflow: true,
+            wordWrap: true,
+            allowInsertColumn: false,
+            allowManualInsertColumn: false,
+            allowDeleteRow: true,
+            copyCompatibility: true,
+            allowInsertRow: true,
+            allowManualInsertRow: false,
+            allowExport: false,
+            editable: false,
+            license: JEXCEL_PRO_KEY,
+            text: {
+                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                show: '',
+                entries: '',
+            },
+            onload: this.loadedShipmentHistory,
+            updateTable: function (el, cell, x, y, source, value, id) {
+                var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+                var elInstance = el.jexcel;
+                var index = elInstance.getJson(null, false).findIndex(c => c[7] == 0);
+                for (var j = 0; j < colArr.length; j++) {
+                    var col = (colArr[j]).concat(parseInt(index) + 1);
+                    var cell = elInstance.getCell(col);
+                    cell.classList.add('historyBold');
+                }
+            }.bind(this),
+            contextMenu: function (obj, x, y, e) {
+                return false;
+            }.bind(this)
+
+        };
+        var elVar = jexcel(document.getElementById("tableDivShipmentDetails"), options);
+        this.el = elVar;
+    }
+
+    loadedOrderHistory(instance, cell, x, y, value) {
+        jExcelLoadedFunctionOnlyHideRow(instance);
+        var asterisk = document.getElementsByClassName("resizable")[4];
+        console.log("Astrisk Mohit@@@@@@@@@", document.getElementsByClassName("resizable"))
+        var tr = asterisk.firstChild;
+        tr.children[8].title = i18n.t('static.manualTagging.changeOrderOrder');
+    }
+
+    loadedShipmentHistory(instance, cell, x, y, value) {
+        jExcelLoadedFunctionOnlyHideRow(instance);
+        var asterisk = document.getElementsByClassName("resizable")[6];
+        console.log("Astrisk Mohit@@@@@@@@@", document.getElementsByClassName("resizable"))
+        var tr = asterisk.firstChild;
+        tr.children[7].title = i18n.t('static.manualTagging.changeOrderShipment');
     }
 
     getPlanningUnitList() {
@@ -1680,69 +1842,23 @@ export default class ShipmentLinkingNotifications extends Component {
                                         <span><b>{i18n.t('static.manualTagging.orderDetails')}</b></span>
                                         <br />
                                         <br />
-                                        <ToolkitProvider
-                                            keyField="optList"
-                                            data={this.state.artmisHistory.erpOrderList != undefined && this.state.artmisHistory.erpOrderList.sort((a, b) => {
-                                                var itemLabelA = moment(a.dataReceivedOn); // ignore upper and lowercase
-                                                var itemLabelB = moment(b.dataReceivedOn);
-                                                return itemLabelA < itemLabelB ? 1 : -1;
-                                            })}
-                                            columns={columns1}
-                                            search={{ searchFormatted: true }}
-                                            hover
-                                            filter={filterFactory()}
-                                        >
-                                            {
-                                                props => (
-                                                    <div className="TableCust FortablewidthMannualtaggingtable3 reactTableNotification ErpLinkBoldRowTable">
-                                                        {/* <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
-            <SearchBar {...props.searchProps} />
-            <ClearSearchButton {...props.searchProps} />
-        </div> */}
-                                                        <BootstrapTable striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
-                                                            // pagination={paginationFactory(options)}
-                                                            rowEvents={{
-                                                            }}
-                                                            {...props.baseProps}
-                                                        />
-                                                    </div>
-                                                )
-                                            }
-                                        </ToolkitProvider>
+                                        {/* <div className="ReportSearchMarginTop"> */}
+                                        <div className='consumptionDataEntryTable'>
+                                            <div id="tableDivOrderDetails" className={"jexcelremoveReadonlybackground"}>
+                                            </div>
+                                        </div>
+                                        {/* </div> */}
                                         <br />
                                         <span><b>{i18n.t('static.supplyPlan.shipmentsDetails')}</b></span>
                                         <br />
                                         <br />
+                                        {/* <div className="ReportSearchMarginTop"> */}
+                                        <div className='consumptionDataEntryTable'>
 
-                                        <ToolkitProvider
-                                            keyField="optList"
-                                            data={this.state.artmisHistory.erpShipmentList != undefined && this.state.artmisHistory.erpShipmentList.sort((a, b) => {
-                                                var itemLabelA = moment(a.dataReceivedOn); // ignore upper and lowercase
-                                                var itemLabelB = moment(b.dataReceivedOn);
-                                                return itemLabelA < itemLabelB ? 1 : -1;
-                                            })}
-                                            columns={columns2}
-                                            search={{ searchFormatted: true }}
-                                            hover
-                                            filter={filterFactory()}
-                                        >
-                                            {
-                                                props => (
-                                                    <div className="TableCust ShipmentNotificationtable ErpLinkBoldRowTable">
-                                                        {/* <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
-            <SearchBar {...props.searchProps} />
-            <ClearSearchButton {...props.searchProps} />
-        </div> */}
-                                                        <BootstrapTable striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
-                                                            // pagination={paginationFactory(options)}
-                                                            rowEvents={{
-                                                            }}
-                                                            {...props.baseProps}
-                                                        />
-                                                    </div>
-                                                )
-                                            }
-                                        </ToolkitProvider>
+                                            <div id="tableDivShipmentDetails" className={"jexcelremoveReadonlybackground"}>
+                                            </div>
+                                        </div>
+                                        {/* </div> */}
 
                                     </div><br />
                                 </ModalBody>
