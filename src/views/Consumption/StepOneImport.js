@@ -183,7 +183,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 selectedPlanningUnitObj = this.state.planningUnitList.filter(c => c.id == ForecastPlanningUnitId)[0];
                 let multiplier = "";
                 if (selectedPlanningUnitObj.forecastingUnit.id == this.el.getValueFromCoords(11, y)) {
-                    multiplier = (this.el.getValueFromCoords(3, y) / selectedPlanningUnitObj.multiplier).toFixed(6)
+                    multiplier = (this.el.getValueFromCoords(3, y) / selectedPlanningUnitObj.multiplier)
                 }
                 this.el.setValueFromCoords(6, y, ForecastPlanningUnitId, true);
                 this.el.setValueFromCoords(8, y, selectedPlanningUnitObj.multiplier, true);
