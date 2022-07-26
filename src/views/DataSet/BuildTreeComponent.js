@@ -4881,7 +4881,7 @@ export default class BuildTree extends Component {
                         }, () => {
                             this.fetchTracerCategoryList(programData);
                             var tree = programData.treeList.filter(c => c.treeId == this.state.treeId)[0];
-                            if (tree.generateMom == 1) {
+                            if (tree != null && tree.generateMom == 1) {
                                 console.log("Inside generate MOM if condition");
                                 this.calculateMOMData(0, 2);
                             } else {
