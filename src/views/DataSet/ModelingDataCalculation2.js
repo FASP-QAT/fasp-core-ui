@@ -61,12 +61,16 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
             for (var tl = 0; tl < treeList.length; tl++) {
                 var tree = treeList[tl];
                 var flatListUnsorted = tree.tree.flatList;
+                console.log("flatListUnsorted---",flatListUnsorted);
                 var sortOrderArray = [...new Set(flatListUnsorted.map(ele => (ele.sortOrder)))];
+                console.log("sortOrderArray---",sortOrderArray);
                 var sortedArray = sortOrderArray.sort();
+                console.log("sortedArray---",sortedArray);
                 var flatList = [];
                 for (var i = 0; i < sortedArray.length; i++) {
                     flatList.push(flatListUnsorted.filter(c => c.sortOrder == sortedArray[i])[0]);
                 }
+                console.log("flatList push---",flatList);
                 var transferToNodeList = [];
                 // if (nodeId != -1) {
                 //     var curNode = flatList.filter(c => c.id == nodeId)[0];
@@ -78,8 +82,12 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                 //         flatList = flatList.filter(c => c.id == nodeId);
                 //     }
                 // }
+                console.log("datasetJson calc---",datasetJson);
+                console.log("flatList.length---",flatList.length);
                 for (var fl = 0; fl < flatList.length; fl++) {
+                    console.log("flatList[fl]---",flatList[fl]);
                     var payload = flatList[fl].payload;
+                    console.log("flatList[fl] payload---",flatList[fl].payload);
                     if (payload.nodeType.id != 1) {
                         var nodeDataMap = payload.nodeDataMap;
                         var scenarioList = tree.scenarioList;
@@ -569,7 +577,9 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                         var parent = (flatList[fl].parent);
                                         var parentFiltered = (flatListUnsorted.filter(c => c.id == parent))[0];
                                         var parentNodeNodeData = (parentFiltered.payload.nodeDataMap[scenarioList[ndm].id])[0];
-                                        if (parentNodeNodeData.fuNode.usageType.id == 2 && nodeDataMapForScenario.puNode.refillMonths > 1) {
+                                        if (parentNodeNodeData.fuNode.usageType.id == 2
+                                            //  && nodeDataMapForScenario.puNode.refillMonths > 1
+                                        ) {
                                             var daysPerMonth = 365 / 12;
 
                                             var grandParent = parentFiltered.parent;
@@ -578,7 +588,17 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                             var grandParentNodeData = (grandParentFiltered.payload.nodeDataMap[scenarioList[ndm].id])[0];
                                             console.log("grandParentNodeData$$$%%%", grandParentNodeData)
                                             if (grandParentNodeData != undefined) {
-                                                patients = grandParentNodeData.calculatedDataValue != null ? grandParentNodeData.calculatedDataValue : grandParentNodeData.dataValue;
+                                                var grandParentPrevMonthMMDValue = grandParentNodeData.nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") == moment(nodeDataMapForScenario.month).subtract(1, 'months').format("YYYY-MM"));
+                                                if (grandParentPrevMonthMMDValue.length > 0) {
+                                                    patients = grandParentPrevMonthMMDValue[0].calculatedValue;
+                                                } else {
+                                                    var grandParentCurMonthMMDValue = grandParentNodeData.nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") == moment(nodeDataMapForScenario.month).format("YYYY-MM"));
+                                                    if (grandParentCurMonthMMDValue.length > 0) {
+                                                        patients = grandParentCurMonthMMDValue[0].calculatedValue;
+                                                    } else {
+                                                        patients = 0;
+                                                    }
+                                                }
                                             } else {
                                                 patients = 0;
                                             }

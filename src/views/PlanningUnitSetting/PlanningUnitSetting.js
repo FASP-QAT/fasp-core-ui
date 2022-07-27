@@ -662,16 +662,16 @@ export default class PlanningUnitSetting extends Component {
                 var index = (instance).getValue(`N${parseInt(data[i].y) + 1}`, true);
                 if (index === "" || index == null || index == undefined) {
                     console.log("-----------------onPaste---------------------3");
-                    // (instance).setValueFromCoords(8, data[i].y, true, true);
-                    (instance).setValueFromCoords(2, data[i].y, true, true);
-                    (instance).setValueFromCoords(3, data[i].y, true, true);
+                    // (instance.jexcel).setValueFromCoords(8, data[i].y, true, true);
+                    // (instance.jexcel).setValueFromCoords(2, data[i].y, true, true);
+                    // (instance.jexcel).setValueFromCoords(3, data[i].y, true, true);
                     (instance).setValueFromCoords(9, data[i].y, true, true);
                     (instance).setValueFromCoords(10, data[i].y, 1, true);
                     (instance).setValueFromCoords(11, data[i].y, 1, true);
                     (instance).setValueFromCoords(12, data[i].y, {}, true);
                     (instance).setValueFromCoords(13, data[i].y, 0, true);
                     (instance).setValueFromCoords(14, data[i].y, true, true);
-                    // (instance).setValueFromCoords(15, data[i].y, "", true);
+                    // (instance.jexcel).setValueFromCoords(15, data[i].y, "", true);
                     (instance).setValueFromCoords(16, data[i].y, true, true);
                     z = data[i].y;
                 }
@@ -696,7 +696,10 @@ export default class PlanningUnitSetting extends Component {
         // }
 
         if (x == 7) {
+
+            console.log("Value--------------->7", value);
             if (value != -1 && value !== null && value !== '') {
+                console.log("Value--------------->IF");
                 let planningUnitId = this.el.getValueFromCoords(1, y);
                 // let planningUnitId = this.el.getValueFromCoords(7, y);
 
@@ -707,21 +710,23 @@ export default class PlanningUnitSetting extends Component {
                 let procurementAgentPlanningUnitList = this.state.originalPlanningUnitList;
                 let tempPaList = procurementAgentPlanningUnitList.filter(c => c.id == planningUnitId)[0];
 
-
                 console.log("mylist--------->1112", planningUnitId);
 
-                // let obj = tempPaList.filter(c => c.procurementAgent.id == value)[0];
-                let obj = tempPaList.procurementAgentPriceList.filter(c => c.id == value)[0];
-                console.log("mylist--------->1113", obj);
-                if (typeof obj != 'undefined') {
-                    this.el.setValueFromCoords(8, y, obj.price, true);
-                } else {
-                    // this.el.setValueFromCoords(8, y, '', true);
-                    let q = '';
-                    q = (this.el.getValueFromCoords(8, y) != '' ? this.el.setValueFromCoords(8, y, '', true) : '');
+                if (tempPaList != undefined) {
+                    // let obj = tempPaList.filter(c => c.procurementAgent.id == value)[0];
+                    let obj = tempPaList.procurementAgentPriceList.filter(c => c.id == value)[0];
+                    console.log("mylist--------->1113", obj);
+                    if (typeof obj != 'undefined') {
+                        this.el.setValueFromCoords(8, y, obj.price, true);
+                    } else {
+                        // this.el.setValueFromCoords(8, y, '', true);
+                        let q = '';
+                        q = (this.el.getValueFromCoords(8, y) != '' ? this.el.setValueFromCoords(8, y, '', true) : '');
+                    }
                 }
 
             } else {
+                console.log("Value--------------->ELSE");
                 // this.el.setValueFromCoords(8, y, '', true);
                 let q = '';
                 q = (this.el.getValueFromCoords(8, y) != '' ? this.el.setValueFromCoords(8, y, '', true) : '');
@@ -1615,7 +1620,7 @@ export default class PlanningUnitSetting extends Component {
 
             // PlanningUnitService.getPlanningUnitByRealmId(AuthenticationService.getRealmId())
             // PlanningUnitService.getActivePlanningUnitList()
-            PlanningUnitService.getPlanningUnitForProductCategoryAndProgram(-1, programId)
+            PlanningUnitService.getPlanningUnitForProductCategory(-1)
                 .then(response => {
                     console.log("RESP----->pu", response.data);
 
@@ -2436,8 +2441,8 @@ export default class PlanningUnitSetting extends Component {
             }
             console.log("in if=====>1.1", pcIdArray);
             console.log("in if=====>1.2", this.state.planningUnitList);
-            console.log("in if=====>1.3", this.state.planningUnitList.filter(c => c.productCategory.id == 21));
-            puList = (this.state.planningUnitList).filter(c => pcIdArray.includes(c.productCategory.id));
+            // console.log("in if=====>1.3", this.state.planningUnitList.filter(c => c.productCategory.id == 21));
+            puList = (this.state.planningUnitList).filter(c => pcIdArray.includes(c.forecastingUnit.productCategory.id));
             console.log("in if=====>1.4", puList);
         } else {
             console.log("in else=====>2");
@@ -2826,7 +2831,7 @@ export default class PlanningUnitSetting extends Component {
                     // });
 
                     this.setState({
-                        // loading: false,
+                        loading: false,
                         message: i18n.t('static.mt.dataUpdateSuccess'),
                         color: "green",
                         isChanged1: false,
@@ -2842,7 +2847,7 @@ export default class PlanningUnitSetting extends Component {
                         this.hideSecondComponent();
                         // this.filterData();
                         // this.setProgramId();
-                        this.getDatasetList();
+                        // this.getDatasetList();
                     });
                     console.log("Data update success1");
                     // alert("success");
@@ -2955,23 +2960,62 @@ export default class PlanningUnitSetting extends Component {
                     let listContainNodeType5 = flatlist.filter(c => c.payload.nodeType.id == 5);
                     console.log("Test---------------->2", listContainNodeType5);
                     for (var l = 0; l < listContainNodeType5.length; l++) {
+                        // Begin logic
                         let nodeDataMap = listContainNodeType5[l].payload.nodeDataMap;
+                        //Fetch transfer nodes
                         let nodeDataMapKeys = Object.keys(listContainNodeType5[l].payload.nodeDataMap);
                         console.log("Test---------------->3", listContainNodeType5[l].id + '-------' + nodeDataMap + ' ----- ' + nodeDataMapKeys);
                         for (var m = 0; m < nodeDataMapKeys.length; m++) {
                             let insideArrayOfNodeDataMap = nodeDataMap[nodeDataMapKeys[m]];
-                            console.log("Test---------------->4", insideArrayOfNodeDataMap);
-                            for (var n = 0; n < insideArrayOfNodeDataMap.length; n++) {
-                                if (insideArrayOfNodeDataMap[n].puNode != null) {
-                                    if (insideArrayOfNodeDataMap[n].puNode.planningUnit.id == parseInt(listOfDisablePuNode[j])) {
-                                        console.log("Test---------------->5", insideArrayOfNodeDataMap[n]);
-                                        console.log("Test---------------->6", insideArrayOfNodeDataMap[n].puNode.planningUnit.id);
-                                        insideArrayOfNodeDataMap[n].puNode.planningUnit.id = null;
-                                    }
-                                }
+                            // find transfer row
+                            if (insideArrayOfNodeDataMap[0].puNode.planningUnit.id == parseInt(listOfDisablePuNode[j])) {
+                                var sameParentList = flatlist.filter(c => c.parent == listContainNodeType5[l].parent);
+                                console.log("sameParentList---", sameParentList);
+                                for (let l = 0; l < sameParentList.length; l++) {
+                                    var nodeDataModelingList = sameParentList[l].payload.nodeDataMap[nodeDataMapKeys[m]][0].nodeDataModelingList;
+                                    var result = nodeDataModelingList.filter(c => c.transferNodeDataId == nodeDataMap[nodeDataMapKeys[m]][0].nodeDataId);
+                                    if (result.length > 0) {
+                                        //Remove transfer
+                                        console.log("result---", result);
+                                        for (let r = 0; r < result.length; r++) {
+                                            var findNodeDataIdIndex = nodeDataModelingList.findIndex(n => n.transferNodeDataId == result[r].transferNodeDataId);
+                                            // Remove entry final
+                                            nodeDataModelingList.splice(findNodeDataIdIndex, 1);
+                                        }
 
+                                    }
+
+                                }
+                                // Delete node itself
+                                console.log("listContainNodeType5[l].id---", listContainNodeType5[l].id);
+                                // listContainNodeType5[l].generateMom = 1;
+                                var findNodeIndex = flatlist.findIndex(n => n.id == listContainNodeType5[l].id);
+                                console.log("flatlist---", flatlist);
+                                console.log("findNodeIndex---", findNodeIndex);
+                                if (findNodeIndex != -1) {
+                                    console.log("treeListForSelectedProgram[k]", treeListForSelectedProgram[k]);
+                                    treeListForSelectedProgram[k].generateMom = 1;
+                                    flatlist.splice(findNodeIndex, 1);
+                                }
                             }
+                            // console.log("Test---------------->4", insideArrayOfNodeDataMap);
+                            // for (var n = 0; n < insideArrayOfNodeDataMap.length; n++) {
+                            //     if (insideArrayOfNodeDataMap[n].puNode != null) {
+                            //         if (insideArrayOfNodeDataMap[n].puNode.planningUnit.id == parseInt(listOfDisablePuNode[j])) {
+                            //             // console.log("Test---------------->5", insideArrayOfNodeDataMap[n]);
+                            //             // console.log("Test---------------->6", insideArrayOfNodeDataMap[n].puNode.planningUnit.id);
+                            //             // insideArrayOfNodeDataMap[n].puNode.planningUnit.id = null;
+                            //             var findNodeIndex = flatlist.findIndex(n => n.payload.nodeDataMap[nodeDataMapKeys[m]][0].puNode.planningUnit.id == listOfDisablePuNode[j]);
+                            //             // Remove entry final
+                            //             flatlist.splice(findNodeIndex, 1);
+                            //         }
+                            //     }
+
+                            // }
                         }
+
+                        //Delete PU node logic
+                        // End logic
                     }
                 }
             }

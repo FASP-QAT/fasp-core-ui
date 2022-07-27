@@ -732,7 +732,7 @@ class EditUserComponent extends Component {
         var proList = [];
         if (value != -1) {
             console.log("mylist--------->3.11");
-            proList = this.state.programListForFilter.filter(c => c.realmCountryId == value);
+            proList = this.state.programListForFilter.filter(c => c.id == -1 || c.realmCountryId == value);
 
         } else {
             console.log("mylist--------->3.22");
@@ -1620,7 +1620,7 @@ class EditUserComponent extends Component {
                                                             case 404:
                                                             case 406:
                                                                 this.setState({
-                                                                    message: error.response.data.messageCode,
+                                                                    message: i18n.t('static.accesscontrol.duplicateAccessControl'),
                                                                     loading: false
                                                                 });
                                                                 break;
