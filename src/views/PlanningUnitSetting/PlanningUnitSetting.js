@@ -663,8 +663,8 @@ export default class PlanningUnitSetting extends Component {
                 if (index === "" || index == null || index == undefined) {
                     console.log("-----------------onPaste---------------------3");
                     // (instance.jexcel).setValueFromCoords(8, data[i].y, true, true);
-                    (instance.jexcel).setValueFromCoords(2, data[i].y, true, true);
-                    (instance.jexcel).setValueFromCoords(3, data[i].y, true, true);
+                    // (instance.jexcel).setValueFromCoords(2, data[i].y, true, true);
+                    // (instance.jexcel).setValueFromCoords(3, data[i].y, true, true);
                     (instance.jexcel).setValueFromCoords(9, data[i].y, true, true);
                     (instance.jexcel).setValueFromCoords(10, data[i].y, 1, true);
                     (instance.jexcel).setValueFromCoords(11, data[i].y, 1, true);
@@ -696,7 +696,10 @@ export default class PlanningUnitSetting extends Component {
         // }
 
         if (x == 7) {
+
+            console.log("Value--------------->7", value);
             if (value != -1 && value !== null && value !== '') {
+                console.log("Value--------------->IF");
                 let planningUnitId = this.el.getValueFromCoords(1, y);
                 // let planningUnitId = this.el.getValueFromCoords(7, y);
 
@@ -707,21 +710,23 @@ export default class PlanningUnitSetting extends Component {
                 let procurementAgentPlanningUnitList = this.state.originalPlanningUnitList;
                 let tempPaList = procurementAgentPlanningUnitList.filter(c => c.id == planningUnitId)[0];
 
-
                 console.log("mylist--------->1112", planningUnitId);
 
-                // let obj = tempPaList.filter(c => c.procurementAgent.id == value)[0];
-                let obj = tempPaList.procurementAgentPriceList.filter(c => c.id == value)[0];
-                console.log("mylist--------->1113", obj);
-                if (typeof obj != 'undefined') {
-                    this.el.setValueFromCoords(8, y, obj.price, true);
-                } else {
-                    // this.el.setValueFromCoords(8, y, '', true);
-                    let q = '';
-                    q = (this.el.getValueFromCoords(8, y) != '' ? this.el.setValueFromCoords(8, y, '', true) : '');
+                if (tempPaList != undefined) {
+                    // let obj = tempPaList.filter(c => c.procurementAgent.id == value)[0];
+                    let obj = tempPaList.procurementAgentPriceList.filter(c => c.id == value)[0];
+                    console.log("mylist--------->1113", obj);
+                    if (typeof obj != 'undefined') {
+                        this.el.setValueFromCoords(8, y, obj.price, true);
+                    } else {
+                        // this.el.setValueFromCoords(8, y, '', true);
+                        let q = '';
+                        q = (this.el.getValueFromCoords(8, y) != '' ? this.el.setValueFromCoords(8, y, '', true) : '');
+                    }
                 }
 
             } else {
+                console.log("Value--------------->ELSE");
                 // this.el.setValueFromCoords(8, y, '', true);
                 let q = '';
                 q = (this.el.getValueFromCoords(8, y) != '' ? this.el.setValueFromCoords(8, y, '', true) : '');
@@ -2824,7 +2829,7 @@ export default class PlanningUnitSetting extends Component {
                         loading: false,
                         message: i18n.t('static.mt.dataUpdateSuccess'),
                         color: "green",
-                        // isChanged1: false,
+                        isChanged1: false,
                         // allowAdd: false
                     }, () => {
                         listOfDisablePuNode = [...new Set(listOfDisablePuNode)];
@@ -2983,7 +2988,7 @@ export default class PlanningUnitSetting extends Component {
                                 console.log("flatlist---", flatlist);
                                 console.log("findNodeIndex---", findNodeIndex);
                                 if (findNodeIndex != -1) {
-                                    console.log("treeListForSelectedProgram[k]",treeListForSelectedProgram[k]);
+                                    console.log("treeListForSelectedProgram[k]", treeListForSelectedProgram[k]);
                                     treeListForSelectedProgram[k].generateMom = 1;
                                     flatlist.splice(findNodeIndex, 1);
                                 }
