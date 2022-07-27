@@ -174,12 +174,12 @@ class CompareAndSelectScenario extends Component {
             //     var selectedEquivalencyUnit = this.state.equivalencyUnitList.filter(c => c.equivalencyUnitMappingId == this.state.equivalencyUnitId);
             //     multiplier = selectedEquivalencyUnit.length > 0 ? selectedEquivalencyUnit[0].convertToEu : 1;
             // }
-            
+
             let startDate = moment.min(datasetJson.actualConsumptionList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId).map(d => moment(d.month)));
-            let actualMinDate=startDate;
-            let forecastStartDate=moment(datasetJson.currentVersion.forecastStartDate).format("YYYY-MM-DD")
-            if(moment(actualMinDate).format("YYYY-MM")>moment(forecastStartDate).format("YYYY-MM")){
-                actualMinDate=forecastStartDate;
+            let actualMinDate = startDate;
+            let forecastStartDate = moment(datasetJson.currentVersion.forecastStartDate).format("YYYY-MM-DD")
+            if (moment(actualMinDate).format("YYYY-MM") > moment(forecastStartDate).format("YYYY-MM")) {
+                actualMinDate = forecastStartDate;
             }
 
             let stopDate = moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM-DD")
@@ -203,12 +203,14 @@ class CompareAndSelectScenario extends Component {
             // var compareToConsumptionForecast = ["","","","22.7% above the highest consumption forecast.","7.9% below the lowest consumption forecast.","In between the highest and lowest consumption forecast."];
             var count = 0;
             var consumptionExtrapolation = datasetJson.consumptionExtrapolation.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId);
-            for (var ce = 0; ce < consumptionExtrapolation.length; ce++) {
-                if (colourArrayCount > 10) {
-                    colourArrayCount = 0;
+            if (selectedPlanningUnit[0].consuptionForecast.toString() == "true") {
+                for (var ce = 0; ce < consumptionExtrapolation.length; ce++) {
+                    if (colourArrayCount > 10) {
+                        colourArrayCount = 0;
+                    }
+                    treeScenarioList.push({ id: consumptionExtrapolation[ce].consumptionExtrapolationId, tree: consumptionExtrapolation[ce], scenario: consumptionExtrapolation[ce], checked: true, color: colourArray[colourArrayCount], type: "C", data: consumptionExtrapolation[ce].extrapolationDataList, readonly: false });
+                    colourArrayCount += 1;
                 }
-                treeScenarioList.push({ id: consumptionExtrapolation[ce].consumptionExtrapolationId, tree: consumptionExtrapolation[ce], scenario: consumptionExtrapolation[ce], checked: true, color: colourArray[colourArrayCount], type: "C", data: consumptionExtrapolation[ce].extrapolationDataList, readonly: false });
-                colourArrayCount += 1;
             }
             for (var tl = 0; tl < treeList.length; tl++) {
                 var tree = treeList[tl];
@@ -220,7 +222,7 @@ class CompareAndSelectScenario extends Component {
                         colourArrayCount = 0;
                     }
                     var readonly = flatList.length > 0 ? false : true
-                    var dataForPlanningUnit = treeList[tl].tree.flatList.filter(c => (c.payload.nodeDataMap[scenarioList[sl].id])[0].puNode != null && (c.payload.nodeDataMap[scenarioList[sl].id])[0].puNode.planningUnit.id == this.state.planningUnitId && (c.payload).nodeType.id==5);
+                    var dataForPlanningUnit = treeList[tl].tree.flatList.filter(c => (c.payload.nodeDataMap[scenarioList[sl].id])[0].puNode != null && (c.payload.nodeDataMap[scenarioList[sl].id])[0].puNode.planningUnit.id == this.state.planningUnitId && (c.payload).nodeType.id == 5);
                     console.log("dataForPlanningUnit####", dataForPlanningUnit);
                     var data = [];
                     if (dataForPlanningUnit.length > 0) {
@@ -452,7 +454,7 @@ class CompareAndSelectScenario extends Component {
             multiplier = selectedEquivalencyUnit.length > 0 ? selectedEquivalencyUnit[0].convertToEu : 1;
         }
         var actualCalculationDataType = selectedPlanningUnit[0].consumptionDataType;
-        console.log("actualCalculationDataType@@@@@@@@@@",actualCalculationDataType)
+        console.log("actualCalculationDataType@@@@@@@@@@", actualCalculationDataType)
         var actualMultiplier = 1;
         // 1=Forecast, 2=PlanningUnit, 3=Other Unit
         // if (actualCalculationDataType == 1) {
@@ -468,7 +470,7 @@ class CompareAndSelectScenario extends Component {
 
             var actualFilter = consumptionData.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayListWithoutFormat[m]).format("YYYY-MM"));
 
-            data[1] = actualFilter.length > 0 ? (Number(actualFilter[0].puAmount) * Number(actualMultiplier)* Number(multiplier)).toFixed(2) : "";
+            data[1] = actualFilter.length > 0 ? (Number(actualFilter[0].puAmount) * Number(actualMultiplier) * Number(multiplier)).toFixed(2) : "";
             actualConsumptionListForMonth.push(actualFilter.length > 0 ? (Number(actualFilter[0].puAmount) * Number(actualMultiplier) * Number(multiplier)).toFixed(2) : null);
             for (var tsl = 0; tsl < treeScenarioList.length; tsl++) {
                 // if (tsl == 0) {
@@ -1391,10 +1393,10 @@ class CompareAndSelectScenario extends Component {
                 if (planningUnitList.length == 1) {
                     planningUnitId = planningUnitList[0].planningUnit.id;
                     event.target.value = planningUnitList[0].planningUnit.id;
-                } else if (this.props.match.params.planningUnitId != "" && planningUnitList.filter(c => c.planningUnit.id == this.props.match.params.planningUnitId && c.active.toString()=="true").length > 0) {
+                } else if (this.props.match.params.planningUnitId != "" && planningUnitList.filter(c => c.planningUnit.id == this.props.match.params.planningUnitId && c.active.toString() == "true").length > 0) {
                     planningUnitId = this.props.match.params.planningUnitId;
                     event.target.value = this.props.match.params.planningUnitId;
-                } else if (localStorage.getItem("sesDatasetPlanningUnitId") != "" && planningUnitList.filter(c => c.planningUnit.id == localStorage.getItem("sesDatasetPlanningUnitId")  && c.active.toString()=="true").length > 0) {
+                } else if (localStorage.getItem("sesDatasetPlanningUnitId") != "" && planningUnitList.filter(c => c.planningUnit.id == localStorage.getItem("sesDatasetPlanningUnitId") && c.active.toString() == "true").length > 0) {
                     planningUnitId = localStorage.getItem("sesDatasetPlanningUnitId");
                     event.target.value = localStorage.getItem("sesDatasetPlanningUnitId");
                 }
@@ -1425,7 +1427,7 @@ class CompareAndSelectScenario extends Component {
                         b = getLabelText(b.label, this.state.lang).toLowerCase();
                         return a < b ? -1 : a > b ? 1 : 0;
                     }.bind(this)),
-                    planningUnitList: datasetJson.planningUnitList.filter(c=> c.active.toString()=="true").sort(function (a, b) {
+                    planningUnitList: datasetJson.planningUnitList.filter(c => c.active.toString() == "true").sort(function (a, b) {
                         a = getLabelText(a.planningUnit.label, this.state.lang).toLowerCase();
                         b = getLabelText(b.planningUnit.label, this.state.lang).toLowerCase();
                         return a < b ? -1 : a > b ? 1 : 0;
@@ -1652,7 +1654,7 @@ class CompareAndSelectScenario extends Component {
                         message: 'static.compareAndSelect.dataSaved',
                         color: 'green',
                         datasetJson: datasetForEncryption,
-                        planningUnitList: planningUnitList1.filter(c=> c.active.toString()=="true").sort(function (a, b) {
+                        planningUnitList: planningUnitList1.filter(c => c.active.toString() == "true").sort(function (a, b) {
                             a = getLabelText(a.planningUnit.label, this.state.lang).toLowerCase();
                             b = getLabelText(b.planningUnit.label, this.state.lang).toLowerCase();
                             return a < b ? -1 : a > b ? 1 : 0;
@@ -1918,9 +1920,9 @@ class CompareAndSelectScenario extends Component {
                 <h5 className="red" id="div1" className={this.state.color}>{i18n.t(this.state.message)}</h5>
 
                 <Card>
-               
+
                     <div className="Card-header-reporticon pb-0">
-                   
+
                         <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
                         <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span>
                         <span className="compareAndSelect-larrowText"> {i18n.t('static.common.backTo')} <a href={this.state.datasetId != -1 && this.state.datasetId != "" && this.state.datasetId != undefined ? "/#/dataSet/buildTree/tree/0/" + this.state.datasetId : "/#/dataSet/buildTree"} className="supplyplanformulas">{i18n.t('static.common.managetree')}</a> {i18n.t('static.tree.or')} <a href="/#/extrapolation/extrapolateData" className='supplyplanformulas'>{i18n.t('static.dashboard.consExtrapolation')}</a></span>
@@ -1928,22 +1930,22 @@ class CompareAndSelectScenario extends Component {
                         {
                             this.state.showAllData &&
                             <div className="col-md-12 card-header-actions">
-                                <a className="card-header-action" style={{float:'right'}}>
+                                <a className="card-header-action" style={{ float: 'right' }}>
 
                                     <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t("static.report.exportPdf")} onClick={() => this.exportPDF()} />
 
 
                                 </a>
-                                <img style={{ height: '25px', width: '25px', cursor: 'pointer',float:'right',marginTop:'4px' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
+                                <img style={{ height: '25px', width: '25px', cursor: 'pointer', float: 'right', marginTop: '4px' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
                             </div>
                         }
-                        
+
                     </div>
                     <div className="card-header-action pr-lg-4">
-                            <a style={{float:'right'}}>
-                                <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
-                            </a>
-                            </div>
+                        <a style={{ float: 'right' }}>
+                            <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
+                        </a>
+                    </div>
                     <CardBody className="pb-lg-2 pt-lg-0 ">
                         <div>
                             <div ref={ref}>
@@ -2069,7 +2071,7 @@ class CompareAndSelectScenario extends Component {
                                                     </tr> */}
                                                     {this.state.treeScenarioList.map((item, idx) => (
                                                         <tr id="addr0" style={{ backgroundColor: item.readonly ? "#CFCDC9" : this.state.selectedTreeScenarioId == item.id ? "#d1e3f5" : "" }}>
-                                                            <td align="center"><input style={{ width: "100%", height: "1.5em" }} type="radio" id="selectAsForecast" name="selectAsForecast" checked={this.state.selectedTreeScenarioId == item.id ? true : false} onClick={() => this.scenarioOrderChanged(item.id)} disabled={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_COMPARE_AND_SELECT')?item.readonly:true}></input></td>
+                                                            <td align="center"><input style={{ width: "100%", height: "1.5em" }} type="radio" id="selectAsForecast" name="selectAsForecast" checked={this.state.selectedTreeScenarioId == item.id ? true : false} onClick={() => this.scenarioOrderChanged(item.id)} disabled={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_COMPARE_AND_SELECT') ? item.readonly : true}></input></td>
                                                             <td align="center"><input type="checkbox" id={"scenarioCheckbox" + item.id} checked={item.checked} onChange={() => this.scenarioCheckedChanged(item.id)} disabled={item.readonly} /></td>
                                                             <td align="center" >{item.type == "T" ? i18n.t('static.forecastMethod.tree') : i18n.t('static.compareAndSelect.cons')}</td>
                                                             <td><i class="fa fa-circle" style={{ color: item.color }} aria-hidden="true"></i> {" "}{item.type == "T" ? getLabelText(item.tree.label, this.state.lang) + " - " + getLabelText(item.scenario.label, this.state.lang) : getLabelText(item.scenario.extrapolationMethod.label, this.state.lang)}{"  "}{item.readonly && <i class="fa fa-exclamation-triangle"></i>}</td>
@@ -2093,7 +2095,7 @@ class CompareAndSelectScenario extends Component {
                                                             id="forecastNotes"
                                                             value={this.state.forecastNotes}
                                                             onChange={(e) => { this.setForecastNotes(e); }}
-                                                            readOnly={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_COMPARE_AND_SELECT')?false:true}
+                                                            readOnly={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_COMPARE_AND_SELECT') ? false : true}
                                                             bsSize="sm"
                                                         >
                                                         </Input>
@@ -2323,41 +2325,41 @@ class CompareAndSelectScenario extends Component {
                     </ModalHeader>
                     <div>
                         <ModalBody>
-                           <div>
-                               <h3 className='ShowGuidanceHeading'>{i18n.t('static.CompareSelect.CompareAndSelect')}</h3>
-                           </div>
+                            <div>
+                                <h3 className='ShowGuidanceHeading'>{i18n.t('static.CompareSelect.CompareAndSelect')}</h3>
+                            </div>
                             <p>
-                                <p style={{fontSize:'13px'}}><span className="UnderLineText">{i18n.t('static.listTree.purpose')} :</span> {i18n.t('static.CompareSelect.EnableUser')} <a href="/#/forecastReport/forecastSummary" target="_blank" style={{textDecoration:'underline'}}> {i18n.t('static.commitTree.forecastSummary')}</a> screen.</p>
+                                <p style={{ fontSize: '13px' }}><span className="UnderLineText">{i18n.t('static.listTree.purpose')} :</span> {i18n.t('static.CompareSelect.EnableUser')} <a href="/#/forecastReport/forecastSummary" target="_blank" style={{ textDecoration: 'underline' }}> {i18n.t('static.commitTree.forecastSummary')}</a> screen.</p>
                             </p>
-                            <p style={{fontSize:'13px'}}>
-                                <p style={{fontSize:'13px'}}><span className="UnderLineText">{i18n.t('static.listTree.useThisScreen')}  :</span></p>
+                            <p style={{ fontSize: '13px' }}>
+                                <p style={{ fontSize: '13px' }}><span className="UnderLineText">{i18n.t('static.listTree.useThisScreen')}  :</span></p>
                                 <ol type='1'>
-                                   <li>{i18n.t('static.CompareSelect.ExpectedForecasts')} <a href='/#/dataset/listTree' target="_blank" style={{textDecoration:'underline'}}>{i18n.t('static.common.managetree')}</a> {i18n.t('static.CompareSelect.BuildForecast')} <a href='/#/Extrapolation/extrapolateData' target="_blank" style={{textDecoration:'underline'}}>{i18n.t('static.commitTree.extrapolation')}</a> {i18n.t('static.CompareSelect.BuildConsumption')} <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>  {i18n.t('static.CompareSelect.SymbolDenotes')}</li>
-                                   <li>{i18n.t('static.CompareSelect.ReviewAvailable')}
-                                       <ul type="a">
-                                           <li> <b>{i18n.t('static.CompareSelect.ForecastError')} (%):</b> {i18n.t('static.CompareSelect.ErrorCalculated')} <span style={{color:'rgb(17, 139, 112)'}}>{i18n.t('static.CompareSelect.GreenText')}</span>, {i18n.t('static.CompareSelect.LowestForecast')}
-                                           <img className="img-fluid" src={forcasterror} /><br></br>
-                                           {i18n.t('static.CompareSelect.WillUtilize')} 
-                                           </li>
-                                           <li> <b>{i18n.t('static.CompareSelect.CompareConsumptionForecast')}:</b> {i18n.t('static.CompareSelect.AvailableConsumption')} <span style={{color:'#BA0C2F'}}>{i18n.t('static.versionSettings.RedText')}</span> {i18n.t('static.CompareSelect.ThresholdPercentages')} <br></br>  <a href='/#/dataset/versionSettings' target="_blank" style={{textDecoration:'underline'}}>{i18n.t('static.versionSettings.versionSettings')}</a> {i18n.t('static.CompareSelect.AssumingReliable')} </li>
-                                           <li> <b>{i18n.t('static.CompareSelect.Graph')}:</b> {i18n.t('static.CompareSelect.VisuallyCompare')} <b>{i18n.t('static.CompareSelect.bolded')}.</b></li>
-                                           <li> <b>{i18n.t('static.CompareSelect.TabularData')}:</b> {i18n.t('static.CompareSelect.ForecastsSidebySide')} <b>{i18n.t('static.CompareSelect.bolded')}/<span style={{color:'#800080',fontStyle:'italic'}}>{i18n.t('static.CompareSelect.boldedItalicized')}</span></b> {i18n.t('static.CompareSelect.ForecastPeriod')} </li>
-                                       </ul>
-                                   </li>
-                                   <li>{i18n.t('static.CompareSelect.FinalForecast')} <a href='/#/forecastReport/forecastOutput' target="_blank" style={{textDecoration:'underline'}}>{i18n.t('static.dashboard.monthlyForecast')}</a> {i18n.t('static.CompareSelect.VerifyPlanningUnit')}</li>
-                               </ol>
+                                    <li>{i18n.t('static.CompareSelect.ExpectedForecasts')} <a href='/#/dataset/listTree' target="_blank" style={{ textDecoration: 'underline' }}>{i18n.t('static.common.managetree')}</a> {i18n.t('static.CompareSelect.BuildForecast')} <a href='/#/Extrapolation/extrapolateData' target="_blank" style={{ textDecoration: 'underline' }}>{i18n.t('static.commitTree.extrapolation')}</a> {i18n.t('static.CompareSelect.BuildConsumption')} <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>  {i18n.t('static.CompareSelect.SymbolDenotes')}</li>
+                                    <li>{i18n.t('static.CompareSelect.ReviewAvailable')}
+                                        <ul type="a">
+                                            <li> <b>{i18n.t('static.CompareSelect.ForecastError')} (%):</b> {i18n.t('static.CompareSelect.ErrorCalculated')} <span style={{ color: 'rgb(17, 139, 112)' }}>{i18n.t('static.CompareSelect.GreenText')}</span>, {i18n.t('static.CompareSelect.LowestForecast')}
+                                                <img className="img-fluid" src={forcasterror} /><br></br>
+                                                {i18n.t('static.CompareSelect.WillUtilize')}
+                                            </li>
+                                            <li> <b>{i18n.t('static.CompareSelect.CompareConsumptionForecast')}:</b> {i18n.t('static.CompareSelect.AvailableConsumption')} <span style={{ color: '#BA0C2F' }}>{i18n.t('static.versionSettings.RedText')}</span> {i18n.t('static.CompareSelect.ThresholdPercentages')} <br></br>  <a href='/#/dataset/versionSettings' target="_blank" style={{ textDecoration: 'underline' }}>{i18n.t('static.versionSettings.versionSettings')}</a> {i18n.t('static.CompareSelect.AssumingReliable')} </li>
+                                            <li> <b>{i18n.t('static.CompareSelect.Graph')}:</b> {i18n.t('static.CompareSelect.VisuallyCompare')} <b>{i18n.t('static.CompareSelect.bolded')}.</b></li>
+                                            <li> <b>{i18n.t('static.CompareSelect.TabularData')}:</b> {i18n.t('static.CompareSelect.ForecastsSidebySide')} <b>{i18n.t('static.CompareSelect.bolded')}/<span style={{ color: '#800080', fontStyle: 'italic' }}>{i18n.t('static.CompareSelect.boldedItalicized')}</span></b> {i18n.t('static.CompareSelect.ForecastPeriod')} </li>
+                                        </ul>
+                                    </li>
+                                    <li>{i18n.t('static.CompareSelect.FinalForecast')} <a href='/#/forecastReport/forecastOutput' target="_blank" style={{ textDecoration: 'underline' }}>{i18n.t('static.dashboard.monthlyForecast')}</a> {i18n.t('static.CompareSelect.VerifyPlanningUnit')}</li>
+                                </ol>
                             </p>
-                            <p style={{fontSize:'13px'}}>
-                            <span className="UnderLineText">{i18n.t('static.CompareSelect.TipsGraphAndTabular')}:</span>
-                            <ul>
-                                <li>{i18n.t('static.CompareSelect.ByDefault')}  </li>
-                                <li>{i18n.t('static.CompareSelect.ViewForecastingUnit')} <a href='/#/dataset/versionSettings' target="_blank" style={{textDecoration:'underline'}}>{i18n.t('static.versionSettings.versionSettings')}</a> screen. </li>
-                            </ul>
+                            <p style={{ fontSize: '13px' }}>
+                                <span className="UnderLineText">{i18n.t('static.CompareSelect.TipsGraphAndTabular')}:</span>
+                                <ul>
+                                    <li>{i18n.t('static.CompareSelect.ByDefault')}  </li>
+                                    <li>{i18n.t('static.CompareSelect.ViewForecastingUnit')} <a href='/#/dataset/versionSettings' target="_blank" style={{ textDecoration: 'underline' }}>{i18n.t('static.versionSettings.versionSettings')}</a> screen. </li>
+                                </ul>
                             </p>
                         </ModalBody>
                     </div>
                 </Modal>
-                
+
             </div >
         );
     }
