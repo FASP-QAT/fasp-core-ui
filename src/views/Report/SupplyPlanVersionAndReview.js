@@ -1279,7 +1279,7 @@ class SupplyPlanVersionAndReview extends Component {
                                                     >  <option value="-1">{i18n.t('static.common.all')}</option>
                                                         {versionTypes}</Input>
                                                 </InputGroup>    </div></FormGroup>
-                                        <FormGroup className="col-md-3">
+                                        <FormGroup className="col-md-3" style={{zIndex:'1'}}>
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.common.status')}</Label>
                                             <div className="controls">
                                                 <InputGroup>
