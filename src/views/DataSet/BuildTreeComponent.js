@@ -5125,33 +5125,17 @@ export default class BuildTree extends Component {
                 this.setState({ showFUValidation: false }, () => {
                     this.getForecastingUnitUnitByFUId(regionIds.value);
                     this.getPlanningUnitListByFUId(regionIds.value);
+                    this.filterUsageTemplateList(0, regionIds.value);
                 });
             } else {
                 currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.id = "";
                 currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.label.label_en = "";
-                // currentItemConfig.context.payload.label.label_en = "";
-                this.setState({ showFUValidation: true, planningUnitList: [] });
+                this.setState({ showFUValidation: true, planningUnitList: [] }, () => {
+                    this.filterUsageTemplateList(0, 0);
+                });
             }
-            // this.getPlanningUnitListByFUId(regionIds.value);
-            console.log("regionValues---", this.state.fuValues);
-            console.log("regionLabels---", this.state.fuLabels);
-            // if ((this.state.regionValues).length > 0) {
-            // var fuList = [];
-            // var fus = this.state.fuValues;
-            // console.log("fus---", fus)
-            // for (let i = 0; i < fus.length; i++) {
-            //     var json = {
-            //         id: fus[i].value,
-            //         label: {
-            //             label_en: fus[i].label
-            //         }
-            //     }
-            //     fuList.push(json);
-            // }
-            // console.log("final fuList---", fuList);
-            // curTreeObj.regionList = regionList;
+
             this.setState({ currentItemConfig });
-            // }
         })
     }
     getTreeTemplateById(treeTemplateId) {
@@ -6429,12 +6413,14 @@ export default class BuildTree extends Component {
         }.bind(this)
     }
 
-    filterUsageTemplateList(tracerCategoryId) {
+    filterUsageTemplateList(tracerCategoryId, forecastingUnitId) {
         var usageTemplateList = [];
         console.log("usage template tc---", tracerCategoryId)
         console.log("usage template list all---", this.state.usageTemplateListAll)
-
-        if (tracerCategoryId != "" && tracerCategoryId != null) {
+        if (forecastingUnitId > 0) {
+            usageTemplateList = this.state.usageTemplateListAll.filter(c => c.forecastingUnit.id == forecastingUnitId);
+        }
+        else if (tracerCategoryId != "" && tracerCategoryId != null) {
             console.log("usage template if")
             usageTemplateList = this.state.usageTemplateListAll.filter(c => c.tracerCategory.id == tracerCategoryId);
         } else {
@@ -7025,7 +7011,7 @@ export default class BuildTree extends Component {
             var fuNode = (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode;
 
             currentItemConfig.context.payload.nodeDataMap[scenarioId][0].fuNode.forecastingUnit.tracerCategory.id = event.target.value;
-            this.filterUsageTemplateList(event.target.value);
+            this.filterUsageTemplateList(event.target.value, 0);
         }
 
         if (event.target.name === "noOfPersons") {
@@ -7647,7 +7633,7 @@ export default class BuildTree extends Component {
                     this.getNoOfFUPatient();
                     this.getNoOfMonthsInUsagePeriod();
                     this.getNoFURequired();
-                    this.filterUsageTemplateList(this.state.currentScenario.fuNode.forecastingUnit.tracerCategory.id);
+                    this.filterUsageTemplateList(this.state.currentScenario.fuNode.forecastingUnit.tracerCategory.id, 0);
                     this.getUsageText();
                     this.state.currentItemConfig.context.payload.nodeUnit.id = this.state.currentItemConfig.parentItem.payload.nodeUnit.id;
                 } else if (data.context.payload.nodeType.id == 5) {
