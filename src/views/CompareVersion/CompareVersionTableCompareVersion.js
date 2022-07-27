@@ -489,7 +489,7 @@ export default class CompareVersionTableCompareVersion extends Component {
                 data[4]=puFiltered.length>0?(puFiltered[0].notes != null && puFiltered[0].notes!='' ? puFiltered[0].notes.label_en : ''):""
                 data[5]=puFiltered1.length>0?getLabelText(puFiltered1[0].selectedForecast):""
                 data[6]=puFiltered1.length>0?puFiltered1[0].totalForecast!=="" && puFiltered1[0].totalForecast!=null?Number(puFiltered1[0].totalForecast).toFixed(2):"":"";
-                data[7]=puFiltered1.length>0?(puFiltered1[0].notes != null && puFiltered[0].notes!='' ? puFiltered1[0].notes.label_en : ''):""
+                data[7]=puFiltered1.length>0?(puFiltered1[0].notes != null && puFiltered1[0].notes!='' ? puFiltered1[0].notes.label_en : ''):""
                 data[8]=""
                 data[9]=""
                 data[10]=""
