@@ -1602,7 +1602,7 @@ class ForecastMetrics extends Component {
                       </div>
                     </FormGroup>
 
-                    <FormGroup className="col-md-3">
+                    <FormGroup className="col-md-3" style={{zIndex:'2'}}>
                       <Label htmlFor="countrysId">{i18n.t('static.program.realmcountry')}</Label>
                       <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
 
@@ -1647,7 +1647,7 @@ class ForecastMetrics extends Component {
 
                     </FormGroup>
 
-                    <FormGroup className="col-md-3">
+                    <FormGroup className="col-md-3" style={{zIndex:'1'}}>
                       <Label htmlFor="appendedInputButton">{i18n.t('static.tracercategory.tracercategory')}</Label>
                       <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                       <div className="controls">
@@ -1670,7 +1670,7 @@ class ForecastMetrics extends Component {
                     </FormGroup>
 
 
-                    <FormGroup className="col-sm-3" id="hideDiv">
+                    <FormGroup className="col-sm-3" id="hideDiv" style={{zIndex:'1'}}>
                       <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
                       <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                       <div className="controls">
@@ -1689,7 +1689,7 @@ class ForecastMetrics extends Component {
                       </div>
                     </FormGroup>
 
-                    <FormGroup className="col-md-3">
+                    <FormGroup className="col-md-3" style={{zIndex:'1'}}>
                       <Label htmlFor="appendedInputButton">{i18n.t('static.report.includeapproved')}</Label>
                       <div className="controls ">
                         <InputGroup>
