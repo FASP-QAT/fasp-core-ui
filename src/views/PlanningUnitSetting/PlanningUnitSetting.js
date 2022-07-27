@@ -1963,7 +1963,7 @@ export default class PlanningUnitSetting extends Component {
                     // readOnly: true //5F
                 },
                 {
-                    title: i18n.t('static.planningUnitSetting.desiredMonthsOfStock') + this.state.endDateDisplay + ')',
+                    title: i18n.t('static.planningUnitSetting.desiredMonthsOfStock') + ' ' +this.state.endDateDisplay + ')',
                     type: 'numeric',
                     textEditor: true,
                     decimal: '.',
