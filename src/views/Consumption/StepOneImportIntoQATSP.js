@@ -975,6 +975,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     versions: (forecastProgram[0].versionList.filter(function (x, i, a) {
                         let forecastStartDate = x.forecastStartDate;
                         let forecastStopDate = x.forecastStopDate;
+                        console.log("forecastStartDate", forecastStartDate)
                         if (!(formattedDate > forecastStartDate && formattedDate < forecastStopDate)) {
                             isForecastOver = true;
                         }
@@ -1088,11 +1089,13 @@ export default class StepOneImportMapPlanningUnits extends Component {
         }
         if (isForecastAlreadyStarted) {
 
-            defaultForecastStartYear = new Date().getFullYear();
-            defaultForecastStartMonth = new Date().getMonth() + 1;
+            defaultForecastStartYear = forecastStartDate.getFullYear();
+            defaultForecastStartMonth = forecastStartDate.getMonth() + 1;
 
-            updatedForecastStartYear = formattedDate.getFullYear();
-            updatedForecastStartMonth = formattedDate.getMonth() + 1;
+            // updatedForecastStartYear = formattedDate.getFullYear();
+            // updatedForecastStartMonth = formattedDate.getMonth() + 1;
+            updatedForecastStartYear = forecastStartDate.getFullYear();
+            updatedForecastStartMonth = forecastStartDate.getMonth() + 1;
             // console.log("defaultForecastStartYear-1->", defaultForecastStartYear);
             // console.log("defaultForecastStartMonth-1->", defaultForecastStartMonth);
 
@@ -1352,7 +1355,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                                                     <li>{i18n.t('static.QATForecastImport.EveryForecasting')} </li>
                                                     <li>{i18n.t('static.QATForecastImport.AllForecast')}</li>
                                                     <br></br>
-                                                    <img className="img-fluid" src={ShowGuidanceScreenshot1} style={{width:'971px'}} />
+                                                    <img className="img-fluid" src={ShowGuidanceScreenshot1} style={{ width: '971px' }} />
                                                 </ul>
 
 
@@ -1360,7 +1363,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                                         </ul>
                                     </p>
                                     <p><b>{i18n.t('static.QATForecastImport.StepTwo')} </b>
-                                    {i18n.t('static.QATForecastImport.ForecastRegion')}:
+                                        {i18n.t('static.QATForecastImport.ForecastRegion')}:
                                         <ul>
                                             <li>{i18n.t('static.QATForecastImport.NationalForecast')}
                                                 <table className="table table-bordered ">
@@ -1497,12 +1500,12 @@ export default class StepOneImportMapPlanningUnits extends Component {
                                         </ul>
                                     </p>
                                     <p><b>{i18n.t('static.QATForecastImport.StepThree')} </b><br></br>
-                                    {i18n.t('static.QATForecastImport.ListForecast')}
+                                        {i18n.t('static.QATForecastImport.ListForecast')}
                                         <ul>
                                             <li>{i18n.t('static.QATForecastImport.ImportedFollows')}: </li>
                                             <img className="formula-img-mr img-fluid mb-lg-0" src={ForecastedConsumptionimported} style={{ border: '1px solid #fff', marginLeft: '-20px' }} />
                                             <p>
-                                            {i18n.t('static.QATForecastImport.FollowingExample')}:
+                                                {i18n.t('static.QATForecastImport.FollowingExample')}:
                                                 <ul>
                                                     <li>{i18n.t('static.QATForecastImport.SplitInto')}</li>
                                                     <li>{i18n.t('static.QATForecastImport.ForecastPlanning')}</li>
@@ -1513,7 +1516,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                                             <li>{i18n.t('static.QATForecastImport.ExistingForecasted')} </li>
                                             <li>{i18n.t('static.QATForecastImport.ImportColumn')}</li>
                                             <br></br>
-                                            <img className="img-fluid" src={ShowGuidanceScreenshot2} style={{width:'971px'}}/>
+                                            <img className="img-fluid" src={ShowGuidanceScreenshot2} style={{ width: '971px' }} />
                                         </ul>
 
                                     </p>

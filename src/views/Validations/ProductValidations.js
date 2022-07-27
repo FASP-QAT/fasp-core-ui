@@ -441,7 +441,12 @@ class ProductValidation extends Component {
                 // selectedText = this.state.currentItemConfig.parentItem.payload.nodeUnit.label.label_en
                 selectedText = getLabelText(unitList.filter(c => c.unitId == nodeDataList.filter(c => c.flatItem.id == finalData[i].parentNodeFlatItem.parent)[0].flatItem.payload.nodeUnit.id)[0].label, this.state.lang);
                 // console.log("+++UNit Label", getLabelText(nodeDataList.filter(c => c.flatItem.id == finalData[i].parentNodeFlatItem.parent)[0].flatItem.payload.nodeUnit.label, this.state.lang));
-                selectedText1 = getLabelText(unitList.filter(c => c.unitId == nodeDataList.filter(c => c.flatItem.id == finalData[i].parentNodeFlatItem.parent)[0].flatItem.payload.nodeUnit.id)[0].label, this.state.lang)
+                console.log("finalData[i].parentNodeNodeDataMap.fuNode.forecastingUnit", finalData[i].parentNodeNodeDataMap.fuNode.forecastingUnit);
+                try {
+                    selectedText1 = getLabelText(this.state.fuList.filter(c => c.forecastingUnitId == finalData[i].parentNodeNodeDataMap.fuNode.forecastingUnit.id)[0].unit.label, this.state.lang)
+                } catch (error) {
+                    selectedText1 = "";
+                }
                 if (finalData[i].parentNodeNodeDataMap.fuNode.usageType.id == 2 || finalData[i].parentNodeNodeDataMap.fuNode.oneTimeUsage != "true") {
                     console.log("finalData[i].parentNodeNodeDataMap.fuNode+++", finalData[i].parentNodeNodeDataMap.fuNode)
                     var upListFiltered = this.state.upList.filter(c => c.usagePeriodId == finalData[i].parentNodeNodeDataMap.fuNode.usagePeriod.usagePeriodId);
@@ -827,71 +832,81 @@ class ProductValidation extends Component {
                             currencyRequest.onerror = function (event) {
                             }.bind(this);
                             currencyRequest.onsuccess = function (event) {
-                                var unitList = unitRequest.result;
-                                var upList = upRequest.result;
-                                var utList = utRequest.result;
-                                var myResult = [];
-                                myResult = getRequest.result;
 
-                                var currencyResult = [];
-                                currencyResult = currencyRequest.result;
-                                var currencyList = [];
-                                currencyResult.map(item => {
-                                    currencyList.push({ id: item.currencyId, name: getLabelText(item.label, this.state.lang), currencyCode: item.currencyCode, conversionRateToUsd: item.conversionRateToUsd })
-                                })
-                                console.log("MyResult+++", myResult);
-                                var datasetList = this.state.datasetList;
-                                for (var mr = 0; mr < myResult.length; mr++) {
-                                    var index = datasetList.findIndex(c => c.id == myResult[mr].programId);
-                                    if (index == -1) {
-                                        var programNameBytes = CryptoJS.AES.decrypt(myResult[mr].programName, SECRET_KEY);
-                                        var programNameLabel = programNameBytes.toString(CryptoJS.enc.Utf8);
-                                        console.log("programNamelabel+++", programNameLabel);
-                                        var programNameJson = JSON.parse(programNameLabel)
-                                        var json = {
-                                            id: myResult[mr].programId,
-                                            name: getLabelText(programNameJson, this.state.lang),
-                                            code: myResult[mr].programCode,
-                                            versionList: [{ versionId: myResult[mr].version + "  (Local)" }]
+                                var fuTransaction = db1.transaction(['forecastingUnit'], 'readwrite');
+                                var fuOs = fuTransaction.objectStore('forecastingUnit');
+                                var fuRequest = fuOs.getAll();
+                                fuRequest.onerror = function (event) {
+                                }.bind(this);
+                                fuRequest.onsuccess = function (event) {
+                                    var fuList = fuRequest.result;
+                                    var unitList = unitRequest.result;
+                                    var upList = upRequest.result;
+                                    var utList = utRequest.result;
+                                    var myResult = [];
+                                    myResult = getRequest.result;
+
+                                    var currencyResult = [];
+                                    currencyResult = currencyRequest.result;
+                                    var currencyList = [];
+                                    currencyResult.map(item => {
+                                        currencyList.push({ id: item.currencyId, name: getLabelText(item.label, this.state.lang), currencyCode: item.currencyCode, conversionRateToUsd: item.conversionRateToUsd })
+                                    })
+                                    console.log("MyResult+++", myResult);
+                                    var datasetList = this.state.datasetList;
+                                    for (var mr = 0; mr < myResult.length; mr++) {
+                                        var index = datasetList.findIndex(c => c.id == myResult[mr].programId);
+                                        if (index == -1) {
+                                            var programNameBytes = CryptoJS.AES.decrypt(myResult[mr].programName, SECRET_KEY);
+                                            var programNameLabel = programNameBytes.toString(CryptoJS.enc.Utf8);
+                                            console.log("programNamelabel+++", programNameLabel);
+                                            var programNameJson = JSON.parse(programNameLabel)
+                                            var json = {
+                                                id: myResult[mr].programId,
+                                                name: getLabelText(programNameJson, this.state.lang),
+                                                code: myResult[mr].programCode,
+                                                versionList: [{ versionId: myResult[mr].version + "  (Local)" }]
+                                            }
+                                            datasetList.push(json)
+                                        } else {
+                                            var existingVersionList = datasetList[index].versionList;
+                                            console.log("existingVersionList+++", datasetList[index].versionList)
+                                            existingVersionList.push({ versionId: myResult[mr].version + "  (Local)" })
+                                            datasetList[index].versionList = existingVersionList
                                         }
-                                        datasetList.push(json)
-                                    } else {
-                                        var existingVersionList = datasetList[index].versionList;
-                                        console.log("existingVersionList+++", datasetList[index].versionList)
-                                        existingVersionList.push({ versionId: myResult[mr].version + "  (Local)" })
-                                        datasetList[index].versionList = existingVersionList
                                     }
-                                }
-                                var datasetId = "";
-                                var event = {
-                                    target: {
-                                        value: ""
+                                    var datasetId = "";
+                                    var event = {
+                                        target: {
+                                            value: ""
+                                        }
+                                    };
+                                    if (datasetList.length == 1) {
+                                        console.log("in if%%%", datasetList.length)
+                                        datasetId = datasetList[0].id;
+                                        event.target.value = datasetList[0].id;
+                                    } else if (localStorage.getItem("sesLiveDatasetId") != "" && datasetList.filter(c => c.id == localStorage.getItem("sesLiveDatasetId")).length > 0) {
+                                        datasetId = localStorage.getItem("sesLiveDatasetId");
+                                        event.target.value = localStorage.getItem("sesLiveDatasetId");
                                     }
-                                };
-                                if (datasetList.length == 1) {
-                                    console.log("in if%%%", datasetList.length)
-                                    datasetId = datasetList[0].id;
-                                    event.target.value = datasetList[0].id;
-                                } else if (localStorage.getItem("sesLiveDatasetId") != "" && datasetList.filter(c => c.id == localStorage.getItem("sesLiveDatasetId")).length > 0) {
-                                    datasetId = localStorage.getItem("sesLiveDatasetId");
-                                    event.target.value = localStorage.getItem("sesLiveDatasetId");
-                                }
-                                this.setState({
-                                    datasetList: datasetList.sort(function (a, b) {
-                                        a = a.code.toLowerCase();
-                                        b = b.code.toLowerCase();
-                                        return a < b ? -1 : a > b ? 1 : 0;
-                                    }),
-                                    currencyList: currencyList,
-                                    unitList: unitList,
-                                    upList: upList,
-                                    utList: utList,
-                                    loading: false
-                                }, () => {
-                                    // if (datasetId != "") {
-                                    this.setDatasetId(event);
-                                    // }
-                                })
+                                    this.setState({
+                                        datasetList: datasetList.sort(function (a, b) {
+                                            a = a.code.toLowerCase();
+                                            b = b.code.toLowerCase();
+                                            return a < b ? -1 : a > b ? 1 : 0;
+                                        }),
+                                        currencyList: currencyList,
+                                        unitList: unitList,
+                                        upList: upList,
+                                        utList: utList,
+                                        fuList: fuList,
+                                        loading: false
+                                    }, () => {
+                                        // if (datasetId != "") {
+                                        this.setDatasetId(event);
+                                        // }
+                                    })
+                                }.bind(this)
                             }.bind(this)
                         }.bind(this)
                     }.bind(this)
