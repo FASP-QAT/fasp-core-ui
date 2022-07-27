@@ -667,7 +667,7 @@ export default class CreateTreeTemplate extends Component {
             activeTab1: new Array(2).fill('1'),
             momListPer: [],
             currentModelingType: '',
-            currentTransferData : '',
+            currentTransferData: '',
             currentCalculatorStartDate: '',
             currentCalculatorStopDate: '',
             currentCalculatorStartValue: '',
@@ -785,9 +785,18 @@ export default class CreateTreeTemplate extends Component {
         this.calculateParentValueFromMOM = this.calculateParentValueFromMOM.bind(this);
         this.generateMonthList = this.generateMonthList.bind(this);
         this.updateTreeData = this.updateTreeData.bind(this);
-        this.levelDeatilsSaved = this.levelDeatilsSaved.bind(this)
+        this.levelDeatilsSaved = this.levelDeatilsSaved.bind(this);
+        this.filterUsageTemplateList = this.filterUsageTemplateList.bind(this);
     }
-
+    filterUsageTemplateList(forecastingUnitId) {
+        var usageTemplateList;
+        if (forecastingUnitId > 0) {
+            usageTemplateList = this.state.usageTemplateListAll.filter(x => x.forecastingUnit.id == forecastingUnitId);
+        } else {
+            usageTemplateList = this.state.usageTemplateListAll;
+        }
+        this.setState({ usageTemplateList });
+    }
     levelClicked(data) {
         var name = "";
         var unit = "";
@@ -1117,7 +1126,7 @@ export default class CreateTreeTemplate extends Component {
                 qatCalculatedPUPerVisit = parseFloat(((currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) * refillMonths) / pu.multiplier).toFixed(4);
             } else {
                 // if (currentItemConfig.context.payload.nodeDataMap[0][0].puNode.sharePlanningUnit == "true" || currentItemConfig.context.payload.nodeDataMap[0][0].puNode.sharePlanningUnit == true) {
-                    qatCalculatedPUPerVisit = addCommas(this.state.noOfMonthsInUsagePeriod / pu.multiplier);
+                qatCalculatedPUPerVisit = addCommas(this.state.noOfMonthsInUsagePeriod / pu.multiplier);
                 // } else {
                 //     qatCalculatedPUPerVisit = this.round(this.state.noOfMonthsInUsagePeriod / pu.multiplier);
                 // }
@@ -1189,12 +1198,15 @@ export default class CreateTreeTemplate extends Component {
                 this.setState({ showFUValidation: false }, () => {
                     this.getForecastingUnitUnitByFUId(regionIds.value);
                     this.getPlanningUnitListByFUId(regionIds.value);
+                    this.filterUsageTemplateList(regionIds.value);
                 });
             } else {
                 currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.forecastingUnit.id = "";
                 currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.forecastingUnit.label.label_en = "";
                 currentItemConfig.context.payload.label.label_en = "";
-                this.setState({ showFUValidation: true, planningUnitList: [] });
+                this.setState({ showFUValidation: true, planningUnitList: [] }, () => {
+                    this.filterUsageTemplateList(0);
+                });
             }
             console.log("regionValues---", this.state.fuValues);
             console.log("regionLabels---", this.state.fuLabels);
@@ -4307,6 +4319,7 @@ export default class CreateTreeTemplate extends Component {
                 return itemLabelA > itemLabelB ? 1 : -1;
             });
             this.setState({
+                usageTemplateListAll: listArray,
                 usageTemplateList: listArray
             }, () => {
                 console.log(" get uasge template--------------", response.data);
@@ -4635,7 +4648,7 @@ export default class CreateTreeTemplate extends Component {
                 if ((this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 1) {
                     var sharePu;
                     // if ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.sharePlanningUnit == "true") {
-                        sharePu = (this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor);
+                    sharePu = (this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor);
                     // } else {
                     //     sharePu = this.round((this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor));
                     // }
@@ -4910,7 +4923,7 @@ export default class CreateTreeTemplate extends Component {
     }
 
     componentDidMount() {
-        console.log("my business functions---",AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE_TEMPLATE') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_TREE_TEMPLATE'));
+        console.log("my business functions---", AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE_TEMPLATE') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_TREE_TEMPLATE'));
         this.getNodeTyeList();
         this.getUsageTemplateList(0);
         ForecastMethodService.getActiveForecastMethodList().then(response => {
@@ -9816,14 +9829,14 @@ export default class CreateTreeTemplate extends Component {
                                                             </FormGroup>
                                                         </div>
 
-                                                        {(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE_TEMPLATE') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_TREE_TEMPLATE')) && 
-                                                        <CardFooter className="col-md-6 pt-lg-0 pr-lg-0 float-right MarginTopCreateTreeBtn" style={{ backgroundColor: 'transparent', borderTop: '0px solid #c8ced3' }}>
-                                                            {/* ---hehehe */}
-                                                            {/* <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
-                                                            <Button type="button" size="md" color="warning" className="float-right mr-1 mb-lg-2" onClick={this.resetTree}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                                            <Button type="submit" color="success" className="mr-1 mb-lg-2 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"> </i>{i18n.t('static.pipeline.save')}</Button>
-                                                        </CardFooter>}
-                                                        
+                                                        {(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE_TEMPLATE') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_TREE_TEMPLATE')) &&
+                                                            <CardFooter className="col-md-6 pt-lg-0 pr-lg-0 float-right MarginTopCreateTreeBtn" style={{ backgroundColor: 'transparent', borderTop: '0px solid #c8ced3' }}>
+                                                                {/* ---hehehe */}
+                                                                {/* <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
+                                                                <Button type="button" size="md" color="warning" className="float-right mr-1 mb-lg-2" onClick={this.resetTree}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                                <Button type="submit" color="success" className="mr-1 mb-lg-2 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"> </i>{i18n.t('static.pipeline.save')}</Button>
+                                                            </CardFooter>}
+
                                                     </CardBody>
 
                                                     <div style={{ display: !this.state.loading ? "block" : "none" }} class="sample">
