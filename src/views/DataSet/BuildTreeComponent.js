@@ -6405,7 +6405,7 @@ export default class BuildTree extends Component {
         console.log("usage template tc---", tracerCategoryId)
         console.log("usage template list all---", this.state.usageTemplateListAll)
         if (forecastingUnitId > 0) {
-
+            usageTemplateList = this.state.usageTemplateListAll.filter(c => c.forecastingUnit.id == forecastingUnitId);
         }
         else if (tracerCategoryId != "" && tracerCategoryId != null) {
             console.log("usage template if")
