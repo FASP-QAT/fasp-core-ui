@@ -1144,7 +1144,7 @@ export default class PlanningUnitListComponent extends Component {
 
                     </div>
                     <CardBody className="pb-lg-0 pt-lg-0">
-                        <Col md="9 pl-0">
+                        <Col md="9 pl-0" style={{zIndex:'1'}}>
                             <div className="row">
                                 <FormGroup className="col-md-3" id="realmDiv">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>

@@ -1075,7 +1075,7 @@ content: '\f1ec';
   // height: 100vh;
 }
 @media only screen and (min-width: 1200px) {
-  .Selectdiv2{position: absolute;top:-25px;margin-bottom: 0.5rem;}
+  .Selectdiv2{position: absolute;top:-25px;margin-bottom: 0.5rem;z-index: 1;}
   .prodCatselect{
     position: absolute;
     top: -6px;
@@ -5197,7 +5197,7 @@ height: 0px;
 //   cursor: pointer;
 // }
 
-.calculatorimg .jexcel>tbody>tr>td>img {
+.calculatorimg .jss>tbody>tr>td>img {
   width: 17px!important;  
 }
 .Radioactive{
@@ -6782,4 +6782,47 @@ top: calc(20em + 3px);
 .jtabs{
   position: relative!important;
   max-width: none!important;
+}
+
+  .leftAlignTable .jss>thead>tr>td:nth-child(2){
+  width: 120px!important;
+  left: 0!important;
+  z-index: 4!important;
+  position: sticky!important;
+  text-align: left!important;
+  }
+  .leftAlignTable .jss_overflow>tbody>tr>td:nth-child(2) {
+    width: 120px!important;
+    left: 0!important;
+    z-index: 2!important;
+    position: sticky!important;
+    text-align: left!important;
+}
+.usageTemplateDataEntryTable .jss>thead>tr>td:nth-child(3)
+{
+  width: 120px!important;
+  left: 0!important;
+  z-index: 4!important;
+  position: sticky!important;
+  text-align: left!important;
+  }
+  .usageTemplateDataEntryTable .jss_overflow>tbody>tr>td:nth-child(3) {
+    width: 120px!important;
+    left: 0!important;
+    z-index: 2!important;
+    position: sticky!important;
+    text-align: left!important;
+}
+.usageTemplateDataEntryTable .jss>thead>tr>td:nth-child(4)
+{
+  width: 150px!important;
+  left: 95px!important;
+  z-index: 4!important;
+  position: sticky!important;
+  }
+  .usageTemplateDataEntryTable .jss_overflow>tbody>tr>td:nth-child(4) {
+    width: 150px!important;
+    left: 95px!important;
+    z-index: 3!important;
+    position: sticky!important;
 }
