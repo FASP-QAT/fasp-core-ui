@@ -165,6 +165,7 @@ class CompareAndSelectScenario extends Component {
         if (this.state.planningUnitId != "" && this.state.regionId != "") {
             this.setState({ loading: true })
             var datasetJson = this.state.datasetJson;
+            console.log("Dataset json@@@@@@@@@@@@",datasetJson)
             var multiplier = 1;
             var selectedPlanningUnit = this.state.planningUnitList.filter(c => c.planningUnit.id == this.state.planningUnitId);
             // if (this.state.viewById == 2) {
@@ -217,12 +218,12 @@ class CompareAndSelectScenario extends Component {
                 var regionList = tree.regionList.filter(c => c.id == this.state.regionId);
                 var scenarioList = regionList.length > 0 ? treeList[tl].scenarioList : [];
                 for (var sl = 0; sl < scenarioList.length; sl++) {
-                    var flatList = tree.tree.flatList.filter(c => c.payload.nodeDataMap[scenarioList[sl].id][0].puNode != null && c.payload.nodeDataMap[scenarioList[sl].id][0].puNode.planningUnit.id == this.state.planningUnitId);
+                    var flatList = tree.tree.flatList.filter(c => c.payload.nodeDataMap[scenarioList[sl].id]!=undefined && c.payload.nodeDataMap[scenarioList[sl].id][0].puNode != null && c.payload.nodeDataMap[scenarioList[sl].id][0].puNode.planningUnit.id == this.state.planningUnitId);
                     if (colourArrayCount > 10) {
                         colourArrayCount = 0;
                     }
                     var readonly = flatList.length > 0 ? false : true
-                    var dataForPlanningUnit = treeList[tl].tree.flatList.filter(c => (c.payload.nodeDataMap[scenarioList[sl].id])[0].puNode != null && (c.payload.nodeDataMap[scenarioList[sl].id])[0].puNode.planningUnit.id == this.state.planningUnitId && (c.payload).nodeType.id == 5);
+                    var dataForPlanningUnit = treeList[tl].tree.flatList.filter(c => c.payload.nodeDataMap[scenarioList[sl].id]!=undefined && (c.payload.nodeDataMap[scenarioList[sl].id])[0].puNode != null && (c.payload.nodeDataMap[scenarioList[sl].id])[0].puNode.planningUnit.id == this.state.planningUnitId && (c.payload).nodeType.id==5);
                     console.log("dataForPlanningUnit####", dataForPlanningUnit);
                     var data = [];
                     if (dataForPlanningUnit.length > 0) {
