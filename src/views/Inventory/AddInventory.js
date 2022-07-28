@@ -1001,4 +1001,3 @@ export default class AddInventory extends Component {
         this.pickRange.current.show()
     }
 }
-

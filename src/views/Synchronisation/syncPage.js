@@ -82,7 +82,10 @@ export default class syncPage extends Component {
       versionType: 1,
       openCount: 0,
       progressPer: 0,
-      notes: ''
+      notes: '',
+      deletedRowsListLocal: [],
+      deletedRowsListServer: [],
+      shipmentAlreadyLinkedToOtherProgCount: 0
     }
     this.toggle = this.toggle.bind(this);
     this.getDataForCompare = this.getDataForCompare.bind(this);
@@ -1120,7 +1123,7 @@ export default class syncPage extends Component {
           }
         }
       }
-      shipmentData = shipmentData.concat(oldProgramDataShipment.filter(c => c.shipmentId == 0 && c.active.toString() == "true"));
+      shipmentData = shipmentData.concat(oldProgramDataShipment.filter(c => (c.shipmentId == 0 && c.erpFlag == true) || (c.shipmentId == 0 && c.active.toString() == "true")));
 
       var uniquePlanningUnitsInShipment = [];
       shipmentJson.map(c => uniquePlanningUnitsInShipment = uniquePlanningUnitsInShipment.concat(parseInt(c[1])));
@@ -1139,6 +1142,7 @@ export default class syncPage extends Component {
       programJson.inventoryList = inventoryData;
       programJson.shipmentList = shipmentData;
       programJson.actionList = actionList;
+      programJson.shipmentLinkingList = linkedShipmentsList.filter(c => (c.shipmentLinkingId > 0) || (c.shipmentLinkingId == 0 && c.active == true));
 
       var planningUnitDataListFromState = this.state.planningUnitDataList;
       var updatedJson = [];
@@ -2328,6 +2332,340 @@ export default class syncPage extends Component {
                                     this.setState({
                                       mergedShipmentJexcel: mergedShipmentJexcel,
                                     })
+
+                                    // Shipment Linked part
+                                    var latestProgramDataShipmentLinked = latestProgramData.shipmentLinkingList != null ? latestProgramData.shipmentLinkingList : [];
+                                    var oldProgramDataShipmentLinked = oldProgramData.shipmentLinkingList != null ? oldProgramData.shipmentLinkingList.filter(c => c.shipmentLinkingId > 0 || (c.shipmentLinkingId == 0 && c.active == true)) : [];
+                                    console.log("latestProgramDataShipmentLinked@@@@@@@@@@@@@", latestProgramDataShipmentLinked)
+                                    console.log("oldProgramDataShipmentLinked@@@@@@@@@@@@@", oldProgramDataShipmentLinked)
+                                    var downloadedProgramDataShipmentLinked = downloadedProgramData.shipmentLinkingList != null ? downloadedProgramData.shipmentLinkingList : [];
+
+                                    // var modifiedShipmentIds = []
+                                    // latestProgramDataShipment.filter(c => c.versionId > oldProgramData.currentVersion.versionId || moment(c.lastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(oldProgramData.currentVersion.createdDate).format("YYYY-MM-DD HH:mm:ss")).map(item => { modifiedShipmentIds.push(item.shipmentId) });
+                                    // oldProgramDataShipment.filter(c => moment(c.lastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(oldProgramData.currentVersion.createdDate).format("YYYY-MM-DD HH:mm:ss")).map(item => modifiedShipmentIds.push(item.shipmentId));
+
+                                    // var latestModifiedShipmentData = latestProgramDataShipment.filter(c => modifiedShipmentIds.includes(c.shipmentId));
+                                    // var oldModifiedShipmentData = oldProgramDataShipment.filter(c => c.shipmentId == 0 || modifiedShipmentIds.includes(c.shipmentId));
+
+                                    // var mergedShipmentData = [];
+                                    // var existingShipmentId = [];
+                                    // for (var c = 0; c < oldModifiedShipmentData.length; c++) {
+                                    //   if (oldModifiedShipmentData[c].shipmentId != 0) {
+                                    //     if ((oldModifiedShipmentData[c].budget.id == "undefined" || oldModifiedShipmentData[c].budget.id == undefined) && oldModifiedShipmentData[c].active.toString() == "false") {
+                                    //       oldModifiedShipmentData[c].budget.id = '';
+                                    //     }
+                                    //     mergedShipmentData.push(oldModifiedShipmentData[c]);
+                                    //     existingShipmentId.push(oldModifiedShipmentData[c].shipmentId);
+                                    //   } else {
+                                    //     // If 0 check whether that exists in latest version or not
+                                    //     if (oldModifiedShipmentData[c].active.toString() == "true") {
+                                    //       mergedShipmentData.push(oldModifiedShipmentData[c]);
+                                    //     }
+                                    //   }
+                                    // }
+                                    // // Getting other entries of latest shipment data
+                                    // var latestOtherShipmentEntries = latestModifiedShipmentData.filter(c => !(existingShipmentId.includes(c.shipmentId)));
+                                    // mergedShipmentData = mergedShipmentData.concat(latestOtherShipmentEntries);
+                                    var data = [];
+                                    var mergedShipmentLinkedJexcel = [];
+                                    var mergedData = (latestProgramDataShipmentLinked.concat(oldProgramDataShipmentLinked).concat(downloadedProgramDataShipmentLinked));
+                                    var uniqueRoNoAndRoPrimeLineNo = [...new Set(mergedData.map(ele => ele.roNo + "|" + ele.roPrimeLineNo))];
+
+                                    for (var cd = 0; cd < uniqueRoNoAndRoPrimeLineNo.length; cd++) {
+                                      data = [];
+                                      var latestProgramDataShipmentLinkedFiltered = latestProgramDataShipmentLinked.filter(c => uniqueRoNoAndRoPrimeLineNo[cd] == (c.roNo + "|" + c.roPrimeLineNo))
+                                      var oldProgramDataShipmentLinkedFiltered = oldProgramDataShipmentLinked.filter(c => uniqueRoNoAndRoPrimeLineNo[cd] == (c.roNo + "|" + c.roPrimeLineNo))
+                                      var downloadedProgramDataShipmentLinkedFiltered = downloadedProgramDataShipmentLinked.filter(c => uniqueRoNoAndRoPrimeLineNo[cd] == (c.roNo + "|" + c.roPrimeLineNo))
+                                      var listFromAPI = responseLinking.data;
+                                      var listFromAPIFiltered = listFromAPI.filter(c => uniqueRoNoAndRoPrimeLineNo[cd] == c.roNo + "|" + c.roPrimeLineNo);
+                                      console.log("latestProgramDataShipmentLinkedFiltered@@@@@@@@@@@@@", latestProgramDataShipmentLinkedFiltered)
+                                      console.log("oldProgramDataShipmentLinkedFiltered@@@@@@@@@@@@@", oldProgramDataShipmentLinkedFiltered)
+                                      data[0] = uniqueRoNoAndRoPrimeLineNo[cd].split("|")[0] + " - " + uniqueRoNoAndRoPrimeLineNo[cd].split("|")[1];
+                                      data[1] = uniqueRoNoAndRoPrimeLineNo[cd].split("|")[1];
+                                      data[2] = oldProgramDataShipmentLinkedFiltered.length > 0 ? getLabelText(oldProgramData.label, this.state.lang) : "";
+                                      data[3] = oldProgramDataShipmentLinkedFiltered.length > 0 ? oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length - 1].parentShipmentId : "";
+                                      data[4] = oldProgramDataShipmentLinkedFiltered.length > 0 ? oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length - 1].conversionFactor : "";
+                                      data[5] = oldProgramDataShipmentLinkedFiltered.length > 0 ? oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length - 1].active == 1 || oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length - 1].active == true ? true : false : false;
+                                      data[6] = listFromAPIFiltered.length > 0 ? getLabelText(listFromAPIFiltered[0].program.label, this.state.lang) : latestProgramDataShipmentLinkedFiltered.length > 0 ? getLabelText(latestProgramData.label, this.state.lang) : "";
+                                      data[7] = listFromAPIFiltered.length > 0 ? listFromAPIFiltered[listFromAPIFiltered.length - 1].shipmentId : latestProgramDataShipmentLinkedFiltered.length > 0 ? latestProgramDataShipmentLinkedFiltered[latestProgramDataShipmentLinkedFiltered.length - 1].parentShipmentId : "";
+                                      data[8] = listFromAPIFiltered.length > 0 ? listFromAPIFiltered[listFromAPIFiltered.length - 1].conversionFactor : latestProgramDataShipmentLinkedFiltered.length > 0 ? latestProgramDataShipmentLinkedFiltered[latestProgramDataShipmentLinkedFiltered.length - 1].conversionFactor : "";
+                                      data[9] = listFromAPIFiltered.length > 0 ? listFromAPIFiltered[listFromAPIFiltered.length - 1].conversionFactor : latestProgramDataShipmentLinkedFiltered.length > 0 ? latestProgramDataShipmentLinkedFiltered[latestProgramDataShipmentLinkedFiltered.length - 1].active == 1 || latestProgramDataShipmentLinkedFiltered[latestProgramDataShipmentLinkedFiltered.length - 1].active == true ? true : false : false;
+                                      data[10] = oldProgramDataShipmentLinkedFiltered.length > 0 ? oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length - 1].shipmentLinkingId : "";
+                                      data[11] = latestProgramDataShipmentLinkedFiltered.length > 0 ? latestProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length - 1].shipmentLinkingId : "";
+                                      data[12] = downloadedProgramDataShipmentLinkedFiltered.length > 0 ? downloadedProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length - 1].shipmentLinkingId : "";
+                                      data[13] = 4;
+                                      data[14] = (oldProgramDataShipmentLinkedFiltered.length > 0 && latestProgramDataShipmentLinkedFiltered.length == 0) || (oldProgramDataShipmentLinkedFiltered.length == 0 && latestProgramDataShipmentLinkedFiltered.length > 0) ? (oldProgramDataShipmentLinkedFiltered.length > 0 && latestProgramDataShipmentLinkedFiltered.length == 0) ? oldProgramData.currentVersion.versionId : latestProgramData.currentVersion.versionId : "";
+                                      data[15] = cd;
+                                      data[16] = oldProgramData.currentVersion.versionId;
+                                      data[17] = latestProgramData.currentVersion.versionId;
+                                      data[18] = [];
+                                      data[19] = oldProgramDataShipmentLinkedFiltered.length > 0 ? oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length - 1] : {};
+                                      data[20] = latestProgramDataShipmentLinkedFiltered.length > 0 ? latestProgramDataShipmentLinkedFiltered[latestProgramDataShipmentLinkedFiltered.length - 1] : {};
+                                      data[21] = downloadedProgramDataShipmentLinkedFiltered.length > 0 ? downloadedProgramDataShipmentLinkedFiltered[downloadedProgramDataShipmentLinkedFiltered.length - 1].active : ""
+                                      // data[8] = mergedShipmentData[cd].dataSource.id;
+                                      // data[9] = mergedShipmentData[cd].shipmentMode == "Air" ? 2 : 1;
+                                      // data[10] = mergedShipmentData[cd].suggestedQty;
+                                      // data[11] = mergedShipmentData[cd].shipmentQty;
+                                      // data[12] = mergedShipmentData[cd].currency.currencyId;
+                                      // data[13] = parseFloat(mergedShipmentData[cd].rate).toFixed(2);
+                                      // data[14] = parseFloat(mergedShipmentData[cd].rate).toFixed(2) * mergedShipmentData[cd].shipmentQty;
+                                      // data[15] = parseFloat(mergedShipmentData[cd].freightCost).toFixed(2);
+                                      // data[16] = mergedShipmentData[cd].plannedDate != "" && mergedShipmentData[cd].plannedDate != null ? moment(mergedShipmentData[cd].plannedDate).format(DATE_FORMAT_CAP) : "";
+                                      // data[17] = mergedShipmentData[cd].submittedDate != "" && mergedShipmentData[cd].submittedDate != null ? moment(mergedShipmentData[cd].submittedDate).format(DATE_FORMAT_CAP) : "";
+                                      // data[18] = mergedShipmentData[cd].approvedDate != "" && mergedShipmentData[cd].approvedDate != null ? moment(mergedShipmentData[cd].approvedDate).format(DATE_FORMAT_CAP) : "";
+                                      // data[19] = mergedShipmentData[cd].shippedDate != "" && mergedShipmentData[cd].shippedDate != null ? moment(mergedShipmentData[cd].shippedDate).format(DATE_FORMAT_CAP) : "";
+                                      // data[20] = mergedShipmentData[cd].arrivedDate != "" && mergedShipmentData[cd].arrivedDate != null ? moment(mergedShipmentData[cd].arrivedDate).format(DATE_FORMAT_CAP) : "";
+                                      // data[21] = mergedShipmentData[cd].receivedDate != "" && mergedShipmentData[cd].receivedDate != null ? moment(mergedShipmentData[cd].receivedDate).format(DATE_FORMAT_CAP) : "";
+                                      // data[22] = mergedShipmentData[cd].notes;
+                                      // data[23] = mergedShipmentData[cd].erpFlag;
+                                      // data[24] = mergedShipmentData[cd].emergencyOrder;
+                                      // data[25] = mergedShipmentData[cd].accountFlag;
+                                      // data[26] = mergedShipmentData[cd].active;
+                                      // data[27] = mergedShipmentData[cd].localProcurement;
+                                      // data[28] = JSON.stringify(mergedShipmentData[cd].batchInfoList != "" ? ((mergedShipmentData[cd].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.shipmentQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : "");
+                                      // data[29] = "";
+                                      // var oldDataList = oldProgramDataShipment.filter(c => c.shipmentId == mergedShipmentData[cd].shipmentId);
+                                      // var oldData = ""
+                                      // if (oldDataList.length > 0) {
+                                      //   oldData = [oldDataList[0].shipmentId, oldDataList[0].planningUnit.id, oldDataList[0].shipmentStatus.id, moment(oldDataList[0].expectedDeliveryDate).format(DATE_FORMAT_CAP), oldDataList[0].procurementAgent.id, oldDataList[0].fundingSource.id, oldDataList[0].budget.id, oldDataList[0].orderNo != "" && oldDataList[0].orderNo != null ? oldDataList[0].orderNo.toString().concat(oldDataList[0].primeLineNo != null ? "~" : "").concat(oldDataList[0].primeLineNo != null ? oldDataList[0].primeLineNo : "") : "", oldDataList[0].dataSource.id, oldDataList[0].shipmentMode == "Air" ? 2 : 1, oldDataList[0].suggestedQty, oldDataList[0].shipmentQty, oldDataList[0].currency.currencyId, parseFloat(oldDataList[0].rate).toFixed(2), parseFloat(oldDataList[0].rate).toFixed(2) * oldDataList[0].shipmentQty, parseFloat(oldDataList[0].freightCost).toFixed(2), oldDataList[0].plannedDate != "" && oldDataList[0].plannedDate != null ? moment(oldDataList[0].plannedDate).format(DATE_FORMAT_CAP) : "", oldDataList[0].submittedDate != "" && oldDataList[0].submittedDate != null ? moment(oldDataList[0].submittedDate).format(DATE_FORMAT_CAP) : "", oldDataList[0].approvedDate != "" && oldDataList[0].approvedDate != null ? moment(oldDataList[0].approvedDate).format(DATE_FORMAT_CAP) : "", oldDataList[0].shippedDate != "" && oldDataList[0].shippedDate != null ? moment(oldDataList[0].shippedDate).format(DATE_FORMAT_CAP) : "", oldDataList[0].arrivedDate != "" && oldDataList[0].arrivedDate != null ? moment(oldDataList[0].arrivedDate).format(DATE_FORMAT_CAP) : "", oldDataList[0].receivedDate != "" && oldDataList[0].receivedDate != null ? moment(oldDataList[0].receivedDate).format(DATE_FORMAT_CAP) : "", oldDataList[0].notes, oldDataList[0].erpFlag, oldDataList[0].emergencyOrder, oldDataList[0].accountFlag, oldDataList[0].active, oldDataList[0].localProcurement, JSON.stringify(oldDataList[0].batchInfoList != "" ? ((oldDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.shipmentQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
+                                      // }
+                                      // data[30] = oldData;//Old data
+                                      // var latestDataList = latestProgramDataShipment.filter(c => c.shipmentId == mergedShipmentData[cd].shipmentId);
+                                      // var latestData = ""
+                                      // if (latestDataList.length > 0) {
+                                      //   latestData = [latestDataList[0].shipmentId, latestDataList[0].planningUnit.id, latestDataList[0].shipmentStatus.id, moment(latestDataList[0].expectedDeliveryDate).format(DATE_FORMAT_CAP), latestDataList[0].procurementAgent.id, latestDataList[0].fundingSource.id, latestDataList[0].budget.id, latestDataList[0].orderNo != "" && latestDataList[0].orderNo != null ? latestDataList[0].orderNo.toString().concat(latestDataList[0].primeLineNo != null ? "~" : "").concat(latestDataList[0].primeLineNo != null ? latestDataList[0].primeLineNo : "") : "", latestDataList[0].dataSource.id, latestDataList[0].shipmentMode == "Air" ? 2 : 1, latestDataList[0].suggestedQty, latestDataList[0].shipmentQty, latestDataList[0].currency.currencyId, parseFloat(latestDataList[0].rate).toFixed(2), parseFloat(latestDataList[0].rate).toFixed(2) * latestDataList[0].shipmentQty, parseFloat(latestDataList[0].freightCost).toFixed(2), latestDataList[0].plannedDate != "" && latestDataList[0].plannedDate != null ? moment(latestDataList[0].plannedDate).format(DATE_FORMAT_CAP) : "", latestDataList[0].submittedDate != "" && latestDataList[0].submittedDate != null ? moment(latestDataList[0].submittedDate).format(DATE_FORMAT_CAP) : "", latestDataList[0].approvedDate != "" && latestDataList[0].approvedDate != null ? moment(latestDataList[0].approvedDate).format(DATE_FORMAT_CAP) : "", latestDataList[0].shippedDate != "" && latestDataList[0].shippedDate != null ? moment(latestDataList[0].shippedDate).format(DATE_FORMAT_CAP) : "", latestDataList[0].arrivedDate != "" && latestDataList[0].arrivedDate != null ? moment(latestDataList[0].arrivedDate).format(DATE_FORMAT_CAP) : "", latestDataList[0].receivedDate != "" && latestDataList[0].receivedDate != null ? moment(latestDataList[0].receivedDate).format(DATE_FORMAT_CAP) : "", latestDataList[0].notes, latestDataList[0].erpFlag, latestDataList[0].emergencyOrder, latestDataList[0].accountFlag, latestDataList[0].active, latestDataList[0].localProcurement, JSON.stringify(latestDataList[0].batchInfoList != "" ? ((latestDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.shipmentQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
+                                      // }
+                                      // data[31] = latestData;//Latest data
+                                      // var downloadedDataList = downloadedProgramDataShipment.filter(c => c.shipmentId == mergedShipmentData[cd].shipmentId);
+                                      // var downloadedData = "";
+                                      // if (downloadedDataList.length > 0) {
+                                      //   downloadedData = [downloadedDataList[0].shipmentId, downloadedDataList[0].planningUnit.id, downloadedDataList[0].shipmentStatus.id, moment(downloadedDataList[0].expectedDeliveryDate).format(DATE_FORMAT_CAP), downloadedDataList[0].procurementAgent.id, downloadedDataList[0].fundingSource.id, downloadedDataList[0].budget.id, downloadedDataList[0].orderNo != "" && downloadedDataList[0].orderNo != null ? downloadedDataList[0].orderNo.toString().concat(downloadedDataList[0].primeLineNo != null ? "~" : "").concat(downloadedDataList[0].primeLineNo != null ? downloadedDataList[0].primeLineNo : "") : "", downloadedDataList[0].dataSource.id, downloadedDataList[0].shipmentMode == "Air" ? 2 : 1, downloadedDataList[0].suggestedQty, downloadedDataList[0].shipmentQty, downloadedDataList[0].currency.currencyId, parseFloat(downloadedDataList[0].rate).toFixed(2), parseFloat(downloadedDataList[0].rate).toFixed(2) * downloadedDataList[0].shipmentQty, parseFloat(downloadedDataList[0].freightCost).toFixed(2), downloadedDataList[0].plannedDate != "" && downloadedDataList[0].plannedDate != null ? moment(downloadedDataList[0].plannedDate).format(DATE_FORMAT_CAP) : "", downloadedDataList[0].submittedDate != "" && downloadedDataList[0].submittedDate != null ? moment(downloadedDataList[0].submittedDate).format(DATE_FORMAT_CAP) : "", downloadedDataList[0].approvedDate != "" && downloadedDataList[0].approvedDate != null ? moment(downloadedDataList[0].approvedDate).format(DATE_FORMAT_CAP) : "", downloadedDataList[0].shippedDate != "" && downloadedDataList[0].shippedDate != null ? moment(downloadedDataList[0].shippedDate).format(DATE_FORMAT_CAP) : "", downloadedDataList[0].arrivedDate != "" && downloadedDataList[0].arrivedDate != null ? moment(downloadedDataList[0].arrivedDate).format(DATE_FORMAT_CAP) : "", downloadedDataList[0].receivedDate != "" && downloadedDataList[0].receivedDate != null ? moment(downloadedDataList[0].receivedDate).format(DATE_FORMAT_CAP) : "", downloadedDataList[0].notes, downloadedDataList[0].erpFlag, downloadedDataList[0].emergencyOrder, downloadedDataList[0].accountFlag, downloadedDataList[0].active, downloadedDataList[0].localProcurement, JSON.stringify(downloadedDataList[0].batchInfoList != "" ? ((downloadedDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.shipmentQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
+                                      // }
+                                      // data[32] = downloadedData;//Downloaded data
+                                      // data[33] = 4;
+                                      mergedShipmentLinkedJexcel.push(data);
+                                    }
+
+                                    var options = {
+                                      data: mergedShipmentLinkedJexcel,
+                                      columnDrag: true,
+                                      nestedHeaders: [
+
+                                        [{
+                                          title: '',
+                                          rowspan: '1',
+                                        }, {
+                                          title: '',
+                                          rowspan: '1',
+                                        },
+                                        {
+                                          title: i18n.t('static.commit.local'),
+                                          colspan: '4',
+                                        },
+                                        {
+                                          title: i18n.t('static.commit.server'),
+                                          colspan: '4',
+                                        },
+                                        ],
+
+                                      ],
+                                      columns: [
+                                        { title: i18n.t('static.manualTagging.RONO'), type: 'text', width: 200 },
+                                        { title: i18n.t('static.commit.erpLineNo'), type: 'hidden', width: 200 },
+                                        { type: 'text', title: i18n.t('static.dashboard.programheader'), width: 150 },
+                                        { type: 'text', title: i18n.t('static.report.id'), width: 100, },
+                                        { type: 'text', title: i18n.t('static.manualTagging.conversionFactor'), width: 120 },
+                                        { type: 'checkbox', title: i18n.t('static.common.active'), width: 120, readonly: true },
+                                        { type: 'text', title: i18n.t('static.dashboard.programheader'), width: 100 },
+                                        { type: 'text', title: i18n.t('static.report.id'), width: 100, },
+                                        { type: 'text', title: i18n.t('static.manualTagging.conversionFactor'), width: 120 },
+                                        { type: 'checkbox', title: i18n.t('static.common.active'), width: 120, readonly: true },
+                                        // { type: 'dropdown', title: i18n.t('static.subfundingsource.fundingsource'), source: fundingSourceList, width: 120 },
+                                        // { type: 'dropdown', title: i18n.t('static.dashboard.budget'), source: budgetList, width: 120 },
+                                        // { type: 'text', title: i18n.t('static.supplyPlan.orderNoAndPrimeLineNo'), width: 150 },
+                                        // { type: 'dropdown', title: i18n.t('static.datasource.datasource'), source: dataSourceList, width: 150 },
+                                        // { type: 'dropdown', title: i18n.t("static.supplyPlan.shipmentMode"), source: [{ id: 1, name: i18n.t('static.supplyPlan.sea') }, { id: 2, name: i18n.t('static.supplyPlan.air') }], width: 100 },
+                                        // { type: 'numeric', title: i18n.t("static.shipment.suggestedQty"), width: 100, mask: '#,##' },
+                                        // { type: 'numeric', title: i18n.t("static.supplyPlan.adjustesOrderQty"), width: 100, mask: '#,##' },
+                                        // { type: 'dropdown', title: i18n.t('static.dashboard.currency'), source: currencyList, width: 120 },
+                                        // { type: 'numeric', title: i18n.t('static.supplyPlan.pricePerPlanningUnit'), width: 80, mask: '#,##.00', decimal: '.' },
+                                        // { type: 'numeric', title: i18n.t('static.shipment.productcost'), width: 80, mask: '#,##.00', decimal: '.' },
+                                        // { type: 'numeric', title: i18n.t('static.shipment.freightcost'), width: 80, mask: '#,##.00', decimal: '.' },
+                                        // { type: 'text', title: i18n.t('static.supplyPlan.plannedDate'), width: 100, },
+                                        // { type: 'text', title: i18n.t('static.supplyPlan.submittedDate'), width: 100, },
+                                        // { type: 'text', title: i18n.t('static.supplyPlan.approvedDate'), width: 100, },
+                                        // { type: 'text', title: i18n.t('static.supplyPlan.shippedDate'), width: 100, },
+                                        // { type: 'text', title: i18n.t('static.supplyPlan.arrivedDate'), width: 100, },
+                                        // { type: 'text', title: i18n.t('static.shipment.receiveddate'), width: 100, },
+                                        // { type: 'text', title: i18n.t('static.program.notes'), width: 200 },
+                                        // { type: 'checkbox', title: i18n.t('static.supplyPlan.erpFlag'), width: 80 },
+                                        // { type: 'checkbox', title: i18n.t('static.supplyPlan.emergencyOrder'), width: 80 },
+                                        // { type: 'checkbox', title: i18n.t('static.common.accountFlag'), width: 80 },
+                                        // { type: 'checkbox', title: i18n.t('static.common.active'), width: 80 },
+                                        // { type: 'checkbox', title: i18n.t('static.report.localprocurement'), width: 80 },
+                                        // { type: 'hidden', title: i18n.t('static.supplyPlan.batchInfo'), width: 0 },
+                                        // { type: 'text', title: i18n.t('static.supplyPlan.batchInfo'), width: 90 },
+                                        { type: 'hidden', title: 'Old Id' },
+                                        { type: 'hidden', title: 'latest Id' },
+                                        { type: 'hidden', title: 'download Id' },
+                                        { type: 'hidden', title: 'result of compare' },
+                                        { type: 'hidden', title: 'version Id' },
+                                        { type: 'hidden', title: 'index' },
+                                        { type: 'hidden', title: 'index' },
+                                        { type: 'hidden', title: 'index' },
+                                        { type: 'hidden', title: 'index' },
+                                        { type: 'hidden', title: 'index' },
+                                        { type: 'hidden', title: 'index' },
+                                        { type: 'hidden', title: 'index' },
+                                      ],
+                                      pagination: localStorage.getItem("sesRecordCount"),
+                                      paginationOptions: JEXCEL_PAGINATION_OPTION,
+                                      search: true,
+                                      columnSorting: true,
+                                      tableOverflow: true,
+                                      wordWrap: true,
+                                      allowInsertColumn: false,
+                                      allowManualInsertColumn: false,
+                                      allowDeleteRow: false,
+                                      editable: false,
+                                      onload: this.loadedFunctionForMergeShipmentLinked,
+                                      filters: true,
+                                      license: JEXCEL_PRO_KEY,
+                                      text: {
+                                        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                                        show: '',
+                                        entries: '',
+                                      },
+                                      contextMenu: function (obj, x, y, e) {
+                                        var items = [];
+                                        //Resolve conflicts
+                                        var rowData = obj.getRowData(y);
+                                        console.log("y@@@@@@@@@@@@@@@@@@@@@", y);
+                                        console.log("13--@@@@@@@@@@@@@@@@@@@@@", rowData[13].toString() == 1);
+                                        if (rowData[13].toString() == 1) {
+                                          items.push({
+                                            title: "Accept local changes",
+                                            onclick: function () {
+                                              var getServerParentShipmentId = obj.getValueFromCoords(7, y);
+                                              var getLocalParentShipmentId = obj.getValueFromCoords(3, y);
+                                              var rowNumber = obj.getJson(null, false).filter(c => getServerParentShipmentId !== "" ? c[3] === getServerParentShipmentId || c[7] === getServerParentShipmentId : c[3] === getLocalParentShipmentId || c[7] === getLocalParentShipmentId);
+                                              for (var rn = 0; rn < rowNumber.length; rn++) {
+                                                obj.options.editable = true;
+                                                obj.options.allowDeleteRow = true;
+                                                var deletedRowsListServer = this.state.deletedRowsListServer;
+                                                if (rowNumber[rn][7] !== "" && rowNumber[rn][3] === "") {
+                                                  obj.deleteRow(parseInt(rowNumber[rn][15]))
+                                                  deletedRowsListServer.push(rowNumber[rn][20])
+                                                } else if (rowNumber[rn][7] !== "" && rowNumber[rn][3] !== "") {
+                                                  obj.setValueFromCoords(6, rowNumber[rn][15], '', true)
+                                                  obj.setValueFromCoords(7, rowNumber[rn][15], '', true)
+                                                  obj.setValueFromCoords(8, rowNumber[rn][15], '', true)
+                                                  obj.setValueFromCoords(9, rowNumber[rn][15], '', true)
+                                                  obj.setValueFromCoords(11, rowNumber[rn][15], '', true)
+                                                  obj.setValueFromCoords(14, rowNumber[rn][15], rowNumber[rn][16], true)
+                                                  deletedRowsListServer.push(rowNumber[rn][20])
+                                                }
+                                                obj.options.allowDeleteRow = false;
+                                                obj.options.editable = false;
+                                                this.setState({
+                                                  conflictsCount: this.state.conflictsCount - 1,
+                                                  deletedRowsListServer: deletedRowsListServer
+                                                }, () => {
+                                                  if (this.state.conflictsCount == 0) {
+                                                    this.generateDataAfterResolveConflictsForQPL();
+                                                  }
+                                                })
+                                              }
+                                              this.recursiveConflictsForShipmentLinking(obj)
+                                            }.bind(this)
+                                          })
+                                          items.push({
+                                            title: "Accept server changes",
+                                            onclick: function () {
+                                              var getServerParentShipmentId = obj.getValueFromCoords(7, y);
+                                              var getLocalParentShipmentId = obj.getValueFromCoords(3, y);
+                                              var rowNumber = obj.getJson(null, false).filter(c => getServerParentShipmentId !== "" ? c[3] === getServerParentShipmentId || c[7] === getServerParentShipmentId : c[3] === getLocalParentShipmentId || c[7] === getLocalParentShipmentId);
+                                              for (var rn = 0; rn < rowNumber.length; rn++) {
+                                                obj.options.editable = true;
+                                                obj.options.allowDeleteRow = true;
+                                                var deletedRowsListLocal = this.state.deletedRowsListLocal;
+                                                if (rowNumber[rn][3] !== "" && rowNumber[rn][7] === "") {
+                                                  obj.deleteRow(parseInt(rowNumber[rn][15]))
+                                                  deletedRowsListLocal.push(rowNumber[rn][19])
+                                                } else if (rowNumber[rn][7] !== "" && rowNumber[rn][3] !== "") {
+                                                  obj.setValueFromCoords(2, rowNumber[rn][15], '', true)
+                                                  obj.setValueFromCoords(3, rowNumber[rn][15], '', true)
+                                                  obj.setValueFromCoords(4, rowNumber[rn][15], '', true)
+                                                  obj.setValueFromCoords(5, rowNumber[rn][15], '', true)
+                                                  obj.setValueFromCoords(10, rowNumber[rn][15], '', true)
+                                                  obj.setValueFromCoords(14, rowNumber[rn][15], rowNumber[rn][17], true)
+                                                  deletedRowsListLocal.push(rowNumber[rn][19])
+                                                }
+                                                obj.options.allowDeleteRow = false;
+                                                obj.options.editable = false;
+                                                this.setState({
+                                                  conflictsCount: this.state.conflictsCount - 1,
+                                                  deletedRowsListLocal: deletedRowsListLocal
+                                                }, () => {
+                                                  if (this.state.conflictsCount == 0) {
+                                                    this.generateDataAfterResolveConflictsForQPL();
+                                                  }
+                                                })
+                                              }
+                                              this.recursiveConflictsForShipmentLinking(obj)
+                                            }.bind(this)
+                                          })
+                                          if (rowData[3] === "" || rowData[7] === "") {
+                                            items.push({
+                                              title: "Accept both",
+                                              onclick: function () {
+                                                // this.setState({ loading: true })
+                                                // this.toggleLargeShipment(rowData[30], rowData[31], y, 'shipment');
+                                                // obj.setValueFromCoords(12,y,this.state.programId.split("_")[1],true);
+                                                var getServerParentShipmentId = obj.getValueFromCoords(7, y);
+                                                var getLocalParentShipmentId = obj.getValueFromCoords(3, y);
+                                                var rowNumber = obj.getJson(null, false).filter(c => getServerParentShipmentId !== "" ? c[3] === getServerParentShipmentId || c[7] === getServerParentShipmentId : c[3] === getLocalParentShipmentId || c[7] === getLocalParentShipmentId);
+                                                var shipmentIdSetThatWhoseConflictsAreResolved = [...new Set(rowNumber.map(ele => ele[15]))];
+                                                for (var rn = 0; rn < rowNumber.length; rn++) {
+                                                  obj.options.editable = true;
+                                                  obj.setValueFromCoords(18, rowNumber[rn][15], rowNumber[rn][18].concat(shipmentIdSetThatWhoseConflictsAreResolved), true);
+                                                  obj.options.editable = false;
+                                                  this.setState({
+                                                    conflictsCount: this.state.conflictsCount - 1
+                                                  }, () => {
+                                                    if (this.state.conflictsCount == 0) {
+                                                      this.generateDataAfterResolveConflictsForQPL();
+                                                    }
+                                                  })
+                                                }
+                                                this.recursiveConflictsForShipmentLinking(obj)
+
+                                              }.bind(this)
+
+                                            })
+                                          }
+                                        } else {
+                                          return [];
+                                        }
+
+                                        // if (rowData[0].toString() > 0) {
+                                        //   items.push({
+                                        //     title: "Show version history",
+                                        //     onclick: function () {
+                                        //       this.toggleVersionHistory(rowData[13]);
+                                        //     }.bind(this)
+                                        //   })
+                                        // }
+                                        console.log("items@@@@@@@@@@@@@@@@@@@@@", items);
+                                        return items;
+                                      }.bind(this)
+                                    };
+
+                                    var mergedShipmentLinkedJexcel = jexcel(document.getElementById("mergedVersionShipmentLinked"), options);
+                                    this.el = mergedShipmentLinkedJexcel;
+                                    this.setState({
+                                      mergedShipmentLinkedJexcel: mergedShipmentLinkedJexcel,
+                                    })
                                     console.log("+++Shipment Jexcel completed", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
                                     this.setState({
                                       oldProgramDataConsumption: oldProgramDataConsumption,
@@ -2692,6 +3030,113 @@ export default class syncPage extends Component {
     elInstance.options.editable = false;
   }
 
+  recursiveConflictsForShipmentLinking(instance) {
+    console.log("In resolve conflicts@@@@@@@@@@@@")
+    var elInstance = instance;
+    var jsonData = elInstance.getJson();
+    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S']
+    elInstance.options.editable = true;
+    for (var c = 0; c < jsonData.length; c++) {
+      if (jsonData[c][2] !== "" && jsonData[c][6] !== "" && jsonData[c][2] !== jsonData[c][6]) {
+        this.setState({
+          conflictsCount: this.state.conflictsCount + 1,
+          shipmentAlreadyLinkedToOtherProgCount: this.state.shipmentAlreadyLinkedToOtherProgCount + 1
+        })
+        elInstance.setValueFromCoords(13, c, 6, true);
+        for (var j = 0; j < colArr.length; j++) {
+          var col = (colArr[j]).concat(parseInt(c) + 1);
+          // elInstance.setStyle(col, "background-color", "transparent");
+          // elInstance.setStyle(col, "background-color", "red");
+          var cell = elInstance.getCell(col);
+          cell.classList.add('commitShipmentAlreadyLinkedToOtherPro');
+        }
+      } else {
+        var checkIfSameParentShipmentIdExists = jsonData.filter((d, index) => (((jsonData[c][3] !== "" && jsonData[c][3] === d[7] && jsonData[c][17] !== d[16]) || (jsonData[c][7] !== "" && jsonData[c][7] === d[3]) && jsonData[c][17] !== d[16]) && !jsonData[c][18].includes(index) && c != index)).length;
+        if (checkIfSameParentShipmentIdExists > 0) {
+          this.setState({
+            conflictsCount: this.state.conflictsCount + 1
+          })
+          elInstance.setValueFromCoords(13, c, 1, true);
+          for (var j = 0; j < colArr.length; j++) {
+            var col = (colArr[j]).concat(parseInt(c) + 1);
+            // elInstance.setStyle(col, "background-color", "transparent");
+            // elInstance.setStyle(col, "background-color", "yellow");
+            var cell = elInstance.getCell(col);
+            cell.classList.add('commitConflict');
+          }
+        } else {
+          if ((jsonData[c])[11] === "" && (jsonData[c])[10] === 0) {
+            elInstance.setValueFromCoords(13, c, 2, true);
+            for (var i = 0; i < colArr.length; i++) {
+              var col = (colArr[i]).concat(parseInt(c) + 1);
+              var cell = elInstance.getCell(col);
+              cell.classList.add('commitLocal');
+
+            }
+            this.setState({
+              isChanged: true
+            })
+          } else if ((jsonData[c])[10] === "" && (jsonData[c])[11] != (jsonData[c])[12]) {
+            console.log("In else if")
+            elInstance.setValueFromCoords(13, c, 3, true);
+            for (var i = 0; i < colArr.length; i++) {
+              var col = (colArr[i]).concat(parseInt(c) + 1);
+              var cell = elInstance.getCell(col);
+              cell.classList.add('commitServer');
+
+            }
+            this.setState({
+              isChanged: true
+            })
+          } else if ((jsonData[c])[11] == (jsonData[c])[10]) {
+            if ((jsonData[c])[5] != (jsonData[c])[9]) {
+              if ((jsonData[c])[5] == (jsonData[c])[21]) {
+                elInstance.setValueFromCoords(13, c, 3, true);
+                var col = (colArr[9]).concat(parseInt(c) + 1);
+                var cell = elInstance.getCell(col);
+                cell.classList.add('commitServer');
+                this.setState({
+                  isChanged: true
+                })
+
+              } else if ((jsonData[c])[9] == (jsonData[c])[21]) {
+                elInstance.setValueFromCoords(13, c, 3, true);
+                var col = (colArr[5]).concat(parseInt(c) + 1);
+                var cell = elInstance.getCell(col);
+                cell.classList.add('commitLocal');
+                this.setState({
+                  isChanged: true
+                })
+              }
+            } else {
+              for (var j = 0; j < colArr.length; j++) {
+                var col = (colArr[j]).concat(parseInt(c) + 1);
+                var cell = elInstance.getCell(col);
+                cell.classList.add('commitNoChange');
+              }
+            }
+          } else if ((jsonData[c])[11] !== "" && (jsonData[c])[10] !== "" && (jsonData[c])[10] !== (jsonData[c])[11]) {
+            this.setState({
+              conflictsCount: this.state.conflictsCount + 1
+            })
+            elInstance.setValueFromCoords(13, c, 1, true);
+            for (var j = 0; j < colArr.length; j++) {
+              var col = (colArr[j]).concat(parseInt(c) + 1);
+              var cell = elInstance.getCell(col);
+              cell.classList.add('commitConflict');
+            }
+          }
+        }
+      }
+    }
+    elInstance.options.editable = false;
+  }
+
+  loadedFunctionForMergeShipmentLinked = function (instance) {
+    jExcelLoadedFunction(instance, 3);
+    this.recursiveConflictsForShipmentLinking(instance.jexcel)
+  }
+
   loadedFunctionForMergeShipment = function (instance) {
     jExcelLoadedFunction(instance, 2);
     var elInstance = instance.worksheets[0];
@@ -3026,8 +3471,20 @@ export default class syncPage extends Component {
         </TabPane>
         <TabPane tabId="4">
           <Row>
+            <Col sm={12} md={12} className="pt-2" style={{ flexBasis: 'auto' }}>
+              <Col md="12" id="realmDiv">
+                <div><h5 style={{ color: "red" }}>{this.state.shipmentAlreadyLinkedToOtherProgCount > 0 ? i18n.t("static.commitVersion.shipmentAlreadyLinkedToOtherProgram") : ""}</h5></div>
+                <div className="table-responsive RemoveStriped consumptionDataEntryTable rightClickColors ERPLinkTable" style={{ marginTop: "-30px" }}>
+                  <div id="mergedVersionShipmentLinked" />
+                </div>
+              </Col>
+            </Col>
+          </Row>
+        </TabPane>
+        <TabPane tabId="5">
+          <Row>
             <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
-              <Col md="12 pl-0 pr-lg-0" id="realmDiv">
+              <Col md="12 pl-0" id="realmDiv">
                 <div className="table-responsive RemoveStriped consumptionDataEntryTable">
                   <div id="mergedVersionProblemList" />
                 </div>
@@ -3266,7 +3723,7 @@ export default class syncPage extends Component {
                               active={this.state.activeTab[0] === '3'}
                               onClick={() => { this.toggle(0, '3'); }}
                             >
-                              {i18n.t('static.shipment.shipment')}
+                              {i18n.t('static.shipment.manualShipments')}
                             </NavLink>
                           </NavItem>
 
@@ -3274,6 +3731,14 @@ export default class syncPage extends Component {
                             <NavLink
                               active={this.state.activeTab[0] === '4'}
                               onClick={() => { this.toggle(0, '4'); }}
+                            >
+                              {i18n.t('static.supplyPlan.erpShipments')}
+                            </NavLink>
+                          </NavItem>
+                          <NavItem>
+                            <NavLink
+                              active={this.state.activeTab[0] === '5'}
+                              onClick={() => { this.toggle(0, '5'); }}
                             >
                               {i18n.t('static.dashboard.qatProblemList')}
                             </NavLink>
