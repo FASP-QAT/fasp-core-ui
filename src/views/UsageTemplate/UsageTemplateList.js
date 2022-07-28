@@ -1282,6 +1282,8 @@ class usageTemplate extends Component {
                             cell1.classList.add('readonly');
                             var cell1 = elInstance.getCell(("H").concat(parseInt(j) + 1))
                             cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("I").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
                             var cell1 = elInstance.getCell(("J").concat(parseInt(j) + 1))
                             cell1.classList.add('readonly');
                             var cell1 = elInstance.getCell(("K").concat(parseInt(j) + 1))
@@ -1295,6 +1297,8 @@ class usageTemplate extends Component {
                             var cell1 = elInstance.getCell(("O").concat(parseInt(j) + 1))
                             cell1.classList.add('readonly');
                             var cell1 = elInstance.getCell(("U").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("V").concat(parseInt(j) + 1))
                             cell1.classList.add('readonly');
 
                         }
@@ -1314,6 +1318,8 @@ class usageTemplate extends Component {
                             cell1.classList.add('readonly');
                             var cell1 = elInstance.getCell(("H").concat(parseInt(j) + 1))
                             cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("I").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
                             var cell1 = elInstance.getCell(("J").concat(parseInt(j) + 1))
                             cell1.classList.add('readonly');
                             var cell1 = elInstance.getCell(("K").concat(parseInt(j) + 1))
@@ -1327,6 +1333,8 @@ class usageTemplate extends Component {
                             var cell1 = elInstance.getCell(("O").concat(parseInt(j) + 1))
                             cell1.classList.add('readonly');
                             var cell1 = elInstance.getCell(("U").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("V").concat(parseInt(j) + 1))
                             cell1.classList.add('readonly');
                         }
                     } catch (err) {
@@ -1413,6 +1421,8 @@ class usageTemplate extends Component {
                             cell1.classList.add('readonly');
                             var cell1 = elInstance.getCell(("H").concat(parseInt(j) + 1))
                             cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("I").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
                             var cell1 = elInstance.getCell(("J").concat(parseInt(j) + 1))
                             cell1.classList.add('readonly');
                             var cell1 = elInstance.getCell(("K").concat(parseInt(j) + 1))
@@ -1426,6 +1436,8 @@ class usageTemplate extends Component {
                             var cell1 = elInstance.getCell(("O").concat(parseInt(j) + 1))
                             cell1.classList.add('readonly');
                             var cell1 = elInstance.getCell(("U").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("V").concat(parseInt(j) + 1))
                             cell1.classList.add('readonly');
 
                         }
@@ -1445,6 +1457,8 @@ class usageTemplate extends Component {
                             cell1.classList.add('readonly');
                             var cell1 = elInstance.getCell(("H").concat(parseInt(j) + 1))
                             cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("I").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
                             var cell1 = elInstance.getCell(("J").concat(parseInt(j) + 1))
                             cell1.classList.add('readonly');
                             var cell1 = elInstance.getCell(("K").concat(parseInt(j) + 1))
@@ -1458,6 +1472,8 @@ class usageTemplate extends Component {
                             var cell1 = elInstance.getCell(("O").concat(parseInt(j) + 1))
                             cell1.classList.add('readonly');
                             var cell1 = elInstance.getCell(("U").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("V").concat(parseInt(j) + 1))
                             cell1.classList.add('readonly');
                         }
                     } catch (err) {
@@ -2709,7 +2725,7 @@ class usageTemplate extends Component {
             var typeId = rowData[19];
             let roleArray = this.state.roleArray;
             var userId = rowData[22];
-            
+
             // if ((roleArray.includes('ROLE_REALM_ADMIN') && typeId != -1 && typeId != 0) || (roleArray.includes('ROLE_DATASET_ADMIN') && typeId == -1 && typeId != 0)) {
             if ((roleArray.includes('ROLE_DATASET_ADMIN') && ((typeId == -1 && typeId != 0) || userId != ""))) {
                 console.log("roleArrayinsideIf--------->onchangepage", roleArray, "---", userId);
@@ -2728,6 +2744,8 @@ class usageTemplate extends Component {
                 cell1.classList.add('readonly');
                 var cell1 = elInstance.getCell(`H${parseInt(y) + 1}`)
                 cell1.classList.add('readonly');
+                var cell1 = elInstance.getCell(`I${parseInt(y) + 1}`)
+                cell1.classList.add('readonly');
                 var cell1 = elInstance.getCell(`J${parseInt(y) + 1}`)
                 cell1.classList.add('readonly');
                 var cell1 = elInstance.getCell(`K${parseInt(y) + 1}`)
@@ -2741,6 +2759,8 @@ class usageTemplate extends Component {
                 var cell1 = elInstance.getCell(`O${parseInt(y) + 1}`)
                 cell1.classList.add('readonly');
                 var cell1 = elInstance.getCell(`U${parseInt(y) + 1}`)
+                cell1.classList.add('readonly');
+                var cell1 = elInstance.getCell(`V${parseInt(y) + 1}`)
                 cell1.classList.add('readonly');
 
             }
@@ -2760,6 +2780,8 @@ class usageTemplate extends Component {
                 cell1.classList.add('readonly');
                 var cell1 = elInstance.getCell(`H${parseInt(y) + 1}`)
                 cell1.classList.add('readonly');
+                var cell1 = elInstance.getCell(`I${parseInt(y) + 1}`)
+                cell1.classList.add('readonly');
                 var cell1 = elInstance.getCell(`J${parseInt(y) + 1}`)
                 cell1.classList.add('readonly');
                 var cell1 = elInstance.getCell(`K${parseInt(y) + 1}`)
@@ -2773,6 +2795,8 @@ class usageTemplate extends Component {
                 var cell1 = elInstance.getCell(`O${parseInt(y) + 1}`)
                 cell1.classList.add('readonly');
                 var cell1 = elInstance.getCell(`U${parseInt(y) + 1}`)
+                cell1.classList.add('readonly');
+                var cell1 = elInstance.getCell(`V${parseInt(y) + 1}`)
                 cell1.classList.add('readonly');
             }
 
@@ -2928,6 +2952,8 @@ class usageTemplate extends Component {
                 cell1.classList.add('readonly');
                 var cell1 = elInstance.getCell(("H").concat(parseInt(j) + 1))
                 cell1.classList.add('readonly');
+                var cell1 = elInstance.getCell(("I").concat(parseInt(j) + 1))
+                cell1.classList.add('readonly');
                 var cell1 = elInstance.getCell(("J").concat(parseInt(j) + 1))
                 cell1.classList.add('readonly');
                 var cell1 = elInstance.getCell(("K").concat(parseInt(j) + 1))
@@ -2941,6 +2967,8 @@ class usageTemplate extends Component {
                 var cell1 = elInstance.getCell(("O").concat(parseInt(j) + 1))
                 cell1.classList.add('readonly');
                 var cell1 = elInstance.getCell(("U").concat(parseInt(j) + 1))
+                cell1.classList.add('readonly');
+                var cell1 = elInstance.getCell(("V").concat(parseInt(j) + 1))
                 cell1.classList.add('readonly');
 
             }
@@ -2960,6 +2988,8 @@ class usageTemplate extends Component {
                 cell1.classList.add('readonly');
                 var cell1 = elInstance.getCell(("H").concat(parseInt(j) + 1))
                 cell1.classList.add('readonly');
+                var cell1 = elInstance.getCell(("I").concat(parseInt(j) + 1))
+                cell1.classList.add('readonly');
                 var cell1 = elInstance.getCell(("J").concat(parseInt(j) + 1))
                 cell1.classList.add('readonly');
                 var cell1 = elInstance.getCell(("K").concat(parseInt(j) + 1))
@@ -2973,6 +3003,8 @@ class usageTemplate extends Component {
                 var cell1 = elInstance.getCell(("O").concat(parseInt(j) + 1))
                 cell1.classList.add('readonly');
                 var cell1 = elInstance.getCell(("U").concat(parseInt(j) + 1))
+                cell1.classList.add('readonly');
+                var cell1 = elInstance.getCell(("V").concat(parseInt(j) + 1))
                 cell1.classList.add('readonly');
             }
 
