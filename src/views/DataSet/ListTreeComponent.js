@@ -787,6 +787,7 @@ export default class ListTreeComponent extends Component {
                             level: 0,
                             parent: null,
                             sortOrder: "00",
+                            newTree: true,
                             payload: {
                                 label: {
                                     label_en: ''
