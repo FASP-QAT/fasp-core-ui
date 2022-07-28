@@ -3444,6 +3444,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     this.props.hideFirstComponent();
                 }.bind(this);
                 programRequest.onsuccess = function (event) {
+                    try{
                     var programDataJson = programRequest.result.programData;
                     var planningUnitDataList = programDataJson.planningUnitDataList;
                     var planningUnitId = document.getElementById("planningUnitId").value
@@ -3889,7 +3890,13 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         }
                         calculateSupplyPlan(programId, planningUnitId, objectStore, "shipment", this.props, [], moment(minDate).startOf('month').format("YYYY-MM-DD"));
                     }.bind(this)
+                }catch(err){
+                    this.props.updateState("shipmentError", i18n.t('static.program.errortext'));
+                    this.props.updateState("loading", false);
+                    this.props.hideSecondComponent()
+                }
                 }.bind(this)
+            
             }.bind(this)
         } else if (validation == false) {
             this.props.updateState("shipmentError", i18n.t('static.supplyPlan.validationFailed'));

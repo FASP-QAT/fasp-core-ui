@@ -1482,9 +1482,9 @@ class ForecastSummary extends Component {
                                             total += Number(ele.amount);
                                         });
                                         console.log("total+++", total);
-                                        if (consumptionExtrapolation[ce].extrapolationMethod.active == true) {
+                                        // if (consumptionExtrapolation[ce].extrapolationMethod.active == true) {
                                             tsList.push({ id: "C" + consumptionExtrapolation[ce].consumptionExtrapolationId, name: consumptionExtrapolation[ce].extrapolationMethod.label.label_en, planningUnitId: consumptionExtrapolation[ce].planningUnit.id, type: "C", id1: consumptionExtrapolation[ce].consumptionExtrapolationId, totalForecast: total, region: [consumptionExtrapolation[ce].region] });
-                                        }
+                                        // }
 
                                     }
                                     tsList = tsList.sort(function (a, b) {
@@ -2133,6 +2133,7 @@ class ForecastSummary extends Component {
         var tsList = this.state.tsList;
         var mylist = [];
         var value = (instance.jexcel.getJson(null, false)[r])[1].id;
+        var consumptionForecast=this.state.regPlanningUnitList.filter(c=>c.planningUnit.id==value)[0].consuptionForecast;
 
         var regionList = this.state.regRegionList;
         // var planningUniObj = this.state.regPlanningUnitList.filter(c => c.planningUnit.id == value);
@@ -2142,7 +2143,7 @@ class ForecastSummary extends Component {
         // console.log("x---------------->2 5", planningUniObj.selectedForecastMap);
         // console.log("x---------------->2 6", selectedForecastMapObj);
         // let selectedForecastMapObj = planningUniObj.selectedForecastMap[regionId];
-        mylist = tsList.filter(e => (e.type == "T" && e.flatList.filter(c => c.payload.nodeDataMap[e.id1][0].puNode != null && c.payload.nodeDataMap[e.id1][0].puNode.planningUnit.id == value).length > 0) || (e.type == "C" && e.planningUnitId == value));
+        mylist = tsList.filter(e => (e.type == "T" && e.flatList.filter(c => c.payload.nodeDataMap[e.id1][0].puNode != null && c.payload.nodeDataMap[e.id1][0].puNode.planningUnit.id == value).length > 0) || (e.type == "C" && e.planningUnitId == value && consumptionForecast.toString()=="true"));
         let mylist1 = [];
         for (var i = 0; i < mylist.length; i++) {
             let regionList = mylist[i].region;
