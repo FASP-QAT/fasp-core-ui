@@ -259,7 +259,7 @@ export default class DatabaseTranslations extends React.Component {
                             {/* <CardHeader>
                                 <strong>{i18n.t('static.label.databaseTranslations')}</strong>
                             </CardHeader> */}
-                            <CardBody className="table-responsive pt-md-1 pb-md-1">
+                            <CardBody className="pt-md-1 pb-md-1">
                                 {/* <div id="loader" className="center"></div> */}
                                 <div id="databaseTranslationTable" className="consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
                                 </div>

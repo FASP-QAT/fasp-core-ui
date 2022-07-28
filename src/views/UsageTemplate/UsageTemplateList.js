@@ -5092,7 +5092,7 @@ class usageTemplate extends Component {
                             <h5>{i18n.t('static.usageTemplate.usageTemplateText')}</h5>
                             <span className=""><h5><i class="fa fa-calculator" aria-hidden="true"></i>  {i18n.t('static.usageTemplate.calculatorReminderText')}</h5></span>
                             <div className="UsageTemplateTable">
-                                <div id="paputableDiv" className="table-responsive consumptionDataEntryTable usageTemplateDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
+                                <div id="paputableDiv" className="consumptionDataEntryTable usageTemplateDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
                                 </div>
                             </div>
                             <div style={{ display: this.state.loading ? "block" : "none" }}>

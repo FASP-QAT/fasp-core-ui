@@ -1027,7 +1027,7 @@ export default class MapPlanningUnits extends Component {
             <>
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h4 className="red">{this.props.message}</h4>
-                <div className="table-responsive" style={{ display: this.state.loading ? "none" : "block" }} >
+                <div className="" style={{ display: this.state.loading ? "none" : "block" }} >
 
                     <div id="mapPlanningUnit" className="RowheightForjexceladdRow consumptionDataEntryTable">
                     </div>

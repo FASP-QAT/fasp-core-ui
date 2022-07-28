@@ -734,7 +734,7 @@ export default class ProgramList extends Component {
                                 </FormGroup>
                             </div>
                         </Col>
-                        <div className="table-responsive consumptionDataEntryTable">
+                        <div className="consumptionDataEntryTable">
                             {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DATASET') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
                             </div>
                         </div>

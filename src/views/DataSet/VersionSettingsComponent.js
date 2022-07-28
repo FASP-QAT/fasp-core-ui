@@ -1515,7 +1515,7 @@ class VersionSettingsComponent extends Component {
                     <CardBody className="pb-lg-5 pt-lg-2">
                         <Col md="9 pl-0">
                             <div className="d-md-flex">
-                                <FormGroup className="mt-md-2 mb-md-0">
+                                <FormGroup className="mt-md-2 mb-md-0 ZindexFeild">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.programheader')}</Label>
                                     <div className="controls SelectGoVesionSetting">
                                         {/* <InMultiputGroup> */}
@@ -1530,7 +1530,7 @@ class VersionSettingsComponent extends Component {
                                         />
                                     </div>
                                 </FormGroup>
-                                <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
+                                <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ZindexFeild">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.report.versiontype')}</Label>
                                     <div className="controls SelectGoVesionSetting">
                                         <InputGroup>
@@ -1548,7 +1548,7 @@ class VersionSettingsComponent extends Component {
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
-                                <FormGroup className="mt-md-2 mb-md-0 col-md-4">
+                                <FormGroup className="mt-md-2 mb-md-0 col-md-4 ZindexFeild">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.versionSettings.committedDate')}<span className="stock-box-icon fa fa-sort-desc ml-1"></span></Label>
                                     <div className="controls edit">
                                         <Picker

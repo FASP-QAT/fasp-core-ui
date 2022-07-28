@@ -3524,7 +3524,7 @@ class ForecastSummary extends Component {
                                                 {/* {this.state.regPlanningUnitList.length > 0 && this.state.displayId == 2 && */}
                                                 {this.state.displayId == 2 &&
                                                     <div className='ForecastSummaryTable datdEntryRow'>
-                                                        <div id="tableDiv" className="table-responsive consumptionDataEntryTable">
+                                                        <div id="tableDiv" className="consumptionDataEntryTable">
                                                         </div>
                                                     </div>
 
