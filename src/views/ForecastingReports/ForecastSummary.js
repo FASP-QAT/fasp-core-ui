@@ -1248,12 +1248,13 @@ class ForecastSummary extends Component {
                                                             console.log("Test------------>7.1", arrayOfNodeDataMap);
 
                                                             if (arrayOfNodeDataMap.length > 0) {
-                                                                console.log("Test------------>8", arrayOfNodeDataMap[0].nodeDataMomList);
+                                                                console.log("Test------------>8", arrayOfNodeDataMap[0].nodeDataMomList,' --- ',planningUnitList[j].planningUnit);
                                                                 nodeDataMomList = arrayOfNodeDataMap[0].nodeDataMomList;
                                                                 let consumptionList = nodeDataMomList.map(m => {
                                                                     return {
                                                                         consumptionDate: m.month,
-                                                                        consumptionQty: (m.calculatedMmdValue).toFixed(2)
+                                                                        // consumptionQty: Math.round(m.calculatedMmdValue)
+                                                                        consumptionQty: (m.calculatedMmdValue == null ? 0 : (m.calculatedMmdValue).toFixed(2))
                                                                     }
                                                                 });
 
