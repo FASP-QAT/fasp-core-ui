@@ -2511,6 +2511,7 @@ class usageTemplate extends Component {
         data[18] = 1;
         data[19] = 0;
         data[20] = "";
+        data[21] = true;
 
         this.el.insertRow(
             data, 0, 1
