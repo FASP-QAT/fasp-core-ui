@@ -237,23 +237,21 @@ export default class ManualTagging extends Component {
 
         }
         var json = [];
-        var orderHistory = this.state.artmisHistory.erpOrderList.sort((a, b) => {
-            var itemLabelA = moment(a.dataReceivedOn); // ignore upper and lowercase
-            var itemLabelB = moment(b.dataReceivedOn);
-            return itemLabelA < itemLabelB ? 1 : -1;
-        })
+        var orderHistory = this.state.artmisHistory.erpOrderList
         console.log("Order History",this.state.artmisHistory);
-        for (var sb = 0; sb < orderHistory.length; sb++) {
+        var count=0;
+        for (var sb = orderHistory.length-1; sb >=0; sb--) {
             var data = [];
             data[0] = orderHistory[sb].procurementAgentOrderNo;
             data[1] = orderHistory[sb].planningUnitName;
-            data[2] = moment(orderHistory[sb].expectedDeliveryDate).format("YYYY-MM-DD");
+            data[2] = moment(moment(orderHistory[sb].expectedDeliveryDate).format("YYYY-MM-DD")+" 00:00:"+(sb<=9?("0"+sb):sb)).format("YYYY-MM-DD HH:mm:ss");
             data[3] = orderHistory[sb].status;
             data[4] = orderHistory[sb].qty;
             data[5] = orderHistory[sb].cost;
-            data[6] = moment(orderHistory[sb].dataReceivedOn).format("YYYY-MM-DD");
+            data[6] = moment(moment(orderHistory[sb].dataReceivedOn).format("YYYY-MM-DD")+" 00:00:"+(sb<=9?("0"+sb):sb)).format("YYYY-MM-DD HH:mm:ss");
             data[7] = orderHistory[sb].changeCode;
-            data[8] =sb;
+            data[8] =count;
+            count++;
             json.push(data);
         }
         var options = {
@@ -315,22 +313,20 @@ export default class ManualTagging extends Component {
 
         }
         var json = [];
-        var shipmentHistory = this.state.artmisHistory.erpShipmentList.sort((a, b) => {
-            var itemLabelA = moment(a.dataReceivedOn); // ignore upper and lowercase
-            var itemLabelB = moment(b.dataReceivedOn);
-            return itemLabelA < itemLabelB ? 1 : -1;
-        })
+        var shipmentHistory = this.state.artmisHistory.erpShipmentList
         console.log("Order History")
-        for (var sb = 0; sb < shipmentHistory.length; sb++) {
+        var count1=0;
+        for (var sb = shipmentHistory.length-1; sb >=0; sb--) {
             var data = [];
             data[0] = shipmentHistory[sb].procurementAgentShipmentNo;
-            data[1] = moment(shipmentHistory[sb].deliveryDate).format("YYYY-MM-DD");
+            data[1] = moment(moment(shipmentHistory[sb].deliveryDate).format("YYYY-MM-DD")+" 00:00:"+(sb<=9?("0"+sb):sb)).format("YYYY-MM-DD HH:mm:ss");
             data[2] = shipmentHistory[sb].batchNo;
             data[3] = moment(shipmentHistory[sb].expiryDate).format("YYYY-MM-DD");
             data[4] = shipmentHistory[sb].qty;
-            data[5] = moment(shipmentHistory[sb].dataReceivedOn).format("YYYY-MM-DD");
+            data[5] = moment(moment(shipmentHistory[sb].dataReceivedOn).format("YYYY-MM-DD")+" 00:00:"+(sb<=9?("0"+sb):sb)).format("YYYY-MM-DD HH:mm:ss");
             data[6] = shipmentHistory[sb].changeCode;
-            data[7] =sb;
+            data[7] =count1;
+            count1++;
             json.push(data);
         }
         var options = {
@@ -391,6 +387,7 @@ export default class ManualTagging extends Component {
         console.log("Astrisk Mohit@@@@@@@@@",document.getElementsByClassName("resizable"))
         var tr = asterisk.firstChild;
         tr.children[8].title = i18n.t('static.manualTagging.changeOrderOrder');
+        tr.children[8].classList.add('InfoTr');
     }
 
     loadedShipmentHistory(instance, cell, x, y, value){
@@ -399,6 +396,7 @@ export default class ManualTagging extends Component {
         console.log("Astrisk Mohit@@@@@@@@@",document.getElementsByClassName("resizable"))
         var tr = asterisk.firstChild;
         tr.children[7].title = i18n.t('static.manualTagging.changeOrderShipment');
+        tr.children[7].classList.add('InfoTr');
     }
 
     // addTitle() {
@@ -5818,7 +5816,8 @@ export default class ManualTagging extends Component {
                                     </ModalHeader>
                                     <ModalBody>
                                         <div>
-                                            <span><b>{i18n.t('static.manualTagging.orderDetails')}</b></span>
+                                            <span><b>{i18n.t('static.manualTagging.orderDetails')}</b></span><br/>
+                                            <span><b>Bold - Latest record received from ERP system</b></span>
                                             <br />
                                             <br />
                                             {/* <div className="ReportSearchMarginTop"> */}
