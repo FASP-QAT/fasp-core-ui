@@ -1368,6 +1368,7 @@
     "static.report.erpOrder": "ERP-linked shipments",
     "static.list.listTechnicalArea": "Go to Technical Area Management",
     "static.message.user.forgotPasswordTokenFailed": "Error while generating the one-time password",
+    "static.manualTagging.tooltipHistory": "Bold - Latest record received from ERP system",
     "static.extrapolation.MovingAverageTextThree": "This method is most useful for short-term forecasts and is sensitive to trends. It is not appropriate for seasonal data",
     "static.tooltip.ExistingShipments": "Enter the total quantity of existing shipments during your forecast period This is used for calculating the procurement gap in the Forecast Summary screen Leave this blank to assume no existing shipments",
     "static.report.procurementAgent": "Shipment Cost Report",
