@@ -837,7 +837,7 @@
     "static.supplyPlan.shelfLife": "Shelf Life (months)",
     "static.commitTree.noPUorFUMapping": "You cannot commit tree with PU nodes/FU nodes that do have Planning unit/Forecasting unit mapped to it",
     "static.extrapolation.SecondStep": "The second step is to consider whether the forecast values are expected to reflect closely the historical patterns in your data and so whether you will use the error metrics to inform your selection.",
-    "static.scenarioPlanning.newlyAddedShipment": "Newly Added Shipment",
+    "static.scenarioPlanning.newlyAddedShipment": "Re-Planned Shipment",
     "static.ManageTree.AdvancedFunctionality": "Advanced Functionality",
     "static.ManageTree.ManageTheTree": "Manage the Tree",
     "static.jexcel.consumptionQuantity": "with consumption quantity",
@@ -2785,5 +2785,7 @@
     "static.organisation.organisationheader": "Organization",
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Max = 7",
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )",
-    "static.loadDeleteProgram.loadDeleteProgram": "Load/Delete Program"
+    "static.loadDeleteProgram.loadDeleteProgram": "Load/Delete Program",
+    "static.scenarioPlanning.currentShipmentSettings":"Current Shipment Settings",
+    "static.scenarioPlanning.replannedShipmentSettings":"Re-Planned Shipment Settings"
 }
