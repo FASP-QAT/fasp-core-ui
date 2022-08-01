@@ -1365,8 +1365,9 @@ class StockAdjustmentComponent extends Component {
                             </div>
                         </div>
 
-
+                        <div className='ProgramListSearchAlignment'>
                         <div id="tableDiv" className="jexcelremoveReadonlybackground consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
+                        </div>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>
                             <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
