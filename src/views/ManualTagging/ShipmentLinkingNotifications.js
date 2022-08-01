@@ -12,8 +12,8 @@ import ProgramService from '../../api/ProgramService.js';
 import ProductService from '../../api/ProductService';
 import ManualTaggingService from '../../api/ManualTaggingService.js';
 import PlanningUnitService from '../../api/PlanningUnitService.js';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
@@ -339,7 +339,7 @@ export default class ShipmentLinkingNotifications extends Component {
     }.bind(this);
 
     oneditionend = function (instance, cell, x, y, value) {
-        var elInstance = instance.jexcel;
+        var elInstance = instance;
         var rowData = elInstance.getRowData(y);
 
         if (x == 10 && !isNaN(rowData[10]) && rowData[10].toString().indexOf('.') != -1) {
@@ -352,11 +352,11 @@ export default class ShipmentLinkingNotifications extends Component {
 
     onPaste(instance, data) {
         if (data.length == 1 && Object.keys(data[0])[2] == "value") {
-            (instance.jexcel).setValueFromCoords(10, data[0].y, parseFloat(data[0].value), true);
+            (instance).setValueFromCoords(10, data[0].y, parseFloat(data[0].value), true);
         }
         else {
             for (var i = 0; i < data.length; i++) {
-                (instance.jexcel).setValueFromCoords(13, data[i].y, 1, true);
+                (instance).setValueFromCoords(13, data[i].y, 1, true);
             }
         }
     }
@@ -545,7 +545,9 @@ export default class ShipmentLinkingNotifications extends Component {
                     outputList: []
                 }, () => {
                     try {
-                        this.state.languageEl.destroy();
+                        // this.state.languageEl.destroy();
+                        jexcel.destroy(document.getElementById("tableDiv"),true);
+
                     } catch (error) {
 
                     }
@@ -772,7 +774,9 @@ export default class ShipmentLinkingNotifications extends Component {
         }
 
         this.el = jexcel(document.getElementById("tableDiv"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("tableDiv"),true);
+
         var json = [];
         var data = manualTaggingArray;
 
@@ -882,16 +886,16 @@ export default class ShipmentLinkingNotifications extends Component {
                 },
             ],
             editable: true,
-            text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
@@ -940,10 +944,10 @@ export default class ShipmentLinkingNotifications extends Component {
                 // }
             }.bind(this),
             onsearch: function (el) {
-                el.jexcel.updateTable();
+                // el.jexcel.updateTable();
             },
             onfilter: function (el) {
-                el.jexcel.updateTable();
+                // el.jexcel.updateTable();
             },
             contextMenu: function (obj, x, y, e) {
                 var items = [];
@@ -1048,7 +1052,9 @@ export default class ShipmentLinkingNotifications extends Component {
         }
 
         this.el = jexcel(document.getElementById("tableDiv1"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("tableDiv1"),true);
+
         var json = [];
         var data = notificationSummaryArray;
 
@@ -1080,16 +1086,16 @@ export default class ShipmentLinkingNotifications extends Component {
                 }
             ],
             editable: false,
-            text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
             onload: this.loaded1,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
@@ -1187,11 +1193,14 @@ export default class ShipmentLinkingNotifications extends Component {
     }
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance, 1);
-        console.log("asterisk---", document.getElementsByClassName("resizable")[2])
-        var asterisk = document.getElementsByClassName("resizable")[2];
+        // console.log("asterisk---", document.getElementsByClassName("resizable")[2])
+        // var asterisk = document.getElementsByClassName("resizable")[2];
+        // console.log("asterisk---", document.getElementsByClassName("jss")[2].firstChild.nextSibling)
+
+        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
 
         var tr = asterisk.firstChild;
-        tr.children[10].classList.add('AsteriskTheadtrTd');
+        // tr.children[10].classList.add('AsteriskTheadtrTd');
     }
 
 
@@ -1302,7 +1311,9 @@ export default class ShipmentLinkingNotifications extends Component {
     buildJexcel() {
         try {
             this.el = jexcel(document.getElementById("tableDivOrderDetails"), '');
-            this.el.destroy();
+            // this.el.destroy();
+            jexcel.destroy(document.getElementById("tableDivOrderDetails"),true);
+
         } catch (err) {
 
         }
@@ -1343,7 +1354,7 @@ export default class ShipmentLinkingNotifications extends Component {
             pagination: false,
             search: false,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
@@ -1354,15 +1365,15 @@ export default class ShipmentLinkingNotifications extends Component {
             allowExport: false,
             editable: false,
             license: JEXCEL_PRO_KEY,
-            text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
             onload: this.loadedOrderHistory,
             updateTable: function (el, cell, x, y, source, value, id) {
                 var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
-                var elInstance = el.jexcel;
+                var elInstance = el;
                 var index = elInstance.getJson(null, false).findIndex(c => c[8] == 0);
                 for (var j = 0; j < colArr.length; j++) {
                     var col = (colArr[j]).concat(parseInt(index) + 1);
@@ -1380,7 +1391,9 @@ export default class ShipmentLinkingNotifications extends Component {
 
         try {
             this.el = jexcel(document.getElementById("tableDivShipmentDetails"), '');
-            this.el.destroy();
+            // this.el.destroy();
+            jexcel.destroy(document.getElementById("tableDivShipmentDetails"),true);
+
         } catch (err) {
 
         }
@@ -1419,7 +1432,7 @@ export default class ShipmentLinkingNotifications extends Component {
             pagination: false,
             search: false,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
@@ -1430,15 +1443,15 @@ export default class ShipmentLinkingNotifications extends Component {
             allowExport: false,
             editable: false,
             license: JEXCEL_PRO_KEY,
-            text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
             onload: this.loadedShipmentHistory,
             updateTable: function (el, cell, x, y, source, value, id) {
                 var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
-                var elInstance = el.jexcel;
+                var elInstance = el;
                 var index = elInstance.getJson(null, false).findIndex(c => c[7] == 0);
                 for (var j = 0; j < colArr.length; j++) {
                     var col = (colArr[j]).concat(parseInt(index) + 1);
@@ -1457,16 +1470,19 @@ export default class ShipmentLinkingNotifications extends Component {
 
     loadedOrderHistory(instance, cell, x, y, value) {
         jExcelLoadedFunctionOnlyHideRow(instance);
-        var asterisk = document.getElementsByClassName("resizable")[4];
-        console.log("Astrisk Mohit@@@@@@@@@", document.getElementsByClassName("resizable"))
+        // var asterisk = document.getElementsByClassName("resizable")[4];
+        var asterisk = document.getElementsByClassName("jss")[4].firstChild.nextSibling;
+        // console.log("Astrisk Mohit@@@@@@@@@", document.getElementsByClassName("resizable"))
         var tr = asterisk.firstChild;
         tr.children[8].title = i18n.t('static.manualTagging.changeOrderOrder');
     }
 
     loadedShipmentHistory(instance, cell, x, y, value) {
         jExcelLoadedFunctionOnlyHideRow(instance);
-        var asterisk = document.getElementsByClassName("resizable")[6];
-        console.log("Astrisk Mohit@@@@@@@@@", document.getElementsByClassName("resizable"))
+        // var asterisk = document.getElementsByClassName("resizable")[6];
+        var asterisk = document.getElementsByClassName("jss")[6].firstChild.nextSibling;
+
+        // console.log("Astrisk Mohit@@@@@@@@@", document.getElementsByClassName("resizable"))
         var tr = asterisk.firstChild;
         tr.children[7].title = i18n.t('static.manualTagging.changeOrderShipment');
     }
@@ -1585,7 +1601,9 @@ export default class ShipmentLinkingNotifications extends Component {
                 planningUnits: []
             }, () => {
                 try {
-                    this.state.languageEl.destroy();
+                    // this.state.languageEl.destroy();
+            jexcel.destroy(document.getElementById("tableDiv"),true);
+
                 } catch (error) {
 
                 }
@@ -1640,6 +1658,10 @@ export default class ShipmentLinkingNotifications extends Component {
 
 
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
 
         const { SearchBar, ClearSearchButton } = Search;
         const customTotal = (from, to, size) => (
@@ -1887,7 +1909,7 @@ export default class ShipmentLinkingNotifications extends Component {
                             <Row>
 
 
-                                <FormGroup className="col-md-3 ">
+                                <FormGroup className="col-md-3 ZindexFeild">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.inventory.program')}</Label>
                                     <div className="controls ">
                                         <InputGroup>
@@ -1908,7 +1930,7 @@ export default class ShipmentLinkingNotifications extends Component {
                                 </FormGroup>
 
 
-                                <FormGroup className="col-md-3">
+                                <FormGroup className="col-md-3 ZindexFeild">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.procurementUnit.planningUnit')}</Label>
                                     <div className="controls ">
                                         {/* <InMultiputGroup> */}
@@ -1924,7 +1946,7 @@ export default class ShipmentLinkingNotifications extends Component {
 
                                     </div>
                                 </FormGroup>
-                                <FormGroup className="col-md-3 ">
+                                <FormGroup className="col-md-3 ZindexFeild">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.mt.addressed')}</Label>
                                     <div className="controls ">
                                         <InputGroup>
