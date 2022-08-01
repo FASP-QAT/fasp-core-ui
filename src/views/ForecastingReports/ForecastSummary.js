@@ -3320,8 +3320,9 @@ class ForecastSummary extends Component {
                                                     <div id="consumptionTable" />
                                                 </div>
                                             </div> */}
-                                            <div className="table-responsive" style={{ display: this.state.loading ? "none" : "block" }}>
+                                            <div className="" style={{ display: this.state.loading ? "none" : "block" }}>
                                                 {this.state.summeryData.length > 0 && this.state.displayId == 1 &&
+                                                <div className='table-responsive'>
                                                     <div className='table-scroll1'>
                                                         <Table className="table-bordered table-bordered1 text-center mt-2">
                                                             {/* <Table className="table-bordered text-center mt-2 overflowhide main-table "> */}
@@ -3519,6 +3520,7 @@ class ForecastSummary extends Component {
                                                                 </tfoot>
                                                             }
                                                         </Table>
+                                                    </div>
                                                     </div>
                                                 }
                                                 {/* {this.state.regPlanningUnitList.length > 0 && this.state.displayId == 2 && */}

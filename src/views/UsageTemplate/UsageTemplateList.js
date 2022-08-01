@@ -911,19 +911,19 @@ class usageTemplate extends Component {
                     title: i18n.t('static.forecastProgram.forecastProgram'),
                     type: 'autocomplete',
                     source: this.state.typeList,
-                    width: '130',
+                    width: '90',
                     filter: this.filterDataset //1 B
                 },
                 {
                     title: i18n.t('static.usageTemplate.usageName'),
                     type: 'text',
-                    width: '150',
+                    width: '90',
                     textEditor: true,//2 C
                 },
                 {
                     title: i18n.t('static.tracercategory.tracercategory'),
                     type: 'autocomplete',
-                    width: '150',
+                    width: '130',
                     source: this.state.tracerCategoryList, //3 D
                     filter: this.filterTracerCategoryByProgramId
 
@@ -931,20 +931,20 @@ class usageTemplate extends Component {
                 {
                     title: i18n.t('static.product.unit1'),
                     type: 'autocomplete',
-                    width: '150',
+                    width: '130',
                     source: this.state.forecastingUnitList,
                     filter: this.filterForecastingUnitBasedOnTracerCategory //4 E
                 },
                 {
                     title: i18n.t('static.usageTemplate.lagInMonth'),
                     type: 'numeric',
-                    width: '150',
+                    width: '100',
                     textEditor: true, //5 F
                 },
                 {
                     title: i18n.t('static.supplyPlan.type'),
                     type: 'dropdown',
-                    width: '100',
+                    width: '95',
                     source: [
                         { id: 1, name: i18n.t('static.usageTemplate.discrete') },
                         { id: 2, name: i18n.t('static.usageTemplate.continuous') }

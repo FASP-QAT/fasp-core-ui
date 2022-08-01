@@ -2176,7 +2176,7 @@ export default class PlanningUnitSetting extends Component {
                     title: i18n.t('static.forecastReport.priceType'),
                     type: 'autocomplete',
                     source: this.state.allProcurementAgentList,
-                    width: '180'
+                    width: '100'
                     // filter: this.filterProcurementAgentByPlanningUnit
                     // readOnly: true //7H
                 },
