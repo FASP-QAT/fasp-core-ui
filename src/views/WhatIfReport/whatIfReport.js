@@ -638,9 +638,11 @@ export default class WhatIfReportComponent extends React.Component {
             if (event.target.value == 1 || event.target.value == 2) {
                 document.getElementById("consumptionScenariosFields1").style.display = "contents";
                 document.getElementById("consumptionScenariosFields2").style.display = "contents";
+                document.getElementById("scenariosFields2").style.display = "none";
             } else if (event.target.value == 3) {
                 document.getElementById("consumptionScenariosFields1").style.display = "none";
                 document.getElementById("consumptionScenariosFields2").style.display = "contents";
+                document.getElementById("scenariosFields2").style.display = "none";
 
             } else if (event.target.value == 7) {
                 document.getElementById("consumptionScenariosFields1").style.display = "none";
@@ -670,6 +672,7 @@ export default class WhatIfReportComponent extends React.Component {
             } else {
                 document.getElementById("consumptionScenariosFields1").style.display = "none";
                 document.getElementById("consumptionScenariosFields2").style.display = "none";
+                document.getElementById("scenariosFields2").style.display = "none";
             }
         } else if (event.target.name === 'percentage') {
             this.setState({ percentage: event.target.value });
@@ -4638,7 +4641,11 @@ export default class WhatIfReportComponent extends React.Component {
                                                     </div> */}
                                             </div>
                                             <div id="scenariosFields2" className="col-md-12" style={{ display: 'none' }}>
+                                                <div className="row col-md-12" style={{marginLeft:"0.5px"}}>
+                                                    <span><b>{i18n.t('static.scenarioPlanning.currentShipmentSettings')}</b></span>
+                                                </div>
                                                 {/* <div className="controls WhatifInputFeild"> */}
+                                                <div className="row col-md-12">
                                                 <FormGroup className="col-md-3">
                                                     <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}</Label>
                                                     <div className="controls edit">
@@ -4694,8 +4701,13 @@ export default class WhatIfReportComponent extends React.Component {
 
                                                     </div>
                                                 </FormGroup>
+                                                </div>
+                                                <div className="row col-md-12" style={{marginLeft:"0.5px"}}>
+                                                    <span><b>{i18n.t('static.scenarioPlanning.replannedShipmentSettings')}</b></span>
+                                                </div>
                                                 {/* </div> */}
                                                 {/* <div className="controls WhatifInputFeild"> */}
+                                                {/* <div className="row col-md-12"> */}
                                                 <FormGroup className="col-md-3">
                                                     <Label htmlFor="appendedInputButton">{i18n.t('static.report.procurementAgentName')}</Label>
                                                     <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
@@ -4778,6 +4790,7 @@ export default class WhatIfReportComponent extends React.Component {
 
                                                     </div>
                                                 </FormGroup>
+                                                {/* </div> */}
                                                 {/* </div> */}
                                             </div>
                                             <FormGroup className="col-md-2 mt-4">
