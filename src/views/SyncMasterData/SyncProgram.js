@@ -130,7 +130,7 @@ export default class SyncProgram extends Component {
                                 });
                             }
                         } else {
-                            this.props.history.push({ pathname: `/masterDataSync/green/` + i18n.t('static.masterDataSync.success'), state: { "programIds": this.props.location.state != undefined ? this.props.location.state.programIds : [] } })
+                            this.props.history.push({ pathname: `/masterDataSync/green/` + i18n.t('static.masterDataSync.success'), state: { "programIds": this.props.location.state != undefined ? this.props.location.state.programIds : [],"isFullSync":this.props.location.state != undefined && this.props.location.state.isFullSync!=undefined ? this.props.location.state.isFullSync : false } })
                             // this.props.history.push(`/masterDataSync/green/` + i18n.t('static.masterDataSync.success'))
                         }
                     })
