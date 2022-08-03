@@ -667,7 +667,7 @@ export default class CreateTreeTemplate extends Component {
             activeTab1: new Array(2).fill('1'),
             momListPer: [],
             currentModelingType: '',
-            currentTransferData : '',
+            currentTransferData: '',
             currentCalculatorStartDate: '',
             currentCalculatorStopDate: '',
             currentCalculatorStartValue: '',
@@ -1117,7 +1117,7 @@ export default class CreateTreeTemplate extends Component {
                 qatCalculatedPUPerVisit = parseFloat(((currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) * refillMonths) / pu.multiplier).toFixed(4);
             } else {
                 // if (currentItemConfig.context.payload.nodeDataMap[0][0].puNode.sharePlanningUnit == "true" || currentItemConfig.context.payload.nodeDataMap[0][0].puNode.sharePlanningUnit == true) {
-                    qatCalculatedPUPerVisit = addCommas(this.state.noOfMonthsInUsagePeriod / pu.multiplier);
+                qatCalculatedPUPerVisit = addCommas(this.state.noOfMonthsInUsagePeriod / pu.multiplier);
                 // } else {
                 //     qatCalculatedPUPerVisit = this.round(this.state.noOfMonthsInUsagePeriod / pu.multiplier);
                 // }
@@ -2838,7 +2838,8 @@ export default class CreateTreeTemplate extends Component {
                     type: 'numeric',
                     disabledMaskOnEdition: true,
                     textEditor: true,
-                    mask: '#,##0.0000%', decimal: '.'
+                    mask: '#,##0.0000%', decimal: '.',
+                    readOnly: !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE_TEMPLATES') ? false : true,
 
                 },
                 {
@@ -3549,7 +3550,7 @@ export default class CreateTreeTemplate extends Component {
     }.bind(this)
 
     selected = function (instance, cell, x, y, value) {
-        if (y == 8) {
+        if (y == 8 && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE_TEMPLATES')) {
             var elInstance = this.state.modelingEl;
             var rowData = elInstance.getRowData(x);
             if (rowData[4] != "" && rowData[4] != null && rowData[1] != "" && rowData[1] != null && rowData[2] != "" && rowData[2] != null) {
@@ -4635,7 +4636,7 @@ export default class CreateTreeTemplate extends Component {
                 if ((this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 1) {
                     var sharePu;
                     // if ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.sharePlanningUnit == "true") {
-                        sharePu = (this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor);
+                    sharePu = (this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor);
                     // } else {
                     //     sharePu = this.round((this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor));
                     // }
@@ -4910,7 +4911,7 @@ export default class CreateTreeTemplate extends Component {
     }
 
     componentDidMount() {
-        console.log("my business functions---",AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE_TEMPLATE') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_TREE_TEMPLATE'));
+        console.log("my business functions---", AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE_TEMPLATE') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_TREE_TEMPLATE'));
         this.getNodeTyeList();
         this.getUsageTemplateList(0);
         ForecastMethodService.getActiveForecastMethodList().then(response => {
@@ -8071,8 +8072,8 @@ export default class CreateTreeTemplate extends Component {
                                     {/* disabled={!isValid} */}
                                     <FormGroup className="pb-lg-3">
                                         <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false, cursorItem: 0, highlightItem: 0, isChanged: false, activeTab1: new Array(2).fill('1') })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                        <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={() => this.resetNodeData()} ><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllNodeData(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
+                                        {!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE_TEMPLATES') && <><Button type="button" size="md" color="warning" className="float-right mr-1" onClick={() => this.resetNodeData()} ><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                            <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllNodeData(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button></>}
                                     </FormGroup>
                                 </Form>
                             )} />
@@ -8163,7 +8164,7 @@ export default class CreateTreeTemplate extends Component {
                                 </div>
                             }
                             <div>{this.state.currentItemConfig.context.payload.nodeType.id != 1 && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.showMomData()}> <i className={this.state.viewMonthlyData ? "fa fa-eye" : "fa fa-eye-slash"} style={{ color: '#fff' }}></i> {this.state.viewMonthlyData ? i18n.t('static.tree.viewMonthlyData') : i18n.t('static.tree.hideMonthlyData')}</Button>}
-                                {this.state.aggregationNode && <><Button color="success" size="md" className="float-right mr-1" type="button" onClick={(e) => this.formSubmitLoader(e)}> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
+                                {this.state.aggregationNode && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE_TEMPLATES') && <><Button color="success" size="md" className="float-right mr-1" type="button" onClick={(e) => this.formSubmitLoader(e)}> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                     <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button></>}
                             </div>
                         </div>
@@ -8503,7 +8504,7 @@ export default class CreateTreeTemplate extends Component {
                                     <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => {
                                         this.setState({ showMomData: false })
                                     }}><i className="fa fa-times"></i> {'Close'}</Button>
-                                    {this.state.currentItemConfig.context.payload.nodeType.id != 1 && <Button type="button" size="md" color="success" className="float-right mr-1" onClick={(e) => this.updateMomDataInDataSet(e)}><i className="fa fa-check"></i> {i18n.t('static.common.update')}</Button>}
+                                    {!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE_TEMPLATES') && this.state.currentItemConfig.context.payload.nodeType.id != 1 && <Button type="button" size="md" color="success" className="float-right mr-1" onClick={(e) => this.updateMomDataInDataSet(e)}><i className="fa fa-check"></i> {i18n.t('static.common.update')}</Button>}
 
                                 </div>
                                 {/* </div> */}
@@ -8583,7 +8584,7 @@ export default class CreateTreeTemplate extends Component {
                                         });
                                     }}><i className="fa fa-times"></i> {'Close'}</Button>
                                     {/* <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.}><i className="fa fa-check"></i> {'Update'}</Button> */}
-                                    <Button type="button" size="md" color="success" className="float-right mr-1" onClick={(e) => this.updateMomDataInDataSet(e)}><i className="fa fa-check"></i> {i18n.t('static.common.update')}</Button>
+                                    {!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE_TEMPLATES') && <Button type="button" size="md" color="success" className="float-right mr-1" onClick={(e) => this.updateMomDataInDataSet(e)}><i className="fa fa-check"></i> {i18n.t('static.common.update')}</Button>}
 
                                 </div>
                                 {/* </div> */}
@@ -9038,35 +9039,39 @@ export default class CreateTreeTemplate extends Component {
                 return <>
                     {itemConfig.parent != null &&
                         <>
-                            <button key="2" type="button" className="StyledButton TreeIconStyle TreeIconStyleCopyPaddingTop" style={{ background: 'none' }}
-                                onClick={(event) => {
-                                    event.stopPropagation();
-                                    this.duplicateNode(JSON.parse(JSON.stringify(itemConfig)));
-                                }}>
-                                <i class="fa fa-clone" aria-hidden="true"></i>
-                            </button>
-                            <button key="3" type="button" className="StyledButton TreeIconStyle TreeIconStyleDeletePaddingTop" style={{ background: 'none' }}
-                                onClick={(event) => {
-                                    event.stopPropagation();
-                                    confirmAlert({
-                                        message: "Are you sure you want to delete this node.",
-                                        buttons: [
-                                            {
-                                                label: i18n.t('static.program.yes'),
-                                                onClick: () => {
-                                                    this.onRemoveButtonClick(itemConfig);
+                            {!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE_TEMPLATES') &&
+                                <button key="2" type="button" className="StyledButton TreeIconStyle TreeIconStyleCopyPaddingTop" style={{ background: 'none' }}
+                                    onClick={(event) => {
+                                        event.stopPropagation();
+                                        this.duplicateNode(JSON.parse(JSON.stringify(itemConfig)));
+                                    }}>
+                                    <i class="fa fa-clone" aria-hidden="true"></i>
+                                </button>
+                            }
+                            {!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE_TEMPLATES') &&
+                                <button key="3" type="button" className="StyledButton TreeIconStyle TreeIconStyleDeletePaddingTop" style={{ background: 'none' }}
+                                    onClick={(event) => {
+                                        event.stopPropagation();
+                                        confirmAlert({
+                                            message: "Are you sure you want to delete this node.",
+                                            buttons: [
+                                                {
+                                                    label: i18n.t('static.program.yes'),
+                                                    onClick: () => {
+                                                        this.onRemoveButtonClick(itemConfig);
+                                                    }
+                                                },
+                                                {
+                                                    label: i18n.t('static.program.no')
                                                 }
-                                            },
-                                            {
-                                                label: i18n.t('static.program.no')
-                                            }
-                                        ]
-                                    });
-                                }}>
-                                {/* <FontAwesomeIcon icon={faTrash} /> */}
-                                <i class="fa fa-trash-o" aria-hidden="true" style={{ fontSize: '16px' }}></i>
-                            </button></>}
-                    {parseInt(itemConfig.payload.nodeType.id) != 5 &&
+                                            ]
+                                        });
+                                    }}>
+                                    {/* <FontAwesomeIcon icon={faTrash} /> */}
+                                    <i class="fa fa-trash-o" aria-hidden="true" style={{ fontSize: '16px' }}></i>
+                                </button>}
+                        </>}
+                    {parseInt(itemConfig.payload.nodeType.id) != 5 && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE_TEMPLATES') &&
                         <button key="1" type="button" className="StyledButton TreeIconStyle TreeIconStylePlusPaddingTop" style={{ background: 'none' }}
                             onClick={(event) => {
                                 console.log("add button called---------");
@@ -9813,14 +9818,14 @@ export default class CreateTreeTemplate extends Component {
                                                             </FormGroup>
                                                         </div>
 
-                                                        {(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE_TEMPLATE') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_TREE_TEMPLATE')) && 
-                                                        <CardFooter className="col-md-6 pt-lg-0 pr-lg-0 float-right MarginTopCreateTreeBtn" style={{ backgroundColor: 'transparent', borderTop: '0px solid #c8ced3' }}>
-                                                            {/* ---hehehe */}
-                                                            {/* <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
-                                                            <Button type="button" size="md" color="warning" className="float-right mr-1 mb-lg-2" onClick={this.resetTree}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                                            <Button type="submit" color="success" className="mr-1 mb-lg-2 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"> </i>{i18n.t('static.pipeline.save')}</Button>
-                                                        </CardFooter>}
-                                                        
+                                                        {(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE_TEMPLATE') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_TREE_TEMPLATE')) &&
+                                                            <CardFooter className="col-md-6 pt-lg-0 pr-lg-0 float-right MarginTopCreateTreeBtn" style={{ backgroundColor: 'transparent', borderTop: '0px solid #c8ced3' }}>
+                                                                {/* ---hehehe */}
+                                                                {/* <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
+                                                                <Button type="button" size="md" color="warning" className="float-right mr-1 mb-lg-2" onClick={this.resetTree}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                                <Button type="submit" color="success" className="mr-1 mb-lg-2 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"> </i>{i18n.t('static.pipeline.save')}</Button>
+                                                            </CardFooter>}
+
                                                     </CardBody>
 
                                                     <div style={{ display: !this.state.loading ? "block" : "none" }} class="sample">
