@@ -785,9 +785,18 @@ export default class CreateTreeTemplate extends Component {
         this.calculateParentValueFromMOM = this.calculateParentValueFromMOM.bind(this);
         this.generateMonthList = this.generateMonthList.bind(this);
         this.updateTreeData = this.updateTreeData.bind(this);
-        this.levelDeatilsSaved = this.levelDeatilsSaved.bind(this)
+        this.levelDeatilsSaved = this.levelDeatilsSaved.bind(this);
+        this.filterUsageTemplateList = this.filterUsageTemplateList.bind(this);
     }
-
+    filterUsageTemplateList(forecastingUnitId) {
+        var usageTemplateList;
+        if (forecastingUnitId > 0) {
+            usageTemplateList = this.state.usageTemplateListAll.filter(x => x.forecastingUnit.id == forecastingUnitId);
+        } else {
+            usageTemplateList = this.state.usageTemplateListAll;
+        }
+        this.setState({ usageTemplateList });
+    }
     levelClicked(data) {
         var name = "";
         var unit = "";
@@ -1189,12 +1198,15 @@ export default class CreateTreeTemplate extends Component {
                 this.setState({ showFUValidation: false }, () => {
                     this.getForecastingUnitUnitByFUId(regionIds.value);
                     this.getPlanningUnitListByFUId(regionIds.value);
+                    this.filterUsageTemplateList(regionIds.value);
                 });
             } else {
                 currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.forecastingUnit.id = "";
                 currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.forecastingUnit.label.label_en = "";
                 currentItemConfig.context.payload.label.label_en = "";
-                this.setState({ showFUValidation: true, planningUnitList: [] });
+                this.setState({ showFUValidation: true, planningUnitList: [] }, () => {
+                    this.filterUsageTemplateList(0);
+                });
             }
             console.log("regionValues---", this.state.fuValues);
             console.log("regionLabels---", this.state.fuLabels);
@@ -4308,6 +4320,7 @@ export default class CreateTreeTemplate extends Component {
                 return itemLabelA > itemLabelB ? 1 : -1;
             });
             this.setState({
+                usageTemplateListAll: listArray,
                 usageTemplateList: listArray
             }, () => {
                 console.log(" get uasge template--------------", response.data);
