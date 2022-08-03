@@ -751,9 +751,11 @@ class EditUserComponent extends Component {
 
         if (selProgram.length > 0) {
             for (var i = 0; i < selProgram.length; i++) {
+                var name = selProgram[i].programCode + " (" + (selProgram[i].programTypeId == 1 ? "SP" : selProgram[i].programTypeId == 2 ? "FC" : "") + ")";
+
                 var paJson = {
                     // name: getLabelText(selProgram[i].label, this.state.lang),
-                    name: selProgram[i].programCode,
+                    name: name,
                     id: parseInt(selProgram[i].programId),
                     active: selProgram[i].active,
                     realmCountryId: selProgram[i].realmCountry.realmCountryId,
