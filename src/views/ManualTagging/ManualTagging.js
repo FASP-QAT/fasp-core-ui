@@ -58,8 +58,7 @@ export default class ManualTagging extends Component {
             filteredBudgetList: [],
             budgetList: [],
             planningUnits1: [],
-            finalShipmentId: '',
-            tempShipmentId: '',
+            finalShipmentId: [],
             selectedShipment: [],
             productCategories: [],
             countryList: [],
@@ -628,14 +627,13 @@ export default class ManualTagging extends Component {
 
         // }
         this.setState({
-            finalShipmentId: '',
-            tempShipmentId: '',
+            finalShipmentId: [],
             selectedShipment: selectedShipment.sort((a, b) => {
                 var itemLabelA = moment(a.expectedDeliveryDate).format("YYYY-MM-DD"); // ignore upper and lowercase
                 var itemLabelB = moment(b.expectedDeliveryDate).format("YYYY-MM-DD"); // ignore upper and lowercase                   
                 return itemLabelA > itemLabelB ? 1 : -1;
             }),
-            originalQty:''
+            originalQty: ''
         }, () => {
             // this.getOrderDetails()
         })
@@ -2001,16 +1999,32 @@ export default class ManualTagging extends Component {
                                         var batchInfoList = programJson.batchInfoList;
                                         console.log("Shipment List@@@@@@@@@@@@@@@", programJson.shipmentList)
                                         if (!this.state.active4) {
-                                            var shipmentId = this.state.active1 ? this.state.outputListAfterSearch[0].shipmentId : this.state.finalShipmentId;
-                                            var index = this.state.active1 ? this.state.outputListAfterSearch[0].tempShipmentId : this.state.tempShipmentId;
+                                            var shipmentId = this.state.active1 ? this.state.outputListAfterSearch[0].shipmentId : this.state.finalShipmentId[0].shipmentId;
+                                            var index = this.state.active1 ? this.state.outputListAfterSearch[0].tempShipmentId : this.state.finalShipmentId[0].tempShipmentId;
                                             var shipmentIndex = shipmentList.findIndex(c => shipmentId > 0 ? (c.shipmentId == shipmentId) : (c.tempShipmentId == index));
 
-                                            console.log("Shipment Index@@@@@@@@@@@@@@@", shipmentIndex)
+                                            // console.log("Shipment Index@@@@@@@@@@@@@@@", shipmentIndex)
                                             shipmentList[shipmentIndex].erpFlag = true;
                                             shipmentList[shipmentIndex].active = false;
                                             var minDate = shipmentList[shipmentIndex].receivedDate != "" && shipmentList[shipmentIndex].receivedDate != null && shipmentList[shipmentIndex].receivedDate != undefined && shipmentList[shipmentIndex].receivedDate != "Invalid date" ? shipmentList[shipmentIndex].receivedDate : shipmentList[shipmentIndex].expectedDeliveryDate;
-                                        }
+                                            for (var i = 1; i < this.state.finalShipmentId.length; i++) {
+                                                var shipmentId1 = this.state.active1 ? this.state.outputListAfterSearch[0].shipmentId : this.state.finalShipmentId[i].shipmentId;
+                                                var index1 = this.state.active1 ? this.state.outputListAfterSearch[0].tempShipmentId : this.state.finalShipmentId[i].tempShipmentId;
+                                                var shipmentIndex1 = shipmentList.findIndex(c => shipmentId1 > 0 ? (c.shipmentId == shipmentId1) : (c.tempShipmentId == index1));
 
+                                                // console.log("Shipment Index@@@@@@@@@@@@@@@", shipmentIndex)
+                                                shipmentList[shipmentIndex1].erpFlag = true;
+                                                shipmentList[shipmentIndex1].active = false;
+                                                shipmentList[shipmentIndex1].linkedParentShipmentId = this.state.finalShipmentId[0].shipmentId > 0 ? this.state.finalShipmentId[0].shipmentId : null;
+                                                shipmentList[shipmentIndex1].tempLinkedParentShipmentId = this.state.finalShipmentId[0].tempShipmentId;
+                                                var minDate1 = shipmentList[shipmentIndex1].receivedDate != "" && shipmentList[shipmentIndex1].receivedDate != null && shipmentList[shipmentIndex1].receivedDate != undefined && shipmentList[shipmentIndex1].receivedDate != "Invalid date" ? shipmentList[shipmentIndex1].receivedDate : shipmentList[shipmentIndex1].expectedDeliveryDate;
+                                                if (moment(minDate1).format("YYYY-MM-DD") < moment(minDate).format("YYYY-MM-DD")) {
+                                                    minDate = moment(minDate1).format("YYYY-MM-DD")
+                                                }
+                                            }
+                                        }
+                                        console.log("ShipmentList@@@@@@@@@@@@@@@@@@@Mohit", shipmentList)
+                                        console.log("MinDate@@@@@@@@@@@@@@@@@@@Mohit", minDate)
 
                                         var tableJson = this.state.instance.getJson(null, false);
                                         for (var y = 0; y < tableJson.length; y++) {
@@ -2270,219 +2284,6 @@ export default class ManualTagging extends Component {
 
     }
 
-    linkOld() {
-        // document.getElementById('div2').style.display = 'block';
-        // let valid = false;
-        // var programId = (this.state.active3 ? this.state.programId1 : this.state.programId);
-        // if (this.state.active3) {
-        //     localStorage.setItem("sesProgramIdReport", programId)
-        //     if (this.state.active5) {
-        //         if (this.state.finalShipmentId != "" && this.state.finalShipmentId != null) {
-        //             valid = true;
-        //         } else {
-        //             alert(i18n.t('static.mt.selectShipmentId'));
-        //         }
-
-        //     } else if (this.state.active4) {
-        //         if (programId == -1) {
-        //             alert(i18n.t('static.mt.selectProgram'));
-        //         }
-        //         else if (document.getElementById("planningUnitId1").value == -1) {
-        //             alert(i18n.t('static.mt.selectPlanninfUnit'));
-        //         }
-        //         else if (this.state.fundingSourceId == -1) {
-        //             alert(i18n.t('static.mt.selectFundingSource'));
-        //         } else if (this.state.budgetId == -1) {
-        //             alert(i18n.t('static.mt.selectBudget'));
-        //         }
-
-
-        //         else {
-        //             // var cf = window.confirm(i18n.t('static.mt.confirmNewShipmentCreation'));
-        //             // if (cf == true) {
-        //             valid = true;
-        //             // } else { }
-        //         }
-        //     }
-        // } else {
-        //     valid = true;
-        // }
-        // if (valid) {
-        //     this.setState({ loading1: true })
-        //     var validation = this.checkValidation();
-        //     let linkedShipmentCount = 0;
-        //     if (validation == true) {
-        //         var tableJson = this.state.instance.getJson(null, false);
-        //         let changedmtList = [];
-        //         for (var i = 0; i < tableJson.length; i++) {
-        //             var map1 = new Map(Object.entries(tableJson[i]));
-        //             if (parseInt(map1.get("10")) === 1) {
-        //                 let json = {
-        //                     parentShipmentId: (this.state.active2 ? this.state.parentShipmentId : 0),
-        //                     programId: programId,
-        //                     fundingSourceId: (this.state.active3 ? this.state.fundingSourceId : 0),
-        //                     budgetId: (this.state.active3 ? this.state.budgetId : 0),
-        //                     shipmentId: (this.state.active3 ? this.state.finalShipmentId : this.state.shipmentId),
-        //                     conversionFactor: this.el.getValue(`H${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-        //                     notes: (map1.get("9") === '' ? null : map1.get("9")),
-        //                     active: map1.get("0"),
-        //                     orderNo: map1.get("11"),
-        //                     primeLineNo: parseInt(map1.get("12")),
-        //                     // planningUnitId: (this.state.active3 ? this.el.getValue(`N${parseInt(i) + 1}`, true).toString().replaceAll(",", "") : 0),
-        //                     planningUnitId: (this.state.active3 ? (this.state.active4 ? document.getElementById("planningUnitId1").value : 0) : 0),
-        //                     quantity: this.el.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll(",", "")
-        //                 }
-
-        //                 changedmtList.push(json);
-        //             }
-        //             if ((this.state.active2 || this.state.active4) && map1.get("0")) {
-        //                 linkedShipmentCount++;
-        //             }
-        //         }
-        //         console.log("FINAL SUBMIT changedmtList---", changedmtList);
-        //         if (this.state.active4 && linkedShipmentCount > 1) {
-        //             alert(i18n.t('static.mt.oneOrderAtATime'));
-        //             this.setState({
-        //                 loading1: false
-        //             })
-
-        //         } else {
-        //             let goAhead = false;
-        //             if (this.state.active4) {
-        //                 var cf = window.confirm(i18n.t('static.mt.confirmNewShipmentCreation'));
-        //                 if (cf == true) {
-        //                     goAhead = true;
-        //                 } else {
-        //                     this.setState({
-        //                         loading1: false
-        //                     })
-        //                 }
-        //             } else {
-        //                 goAhead = true;
-        //             }
-        //             let callApiActive2 = false;
-        //             if (this.state.active2) {
-        //                 let active2GoAhead = false;
-
-        //                 if (linkedShipmentCount > 0) {
-        //                     active2GoAhead = false
-        //                     callApiActive2 = true
-        //                 } else {
-        //                     active2GoAhead = true
-        //                 }
-        //                 if (active2GoAhead) {
-        //                     // var cf1 = window.confirm(i18n.t('static.mt.confirmNewShipmentCreation'));
-        //                     var cf1 = window.confirm(i18n.t("static.mt.delinkAllShipments"));
-        //                     if (cf1 == true) {
-        //                         callApiActive2 = true;
-        //                     } else {
-        //                         callApiActive2 = false;
-        //                     }
-        //                 }
-        //             }
-        //             if (!callApiActive2 && this.state.active2) {
-        //                 this.setState({
-        //                     loading: false,
-        //                     loading1: false
-        //                 });
-        //             }
-        //             if (this.state.active1 || (this.state.active3 && this.state.active4 && goAhead) || (this.state.active3 && this.state.active5) || callApiActive2) {
-        //                 console.log("Going to link shipment-----", changedmtList);
-        //                 // for (var i = 0; i <= 2; i++) {
-        //                 // console.log("for loop -----",i);
-        //                 ManualTaggingService.linkShipmentWithARTMIS(changedmtList)
-        //                     .then(response => {
-        //                         console.log("linking response---", response);
-
-        //                         this.setState({
-        //                             message: (this.state.active2 ? i18n.t('static.mt.linkingUpdateSuccess') : i18n.t('static.shipment.linkingsuccess')),
-        //                             color: 'green',
-        //                             loading: false,
-        //                             loading1: false,
-        //                             planningUnitIdUpdated: ''
-        //                         },
-        //                             () => {
-
-        //                                 this.hideSecondComponent();
-        //                                 this.toggleLarge();
-
-        //                                 (this.state.active3 ? this.filterErpData() : this.filterData(this.state.planningUnitIds));
-
-        //                             })
-        //                         // }
-
-        //                     }).catch(
-        //                         error => {
-        //                             console.log("Linking error-----------", error);
-        //                             if (error.message === "Network Error") {
-        //                                 this.setState({
-        //                                     message: 'static.unkownError',
-        //                                     color: '#BA0C2F',
-        //                                     loading: false,
-        //                                     loading1: false
-        //                                 });
-        //                             } else {
-        //                                 switch (error.response ? error.response.status : "") {
-
-        //                                     case 401:
-        //                                         this.props.history.push(`/login/static.message.sessionExpired`)
-        //                                         break;
-        //                                     case 403:
-        //                                         this.props.history.push(`/accessDenied`)
-        //                                         break;
-        //                                     case 500:
-        //                                     case 404:
-        //                                     case 406:
-        //                                         console.log("500 error--------");
-        //                                         this.setState({
-        //                                             message: error.response.data.messageCode,
-        //                                             loading: false,
-        //                                             loading1: false,
-        //                                             color: '#BA0C2F',
-        //                                         },
-        //                                             () => {
-
-        //                                                 this.hideSecondComponent();
-        //                                                 this.toggleLarge();
-
-        //                                                 (this.state.active3 ? this.filterErpData() : this.filterData(this.state.planningUnitIds));
-
-        //                                             });
-        //                                         break;
-        //                                     case 412:
-        //                                         this.setState({
-        //                                             message: error.response.data.messageCode,
-        //                                             loading: false,
-        //                                             loading1: false,
-        //                                             color: '#BA0C2F',
-        //                                         },
-        //                                             () => {
-
-        //                                                 this.hideSecondComponent();
-        //                                                 this.toggleLarge();
-
-        //                                                 (this.state.active3 ? this.filterErpData() : this.filterData(this.state.planningUnitIds));
-
-        //                                             });
-        //                                         break;
-        //                                     default:
-        //                                         this.setState({
-        //                                             message: 'static.unkownError',
-        //                                             loading: false,
-        //                                             loading1: false,
-        //                                             color: '#BA0C2F',
-        //                                         });
-        //                                         break;
-        //                                 }
-        //                             }
-        //                         }
-        //                     );
-        //                 // }
-        //             }
-        //         }
-        //     }
-        // }
-    }
     getConvertedQATShipmentQty = () => {
         var conversionFactor = document.getElementById("conversionFactor").value;
         // conversionFactor = conversionFactor.slice(0,13)
@@ -3627,7 +3428,7 @@ export default class ManualTagging extends Component {
                     instance, loading: false,
                     buildJexcelRequired: true,
                     table1Loader: true,
-                    loading1:false
+                    loading1: false
                 })
                 // }
             })
@@ -4711,7 +4512,7 @@ export default class ManualTagging extends Component {
 
     render() {
         const selectRow = {
-            mode: 'radio',
+            mode: 'checkbox',
             clickToSelect: true,
             // columnWidth: '10px',
             selectionHeaderRenderer: () => i18n.t('static.mt.selectShipment'),
@@ -4724,10 +4525,18 @@ export default class ManualTagging extends Component {
             },
             onSelect: (row, isSelect, rowIndex, e) => {
                 console.log("my row---", row);
+                console.log("is select---", isSelect);
+                var finalShipmentId = this.state.finalShipmentId;
+                // var tempShipmentId=this.state.tempShipmentId;
+                if (isSelect) {
+                    finalShipmentId.push({ "shipmentId": row.shipmentId, "tempShipmentId": row.shipmentId > 0 ? null : row.tempShipmentId, "index": rowIndex })
+                } else {
+                    finalShipmentId = finalShipmentId.filter(c => c.index != rowIndex);
+                }
+                console.log("Final Shipment Ids @@@@@@@@@@@@@@@", finalShipmentId)
                 this.setState({
-                    originalQty: row.shipmentQty,
-                    finalShipmentId: row.shipmentId,
-                    tempShipmentId: row.shipmentId > 0 ? null : row.tempShipmentId,
+                    originalQty: Number(this.state.originalQty) + Number(row.shipmentQty),
+                    finalShipmentId: finalShipmentId,
                     tempNotes: (row.notes != null && row.notes != "" ? row.notes : "")
                 });
             }
