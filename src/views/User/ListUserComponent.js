@@ -1280,7 +1280,7 @@ class ListUserComponent extends Component {
                 },
                 {
                     title: i18n.t('static.user.failedAttempts'),
-                    type: 'numeric', mask: '#,##.00', decimal: '.',
+                    type: 'numeric', mask: '#,##',
                     // readOnly: true//6G
                 },
                 {
@@ -1348,7 +1348,7 @@ class ListUserComponent extends Component {
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
