@@ -59,20 +59,15 @@ export default class DatabaseTranslations extends React.Component {
                 }
                 var options = {
                     data: label,
-                    colHeaders: [
-                        `${i18n.t('static.translation.labelId')}`,
-                        `${i18n.t('static.translation.labelFor')}`,
-                        `${i18n.t('static.databaseTranslations.relatedTo')}`,
-                        `${i18n.t('static.translation.english')}`,
-                        `${i18n.t('static.translation.french')}`,
-                        `${i18n.t('static.translation.pourtegese')}`,
-                        `${i18n.t('static.translation.spanish')}`,
-                    ],
                     colWidths: [80, 80, 80, 80, 80],
                     columns: [
-                        { type: 'hidden' },
-                        { type: 'text' },
-                        { type: 'text' }
+                        { type: 'hidden',title:`${i18n.t('static.translation.labelId')}`, },
+                        { type: 'text',title:`${i18n.t('static.translation.labelFor')}`, },
+                        { type: 'text',title:`${i18n.t('static.databaseTranslations.relatedTo')}`, },
+                        { type: 'text',title:`${i18n.t('static.translation.english')}`, },
+                        { type: 'text',title:`${i18n.t('static.translation.french')}`, },
+                        { type: 'text',title:`${i18n.t('static.translation.pourtegese')}`, },
+                        { type: 'text',title:`${i18n.t('static.translation.spanish')}`, },
                     ],
                     editable: false,
                     pagination: localStorage.getItem("sesRecordCount"),
