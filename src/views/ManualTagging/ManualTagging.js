@@ -3827,7 +3827,7 @@ export default class ManualTagging extends Component {
                     },
                     {
                         title: i18n.t('static.mt.parentShipmentId(childShipmentId)'),
-                        type: 'numeric',
+                        type: 'text',
                         readOnly: true
                         // mask: '#,##', decimal: '.'
                     },
