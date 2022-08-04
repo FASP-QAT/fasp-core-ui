@@ -994,7 +994,7 @@ class VersionSettingsComponent extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [100, 120, 60, 80, 150, 100, 110, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+            colWidths: [100, 120, 60, 80, 100, 100, 110, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
@@ -1072,7 +1072,7 @@ class VersionSettingsComponent extends Component {
                     title: i18n.t('static.program.noOfDaysInMonth'),
                     type: 'dropdown',
                     source: this.state.noOfDays,
-                    width: '200',
+                    // width: '150',
                 },//13 N
 
 
