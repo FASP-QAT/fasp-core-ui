@@ -114,7 +114,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       tempConsumptionUnitObject: { "consumptionDataType": "" },
       dataEnteredInUnitList: [],
       minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
-      singleValue2: localStorage.getItem("sesDataentryDateRange") != "" ? JSON.parse(localStorage.getItem("sesDataentryDateRange")) : { from: { year: Number(moment(startDate).startOf('month').format("YYYY")), month: Number(moment(startDate).startOf('month').format("M")) }, to: { year: Number(moment(stopDate).startOf('month').format("YYYY")), month: Number(moment(stopDate).startOf('month').format("M")) } },
+      singleValue2: localStorage.getItem("sesDataentryStartDateRange") != "" ? JSON.parse(localStorage.getItem("sesDataentryStartDateRange")) : { year: Number(moment(startDate).startOf('month').format("YYYY")), month: Number(moment(startDate).startOf('month').format("M"))},
       maxDate: { year: Number(moment(Date.now()).startOf('month').format("YYYY")), month: Number(moment(Date.now()).startOf('month').format("M")) },
       planningUnitTotalList: [],
       dataEnteredInTableExSpan: 0
@@ -659,8 +659,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     var consumptionUnit = this.state.selectedConsumptionUnitObject;
     var rangeValue = this.state.singleValue2;
     console.log("RangeValuie@@@@@@@@@@@@", rangeValue);
-    var startDate = moment(rangeValue.from.year + '-' + rangeValue.from.month + '-01').format("YYYY-MM-DD");
-    var stopDate = moment(rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate()).format("YYYY-MM-DD");
+    var startDate = moment(rangeValue.year + '-' + rangeValue.month + '-01').format("YYYY-MM-DD");
+    var stopDate = moment(startDate).add(35,'months').format("YYYY-MM-DD");
     var fullConsumptionList = this.state.tempConsumptionList.filter(c => (c.planningUnit.id != consumptionUnit.planningUnit.id) || (c.planningUnit.id == consumptionUnit.planningUnit.id && (moment(c.month).format("YYYY-MM") < moment(startDate).format("YYYY-MM") || moment(c.month).format("YYYY-MM") > moment(stopDate).format("YYYY-MM"))));
     var elInstance = this.state.dataEl;
     for (var i = 0; i < monthArray.length; i++) {
@@ -836,8 +836,10 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           // var fullConsumptionList = this.state.consumptionList.filter(c => c.planningUnit.id != consumptionUnit.planningUnit.id);
           var rangeValue = this.state.singleValue2;
           console.log("RangeValuie@@@@@@@@@@@@", rangeValue);
-          var startDate = moment(rangeValue.from.year + '-' + rangeValue.from.month + '-01').format("YYYY-MM-DD");
-          var stopDate = moment(rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate()).format("YYYY-MM-DD");
+          var startDate = moment(rangeValue.year + '-' + rangeValue.month + '-01').format("YYYY-MM-DD");
+          // var stopDate = moment(rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate()).format("YYYY-MM-DD");
+          var stopDate = moment(startDate).add(35,'months').format("YYYY-MM-DD");
+    
           var fullConsumptionList = this.state.consumptionList.filter(c => (c.planningUnit.id != consumptionUnit.planningUnit.id) || (c.planningUnit.id == consumptionUnit.planningUnit.id && (moment(c.month).format("YYYY-MM") < moment(startDate).format("YYYY-MM") || moment(c.month).format("YYYY-MM") > moment(stopDate).format("YYYY-MM"))));
           console.log("Full ConsumptionList @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@", fullConsumptionList)
           var monthArray = this.state.monthArray;
@@ -1528,8 +1530,10 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               });
               var rangeValue = this.state.singleValue2;
               console.log("RangeValuie@@@@@@@@@@@@", rangeValue);
-              var startDate = moment(rangeValue.from.year + '-' + rangeValue.from.month + '-01').format("YYYY-MM-DD");
-              var stopDate = moment(rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate()).format("YYYY-MM-DD");
+              var startDate = moment(rangeValue.year + '-' + rangeValue.month + '-01').format("YYYY-MM-DD");
+              // var stopDate = moment(rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate()).format("YYYY-MM-DD");
+              var stopDate = moment(startDate).add(35,'months').format("YYYY-MM-DD");
+    
               console.log("stopDate@@@@@@@@@@@@", stopDate);
               var daysInMonth = datasetJson.currentVersion.daysInMonth;
               var monthArray = [];
@@ -1900,29 +1904,29 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       cont = true;
     }
     console.log("Value@@@@@@@@@@@@@@@", value)
-    let startDate = moment(value.from.year + '-' + value.from.month + '-01').format("YYYY-MM");
-    let endDate = moment(value.to.year + '-' + value.to.month + '-' + new Date(value.to.year, value.to.month, 0).getDate()).format("YYYY-MM");
-    console.log("startDate-->", startDate);
-    console.log("endDate-->", endDate);
+    // let startDate = moment(value.from.year + '-' + value.from.month + '-01').format("YYYY-MM");
+    // let endDate = moment(value.to.year + '-' + value.to.month + '-' + new Date(value.to.year, value.to.month, 0).getDate()).format("YYYY-MM");
+    // console.log("startDate-->", startDate);
+    // console.log("endDate-->", endDate);
     // var monthsDiff = moment(endDate).diff(startDate, 'months', true);
-    const monthsDiff = moment(new Date(endDate)).diff(new Date(startDate), 'months', true);
+    // const monthsDiff = moment(new Date(endDate)).diff(new Date(startDate), 'months', true);
     if (cont == true) {
-      if (monthsDiff <= 36) {
+      // if (monthsDiff <= 36) {
         this.setState({
           consumptionChanged: false
         }, () => {
           this.setState({ singleValue2: value, }, () => {
-            localStorage.setItem("sesDataentryDateRange", JSON.stringify(value))
+            localStorage.setItem("sesDataentryStartDateRange", JSON.stringify(value))
             this.getDatasetData()
           })
         })
-      } else {
-        alert(i18n.t('static.dataentry.maxRange'));
-        let rangeValue = this.state.singleValue2;
-        let startDate = moment(rangeValue.from.year + '-' + rangeValue.from.month + '-01').format("YYYY-MM");
-        let stopDate = moment(rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate()).format("YYYY-MM");
-        this.setState({ singleValue2: { from: { year: Number(moment(startDate).startOf('month').format("YYYY")), month: Number(moment(startDate).startOf('month').format("M")) }, to: { year: Number(moment(stopDate).startOf('month').format("YYYY")), month: Number(moment(stopDate).startOf('month').format("M")) } } });
-      }
+      // } else {
+      //   alert(i18n.t('static.dataentry.maxRange'));
+      //   let rangeValue = this.state.singleValue2;
+      //   let startDate = moment(rangeValue.from.year + '-' + rangeValue.from.month + '-01').format("YYYY-MM");
+      //   let stopDate = moment(rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate()).format("YYYY-MM");
+      //   this.setState({ singleValue2: { from: { year: Number(moment(startDate).startOf('month').format("YYYY")), month: Number(moment(startDate).startOf('month').format("M")) }, to: { year: Number(moment(stopDate).startOf('month').format("YYYY")), month: Number(moment(stopDate).startOf('month').format("M")) } } });
+      // }
     }
 
   }
@@ -2195,7 +2199,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                         // onChange={this.handleRangeChange}
                         // onDismiss={this.handleRangeDissmis}
                         >
-                          <MonthBox value={makeText(this.state.singleValue2.from) + ' ~ ' + makeText(this.state.singleValue2.to)} onClick={this.handleClickMonthBox2} />
+                          {/* <MonthBox value={makeText(this.state.singleValue2.from) + ' ~ ' + makeText(this.state.singleValue2.to)} onClick={this.handleClickMonthBox2} /> */}
+                          <MonthBox value={makeText(this.state.singleValue2)} onClick={this.handleClickMonthBox2} />
+  
                         </Picker>
                       </div>
                     </FormGroup>

@@ -3099,7 +3099,7 @@ class EditSupplyPlanStatus extends Component {
                                                                 this.state.expiredStockArr.map(item1 => {
                                                                     if (item1.toString() != "") {
                                                                         if (item1.qty != 0) {
-                                                                            return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('expiredStock', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, '')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                                            return (<td align="right" className="hoverTd redColor" onClick={() => this.toggleLarge('expiredStock', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, '')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                                                         } else {
                                                                             return (<td align="right"></td>)
                                                                         }
