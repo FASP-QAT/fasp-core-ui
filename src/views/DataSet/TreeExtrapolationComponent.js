@@ -4158,7 +4158,7 @@ export default class TreeExtrapolationComponent extends React.Component {
 
                                                 </FormGroup>
                                                 <FormGroup className="pl-lg-3 ExtrapolateSaveBtn">
-                                                    {!this.state.dataChanged && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && <Button type="submit" color="success" onClick={() => this.touchAllExtrapolation(setTouched, errors, 1)} className="mr-1 float-right" size="md"><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>}
+                                                    {this.state.isChanged && !this.state.dataChanged && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && <Button type="submit" color="success" onClick={() => this.touchAllExtrapolation(setTouched, errors, 1)} className="mr-1 float-right" size="md"><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>}
                                                 </FormGroup>
                                             </Row>
                                             {!this.state.dataChanged || !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && <Row>{this.state.dataChanged && <div class="red">{i18n.t('static.message.treeExtrapolationSave')}</div>}</Row>}
