@@ -251,6 +251,13 @@ export default class ExportDataset extends Component {
                                                                                     var equivalencyUnitList = [];
                                                                                     equivalencyUnitList = equivalencyUnitRequest.result;
 
+                                                                                    var isUnEncrepted = false;
+                                                                                    if (window.confirm("Do you want to Encrepte data?")) {
+                                                                                        isUnEncrepted = true;
+                                                                                    } else {
+                                                                                        isUnEncrepted = false;
+                                                                                    }
+
                                                                                     for (var i = 0; i < myResult.length; i++) {
                                                                                         for (var j = 0; j < programId.length; j++) {
                                                                                             if (myResult[i].id == programId[j].value) {
@@ -275,16 +282,84 @@ export default class ExportDataset extends Component {
                                                                                                 // myResult[i].addressedCount = programQPLResultFiltered.addressedCount;
                                                                                                 myResult[i].readonly = programQPLResultFiltered.readonly;
 
-                                                                                                var txt = JSON.stringify(myResult[i]);
-                                                                                                var dArray = dMyResult.filter(c => c.id == programId[j].value)[0];
-                                                                                                var txt1 = JSON.stringify(dArray)
+                                                                                                if (isUnEncrepted) {//encrept data
+
+                                                                                                    var txt = JSON.stringify(myResult[i]);
+                                                                                                    var dArray = dMyResult.filter(c => c.id == programId[j].value)[0];
+                                                                                                    var txt1 = JSON.stringify(dArray)
+                                                                                                    // var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                                                                                                    // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                                                                                                    var labelName = (programId[j].label).replaceAll("/", "-")
+                                                                                                    // zip.file(labelName + "_" + parseInt(j + 1) + ".txt", programData);
+                                                                                                    console.log("Txt ", txt);
+                                                                                                    console.log("Txt 1", txt1);
+
+                                                                                                    zip.file(labelName + "_" + parseInt(j + 1) + ".txt", txt + "@~-~@" + txt1);
+
+
+                                                                                                } else {//unencrept data
+
+                                                                                                    var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+                                                                                                    var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+                                                                                                    var programNameLabel1 = JSON.parse(programNameLabel);
+
+                                                                                                    var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                                                                                                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                                                                                                    var programJson1 = JSON.parse(programData);
+
+                                                                                                    myResult[i].programName = programNameLabel1;
+                                                                                                    myResult[i].programData = programJson1;
+
+                                                                                                    var txt = JSON.stringify(myResult[i]);
+
+
+                                                                                                    var dArray = dMyResult.filter(c => c.id == programId[j].value)[0];
+
+                                                                                                    var bytes1 = CryptoJS.AES.decrypt(dArray.programName, SECRET_KEY);
+                                                                                                    var programNameLabel11 = bytes1.toString(CryptoJS.enc.Utf8);
+                                                                                                    var programNameLabel111 = JSON.parse(programNameLabel11);
+
+                                                                                                    var programDataBytes1 = CryptoJS.AES.decrypt(dArray.programData, SECRET_KEY);
+                                                                                                    var programData1 = programDataBytes1.toString(CryptoJS.enc.Utf8);
+                                                                                                    var programJson111 = JSON.parse(programData1);
+
+                                                                                                    dArray.programName = programNameLabel111;
+                                                                                                    dArray.programData = programJson111;
+
+                                                                                                    var txt1 = JSON.stringify(dArray)
+                                                                                                    // var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                                                                                                    // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                                                                                                    var labelName = (programId[j].label).replaceAll("/", "-")
+                                                                                                    // zip.file(labelName + "_" + parseInt(j + 1) + ".txt", programData);
+                                                                                                    console.log("Txt-unencrept data ", txt);
+                                                                                                    console.log("Txt 1-unencrept data", txt1);
+
+                                                                                                    zip.file(labelName + "_" + parseInt(j + 1) + ".txt", txt + "@~-~@" + txt1);
+
+                                                                                                }
+
+                                                                                                // var txt = JSON.stringify(myResult[i]);
+                                                                                                // var dArray = dMyResult.filter(c => c.id == programId[j].value)[0];
+                                                                                                // var txt1 = JSON.stringify(dArray)
+                                                                                                // // var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                                                                                                // // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                                                                                                // var labelName = (programId[j].label).replaceAll("/", "-")
+                                                                                                // // zip.file(labelName + "_" + parseInt(j + 1) + ".txt", programData);
+                                                                                                // console.log("Txt ", txt);
+                                                                                                // console.log("Txt 1", txt1);
+
+                                                                                                // var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+                                                                                                // var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                                                                                                 // var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
                                                                                                 // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                                                                                                var labelName = (programId[j].label).replaceAll("/", "-")
-                                                                                                // zip.file(labelName + "_" + parseInt(j + 1) + ".txt", programData);
-                                                                                                console.log("Txt ", txt);
-                                                                                                console.log("Txt 1", txt1);
-                                                                                                zip.file(labelName + "_" + parseInt(j + 1) + ".txt", txt + "@~-~@" + txt1);
+                                                                                                // var programJson1 = JSON.parse(programData);
+
+                                                                                                // txt.programName = programNameLabel;
+                                                                                                // txt.programData = programData;
+
+                                                                                                // console.log("Txt 2", txt);
+
+                                                                                                // zip.file(labelName + "_" + parseInt(j + 1) + ".txt", txt + "@~-~@" + txt1);
                                                                                             }
                                                                                         }
                                                                                         if (i == myResult.length - 1) {
