@@ -828,10 +828,14 @@ class usageTemplate extends Component {
                 data[15] = (papuList[j].usageType.id == 1 ? (papuList[j].oneTimeUsage == false ? `=ROUND(${v13}/${usagePeriodConversion}*${s1},2)` : `=ROUND(${n1},2)`) : '')
 
                 let unitName = (this.state.dimensionList.filter(c => c.id == papuList[j].unit.id)[0]).name;
-                let string = "Every " + (papuList[j].noOfPatients).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") + " " + unitName + "(s) - requires " + papuList[j].noOfForecastingUnits + " " + papuList[j].forecastingUnit.unit.label.label_en;
+                let string = "Every " + (papuList[j].noOfPatients).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") + " " + unitName + "(s) - requires " + papuList[j].noOfForecastingUnits + " " + papuList[j].forecastingUnit.unit.label.label_en + "(s)";
 
                 if (!papuList[j].oneTimeUsage) { //one time usage false
-                    string += " " + (papuList[j].usageFrequencyCount == null ? '' : papuList[j].usageFrequencyCount) + " time(s) per " + (papuList[j].usageFrequencyUsagePeriod != null ? papuList[j].usageFrequencyUsagePeriod.label.label_en : '');
+                    if (papuList[j].usageType.id == 2) {
+                        string += " " + (papuList[j].usageFrequencyCount == null ? '' : " Every " + papuList[j].usageFrequencyCount) + " " + (papuList[j].usageFrequencyUsagePeriod != null ? papuList[j].usageFrequencyUsagePeriod.label.label_en : '');
+                    } else {
+                        string += " " + (papuList[j].usageFrequencyCount == null ? '' : papuList[j].usageFrequencyCount) + " time(s) per " + (papuList[j].usageFrequencyUsagePeriod != null ? papuList[j].usageFrequencyUsagePeriod.label.label_en : '');
+                    }
 
                     if (papuList[j].usageType.id == 2) {
                         string += " indefinitely";
@@ -2709,7 +2713,7 @@ class usageTemplate extends Component {
             var typeId = rowData[19];
             let roleArray = this.state.roleArray;
             var userId = rowData[22];
-            
+
             // if ((roleArray.includes('ROLE_REALM_ADMIN') && typeId != -1 && typeId != 0) || (roleArray.includes('ROLE_DATASET_ADMIN') && typeId == -1 && typeId != 0)) {
             if ((roleArray.includes('ROLE_DATASET_ADMIN') && ((typeId == -1 && typeId != 0) || userId != ""))) {
                 console.log("roleArrayinsideIf--------->onchangepage", roleArray, "---", userId);
@@ -3233,23 +3237,26 @@ class usageTemplate extends Component {
             }
 
 
-            let string = 'Every ' + (this.el.getValue(`H${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`H${parseInt(y) + 1}`, true)) + ' ' + (unitName == '' ? '____' : unitName) + '(s) - requires ' + (this.el.getValue(`J${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`J${parseInt(y) + 1}`, true)) + " " + (unitName1 == '' ? '____' : unitName1);
+            let string = 'Every ' + (this.el.getValue(`H${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`H${parseInt(y) + 1}`, true)) + ' ' + (unitName == '' ? '____' : unitName) + '(s) - requires ' + (this.el.getValue(`J${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`J${parseInt(y) + 1}`, true)) + " " + (unitName1 == '' ? '____' : unitName1 + "(s)");
 
             let q1 = '';
+            // if (this.el.getValueFromCoords(10, y) == false) {
+            //     q1 = 'time(s) per';
+            // } else {
+            //     q1 = '';
+            // }
+            console.log("Test-1--", string)
             if (this.el.getValueFromCoords(10, y) == false) {
-                q1 = 'time(s) per';
-            } else {
-                q1 = '';
-            }
-
-            if (this.el.getValueFromCoords(6, y) == 2) {//contonuous
-                q1 = 'time(s) per';
-            } else {
-                q1 = '';
-                if (!this.el.getValueFromCoords(10, y)) {
-                    q1 = 'time(s) per';
+                if (this.el.getValueFromCoords(6, y) == 1) {
+                    q1 = '';
+                    if (!this.el.getValueFromCoords(10, y)) {
+                        q1 = 'time(s) per';
+                    }
                 }
+            } else {
+                q1 = '';
             }
+            console.log("Test-2--", string)
 
             let t1 = ''
             if (this.el.getValueFromCoords(6, y) == 1 && !this.el.getValueFromCoords(10, y)) {
@@ -3265,13 +3272,19 @@ class usageTemplate extends Component {
             // let string = 'Every ' + this.el.getValue(`I${parseInt(y) + 1}`, true) + ' patient - requires ' + this.el.getValue(`L${parseInt(y) + 1}`, true) + " " + this.el.getValue(`M${parseInt(y) + 1}`, true);
 
             if (!this.el.getValueFromCoords(10, y)) {//one time usage false
-                string += " " + (this.el.getValue(`L${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`L${parseInt(y) + 1}`, true)) + " " + (q1 == '' ? '____' : q1) + " " + (this.el.getValue(`M${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`M${parseInt(y) + 1}`, true));
+                if (this.el.getValueFromCoords(6, y) == 2) {
+                    string += " Every " + (this.el.getValue(`L${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`L${parseInt(y) + 1}`, true)) + " " + (this.el.getValue(`M${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`M${parseInt(y) + 1}`, true));
+                } else {
+                    string += " " + (this.el.getValue(`L${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`L${parseInt(y) + 1}`, true)) + " " + (q1 == '' ? '____' : q1) + " " + (this.el.getValue(`M${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`M${parseInt(y) + 1}`, true));
+                }
+                console.log("Test-3--", string)
                 if (this.el.getValueFromCoords(6, y) == 2) {
                     string += " " + (this.el.getValue(`O${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`O${parseInt(y) + 1}`, true));
                 } else {
                     string += " " + (t1 == '' ? '____' : t1) + " " + (this.el.getValue(`N${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`N${parseInt(y) + 1}`, true)) + " " + (this.el.getValue(`O${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`O${parseInt(y) + 1}`, true));
                 }
             }
+            console.log("Test-4--", string)
 
 
             this.el.setValueFromCoords(16, y, string, true);
