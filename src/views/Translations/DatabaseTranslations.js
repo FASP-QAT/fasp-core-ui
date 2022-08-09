@@ -57,24 +57,31 @@ export default class DatabaseTranslations extends React.Component {
                     data[6] = json[i].label_sp;//F
                     label[i] = data;
                 }
+                var colHeadersArray = [];
+                colHeadersArray.push({ type: 'hidden', title: `${i18n.t('static.translation.labelId')}` })
+                colHeadersArray.push({ type: 'text', title: `${i18n.t('static.translation.labelFor')}` })
+                colHeadersArray.push({ type: 'text', title: `${i18n.t('static.databaseTranslations.relatedTo')}` })
+                colHeadersArray.push({ type: 'text', title: `${i18n.t('static.translation.english')}` })
+                colHeadersArray.push({ type: 'text', title: `${i18n.t('static.translation.french')}` })
+                colHeadersArray.push({ type: 'text', title: `${i18n.t('static.translation.pourtegese')}` })
+                colHeadersArray.push({ type: 'text', title: `${i18n.t('static.translation.spanish')}` })
+
+
                 var options = {
                     data: label,
-                    colHeaders: [
-                        `${i18n.t('static.translation.labelId')}`,
-                        `${i18n.t('static.translation.labelFor')}`,
-                        `${i18n.t('static.databaseTranslations.relatedTo')}`,
-                        `${i18n.t('static.translation.english')}`,
-                        `${i18n.t('static.translation.french')}`,
-                        `${i18n.t('static.translation.pourtegese')}`,
-                        `${i18n.t('static.translation.spanish')}`,
-                    ],
+
+                    // colHeaders: [
+                    // `${i18n.t('static.translation.labelId')}`,
+                    // `${i18n.t('static.translation.labelFor')}`,
+                    // `${i18n.t('static.databaseTranslations.relatedTo')}`,
+                    // `${i18n.t('static.translation.english')}`,
+                    // `${i18n.t('static.translation.french')}`,
+                    // `${i18n.t('static.translation.pourtegese')}`,
+                    // `${i18n.t('static.translation.spanish')}`,
+                    // ],
                     colWidths: [80, 80, 80, 80, 80],
-                    columns: [
-                        { type: 'hidden' },
-                        { type: 'text' },
-                        { type: 'text' }
-                    ],
-                    editable: false,
+                    columns: colHeadersArray,
+                    // editable: false,
                     pagination: localStorage.getItem("sesRecordCount"),
                     search: true,
                     columnSorting: true,
