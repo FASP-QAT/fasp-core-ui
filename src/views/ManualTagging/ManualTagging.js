@@ -5319,13 +5319,15 @@ export default class ManualTagging extends Component {
                                         <Button size="md" color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1" onClick={() => this.cancelClicked()} disabled={(this.state.table1Loader ? false : true)}> <i className="fa fa-times"></i></Button>
                                     </ModalHeader>
                                     <ModalBody>
-                                        <div>
+                                        <div className='row'>
                                             {!this.state.active3 && !this.state.active2 &&
-                                                <p><h5><b>{i18n.t('static.manualTagging.qatShipmentTitle')}
-                                                    <div className={"check inline pl-lg-3"}>
+                                                <div className='col-md-12' style={{display:'inline-flex'}}>
+                                                   <div className='col-md-2'> <h5><b>{i18n.t('static.manualTagging.qatShipmentTitle')}</b></h5></div>
+                                                   <div className='col-md-3'>
+                                                    <div className={"check inline pl-lg-0 pt-lg-1"}>
                                                         <div className="">
                                                             <Input
-                                                                style={{ width: '16px', height: '16px', marginTop: '3px' }}
+                                                                // style={{ width: '16px', height: '16px', marginTop: '3px' }}
                                                                 className="form-check-input"
                                                                 type="checkbox"
                                                                 id="showAllShipments"
@@ -5334,17 +5336,19 @@ export default class ManualTagging extends Component {
                                                                 onClick={(e) => { this.setShowAllShipments(e); }}
                                                             />
                                                             <Label
+                                                                style={{marginTop:'3px'}}
                                                                 className="form-check-label pl-lg-1"
-                                                                check htmlFor="inline-radio2" style={{ fontSize: '16px' }}>
+                                                                check htmlFor="inline-radio2">
                                                                 <b>Show All Shipments</b>
                                                                 {/* <i class="fa fa-info-circle icons pl-lg-2" id="Popover5" onClick={() => this.toggle('popoverOpenArima', !this.state.popoverOpenArima)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i> */}
                                                             </Label>
                                                         </div>
                                                     </div>
-                                                </b></h5>
+                                                    </div>
+                                                {/* </b></h5> */}
 
                                                     {/* // </div> */}
-                                                </p>}
+                                                </div>}
                                             {!this.state.active3 && !this.state.active2 &&
 
                                                 // <ToolkitProvider
