@@ -1934,13 +1934,14 @@ class CompareAndSelectScenario extends Component {
                         {
                             this.state.showAllData &&
                             <div className="col-md-12 card-header-actions">
+                                 <img style={{ height: '25px', width: '25px', cursor: 'pointer',float:'right',marginTop:'4px' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
                                 <a className="card-header-action" style={{float:'right'}}>
 
                                     <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t("static.report.exportPdf")} onClick={() => this.exportPDF()} />
 
 
                                 </a>
-                                <img style={{ height: '25px', width: '25px', cursor: 'pointer',float:'right',marginTop:'4px' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
+                               
                             </div>
                         }
                         
