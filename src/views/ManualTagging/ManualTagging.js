@@ -107,7 +107,8 @@ export default class ManualTagging extends Component {
             changedDataForTab2: false,
             roPrimeLineNoForTab3: "",
             planningUnitsBasedOnTracerCategory: [],
-            test: 0
+            test: 0,
+            showAllShipments: false
 
         }
 
@@ -145,7 +146,6 @@ export default class ManualTagging extends Component {
         this.getPlanningUnitListByRealmCountryId = this.getPlanningUnitListByRealmCountryId.bind(this);
         this.filterProgramByCountry = this.filterProgramByCountry.bind(this);
         this.getPlanningUnitArray = this.getPlanningUnitArray.bind(this);
-        this.getShipmentDetailsByParentShipmentId = this.getShipmentDetailsByParentShipmentId.bind(this);
         this.toggleDetailsModal = this.toggleDetailsModal.bind(this);
         this.toggle = this.toggle.bind(this);
         this.toggleArtmisHistoryModal = this.toggleArtmisHistoryModal.bind(this);
@@ -153,6 +153,8 @@ export default class ManualTagging extends Component {
         this.oneditionend = this.oneditionend.bind(this);
         this.changeTab2 = this.changeTab2.bind(this);
         this.delink = this.delink.bind(this);
+        this.loadedERP = this.loadedERP.bind(this)
+        this.changedTab1 = this.changedTab1.bind(this)
     }
 
     versionChange(event) {
@@ -426,65 +428,7 @@ export default class ManualTagging extends Component {
             modal: !this.state.modal,
         });
     }
-    getShipmentDetailsByParentShipmentId(parentShipmentId) {
-        ManualTaggingService.getShipmentDetailsByParentShipmentId(parentShipmentId)
-            .then(response => {
-                let outputListAfterSearch = [];
-                outputListAfterSearch.push(response.data)
-                this.setState({
-                    outputListAfterSearch,
-                    originalQty: outputListAfterSearch[0].shipmentQty,
-                    tempNotes: (outputListAfterSearch[0].notes != null && outputListAfterSearch[0].notes != "" ? outputListAfterSearch[0].notes : "")
-                })
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({
-                            message: 'static.unkownError',
-                            loading: false
-                        }, () => {
-                            this.hideSecondComponent()
-                        });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
 
-                            case 401:
-                                this.props.history.push(`/login/static.message.sessionExpired`)
-                                break;
-                            case 403:
-                                this.props.history.push(`/accessDenied`)
-                                break;
-                            case 500:
-                            case 404:
-                            case 406:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                }, () => {
-                                    this.hideSecondComponent()
-                                });
-                                break;
-                            case 412:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                }, () => {
-                                    this.hideSecondComponent()
-                                });
-                                break;
-                            default:
-                                this.setState({
-                                    message: 'static.unkownError',
-                                    loading: false
-                                }, () => {
-                                    this.hideSecondComponent()
-                                });
-                                break;
-                        }
-                    }
-                }
-            );
-    }
     filterProgramByCountry() {
         let programList = this.state.programObjectStoreList;
         let countryId = this.state.countryId;
@@ -897,6 +841,28 @@ export default class ManualTagging extends Component {
                 }
             }
 
+        }
+    }
+
+    changedTab1 = function (instance, cell, x, y, value) {
+        if (x == 0) {
+            var finalShipmentId = this.state.finalShipmentId;
+            var rowData = instance.jexcel.getRowData(y);
+
+            if (value.toString() == "true") {
+                finalShipmentId.push({ "shipmentId": rowData[2], "tempShipmentId": rowData[2] > 0 ? null : rowData[11], "index": rowData[10], "qty": rowData[8] })
+            } else {
+                finalShipmentId = finalShipmentId.filter(c => c.index != rowData[10]);
+            }
+            var qty = 0;
+            finalShipmentId.map(c => {
+                qty += Number(c.qty)
+            })
+            console.log("Final Shipment Ids @@@@@@@@@@@@@@@", finalShipmentId)
+            this.setState({
+                originalQty: qty,
+                finalShipmentId: finalShipmentId,
+            });
         }
     }
 
@@ -1792,10 +1758,30 @@ export default class ManualTagging extends Component {
                                     shipmentList[parentShipmentIndex].lastModifiedDate = curDate;
 
                                     if (moment(minDate).format("YYYY-MM-DD") > moment(shipmentList[parentShipmentIndex].expectedDeliveryDate).format("YYYY-MM-DD")) {
-                                        minDate = moment(shipmentList[shipmentIndex].expectedDeliveryDate).format("YYYY-MM-DD");
+                                        minDate = moment(shipmentList[parentShipmentIndex].expectedDeliveryDate).format("YYYY-MM-DD");
                                     }
                                     if (shipmentList[parentShipmentIndex].receivedDate != null && shipmentList[parentShipmentIndex].receivedDate != "" && shipmentList[parentShipmentIndex].receivedDate != undefined && moment(minDate).format("YYYY-MM-DD") > moment(shipmentList[parentShipmentIndex].receivedDate).format("YYYY-MM-DD")) {
-                                        minDate = moment(shipmentList[shipmentIndex].receivedDate).format("YYYY-MM-DD");
+                                        minDate = moment(shipmentList[parentShipmentIndex].receivedDate).format("YYYY-MM-DD");
+                                    }
+                                    // Activate linked parent shipment Id
+                                    var linkedParentShipmentIdList = shipmentList.filter(c => linkedShipmentsListFilter[0].parentShipmentId > 0 ? (c.parentLinkedShipmentId == linkedShipmentsListFilter[0].parentShipmentId) : (c.tempParentLinkedShipmentId == linkedShipmentsListFilter[0].tempParentShipmentId));
+                                    for (var l = 0; l < linkedParentShipmentIdList.length; l++) {
+                                        var parentShipmentIndex1 = shipmentList.findIndex(c => linkedParentShipmentIdList[l].shipmentId > 0 ? c.shipmentId == linkedParentShipmentIdList[l].shipmentId : c.tempShipmentId == linkedParentShipmentIdList[l].tempShipmentId);
+                                        shipmentList[parentShipmentIndex1].active = true;
+                                        shipmentList[parentShipmentIndex1].erpFlag = false;
+                                        shipmentList[parentShipmentIndex1].lastModifiedBy.userId = curUser;
+                                        shipmentList[parentShipmentIndex1].lastModifiedBy.username = username;
+                                        shipmentList[parentShipmentIndex1].lastModifiedDate = curDate;
+                                        shipmentList[parentShipmentIndex1].parentLinkedShipmentId = null;
+                                        shipmentList[parentShipmentIndex1].tempParentLinkedShipmentId = null;
+
+                                        if (moment(minDate).format("YYYY-MM-DD") > moment(shipmentList[parentShipmentIndex1].expectedDeliveryDate).format("YYYY-MM-DD")) {
+                                            minDate = moment(shipmentList[parentShipmentIndex1].expectedDeliveryDate).format("YYYY-MM-DD");
+                                        }
+                                        if (shipmentList[parentShipmentIndex1].receivedDate != null && shipmentList[parentShipmentIndex1].receivedDate != "" && shipmentList[parentShipmentIndex1].receivedDate != undefined && moment(minDate).format("YYYY-MM-DD") > moment(shipmentList[parentShipmentIndex1].receivedDate).format("YYYY-MM-DD")) {
+                                            minDate = moment(shipmentList[parentShipmentIndex1].receivedDate).format("YYYY-MM-DD");
+                                        }
+
                                     }
                                 }
                             }
@@ -1999,8 +1985,8 @@ export default class ManualTagging extends Component {
                                         var batchInfoList = programJson.batchInfoList;
                                         console.log("Shipment List@@@@@@@@@@@@@@@", programJson.shipmentList)
                                         if (!this.state.active4) {
-                                            var shipmentId = this.state.active1 ? this.state.outputListAfterSearch[0].shipmentId : this.state.finalShipmentId[0].shipmentId;
-                                            var index = this.state.active1 ? this.state.outputListAfterSearch[0].tempShipmentId : this.state.finalShipmentId[0].tempShipmentId;
+                                            var shipmentId = this.state.active1 ? this.state.finalShipmentId[0].shipmentId : this.state.finalShipmentId[0].shipmentId;
+                                            var index = this.state.active1 ? this.state.finalShipmentId[0].tempShipmentId : this.state.finalShipmentId[0].tempShipmentId;
                                             var shipmentIndex = shipmentList.findIndex(c => shipmentId > 0 ? (c.shipmentId == shipmentId) : (c.tempShipmentId == index));
 
                                             // console.log("Shipment Index@@@@@@@@@@@@@@@", shipmentIndex)
@@ -2008,15 +1994,15 @@ export default class ManualTagging extends Component {
                                             shipmentList[shipmentIndex].active = false;
                                             var minDate = shipmentList[shipmentIndex].receivedDate != "" && shipmentList[shipmentIndex].receivedDate != null && shipmentList[shipmentIndex].receivedDate != undefined && shipmentList[shipmentIndex].receivedDate != "Invalid date" ? shipmentList[shipmentIndex].receivedDate : shipmentList[shipmentIndex].expectedDeliveryDate;
                                             for (var i = 1; i < this.state.finalShipmentId.length; i++) {
-                                                var shipmentId1 = this.state.active1 ? this.state.outputListAfterSearch[0].shipmentId : this.state.finalShipmentId[i].shipmentId;
-                                                var index1 = this.state.active1 ? this.state.outputListAfterSearch[0].tempShipmentId : this.state.finalShipmentId[i].tempShipmentId;
+                                                var shipmentId1 = this.state.active1 ? this.state.finalShipmentId[i].shipmentId : this.state.finalShipmentId[i].shipmentId;
+                                                var index1 = this.state.active1 ? this.state.finalShipmentId[i].tempShipmentId : this.state.finalShipmentId[i].tempShipmentId;
                                                 var shipmentIndex1 = shipmentList.findIndex(c => shipmentId1 > 0 ? (c.shipmentId == shipmentId1) : (c.tempShipmentId == index1));
 
                                                 // console.log("Shipment Index@@@@@@@@@@@@@@@", shipmentIndex)
                                                 shipmentList[shipmentIndex1].erpFlag = true;
                                                 shipmentList[shipmentIndex1].active = false;
-                                                shipmentList[shipmentIndex1].linkedParentShipmentId = this.state.finalShipmentId[0].shipmentId > 0 ? this.state.finalShipmentId[0].shipmentId : null;
-                                                shipmentList[shipmentIndex1].tempLinkedParentShipmentId = this.state.finalShipmentId[0].tempShipmentId;
+                                                shipmentList[shipmentIndex1].parentLinkedShipmentId = this.state.finalShipmentId[0].shipmentId > 0 ? this.state.finalShipmentId[0].shipmentId : null;
+                                                shipmentList[shipmentIndex1].tempParentLinkedShipmentId = this.state.finalShipmentId[0].tempShipmentId;
                                                 var minDate1 = shipmentList[shipmentIndex1].receivedDate != "" && shipmentList[shipmentIndex1].receivedDate != null && shipmentList[shipmentIndex1].receivedDate != undefined && shipmentList[shipmentIndex1].receivedDate != "Invalid date" ? shipmentList[shipmentIndex1].receivedDate : shipmentList[shipmentIndex1].expectedDeliveryDate;
                                                 if (moment(minDate1).format("YYYY-MM-DD") < moment(minDate).format("YYYY-MM-DD")) {
                                                     minDate = moment(minDate1).format("YYYY-MM-DD")
@@ -2132,6 +2118,8 @@ export default class ManualTagging extends Component {
                                                             lastModifiedDate: curDate,
                                                             tempShipmentId: ppuObject.planningUnit.id.toString().concat(shipmentList.length),
                                                             tempParentShipmentId: null,
+                                                            parentLinkedShipmentId: null,
+                                                            tempParentLinkedShipmentId: null
                                                         })
                                                         var shipmentId = 0;
                                                         var index = ppuObject.planningUnit.id.toString().concat(shipmentList.length - 1);
@@ -2216,6 +2204,8 @@ export default class ManualTagging extends Component {
                                                         lastModifiedDate: curDate,
                                                         tempShipmentId: shipmentList[shipmentIndex].planningUnit.id.toString().concat(shipmentList.length),
                                                         tempParentShipmentId: shipmentList[shipmentIndex].shipmentId == 0 ? shipmentList[shipmentIndex].tempShipmentId : null,
+                                                        parentLinkedShipmentId: null,
+                                                        tempParentLinkedShipmentId: null
                                                     })
 
                                                     for (var bi = 0; bi < batchInfo.length; bi++) {
@@ -2843,6 +2833,7 @@ export default class ManualTagging extends Component {
                         var planningUnitDataJson = JSON.parse(programData);
                         shipmentList = shipmentList.concat(planningUnitDataJson.shipmentList);
                     }
+                    var fullShipmentList = shipmentList;
                     if (this.state.active1) {
                         shipmentList = shipmentList.filter(c => c.erpFlag.toString() == "false" && c.active.toString() == "true" && c.accountFlag.toString() == "true" && c.procurementAgent.id == PSM_PROCUREMENT_AGENT_ID && SHIPMENT_ID_ARR_MANUAL_TAGGING.includes(c.shipmentStatus.id.toString()));
                         shipmentList = shipmentList.filter(c => (moment(c.expectedDeliveryDate).format("YYYY-MM-DD") < moment(Date.now()).subtract(6, 'months').format("YYYY-MM-DD") && ([3, 4, 5, 6, 9]).includes(c.shipmentStatus.id.toString())) || (moment(c.expectedDeliveryDate).format("YYYY-MM-DD") >= moment(Date.now()).subtract(6, 'months').format("YYYY-MM-DD") && SHIPMENT_ID_ARR_MANUAL_TAGGING.includes(c.shipmentStatus.id.toString())));
@@ -2850,6 +2841,11 @@ export default class ManualTagging extends Component {
                         shipmentList = shipmentList.filter(c => c.erpFlag.toString() == "true" && c.active.toString() == "true" && c.accountFlag.toString() == "true" && c.procurementAgent.id == PSM_PROCUREMENT_AGENT_ID);
                         console.log("ShipmentList@@@@@@@@@@@@@@@", shipmentList);
                         for (var sl = 0; sl < shipmentList.length; sl++) {
+                            var arr = [];
+                            var list = (fullShipmentList.filter(c => shipmentList[sl].parentShipmentId == 0 ? c.tempParentLinkedShipmentId == shipmentList[sl].tempParentShipmentId : c.parentLinkedShipmentId == shipmentList[sl].parentShipmentId)).map(item => {
+                                arr.push(item.shipmentId)
+                            });
+                            shipmentList[sl].parentShipmentIdArr = arr;
                             var lsf = linkedShipmentsList.filter(c => shipmentList[sl].shipmentId > 0 ? c.childShipmentId == shipmentList[sl].shipmentId : c.tempChildShipmentId == shipmentList[sl].tempShipmentId);
                             if (lsf.length > 0) {
                                 roPrimeNoList.push({
@@ -3174,7 +3170,162 @@ export default class ManualTagging extends Component {
             table1Loader: false
         },
             () => {
+                if (this.state.active1) {
+                    console.log("Final Shipment Id@@@@@@@", this.state.finalShipmentId)
+                    var list = this.state.showAllShipments ? this.state.outputList.filter(c => c.planningUnit.id == this.state.outputListAfterSearch[0].planningUnit.id) : this.state.outputListAfterSearch;
 
+                    var dataArray1 = [];
+                    var data1 = [];
+                    var finalShipmentId = this.state.finalShipmentId;
+                    var shipmentListArr = [...new Set(finalShipmentId.filter(c => c.shipmentId != 0).map(ele => (ele.shipmentId)))]
+                    var tempShipmentListArr = [...new Set(finalShipmentId.filter(c => c.tempShipmentId != 0 && c.tempShipmentId != null).map(ele => (ele.tempShipmentId)))]
+                    for (var i = 0; i < list.length; i++) {
+                        data1 = []
+                        data1[0] = list[i].shipmentId > 0 ? (shipmentListArr.includes(list[i].shipmentId) ? true : false) : (tempShipmentListArr.includes(list[i].tempShipmentId) ? true : false);
+                        data1[1] = getLabelText(list[i].planningUnit.label);
+                        data1[2] = list[i].shipmentId;
+                        data1[3] = list[i].orderNo;
+                        data1[4] = list[i].shipmentTransId;
+                        data1[5] = list[i].expectedDeliveryDate;
+                        data1[6] = getLabelText(list[i].shipmentStatus.label)
+                        data1[7] = list[i].procurementAgent.code
+                        data1[8] = list[i].shipmentQty
+                        data1[9] = list[i].notes
+                        data1[10] = i;
+                        data1[11] = list[i].tempShipmentId;
+                        dataArray1.push(data1)
+                    }
+
+
+                    this.el = jexcel(document.getElementById("tab1"), '');
+                    this.el.destroy();
+                    var json = [];
+                    // var data = [];
+
+                    var options = {
+                        data: dataArray1,
+                        columnDrag: true,
+                        colHeaderClasses: ["Reqasterisk"],
+                        columns: [
+                            {
+                                title: i18n.t('static.mt.selectShipment'),
+                                type: 'checkbox',
+                                width: 80
+                            },
+                            {
+                                title: i18n.t('static.supplyPlan.qatProduct'),
+                                type: 'text',
+                                readOnly: true,
+                                width: 150
+                            },
+                            {
+                                title: i18n.t('static.commit.qatshipmentId'),
+                                type: 'numeric',
+                                mask: '#,##', decimal: '.',
+                                readOnly: true,
+                                width: 80
+                            },
+                            {
+                                title: i18n.t('static.manualTagging.procOrderNo'),
+                                type: 'text',
+                                readOnly: true,
+                                width: 100
+                            },
+                            {
+                                title: i18n.t('shipmentTransId'),
+                                type: 'hidden',
+                                readOnly: true,
+                                width: 0
+                            },
+                            {
+                                title: i18n.t('static.supplyPlan.mtexpectedDeliveryDate'),
+                                type: 'calendar',
+                                readOnly: true,
+                                options: { format: JEXCEL_DATE_FORMAT },
+                                width: 80
+                            },
+                            {
+                                title: i18n.t('static.supplyPlan.mtshipmentStatus'),
+                                type: 'text',
+                                readOnly: true,
+                                width: 80
+                            },
+                            {
+                                title: i18n.t('static.report.procurementAgentName'),
+                                type: 'text',
+                                readOnly: true,
+                                width: 100
+                            },
+                            {
+                                title: i18n.t('static.supplyPlan.shipmentQty'),
+                                type: 'numeric',
+                                mask: '#,##', decimal: '.',
+                                readOnly: true,
+                                width: 80
+                            },
+                            {
+                                title: i18n.t('static.common.notes'),
+                                type: 'text',
+                                readOnly: true,
+                                width: 150
+                            },
+                            {
+                                title: i18n.t('shipmentTransId'),
+                                type: 'hidden',
+                                readOnly: true,
+                                width: 0
+                            },
+                            {
+                                title: i18n.t('shipmentTransId'),
+                                type: 'hidden',
+                                readOnly: true,
+                                width: 0
+                            },
+                        ],
+                        // footers: [['Total','1','1','1','1',0,0,0,0]],
+                        editable: true,
+                        text: {
+                            showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                            show: '',
+                            entries: '',
+                        },
+                        onload: this.loadedERP1,
+                        pagination: false,
+                        search: false,
+                        columnSorting: false,
+                        tableOverflow: false,
+                        wordWrap: true,
+                        allowInsertColumn: false,
+                        allowManualInsertColumn: false,
+                        allowDeleteRow: false,
+                        tableOverflow: false,
+                        filters: false,
+                        onchange: this.changedTab1,
+
+                        // oneditionend: this.oneditionend,
+                        text: {
+                            // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                            showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                            show: '',
+                            entries: '',
+                        },
+
+                        license: JEXCEL_PRO_KEY,
+                        contextMenu: function (obj, x, y, e) {
+                            return false;
+                        }.bind(this),
+
+                    };
+                    var instance = jexcel(document.getElementById("tab1"), options);
+                    this.el = instance;
+                } else {
+                    try {
+                        this.el = jexcel(document.getElementById("tab1"), '');
+                        this.el.destroy();
+                    } catch (error) {
+
+                    }
+                }
                 let erpDataList = this.state.artmisList;
                 console.log('erpDataList****************', erpDataList)
                 let erpDataArray = [];
@@ -3464,7 +3615,7 @@ export default class ManualTagging extends Component {
                 console.log("linkedShipmentsListForTab2@@@@@@@@@@@", linkedShipmentsListForTab2)
                 console.log("manualTaggingList[j]@@@@@@@@@@@@", manualTaggingList[j])
                 data[0] = true;
-                data[1] = (linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].parentShipmentId : 0) + " (" + (!this.state.versionId.toString().includes("Local") ? manualTaggingList[j].childShipmentId : manualTaggingList[j].shipmentId) + ")";
+                data[1] = (linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].parentShipmentId + (manualTaggingList[j].parentShipmentIdArr.length > 0 ? ", " + manualTaggingList[j].parentShipmentIdArr.toString() : "") : 0) + " (" + (!this.state.versionId.toString().includes("Local") ? manualTaggingList[j].childShipmentId : manualTaggingList[j].shipmentId) + ")";
                 data[2] = !this.state.versionId.toString().includes("Local") ? manualTaggingList[j].childShipmentId : manualTaggingList[j].shipmentId
                 data[3] = (linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].roNo + " - " + linkedShipmentsListForTab2[0].roPrimeLineNo : "") + " | " + (manualTaggingList[j].orderNo + " - " + manualTaggingList[j].primeLineNo) + (linkedShipmentsListForTab2.length > 0 && linkedShipmentsListForTab2[0].knShipmentNo != "" && linkedShipmentsListForTab2[0].knShipmentNo != null ? " | " + linkedShipmentsListForTab2[0].knShipmentNo : "");
                 data[4] = manualTaggingList[j].orderNo + " | " + manualTaggingList[j].primeLineNo
@@ -3969,9 +4120,19 @@ export default class ManualTagging extends Component {
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance, 0);
     }
+
+    loadedERP1 = function (instance, cell, x, y, value) {
+        jExcelLoadedFunction(instance);
+    }
+
     loadedERP = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance, 1);
-        var asterisk = document.getElementsByClassName("resizable")[2];
+        console.log("Class List", document.getElementsByClassName("resizable"))
+        if (this.state.active1) {
+            var asterisk = document.getElementsByClassName("resizable")[4];
+        } else {
+            var asterisk = document.getElementsByClassName("resizable")[2];
+        }
         var tr = asterisk.firstChild;
         tr.children[10].classList.add('AsteriskTheadtrTd');
     }
@@ -3996,8 +4157,10 @@ export default class ManualTagging extends Component {
             ) {
                 row = this.state.outputList.filter(c => (this.el.getValueFromCoords(0, x) != 0 ? c.shipmentId == this.el.getValueFromCoords(0, x) : c.tempShipmentId == this.el.getValueFromCoords(9, x)))[0];
                 outputListAfterSearch.push(row);
+                var finalShipmentId = []
                 if (outputListAfterSearch[0].orderNo != null && outputListAfterSearch[0].orderNo != "") {
                     json = { id: outputListAfterSearch[0].orderNo, label: outputListAfterSearch[0].orderNo };
+                    finalShipmentId.push({ "shipmentId": this.el.getValueFromCoords(0, x), "tempShipmentId": this.el.getValueFromCoords(0, x) > 0 ? null : this.el.getValueFromCoords(9, x), "index": "", "qty": outputListAfterSearch[0].shipmentQty })
                 } else {
                     json = { id: '', label: '' };
                     buildJexcelRequired = false;
@@ -4010,7 +4173,9 @@ export default class ManualTagging extends Component {
                     roNoOrderNo: json,
                     table1Loader: outputListAfterSearch[0].orderNo != null && outputListAfterSearch[0].orderNo != "" ? false : true,
                     searchedValue: (outputListAfterSearch[0].orderNo != null && outputListAfterSearch[0].orderNo != "" ? outputListAfterSearch[0].orderNo : ""),
-                    selectedRowPlanningUnit: outputListAfterSearch[0].planningUnit.id
+                    selectedRowPlanningUnit: outputListAfterSearch[0].planningUnit.id,
+                    finalShipmentId: finalShipmentId,
+                    showAllShipments: false
                     // planningUnitIdUpdated: outputListAfterSearch[0].planningUnit.id
                 }, () => {
 
@@ -4510,6 +4675,14 @@ export default class ManualTagging extends Component {
         }
     }
 
+    setShowAllShipments(e) {
+        this.setState({
+            showAllShipments: e.target.checked
+        }, () => {
+            this.buildJExcelERP()
+        })
+    }
+
     render() {
         const selectRow = {
             mode: 'checkbox',
@@ -4529,13 +4702,17 @@ export default class ManualTagging extends Component {
                 var finalShipmentId = this.state.finalShipmentId;
                 // var tempShipmentId=this.state.tempShipmentId;
                 if (isSelect) {
-                    finalShipmentId.push({ "shipmentId": row.shipmentId, "tempShipmentId": row.shipmentId > 0 ? null : row.tempShipmentId, "index": rowIndex })
+                    finalShipmentId.push({ "shipmentId": row.shipmentId, "tempShipmentId": row.shipmentId > 0 ? null : row.tempShipmentId, "index": rowIndex, "qty": row.shipmentQty })
                 } else {
                     finalShipmentId = finalShipmentId.filter(c => c.index != rowIndex);
                 }
+                var qty = 0;
+                finalShipmentId.map(c => {
+                    qty += Number(c.qty)
+                })
                 console.log("Final Shipment Ids @@@@@@@@@@@@@@@", finalShipmentId)
                 this.setState({
-                    originalQty: Number(this.state.originalQty) + Number(row.shipmentQty),
+                    originalQty: qty,
                     finalShipmentId: finalShipmentId,
                     tempNotes: (row.notes != null && row.notes != "" ? row.notes : "")
                 });
@@ -5143,33 +5320,64 @@ export default class ManualTagging extends Component {
                                     </ModalHeader>
                                     <ModalBody>
                                         <div>
-                                            {!this.state.active3 && !this.state.active2 && <p><h5><b>{i18n.t('static.manualTagging.qatShipmentTitle')}</b></h5></p>}
                                             {!this.state.active3 && !this.state.active2 &&
-                                                <ToolkitProvider
-                                                    keyField="optList"
-                                                    data={this.state.outputListAfterSearch}
-                                                    columns={columns}
-                                                    search={{ searchFormatted: true }}
-                                                    hover
-                                                    filter={filterFactory()}
-                                                >
-                                                    {
-                                                        props => (
-                                                            <div className="TableCust FortablewidthMannualtaggingtable2 ">
-                                                                {/* <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
-                                                    <SearchBar {...props.searchProps} />
-                                                    <ClearSearchButton {...props.searchProps} />
-                                                </div> */}
-                                                                <BootstrapTable striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
-                                                                    // pagination={paginationFactory(options)}
-                                                                    rowEvents={{
-                                                                    }}
-                                                                    {...props.baseProps}
-                                                                />
-                                                            </div>
-                                                        )
-                                                    }
-                                                </ToolkitProvider>}
+                                                <p><h5><b>{i18n.t('static.manualTagging.qatShipmentTitle')}
+                                                    <div className={"check inline pl-lg-3"}>
+                                                        <div className="">
+                                                            <Input
+                                                                style={{ width: '16px', height: '16px', marginTop: '3px' }}
+                                                                className="form-check-input"
+                                                                type="checkbox"
+                                                                id="showAllShipments"
+                                                                name="showAllShipments"
+                                                                checked={this.state.showAllShipments}
+                                                                onClick={(e) => { this.setShowAllShipments(e); }}
+                                                            />
+                                                            <Label
+                                                                className="form-check-label pl-lg-1"
+                                                                check htmlFor="inline-radio2" style={{ fontSize: '16px' }}>
+                                                                <b>Show All Shipments</b>
+                                                                {/* <i class="fa fa-info-circle icons pl-lg-2" id="Popover5" onClick={() => this.toggle('popoverOpenArima', !this.state.popoverOpenArima)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i> */}
+                                                            </Label>
+                                                        </div>
+                                                    </div>
+                                                </b></h5>
+
+                                                    {/* // </div> */}
+                                                </p>}
+                                            {!this.state.active3 && !this.state.active2 &&
+
+                                                // <ToolkitProvider
+                                                //     keyField="optList"
+                                                //     data={this.state.outputListAfterSearch}
+                                                //     columns={columns}
+                                                //     search={{ searchFormatted: true }}
+                                                //     hover
+                                                //     filter={filterFactory()}
+                                                // >
+                                                //     {
+                                                //         props => (
+                                                //             <div className="TableCust FortablewidthMannualtaggingtable2 ">
+                                                //                 {/* <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
+                                                //     <SearchBar {...props.searchProps} />
+                                                //     <ClearSearchButton {...props.searchProps} />
+                                                // </div> */}
+                                                //                 <BootstrapTable
+                                                //                 ref={n => this.node = n}
+                                                //                 selectRow={selectRow}
+                                                //                  striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                                //                     // pagination={paginationFactory(options)}
+                                                //                     rowEvents={{
+                                                //                     }}
+                                                //                     {...props.baseProps}
+                                                //                 />
+                                                //             </div>
+                                                //         )
+                                                //     }
+                                                // </ToolkitProvider>
+                                                <div id="tab1" className={"jexcelremoveReadonlybackground"}>
+                                                </div>
+                                            }
                                             {this.state.active3 &&
                                                 <>
                                                     <div className="col-md-12">
