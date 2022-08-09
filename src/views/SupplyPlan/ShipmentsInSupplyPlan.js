@@ -3772,7 +3772,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                     userId: curUser,
                                     username: username
                                 },
-                                lastModifiedDate: curDate
+                                lastModifiedDate: curDate,
+                                parentLinkedShipmentId:null,
+                                tempParentLinkedShipmentId:null
                             }
                             if (map.get("25") != "" && map.get("25").length != 0) {
                                 var totalShipmentQty = (map.get("26"));

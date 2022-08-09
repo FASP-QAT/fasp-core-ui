@@ -1177,6 +1177,20 @@ export default class syncPage extends Component {
           shipmentData[parentShipmentIndex].lastModifiedBy.userId = curUser;
           shipmentData[parentShipmentIndex].lastModifiedBy.username = username;
           shipmentData[parentShipmentIndex].lastModifiedDate = curDate;
+
+          // Activate linked parent shipment Id
+          var linkedParentShipmentIdList = shipmentData.filter(c => linkedShipmentsListFilter[0].parentShipmentId > 0 ? (c.parentLinkedShipmentId == linkedShipmentsListFilter[0].parentShipmentId) : (c.tempParentLinkedShipmentId == linkedShipmentsListFilter[0].tempParentShipmentId));
+          for (var l = 0; l < linkedParentShipmentIdList.length; l++) {
+            var parentShipmentIndex1 = shipmentData.findIndex(c => linkedParentShipmentIdList[l].shipmentId > 0 ? c.shipmentId == linkedParentShipmentIdList[l].shipmentId : c.tempShipmentId == linkedParentShipmentIdList[l].tempShipmentId);
+            shipmentData[parentShipmentIndex1].active = true;
+            shipmentData[parentShipmentIndex1].erpFlag = false;
+            shipmentData[parentShipmentIndex1].lastModifiedBy.userId = curUser;
+            shipmentData[parentShipmentIndex1].lastModifiedBy.username = username;
+            shipmentData[parentShipmentIndex1].lastModifiedDate = curDate;
+            shipmentData[parentShipmentIndex1].parentLinkedShipmentId = null;
+            shipmentData[parentShipmentIndex1].tempParentLinkedShipmentId = null;
+
+          }
         }
       }
 
@@ -1208,7 +1222,19 @@ export default class syncPage extends Component {
           shipmentData[parentShipmentIndex].lastModifiedBy.userId = curUser;
           shipmentData[parentShipmentIndex].lastModifiedBy.username = username;
           shipmentData[parentShipmentIndex].lastModifiedDate = curDate;
+          // Activate linked parent shipment Id
+          var linkedParentShipmentIdList = shipmentData.filter(c => linkedShipmentsListFilter[0].parentShipmentId > 0 ? (c.parentLinkedShipmentId == linkedShipmentsListFilter[0].parentShipmentId) : (c.tempParentLinkedShipmentId == linkedShipmentsListFilter[0].tempParentShipmentId));
+          for (var l = 0; l < linkedParentShipmentIdList.length; l++) {
+            var parentShipmentIndex1 = shipmentData.findIndex(c => linkedParentShipmentIdList[l].shipmentId > 0 ? c.shipmentId == linkedParentShipmentIdList[l].shipmentId : c.tempShipmentId == linkedParentShipmentIdList[l].tempShipmentId);
+            shipmentData[parentShipmentIndex1].active = true;
+            shipmentData[parentShipmentIndex1].erpFlag = false;
+            shipmentData[parentShipmentIndex1].lastModifiedBy.userId = curUser;
+            shipmentData[parentShipmentIndex1].lastModifiedBy.username = username;
+            shipmentData[parentShipmentIndex1].lastModifiedDate = curDate;
+            shipmentData[parentShipmentIndex1].parentLinkedShipmentId = null;
+            shipmentData[parentShipmentIndex1].tempParentLinkedShipmentId = null;
 
+          }
         }
       }
 
@@ -2502,14 +2528,36 @@ export default class syncPage extends Component {
                                             var listFromAPIFiltered = listFromAPI.filter(c => uniqueRoNoAndRoPrimeLineNo[cd] == c.roNo + "|" + c.roPrimeLineNo);
                                             console.log("latestProgramDataShipmentLinkedFiltered@@@@@@@@@@@@@", latestProgramDataShipmentLinkedFiltered)
                                             console.log("oldProgramDataShipmentLinkedFiltered@@@@@@@@@@@@@", oldProgramDataShipmentLinkedFiltered)
+                                            var arr = [];
+                                            var arr1 = [];
+                                            var arr2 = [];
+                                            if (listFromAPIFiltered.length > 0) {
+
+                                            } else {
+                                              if (latestProgramDataShipmentLinkedFiltered.length > 0) {
+                                                arr.push(latestProgramDataShipmentLinkedFiltered[latestProgramDataShipmentLinkedFiltered.length - 1].parentShipmentId)
+                                                  (latestProgramData.shipmentList.filter(c => latestProgramDataShipmentLinkedFiltered[latestProgramDataShipmentLinkedFiltered.length - 1].parentShipmentId == 0 ? c.tempParentLinkedShipmentId == latestProgramDataShipmentLinkedFiltered[latestProgramDataShipmentLinkedFiltered.length - 1].tempParentShipmentId : c.parentLinkedShipmentId == latestProgramDataShipmentLinkedFiltered[latestProgramDataShipmentLinkedFiltered.length - 1].parentShipmentId)).map(item => {
+                                                    arr.push(item.shipmentId)
+
+                                                  })
+                                              }
+                                            }
+                                            console.log("oldProgramDataShipmentLinkedFiltered@@@@@@@@", oldProgramDataShipmentLinkedFiltered)
+                                            console.log("oldProgramData.shipmentList@@@@@@@", (oldProgramData.shipmentList.filter(c => oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length - 1].parentShipmentId == 0 ? c.tempParentLinkedShipmentId == oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length - 1].tempParentShipmentId : c.parentLinkedShipmentId == oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length - 1].parentShipmentId)))
+                                            if (oldProgramDataShipmentLinkedFiltered.length > 0) {
+                                              arr1.push(oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length - 1].parentShipmentId);
+                                              (oldProgramData.shipmentList.filter(c => oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length - 1].parentShipmentId == 0 ? c.tempParentLinkedShipmentId == oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length - 1].tempParentShipmentId : c.parentLinkedShipmentId == oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length - 1].parentShipmentId)).map(item => {
+                                                arr1.push(item.shipmentId)
+                                              })
+                                            }
                                             data[0] = uniqueRoNoAndRoPrimeLineNo[cd].split("|")[0] + " - " + uniqueRoNoAndRoPrimeLineNo[cd].split("|")[1];
                                             data[1] = uniqueRoNoAndRoPrimeLineNo[cd].split("|")[1];
                                             data[2] = oldProgramDataShipmentLinkedFiltered.length > 0 ? getLabelText(oldProgramData.label, this.state.lang) : "";
-                                            data[3] = oldProgramDataShipmentLinkedFiltered.length > 0 ? oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length - 1].parentShipmentId : "";
+                                            data[3] = oldProgramDataShipmentLinkedFiltered.length > 0 ? arr1 : "";
                                             data[4] = oldProgramDataShipmentLinkedFiltered.length > 0 ? oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length - 1].conversionFactor : "";
                                             data[5] = oldProgramDataShipmentLinkedFiltered.length > 0 ? oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length - 1].active == 1 || oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length - 1].active == true ? true : false : false;
                                             data[6] = listFromAPIFiltered.length > 0 ? getLabelText(listFromAPIFiltered[0].program.label, this.state.lang) : latestProgramDataShipmentLinkedFiltered.length > 0 ? getLabelText(latestProgramData.label, this.state.lang) : "";
-                                            data[7] = listFromAPIFiltered.length > 0 ? listFromAPIFiltered[listFromAPIFiltered.length - 1].shipmentId : latestProgramDataShipmentLinkedFiltered.length > 0 ? latestProgramDataShipmentLinkedFiltered[latestProgramDataShipmentLinkedFiltered.length - 1].parentShipmentId : "";
+                                            data[7] = listFromAPIFiltered.length > 0 ? listFromAPIFiltered[listFromAPIFiltered.length - 1].shipmentId : latestProgramDataShipmentLinkedFiltered.length > 0 ? arr : "";
                                             data[8] = listFromAPIFiltered.length > 0 ? listFromAPIFiltered[listFromAPIFiltered.length - 1].conversionFactor : latestProgramDataShipmentLinkedFiltered.length > 0 ? latestProgramDataShipmentLinkedFiltered[latestProgramDataShipmentLinkedFiltered.length - 1].conversionFactor : "";
                                             data[9] = listFromAPIFiltered.length > 0 ? listFromAPIFiltered[listFromAPIFiltered.length - 1].conversionFactor : latestProgramDataShipmentLinkedFiltered.length > 0 ? latestProgramDataShipmentLinkedFiltered[latestProgramDataShipmentLinkedFiltered.length - 1].active == 1 || latestProgramDataShipmentLinkedFiltered[latestProgramDataShipmentLinkedFiltered.length - 1].active == true ? true : false : false;
                                             data[10] = oldProgramDataShipmentLinkedFiltered.length > 0 ? oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length - 1].shipmentLinkingId : "";
