@@ -1271,7 +1271,9 @@ class usageTemplate extends Component {
                         var userId = rowData[22];
                         var curUser = AuthenticationService.getLoggedInUserId();
                         // if ((roleArray.includes('ROLE_REALM_ADMIN') && typeId != -1 && typeId != 0) || (roleArray.includes('ROLE_DATASET_ADMIN') && typeId == -1 && typeId != 0)) {
-                        if ((roleArray.includes('ROLE_DATASET_ADMIN') && ((typeId == -1 && typeId != 0) || curUser != userId))) {
+                        // if ((roleArray.includes('ROLE_DATASET_ADMIN') && ((typeId == -1 && typeId != 0) || curUser != userId))) {
+                        if ((roleArray.includes('ROLE_DATASET_ADMIN') && ((typeId == -1 && typeId != 0))) || (roleArray.includes('ROLE_REALM_ADMIN') && ((typeId == -1 && typeId != 0) || curUser != userId))) {
+
                             var cell1 = elInstance.getCell(("B").concat(parseInt(j) + 1))
                             cell1.classList.add('readonly');
                             var cell1 = elInstance.getCell(("C").concat(parseInt(j) + 1))
@@ -1410,7 +1412,9 @@ class usageTemplate extends Component {
                         var userId = rowData[22];
                         var curUser = AuthenticationService.getLoggedInUserId();
                         // if ((roleArray.includes('ROLE_REALM_ADMIN') && typeId != -1 && typeId != 0) || (roleArray.includes('ROLE_DATASET_ADMIN') && typeId == -1 && typeId != 0)) {
-                        if ((roleArray.includes('ROLE_DATASET_ADMIN') && ((typeId == -1 && typeId != 0) || curUser != userId))) {
+                        // if ((roleArray.includes('ROLE_DATASET_ADMIN') && ((typeId == -1 && typeId != 0) || curUser != userId))) {
+                        if ((roleArray.includes('ROLE_DATASET_ADMIN') && ((typeId == -1 && typeId != 0))) || (roleArray.includes('ROLE_REALM_ADMIN') && ((typeId == -1 && typeId != 0) || curUser != userId))) {
+
                             var cell1 = elInstance.getCell(("B").concat(parseInt(j) + 1))
                             cell1.classList.add('readonly');
                             var cell1 = elInstance.getCell(("C").concat(parseInt(j) + 1))
@@ -2732,8 +2736,10 @@ class usageTemplate extends Component {
             var userId = rowData[22];
 
             // if ((roleArray.includes('ROLE_REALM_ADMIN') && typeId != -1 && typeId != 0) || (roleArray.includes('ROLE_DATASET_ADMIN') && typeId == -1 && typeId != 0)) {
-            if ((roleArray.includes('ROLE_DATASET_ADMIN') && ((typeId == -1 && typeId != 0) || userId != ""))) {
-                console.log("roleArrayinsideIf--------->onchangepage", roleArray, "---", userId);
+            // if ((roleArray.includes('ROLE_DATASET_ADMIN') && ((typeId == -1 && typeId != 0) || (roleArray.includes('ROLE_REALM_ADMIN') && typeId != -1 && typeId != 0)))) {
+            if ((roleArray.includes('ROLE_DATASET_ADMIN') && (typeId == -1 && typeId != 0)) || (roleArray.includes('ROLE_REALM_ADMIN') && (typeId == -1 && typeId != 0 || userId != ""))) {
+
+                // console.log("roleArrayinsideIf--------->onchangepage", roleArray, "---", userId);
 
                 var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
                 cell1.classList.add('readonly');
@@ -2940,7 +2946,9 @@ class usageTemplate extends Component {
             var userId = rowData[22];
             var curUser = AuthenticationService.getLoggedInUserId();
             // if ((roleArray.includes('ROLE_REALM_ADMIN') && typeId != -1 && typeId != 0) || (roleArray.includes('ROLE_DATASET_ADMIN') && typeId == -1 && typeId != 0)) {
-            if ((roleArray.includes('ROLE_DATASET_ADMIN') && ((typeId == -1 && typeId != 0) || curUser != userId))) {
+            // if ((roleArray.includes('ROLE_DATASET_ADMIN') && ((typeId == -1 && typeId != 0) || curUser != userId))) {
+            if ((roleArray.includes('ROLE_DATASET_ADMIN') && ((typeId == -1 && typeId != 0))) || (roleArray.includes('ROLE_REALM_ADMIN') && ((typeId == -1 && typeId != 0) || curUser != userId))) {
+
                 // console.log("roleArrayinsideIf--------->2", elInstance);
 
                 var cell1 = elInstance.getCell(("B").concat(parseInt(j) + 1))
@@ -4902,7 +4910,7 @@ class usageTemplate extends Component {
                                 {this.state.isChanged1 &&
                                     <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                 }
-                                <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>
+                                <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> {i18n.t('static.common.addRow')}</Button>
                                 &nbsp;
                             </FormGroup>
                         }
