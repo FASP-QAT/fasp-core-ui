@@ -19,7 +19,7 @@ import paginationFactory from 'react-bootstrap-table2-paginator'
 import BootstrapTable from 'react-bootstrap-table-next';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { SECRET_KEY, DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, INDEXED_DB_VERSION, INDEXED_DB_NAME } from '../../Constants.js';
+import { SECRET_KEY, DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY, SPV_REPORT_DATEPICKER_START_MONTH, INDEXED_DB_VERSION, INDEXED_DB_NAME } from '../../Constants.js';
 import jexcel from 'jexcel-pro';
 import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
@@ -79,9 +79,9 @@ class SupplyPlanVersionAndReview extends Component {
     constructor(props) {
         super(props);
         var dt = new Date();
-        dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
+        dt.setMonth(dt.getMonth() - SPV_REPORT_DATEPICKER_START_MONTH);
         var dt1 = new Date();
-        dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
+        dt1.setMonth(dt1.getMonth());
         this.state = {
             loading: true,
             matricsList: [],
@@ -146,7 +146,7 @@ class SupplyPlanVersionAndReview extends Component {
     buildJexcel() {
 
         let matricsList = this.state.matricsList;
-        console.log("matricsList---->", matricsList);
+        // console.log("matricsList---->", matricsList);
         let matricsArray = [];
         let count = 0;
         for (var j = 0; j < matricsList.length; j++) {
@@ -180,7 +180,7 @@ class SupplyPlanVersionAndReview extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [100, 70, 100, 100, 120, 100, 100, 120, 100],
+            colWidths: [100, 70, 100, 100, 120, 100, 100, 120, 180],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
@@ -571,7 +571,7 @@ class SupplyPlanVersionAndReview extends Component {
             this.setState({
                 versionTypeList: listArray, loading: false
             }, () => {
-                document.getElementById("versionTypeId").value = 2;
+                // document.getElementById("versionTypeId").value = 2;
             })
         }).catch(
             error => {
@@ -717,6 +717,11 @@ class SupplyPlanVersionAndReview extends Component {
                     if (versionStatusId == 1) {
                         result = result.filter(c => c.versionType.id != 1);
                     }
+                    result.sort((a, b) => {
+                        var itemLabelA = a.lastModifiedDate;
+                        var itemLabelB = b.lastModifiedDate
+                        return itemLabelA < itemLabelB ? 1 : -1;
+                    });
                     this.setState({
                         matricsList: result,
                         message: ''
@@ -1005,7 +1010,7 @@ class SupplyPlanVersionAndReview extends Component {
         let statusList = statuses.length > 0
             && statuses.map((item, i) => {
                 return (
-                    <option key={i} value={item.id} selected={item.id == 1 ? 'selected' : ''}>
+                    <option key={i} value={item.id}>
                         {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
