@@ -618,6 +618,14 @@ export default class CommitTreeComponent extends React.Component {
                                             } else if (node.payload.nodeType.id == 5) {
                                                 node.payload.nodeDataMap[scenarioList[ndm].id][0].fuNode = null;
                                             }
+                                            var nodeDataModelingList=node.payload.nodeDataMap[scenarioList[ndm].id][0].nodeDataModelingList;
+                                            var nodeDataModelingListUpdated=[];
+                                            for(var nml=0;nml<nodeDataModelingList.length;nml++){
+                                                if(nodeDataModelingList[nml].dataValue!=="" && nodeDataModelingList[nml].dataValue!=="NaN" && nodeDataModelingList[nml].dataValue!==undefined && nodeDataModelingList[nml].increaseDecrease!==""){
+                                                    nodeDataModelingListUpdated.push(nodeDataModelingList[nml]);
+                                                }
+                                            }
+                                            node.payload.nodeDataMap[scenarioList[ndm].id][0].nodeDataModelingList=nodeDataModelingListUpdated;
                                             console.log("commit*** node after---", node);
                                             var findNodeIndex = completeFlatList.findIndex(n => n.id == node.id);
                                             console.log("commit*** findNodeIndex1---", findNodeIndex);
