@@ -49,7 +49,7 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 import 'chartjs-plugin-annotation';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import MultiSelect from "react-multi-select-component";
+import {MultiSelect} from "react-multi-select-component";
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 import jexcel from 'jexcel-pro';
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
@@ -208,6 +208,15 @@ export default class ImportFromQATSupplyPlan extends Component {
                 <Row>
                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                         <Card>
+                        <div className="card-header-actions">
+            <div className="Card-header-reporticon">
+              <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
+              <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span>
+              <span className="compareAndSelect-larrowText"> {i18n.t('static.common.backTo')} <a href="/#/planningUnitSetting/listPlanningUnitSetting" className="supplyplanformulas">{i18n.t('static.updatePlanningUnit.updatePlanningUnit')}</a></span>
+              <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')} <a href="/#/dataentry/consumptionDataEntryAndAdjustment" className="supplyplanformulas">{i18n.t('static.dashboard.dataEntryAndAdjustments')}</a></span><br />
+             
+            </div>
+          </div>
                             <CardBody>
                                 <ProgressBar
                                     percent={this.state.progressPer}

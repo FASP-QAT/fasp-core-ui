@@ -65,6 +65,38 @@ class ManualTaggingSerice {
         });
     }
 
+    getNotLinkedQatShipments(programId, versionId, json) {
+        console.log('Json@@@@@@@@@', json)
+        return axios.post(`${API_URL}/api/erpLinking/notLinkedQatShipments/programId/${programId}/versionId/${versionId}`, json, {
+        });
+    }
+
+    autocompleteDataOrderNo(roNo, programId, erpPlanningUnit) {
+        return axios.get(`${API_URL}/api/erpLinking/autoCompleteOrder/${programId}/${erpPlanningUnit}/${roNo}`, {
+        });
+    }
+
+    autocompletePlanningUnit(planningUnitId, term) {
+        return axios.get(`${API_URL}/api/erpLinking/autoCompletePu/${planningUnitId}/${term}`, {
+        });
+    }
+
+    getOrderDetails(json) {
+        return axios.post(`${API_URL}/api/erpLinking/notLinkedErpShipments/tab1`, json, {
+        });
+    }
+
+    getShipmentListForTab3(json) {
+        return axios.post(`${API_URL}/api/erpLinking/notLinkedErpShipments/tab3`, json, {
+        });
+    }
+
+    getLinkedQatShipments(programId, versionId, json) {
+        console.log('Json@@@@@@@@@', json)
+        return axios.post(`${API_URL}/api/erpLinking/linkedShipments/programId/${programId}/versionId/${versionId}`, json, {
+        });
+    }
+
 }
 
 export default new ManualTaggingSerice()

@@ -210,17 +210,17 @@ export default class PlanningUnitSetting extends Component {
                     if (isNaN(parseInt(value))) {//string value check
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, 'String value not allowed');
+                        this.el.setComments(col, i18n.t('static.planningUnitSetting.stringNotAllowed'));
                         valid = false;
                     } else if (!Number.isInteger(Number(value))) {//decimal value check
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, 'Decimal value not allowed');
+                        this.el.setComments(col, i18n.t('static.planningUnitSetting.decimalNotAllowed'));
                         valid = false;
                     } else if (!(reg.test(value))) {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, 'Please enter 10 digit whole number');
+                        this.el.setComments(col, i18n.t('static.planningUnitSetting.10digitWholeNumber'));
                         valid = false;
                     } else {
                         this.el.setStyle(col, "background-color", "transparent");
@@ -254,17 +254,17 @@ export default class PlanningUnitSetting extends Component {
                     if (isNaN(parseInt(value))) {//string value check
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, 'String value not allowed');
+                        this.el.setComments(col, i18n.t('static.planningUnitSetting.stringNotAllowed'));
                         valid = false;
                     } else if (!Number.isInteger(Number(value))) {//decimal value check
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, 'Decimal value not allowed');
+                        this.el.setComments(col, i18n.t('static.planningUnitSetting.decimalNotAllowed'));
                         valid = false;
                     } else if (!(reg.test(value))) {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, 'Please enter 10 digit whole number');
+                        this.el.setComments(col, i18n.t('static.planningUnitSetting.10digitWholeNumber'));
                         valid = false;
                     } else {
                         this.el.setStyle(col, "background-color", "transparent");
@@ -288,22 +288,22 @@ export default class PlanningUnitSetting extends Component {
                     if (isNaN(parseInt(value))) {//string value check
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, 'String value not allowed');
+                        this.el.setComments(col, i18n.t('static.planningUnitSetting.stringNotAllowed'));
                         valid = false;
                     } else if (!Number.isInteger(Number(value))) {//decimal value check
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, 'Decimal value not allowed');
+                        this.el.setComments(col, i18n.t('static.planningUnitSetting.decimalNotAllowed'));
                         valid = false;
                     } else if (!(reg.test(value))) {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, 'Please enter 10 digit whole number');
+                        this.el.setComments(col, i18n.t('static.planningUnitSetting.10digitWholeNumber'));
                         valid = false;
                     } else if (parseInt(value) > 99) {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, 'Maximum 99 months are allowed');
+                        this.el.setComments(col, i18n.t('static.planningUnitSetting.max99MonthAllowed'));
                         valid = false;
                     } else {
                         this.el.setStyle(col, "background-color", "transparent");
@@ -341,17 +341,17 @@ export default class PlanningUnitSetting extends Component {
                     if (isNaN(parseInt(value))) {//string value check
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, 'String value not allowed');
+                        this.el.setComments(col, i18n.t('static.planningUnitSetting.stringNotAllowed'));
                         valid = false;
                     } else if (Number(value) < 0) {//negative value check
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, 'Negative value not allowed');
+                        this.el.setComments(col, i18n.t('static.planningUnitSetting.negativeValueNotAllowed'));
                         valid = false;
                     } else if (!(reg.test(value))) {//regex check
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, 'Max 10 digit number and 4 digits after decimal are allowed.');
+                        this.el.setComments(col, i18n.t('static.planningUnitSetting.max10Digit4AfterDecimal'));
                         valid = false;
                     } else {
                         this.el.setStyle(col, "background-color", "transparent");
@@ -660,9 +660,11 @@ export default class PlanningUnitSetting extends Component {
             if (z != data[i].y) {
                 console.log("-----------------onPaste---------------------2");
                 var index = (instance.jexcel).getValue(`N${parseInt(data[i].y) + 1}`, true);
-                if (index == "" || index == null || index == undefined) {
+                if (index === "" || index == null || index == undefined) {
                     console.log("-----------------onPaste---------------------3");
                     // (instance.jexcel).setValueFromCoords(8, data[i].y, true, true);
+                    (instance.jexcel).setValueFromCoords(2, data[i].y, true, true);
+                    (instance.jexcel).setValueFromCoords(3, data[i].y, true, true);
                     (instance.jexcel).setValueFromCoords(9, data[i].y, true, true);
                     (instance.jexcel).setValueFromCoords(10, data[i].y, 1, true);
                     (instance.jexcel).setValueFromCoords(11, data[i].y, 1, true);
@@ -670,6 +672,7 @@ export default class PlanningUnitSetting extends Component {
                     (instance.jexcel).setValueFromCoords(13, data[i].y, 0, true);
                     (instance.jexcel).setValueFromCoords(14, data[i].y, true, true);
                     // (instance.jexcel).setValueFromCoords(15, data[i].y, "", true);
+                    (instance.jexcel).setValueFromCoords(16, data[i].y, true, true);
                     z = data[i].y;
                 }
             }
@@ -696,15 +699,22 @@ export default class PlanningUnitSetting extends Component {
             if (value != -1 && value !== null && value !== '') {
                 let planningUnitId = this.el.getValueFromCoords(1, y);
                 // let planningUnitId = this.el.getValueFromCoords(7, y);
-                let procurementAgentPlanningUnitList = this.state.responsePa;
-                let tempPaList = procurementAgentPlanningUnitList[planningUnitId];
-                console.log("mylist--------->1111", procurementAgentPlanningUnitList);
+
+                // let procurementAgentPlanningUnitList = this.state.responsePa;
+                // let tempPaList = procurementAgentPlanningUnitList[planningUnitId];
+                // console.log("mylist--------->1111", procurementAgentPlanningUnitList);
+
+                let procurementAgentPlanningUnitList = this.state.originalPlanningUnitList;
+                let tempPaList = procurementAgentPlanningUnitList.filter(c => c.id == planningUnitId)[0];
+
+
                 console.log("mylist--------->1112", planningUnitId);
 
-                let obj = tempPaList.filter(c => c.procurementAgent.id == value)[0];
+                // let obj = tempPaList.filter(c => c.procurementAgent.id == value)[0];
+                let obj = tempPaList.procurementAgentPriceList.filter(c => c.id == value)[0];
                 console.log("mylist--------->1113", obj);
                 if (typeof obj != 'undefined') {
-                    this.el.setValueFromCoords(8, y, obj.catalogPrice, true);
+                    this.el.setValueFromCoords(8, y, obj.price, true);
                 } else {
                     // this.el.setValueFromCoords(8, y, '', true);
                     let q = '';
@@ -800,15 +810,15 @@ export default class PlanningUnitSetting extends Component {
                 if (isNaN(parseInt(value))) {//string value check
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, 'String value not allowed')
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.stringNotAllowed'))
                 } else if (!Number.isInteger(Number(value))) {//decimal value check
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, 'Decimal value not allowed')
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.decimalNotAllowed'))
                 } else if (!(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, 'Please enter 10 digit whole number')
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.10digitWholeNumber'))
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
@@ -835,15 +845,15 @@ export default class PlanningUnitSetting extends Component {
                 if (isNaN(parseInt(value))) {//string value check
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, 'String value not allowed')
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.stringNotAllowed'))
                 } else if (!Number.isInteger(Number(value))) {//decimal value check
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, 'Decimal value not allowed')
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.decimalNotAllowed'))
                 } else if (!(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, 'Please enter 10 digit whole number')
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.10digitWholeNumber'))
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
@@ -870,19 +880,19 @@ export default class PlanningUnitSetting extends Component {
                 if (isNaN(parseInt(value))) {//string value check
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, 'String value not allowed')
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.stringNotAllowed'))
                 } else if (!Number.isInteger(Number(value))) {//decimal value check
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, 'Decimal value not allowed')
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.decimalNotAllowed'))
                 } else if (!(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, 'Please enter 10 digit whole number')
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.10digitWholeNumber'))
                 } else if (parseInt(value) > 99) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, 'Maximum 99 months are allowed');
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.max99MonthAllowed'));
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
@@ -933,15 +943,15 @@ export default class PlanningUnitSetting extends Component {
                 if (isNaN(parseInt(value))) {//string value check
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, 'String value not allowed')
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.stringNotAllowed'))
                 } else if (Number(value) < 0) {//negative value check
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, 'Negative value not allowed')
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.negativeValueNotAllowed'))
                 } else if (!(reg.test(value))) {//regex check
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, 'Max 10 digit number and 4 digits after decimal are allowed.')
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.max10Digit4AfterDecimal'))
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
@@ -953,6 +963,25 @@ export default class PlanningUnitSetting extends Component {
         this.setState({
             isChanged1: true,
         });
+
+        if (x == 11) {
+            console.log("Value@@@@@@@@@@@@@", value)
+            //left align
+            this.el.setStyle(`A${parseInt(y) + 1}`, 'text-align', 'left');
+            this.el.setStyle(`B${parseInt(y) + 1}`, 'text-align', 'left');
+
+            if (value == 1 || value == "") {
+                var cell = this.el.getCell(("B").concat(parseInt(y) + 1))
+                cell.classList.remove('readonly');
+                var cell = this.el.getCell(("A").concat(parseInt(y) + 1))
+                cell.classList.remove('readonly');
+            } else {
+                var cell = this.el.getCell(("B").concat(parseInt(y) + 1))
+                cell.classList.add('readonly');
+                var cell = this.el.getCell(("A").concat(parseInt(y) + 1))
+                cell.classList.add('readonly');
+            }
+        }
 
     }
 
@@ -1268,104 +1297,181 @@ export default class PlanningUnitSetting extends Component {
     }
 
     procurementAgentList() {
-        ProcurementAgentService.getProcurementAgentListAll()
-            .then(response => {
-                if (response.status == 200) {
+        // ProcurementAgentService.getProcurementAgentListAll()
+        //     .then(response => {
+        //         if (response.status == 200) {
 
-                    var listArray = response.data;
-                    listArray.sort((a, b) => {
-                        var itemLabelA = (a.procurementAgentCode).toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = (b.procurementAgentCode).toUpperCase(); // ignore upper and lowercase                   
-                        return itemLabelA > itemLabelB ? 1 : -1;
-                    });
+        //             var listArray = response.data;
+        //             listArray.sort((a, b) => {
+        //                 var itemLabelA = (a.procurementAgentCode).toUpperCase(); // ignore upper and lowercase
+        //                 var itemLabelB = (b.procurementAgentCode).toUpperCase(); // ignore upper and lowercase                   
+        //                 return itemLabelA > itemLabelB ? 1 : -1;
+        //             });
 
-                    let tempList = [];
+        //             let tempList = [];
 
-                    if (listArray.length > 0) {
-                        for (var i = 0; i < listArray.length; i++) {
-                            var paJson = {
-                                // name: getLabelText(listArray[i].label, this.state.lang),
-                                name: listArray[i].procurementAgentCode,
-                                id: parseInt(listArray[i].procurementAgentId),
-                                active: listArray[i].active,
-                                code: listArray[i].procurementAgentCode,
-                                label: listArray[i].label
-                            }
-                            tempList[i] = paJson
+        //             if (listArray.length > 0) {
+        //                 for (var i = 0; i < listArray.length; i++) {
+        //                     var paJson = {
+        //                         // name: getLabelText(listArray[i].label, this.state.lang),
+        //                         name: listArray[i].procurementAgentCode,
+        //                         id: parseInt(listArray[i].procurementAgentId),
+        //                         active: listArray[i].active,
+        //                         code: listArray[i].procurementAgentCode,
+        //                         label: listArray[i].label
+        //                     }
+        //                     tempList[i] = paJson
+        //                 }
+        //             }
+
+        //             tempList.unshift({
+        //                 name: 'CUSTOM',
+        //                 id: -1,
+        //                 active: true,
+        //                 code: 'CUSTOM',
+        //                 label: {}
+        //             });
+
+
+        //             this.setState({
+        //                 allProcurementAgentList: tempList,
+        //                 // loading: false
+        //             },
+        //                 () => {
+        //                     console.log("List------->pa", this.state.allProcurementAgentList);
+        //                     // if (this.state.datasetList.length == 1) {
+        //                     //     this.setProgramId();
+        //                     // }
+        //                     this.setProgramId();
+        //                     // this.buildJExcel();
+        //                 })
+        //         } else {
+        //             this.setState({
+        //                 message: response.data.messageCode, loading: false
+        //             },
+        //                 () => {
+        //                     this.hideSecondComponent();
+        //                 })
+        //         }
+
+        //     })
+        //     .catch(
+        //         error => {
+        //             if (error.message === "Network Error") {
+        //                 this.setState({
+        //                     message: 'static.unkownError',
+        //                     loading: false
+        //                 });
+        //             } else {
+        //                 switch (error.response ? error.response.status : "") {
+
+        //                     case 401:
+        //                         this.props.history.push(`/login/static.message.sessionExpired`)
+        //                         break;
+        //                     case 403:
+        //                         this.props.history.push(`/accessDenied`)
+        //                         break;
+        //                     case 500:
+        //                     case 404:
+        //                     case 406:
+        //                         this.setState({
+        //                             message: error.response.data.messageCode,
+        //                             loading: false
+        //                         });
+        //                         break;
+        //                     case 412:
+        //                         this.setState({
+        //                             message: error.response.data.messageCode,
+        //                             loading: false
+        //                         });
+        //                         break;
+        //                     default:
+        //                         this.setState({
+        //                             message: 'static.unkownError',
+        //                             loading: false
+        //                         });
+        //                         break;
+        //                 }
+        //             }
+        //         }
+        //     );
+
+
+        const lan = 'en';
+        var db1;
+        var storeOS;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var procurementAgentTransaction = db1.transaction(['procurementAgent'], 'readwrite');
+            var procurementAgentOs = procurementAgentTransaction.objectStore('procurementAgent');
+            var procurementAgentRequest = procurementAgentOs.getAll();
+            var planningList = []
+            procurementAgentRequest.onerror = function (event) {
+                // Handle errors!
+                this.setState({
+                    message: 'unknown error occured', loading: false
+                },
+                    () => {
+                        this.hideSecondComponent();
+                    })
+            };
+            procurementAgentRequest.onsuccess = function (e) {
+                var myResult = [];
+                myResult = procurementAgentRequest.result;
+
+                console.log("myResult----------->", myResult);
+
+
+                var listArray = myResult;
+                listArray.sort((a, b) => {
+                    var itemLabelA = (a.procurementAgentCode).toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = (b.procurementAgentCode).toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
+
+                let tempList = [];
+
+                if (listArray.length > 0) {
+                    for (var i = 0; i < listArray.length; i++) {
+                        var paJson = {
+                            // name: getLabelText(listArray[i].label, this.state.lang),
+                            name: listArray[i].procurementAgentCode,
+                            id: parseInt(listArray[i].procurementAgentId),
+                            active: listArray[i].active,
+                            code: listArray[i].procurementAgentCode,
+                            label: listArray[i].label
                         }
+                        tempList[i] = paJson
                     }
-
-                    tempList.unshift({
-                        name: 'CUSTOM',
-                        id: -1,
-                        active: true,
-                        code: 'CUSTOM',
-                        label: {}
-                    });
-
-
-                    this.setState({
-                        allProcurementAgentList: tempList,
-                        // loading: false
-                    },
-                        () => {
-                            console.log("List------->pa", this.state.allProcurementAgentList);
-                            // if (this.state.datasetList.length == 1) {
-                            //     this.setProgramId();
-                            // }
-                            this.setProgramId();
-                            // this.buildJExcel();
-                        })
-                } else {
-                    this.setState({
-                        message: response.data.messageCode, loading: false
-                    },
-                        () => {
-                            this.hideSecondComponent();
-                        })
                 }
 
-            })
-            .catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({
-                            message: 'static.unkownError',
-                            loading: false
-                        });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
+                tempList.unshift({
+                    name: 'CUSTOM',
+                    id: -1,
+                    active: true,
+                    code: 'CUSTOM',
+                    label: {}
+                });
 
-                            case 401:
-                                this.props.history.push(`/login/static.message.sessionExpired`)
-                                break;
-                            case 403:
-                                this.props.history.push(`/accessDenied`)
-                                break;
-                            case 500:
-                            case 404:
-                            case 406:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            case 412:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            default:
-                                this.setState({
-                                    message: 'static.unkownError',
-                                    loading: false
-                                });
-                                break;
-                        }
-                    }
-                }
-            );
+
+                this.setState({
+                    allProcurementAgentList: tempList,
+                    // loading: false
+                },
+                    () => {
+                        console.log("List------->pa", this.state.allProcurementAgentList);
+                        // if (this.state.datasetList.length == 1) {
+                        //     this.setProgramId();
+                        // }
+                        // this.setProgramId();
+                        this.productCategoryList();
+                        // this.buildJExcel();
+                    })
+
+            }.bind(this);
+        }.bind(this)
     }
 
 
@@ -1453,7 +1559,8 @@ export default class PlanningUnitSetting extends Component {
                         datasetId: (datasetList.filter(c => c.programId == localStorage.getItem("sesForecastProgramIdReport") && c.programVersion == localStorage.getItem("sesForecastVersionIdReport")).length > 0 ? datasetList.filter(c => c.programId == localStorage.getItem("sesForecastProgramIdReport") && c.programVersion == localStorage.getItem("sesForecastVersionIdReport"))[0].id : ''),
                     }, () => {
                         // this.planningUnitList();
-                        this.tracerCategoryList();
+                        // this.tracerCategoryList();
+                        this.procurementAgentList();
                     })
                 } else {
                     this.setState({
@@ -1464,7 +1571,8 @@ export default class PlanningUnitSetting extends Component {
                         datasetId: (datasetList.length == 1 ? datasetList[0].id : ''),
                     }, () => {
                         // this.planningUnitList();
-                        this.tracerCategoryList();
+                        // this.tracerCategoryList();
+                        this.procurementAgentList();
                     })
                 }
 
@@ -1506,7 +1614,8 @@ export default class PlanningUnitSetting extends Component {
             // console.log("tracerCategoryArray----------->3", tracerCategoryArray3);
 
             // PlanningUnitService.getPlanningUnitByRealmId(AuthenticationService.getRealmId())
-            PlanningUnitService.getActivePlanningUnitList()
+            // PlanningUnitService.getActivePlanningUnitList()
+            PlanningUnitService.getPlanningUnitForProductCategoryAndProgram(-1, programId)
                 .then(response => {
                     console.log("RESP----->pu", response.data);
 
@@ -1521,10 +1630,16 @@ export default class PlanningUnitSetting extends Component {
                     if (listArray.length > 0) {
                         for (var i = 0; i < listArray.length; i++) {
                             var paJson = {
-                                name: getLabelText(listArray[i].label, this.state.lang) + ' | ' + parseInt(listArray[i].planningUnitId),
-                                id: parseInt(listArray[i].planningUnitId),
-                                active: listArray[i].active,
-                                forecastingUnit: listArray[i].forecastingUnit,
+                                // name: getLabelText(listArray[i].label, this.state.lang) + ' | ' + parseInt(listArray[i].planningUnitId),
+                                // id: parseInt(listArray[i].planningUnitId),
+                                // active: listArray[i].active,
+                                // forecastingUnit: listArray[i].forecastingUnit,
+                                // label: listArray[i].label
+
+                                name: getLabelText(listArray[i].label, this.state.lang) + ' | ' + parseInt(listArray[i].id),
+                                id: parseInt(listArray[i].id),
+                                // active: listArray[i].active,
+                                // forecastingUnit: listArray[i].forecastingUnit,
                                 label: listArray[i].label
                             }
                             tempList[i] = paJson
@@ -1535,7 +1650,7 @@ export default class PlanningUnitSetting extends Component {
                         originalPlanningUnitList: response.data,
                         planningUnitList: response.data,
                     }, () => {
-                        console.log("List------->pu", this.state.allPlanningUnitList)
+                        console.log("List------->pu123", this.state.allPlanningUnitList.filter(c => c.id == 915));
 
                         let forecastStartDate = selectedForecastProgram.forecastStartDate;
                         let forecastStopDate = selectedForecastProgram.forecastStopDate;
@@ -1565,8 +1680,8 @@ export default class PlanningUnitSetting extends Component {
                                 // console.log("d----------->1", this.state.startDateDisplay);
                                 // console.log("d----------->2", this.state.endDateDisplay);
                                 // console.log("d----------->3", this.state.beforeEndDateDisplay);
-                                this.productCategoryList();
-                                // this.filterData();
+                                // this.productCategoryList();
+                                this.filterData();
                             })
                     });
                 }).catch(
@@ -1641,21 +1756,144 @@ export default class PlanningUnitSetting extends Component {
     }
 
     productCategoryList() {
-        ProductCategoryServcie.getProductCategoryListByRealmId(AuthenticationService.getRealmId()).then(response => {
-            console.log("RESP----->1ProductCategoryServcie", response.data);
-            var productCategoryListNew = [];
 
-            // var listArray = response.data;
-            // listArray.sort((a, b) => {
-            //     var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-            //     var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
-            //     return itemLabelA > itemLabelB ? 1 : -1;
-            // });
+        // ProductCategoryServcie.getProductCategoryListByRealmId(AuthenticationService.getRealmId()).then(response => {
+        //     console.log("RESP----->1ProductCategoryServcie", response.data);
+        //     var productCategoryListNew = [];
 
-            if (response.status == 200) {
-                console.log("productCategory response----->", response.data);
-                for (var k = 0; k < (response.data).length; k++) {
-                    var spaceCount = response.data[k].sortOrder.split(".").length;
+        //     // var listArray = response.data;
+        //     // listArray.sort((a, b) => {
+        //     //     var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+        //     //     var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+        //     //     return itemLabelA > itemLabelB ? 1 : -1;
+        //     // });
+
+        //     if (response.status == 200) {
+        //         console.log("productCategory response----->", response.data);
+        //         for (var k = 0; k < (response.data).length; k++) {
+        //             var spaceCount = response.data[k].sortOrder.split(".").length;
+        //             console.log("spaceCOunt--->", spaceCount);
+        //             var indendent = "";
+        //             for (var p = 1; p <= spaceCount - 1; p++) {
+        //                 if (p == 1) {
+        //                     indendent = indendent.concat("|_");
+        //                 } else {
+        //                     indendent = indendent.concat("_");
+        //                 }
+        //             }
+        //             console.log("ind", indendent);
+        //             console.log("indendent.concat(response.data[k].payload.label.label_en)-->", indendent.concat(response.data[k].payload.label.label_en));
+
+        //             var productCategoryJson = {};
+        //             if (response.data[k].payload.productCategoryId == 0) {
+        //                 productCategoryJson = {
+        //                     name: (response.data[k].payload.label.label_en),
+        //                     id: -1
+        //                 }
+        //             } else {
+        //                 productCategoryJson = {
+        //                     name: (response.data[k].payload.label.label_en),
+        //                     id: response.data[k].payload.productCategoryId
+        //                 }
+        //             }
+
+        //             productCategoryListNew.push(productCategoryJson);
+
+        //         }
+        //         console.log("constant product category list====>", productCategoryListNew);
+        //         this.setState({
+        //             productCategoryList: response.data,
+        //             productCategoryListNew: productCategoryListNew
+        //         }, () => {
+        //             this.filterData();
+        //         });
+
+        //     }
+
+        // }).catch(
+        //     error => {
+        //         if (error.message === "Network Error") {
+        //             this.setState({
+        //                 message: 'static.unkownError',
+        //                 loading: false
+        //             });
+        //         } else {
+        //             switch (error.response ? error.response.status : "") {
+
+        //                 case 401:
+        //                     this.props.history.push(`/login/static.message.sessionExpired`)
+        //                     break;
+        //                 case 403:
+        //                     this.props.history.push(`/accessDenied`)
+        //                     break;
+        //                 case 500:
+        //                 case 404:
+        //                 case 406:
+        //                     this.setState({
+        //                         message: error.response.data.messageCode,
+        //                         loading: false
+        //                     });
+        //                     break;
+        //                 case 412:
+        //                     this.setState({
+        //                         message: error.response.data.messageCode,
+        //                         loading: false
+        //                     });
+        //                     break;
+        //                 default:
+        //                     this.setState({
+        //                         message: 'static.unkownError',
+        //                         loading: false
+        //                     });
+        //                     break;
+        //             }
+        //         }
+        //     }
+        // );
+
+
+
+        //check
+        const lan = 'en';
+        var db1;
+        var storeOS;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var productCategoryTransaction = db1.transaction(['productCategory'], 'readwrite');
+            var productCategoryOs = productCategoryTransaction.objectStore('productCategory');
+            var productCategoryRequest = productCategoryOs.getAll();
+            var planningList = []
+            productCategoryRequest.onerror = function (event) {
+                // Handle errors!
+                this.setState({
+                    message: 'unknown error occured', loading: false
+                },
+                    () => {
+                        this.hideSecondComponent();
+                    })
+            };
+            productCategoryRequest.onsuccess = function (e) {
+                var myResult = [];
+                myResult = productCategoryRequest.result;
+
+                console.log("myResult----------->123", myResult);
+
+                myResult = myResult.filter(c => c.payload.active == true || c.payload.realm.id == 0);
+
+                var productCategoryListNew = [];
+
+                // var listArray = myResult;
+                // listArray.sort((a, b) => {
+                //     var itemLabelA = getLabelText(a.payload.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                //     var itemLabelB = getLabelText(b.payload.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                //     return itemLabelA > itemLabelB ? 1 : -1;
+                // });
+
+                console.log("productCategory response----->", myResult);
+                for (var k = 0; k < (myResult).length; k++) {
+                    var spaceCount = myResult[k].sortOrder.split(".").length;
                     console.log("spaceCOunt--->", spaceCount);
                     var indendent = "";
                     for (var p = 1; p <= spaceCount - 1; p++) {
@@ -1666,74 +1904,50 @@ export default class PlanningUnitSetting extends Component {
                         }
                     }
                     console.log("ind", indendent);
-                    console.log("indendent.concat(response.data[k].payload.label.label_en)-->", indendent.concat(response.data[k].payload.label.label_en));
+                    console.log("indendent.concat(response.data[k].payload.label.label_en)-->", indendent.concat(myResult[k].payload.label.label_en));
 
                     var productCategoryJson = {};
-                    if (response.data[k].payload.productCategoryId == 0) {
+                    if (myResult[k].payload.productCategoryId == 0) {
                         productCategoryJson = {
-                            name: (response.data[k].payload.label.label_en),
+                            name: (myResult[k].payload.label.label_en),
                             id: -1
                         }
                     } else {
                         productCategoryJson = {
-                            name: (response.data[k].payload.label.label_en),
-                            id: response.data[k].payload.productCategoryId
+                            name: (myResult[k].payload.label.label_en),
+                            id: myResult[k].payload.productCategoryId
                         }
                     }
 
                     productCategoryListNew.push(productCategoryJson);
 
                 }
-                console.log("constant product category list====>", productCategoryListNew);
-                this.setState({
-                    productCategoryList: response.data,
-                    productCategoryListNew: productCategoryListNew
-                }, () => {
-                    this.filterData();
+                console.log("constant product category list====>0", productCategoryListNew);
+
+                const ids = productCategoryListNew.map(o => o.id)
+                let filteredEQUnit = productCategoryListNew.filter(({ id }, index) => !ids.includes(id, index + 1))
+
+                console.log("constant product category list====>1", filteredEQUnit);
+
+
+                filteredEQUnit.sort((a, b) => {
+                    var itemLabelA = a.name.toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = b.name.toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
                 });
 
-            }
+                this.setState({
+                    productCategoryList: myResult,
+                    productCategoryListNew: filteredEQUnit
+                }, () => {
+                    // this.filterData();
+                    this.setProgramId();
+                });
 
-        }).catch(
-            error => {
-                if (error.message === "Network Error") {
-                    this.setState({
-                        message: 'static.unkownError',
-                        loading: false
-                    });
-                } else {
-                    switch (error.response ? error.response.status : "") {
 
-                        case 401:
-                            this.props.history.push(`/login/static.message.sessionExpired`)
-                            break;
-                        case 403:
-                            this.props.history.push(`/accessDenied`)
-                            break;
-                        case 500:
-                        case 404:
-                        case 406:
-                            this.setState({
-                                message: error.response.data.messageCode,
-                                loading: false
-                            });
-                            break;
-                        case 412:
-                            this.setState({
-                                message: error.response.data.messageCode,
-                                loading: false
-                            });
-                            break;
-                        default:
-                            this.setState({
-                                message: 'static.unkownError',
-                                loading: false
-                            });
-                            break;
-                    }
-                }
-            }
-        );
+
+            }.bind(this);
+        }.bind(this)
     }
 
     filterData() {
@@ -1748,6 +1962,7 @@ export default class PlanningUnitSetting extends Component {
             let selectedForecastProgram = this.state.datasetList.filter(c => c.programId == this.state.forecastProgramId && c.versionId == this.state.forecastProgramVersionId)[0];
             console.log("selectedForecastProgram---------->", selectedForecastProgram);
             let planningUnitList = selectedForecastProgram.planningUnitList;
+            console.log("planningUnitList---------->", planningUnitList);
             planningUnitList.sort((a, b) => {
                 var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
                 var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
@@ -1761,10 +1976,10 @@ export default class PlanningUnitSetting extends Component {
                 }, () => {
                     // this.buildJExcel();
                     // let planningUnitIds = this.state.selsource.map(ele => ele.planningUnit.id);
-                    let planningUnitIds = this.state.allPlanningUnitList.map(ele => ele.id);
-                    console.log("selectedForecastProgram---------->11", planningUnitIds);
-                    this.getProcurementAgentPlanningUnitByPlanningUnitIds(planningUnitIds);
-                    // this.buildJExcel();
+                    // let planningUnitIds = this.state.allPlanningUnitList.map(ele => ele.id);
+                    // console.log("selectedForecastProgram---------->11", planningUnitIds);
+                    // this.getProcurementAgentPlanningUnitByPlanningUnitIds(planningUnitIds);
+                    this.buildJExcel();
 
                 })
         } else {
@@ -1892,13 +2107,13 @@ export default class PlanningUnitSetting extends Component {
                 //     // readOnly: true// 0A
                 // },
                 {
-                    title: 'Planning Unit Category',
+                    title: i18n.t('static.productCategory.productCategory'),
                     type: 'autocomplete',
                     source: this.state.productCategoryListNew,
                     // readOnly: true// 0A
                 },
                 {
-                    title: 'Planning Unit',
+                    title: i18n.t('static.dashboard.planningunitheader'),
                     type: 'autocomplete',
                     source: this.state.allPlanningUnitList,
                     // filter: this.filterPlanningUnitListByTracerCategoryId,
@@ -1907,19 +2122,21 @@ export default class PlanningUnitSetting extends Component {
                     // readOnly: true //1B
                 },
                 {
-                    title: 'Consumption Forecast?',
+                    title: i18n.t('static.commitTree.consumptionForecast') + ' ?',
                     type: 'checkbox',
-                    width: '150'
+                    width: '150',
+                    readOnly: ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) ? false : true)
                     // readOnly: true //2C
                 },
                 {
-                    title: 'Tree Forecast?',
+                    title: i18n.t('static.TreeForecast.TreeForecast') + ' ?',
                     type: 'checkbox',
-                    width: '150'
+                    width: '150',
+                    readOnly: ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) ? false : true)
                     // readOnly: true //3D
                 },
                 {
-                    title: 'Stock (end of ' + this.state.beforeEndDateDisplay + ')',
+                    title: i18n.t('static.planningUnitSetting.stockEndOf') + this.state.beforeEndDateDisplay + ')',
                     type: 'numeric',
                     textEditor: true,
                     decimal: '.',
@@ -1929,7 +2146,7 @@ export default class PlanningUnitSetting extends Component {
                     // readOnly: true //4E
                 },
                 {
-                    title: 'Existing Shipments (' + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ')',
+                    title: i18n.t('static.planningUnitSetting.existingShipments') + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ')',
                     type: 'numeric',
                     textEditor: true,
                     decimal: '.',
@@ -1939,7 +2156,7 @@ export default class PlanningUnitSetting extends Component {
                     // readOnly: true //5F
                 },
                 {
-                    title: 'Desired Months of Stock (end of ' + this.state.endDateDisplay + ')',
+                    title: i18n.t('static.planningUnitSetting.desiredMonthsOfStock') + this.state.endDateDisplay + ')',
                     type: 'numeric',
                     textEditor: true,
                     decimal: '.',
@@ -1949,7 +2166,7 @@ export default class PlanningUnitSetting extends Component {
                     // readOnly: true //6G
                 },
                 {
-                    title: 'Price Type',
+                    title: i18n.t('static.forecastReport.priceType'),
                     type: 'autocomplete',
                     source: this.state.allProcurementAgentList,
                     width: '180'
@@ -1957,7 +2174,7 @@ export default class PlanningUnitSetting extends Component {
                     // readOnly: true //7H
                 },
                 {
-                    title: 'Unit Price',
+                    title: i18n.t('static.forecastReport.unitPrice'),
                     type: 'numeric',
                     textEditor: true,
                     decimal: '.',
@@ -2004,6 +2221,7 @@ export default class PlanningUnitSetting extends Component {
                 {
                     title: 'Active',
                     type: 'checkbox',
+                    readOnly: ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) ? false : true)
                     // readOnly: true //16Q
                 },
                 {
@@ -2013,25 +2231,25 @@ export default class PlanningUnitSetting extends Component {
                 },
             ],
             updateTable: function (el, cell, x, y, source, value, id) {
-                var elInstance = el.jexcel;
+                // var elInstance = el.jexcel;
 
-                //left align
-                elInstance.setStyle(`A${parseInt(y) + 1}`, 'text-align', 'left');
-                elInstance.setStyle(`B${parseInt(y) + 1}`, 'text-align', 'left');
+                // //left align
+                // elInstance.setStyle(`A${parseInt(y) + 1}`, 'text-align', 'left');
+                // elInstance.setStyle(`B${parseInt(y) + 1}`, 'text-align', 'left');
 
-                var rowData = elInstance.getRowData(y);
-                var programPlanningUnitId = rowData[11];
-                if (programPlanningUnitId == 1) {
-                    var cell = elInstance.getCell(`B${parseInt(y) + 1}`)
-                    var cellA = elInstance.getCell(`A${parseInt(y) + 1}`)
-                    cell.classList.remove('readonly');
-                    cellA.classList.remove('readonly');
-                } else {
-                    var cell = elInstance.getCell(`B${parseInt(y) + 1}`)
-                    var cellA = elInstance.getCell(`A${parseInt(y) + 1}`)
-                    cell.classList.add('readonly');
-                    cellA.classList.add('readonly');
-                }
+                // var rowData = elInstance.getRowData(y);
+                // var programPlanningUnitId = rowData[11];
+                // if (programPlanningUnitId == 1) {
+                //     var cell = elInstance.getCell(`B${parseInt(y) + 1}`)
+                //     var cellA = elInstance.getCell(`A${parseInt(y) + 1}`)
+                //     cell.classList.remove('readonly');
+                //     cellA.classList.remove('readonly');
+                // } else {
+                //     var cell = elInstance.getCell(`B${parseInt(y) + 1}`)
+                //     var cellA = elInstance.getCell(`A${parseInt(y) + 1}`)
+                //     cell.classList.add('readonly');
+                //     cellA.classList.add('readonly');
+                // }
 
                 // var procurementAgentId = rowData[7];
                 // if (procurementAgentId == -1) {
@@ -2065,6 +2283,7 @@ export default class PlanningUnitSetting extends Component {
             // onselection: this.selected,
             onchange: this.changed,
             onpaste: this.onPaste,
+            onchangepage: this.onchangepage,
             contextMenu: function (obj, x, y, e) {
                 var items = [];
                 //Add consumption batch info
@@ -2110,6 +2329,7 @@ export default class PlanningUnitSetting extends Component {
             position: 'top',
             filters: true,
             license: JEXCEL_PRO_KEY,
+            editable: ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) ? true : false),
             // contextMenu: function (obj, x, y, e) {
             //     return [];
             // }.bind(this),
@@ -2121,39 +2341,37 @@ export default class PlanningUnitSetting extends Component {
         })
     }
 
-    filterProcurementAgentByPlanningUnit = function (instance, cell, c, r, source) {
+    // filterProcurementAgentByPlanningUnit = function (instance, cell, c, r, source) {
 
-        var mylist = [];
-        let procurementAgentPlanningUnitList = this.state.responsePa;
-        var planningUnitId = (instance.jexcel.getJson(null, false)[r])[1];
-        console.log("ID------->", planningUnitId);
+    //     var mylist = [];
+    //     let procurementAgentPlanningUnitList = this.state.responsePa;
+    //     var planningUnitId = (instance.jexcel.getJson(null, false)[r])[1];
+    //     console.log("ID------->", planningUnitId);
 
-        if (planningUnitId !== '') {
+    //     if (planningUnitId !== '') {
 
-            let tempPaList = procurementAgentPlanningUnitList[planningUnitId];
-            let paList = tempPaList.map(template => {
-                return {
-                    name: template.procurementAgent.code,
-                    id: template.procurementAgent.id,
-                    price: template.catalogPrice
-                };
-            });
+    //         let tempPaList = procurementAgentPlanningUnitList[planningUnitId];
+    //         let paList = tempPaList.map(template => {
+    //             return {
+    //                 name: template.procurementAgent.code,
+    //                 id: template.procurementAgent.id,
+    //                 price: template.catalogPrice
+    //             };
+    //         });
 
-            paList.unshift({
-                id: -1,
-                name: 'CUSTOM',
-                price: 0
-            })
+    //         paList.unshift({
+    //             id: -1,
+    //             name: 'CUSTOM',
+    //             price: 0
+    //         })
 
-            // console.log("planningUnitId------->33", paList);
+    //         // console.log("planningUnitId------->33", paList);
 
-            return paList;
-        } else {
-            return [];
-        }
-
-
-    }.bind(this)
+    //         return paList;
+    //     } else {
+    //         return [];
+    //     }
+    // }.bind(this)
 
 
     filterPlanningUnitListByTracerCategoryId = function (instance, cell, c, r, source) {
@@ -2192,6 +2410,7 @@ export default class PlanningUnitSetting extends Component {
     filterPlanningUnitListByProductCategoryId = function (instance, cell, c, r, source) {
         var mylist = [];
         var value = (instance.jexcel.getJson(null, false)[r])[0];
+        console.log("mylist--------->3.2", value);
 
         // if (productCategoryId == -1) {
         //     mylist = this.state.allPlanningUnitList
@@ -2201,25 +2420,32 @@ export default class PlanningUnitSetting extends Component {
         // console.log("mylist--------->32", mylist);
         // return mylist;
 
-        var puList = []
+        var puList = [];
+        console.log("in if=====>0", this.state.productCategoryList);
         if (value != -1) {
-            console.log("in if=====>");
+            console.log("in if=====>1");
             var pc = this.state.productCategoryList.filter(c => c.payload.productCategoryId == value)[0]
             var pcList = this.state.productCategoryList.filter(c => c.payload.productCategoryId == pc.payload.productCategoryId || c.parentId == pc.id);
             var pcIdArray = [];
             for (var pcu = 0; pcu < pcList.length; pcu++) {
                 pcIdArray.push(pcList[pcu].payload.productCategoryId);
             }
-            puList = (this.state.planningUnitList).filter(c => pcIdArray.includes(c.forecastingUnit.productCategory.id) && c.active.toString() == "true");
+            console.log("in if=====>1.1", pcIdArray);
+            console.log("in if=====>1.2", this.state.planningUnitList);
+            console.log("in if=====>1.3", this.state.planningUnitList.filter(c => c.productCategory.id == 21));
+            puList = (this.state.planningUnitList).filter(c => pcIdArray.includes(c.productCategory.id));
+            console.log("in if=====>1.4", puList);
         } else {
             console.log("in else=====>2");
             puList = this.state.planningUnitList;
         }
 
+        console.log("in else=====>3", puList);
+
         for (var k = 0; k < puList.length; k++) {
             var planningUnitJson = {
-                name: puList[k].label.label_en + ' | ' + puList[k].planningUnitId,
-                id: puList[k].planningUnitId
+                name: puList[k].label.label_en + ' | ' + puList[k].id,
+                id: puList[k].id
             }
             mylist.push(planningUnitJson);
         }
@@ -2259,6 +2485,44 @@ export default class PlanningUnitSetting extends Component {
 
     }.bind(this)
 
+    onchangepage(el, pageNo, oldPageNo) {
+        var elInstance = el.jexcel;
+        var json = elInstance.getJson(null, false);
+
+        var colArr = ['A', 'B'];
+
+        var jsonLength = (pageNo + 1) * (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+        if (jsonLength == undefined) {
+            jsonLength = 15
+        }
+        if (json.length < jsonLength) {
+            jsonLength = json.length;
+        }
+        var start = pageNo * (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+
+        for (var j = start; j < jsonLength; j++) {
+            var rowData = elInstance.getRowData(j);
+            var programPlanningUnitId = rowData[11];
+
+            //left align
+            elInstance.setStyle(`A${parseInt(j) + 1}`, 'text-align', 'left');
+            elInstance.setStyle(`B${parseInt(j) + 1}`, 'text-align', 'left');
+
+            if (programPlanningUnitId == 1) {
+                var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
+                cell.classList.remove('readonly');
+                var cell = elInstance.getCell(("A").concat(parseInt(j) + 1))
+                cell.classList.remove('readonly');
+            } else {
+                var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("A").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+            }
+        }
+
+    }
+
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
         var asterisk = document.getElementsByClassName("resizable")[0];
@@ -2281,6 +2545,49 @@ export default class PlanningUnitSetting extends Component {
         tr.children[8].title = i18n.t('static.tooltip.PriceType');
 
 
+        var elInstance = instance.jexcel;
+        var json = elInstance.getJson();
+        var colArr = ['A', 'B'];
+
+        var jsonLength;
+
+        if ((document.getElementsByClassName("jexcel_pagination_dropdown")[0] != undefined)) {
+            jsonLength = 1 * (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+        }
+
+        if (jsonLength == undefined) {
+            jsonLength = 15
+        }
+        if (json.length < jsonLength) {
+            jsonLength = json.length;
+        }
+
+        for (var j = 0; j < jsonLength; j++) {
+            var rowData = elInstance.getRowData(j);
+            var programPlanningUnitId = rowData[11];
+
+            //left align
+            elInstance.setStyle(`A${parseInt(j) + 1}`, 'text-align', 'left');
+            elInstance.setStyle(`B${parseInt(j) + 1}`, 'text-align', 'left');
+
+            if (programPlanningUnitId == 1) {
+                // for (var i = 0; i < colArr.length; i++) {
+                //     var cell = elInstance.getCell((colArr[i]).concat(parseInt(y) + 1))
+                //     cell.classList.remove('readonly');
+                // }
+                var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
+                cell.classList.remove('readonly');
+                var cell = elInstance.getCell(("A").concat(parseInt(j) + 1))
+                cell.classList.remove('readonly');
+            } else {
+                var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("A").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+            }
+
+
+        }
     }
 
     formSubmit = function () {
@@ -2315,7 +2622,7 @@ export default class PlanningUnitSetting extends Component {
                 var map1 = new Map(Object.entries(tableJson[i]));
 
                 // let planningUnitObj = this.state.allPlanningUnitList.filter(c => c.id == parseInt(map1.get("1")))[0];
-                let planningUnitObj = this.state.originalPlanningUnitList.filter(c => c.planningUnitId == parseInt(map1.get("1")))[0];
+                let planningUnitObj = this.state.originalPlanningUnitList.filter(c => c.id == parseInt(map1.get("1")))[0];
                 let procurementAgentObj = "";
                 if (parseInt(map1.get("7")) === -1) {
                     procurementAgentObj = null
@@ -2332,12 +2639,12 @@ export default class PlanningUnitSetting extends Component {
                             "unit": planningUnitObj.unit,
                             "multiplier": planningUnitObj.multiplier,
                             "forecastingUnit": {
-                                "id": planningUnitObj.forecastingUnit.forecastingUnitId,
+                                "id": planningUnitObj.forecastingUnit.id,
                                 "label": planningUnitObj.forecastingUnit.label,
                                 "unit": planningUnitObj.forecastingUnit.unit,
                                 "productCategory": planningUnitObj.forecastingUnit.productCategory,
                                 "tracerCategory": planningUnitObj.forecastingUnit.tracerCategory,
-                                "idString": "" + planningUnitObj.forecastingUnit.forecastingUnitId
+                                "idString": "" + planningUnitObj.forecastingUnit.id
                             },
                             "idString": "" + parseInt(map1.get("1"))
                         },
@@ -2381,12 +2688,12 @@ export default class PlanningUnitSetting extends Component {
                             "unit": planningUnitObj.unit,
                             "multiplier": planningUnitObj.multiplier,
                             "forecastingUnit": {
-                                "id": planningUnitObj.forecastingUnit.forecastingUnitId,
+                                "id": planningUnitObj.forecastingUnit.id,
                                 "label": planningUnitObj.forecastingUnit.label,
                                 "unit": planningUnitObj.forecastingUnit.unit,
                                 "productCategory": planningUnitObj.forecastingUnit.productCategory,
                                 "tracerCategory": planningUnitObj.forecastingUnit.tracerCategory,
-                                "idString": "" + planningUnitObj.forecastingUnit.forecastingUnitId
+                                "idString": "" + planningUnitObj.forecastingUnit.id
                             },
                             "idString": "" + parseInt(map1.get("1"))
                         },
@@ -2759,7 +3066,7 @@ export default class PlanningUnitSetting extends Component {
         data[17] = true;
 
         this.el.insertRow(
-            data, 0, 1
+            data
         );
     };
 
@@ -2808,8 +3115,13 @@ export default class PlanningUnitSetting extends Component {
                 {/* <h5 className="red">{i18n.t(this.state.message)}</h5> */}
                 <h5 className={this.state.color} id="div2">{i18n.t(this.state.message)}</h5>
                 <Card>
-                    <div className="Card-header-reporticon">
-
+                    <div className="card-header-actions">
+                        <div className="Card-header-reporticon">
+                            <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
+                            <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span>
+                            <span className="compareAndSelect-larrowText"> {i18n.t('static.common.backTo')} <a href="/#/dataset/versionSettings" className="supplyplanformulas">{i18n.t('static.UpdateversionSettings.UpdateversionSettings')}</a></span>
+                            <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')} <a href={this.state.datasetId != -1 && this.state.datasetId != "" && this.state.datasetId != undefined ? "/#/dataSet/buildTree/tree/0/" + this.state.datasetId : "/#/dataSet/buildTree"} className="supplyplanformulas">{i18n.t('static.common.managetree')}</a> {i18n.t('static.tree.or')} <a href="/#/importFromQATSupplyPlan/listImportFromQATSupplyPlan" className='supplyplanformulas'>{i18n.t('static.importFromQATSupplyPlan.importFromQATSupplyPlan')}</a></span>
+                        </div>
                     </div>
 
                     <CardBody className="pb-lg-3 pt-lg-0">
@@ -2862,7 +3174,7 @@ export default class PlanningUnitSetting extends Component {
                                             </div>
                                         </FormGroup>
                                         <FormGroup className="col-md-3" style={{ display: 'none' }}>
-                                            <Label htmlFor="appendedInputButton">Forecast Period</Label>
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.common.forecastPeriod')}</Label>
                                             <div className="controls edit">
 
                                                 <Picker
@@ -2890,7 +3202,7 @@ export default class PlanningUnitSetting extends Component {
                             </div>
                         </div>
 
-                        <div className="UpdatePlanningSettingTable" style={{ display: this.state.loading ? "none" : "block" }}>
+                        <div className="UpdatePlanningSettingTable consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
                             <div id="tableDiv">
                             </div>
                         </div>
@@ -2911,16 +3223,16 @@ export default class PlanningUnitSetting extends Component {
                     {
                         this.state.allowAdd &&
                         <CardFooter>
-                            {/* {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_REALM_COUNTRY_PLANNING_UNIT') && */}
-                            <FormGroup>
-                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                {this.state.isChanged1 &&
-                                    <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                }
-                                <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>
-                                &nbsp;
-                            </FormGroup>
-                            {/* } */}
+                            {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS') &&
+                                <FormGroup>
+                                    <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                    {this.state.isChanged1 &&
+                                        <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                    }
+                                    <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>
+                                    &nbsp;
+                                </FormGroup>
+                            }
                         </CardFooter>
                     }
 

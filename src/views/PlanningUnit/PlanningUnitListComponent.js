@@ -1221,7 +1221,7 @@ export default class PlanningUnitListComponent extends Component {
                         </Col>
 
                         {/* <div id="loader" className="center"></div> */}
-                        <div className="shipmentconsumptionSearchMarginTop">
+                        <div className="shipmentconsumptionSearchMarginTop consumptionDataEntryTable">
                             <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PLANNING_UNIT') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
                             </div>
                             <div style={{ display: this.state.loading ? "block" : "none" }}>

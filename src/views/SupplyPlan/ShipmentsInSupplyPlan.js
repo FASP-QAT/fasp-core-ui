@@ -80,7 +80,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 (instance.jexcel).setValueFromCoords(21, data[i].y, moment(Date.now()).format("YYYY-MM-DD"), true);
                 (instance.jexcel).setValueFromCoords(16, data[i].y, `=ROUND(P${parseInt(data[i].y) + 1}*K${parseInt(data[i].y) + 1},2)`, true);
                 (instance.jexcel).setValueFromCoords(18, data[i].y, `=ROUND(ROUND(K${parseInt(data[i].y) + 1}*P${parseInt(data[i].y) + 1},2)+R${parseInt(data[i].y) + 1},2)`, true);
-                if (index == "" || index == null || index == undefined) {
+                if (index === "" || index == null || index == undefined) {
                     (instance.jexcel).setValueFromCoords(22, data[i].y, false, true);
                     (instance.jexcel).setValueFromCoords(23, data[i].y, "", true);
                     (instance.jexcel).setValueFromCoords(24, data[i].y, -1, true);
@@ -137,7 +137,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
                 var index = (instance.jexcel).getValue(`F${parseInt(data[i].y) + 1}`, true);
-                if (index == "" || index == null || index == undefined) {
+                if (index === "" || index == null || index == undefined) {
                     var rowData = (instance.jexcel).getRowData(0);
                     (instance.jexcel).setValueFromCoords(2, data[i].y, rowData[2], true);
                     (instance.jexcel).setValueFromCoords(5, data[i].y, 0, true);
@@ -229,16 +229,25 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 paRequest.onsuccess = function (event) {
                     var paResult = [];
                     paResult = paRequest.result;
+                    var listArrays = [];
+                    for (var i = 0; i < paResult.length; i++) {
+                        for (var j = 0; j < paResult[i].programList.length; j++) {
+                            if (paResult[i].programList[j].id == generalProgramJson.programId) {
+                                listArrays.push(paResult[i]);
+                            }
+                        }
+                    }
+                    console.log("paResult", listArrays)
 
-                    for (var k = 0; k < paResult.length; k++) {
+                    for (var k = 0; k < listArrays.length; k++) {
                         var paJson = {
-                            name: paResult[k].procurementAgentCode,
-                            id: paResult[k].procurementAgentId,
-                            active: paResult[k].active,
-                            label: paResult[k].label
+                            name: listArrays[k].procurementAgentCode,
+                            id: listArrays[k].procurementAgentId,
+                            active: listArrays[k].active,
+                            label: listArrays[k].label
                         }
                         procurementAgentList.push(paJson);
-                        procurementAgentListAll.push(paResult[k]);
+                        procurementAgentListAll.push(listArrays[k]);
                     }
                     var papuTransaction = db1.transaction(['procurementAgentPlanningUnit'], 'readwrite');
                     var papuOs = papuTransaction.objectStore('procurementAgentPlanningUnit');
@@ -332,7 +341,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                     dataSourceResult = dataSourceRequest.result;
 
                                     for (var k = 0; k < dataSourceResult.length; k++) {
-                                        if ((dataSourceResult[k].program.id == generalProgramJson.programId || dataSourceResult[k].program.id == 0)) {
+                                        if ((dataSourceResult[k].program == null || dataSourceResult[k].program.id == generalProgramJson.programId || dataSourceResult[k].program.id == 0)) {
                                             if (dataSourceResult[k].realm.id == generalProgramJson.realmCountry.realm.realmId && dataSourceResult[k].dataSourceType.id == SHIPMENT_DATA_SOURCE_TYPE) {
                                                 var dataSourceJson = {
                                                     name: getLabelText(dataSourceResult[k].label, this.props.items.lang),
@@ -513,9 +522,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             data[12] = shipmentList[i].fundingSource.id;//M
                                             data[13] = shipmentList[i].budget.id;//N
                                             data[14] = shipmentList[i].currency.currencyId;//O
-                                            data[15] = shipmentList[i].rate;//P
+                                            data[15] = shipmentList[i].rate != undefined ? Number(shipmentList[i].rate).toFixed(2) : "";//P
                                             data[16] = `=ROUND(K${parseInt(i) + 1}*P${parseInt(i) + 1},2)`;//Q
-                                            data[17] = shipmentList[i].freightCost;//R
+                                            data[17] = shipmentList[i].freightCost != undefined ? Number(shipmentList[i].freightCost).toFixed(2) : "";//R
 
                                             data[18] = `=ROUND(ROUND(K${parseInt(i) + 1}*P${parseInt(i) + 1},2)+R${parseInt(i) + 1},2)`;
 
@@ -585,7 +594,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                 { type: 'text', title: i18n.t('static.report.id'), width: 80, readOnly: true },
                                                 { type: 'hidden', title: i18n.t('static.supplyPlan.qatProduct'), width: 150 },
                                                 { type: 'dropdown', title: i18n.t('static.shipmentDataEntry.shipmentStatus'), source: shipmentStatusList, filter: this.filterShipmentStatus, width: 100 },
-                                                { type: 'calendar', title: i18n.t('static.common.receivedate'), options: { format: JEXCEL_DATE_FORMAT,validRange: [moment(MIN_DATE_RESTRICTION_IN_DATA_ENTRY).startOf('month').format("YYYY-MM-DD"), moment(Date.now()).add(MAX_DATE_RESTRICTION_IN_DATA_ENTRY,'years').endOf('month').format("YYYY-MM-DD")] }, width: 150 },
+                                                { type: 'calendar', title: i18n.t('static.common.receivedate'), options: { format: JEXCEL_DATE_FORMAT, validRange: [moment(MIN_DATE_RESTRICTION_IN_DATA_ENTRY).startOf('month').format("YYYY-MM-DD"), moment(Date.now()).add(MAX_DATE_RESTRICTION_IN_DATA_ENTRY, 'years').endOf('month').format("YYYY-MM-DD")] }, width: 150 },
                                                 { type: 'dropdown', title: i18n.t("static.supplyPlan.shipmentMode"), source: [{ id: 1, name: i18n.t('static.supplyPlan.sea') }, { id: 2, name: i18n.t('static.supplyPlan.air') }], width: 100 },
                                                 { type: 'dropdown', title: i18n.t('static.procurementagent.procurementagent'), source: procurementAgentList, filter: this.filterProcurementAgent, width: 120 },
                                                 { type: 'checkbox', title: i18n.t('static.shipmentDataEntry.localProcurement'), width: 80, readOnly: !shipmentEditable },
@@ -1020,7 +1029,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                                     type: 'calendar',
                                                                                     options: {
                                                                                         format: JEXCEL_DATE_FORMAT,
-                                                                                        validRange: shipmentStatus == DELIVERED_SHIPMENT_STATUS ? [moment(MIN_DATE_RESTRICTION_IN_DATA_ENTRY).startOf('month').format("YYYY-MM-DD"), (moment(Date.now()).format("YYYY-MM-DD")).toString()] : [moment(MIN_DATE_RESTRICTION_IN_DATA_ENTRY).startOf('month').format("YYYY-MM-DD"), moment(Date.now()).add(MAX_DATE_RESTRICTION_IN_DATA_ENTRY,'years').endOf('month').format("YYYY-MM-DD")]
+                                                                                        validRange: shipmentStatus == DELIVERED_SHIPMENT_STATUS ? [moment(MIN_DATE_RESTRICTION_IN_DATA_ENTRY).startOf('month').format("YYYY-MM-DD"), (moment(Date.now()).format("YYYY-MM-DD")).toString()] : [moment(MIN_DATE_RESTRICTION_IN_DATA_ENTRY).startOf('month').format("YYYY-MM-DD"), moment(Date.now()).add(MAX_DATE_RESTRICTION_IN_DATA_ENTRY, 'years').endOf('month').format("YYYY-MM-DD")]
                                                                                     }
                                                                                 },
                                                                                 {
@@ -1348,7 +1357,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
     }.bind(this)
 
     filterProcurementAgent = function (instance, cell, c, r, source) {
-        return this.state.procurementAgentList.filter(c => c.active.toString() == "true").sort(function (a, b) {
+        return this.state.procurementAgentList.filter(c => c.name != "" && c.active.toString() == "true").sort(function (a, b) {
             a = a.name.toLowerCase();
             b = b.name.toLowerCase();
             return a < b ? -1 : a > b ? 1 : 0;
@@ -1662,7 +1671,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     type: 'calendar',
                     options: {
                         format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker',
-                        validRange: [moment(expectedDeliveryDate).format("YYYY-MM-DD"), moment(Date.now()).add(MAX_DATE_RESTRICTION_IN_DATA_ENTRY,'years').endOf('month').format("YYYY-MM-DD")]
+                        validRange: [moment(expectedDeliveryDate).format("YYYY-MM-DD"), moment(Date.now()).add(MAX_DATE_RESTRICTION_IN_DATA_ENTRY, 'years').endOf('month').format("YYYY-MM-DD")]
                     }
                 },
                 {
@@ -3327,7 +3336,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     }
                 }
 
-                if (rowData[22] == false) {
+                if (rowData[22] == false && rowData[0].toString()=="true") {
                     var validation = checkValidtion("number", "K", y, elInstance.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll("\,", ""), elInstance, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, 1, 0);
                     if (validation == false) {
                         valid = false;
@@ -3731,6 +3740,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                 expectedDeliveryDate: expectedDeliveryDate,
                                 receivedDate: receivedDate,
                                 index: shipmentDataList.length,
+                                tempShipmentId:map.get("2").toString().concat(shipmentDataList.length),
                                 batchInfoList: [],
                                 orderNo: map.get("8"),
                                 createdBy: {

@@ -779,7 +779,7 @@ export default class PipelineProgramInventory extends Component {
         return (
             <>
                 <AuthenticationServiceComponent history={this.props.history} />
-                <div className="table-responsive" style={{ display: this.state.loading ? "none" : "block" }}>
+                <div className="table-responsive consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
 
                     <div id="inventorytableDiv">
                     </div>

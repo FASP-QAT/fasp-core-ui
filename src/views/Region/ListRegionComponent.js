@@ -345,7 +345,7 @@ import { getStyle } from '@coreui/coreui-pro/dist/js/coreui-utilities';
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import ReportService from '../../api/ReportService';
-import MultiSelect from 'react-multi-select-component';
+import {MultiSelect} from 'react-multi-select-component';
 import { JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants';
 
 
@@ -1011,8 +1011,8 @@ class RegionListComponent extends Component {
                                     </div>
                                 </Form>
 
-                                <div className="werehousecapacitySearchposition" style={{ display: this.state.loading ? "none" : "block" }}>
-                                    <div id="tableDiv" className="jexcelremoveReadonlybackground"> </div>
+                                <div className="werehousecapacitySearchposition" >
+                                    <div id="tableDiv" style={{ display: this.state.loading ? "none" : "block" }} className="jexcelremoveReadonlybackground"> </div>
                                 </div>
                                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >

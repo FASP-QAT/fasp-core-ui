@@ -81,7 +81,8 @@ export default class ProgramOnboarding extends Component {
                 programNotes: '',
                 regionArray: [],
                 healthAreaArray: [],
-                programPlanningUnits: []
+                programPlanningUnits: [],
+                programTypeId:1
             },
             lang: localStorage.getItem('lang'),
             regionId: '',

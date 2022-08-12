@@ -40,7 +40,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, DATE_FORMAT_CAP } from '../../Constants.js'
 import moment, { version } from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
@@ -126,6 +126,7 @@ class ForcastMatrixOverTime extends Component {
       planningUnitLabel: ''
 
 
+
     };
 
     this.fetchData = this.fetchData.bind(this);
@@ -164,6 +165,10 @@ class ForcastMatrixOverTime extends Component {
   }
   dateFormatter = value => {
     return moment(value).format('MMM YY')
+  }
+
+  dateFormatterCSV = value => {
+    return moment(value).format(DATE_FORMAT_CAP)
   }
   makeText = m => {
     if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
@@ -204,7 +209,7 @@ class ForcastMatrixOverTime extends Component {
     csvRow.push('')
     csvRow.push('"' + (i18n.t('static.program.program') + ': ' + (document.getElementById("programId").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
     csvRow.push('')
-    csvRow.push('"' + (i18n.t('static.report.version*') + ' : ' + (document.getElementById("versionId").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
+    csvRow.push('"' + (i18n.t('static.report.versionFinal*') + ' : ' + (document.getElementById("versionId").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
     csvRow.push('')
     csvRow.push('"' + (i18n.t('static.planningunit.planningunit') + ' : ' + (document.getElementById("planningUnitId").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
     csvRow.push('')
@@ -218,7 +223,7 @@ class ForcastMatrixOverTime extends Component {
 
 
     for (var item = 0; item < re.length; item++) {
-      A.push(this.addDoubleQuoteToRowContent([this.dateFormatter(re[item].month).replaceAll(' ', '%20'), re[item].forecastedConsumption == null ? '' : re[item].forecastedConsumption, re[item].actualConsumption == null ? '' : re[item].actualConsumption, re[item].message == null ? this.PercentageFormatter(re[item].forecastError) : (i18n.t(re[item].message)).replaceAll(' ', '%20')]))
+      A.push(this.addDoubleQuoteToRowContent([this.dateFormatterCSV(re[item].month).replaceAll(' ', '%20'), re[item].forecastedConsumption == null ? '' : re[item].forecastedConsumption, re[item].actualConsumption == null ? '' : re[item].actualConsumption, re[item].message == null ? this.PercentageFormatter(re[item].forecastError) : (i18n.t(re[item].message)).replaceAll(' ', '%20')]))
     }
     for (var i = 0; i < A.length; i++) {
       csvRow.push(A[i].join(","))
@@ -282,7 +287,7 @@ class ForcastMatrixOverTime extends Component {
           doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
             align: 'left'
           })
-          doc.text(i18n.t('static.report.version*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
+          doc.text(i18n.t('static.report.versionFinal*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
             align: 'left'
           })
           doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 170, {
@@ -844,23 +849,23 @@ class ForcastMatrixOverTime extends Component {
             // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
             // var programJson = JSON.parse(programData);
             // console.log('programJson', programJson)
-            var planningUnitDataList=programRequest.result.programData.planningUnitDataList;
+            var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
             var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == planningUnitId);
-                        var programJson = {}
-                        if (planningUnitDataIndex != -1) {
-                            var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == planningUnitId))[0];
-                            var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
-                            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                            programJson = JSON.parse(programData);
-                        } else {
-                            programJson = {
-                                consumptionList: [],
-                                inventoryList: [],
-                                shipmentList: [],
-                                batchInfoList: [],
-                                supplyPlan: []
-                            }
-                        }
+            var programJson = {}
+            if (planningUnitDataIndex != -1) {
+              var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == planningUnitId))[0];
+              var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+              var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+              programJson = JSON.parse(programData);
+            } else {
+              programJson = {
+                consumptionList: [],
+                inventoryList: [],
+                shipmentList: [],
+                batchInfoList: [],
+                supplyPlan: []
+              }
+            }
             var pu = (this.state.planningUnits.filter(c => c.planningUnit.id == planningUnitId))[0]
 
             var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && c.active == true);
@@ -884,30 +889,30 @@ class ForcastMatrixOverTime extends Component {
                   var dt = year + "-" + String(i).padStart(2, '0') + "-01"
                   var conlist = consumptionList.filter(c => c.consumptionDate === dt)
                   console.log(dt, conlist)
-                  var actconsumption = 0;
-                  var forConsumption = 0;
+                  var actconsumption = null;
+                  var forConsumption = null;
                   if (conlist.length == 2) {
                     montcnt = montcnt + 1
                   }
                   for (var l = 0; l < conlist.length; l++) {
                     if (conlist[l].actualFlag.toString() == 'true') {
-                      actconsumption = actconsumption + Math.round(Number(conlist[l].consumptionQty))
+                      actconsumption = (actconsumption == null ? 0 : actconsumption) + Math.round(Number(conlist[l].consumptionQty))
                     } else {
-                      forConsumption = forConsumption + Math.round(Number(conlist[l].consumptionQty))
+                      forConsumption = (forConsumption == null ? 0 : forConsumption) + Math.round(Number(conlist[l].consumptionQty))
                     }
                   }
                   actualconsumption = actualconsumption + actconsumption
                   forcastConsumption = forcastConsumption + forConsumption
                   if (j == 0) {
                     console.log(currentActualconsumption, ' ', actconsumption)
-                    if (currentActualconsumption == null && actconsumption > 0) {
+                    if (currentActualconsumption == null && actconsumption != null) {
                       currentActualconsumption = actconsumption
                     } else if (currentActualconsumption != null) {
                       currentActualconsumption = currentActualconsumption + actconsumption
                     }
-                    currentForcastConsumption = currentForcastConsumption + forConsumption
+                    currentForcastConsumption = forConsumption == null ? null : currentForcastConsumption + forConsumption
                   }
-                  if (actconsumption > 0 && forConsumption > 0)
+                  if (actconsumption != null && forConsumption != null)
                     absvalue = absvalue + (Math.abs(actconsumption - forConsumption))
 
 
@@ -920,8 +925,8 @@ class ForcastMatrixOverTime extends Component {
                   month: new Date(from, month - 1),
                   actualConsumption: currentActualconsumption,
                   forecastedConsumption: currentForcastConsumption,
-                  forecastError: currentActualconsumption > 0 && actualconsumption > 0 ? (((absvalue * 100) / actualconsumption)) : '',
-                  message: montcnt == 0 ? "static.reports.forecastMetrics.noConsumptionAcrossPeriod" : currentActualconsumption == null || currentForcastConsumption == null ? "static.reports.forecastMetrics.noConsumption" : (actualconsumption == null || actualconsumption == 0) ? "static.reports.forecastMetrics.totalConsumptionIs0" : null
+                  forecastError: currentActualconsumption != null && actualconsumption != null ? (((absvalue * 100) / actualconsumption)) : '',
+                  message: montcnt == 0 ? "static.reports.forecastMetrics.noConsumptionAcrossPeriod" : currentActualconsumption == null || currentForcastConsumption == null ? "static.reports.forecastMetrics.noConsumption" : (actualconsumption == null) ? "static.reports.forecastMetrics.totalConsumptionIs0" : null
                 }
                 data.push(json)
                 console.log("Json------------->", json);
@@ -1386,7 +1391,8 @@ class ForcastMatrixOverTime extends Component {
                                     && programs.map((item, i) => {
                                       return (
                                         <option key={i} value={item.programId}>
-                                          {getLabelText(item.label, this.state.lang)}
+                                          {/* {getLabelText(item.label, this.state.lang)} */}
+                                          {(item.programCode)}
                                         </option>
                                       )
                                     }, this)}
@@ -1436,7 +1442,7 @@ class ForcastMatrixOverTime extends Component {
 
                             </FormGroup>*/}
                           <FormGroup className="col-md-3">
-                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.version*')}</Label>
+                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.versionFinal*')}</Label>
                             <div className="controls">
                               <InputGroup>
                                 <Input
@@ -1499,9 +1505,10 @@ class ForcastMatrixOverTime extends Component {
                       </div>
 
                       <div className="row">
-                        <div className="col-md-12">
+                        <div className="col-md-12 mt-2">
                           {this.state.show && this.state.matricsList.length > 0 &&
-                            <Table responsive className="table-striped table-bordered text-center mt-2">
+                          <div className='fixTableHead table-responsive'>
+                            <Table  className="table-striped table-bordered text-center ">
 
                               <thead>
                                 <tr>
@@ -1535,7 +1542,8 @@ class ForcastMatrixOverTime extends Component {
 
                                 }
                               </tbody>
-                            </Table>}
+                            </Table>
+                            </div>}
 
                         </div>
                       </div></Col>

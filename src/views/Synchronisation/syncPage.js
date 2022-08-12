@@ -2990,8 +2990,8 @@ export default class syncPage extends Component {
         <TabPane tabId="1">
           <Row>
             <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
-              <Col md="12 pl-0" id="realmDiv">
-                <div className="table-responsive RemoveStriped">
+              <Col md="12 pl-0 pr-lg-0" id="realmDiv">
+                <div className="table-responsive RemoveStriped consumptionDataEntryTable">
                   <div id="mergedVersionConsumption" />
                 </div>
               </Col>
@@ -3001,8 +3001,8 @@ export default class syncPage extends Component {
         <TabPane tabId="2">
           <Row>
             <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
-              <Col md="12 pl-0" id="realmDiv">
-                <div className="table-responsive RemoveStriped">
+              <Col md="12 pl-0 pr-lg-0" id="realmDiv">
+                <div className="table-responsive RemoveStriped consumptionDataEntryTable">
                   <div id="mergedVersionInventory" />
                 </div>
               </Col>
@@ -3012,8 +3012,8 @@ export default class syncPage extends Component {
         <TabPane tabId="3">
           <Row>
             <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
-              <Col md="12 pl-0" id="realmDiv">
-                <div className="table-responsive RemoveStriped">
+              <Col md="12 pl-0 pr-lg-0" id="realmDiv">
+                <div className="table-responsive RemoveStriped consumptionDataEntryTable">
                   <div id="mergedVersionShipment" />
                 </div>
               </Col>
@@ -3023,8 +3023,8 @@ export default class syncPage extends Component {
         <TabPane tabId="4">
           <Row>
             <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
-              <Col md="12 pl-0" id="realmDiv">
-                <div className="table-responsive RemoveStriped">
+              <Col md="12 pl-0 pr-lg-0" id="realmDiv">
+                <div className="table-responsive RemoveStriped consumptionDataEntryTable">
                   <div id="mergedVersionProblemList" />
                 </div>
               </Col>
@@ -3309,7 +3309,7 @@ export default class syncPage extends Component {
             </ul>
           </ModalHeader>
           <ModalBody>
-            <div className="table-responsive RemoveStriped">
+            <div className="table-responsive RemoveStriped consumptionDataEntryTable">
               <div id="resolveConflictsTable" />
               <input type="hidden" id="index" />
             </div>
@@ -3333,7 +3333,7 @@ export default class syncPage extends Component {
             </ul>
           </ModalHeader>
           <ModalBody>
-            <div className="table-responsive RemoveStriped">
+            <div className="table-responsive RemoveStriped consumptionDataEntryTable">
               <div id="resolveConflictsInventoryTable" />
               <input type="hidden" id="indexInventory" />
             </div>
@@ -3356,7 +3356,7 @@ export default class syncPage extends Component {
             </ul>
           </ModalHeader>
           <ModalBody>
-            <div className="table-responsive RemoveStriped">
+            <div className="table-responsive RemoveStriped consumptionDataEntryTable">
               <div id="resolveConflictsShipmentTable" />
               <input type="hidden" id="indexShipment" />
             </div>
@@ -3379,7 +3379,7 @@ export default class syncPage extends Component {
             </ul>
           </ModalHeader>
           <ModalBody>
-            <div className="table-responsive RemoveStriped">
+            <div className="table-responsive RemoveStriped consumptionDataEntryTable">
               <div id="resolveConflictsProblemTable" />
               <input type="hidden" id="indexProblem" />
             </div>
@@ -4044,79 +4044,72 @@ export default class syncPage extends Component {
   }
 
   redirectToDashbaord(commitRequestId) {
-    console.log(")))) Call for async api");
     this.setState({ loading: true });
-    console.log("method called", commitRequestId);
+    // console.log("method called", commitRequestId);
     AuthenticationService.setupAxiosInterceptors();
-    const sendGetRequest = async () => {
-      try {
-        const resp = await ProgramService.sendNotificationAsync(commitRequestId);
-        console.log(")))) Supply plan rebuild completed");
-        // var msg=resp.data.messageCode;
-        // console.log("Response +++", msg);
-        // this.setState({openModal:true,
-        // responseMessage:msg});
-        var curUser = AuthenticationService.getLoggedInUserId();
-        console.log("Resposne.data+++", resp.data);
-        if (resp.data.createdBy.userId == curUser && resp.data.status == 2) {
+    ProgramService.sendNotificationAsync(commitRequestId).then(resp => {
+      var curUser = AuthenticationService.getLoggedInUserId();
+      if (resp.data.createdBy.userId == curUser && resp.data.status == 1) {
+        setTimeout(function () {
+          this.redirectToDashbaord(commitRequestId)
+        }.bind(this), 10000);
+      } else if (resp.data.createdBy.userId == curUser && resp.data.status == 2) {
+        this.setState({
+          progressPer: 75
+          , message: i18n.t('static.commitVersion.serverProcessingCompleted'), color: 'green'
+        }, () => {
+          this.hideFirstComponent();
+          this.getLatestProgram({ openModal: true, notificationDetails: resp.data });
+        })
+        // eventBus.dispatch("testDataAccess", { openModal: true, notificationDetails: resp.data });
+      } else if (resp.data.createdBy.userId == curUser && resp.data.status == 3) {
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onerror = function (event) {
           this.setState({
-            progressPer: 75
-            , message: i18n.t('static.commitVersion.serverProcessingCompleted'), color: 'green'
-          }, () => {
-            this.hideFirstComponent();
-            this.getLatestProgram({ openModal: true, notificationDetails: resp.data });
+            message: i18n.t('static.program.errortext'),
+            color: 'red'
           })
-          // eventBus.dispatch("testDataAccess", { openModal: true, notificationDetails: resp.data });
-        } else if (resp.data.createdBy.userId == curUser && resp.data.status == 3) {
-          var db1;
-          getDatabase();
-          var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-          openRequest.onerror = function (event) {
+          this.hideFirstComponent()
+        }.bind(this);
+        openRequest.onsuccess = function (e) {
+          db1 = e.target.result;
+          var transaction = db1.transaction(['programQPLDetails'], 'readwrite');
+          var program = transaction.objectStore('programQPLDetails');
+          var getRequest = program.get((this.state.programId).value);
+          getRequest.onerror = function (event) {
             this.setState({
               message: i18n.t('static.program.errortext'),
               color: 'red'
             })
             this.hideFirstComponent()
           }.bind(this);
-          openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
-            var transaction = db1.transaction(['programQPLDetails'], 'readwrite');
-            var program = transaction.objectStore('programQPLDetails');
-            var getRequest = program.get((this.state.programId).value);
-            getRequest.onerror = function (event) {
+          getRequest.onsuccess = function (event) {
+            var myResult = [];
+            myResult = getRequest.result;
+            myResult.readonly = 0;
+            var transaction1 = db1.transaction(['programQPLDetails'], 'readwrite');
+            var program1 = transaction1.objectStore('programQPLDetails');
+            var getRequest1 = program1.put(myResult);
+            getRequest1.onsuccess = function (e) {
               this.setState({
-                message: i18n.t('static.program.errortext'),
-                color: 'red'
+                message: i18n.t('static.commitVersion.commitFailed'),
+                color: 'red',
+                loading: false
               })
               this.hideFirstComponent()
-            }.bind(this);
-            getRequest.onsuccess = function (event) {
-              var myResult = [];
-              myResult = getRequest.result;
-              myResult.readonly = 0;
-              var transaction1 = db1.transaction(['programQPLDetails'], 'readwrite');
-              var program1 = transaction1.objectStore('programQPLDetails');
-              var getRequest1 = program1.put(myResult);
-              getRequest1.onsuccess = function (e) {
-                this.setState({
-                  message: i18n.t('static.commitVersion.commitFailed'),
-                  color: 'red',
-                  loading: false
-                })
-                this.hideFirstComponent()
-              }.bind(this)
             }.bind(this)
           }.bind(this)
-        }
-
-        // window.visible=true;
-
-      } catch (err) {
-        // Handle Error Here
-        console.error("Error+++", err);
+        }.bind(this)
       }
-    };
-    sendGetRequest();
+
+      // window.visible=true;
+
+    }).catch(
+      error => {
+        this.redirectToDashbaord(commitRequestId)
+      })
   }
 
   getLatestProgram(notificationDetails) {
@@ -4449,7 +4442,7 @@ export default class syncPage extends Component {
           openCount: mergedProblemListData.filter(c =>
             c.problemStatus.id == OPEN_PROBLEM_STATUS_ID
             //  && moment(c.createdDate).format("YYYY-MM-DD") > problemListDate
-            ).length
+          ).length
         })
 
         var data = [];

@@ -861,7 +861,9 @@ class ListTracerCategoryComponent extends Component {
                                 </FormGroup>
                             </Col>
                         }
+                        <div className='consumptionDataEntryTable'>
                         <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TRACER_CATEGORY') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
+                        </div>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>
                             <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >

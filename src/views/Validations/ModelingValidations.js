@@ -5,7 +5,7 @@ import {
     Card,
     CardBody,
     Col,
-    Table, FormGroup, Input, InputGroup, Label, Form
+    Table, FormGroup, Input, InputGroup,PopoverBody, Popover, Label, Form
 } from 'reactstrap';
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import i18n from '../../i18n'
@@ -43,6 +43,7 @@ class ModelingValidation extends Component {
         var dt = new Date();
         dt.setMonth(dt.getMonth() - 10);
         this.state = {
+            popoverOpenLevelFeild: false,
             datasetId: "",
             datasetList: [],
             lang: localStorage.getItem("lang"),
@@ -69,6 +70,7 @@ class ModelingValidation extends Component {
             monthList: [],
             show: false
         };
+        this.toggleLevelFeild = this.toggleLevelFeild.bind(this);
         this.setDatasetId = this.setDatasetId.bind(this);
         this.getOfflineDatasetList = this.getOfflineDatasetList.bind(this);
         this.getVersionList = this.getVersionList.bind(this);
@@ -120,6 +122,11 @@ class ModelingValidation extends Component {
         this.setState({
             show: !show
         })
+    }
+    toggleLevelFeild() {
+        this.setState({
+            popoverOpenLevelFeild: !this.state.popoverOpenLevelFeild,
+        });
     }
 
     setVersionId(e) {
@@ -654,7 +661,11 @@ class ModelingValidation extends Component {
             this.setState({
                 levelId: levelId,
                 levelUnit: levelUnit != null ? levelUnit : "",
-                nodeList: nodeList,
+                nodeList: nodeList.sort(function (a, b) {
+                    a = a.label.toLowerCase();
+                    b = b.label.toLowerCase();
+                    return a < b ? -1 : a > b ? 1 : 0;
+                }),
                 nodeIdArr: nodeIdArr,
                 nodeLabelArr: nodeLabelArr,
                 nodeVal: nodeVal,
@@ -845,8 +856,8 @@ class ModelingValidation extends Component {
                     }
                     this.setState({
                         datasetList: datasetList.sort(function (a, b) {
-                            a = a.name.toLowerCase();
-                            b = b.name.toLowerCase();
+                            a = a.code.toLowerCase();
+                            b = b.code.toLowerCase();
                             return a < b ? -1 : a > b ? 1 : 0;
                         }),
                         unitList: unitList,
@@ -1285,16 +1296,19 @@ class ModelingValidation extends Component {
                         },
                         ticks: {
                             callback: function (label) {
+                                var monthArrayList = [...new Set(this.state.monthList.map(ele => moment(ele).format("MMM-YYYY")))];
                                 var xAxis2 = label
                                 xAxis2 += '';
                                 var month = xAxis2.split('-')[0];
                                 var year = xAxis2.split('-')[1];
-                                if (month === "Jul") {
+                                var filterByYear = monthArrayList.filter(c => moment(c).format("YYYY") == moment(year).format("YYYY"));
+                                var divideByTwo = Math.floor(filterByYear.length / 2);
+                                if (moment(filterByYear[divideByTwo]).format("MMM") === month) {
                                     return year;
                                 } else {
                                     return "";
                                 }
-                            },
+                            }.bind(this),
                             maxRotation: 0,
                             minRotation: 0,
                             autoSkip: false
@@ -1470,10 +1484,11 @@ class ModelingValidation extends Component {
                 <Card>
                     <div className="Card-header-reporticon pb-2">
                         <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
+                        <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span>
                         <span className="compareAndSelect-larrowText"> {i18n.t('static.common.backTo')} <a href={this.state.datasetId != -1 && this.state.datasetId != "" && this.state.datasetId != undefined ? "/#/dataSet/buildTree/tree/0/" + this.state.datasetId : "/#/dataSet/buildTree"} className="supplyplanformulas">{i18n.t('static.common.managetree')}</a> </span>
-
+                        <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')} <a href="/#/report/compareAndSelectScenario" className="supplyplanformulas">{i18n.t('static.dashboard.compareAndSelect')}</a> {i18n.t('static.tree.or')} <a href="/#/validation/productValidation" className='supplyplanformulas'>{i18n.t('static.dashboard.productValidation')}</a></span>
                         {/* {this.state.dataList.length > 0 && */}
-                        <div className="card-header-actions">
+                        {/* <div className="card-header-actions">
                             <a className="card-header-action">
 
                                 {this.state.monthList.length > 0 && this.state.dataEl != undefined && this.state.dataEl != "" && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF()} />}
@@ -1481,9 +1496,18 @@ class ModelingValidation extends Component {
 
                             </a>
                             {this.state.monthList.length > 0 && this.state.dataEl != undefined && this.state.dataEl != "" && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />}
-                        </div>
+                        </div> */}
                         {/* } */}
                     </div>
+                    <div className="card-header-actions pr-lg-3">
+                            <a className="card-header-action" style={{float:'right'}}>
+
+                                {this.state.monthList.length > 0 && this.state.dataEl != undefined && this.state.dataEl != "" && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF()} />}
+
+
+                            </a>
+                            {this.state.monthList.length > 0 && this.state.dataEl != undefined && this.state.dataEl != "" && <img style={{ height: '25px', width: '25px', cursor: 'pointer',float:'right',marginTop:'3px' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />}
+                        </div>
                     <CardBody className="pb-lg-2 pt-lg-0 ">
                         <div>
                             <div ref={ref}>
@@ -1592,8 +1616,13 @@ class ModelingValidation extends Component {
                                                     </Picker>
                                                 </div>
                                             </FormGroup>
+                                            <div>
+                                            <Popover placement="top" isOpen={this.state.popoverOpenLevelFeild} target="Popover5" trigger="hover" toggle={this.toggleLevelFeild}>
+                                                <PopoverBody>{i18n.t('static.Tooltip.levelModelingValdation')}</PopoverBody>
+                                            </Popover>
+                                        </div>
                                             <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.common.level')}</Label>
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.common.level')}<i class="fa fa-info-circle icons pl-lg-2" id="Popover5" onClick={this.toggleLevelFeild} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                 <div className="controls ">
                                                     <InputGroup>
                                                         <Input
@@ -1701,7 +1730,7 @@ class ModelingValidation extends Component {
 
                                             {/* // <div className="table-scroll">
                                                     // <div className="table-wrap table-responsive"> */}
-                                            <div id="tableDiv" className="jexcelremoveReadonlybackground" style={{ display: this.state.show && !this.state.loading ? "block" : "none" }}>
+                                            <div id="tableDiv" className="jexcelremoveReadonlybackground consumptionDataEntryTable" style={{ display: this.state.show && !this.state.loading ? "block" : "none" }}>
                                             </div>
                                             {/* // </div>
                                                 // </div> */}

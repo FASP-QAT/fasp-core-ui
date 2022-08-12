@@ -236,5 +236,20 @@ class ProgramService {
         );
     }
 
+    getPlanningUnitByProgramId(programId, json) {
+        return axios.post(`${API_URL}/api/program/${programId}/tracerCategory/simple/planningUnit`, json, {}
+        );
+    }
+
+    getProgramManagerListByProgramId(programId) {
+        return axios.get(`${API_URL}/api/user/programId/${programId}`, {}
+        );
+    }
+    
+    checkIfLinkingExistsWithOtherProgram(json){
+        return axios.post(`${API_URL}/api/erpLinking/otherProgramCheck`, json, {}
+        );
+    }
+
 }
 export default new ProgramService()

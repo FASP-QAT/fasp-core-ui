@@ -156,7 +156,7 @@ class MasterSyncService {
         });
     }
 
-    syncProgram(programId, versionId, userId,lastSyncDate) {
+    syncProgram(programId, versionId, userId, lastSyncDate) {
         console.log("In service")
         return axios.get(`${API_URL}/api/programData/shipmentSync/programId/${programId}/versionId/${versionId}/userId/${userId}/lastSyncDate/${lastSyncDate}`, {
         });
@@ -167,8 +167,13 @@ class MasterSyncService {
         });
     }
 
-    getSyncAllMastersForProgram(lastSyncDate,programIds){
-        return axios.post(`${API_URL}/api/sync/allMasters/forPrograms/${lastSyncDate}/`,programIds, {
+    getSyncAllMastersForProgram(lastSyncDate, programIds) {
+        return axios.post(`${API_URL}/api/sync/allMasters/forPrograms/${lastSyncDate}/`, programIds, {
+        });
+    }
+
+    getNewShipmentSyncApi(json){
+        return axios.post(`${API_URL}/api/erpLinking/shipmentSync/`,json, {
         });
     }
 

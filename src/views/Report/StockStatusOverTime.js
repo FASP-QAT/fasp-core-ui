@@ -17,10 +17,10 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import RealmCountryService from '../../api/RealmCountryService';
 import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
-import MultiSelect from "react-multi-select-component";
+import {MultiSelect} from "react-multi-select-component";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, FIRST_DATA_ENTRY_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH } from '../../Constants.js'
+import { SECRET_KEY, FIRST_DATA_ENTRY_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, DATE_FORMAT_CAP } from '../../Constants.js'
 import ReportService from '../../api/ReportService';
 import moment from "moment";
 import {
@@ -49,7 +49,6 @@ const options = {
                 ticks: {
                     beginAtZero: true,
                     fontColor: 'black',
-                    max: 50,
                     callback: function (value) {
                         var cell1 = value
                         cell1 += '';
@@ -156,6 +155,7 @@ class StockStatusOverTime extends Component {
             loading: true,
             programId: '',
             versionId: ''
+
 
 
         }
@@ -1248,7 +1248,7 @@ class StockStatusOverTime extends Component {
         csvRow.push('')
         csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.report.version*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.report.versionFinal*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         this.state.planningUnitValues.map(ele =>
             csvRow.push('"' + (i18n.t('static.planningunit.planningunit') + ' : ' + (ele.label).toString()).replaceAll(' ', '%20') + '"'))
@@ -1263,7 +1263,7 @@ class StockStatusOverTime extends Component {
         var A = [this.addDoubleQuoteToRowContent([i18n.t('static.common.month'), ((i18n.t('static.report.qatPID')).replaceAll(',', '%20')).replaceAll(' ', '%20'), ((i18n.t('static.planningunit.planningunit')).replaceAll(',', '%20')).replaceAll(' ', '%20'), i18n.t('static.report.stock'), ((i18n.t('static.report.consupmtionqty')).replaceAll(',', '%20')).replaceAll(' ', '%20'), i18n.t('static.report.amc'), ((i18n.t('static.report.noofmonth')).replaceAll(',', '%20')).replaceAll(' ', '%20'), i18n.t('static.report.mos')])]
 
 
-        this.state.matricsList.map(elt => A.push(this.addDoubleQuoteToRowContent([this.dateFormatter(elt.dt).replaceAll(' ', '%20'), elt.planningUnit.id, ((getLabelText(elt.planningUnit.label, this.state.lang)).replaceAll(',', '%20')).replaceAll(' ', '%20'), elt.stock == null ? '' : elt.stock, elt.consumptionQty == null ? '' : elt.consumptionQty, elt.amc != null ? this.formatAmc(elt.amc) : "", elt.amcMonthCount, elt.mos != null ? this.roundN(elt.mos) : i18n.t("static.supplyPlanFormula.na")])));
+        this.state.matricsList.map(elt => A.push(this.addDoubleQuoteToRowContent([moment(elt.dt).format(DATE_FORMAT_CAP).replaceAll(' ', '%20'), elt.planningUnit.id, ((getLabelText(elt.planningUnit.label, this.state.lang)).replaceAll(',', '%20')).replaceAll(' ', '%20'), elt.stock == null ? '' : elt.stock, elt.consumptionQty == null ? '' : elt.consumptionQty, elt.amc != null ? this.formatAmc(elt.amc) : "", elt.amcMonthCount, elt.mos != null ? this.roundN(elt.mos) : i18n.t("static.supplyPlanFormula.na")])));
 
 
         for (var i = 0; i < A.length; i++) {
@@ -1339,7 +1339,7 @@ class StockStatusOverTime extends Component {
                     doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
                         align: 'left'
                     })
-                    doc.text(i18n.t('static.report.version*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
+                    doc.text(i18n.t('static.report.versionFinal*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
                         align: 'left'
                     })
                     doc.text(i18n.t('static.report.mospast') + ' : ' + document.getElementById("monthsInPastForAmc").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
@@ -1435,7 +1435,8 @@ class StockStatusOverTime extends Component {
             && programs.map((item, i) => {
                 return (
                     <option key={i} value={item.programId}>
-                        {getLabelText(item.label, this.state.lang)}
+                        {/* {getLabelText(item.label, this.state.lang)} */}
+                        {item.programCode}
                     </option>
                 )
             }, this);
@@ -1489,7 +1490,7 @@ class StockStatusOverTime extends Component {
         console.log(this.state.matricsList)
 
         // var v = this.state.planningUnitValues.map(pu => this.state.matricsList.filter(c => c.planningUnit.id == pu.value).map(ele => (this.roundN(ele.mos) > 48 ? 48 : this.roundN(ele.mos))))
-        var v = this.state.planningUnitValues.map(pu => this.state.matricsList.filter(c => c.planningUnit.id == pu.value).map(ele => (ele.mos != null ? this.roundN(ele.mos) : i18n.t("static.supplyPlanFormula.na"))))
+        var v = this.state.planningUnitValues.map(pu => this.state.matricsList.filter(c => c.planningUnit.id == pu.value).map(ele => (this.roundN(ele.mos) > 48 ? 48 : ele.mos != null ? this.roundN(ele.mos) : i18n.t("static.supplyPlanFormula.na"))))
         var dts = Array.from(new Set(this.state.matricsList.map(ele => (this.dateFormatterLanguage(ele.dt)))))
         // var dts = Array.from(new Set(this.state.matricsList.map(ele => (this.dateFormatter(ele.dt)))))
 
@@ -1630,7 +1631,7 @@ class StockStatusOverTime extends Component {
                                         </FormGroup>
 
                                         <FormGroup className="col-md-3">
-                                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.version*')}</Label>
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.versionFinal*')}</Label>
                                             <div className="controls">
                                                 <InputGroup>
                                                     <Input
@@ -1753,7 +1754,6 @@ class StockStatusOverTime extends Component {
 
                                     </div>
                                 </div>
-                                <div className="col-md-12 pt-1"> <span><b>{i18n.t('static.stockStatusOverTime.noteBelowGraph')}</b></span></div>
                                 <div className="col-md-12">
                                     <button className="mr-1 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
                                         {this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
@@ -1764,10 +1764,11 @@ class StockStatusOverTime extends Component {
                                 <br></br>
                             </div>}</div>
 
-                        <div className="row" style={{ display: this.state.loading ? "none" : "block" }}>
+                        <div className="row mt-4" style={{ display: this.state.loading ? "none" : "block" }}>
                             <div className="col-md-12">
                                 {this.state.show && this.state.matricsList.length > 0 &&
-                                    <Table responsive className="table-striped table-bordered text-center mt-2">
+                                <div className='table-responsive fixTableHead'>
+                                    <Table className="table-striped table-bordered text-center">
 
                                         <thead>
                                             <tr>
@@ -1812,7 +1813,8 @@ class StockStatusOverTime extends Component {
 
 
                                         </tbody>
-                                    </Table>}
+                                    </Table>
+                                    </div>}
 
                             </div>
                         </div>

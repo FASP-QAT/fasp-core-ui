@@ -492,7 +492,8 @@ class AddBudgetComponent extends Component {
         let programList = programs.length > 0 && programs.map((item, i) => {
             return (
                 <option key={i} value={item.programId}>
-                    {getLabelText(item.label, this.state.lang)}
+                    {/* {getLabelText(item.label, this.state.lang)} */}
+                    {item.programCode}
                 </option>
             )
         }, this);
@@ -595,6 +596,14 @@ class AddBudgetComponent extends Component {
                                                                 loading: false
                                                             });
                                                             break;
+                                                        case 409:
+                                                            this.setState({
+                                                                // message: error.response.data.messageCode,
+                                                                message: i18n.t('static.budget.duplicateDisplayName'),
+                                                                loading: false
+                                                            });
+                                                            break;
+
                                                         case 412:
                                                             this.setState({
                                                                 message: error.response.data.messageCode,

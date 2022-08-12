@@ -625,7 +625,9 @@ export default class PlanningUnitCapacityList extends Component {
                             </FormGroup>
                         </Col>
                         {/* <div id="loader" className="center"></div> */}
+                        <div className='consumptionDataEntryTable'>
                         <div id="tableDiv" className="jexcelremoveReadonlybackground" style={{ display: this.state.loading ? "none" : "block" }}>
+                        </div>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>
                             <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >

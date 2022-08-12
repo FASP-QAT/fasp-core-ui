@@ -18,7 +18,7 @@ import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions.js';
-import MultiSelect from 'react-multi-select-component';
+import {MultiSelect} from 'react-multi-select-component';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 
@@ -1575,7 +1575,8 @@ export default class ShipmentLinkingNotifications extends Component {
         let programList = programs.length > 0 && programs.map((item, i) => {
             return (
                 <option key={i} value={item.programId}>
-                    {getLabelText(item.label, this.state.lang)}
+                    {/* {getLabelText(item.label, this.state.lang)} */}
+                    {item.programCode}
                 </option>
             )
         }, this);
@@ -1656,7 +1657,7 @@ export default class ShipmentLinkingNotifications extends Component {
                                                     <SearchBar {...props.searchProps} />
                                                     <ClearSearchButton {...props.searchProps} />
                                                 </div> */}
-                                                            <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                                            <BootstrapTable striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
                                                                 // pagination={paginationFactory(options)}
                                                                 rowEvents={{
                                                                 }}
@@ -1687,7 +1688,7 @@ export default class ShipmentLinkingNotifications extends Component {
                         </Modal>
                         {/* Consumption modal */}
                         <div className="col-md-12 pl-0">
-                            <div id="tableDiv1" className="jexcelremoveReadonlybackground RowClickable">
+                            <div id="tableDiv1" className="jexcelremoveReadonlybackground RowClickable consumptionDataEntryTable">
                             </div>
                         </div>
                         <div className="col-md-12 pl-0">
@@ -1751,7 +1752,7 @@ export default class ShipmentLinkingNotifications extends Component {
                                     </div>
                                 </FormGroup>
                             </Row>
-                            <div className="ReportSearchMarginTop" style={{ display: this.state.loading ? "none" : "block" }}>
+                            <div className="ReportSearchMarginTop consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
                                 <div id="tableDiv" className="RemoveStriped">
                                 </div>
                                 {/* <div id="tableDiv1" className="jexcelremoveReadonlybackground">

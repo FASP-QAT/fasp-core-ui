@@ -505,8 +505,8 @@ export default class QunatimedImportStepFive extends Component {
                         { type: 'text', readOnly: true },
                         { type: 'text', readOnly: true },
                         { type: 'numeric', mask: '#,##', readOnly: true },
-                        { type: 'numeric', mask: '#,##.##', decimal: '.', readOnly: true },
-                        { type: 'numeric', mask: '#,##.##', decimal: '.', readOnly: true },
+                        { type: 'numeric', mask: '#,##.00', decimal: '.', readOnly: true },
+                        { type: 'numeric', mask: '#,##.00', decimal: '.', readOnly: true },
                         { type: 'numeric', mask: '#,##', readOnly: true },
                         { type: 'numeric', mask: '#,##', readOnly: true },
                         { type: 'checkbox' }

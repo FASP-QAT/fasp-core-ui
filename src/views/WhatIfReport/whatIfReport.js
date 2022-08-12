@@ -98,6 +98,9 @@ export default class WhatIfReportComponent extends React.Component {
         dt.setMonth(dt.getMonth() - 10);
         var value = JSON.parse(localStorage.getItem("sesStartDate"));
         var date = moment(value.year + "-" + value.month + "-01").format("YYYY-MM-DD");
+        if(value.month<=9){
+            date = moment(value.year + "-0" + value.month + "-01").format("YYYY-MM-DD");
+        }
         var currentDate = moment(Date.now()).startOf('month').format("YYYY-MM-DD");
         const monthDifference = moment(new Date(date)).diff(new Date(currentDate), 'months', true) + MONTHS_IN_PAST_FOR_SUPPLY_PLAN;
         this.state = {
@@ -249,6 +252,9 @@ export default class WhatIfReportComponent extends React.Component {
     }
     handleRangeDissmis1(value) {
         var date = moment(value.year + "-" + value.month + "-01").format("YYYY-MM-DD");
+        if(value.month<=9){
+            date = moment(value.year + "-0" + value.month + "-01").format("YYYY-MM-DD");
+        }
         var currentDate = moment(Date.now()).startOf('month').format("YYYY-MM-DD");
         const monthDifference = moment(new Date(date)).diff(new Date(currentDate), 'months', true) + MONTHS_IN_PAST_FOR_SUPPLY_PLAN;
         this.setState({ startDate: value, monthCount: monthDifference })
@@ -1767,7 +1773,7 @@ export default class WhatIfReportComponent extends React.Component {
         csvRow.push('')
 
         const header = [...[""], ... (this.state.monthsArray.map(item => (
-            item.monthName.concat(" ").concat(item.monthYear)
+            ("\'").concat(item.monthName).concat(" ").concat(item.monthYear)
         ))
         )]
         var A = [header]
@@ -2370,7 +2376,7 @@ export default class WhatIfReportComponent extends React.Component {
                                     var dataSourceResult = [];
                                     dataSourceResult = dataSourceRequest.result;
                                     for (var k = 0; k < dataSourceResult.length; k++) {
-                                        if (dataSourceResult[k].program.id == programJson.programId || dataSourceResult[k].program.id == 0 && dataSourceResult[k].active == true) {
+                                        if (dataSourceResult[k].program==null || dataSourceResult[k].program.id == programJson.programId || dataSourceResult[k].program.id == 0 && dataSourceResult[k].active == true) {
                                             if (dataSourceResult[k].realm.id == programJson.realmCountry.realm.realmId) {
                                                 dataSourceListAll.push(dataSourceResult[k]);
 

@@ -23,6 +23,8 @@ import { calculateArima } from '../Extrapolation/Arima';
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import { JEXCEL_INTEGER_REGEX } from '../../Constants.js'
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
+import { calculateError } from "../Extrapolation/ErrorCalculations";
+import AuthenticationService from '../Common/AuthenticationService.js';
 
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -247,6 +249,7 @@ export default class TreeExtrapolationComponent extends React.Component {
         var startDate = moment("2021-05-01").format("YYYY-MM-DD");
         var endDate = moment("2022-02-01").format("YYYY-MM-DD")
         this.state = {
+            seasonality: 0,
             dataChanged: false,
             buttonFalg: 1,
             showJexcelData: false,
@@ -349,8 +352,13 @@ export default class TreeExtrapolationComponent extends React.Component {
         this.checkActualValuesGap = this.checkActualValuesGap.bind(this);
         this.saveJexcelData = this.saveJexcelData.bind(this);
         this.toggleJexcelData = this.toggleJexcelData.bind(this);
+        this.seasonalityCheckbox = this.seasonalityCheckbox.bind(this);
     }
-
+    seasonalityCheckbox(event) {
+        this.setState({
+            seasonality: event.target.checked ? 1 : 0
+        });
+    }
     toggleJexcelData() {
         this.setState({ showJexcelData: !this.state.showJexcelData })
     }
@@ -376,6 +384,7 @@ export default class TreeExtrapolationComponent extends React.Component {
             jexcelDataArr.push(json);
         }
         const { nodeDataExtrapolation } = this.state;
+        console.log("nodeDataExtrapolation check---", nodeDataExtrapolation);
         nodeDataExtrapolation.extrapolationDataList = jexcelDataArr;
         this.setState({ jexcelDataArr, nodeDataExtrapolation }, () => { this.buildJexcel() });
     }
@@ -417,15 +426,13 @@ export default class TreeExtrapolationComponent extends React.Component {
                     if (type) {
                         var dataForExtrapolation = jexcelDataArr.filter(c => c.amount != "");
                         if (dataForExtrapolation.length < 3 || (this.state.smoothingId && dataForExtrapolation.length < 24) || (this.state.arimaId && dataForExtrapolation.length < 14)) {
-                            this.setState({ extrapolationLoader: false }, () => {
-                                setTimeout(() => {
-                                    alert(i18n.t('static.tree.minDataRequiredToExtrapolate'))
-                                }, 0);
-                            });
+                            // this.setState({ extrapolationLoader: false }, () => {
+                            setTimeout(() => {
+                                alert(i18n.t('static.tree.minDataRequiredToExtrapolateNote1') + dataForExtrapolation.length + i18n.t('static.tree.minDataRequiredToExtrapolateNote2') + i18n.t('static.tree.minDataRequiredToExtrapolate'))
+                            }, 0);
+                            // });
                         }
-                        else {
-                            this.calculateExtrapolatedData(false);
-                        }
+                        this.calculateExtrapolatedData(false);
                     } else {
                         this.buildExtrapolationMom();
                     }
@@ -441,33 +448,90 @@ export default class TreeExtrapolationComponent extends React.Component {
         })
     }
     buildExtrapolationMom() {
-
+        console.log("is valid result start---",this.props.items.isValidError);
+        var movingAveragesData = [];
+        var semiAveragesData = [];
+        var linearRegressionData = [];
+        var tesData = [];
+        var arimaData = [];
         var extrapolationDataList = [];
         var momList = [];
         var tableJson = this.state.dataExtrapolation.getJson(null, false);
+        var minMonth = this.state.minMonth;
+        var count = 1;
         for (var i = 0; i < tableJson.length; i++) {
             var map1 = new Map(Object.entries(tableJson[i]));
-            var json = {
-                month: map1.get("0"),
-                amount: map1.get("1"),
-                reportingRate: map1.get("2") != "" ? map1.get("2").toString().replaceAll("%", "") : map1.get("2"),
-                manualChange: map1.get("10").toString().replaceAll(",", ""),
-                adjustedActuals: (this.state.dataExtrapolation.getValue(`D${parseInt(i) + 1}`, true)) != "" ? (this.state.dataExtrapolation.getValue(`D${parseInt(i) + 1}`, true)).toString().replaceAll(",", "") : (this.state.dataExtrapolation.getValue(`D${parseInt(i) + 1}`, true))
-            };
-            extrapolationDataList.push(json)
+            if (moment(this.state.minMonth).format('YYYY-MM') <= moment(map1.get("0")).format('YYYY-MM')) {
+                var json = {
+                    month: map1.get("0"),
+                    amount: map1.get("1"),
+                    reportingRate: map1.get("2") != "" ? map1.get("2").toString().replaceAll("%", "") : map1.get("2"),
+                    manualChange: map1.get("10").toString().replaceAll(",", ""),
+                    adjustedActuals: (this.state.dataExtrapolation.getValue(`D${parseInt(i) + 1}`, true)) != "" ? (this.state.dataExtrapolation.getValue(`D${parseInt(i) + 1}`, true)).toString().replaceAll(",", "") : (this.state.dataExtrapolation.getValue(`D${parseInt(i) + 1}`, true))
+                };
+                extrapolationDataList.push(json)
+            }
             // (this.state.dataExtrapolation.getValue(`F${parseInt(i) + 1}`, true)).toString().replaceAll(",", "");
+            console.log("this.state.dataExtrapolation---", this.state.dataExtrapolation);
+            console.log("start value---", this.state.dataExtrapolation.getValue(`D${parseInt(i) + 1}`, true));
+            console.log("start value updated---", (this.state.dataExtrapolation.getValue(`D${parseInt(i) + 1}`, true)).toString().replaceAll(",", ""));
             var json2 = {
-                calculatedValue: (this.state.dataExtrapolation.getValue(`L${parseInt(i) + 1}`, true)).toString().replaceAll(",", ""),
+                calculatedValue: this.state.dataExtrapolation.getValue(`L${parseInt(i) + 1}`, true) != "" && this.state.dataExtrapolation.getValue(`L${parseInt(i) + 1}`, true) != null ? (this.state.dataExtrapolation.getValue(`L${parseInt(i) + 1}`, true)).toString().replaceAll(",", "") : 0,
                 difference: 0,
-                endValue: (this.state.dataExtrapolation.getValue(`L${parseInt(i) + 1}`, true)).toString().replaceAll(",", ""),
-                endValueWMC: (this.state.dataExtrapolation.getValue(`L${parseInt(i) + 1}`, true)).toString().replaceAll(",", ""),
-                manualChange: (this.state.dataExtrapolation.getValue(`K${parseInt(i) + 1}`, true)).toString().replaceAll(",", ""),
+                endValue: this.state.dataExtrapolation.getValue(`L${parseInt(i) + 1}`, true) != "" && this.state.dataExtrapolation.getValue(`L${parseInt(i) + 1}`, true) != null ? (this.state.dataExtrapolation.getValue(`L${parseInt(i) + 1}`, true)).toString().replaceAll(",", "") : 0,
+                endValueWMC: this.state.dataExtrapolation.getValue(`L${parseInt(i) + 1}`, true) != "" && this.state.dataExtrapolation.getValue(`L${parseInt(i) + 1}`, true) != null ? (this.state.dataExtrapolation.getValue(`L${parseInt(i) + 1}`, true)).toString().replaceAll(",", "") : 0,
+                manualChange: this.state.dataExtrapolation.getValue(`K${parseInt(i) + 1}`, true) != "" && this.state.dataExtrapolation.getValue(`K${parseInt(i) + 1}`, true) != null ? (this.state.dataExtrapolation.getValue(`K${parseInt(i) + 1}`, true)).toString().replaceAll(",", "") : null,
                 month: map1.get("0"),
                 seasonalityPerc: 0,
-                startValue: this.state.dataExtrapolation.getValue(`D${parseInt(i) + 1}`, true) != "" ? (this.state.dataExtrapolation.getValue(`D${parseInt(i) + 1}`, true)).toString().replaceAll(",", "") : 0
+                startValue: this.state.dataExtrapolation.getValue(`D${parseInt(i) + 1}`, true) != "" && this.state.dataExtrapolation.getValue(`D${parseInt(i) + 1}`, true) != null ? (this.state.dataExtrapolation.getValue(`D${parseInt(i) + 1}`, true)).toString().replaceAll(",", "") : 0
             };
             momList.push(json2);
+            if (moment(this.state.minMonth).format('YYYY-MM') <= moment(map1.get("0")).format('YYYY-MM')) {
+                // Moving averages
+                var movingAveragesJson = {
+                    month: map1.get("0"),
+                    amount: map1.get("4") != "" && map1.get("4") != null ? map1.get("4").toString().replaceAll("%", "") : null,
+                }
+                movingAveragesData.push(movingAveragesJson);
+                // Semi averages
+                var semiAveragesJson = {
+                    month: map1.get("0"),
+                    amount: map1.get("5") != "" && map1.get("5") != null ? map1.get("5").toString().replaceAll("%", "") : null,
+                }
+                semiAveragesData.push(semiAveragesJson);
+
+                var linearRegressionJson = {
+                    month: map1.get("0"),
+                    amount: map1.get("6") != "" && map1.get("6") != null ? map1.get("6").toString().replaceAll("%", "") : null,
+                    ci: this.state.linearRegressionData.filter(x => x.month == count)[0].ci
+                }
+                linearRegressionData.push(linearRegressionJson);
+
+
+                if (this.state.tesData.length > 0) {
+                    console.log("result here rama---", map1.get("7") != "" && map1.get("7") != null && map1.get("7") != 'NaN' ? "A" : "B");
+                    var tesJson = {
+                        month: map1.get("0"),
+                        amount: map1.get("7") != "" && map1.get("7") != null && map1.get("7") != 'NaN' ? map1.get("7").toString().replaceAll("%", "") : null,
+                        ci: this.state.tesData.filter(x => x.month == count)[0].ci
+                    }
+                    tesData.push(tesJson);
+                }
+
+
+                if (this.state.arimaData.length > 0) {
+                    var arimaJson = {
+                        month: map1.get("0"),
+                        amount: map1.get("8") != "" && map1.get("8") != null ? map1.get("8").toString().replaceAll("%", "") : null,
+                        ci: this.state.arimaData.filter(x => x.month == count)[0].ci
+                    }
+                    arimaData.push(arimaJson);
+                }
+                count++;
+
+            }
         }
+
         const { nodeDataExtrapolation } = this.state;
         nodeDataExtrapolation.extrapolationDataList = extrapolationDataList;
         var nodeDataExtrapolationOptionList = [];
@@ -476,11 +540,17 @@ export default class TreeExtrapolationComponent extends React.Component {
         for (let i = 0; i < filteredExtrapolationMethodList.length; i++) {
             //Moving averages
             if (filteredExtrapolationMethodList[i].id == 7) {
+                var extrapolationOptionDataList = [];
+                var optionDataJson = {
+                    month: '',
+                    amount: ''
+                };
                 json = {
                     extrapolationMethod: { id: 7 },
                     jsonProperties: {
                         months: this.state.monthsForMovingAverage
-                    }
+                    },
+                    extrapolationOptionDataList: movingAveragesData
                 }
                 // json1 = this.state.extrapolationMethodList.filter(c => c.id == 7)[0];
                 nodeDataExtrapolationOptionList.push(json);
@@ -490,7 +560,8 @@ export default class TreeExtrapolationComponent extends React.Component {
                 json = {
                     extrapolationMethod: { id: 6 },
                     jsonProperties: {
-                    }
+                    },
+                    extrapolationOptionDataList: semiAveragesData
                 }
                 nodeDataExtrapolationOptionList.push(json);
             }
@@ -500,38 +571,29 @@ export default class TreeExtrapolationComponent extends React.Component {
                     extrapolationMethod: { id: 5 },
                     jsonProperties: {
                         confidenceLevelIdLinearRegression: this.state.confidenceLevelIdLinearRegression
-                    }
+                    },
+                    extrapolationOptionDataList: linearRegressionData
                 }
                 nodeDataExtrapolationOptionList.push(json);
             }
             //ARIMA
             if (filteredExtrapolationMethodList[i].id == 4) {
+                console.log("seasonality for arima---", this.state.seasonality);
                 json = {
                     extrapolationMethod: { id: 4 },
                     jsonProperties: {
                         p: this.state.p,
                         d: this.state.d,
                         q: this.state.q,
-                        confidenceLevelIdArima: this.state.confidenceLevelIdArima
-                    }
+                        confidenceLevelIdArima: this.state.confidenceLevelIdArima,
+                        seasonality: this.state.seasonality
+                    },
+                    extrapolationOptionDataList: arimaData
                 }
                 nodeDataExtrapolationOptionList.push(json);
             }
             // TES
             if (filteredExtrapolationMethodList[i].id == 2) {
-                // //TES L
-                // json = {
-                //     extrapolationMethod: { id: 1 },
-                //     jsonProperties: {
-                //         confidenceLevel: this.state.confidenceLevelId,
-                //         seasonality: this.state.noOfMonthsForASeason,
-                //         alpha: this.state.alpha,
-                //         beta: this.state.beta,
-                //         gamma: this.state.gamma
-                //     }
-                // }
-                // nodeDataExtrapolationOptionList.push(json);
-                // TES M
                 json = {
                     extrapolationMethod: { id: 2 },
                     jsonProperties: {
@@ -540,21 +602,10 @@ export default class TreeExtrapolationComponent extends React.Component {
                         alpha: this.state.alpha,
                         beta: this.state.beta,
                         gamma: this.state.gamma
-                    }
+                    },
+                    extrapolationOptionDataList: tesData
                 }
                 nodeDataExtrapolationOptionList.push(json);
-                // TES H
-                // json = {
-                //     extrapolationMethod: { id: 3 },
-                //     jsonProperties: {
-                //         confidenceLevel: this.state.confidenceLevelId,
-                //         seasonality: this.state.noOfMonthsForASeason,
-                //         alpha: this.state.alpha,
-                //         beta: this.state.beta,
-                //         gamma: this.state.gamma
-                //     }
-                // }
-                // nodeDataExtrapolationOptionList.push(json);
             }
         }
 
@@ -564,18 +615,22 @@ export default class TreeExtrapolationComponent extends React.Component {
             extrapolationLoader: false,
             isChanged: false
         }, () => {
-            const { currentItemConfig } = this.props.items;
+            var currentItemConfig = this.props.items.currentItemConfig;
             var mom = momList.filter(m => moment(m.month).format('YYYY-MM') == moment(currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].month).format('YYYY-MM'));
             currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].nodeDataExtrapolation = this.state.nodeDataExtrapolation;
             currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].nodeDataMomList = momList;
-            currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].nodeDataModelingList = [];
+            // currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].nodeDataModelingList = [];
             currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].nodeDataExtrapolationOptionList = this.state.nodeDataExtrapolationOptionList;
             // if (currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].dataValue == "" || currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].dataValue == 0) {
             currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].dataValue = mom.length > 0 ? mom[0].calculatedValue : '0';
             currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].calculatedDataValue = mom.length > 0 ? mom[0].calculatedValue : '0';
             // }
-            console.log("extrapolation data----", currentItemConfig);
-            this.props.updateState("currentItemConfig", currentItemConfig);
+            console.log("is valid result ---",this.props.items.isValidError);
+            if (this.props.items.isValidError.toString() == "false") {
+                this.props.updateState("currentItemConfig", currentItemConfig);
+            } else {
+                alert("Please fill all the required fields in Node Data Tab");
+            }
 
         });
     }
@@ -857,27 +912,43 @@ export default class TreeExtrapolationComponent extends React.Component {
         var resultCount = 0;
         // console.log("my data---",this.props.items.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])
         if (dataAvailabel) {
-            var extrapolationDataList = this.state.nodeDataExtrapolation.extrapolationDataList;
-            for (var i = 0; i < extrapolationDataList.length; i++) {
-                var result = jexcelDataArr.filter(x => x.amount != "");
-                resultCount = (extrapolationDataList[i].amount != "" && extrapolationDataList[i].amount != 0) || result.length > 0 ? resultCount + 1 : resultCount;
-                var json = {
-                    month: extrapolationDataList[i].month,
-                    amount: extrapolationDataList[i].amount,
-                    reportingRate: extrapolationDataList[i].reportingRate,
-                    monthNo: resultCount,
-                    manualChange: extrapolationDataList[i].manualChange,
-                    adjustedActuals: extrapolationDataList[i].amount / (extrapolationDataList[i].reportingRate / 100)
+            var extrapolationDataList = this.state.nodeDataExtrapolation != null ? this.state.nodeDataExtrapolation.extrapolationDataList : [];
+            console.log("monthArray check---", monthArray);
+            for (var i = 0; i < monthArray.length; i++) {
+                var extrapolationDataListData = extrapolationDataList.filter(x => moment(x.month).format('YYYY-MM') == moment(monthArray[i]).format('YYYY-MM'));
+                console.log("extrapolationDataListData---", extrapolationDataListData + " month---", monthArray[i]);
+                if (extrapolationDataListData.length > 0) {
+                    var result = jexcelDataArr.filter(x => x.amount != "" && x.amount != null);
+                    resultCount = (extrapolationDataListData[0].amount != "" && extrapolationDataListData[0].amount != null) || result.length > 0 ? resultCount + 1 : resultCount;
+                    var json = {
+                        month: extrapolationDataListData[0].month,
+                        amount: extrapolationDataListData[0].amount,
+                        reportingRate: extrapolationDataListData[0].reportingRate,
+                        monthNo: resultCount,
+                        manualChange: extrapolationDataListData[0].manualChange,
+                        adjustedActuals: extrapolationDataListData[0].amount / (extrapolationDataListData[0].reportingRate / 100)
+                    }
+                } else {
+                    var json = {
+                        month: monthArray[i],
+                        amount: null,
+                        reportingRate: 100,
+                        monthNo: resultCount + 1,
+                        manualChange: null,
+                        adjustedActuals: null
+                    }
                 }
+                console.log("my json---", json);
                 jexcelDataArr.push(json);
             }
+            console.log("after jexcelDataArr---", jexcelDataArr);
         } else {
             var tableJson = this.state.dataExtrapolation.getJson(null, false);
             for (var i = 0; i < tableJson.length; i++) {
                 var map1 = new Map(Object.entries(tableJson[i]));
                 console.log("10 map---" + map1.get("10"));
                 var result = jexcelDataArr.filter(x => x.amount != "");
-                resultCount = (map1.get("1") != "" && map1.get("1") != 0) || result.length > 0 ? resultCount + 1 : resultCount;
+                resultCount = (map1.get("1") != "" && map1.get("1") != null) || result.length > 0 ? resultCount + 1 : resultCount;
                 var json = {
                     month: map1.get("0"),
                     amount: map1.get("1") != "" ? map1.get("1").toString().replaceAll(",", "") : map1.get("1"),
@@ -889,11 +960,12 @@ export default class TreeExtrapolationComponent extends React.Component {
                 jexcelDataArr.push(json);
             }
 
-
+            console.log("before jexcelDataArr---", jexcelDataArr);
         }
         const { nodeDataExtrapolation } = this.state;
+        console.log("nodeDataExtrapolation check---", nodeDataExtrapolation);
         nodeDataExtrapolation.extrapolationDataList = jexcelDataArr;
-        console.log("jexcel data final---", jexcelDataArr);
+        console.log("jexcel data final data available---", jexcelDataArr);
 
         this.setState({ jexcelDataArr, nodeDataExtrapolation, isChanged: true }, () => {
             // setTimeout(() => {
@@ -901,96 +973,129 @@ export default class TreeExtrapolationComponent extends React.Component {
             if (jexcelDataArr.length > 0) {
                 console.log("jexcelDataArr with month no---->", jexcelDataArr)
 
-                var valList = jexcelDataArr.filter(c => c.amount != "")
+                var valList = jexcelDataArr.filter(c => c.amount != "" && c.amount != null)
                     .sort(function (a, b) {
                         return new Date(a.month) - new Date(b.month);
                     });
+                console.log("valList---->", valList)
                 this.setState({
                     minMonth: valList[0].month,
                     maxMonth: valList[valList.length - 1].month
-                });
-                for (let i = 0; i < jexcelDataArr.length; i++) {
-                    if (moment(valList[0].month).format("YYYY-MM") <= moment(jexcelDataArr[i].month).format("YYYY-MM") && jexcelDataArr[i].amount != "") {
-                        inputDataMovingAvg.push({ "month": inputDataMovingAvg.length + 1, "actual": jexcelDataArr[i].adjustedActuals != "" ? Number(jexcelDataArr[i].adjustedActuals) : null, "forecast": null })
-                        // console.log("inputDataSemiAverage 1--->>>", jexcelDataArr[i]);
-                        // console.log("inputDataSemiAverage 2--->>>", inputDataSemiAverage.length);
-                        var json = { "month": inputDataSemiAverage.length + 1, "actual": jexcelDataArr[i].adjustedActuals != "" ? Number(jexcelDataArr[i].adjustedActuals) : null, "forecast": null };
-                        // console.log("inputDataSemiAverage 4--->>>", json);
-                        // console.log("inputDataSemiAverage 5 before--->>>", inputDataSemiAverage);
-                        inputDataSemiAverage.push(json);
-                        console.log("inputDataSemiAverage 6 after--->>>", inputDataSemiAverage);
-                        inputDataLinearRegression.push({ "month": inputDataLinearRegression.length + 1, "actual": jexcelDataArr[i].adjustedActuals != "" ? Number(jexcelDataArr[i].adjustedActuals) : null, "forecast": null })
-                        // console.log("inputDataSemiAverage 7--->>>", inputDataLinearRegression);
-                        inputDataTes.push({ "month": inputDataTes.length + 1, "actual": jexcelDataArr[i].adjustedActuals != "" ? Number(jexcelDataArr[i].adjustedActuals) : null, "forecast": null })
-                        console.log("inputDataSemiAverage 8--->>>", inputDataTes)
-                        inputDataArima.push({ "month": inputDataArima.length + 1, "actual": jexcelDataArr[i].adjustedActuals != "" ? Number(jexcelDataArr[i].adjustedActuals) : null, "forecast": null })
-                        console.log("inputDataArima 8--->>>", inputDataArima)
-                    }
-                }
-                console.log("inputDataMovingAvg--->>>", inputDataMovingAvg)
-                var data = jexcelDataArr.filter(c => c.amount != "")
-                    .sort(function (a, b) {
-                        return new Date(a.month) - new Date(b.month);
-                    });
-                console.log("jexcelDataArr---%%%", jexcelDataArr);
-                var lastMonth = data[data.length - 1].month;
-                var noOfMonthsForProjection = moment(new Date(this.props.items.forecastStopDate)).diff(new Date(lastMonth), 'months', true)
-                console.log("noOfMonthsForProjection", noOfMonthsForProjection);
-                if (this.state.semiAvgId) {
-                    console.log("inputDataSemiAverage---", inputDataSemiAverage);
-                    calculateSemiAverages(JSON.parse(JSON.stringify(inputDataSemiAverage)), Math.trunc(noOfMonthsForProjection), this);
-                } else {
-                    this.setState({
-                        semiAvgData: [],
-                        semiAvgError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" }
-                    })
-                }
-                if (this.state.movingAvgId) {
-                    calculateMovingAvg(JSON.parse(JSON.stringify(inputDataMovingAvg)), this.state.monthsForMovingAverage, Math.trunc(noOfMonthsForProjection), this);
-                } else {
-                    this.setState({
-                        movingAvgData: [],
-                        movingAvgError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" }
-                    })
-                }
+                }, () => {
+                    console.log("minMonth hehehe yo---->", this.state.minMonth)
+                    console.log("maxMonth hehehe yo---->", this.state.maxMonth)
 
-                if (this.state.linearRegressionId) {
-                    calculateLinearRegression(JSON.parse(JSON.stringify(inputDataLinearRegression)), this.state.confidenceLevelIdLinearRegression, Math.trunc(noOfMonthsForProjection), this);
-                } else {
-                    this.setState({
-                        linearRegressionData: [],
-                        linearRegressionError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" }
-                    })
-                }
-                if (this.state.smoothingId) {
-                    // if (inputDataTes.length >= (this.state.noOfMonthsForASeason * 2)) {
-                    console.log("tes inside if")
-                    calculateTES(JSON.parse(JSON.stringify(inputDataTes)), this.state.alpha, this.state.beta, this.state.gamma, this.state.confidenceLevelId, Math.trunc(noOfMonthsForProjection), this, jexcelDataArr[0].month, 1);
-                    // }
-                    //  else {
-                    //     console.log("tes inside else")
-                    //     this.setState({
-                    //         extrapolationLoader: false,
-                    //         tesData: [],
-                    //         CI: 0,
-                    //         tesError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" }
-                    //     })
-                    // }
-                } else {
-                    this.setState({
-                        tesData: [],
-                        CI: 0,
-                        tesError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" }
-                    })
-                }
-                if (this.state.arimaId) {
-                    calculateArima(JSON.parse(JSON.stringify(inputDataArima)), this.state.p, this.state.d, this.state.q, this.state.confidenceLevelIdArima, Math.trunc(noOfMonthsForProjection), this, jexcelDataArr[0].month, 1);
-                } else {
-                    this.setState({
-                        arimaData: [],
-                        arimaError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" }
-                    })
-                }
+
+                    for (let i = 0; i < jexcelDataArr.length; i++) {
+                        if (moment(valList[0].month).format("YYYY-MM") <= moment(jexcelDataArr[i].month).format("YYYY-MM") && jexcelDataArr[i].amount != "" && jexcelDataArr[i].amount != null) {
+                            inputDataMovingAvg.push({ "month": inputDataMovingAvg.length + 1, "actual": jexcelDataArr[i].adjustedActuals != "" ? Number(jexcelDataArr[i].adjustedActuals) : null, "forecast": null })
+                            // console.log("inputDataSemiAverage 1--->>>", jexcelDataArr[i]);
+                            // console.log("inputDataSemiAverage 2--->>>", inputDataSemiAverage.length);
+                            inputDataSemiAverage.push({ "month": inputDataSemiAverage.length + 1, "actual": jexcelDataArr[i].adjustedActuals != "" ? Number(jexcelDataArr[i].adjustedActuals) : null, "forecast": null })
+                            // var json = { "month": inputDataSemiAverage.length + 1, "actual": jexcelDataArr[i].adjustedActuals != "" ? Number(jexcelDataArr[i].adjustedActuals) : null, "forecast": null };
+                            // console.log("inputDataSemiAverage 4--->>>", json);
+                            // console.log("inputDataSemiAverage 5 before--->>>", inputDataSemiAverage);
+                            // inputDataSemiAverage.push(json);
+                            console.log("inputDataSemiAverage 6 after--->>>", inputDataSemiAverage);
+                            inputDataLinearRegression.push({ "month": inputDataLinearRegression.length + 1, "actual": jexcelDataArr[i].adjustedActuals != "" ? Number(jexcelDataArr[i].adjustedActuals) : null, "forecast": null })
+                            // console.log("inputDataSemiAverage 7--->>>", inputDataLinearRegression);
+                            inputDataTes.push({ "month": inputDataTes.length + 1, "actual": jexcelDataArr[i].adjustedActuals != "" ? Number(jexcelDataArr[i].adjustedActuals) : null, "forecast": null })
+                            console.log("inputDataSemiAverage 8--->>>", inputDataTes)
+                            inputDataArima.push({ "month": inputDataArima.length + 1, "actual": jexcelDataArr[i].adjustedActuals != "" ? Number(jexcelDataArr[i].adjustedActuals) : null, "forecast": null })
+                            console.log("inputDataArima 8--->>>", inputDataArima)
+                        }
+                    }
+                    if (!dataAvailabel) {
+                        console.log("inputDataMovingAvg--->>>", inputDataMovingAvg)
+                        var data = jexcelDataArr.filter(c => c.amount != "" && c.amount != null)
+                            .sort(function (a, b) {
+                                return new Date(a.month) - new Date(b.month);
+                            });
+                        console.log("jexcelDataArr---%%%", jexcelDataArr);
+                        var lastMonth = data[data.length - 1].month;
+                        var noOfMonthsForProjection = moment(new Date(this.props.items.forecastStopDate)).diff(new Date(lastMonth), 'months', true)
+                        console.log("noOfMonthsForProjection", noOfMonthsForProjection);
+                        if (this.state.semiAvgId) {
+                            console.log("inputDataSemiAverage---", inputDataSemiAverage);
+                            calculateSemiAverages(JSON.parse(JSON.stringify(inputDataSemiAverage)), Math.trunc(noOfMonthsForProjection), this);
+                        } else {
+                            this.setState({
+                                semiAvgData: [],
+                                semiAvgError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" }
+                            })
+                        }
+                        if (this.state.movingAvgId) {
+                            calculateMovingAvg(JSON.parse(JSON.stringify(inputDataMovingAvg)), this.state.monthsForMovingAverage, Math.trunc(noOfMonthsForProjection), this);
+                        } else {
+                            this.setState({
+                                movingAvgData: [],
+                                movingAvgError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" }
+                            })
+                        }
+
+                        if (this.state.linearRegressionId) {
+                            calculateLinearRegression(JSON.parse(JSON.stringify(inputDataLinearRegression)), this.state.confidenceLevelIdLinearRegression, Math.trunc(noOfMonthsForProjection), this, true);
+                        } else {
+                            this.setState({
+                                linearRegressionData: [],
+                                linearRegressionError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" }
+                            })
+                        }
+                        if (this.state.smoothingId) {
+                            console.log("tes inside if")
+                            calculateTES(JSON.parse(JSON.stringify(inputDataTes)), this.state.alpha, this.state.beta, this.state.gamma, this.state.confidenceLevelId, Math.trunc(noOfMonthsForProjection), this, jexcelDataArr[0].month, 1);
+                        } else {
+                            this.setState({
+                                tesData: [],
+                                ci: 0,
+                                tesError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" }
+                            })
+                        }
+                        if (this.state.arimaId) {
+                            calculateArima(JSON.parse(JSON.stringify(inputDataArima)), this.state.p, this.state.d, this.state.q, this.state.confidenceLevelIdArima, Math.trunc(noOfMonthsForProjection), this, jexcelDataArr[0].month, 1, this.state.seasonality);
+                        } else {
+                            this.setState({
+                                arimaData: [],
+                                arimaError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" }
+                            })
+                        }
+                    } else {
+                        console.log("jexcel build else called")
+                        console.log("this.state.semiAvgData--->>>", this.state.semiAvgData)
+                        if (this.state.semiAvgId) {
+                            calculateError(this.state.semiAvgData, "semiAvgError", this);
+                        }
+                        if (this.state.movingAvgId) {
+                            calculateError(this.state.movingAvgData, "movingAvgError", this);
+                        }
+                        if (this.state.linearRegressionId) {
+                            calculateError(this.state.linearRegressionData, "linearRegressionError", this);
+                        }
+                        if (this.state.smoothingId) {
+                            if (this.state.tesData.length > 0) {
+                                calculateError(this.state.tesData, "tesError", this);
+                            } else {
+                                this.setState({
+                                    tesData: [],
+                                    tesError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" }
+                                });
+                            }
+                        }
+                        if (this.state.arimaId) {
+                            if (this.state.arimaData.length > 0) {
+                                calculateError(this.state.arimaData, "arimaError", this);
+                            }
+                            else {
+                                this.setState({
+                                    arimaData: [],
+                                    arimaError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" }
+                                });
+                            }
+                        }
+                        // this.buildJexcel();
+                    }
+                });
+
             } else {
                 this.setState({ extrapolationLoader: false });
             }
@@ -1150,48 +1255,60 @@ export default class TreeExtrapolationComponent extends React.Component {
                         extrapolationMethodList: myResult.filter(x => x.active == true),
                         changed: 1
                     }, () => {
-                        if (this.props.items.currentScenario.nodeDataExtrapolationOptionList == null) {
+                        var month = this.props.items.currentScenario.month;
+                        var forecastStartDate = this.props.items.forecastStartDate;
+                        var forecastStopDate = this.props.items.forecastStopDate;
+                        var minStartDate = month;
+                        if (moment(month).format("YYYY-MM") > moment(forecastStartDate).format("YYYY-MM")) {
+                            minStartDate = forecastStartDate;
+                        }
+                        console.log("month---", month);
+                        console.log("forecastStartDate---", forecastStartDate);
+                        console.log("forecastStopDate---", forecastStopDate);
+                        console.log("minStartDate---", minStartDate);
+                        var monthArray = [];
+                        var curDate1 = minStartDate;
+                        // monthArray.push('2019-01-01');
+
+                        for (var m = 0; curDate1 < moment(forecastStopDate).format("YYYY-MM-DD"); m++) {
+                            console.log("curDate1---", curDate1 + " stop date---", moment(forecastStopDate).format("YYYY-MM-DD") + " result---", curDate1 < moment(forecastStopDate).format("YYYY-MM-DD"));
+                            console.log("");
+                            curDate1 = moment(minStartDate).add(m, 'months').format("YYYY-MM-DD");
+                            console.log("curDate1 only---", curDate1);
+                            if (moment(forecastStopDate).format("YYYY-MM-DD") >= curDate1) {
+                                monthArray.push(curDate1)
+                            }
+
+                        }
+                        this.setState({ monthArray });
+                        // monthArray.push('2025-01-01');
+                        console.log("monthArray---", monthArray);
+
+
+                        if (this.props.items.currentScenario.nodeDataExtrapolation == null) {
+                            var nodeDataExtrapolation = {
+                                extrapolationMethod: { id: '' },
+                                notes: '',
+                                // reportingRate
+                                // month
+                                // amount
+                                extrapolationDataList: []
+                            }
+                            this.setState({ nodeDataExtrapolation })
+                        }
+                        console.log("### inside did mount current---", this.props.items.currentScenario)
+                        if (this.props.items.currentScenario.nodeDataExtrapolationOptionList == null || this.props.items.currentScenario.nodeDataExtrapolationOptionList.length == 0) {
                             console.log("### inside did mount if")
                             this.setState({ extrapolationLoader: false, forecastNestedHeader: 5, filteredExtrapolationMethodList: JSON.parse(JSON.stringify(this.state.extrapolationMethodList)) }, () => {
                                 console.log("### inside did mount if state update")
                                 this.buildJexcel();
                             })
-                            // var nodeDataExtrapolationOptionList = [];
-                            // for (let i = 0; i < this.state.extrapolationMethodList.length; i++) {
-                            //     var e = this.state.extrapolationMethodList[i];
-                            //     var json;
-                            //     if (e.id == 7) { // moving avg
-                            //         json = {
-                            //             extrapolationMethod: e.id,
-                            //             jsonProperties: {
-                            //                 months: this.state.monthsForMovingAverage
-                            //             }
-                            //         }
-                            //     } else if (e.id == 5 || e.id == 6) { // semi avg
-                            //         json = {
-                            //             extrapolationMethod: e.id,
-                            //             jsonProperties: {
-                            //             }
-                            //         }
-                            //     }
-                            //     else if (e.id == 2) { // TES
-                            //         json = {
-                            //             extrapolationMethod: e.id,
-                            //             jsonProperties: {
-                            //                 confidenceLevel: this.state.confidenceLevelId,
-                            //                 seasonality: this.state.noOfMonthsForASeason,
-                            //                 alpha: this.state.alpha,
-                            //                 beta: this.state.beta,
-                            //                 gamma: this.state.gamma
-                            //             }
-                            //         }
-                            //     }
-                            //     nodeDataExtrapolationOptionList.push(json);
-                            // }
-                            // this.setState({ nodeDataExtrapolationOptionList, filteredExtrapolationMethodList: JSON.parse(JSON.stringify(this.state.extrapolationMethodList)) })
+
                         } else {
+                            console.log("### inside did mount else")
                             var filteredExtrapolationMethodList = [];
                             var nodeDataExtrapolation = this.props.items.currentScenario.nodeDataExtrapolation;
+                            var extrapolationDataList = nodeDataExtrapolation.extrapolationDataList;
                             var nodeDataExtrapolationOptionList = this.props.items.currentScenario.nodeDataExtrapolationOptionList;
                             console.log("nodeDataExtrapolationOptionList----", nodeDataExtrapolationOptionList)
                             console.log("nodeDataExtrapolation----", nodeDataExtrapolation)
@@ -1211,27 +1328,94 @@ export default class TreeExtrapolationComponent extends React.Component {
                             var p = this.state.p;
                             var d = this.state.d;
                             var q = this.state.q;
+                            var seasonality = this.state.seasonality;
+                            var movingAvgData = [];
+                            var semiAvgData = [];
+                            var arimaData = [];
+                            var tesData = [];
+                            var linearRegressionData = [];
+                            var json;
 
                             for (let i = 0; i < nodeDataExtrapolationOptionList.length; i++) {
                                 var id = nodeDataExtrapolationOptionList[i].extrapolationMethod.id;
-                                filteredExtrapolationMethodList.push(this.state.extrapolationMethodList.filter(x => x.id == id)[0]);
+                                console.log("this.state.extrapolationMethodList---", this.state.extrapolationMethodList);
+                                var methodData = this.state.extrapolationMethodList.filter(x => x.id == id);
+                                if (methodData.length > 0) {
+                                    filteredExtrapolationMethodList.push(methodData[0]);
+                                }
                                 if (id == 7) {
                                     movingAvgId = true;
                                     console.log("nodeDataExtrapolationOptionList[i] inside ---", nodeDataExtrapolationOptionList[i])
                                     monthsForMovingAverage = nodeDataExtrapolationOptionList[i].jsonProperties.months;
                                     console.log("monthsForMovingAverage from json properties---", monthsForMovingAverage)
+                                    var movingAvgDataTemp = JSON.parse(JSON.stringify(nodeDataExtrapolationOptionList[i].extrapolationOptionDataList));
+                                    console.log("movingAvgDataTemp---", movingAvgDataTemp)
+                                    if (movingAvgDataTemp.length > 0) {
+                                        for (let i = 0; i < movingAvgDataTemp.length; i++) {
+                                            var mvData = extrapolationDataList.filter(x => moment(x.month).format('YYYY-MM') == moment(movingAvgDataTemp[i].month).format('YYYY-MM'));
+                                            json = {
+                                                month: i + 1,
+                                                actual: mvData.length > 0 ? mvData[0].amount != "" ? parseFloat(mvData[0].amount) : null : null,
+                                                forecast: movingAvgDataTemp[i].amount == null || movingAvgDataTemp[i].amount == "" ? null : parseFloat(movingAvgDataTemp[i].amount)
+                                            }
+                                            movingAvgData.push(json);
+                                        }
+                                        console.log("movingAvgData after temp---", movingAvgData);
+                                    }
                                 } else if (id == 6) {
                                     semiAvgId = true;
+                                    var semiAvgDataTemp = JSON.parse(JSON.stringify(nodeDataExtrapolationOptionList[i].extrapolationOptionDataList));
+                                    if (semiAvgDataTemp.length > 0) {
+                                        for (let i = 0; i < semiAvgDataTemp.length; i++) {
+                                            // console
+                                            var saData = extrapolationDataList.filter(x => moment(x.month).format('YYYY-MM') == moment(semiAvgDataTemp[i].month).format('YYYY-MM'));
+                                            json = {
+                                                month: i + 1,
+                                                actual: saData.length > 0 ? saData[0].amount != "" ? parseFloat(saData[0].amount) : null : null,
+                                                forecast: semiAvgDataTemp[i].amount == null || semiAvgDataTemp[i].amount == "" ? null : parseFloat(semiAvgDataTemp[i].amount)
+                                            }
+                                            semiAvgData.push(json);
+                                        }
+                                    }
                                 } else if (id == 5) {
                                     linearRegressionId = true;
                                     confidenceLevelIdLinearRegression = nodeDataExtrapolationOptionList[i].jsonProperties.confidenceLevelIdLinearRegression;
+                                    var linearRegressionDataTemp = JSON.parse(JSON.stringify(nodeDataExtrapolationOptionList[i].extrapolationOptionDataList));
+                                    if (linearRegressionDataTemp.length > 0) {
+                                        for (let i = 0; i < linearRegressionDataTemp.length; i++) {
+                                            var lrData = extrapolationDataList.filter(x => moment(x.month).format('YYYY-MM') == moment(linearRegressionDataTemp[i].month).format('YYYY-MM'));
+                                            json = {
+                                                month: i + 1,
+                                                actual: lrData.length > 0 ? lrData[0].amount != null && lrData[0].amount != "" ? parseFloat(lrData[0].amount) : null : null,
+                                                forecast: linearRegressionDataTemp[i].amount == null || linearRegressionDataTemp[i].amount == "" ? null : parseFloat(linearRegressionDataTemp[i].amount),
+                                                ci: linearRegressionDataTemp[i].ci != null && linearRegressionDataTemp[i].ci != "" ? parseFloat(linearRegressionDataTemp[i].ci) : null
+                                            }
+                                            linearRegressionData.push(json);
+                                        }
+                                        console.log("linearRegressionData on load---", linearRegressionData);
+                                    }
                                 }
                                 else if (id == 4) {
                                     p = nodeDataExtrapolationOptionList[i].jsonProperties.p;
                                     d = nodeDataExtrapolationOptionList[i].jsonProperties.d;
                                     q = nodeDataExtrapolationOptionList[i].jsonProperties.q;
                                     confidenceLevelIdArima = nodeDataExtrapolationOptionList[i].jsonProperties.confidenceLevelIdArima;
+                                    seasonality = nodeDataExtrapolationOptionList[i].jsonProperties.seasonality;
+                                    console.log("seasonality for arima on load---", seasonality);
                                     arimaId = true;
+                                    var arimaDataTemp = JSON.parse(JSON.stringify(nodeDataExtrapolationOptionList[i].extrapolationOptionDataList));
+                                    if (arimaDataTemp.length > 0) {
+                                        for (let i = 0; i < arimaDataTemp.length; i++) {
+                                            var arData = extrapolationDataList.filter(x => moment(x.month).format('YYYY-MM') == moment(arimaDataTemp[i].month).format('YYYY-MM'));
+                                            json = {
+                                                month: i + 1,
+                                                actual: arData.length > 0 ? arData[0].amount != null && arData[0].amount != "" ? parseFloat(arData[0].amount) : null : null,
+                                                forecast: arimaDataTemp[i].amount == null || arimaDataTemp[i].amount == "" ? null : parseFloat(arimaDataTemp[i].amount),
+                                                ci: arimaDataTemp[i].ci != null && arimaDataTemp[i].ci != "" ? parseFloat(arimaDataTemp[i].ci) : null
+                                            }
+                                            arimaData.push(json);
+                                        }
+                                    }
                                 }
                                 else if (id == 2) {
                                     confidenceLevelId = nodeDataExtrapolationOptionList[i].jsonProperties.confidenceLevel;
@@ -1240,12 +1424,43 @@ export default class TreeExtrapolationComponent extends React.Component {
                                     beta = nodeDataExtrapolationOptionList[i].jsonProperties.beta;
                                     gamma = nodeDataExtrapolationOptionList[i].jsonProperties.gamma;
                                     smoothingId = true;
+                                    var tesDataTemp = JSON.parse(JSON.stringify(nodeDataExtrapolationOptionList[i].extrapolationOptionDataList));
+                                    console.log("tesDataTemp---", tesDataTemp);
+                                    if (tesDataTemp.length > 0) {
+                                        for (let i = 0; i < tesDataTemp.length; i++) {
+                                            var tsData = extrapolationDataList.filter(x => moment(x.month).format('YYYY-MM') == moment(tesDataTemp[i].month).format('YYYY-MM'));
+                                            console.log("tesDataTemp[i].amount---", tesDataTemp[i].amount);
+                                            json = {
+                                                month: i + 1,
+                                                actual: tsData.length > 0 ? tsData[0].amount != null && tsData[0].amount != "" ? parseFloat(tsData[0].amount) : null : null,
+                                                forecast: tesDataTemp[i].amount == null || tesDataTemp[i].amount == "" ? null : parseFloat(tesDataTemp[i].amount),
+                                                ci: tesDataTemp[i].ci != null && tesDataTemp[i].ci != "" ? parseFloat(tesDataTemp[i].ci) : null
+                                            }
+                                            tesData.push(json);
+                                        }
+                                    }
+                                    console.log("tesData---", tesData);
                                 }
 
                             }
                             console.log("filteredExtrapolationMethodList---", filteredExtrapolationMethodList)
-                            this.setState({ nodeDataExtrapolation, p, d, q, confidenceLevelId, confidenceLevelIdLinearRegression, confidenceLevelIdArima, alpha, beta, gamma, movingAvgId, semiAvgId, linearRegressionId, smoothingId, arimaId, filteredExtrapolationMethodList, forecastNestedHeader: filteredExtrapolationMethodList.length, nodeDataExtrapolationOptionList, movingAvgId, monthsForMovingAverage }, () => {
-                                console.log("obj------>>>", this.state.nodeDataExtrapolation)
+                            filteredExtrapolationMethodList = filteredExtrapolationMethodList.length > 0 && filteredExtrapolationMethodList.sort((a, b) => {
+                                var itemLabelA = a.sortOrder; // ignore upper and lowercase
+                                var itemLabelB = b.sortOrder; // ignore upper and lowercase                   
+                                return itemLabelA > itemLabelB ? 1 : -1;
+                            });
+                            this.setState({
+                                nodeDataExtrapolation, p, d, q,
+                                confidenceLevelId, confidenceLevelIdLinearRegression,
+                                confidenceLevelIdArima, alpha, beta, gamma, movingAvgId,
+                                semiAvgId, linearRegressionId, smoothingId, arimaId,
+                                filteredExtrapolationMethodList, forecastNestedHeader: filteredExtrapolationMethodList.length,
+                                nodeDataExtrapolationOptionList, movingAvgId, monthsForMovingAverage, seasonality,
+                                movingAvgData, semiAvgData, linearRegressionData, tesData, arimaData,
+                                // extrapolationLoader: false
+                            }, () => {
+                                console.log("obj------>>>", this.state.nodeDataExtrapolation);
+                                console.log("mv data hehehe------>>>", this.state.movingAvgData);
                                 this.calculateExtrapolatedData(true);
                             })
                             // this.setState({ filteredExtrapolationMethodList, forecastNestedHeader: filteredExtrapolationMethodList.length })
@@ -1257,7 +1472,6 @@ export default class TreeExtrapolationComponent extends React.Component {
 
                         // var changed = 0;
                         // if (this.state.changed == 1) {
-                        // this.calculateExtrapolatedData();
                         // } else {
                         //     this.setSa
                         //     changed = 0;
@@ -1276,31 +1490,31 @@ export default class TreeExtrapolationComponent extends React.Component {
         var month = this.props.items.currentScenario.month;
         var forecastStartDate = this.props.items.forecastStartDate;
         var forecastStopDate = this.props.items.forecastStopDate;
-        var minStartDate = month;
-        if (moment(month).format("YYYY-MM") > moment(forecastStartDate).format("YYYY-MM")) {
-            minStartDate = forecastStartDate;
-        }
-        console.log("month---", month);
-        console.log("forecastStartDate---", forecastStartDate);
-        console.log("forecastStopDate---", forecastStopDate);
-        console.log("minStartDate---", minStartDate);
-        var monthArray = [];
-        var curDate1 = minStartDate;
+        // var minStartDate = month;
+        // if (moment(month).format("YYYY-MM") > moment(forecastStartDate).format("YYYY-MM")) {
+        //     minStartDate = forecastStartDate;
+        // }
+        // console.log("month---", month);
+        // console.log("forecastStartDate---", forecastStartDate);
+        // console.log("forecastStopDate---", forecastStopDate);
+        // console.log("minStartDate---", minStartDate);
+        var monthArray = this.state.monthArray;
+        // var curDate1 = minStartDate;
         // monthArray.push('2019-01-01');
 
-        for (var m = 0; curDate1 < moment(forecastStopDate).format("YYYY-MM-DD"); m++) {
-            console.log("curDate1---", curDate1 + " stop date---", moment(forecastStopDate).format("YYYY-MM-DD") + " result---", curDate1 < moment(forecastStopDate).format("YYYY-MM-DD"));
-            console.log("");
-            curDate1 = moment(minStartDate).add(m, 'months').format("YYYY-MM-DD");
-            console.log("curDate1 only---", curDate1);
-            if (moment(forecastStopDate).format("YYYY-MM-DD") >= curDate1) {
-                monthArray.push(curDate1)
-            }
+        // for (var m = 0; curDate1 < moment(forecastStopDate).format("YYYY-MM-DD"); m++) {
+        //     console.log("curDate1---", curDate1 + " stop date---", moment(forecastStopDate).format("YYYY-MM-DD") + " result---", curDate1 < moment(forecastStopDate).format("YYYY-MM-DD"));
+        //     console.log("");
+        //     curDate1 = moment(minStartDate).add(m, 'months').format("YYYY-MM-DD");
+        //     console.log("curDate1 only---", curDate1);
+        //     if (moment(forecastStopDate).format("YYYY-MM-DD") >= curDate1) {
+        //         monthArray.push(curDate1)
+        //     }
 
-        }
-        this.setState({ monthArray });
+        // }
+        // this.setState({ monthArray });
         // monthArray.push('2025-01-01');
-        console.log("monthArray---", monthArray);
+        // console.log("monthArray---", monthArray);
         let count = 0;
         let count1 = '';
         for (var j = 0; j < monthArray.length; j++) {
@@ -1320,31 +1534,41 @@ export default class TreeExtrapolationComponent extends React.Component {
             }
             data[3] = adjustedActuals
             count1 = moment(this.state.minMonth).format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM") ? 0 : moment(this.state.minMonth).format("YYYY-MM") < moment(monthArray[j]).format("YYYY-MM") ? count1 : '';
-            data[4] = this.state.movingAvgData.length > 0 && count1 != '' ? this.state.movingAvgData[count1] != null ? this.state.movingAvgData[count1].forecast.toFixed(4) : '' : ''
-            data[5] = this.state.semiAvgData.length > 0 && this.state.semiAvgData[count1] != null ? this.state.semiAvgData[count1].forecast.toFixed(4) : ''
-            data[6] = this.state.linearRegressionData.length > 0 && this.state.linearRegressionData[count1] != null ? this.state.linearRegressionData[count1].forecast.toFixed(4) : ''
+            console.log("mv data hehehe 2------>>>", this.state.movingAvgData);
+            console.log("minMonth hehehe---", this.state.minMonth);
+            console.log("count 1 hehehe---", count1);
+            console.log("final hehehe---", this.state.movingAvgData.length > 0 && count1 != '' ? this.state.movingAvgData[count1] != null ? "A" : 'B' : 'C');
+            data[4] = this.state.movingAvgData.length > 0 && count1 != '' ? this.state.movingAvgData[count1] != null ? parseFloat(this.state.movingAvgData[count1].forecast).toFixed(4) : '' : ''
+            data[5] = this.state.semiAvgData.length > 0 && this.state.semiAvgData[count1] != null ? parseFloat(this.state.semiAvgData[count1].forecast).toFixed(4) : ''
+            data[6] = this.state.linearRegressionData.length > 0 && this.state.linearRegressionData[count1] != null ? parseFloat(this.state.linearRegressionData[count1].forecast).toFixed(4) : ''
             data[7] = this.state.tesData.length > 0 && this.state.tesData[count1] != null ? this.state.tesData[count1].forecast : ''
             data[8] = this.state.arimaData.length > 0 && this.state.arimaData[count1] != null ? this.state.arimaData[count1].forecast : ''
+
+            data[9] = `=IF(D${parseInt(j) + 1} != "",ROUND(D${parseInt(j) + 1},4),IF(N1 == 4,I${parseInt(j) + 1},IF(N1 == 2,H${parseInt(j) + 1},IF(N1 == 7,E${parseInt(j) + 1},IF(N1==5,G${parseInt(j) + 1},IF(N1 == 6,F${parseInt(j) + 1},''))))))` // J
+            data[10] = cellData != null && cellData != "" ? cellData.manualChange : ""
+            // data[11] = `=IF(M1 == true,IF(J${parseInt(j)} + K${parseInt(j)} == "",'',ROUND((J${parseInt(j + 1)} + K${parseInt(j + 1)})-(J${parseInt(j)} + K${parseInt(j)})+(J${parseInt(j + 1)} + K${parseInt(j + 1)}),4)),IF(J${parseInt(j) + 1} + K${parseInt(j) + 1} == "",'',ROUND(J${parseInt(j) + 1} + K${parseInt(j) + 1},4)))`
+            // data[11] = `=IF(M1 == true,IF(J${parseInt(j)} + K${parseInt(j)} == "",'',ROUND((J${parseInt(j + 1)} + K${parseInt(j + 1)})-(J${parseInt(j)} + K${parseInt(j)})+(J${parseInt(j + 1)} + K${parseInt(j + 1)}),4)),IF(J${parseInt(j) + 1} + K${parseInt(j) + 1} == "",'',ROUND(J${parseInt(j) + 1} + K${parseInt(j) + 1},4)))`
+            data[11] = `=IF(M1 == true,ROUND((J${parseInt(j + 1)} + SUM(K0:K${parseInt(j) + 1})),4),ROUND((J${parseInt(j + 1)} + K${parseInt(j + 1)}),4))`
+            data[12] = this.props.items.currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].manualChangesEffectFuture
+            data[13] = this.state.nodeDataExtrapolation.extrapolationMethod.id
+            //TES lower
+            // data[14] = this.state.tesData.length > 0 && this.state.tesData[count1] != null ? this.state.tesData[count1].forecast - this.state.tesData[count1].CI : ''
+            // console.log("tes lower calculations---", this.state.tesData[count1]);
+            data[14] = this.state.tesData.length > 0 && this.state.tesData[count1] != null ? this.state.tesData[count1].forecast != null ? this.state.tesData[count1].ci != null ? this.state.tesData[count1].forecast - this.state.tesData[count1].ci : this.state.tesData[count1].forecast : '' : ''
+            //TES Upper
+            data[15] = this.state.tesData.length > 0 && this.state.tesData[count1] != null ? this.state.tesData[count1].forecast != null ? this.state.tesData[count1].ci != null ? this.state.tesData[count1].forecast + this.state.tesData[count1].ci : this.state.tesData[count1].forecast : '' : ''
+            //Arima lower
+            data[16] = this.state.arimaData.length > 0 && this.state.arimaData[count1] != null ? this.state.arimaData[count1].forecast != null ? this.state.arimaData[count1].ci != null ? this.state.arimaData[count1].forecast - this.state.arimaData[count1].ci : this.state.arimaData[count1].forecast : '' : ''
+            //Arima Upper
+            data[17] = this.state.arimaData.length > 0 && this.state.arimaData[count1] != null ? this.state.arimaData[count1].forecast != null ? this.state.arimaData[count1].ci != null ? this.state.arimaData[count1].forecast + this.state.arimaData[count1].ci : this.state.arimaData[count1].forecast : '' : ''
+            //LR Lower
+            data[18] = this.state.linearRegressionData.length > 0 && this.state.linearRegressionData[count1] != null ? this.state.linearRegressionData[count1].forecast != null ? this.state.linearRegressionData[count1].ci != null ? this.state.linearRegressionData[count1].forecast - this.state.linearRegressionData[count1].ci : this.state.linearRegressionData[count1].forecast : '' : ''
+            //LR Upper
+            data[19] = this.state.linearRegressionData.length > 0 && this.state.linearRegressionData[count1] != null ? this.state.linearRegressionData[count1].forecast != null ? this.state.linearRegressionData[count1].ci != null ? this.state.linearRegressionData[count1].forecast + this.state.linearRegressionData[count1].ci : this.state.linearRegressionData[count1].forecast : '' : ''
             if (count1 >= 0) {
                 count1++;
             }
-            data[9] = `=IF(D${parseInt(j) + 1} != "",ROUND(D${parseInt(j) + 1},4),IF(N1 == 4,I${parseInt(j) + 1},IF(N1 == 2,H${parseInt(j) + 1},IF(N1 == 7,E${parseInt(j) + 1},IF(N1==5,G${parseInt(j) + 1},IF(N1 == 6,F${parseInt(j) + 1},''))))))` // J
-            data[10] = cellData != null && cellData != "" ? cellData.manualChange : ""
-            data[11] = `=IF(M1 == true,ROUND(J${parseInt(j)} + K${parseInt(j)},4),ROUND(J${parseInt(j) + 1} + K${parseInt(j) + 1},4))`
-            data[12] = this.props.items.currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].manualChangesEffectFuture
-            data[13] = this.state.nodeDataExtrapolation.extrapolationMethod.id
-            // data[0] = list[j].month
-            // data[1] = list[j].node
-            // data[2] = list[j].reportingRate
-            // data[3] = list[j].adjustedActuals
-            // data[4] = list[j].ma
-            // data[5] = list[j].sa
-            // data[6] = list[j].lr
-            // data[7] = list[j].arima
-            // data[8] = list[j].tesM
-            // data[9] = list[j].selectedForecast
-            // data[10] = list[j].manualChange
-            // data[11] = list[j].monthEndFinal
+            // data[20] = `=SUM(K0:K${parseInt(j) + 1})`
             dataArray[count] = data;
             count++;
         }
@@ -1480,7 +1704,35 @@ export default class TreeExtrapolationComponent extends React.Component {
                 {
                     title: 'extrapolationMethodId',
                     type: 'hidden'
-                }
+                },
+                {
+                    title: 'tesLower',
+                    type: 'hidden'
+                },
+                {
+                    title: 'tesUpper',
+                    type: 'hidden'
+                },
+                {
+                    title: 'arimaLower',
+                    type: 'hidden'
+                },
+                {
+                    title: 'arimaUpper',
+                    type: 'hidden'
+                },
+                {
+                    title: 'lrLower',
+                    type: 'hidden'
+                },
+                {
+                    title: 'lrUpper',
+                    type: 'hidden'
+                },
+                // {
+                //     title: 'cumulativeManualChange',
+                //     type: 'text'
+                // },
             ],
 
             text: {
@@ -1509,9 +1761,14 @@ export default class TreeExtrapolationComponent extends React.Component {
                     if (moment(rowData[0]).isBetween(this.props.items.forecastStartDate, this.props.items.forecastStopDate, undefined, '[]')) {
                         var cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
                         cell.classList.add('bold');
+                        cell = elInstance.getCell(("K").concat(parseInt(y) + 1))
+                        cell.classList.remove('readonly');
+
                     } else {
                         var cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
                         cell.classList.remove('bold');
+                        cell = elInstance.getCell(("K").concat(parseInt(y) + 1))
+                        cell.classList.add('readonly');
                         // elInstance.showIndex(6);
                     }
                     var cell;
@@ -1689,7 +1946,6 @@ export default class TreeExtrapolationComponent extends React.Component {
             // startMonthForExtrapolation: startMonth
         }, () => {
             console.log("");
-            // this.calculateExtrapolatedData();
         })
     }
     loadedExtrapolation = function (instance, cell, x, y, value) {
@@ -1723,6 +1979,7 @@ export default class TreeExtrapolationComponent extends React.Component {
             var col = ("B").concat(parseInt(y) + 1);
             var reg = JEXCEL_DECIMAL_NO_REGEX_LONG_4_DECIMAL;
             console.log("population value---", value)
+            this.setState({ dataChanged: true })
             if (value != "" && !(reg.test(value.toString().replaceAll(",", "")))) {
                 instance.jexcel.setStyle(col, "background-color", "transparent");
                 instance.jexcel.setStyle(col, "background-color", "yellow");
@@ -1776,6 +2033,7 @@ export default class TreeExtrapolationComponent extends React.Component {
             var col = ("C").concat(parseInt(y) + 1);
             var reg = JEXCEL_DECIMAL_NO_REGEX_LONG_4_DECIMAL;
             console.log("reporting rate value---", value)
+            this.setState({ dataChanged: true })
             var actualValue = instance.jexcel.getValue(`B${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             // value.split("%")[0];
             value = value.toString().replaceAll(",", "").split("%")[0];
@@ -1814,9 +2072,10 @@ export default class TreeExtrapolationComponent extends React.Component {
                 instance.jexcel.setComments(col, "");
             }
         }
-        if (x != 10 && this.state.nodeDataExtrapolation.extrapolationMethod.id == "") {
-            this.setState({ dataChanged: true })
-        }
+        console.log("x value for data change---", x);
+        // if (x != 10 && (x == 1 || x > 2)) {
+        //     this.setState({ dataChanged: true })
+        // }
         this.setState({ isChanged: true })
     }.bind(this);
 
@@ -2150,15 +2409,22 @@ export default class TreeExtrapolationComponent extends React.Component {
 
     render() {
         const { filteredExtrapolationMethodList } = this.state;
-        console.log("render filteredExtrapolationMethodList ---", filteredExtrapolationMethodList)
-        let extrapolationMethods = filteredExtrapolationMethodList.length > 0
-            && filteredExtrapolationMethodList.map((item, i) => {
+        console.log("render filteredExtrapolationMethodList ---", filteredExtrapolationMethodList);
+        var filteredExtrapolationMethodListNew = filteredExtrapolationMethodList.length > 0 && filteredExtrapolationMethodList.sort((a, b) => {
+            var itemLabelA = a.sortOrder; // ignore upper and lowercase
+            var itemLabelB = b.sortOrder; // ignore upper and lowercase                   
+            return itemLabelA > itemLabelB ? 1 : -1;
+        });
+        let extrapolationMethods = filteredExtrapolationMethodListNew.length > 0
+            && filteredExtrapolationMethodListNew.map((item, i) => {
                 return (
                     <option key={i} value={item.id}>
                         {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
             }, this);
+        // console.log("extrapolationMethods---", extrapolationMethods);
+
         const pickerLang = {
             months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
             from: 'From', to: 'To',
@@ -2319,6 +2585,7 @@ export default class TreeExtrapolationComponent extends React.Component {
             label: i18n.t('static.extrapolation.adjustedActuals'),
             backgroundColor: 'transparent',
             borderColor: '#002F6C',
+            borderWidth: 2,
             ticks: {
                 fontSize: 2,
                 fontColor: 'transparent',
@@ -2332,15 +2599,19 @@ export default class TreeExtrapolationComponent extends React.Component {
             // pointRadius: 1,
             pointHitRadius: 5,
             yValueFormatString: "###,###,###,###",
-            data: this.state.jexcelDataArr.map((item, index) => (item.adjustedActuals > 0 ? item.adjustedActuals : null))
+            data: this.state.jexcelDataArr.map((item, index) => (item.adjustedActuals > 0 && this.state.monthArray.filter(x => moment(x).format('YYYY-MM') == moment(item.month).format('YYYY-MM')).length > 0 ? item.adjustedActuals : null))
         })
 
         let stopDate = moment(this.props.items.forecastStopDate).format("YYYY-MM-DD");
         let startDate = moment(this.props.items.forecastStartDate).format("YYYY-MM-DD");
 
-        console.log("Stop Date&&&", stopDate);
-        console.log("Stop Date&&&", this.state.movingAvgData);
-        if (this.state.nodeDataExtrapolation.extrapolationMethod != null && this.state.nodeDataExtrapolation.extrapolationMethod.id == 7) {
+        // console.log("Stop Date&&&", stopDate);
+        console.log("Stop Date 1&&&", this.state.tesData);
+        // console.log("Stop Date 2&&&", this.state.jexcelDataArr);
+        // console.log("Stop Date 3&&&", this.state.linearRegressionData);
+        // console.log("Stop Date 4&&&", this.state.maxMonth);
+        // console.log("Stop Date 5&&&", this.state.minMonth);
+        if (this.state.nodeDataExtrapolation != null && this.state.nodeDataExtrapolation.extrapolationMethod != null && this.state.nodeDataExtrapolation.extrapolationMethod.id == 7) {
             if (this.state.movingAvgId) {
                 datasets.push(
                     {
@@ -2364,12 +2635,12 @@ export default class TreeExtrapolationComponent extends React.Component {
                         // pointRadius: 1,
                         pointHitRadius: 5,
                         yValueFormatString: "###,###,###,###",
-                        data: this.state.jexcelDataArr.map((item, index) => (this.state.movingAvgData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && item.amount == "")) ? this.state.movingAvgData.filter(x => x.month == item.monthNo)[0].forecast : null))
+                        data: this.state.jexcelDataArr.map((item, index) => (this.state.movingAvgData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && (item.amount == "" || item.amount == null))) ? this.state.movingAvgData.filter(x => x.month == item.monthNo)[0].forecast : null))
                     })
             }
         }
         // Semi Averages
-        else if (this.state.nodeDataExtrapolation.extrapolationMethod != null && this.state.nodeDataExtrapolation.extrapolationMethod.id == 6) {
+        else if (this.state.nodeDataExtrapolation != null && this.state.nodeDataExtrapolation.extrapolationMethod != null && this.state.nodeDataExtrapolation.extrapolationMethod.id == 6) {
             if (this.state.semiAvgId) {
                 datasets.push({
                     type: "line",
@@ -2393,14 +2664,16 @@ export default class TreeExtrapolationComponent extends React.Component {
                     pointHitRadius: 5,
                     yValueFormatString: "###,###,###,###",
                     // data: this.state.semiAvgData.map((item, index) => (item.forecast > 0 && moment(this.state.minMonth).format("YYYY-MM") <= moment(this.props.items.forecastStopDate).format("YYYY-MM") ? item.forecast.toFixed(4) : null))
-                    data: this.state.jexcelDataArr.map((item, index) => (this.state.semiAvgData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && item.amount == "")) ? this.state.semiAvgData.filter(x => x.month == item.monthNo)[0].forecast : null))
+                    data: this.state.jexcelDataArr.map((item, index) => (this.state.semiAvgData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && (item.amount == "" || item.amount == null))) ? this.state.semiAvgData.filter(x => x.month == item.monthNo)[0].forecast : null))
                     // data: this.state.jexcelDataArr.map((item, index) => (this.state.movingAvgData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && item.amount == "")) ? this.state.movingAvgData.filter(x => x.month == item.monthNo)[0].forecast : null))
                 })
             }
         }
         // Linear Regression
-        else if (this.state.nodeDataExtrapolation.extrapolationMethod != null && this.state.nodeDataExtrapolation.extrapolationMethod.id == 5) {
+        else if (this.state.nodeDataExtrapolation != null && this.state.nodeDataExtrapolation.extrapolationMethod != null && this.state.nodeDataExtrapolation.extrapolationMethod.id == 5) {
+            console.log("inside if linear regression");
             if (this.state.linearRegressionId) {
+                console.log("inside if linear regression true");
                 datasets.push(
                     {
                         type: "line",
@@ -2426,7 +2699,16 @@ export default class TreeExtrapolationComponent extends React.Component {
                         pointHitRadius: 5,
                         yValueFormatString: "###,###,###,###",
                         // data: this.state.linearRegressionData.map((item, index) => (item.forecast > 0 && moment(this.state.minMonth).format("YYYY-MM") <= moment(this.props.items.forecastStopDate).format("YYYY-MM") ? item.forecast.toFixed(4) : null))
-                        data: this.state.jexcelDataArr.map((item, index) => (this.state.linearRegressionData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && item.amount == "")) ? (this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].CI != null && this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].CI != "" && this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].CI != undefined ? this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].forecast : (this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].forecast - this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].ci)) : null))
+                        data: this.state.jexcelDataArr.map((item, index) => (this.state.linearRegressionData.filter(x => x.month == item.monthNo).length > 0
+                            && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM')
+                                || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && (item.amount == ""
+                                    || item.amount == null)))
+                            ? (this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].ci != null
+                                && this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].ci != ""
+                                && this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].ci != undefined
+                                ? ((this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].forecast - this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].ci) < 0 ? 0 : (this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].forecast - this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].ci))
+                                : this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].forecast)
+                            : null))
                     })
             }
             // Linear Regression 
@@ -2454,7 +2736,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                         pointHitRadius: 5,
                         yValueFormatString: "###,###,###,###",
                         // data: this.state.linearRegressionData.map((item, index) => (item.forecast > 0 && moment(this.state.minMonth).format("YYYY-MM") <= moment(this.props.items.forecastStopDate).format("YYYY-MM") ? item.forecast.toFixed(4) : null))
-                        data: this.state.jexcelDataArr.map((item, index) => (this.state.linearRegressionData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && item.amount == "")) ? this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].forecast : null))
+                        data: this.state.jexcelDataArr.map((item, index) => (this.state.linearRegressionData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && (item.amount == "" || item.amount == null))) ? this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].forecast : null))
                     })
             }
             // Linear Regression High
@@ -2484,12 +2766,21 @@ export default class TreeExtrapolationComponent extends React.Component {
                         pointHitRadius: 5,
                         yValueFormatString: "###,###,###,###",
                         // data: this.state.linearRegressionData.map((item, index) => (item.forecast > 0 && moment(this.state.minMonth).format("YYYY-MM") <= moment(this.props.items.forecastStopDate).format("YYYY-MM") ? item.forecast.toFixed(4) : null))
-                        data: this.state.jexcelDataArr.map((item, index) => (this.state.linearRegressionData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && item.amount == "")) ? (this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].CI != null && this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].CI != "" && this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].CI != undefined ? this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].forecast : (this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].forecast + this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].ci)) : null))
+                        data: this.state.jexcelDataArr.map((item, index) => (this.state.linearRegressionData.filter(x => x.month == item.monthNo).length > 0
+                            && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM')
+                                || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && (item.amount == ""
+                                    || item.amount == null)))
+                            ? (this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].ci != null
+                                && this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].ci != ""
+                                && this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].ci != undefined
+                                ? ((this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].forecast + this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].ci) < 0 ? 0 : (this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].forecast + this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].ci))
+                                : this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].forecast)
+                            : null))
                     })
             }
         }
         // TES
-        else if (this.state.nodeDataExtrapolation.extrapolationMethod != null && this.state.nodeDataExtrapolation.extrapolationMethod.id == 2) {
+        else if (this.state.nodeDataExtrapolation != null && this.state.nodeDataExtrapolation.extrapolationMethod != null && this.state.nodeDataExtrapolation.extrapolationMethod.id == 2) {
             // TES low
             if (this.state.smoothingId) {
                 datasets.push({
@@ -2517,7 +2808,16 @@ export default class TreeExtrapolationComponent extends React.Component {
                     yValueFormatString: "###,###,###,###",
                     // data: this.state.tesData.map((item, index) => (item.forecast > 0 && moment(this.state.minMonth).format("YYYY-MM") <= moment(this.props.items.forecastStopDate).format("YYYY-MM") ? (item.forecast - this.state.CI).toFixed(4) : null))
                     // data: this.state.jexcelDataArr.map((item, index) => (this.state.tesData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && item.amount == "")) ? this.state.tesData.filter(x => x.month == item.monthNo)[0].forecast - this.state.CI : null))
-                    data: this.state.jexcelDataArr.map((item, index) => (this.state.tesData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && item.amount == "")) ? (this.state.tesData.filter(x => x.month == item.monthNo)[0].CI != null && this.state.tesData.filter(x => x.month == item.monthNo)[0].CI != "" && this.state.tesData.filter(x => x.month == item.monthNo)[0].CI != undefined ? this.state.tesData.filter(x => x.month == item.monthNo)[0].forecast : (this.state.tesData.filter(x => x.month == item.monthNo)[0].forecast - this.state.tesData.filter(x => x.month == item.monthNo)[0].ci)) : null))
+                    data: this.state.jexcelDataArr.map((item, index) => (this.state.tesData.filter(x => x.month == item.monthNo).length > 0
+                        && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM')
+                            || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM')
+                                && (item.amount == "" || item.amount == null)))
+                        ? (this.state.tesData.filter(x => x.month == item.monthNo)[0].ci != null
+                            && this.state.tesData.filter(x => x.month == item.monthNo)[0].ci != ""
+                            && this.state.tesData.filter(x => x.month == item.monthNo)[0].ci != undefined
+                            ? ((this.state.tesData.filter(x => x.month == item.monthNo)[0].forecast - this.state.tesData.filter(x => x.month == item.monthNo)[0].ci) < 0 ? 0 : (this.state.tesData.filter(x => x.month == item.monthNo)[0].forecast - this.state.tesData.filter(x => x.month == item.monthNo)[0].ci))
+                            : this.state.tesData.filter(x => x.month == item.monthNo)[0].forecast)
+                        : null))
                 })
             }
             if (this.state.smoothingId) {
@@ -2543,7 +2843,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                     pointHitRadius: 5,
                     yValueFormatString: "###,###,###,###",
                     // data: this.state.tesData.map((item, index) => (item.forecast > 0 && moment(this.state.minMonth).format("YYYY-MM") <= moment(this.props.items.forecastStopDate).format("YYYY-MM") ? item.forecast.toFixed(4) : null))
-                    data: this.state.jexcelDataArr.map((item, index) => (this.state.tesData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && item.amount == "")) ? this.state.tesData.filter(x => x.month == item.monthNo)[0].forecast : null))
+                    data: this.state.jexcelDataArr.map((item, index) => (this.state.tesData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && (item.amount == "" || item.amount == null))) ? this.state.tesData.filter(x => x.month == item.monthNo)[0].forecast : null))
                 })
             }
             if (this.state.smoothingId) {
@@ -2572,14 +2872,25 @@ export default class TreeExtrapolationComponent extends React.Component {
                     yValueFormatString: "###,###,###,###",
                     // data: this.state.tesData.map((item, index) => (item.forecast > 0 && moment(this.state.minMonth).format("YYYY-MM") <= moment(this.props.items.forecastStopDate).format("YYYY-MM") ? (item.forecast + this.state.CI).toFixed(4) : null))
                     // data: this.state.jexcelDataArr.map((item, index) => (this.state.tesData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && item.amount == "")) ? this.state.tesData.filter(x => x.month == item.monthNo)[0].forecast + this.state.CI : null))
-                    data: this.state.jexcelDataArr.map((item, index) => (this.state.tesData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && item.amount == "")) ? (this.state.tesData.filter(x => x.month == item.monthNo)[0].CI != null && this.state.tesData.filter(x => x.month == item.monthNo)[0].CI != "" && this.state.tesData.filter(x => x.month == item.monthNo)[0].CI != undefined ? this.state.tesData.filter(x => x.month == item.monthNo)[0].forecast : (this.state.tesData.filter(x => x.month == item.monthNo)[0].forecast + this.state.tesData.filter(x => x.month == item.monthNo)[0].ci)) : null))
+                    data: this.state.jexcelDataArr.map((item, index) => (this.state.tesData.filter(x => x.month == item.monthNo).length > 0
+                        && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM')
+                            || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM')
+                                && (item.amount == "" || item.amount == null)))
+                        ? (this.state.tesData.filter(x => x.month == item.monthNo)[0].ci != null
+                            && this.state.tesData.filter(x => x.month == item.monthNo)[0].ci != ""
+                            && this.state.tesData.filter(x => x.month == item.monthNo)[0].ci != undefined
+                            ? ((this.state.tesData.filter(x => x.month == item.monthNo)[0].forecast + this.state.tesData.filter(x => x.month == item.monthNo)[0].ci) < 0 ? 0 : (this.state.tesData.filter(x => x.month == item.monthNo)[0].forecast + this.state.tesData.filter(x => x.month == item.monthNo)[0].ci))
+                            : this.state.tesData.filter(x => x.month == item.monthNo)[0].forecast)
+                        : null))
                 })
             }
         }
         //ARIMA
-        else if (this.state.nodeDataExtrapolation.extrapolationMethod != null && this.state.nodeDataExtrapolation.extrapolationMethod.id == 4) {
+        else if (this.state.nodeDataExtrapolation != null && this.state.nodeDataExtrapolation.extrapolationMethod != null && this.state.nodeDataExtrapolation.extrapolationMethod.id == 4) {
+            console.log("arima method select inside if 1")
             // Arima Lower
             if (this.state.arimaId) {
+                console.log("arima method select inside if 2")
                 datasets.push({
                     type: "line",
                     pointRadius: 0,
@@ -2605,11 +2916,21 @@ export default class TreeExtrapolationComponent extends React.Component {
                     yValueFormatString: "###,###,###,###",
                     // data: this.state.tesData.map((item, index) => (item.forecast > 0 && moment(this.state.minMonth).format("YYYY-MM") <= moment(this.props.items.forecastStopDate).format("YYYY-MM") ? (item.forecast + this.state.CI).toFixed(4) : null))
                     // data: this.state.jexcelDataArr.map((item, index) => (this.state.tesData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && item.amount == "")) ? this.state.tesData.filter(x => x.month == item.monthNo)[0].forecast + this.state.CI : null))
-                    data: this.state.jexcelDataArr.map((item, index) => (this.state.arimaData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && item.amount == "")) ? (this.state.arimaData.filter(x => x.month == item.monthNo)[0].CI != null && this.state.arimaData.filter(x => x.month == item.monthNo)[0].CI != "" && this.state.arimaData.filter(x => x.month == item.monthNo)[0].CI != undefined ? this.state.arimaData.filter(x => x.month == item.monthNo)[0].forecast : (this.state.arimaData.filter(x => x.month == item.monthNo)[0].forecast - this.state.arimaData.filter(x => x.month == item.monthNo)[0].ci)) : null))
+                    data: this.state.jexcelDataArr.map((item, index) => (this.state.arimaData.filter(x => x.month == item.monthNo).length > 0
+                        && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM')
+                            || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM')
+                                && (item.amount == "" || item.amount == null)))
+                        ? (this.state.arimaData.filter(x => x.month == item.monthNo)[0].ci != null
+                            && this.state.arimaData.filter(x => x.month == item.monthNo)[0].ci != ""
+                            && this.state.arimaData.filter(x => x.month == item.monthNo)[0].ci != undefined
+                            ? ((this.state.arimaData.filter(x => x.month == item.monthNo)[0].forecast - this.state.arimaData.filter(x => x.month == item.monthNo)[0].ci) < 0 ? 0 : (this.state.arimaData.filter(x => x.month == item.monthNo)[0].forecast - this.state.arimaData.filter(x => x.month == item.monthNo)[0].ci))
+                            : this.state.arimaData.filter(x => x.month == item.monthNo)[0].forecast)
+                        : null))
                 })
             }
             //Arima
             if (this.state.arimaId) {
+                console.log("arima method select inside if 3")
                 datasets.push({
                     type: "line",
                     pointRadius: 0,
@@ -2631,12 +2952,13 @@ export default class TreeExtrapolationComponent extends React.Component {
                     // pointRadius: 1,
                     pointHitRadius: 5,
                     yValueFormatString: "###,###,###,###",
-                    data: this.state.jexcelDataArr.map((item, index) => (this.state.arimaData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && item.amount == "")) ? this.state.arimaData.filter(x => x.month == item.monthNo)[0].forecast : null))
+                    data: this.state.jexcelDataArr.map((item, index) => (this.state.arimaData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && (item.amount == "" || item.amount == null))) ? this.state.arimaData.filter(x => x.month == item.monthNo)[0].forecast : null))
                     // data: this.state.jexcelDataArr.map((item, index) => (this.state.tesData.filter(x => x.month == item.monthNo).length > 0 ? this.state.tesData.filter(x => x.month == item.monthNo)[0].forecast- this.state.CI : null))
                 })
             }
             // arima Upper
             if (this.state.arimaId) {
+                console.log("arima method select inside if 4")
                 datasets.push({
                     type: "line",
                     pointRadius: 0,
@@ -2661,7 +2983,16 @@ export default class TreeExtrapolationComponent extends React.Component {
                     pointHitRadius: 5,
                     yValueFormatString: "###,###,###,###",
                     // data: this.state.tesData.map((item, index) => (item.forecast > 0 && moment(this.state.minMonth).format("YYYY-MM") <= moment(this.props.items.forecastStopDate).format("YYYY-MM") ? (item.forecast + this.state.CI).toFixed(4) : null))
-                    data: this.state.jexcelDataArr.map((item, index) => (this.state.arimaData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && item.amount == "")) ? (this.state.arimaData.filter(x => x.month == item.monthNo)[0].CI != null && this.state.arimaData.filter(x => x.month == item.monthNo)[0].CI != "" && this.state.arimaData.filter(x => x.month == item.monthNo)[0].CI != undefined ? this.state.arimaData.filter(x => x.month == item.monthNo)[0].forecast : (this.state.arimaData.filter(x => x.month == item.monthNo)[0].forecast + this.state.arimaData.filter(x => x.month == item.monthNo)[0].ci)) : null))
+                    data: this.state.jexcelDataArr.map((item, index) => (this.state.arimaData.filter(x => x.month == item.monthNo).length > 0
+                        && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM')
+                            || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM')
+                                && (item.amount == "" || item.amount == null)))
+                        ? (this.state.arimaData.filter(x => x.month == item.monthNo)[0].ci != null
+                            && this.state.arimaData.filter(x => x.month == item.monthNo)[0].ci != ""
+                            && this.state.arimaData.filter(x => x.month == item.monthNo)[0].ci != undefined
+                            ? ((this.state.arimaData.filter(x => x.month == item.monthNo)[0].forecast + this.state.arimaData.filter(x => x.month == item.monthNo)[0].ci) < 0 ? 0 : (this.state.arimaData.filter(x => x.month == item.monthNo)[0].forecast + this.state.arimaData.filter(x => x.month == item.monthNo)[0].ci))
+                            : this.state.arimaData.filter(x => x.month == item.monthNo)[0].forecast)
+                        : null))
                 })
             }
 
@@ -2691,7 +3022,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                     // pointRadius: 1,
                     pointHitRadius: 5,
                     yValueFormatString: "###,###,###,###",
-                    data: this.state.jexcelDataArr.map((item, index) => (this.state.movingAvgData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && item.amount == "")) ? this.state.movingAvgData.filter(x => x.month == item.monthNo)[0].forecast : null))
+                    data: this.state.jexcelDataArr.map((item, index) => (this.state.movingAvgData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && (item.amount == "" || item.amount == null))) ? this.state.movingAvgData.filter(x => x.month == item.monthNo)[0].forecast : null))
                 })
         }
         if (this.state.semiAvgId && (this.state.nodeDataExtrapolation.extrapolationMethod == null || this.state.nodeDataExtrapolation.extrapolationMethod.id != 6)) {
@@ -2717,7 +3048,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                 pointHitRadius: 5,
                 yValueFormatString: "###,###,###,###",
                 // data: this.state.semiAvgData.map((item, index) => (item.forecast > 0 && moment(this.state.minMonth).format("YYYY-MM") <= moment(this.props.items.forecastStopDate).format("YYYY-MM") ? item.forecast.toFixed(4) : null))
-                data: this.state.jexcelDataArr.map((item, index) => (this.state.semiAvgData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && item.amount == "")) ? this.state.semiAvgData.filter(x => x.month == item.monthNo)[0].forecast : null))
+                data: this.state.jexcelDataArr.map((item, index) => (this.state.semiAvgData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && (item.amount == "" || item.amount == null))) ? this.state.semiAvgData.filter(x => x.month == item.monthNo)[0].forecast : null))
                 // data: this.state.jexcelDataArr.map((item, index) => (this.state.movingAvgData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && item.amount == "")) ? this.state.movingAvgData.filter(x => x.month == item.monthNo)[0].forecast : null))
             })
         }
@@ -2748,7 +3079,16 @@ export default class TreeExtrapolationComponent extends React.Component {
                     pointHitRadius: 5,
                     yValueFormatString: "###,###,###,###",
                     // data: this.state.linearRegressionData.map((item, index) => (item.forecast > 0 && moment(this.state.minMonth).format("YYYY-MM") <= moment(this.props.items.forecastStopDate).format("YYYY-MM") ? item.forecast.toFixed(4) : null))
-                    data: this.state.jexcelDataArr.map((item, index) => (this.state.linearRegressionData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && item.amount == "")) ? (this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].CI != null && this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].CI != "" && this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].CI != undefined ? this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].forecast : (this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].forecast - this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].ci)) : null))
+                    data: this.state.jexcelDataArr.map((item, index) => (this.state.linearRegressionData.filter(x => x.month == item.monthNo).length > 0
+                        && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM')
+                            || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM')
+                                && (item.amount == "" || item.amount == null)))
+                        ? (this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].ci != null
+                            && this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].ci != ""
+                            && this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].ci != undefined
+                            ? ((this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].forecast - this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].ci) < 0 ? 0 : (this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].forecast - this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].ci))
+                            : this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].forecast)
+                        : null))
                 })
         }
         // Linear Regression 
@@ -2776,11 +3116,16 @@ export default class TreeExtrapolationComponent extends React.Component {
                     pointHitRadius: 5,
                     yValueFormatString: "###,###,###,###",
                     // data: this.state.linearRegressionData.map((item, index) => (item.forecast > 0 && moment(this.state.minMonth).format("YYYY-MM") <= moment(this.props.items.forecastStopDate).format("YYYY-MM") ? item.forecast.toFixed(4) : null))
-                    data: this.state.jexcelDataArr.map((item, index) => (this.state.linearRegressionData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && item.amount == "")) ? this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].forecast : null))
+                    data: this.state.jexcelDataArr.map((item, index) => (this.state.linearRegressionData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && (item.amount == "" || item.amount == null))) ? this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].forecast : null))
                 })
         }
         // Linear Regression High
         if (this.state.linearRegressionId && (this.state.nodeDataExtrapolation.extrapolationMethod == null || this.state.nodeDataExtrapolation.extrapolationMethod.id != 5)) {
+            console.log("Stop Date 2&&&", this.state.jexcelDataArr);
+            console.log("Stop Date 3&&&", this.state.linearRegressionData);
+            console.log("Stop Date 4&&&", this.state.maxMonth);
+            console.log("Stop Date 5&&&", this.state.minMonth);
+            console.log("final data---", this.state.jexcelDataArr.map((item, index) => (this.state.linearRegressionData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && (item.amount == "" || item.amount == null))) ? (this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].ci != null && this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].ci != "" && this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].ci != undefined ? "A" : "B") : "C")));
             datasets.push(
                 {
                     type: "line",
@@ -2806,7 +3151,16 @@ export default class TreeExtrapolationComponent extends React.Component {
                     pointHitRadius: 5,
                     yValueFormatString: "###,###,###,###",
                     // data: this.state.linearRegressionData.map((item, index) => (item.forecast > 0 && moment(this.state.minMonth).format("YYYY-MM") <= moment(this.props.items.forecastStopDate).format("YYYY-MM") ? item.forecast.toFixed(4) : null))
-                    data: this.state.jexcelDataArr.map((item, index) => (this.state.linearRegressionData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && item.amount == "")) ? (this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].CI != null && this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].CI != "" && this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].CI != undefined ? this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].forecast : (this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].forecast + this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].ci)) : null))
+                    data: this.state.jexcelDataArr.map((item, index) => (this.state.linearRegressionData.filter(x => x.month == item.monthNo).length > 0
+                        && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM')
+                            || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM')
+                                && (item.amount == "" || item.amount == null)))
+                        ? (this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].ci != null
+                            && this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].ci != ""
+                            && this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].ci != undefined
+                            ? ((this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].forecast + this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].ci) < 0 ? 0 : (this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].forecast + this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].ci))
+                            : this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].forecast)
+                        : null))
                 })
         }
         // TES low
@@ -2836,7 +3190,16 @@ export default class TreeExtrapolationComponent extends React.Component {
                 yValueFormatString: "###,###,###,###",
                 // data: this.state.tesData.map((item, index) => (item.forecast > 0 && moment(this.state.minMonth).format("YYYY-MM") <= moment(this.props.items.forecastStopDate).format("YYYY-MM") ? (item.forecast - this.state.CI).toFixed(4) : null))
                 // data: this.state.jexcelDataArr.map((item, index) => (this.state.tesData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && item.amount == "")) ? this.state.tesData.filter(x => x.month == item.monthNo)[0].forecast - this.state.CI : null))
-                data: this.state.jexcelDataArr.map((item, index) => (this.state.tesData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && item.amount == "")) ? (this.state.tesData.filter(x => x.month == item.monthNo)[0].CI != null && this.state.tesData.filter(x => x.month == item.monthNo)[0].CI != "" && this.state.tesData.filter(x => x.month == item.monthNo)[0].CI != undefined ? this.state.tesData.filter(x => x.month == item.monthNo)[0].forecast : (this.state.tesData.filter(x => x.month == item.monthNo)[0].forecast - this.state.tesData.filter(x => x.month == item.monthNo)[0].ci)) : null))
+                data: this.state.jexcelDataArr.map((item, index) => (this.state.tesData.filter(x => x.month == item.monthNo).length > 0
+                    && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM')
+                        || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM')
+                            && (item.amount == "" || item.amount == null)))
+                    ? (this.state.tesData.filter(x => x.month == item.monthNo)[0].ci != null
+                        && this.state.tesData.filter(x => x.month == item.monthNo)[0].ci != ""
+                        && this.state.tesData.filter(x => x.month == item.monthNo)[0].ci != undefined
+                        ? ((this.state.tesData.filter(x => x.month == item.monthNo)[0].forecast - this.state.tesData.filter(x => x.month == item.monthNo)[0].ci) < 0 ? 0 : (this.state.tesData.filter(x => x.month == item.monthNo)[0].forecast - this.state.tesData.filter(x => x.month == item.monthNo)[0].ci))
+                        : this.state.tesData.filter(x => x.month == item.monthNo)[0].forecast)
+                    : null))
             })
         }
         if (this.state.smoothingId && (this.state.nodeDataExtrapolation.extrapolationMethod == null || this.state.nodeDataExtrapolation.extrapolationMethod.id != 2)) {
@@ -2862,7 +3225,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                 pointHitRadius: 5,
                 yValueFormatString: "###,###,###,###",
                 // data: this.state.tesData.map((item, index) => (item.forecast > 0 && moment(this.state.minMonth).format("YYYY-MM") <= moment(this.props.items.forecastStopDate).format("YYYY-MM") ? item.forecast.toFixed(4) : null))
-                data: this.state.jexcelDataArr.map((item, index) => (this.state.tesData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && item.amount == "")) ? this.state.tesData.filter(x => x.month == item.monthNo)[0].forecast : null))
+                data: this.state.jexcelDataArr.map((item, index) => (this.state.tesData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && (item.amount == "" || item.amount == null))) ? this.state.tesData.filter(x => x.month == item.monthNo)[0].forecast : null))
             })
         }
         if (this.state.smoothingId && (this.state.nodeDataExtrapolation.extrapolationMethod == null || this.state.nodeDataExtrapolation.extrapolationMethod.id != 2)) {
@@ -2891,7 +3254,16 @@ export default class TreeExtrapolationComponent extends React.Component {
                 yValueFormatString: "###,###,###,###",
                 // data: this.state.tesData.map((item, index) => (item.forecast > 0 && moment(this.state.minMonth).format("YYYY-MM") <= moment(this.props.items.forecastStopDate).format("YYYY-MM") ? (item.forecast + this.state.CI).toFixed(4) : null))
                 // data: this.state.jexcelDataArr.map((item, index) => (this.state.tesData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && item.amount == "")) ? this.state.tesData.filter(x => x.month == item.monthNo)[0].forecast + this.state.CI : null))
-                data: this.state.jexcelDataArr.map((item, index) => (this.state.tesData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && item.amount == "")) ? (this.state.tesData.filter(x => x.month == item.monthNo)[0].CI != null && this.state.tesData.filter(x => x.month == item.monthNo)[0].CI != "" && this.state.tesData.filter(x => x.month == item.monthNo)[0].CI != undefined ? this.state.tesData.filter(x => x.month == item.monthNo)[0].forecast : (this.state.tesData.filter(x => x.month == item.monthNo)[0].forecast + this.state.tesData.filter(x => x.month == item.monthNo)[0].ci)) : null))
+                data: this.state.jexcelDataArr.map((item, index) => (this.state.tesData.filter(x => x.month == item.monthNo).length > 0
+                    && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM')
+                        || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && (item.amount == ""
+                            || item.amount == null)))
+                    ? (this.state.tesData.filter(x => x.month == item.monthNo)[0].ci != null
+                        && this.state.tesData.filter(x => x.month == item.monthNo)[0].ci != ""
+                        && this.state.tesData.filter(x => x.month == item.monthNo)[0].ci != undefined
+                        ? ((this.state.tesData.filter(x => x.month == item.monthNo)[0].forecast + this.state.tesData.filter(x => x.month == item.monthNo)[0].ci) < 0 ? 0 : (this.state.tesData.filter(x => x.month == item.monthNo)[0].forecast + this.state.tesData.filter(x => x.month == item.monthNo)[0].ci))
+                        : this.state.tesData.filter(x => x.month == item.monthNo)[0].forecast)
+                    : null))
             })
         }
         // Arima Lower
@@ -2921,7 +3293,16 @@ export default class TreeExtrapolationComponent extends React.Component {
                 yValueFormatString: "###,###,###,###",
                 // data: this.state.tesData.map((item, index) => (item.forecast > 0 && moment(this.state.minMonth).format("YYYY-MM") <= moment(this.props.items.forecastStopDate).format("YYYY-MM") ? (item.forecast + this.state.CI).toFixed(4) : null))
                 // data: this.state.jexcelDataArr.map((item, index) => (this.state.tesData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && item.amount == "")) ? this.state.tesData.filter(x => x.month == item.monthNo)[0].forecast + this.state.CI : null))
-                data: this.state.jexcelDataArr.map((item, index) => (this.state.arimaData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && item.amount == "")) ? (this.state.arimaData.filter(x => x.month == item.monthNo)[0].CI != null && this.state.arimaData.filter(x => x.month == item.monthNo)[0].CI != "" && this.state.arimaData.filter(x => x.month == item.monthNo)[0].CI != undefined ? this.state.arimaData.filter(x => x.month == item.monthNo)[0].forecast : (this.state.arimaData.filter(x => x.month == item.monthNo)[0].forecast - this.state.arimaData.filter(x => x.month == item.monthNo)[0].ci)) : null))
+                data: this.state.jexcelDataArr.map((item, index) => (this.state.arimaData.filter(x => x.month == item.monthNo).length > 0
+                    && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM')
+                        || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM')
+                            && (item.amount == "" || item.amount == null)))
+                    ? (this.state.arimaData.filter(x => x.month == item.monthNo)[0].ci != null
+                        && this.state.arimaData.filter(x => x.month == item.monthNo)[0].ci != ""
+                        && this.state.arimaData.filter(x => x.month == item.monthNo)[0].ci != undefined
+                        ? ((this.state.arimaData.filter(x => x.month == item.monthNo)[0].forecast - this.state.arimaData.filter(x => x.month == item.monthNo)[0].ci) < 0 ? 0 : (this.state.arimaData.filter(x => x.month == item.monthNo)[0].forecast - this.state.arimaData.filter(x => x.month == item.monthNo)[0].ci))
+                        : this.state.arimaData.filter(x => x.month == item.monthNo)[0].forecast)
+                    : null))
             })
         }
         //Arima
@@ -2947,7 +3328,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                 // pointRadius: 1,
                 pointHitRadius: 5,
                 yValueFormatString: "###,###,###,###",
-                data: this.state.jexcelDataArr.map((item, index) => (this.state.arimaData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && item.amount == "")) ? this.state.arimaData.filter(x => x.month == item.monthNo)[0].forecast : null))
+                data: this.state.jexcelDataArr.map((item, index) => (this.state.arimaData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && (item.amount == "" || item.amount == null))) ? this.state.arimaData.filter(x => x.month == item.monthNo)[0].forecast : null))
                 // data: this.state.jexcelDataArr.map((item, index) => (this.state.tesData.filter(x => x.month == item.monthNo).length > 0 ? this.state.tesData.filter(x => x.month == item.monthNo)[0].forecast- this.state.CI : null))
             })
         }
@@ -2977,322 +3358,20 @@ export default class TreeExtrapolationComponent extends React.Component {
                 pointHitRadius: 5,
                 yValueFormatString: "###,###,###,###",
                 // data: this.state.tesData.map((item, index) => (item.forecast > 0 && moment(this.state.minMonth).format("YYYY-MM") <= moment(this.props.items.forecastStopDate).format("YYYY-MM") ? (item.forecast + this.state.CI).toFixed(4) : null))
-                data: this.state.jexcelDataArr.map((item, index) => (this.state.arimaData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && item.amount == "")) ? (this.state.arimaData.filter(x => x.month == item.monthNo)[0].CI != null && this.state.arimaData.filter(x => x.month == item.monthNo)[0].CI != "" && this.state.arimaData.filter(x => x.month == item.monthNo)[0].CI != undefined ? this.state.arimaData.filter(x => x.month == item.monthNo)[0].forecast : (this.state.arimaData.filter(x => x.month == item.monthNo)[0].forecast + this.state.arimaData.filter(x => x.month == item.monthNo)[0].ci)) : null))
+                data: this.state.jexcelDataArr.map((item, index) => (this.state.arimaData.filter(x => x.month == item.monthNo).length > 0
+                    && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM')
+                        || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM')
+                            && (item.amount == "" || item.amount == null)))
+                    ? (this.state.arimaData.filter(x => x.month == item.monthNo)[0].ci != null
+                        && this.state.arimaData.filter(x => x.month == item.monthNo)[0].ci != ""
+                        && this.state.arimaData.filter(x => x.month == item.monthNo)[0].ci != undefined
+                        ? ((this.state.arimaData.filter(x => x.month == item.monthNo)[0].forecast + this.state.arimaData.filter(x => x.month == item.monthNo)[0].ci) < 0 ? 0 : (this.state.arimaData.filter(x => x.month == item.monthNo)[0].forecast + this.state.arimaData.filter(x => x.month == item.monthNo)[0].ci))
+                        : this.state.arimaData.filter(x => x.month == item.monthNo)[0].forecast)
+                    : null))
             })
         }
-        // }
-        // if (this.state.movingAvgId) {
-        //     datasets.push(
-        //         {
-        //             type: "line",
-        //             pointRadius: 0,
-        //             lineTension: 0,
-        //             label: i18n.t('static.extrapolation.movingAverages'),
-        //             backgroundColor: 'transparent',
-        //             borderColor: '#BA0C2F',
-        //             borderWidth: this.state.nodeDataExtrapolation.extrapolationMethod != null && this.state.nodeDataExtrapolation.extrapolationMethod.id == 7 ? 4 : 2,
-        //             ticks: {
-        //                 fontSize: 2,
-        //                 fontColor: 'transparent',
-        //             },
-        //             showInLegend: true,
-        //             pointStyle: 'line',
-        //             pointBorderWidth: 5,
-        //             pointHoverBackgroundColor: 'rgba(75,192,192,1)',
-        //             pointHoverBorderColor: 'rgba(220,220,220,1)',
-        //             // pointHoverBorderWidth: 2,
-        //             // pointRadius: 1,
-        //             pointHitRadius: 10,
-        //             yValueFormatString: "###,###,###,###",
-        //             data: this.state.jexcelDataArr.map((item, index) => (this.state.movingAvgData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && item.amount == "")) ? this.state.movingAvgData.filter(x => x.month == item.monthNo)[0].forecast : null))
-        //         })
-        // }
-        // if (this.state.semiAvgId) {
-        //     datasets.push({
-        //         type: "line",
-        //         pointRadius: 0,
-        //         lineTension: 0,
-        //         label: i18n.t('static.extrapolation.semiAverages'),
-        //         backgroundColor: 'transparent',
-        //         borderColor: '#118B70',
-        //         borderWidth: this.state.nodeDataExtrapolation.extrapolationMethod != null && this.state.nodeDataExtrapolation.extrapolationMethod.id == 6 ? 4 : 2,
-        //         ticks: {
-        //             fontSize: 2,
-        //             fontColor: 'transparent',
-        //         },
-        //         showInLegend: true,
-        //         pointStyle: 'line',
-        //         pointBorderWidth: 5,
-        //         pointHoverBackgroundColor: 'rgba(75,192,192,1)',
-        //         pointHoverBorderColor: 'rgba(220,220,220,1)',
-        //         // pointHoverBorderWidth: 2,
-        //         // pointRadius: 1,
-        //         pointHitRadius: 10,
-        //         yValueFormatString: "###,###,###,###",
-        //         // data: this.state.semiAvgData.map((item, index) => (item.forecast > 0 && moment(this.state.minMonth).format("YYYY-MM") <= moment(this.props.items.forecastStopDate).format("YYYY-MM") ? item.forecast.toFixed(4) : null))
-        //         // data: this.state.jexcelDataArr.map((item, index) => (this.state.semiAvgData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && item.amount == "")) ? this.state.semiAvgData.filter(x => x.month == item.monthNo)[0].forecast : null))
-        //         data: this.state.jexcelDataArr.map((item, index) => (this.state.movingAvgData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && item.amount == "")) ? this.state.movingAvgData.filter(x => x.month == item.monthNo)[0].forecast : null))
-        //     })
-        // }
-        // // Linear Regression Low
-        // if (this.state.linearRegressionId) {
-        //     datasets.push(
-        //         {
-        //             type: "line",
-        //             pointRadius: 0,
-        //             lineTension: 0,
-        //             label: i18n.t("static.extrapolation.lrLower"),
-        //             backgroundColor: 'transparent',
-        //             borderColor: '#EDB944',
-        //             borderStyle: 'dotted',
-        //             borderDash: [10, 10],
-        //             borderWidth: this.state.nodeDataExtrapolation.extrapolationMethod != null && this.state.nodeDataExtrapolation.extrapolationMethod.id == 5 ? 4 : 2,
-        //             ticks: {
-        //                 fontSize: 2,
-        //                 fontColor: 'transparent',
-        //             },
-        //             showInLegend: true,
-        //             pointStyle: 'line',
-        //             pointBorderWidth: 5,
-        //             pointHoverBackgroundColor: 'rgba(75,192,192,1)',
-        //             pointHoverBorderColor: 'rgba(220,220,220,1)',
-        //             // pointHoverBorderWidth: 2,
-        //             // pointRadius: 1,
-        //             pointHitRadius: 10,
-        //             yValueFormatString: "###,###,###,###",
-        //             // data: this.state.linearRegressionData.map((item, index) => (item.forecast > 0 && moment(this.state.minMonth).format("YYYY-MM") <= moment(this.props.items.forecastStopDate).format("YYYY-MM") ? item.forecast.toFixed(4) : null))
-        //             data: this.state.jexcelDataArr.map((item, index) => (this.state.linearRegressionData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && item.amount == "")) ? (this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].CI != null && this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].CI != "" && this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].CI != undefined ? this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].forecast : (this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].forecast - this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].ci)) : null))
-        //         })
-        // }
-        // // Linear Regression 
-        // if (this.state.linearRegressionId) {
-        //     datasets.push(
-        //         {
-        //             type: "line",
-        //             pointRadius: 0,
-        //             lineTension: 0,
-        //             label: i18n.t('static.extrapolation.linearRegression'),
-        //             backgroundColor: 'transparent',
-        //             borderColor: '#EDB944',
-        //             borderWidth: this.state.nodeDataExtrapolation.extrapolationMethod != null && this.state.nodeDataExtrapolation.extrapolationMethod.id == 5 ? 4 : 2,
-        //             ticks: {
-        //                 fontSize: 2,
-        //                 fontColor: 'transparent',
-        //             },
-        //             showInLegend: true,
-        //             pointStyle: 'line',
-        //             pointBorderWidth: 5,
-        //             pointHoverBackgroundColor: 'rgba(75,192,192,1)',
-        //             pointHoverBorderColor: 'rgba(220,220,220,1)',
-        //             // pointHoverBorderWidth: 2,
-        //             // pointRadius: 1,
-        //             pointHitRadius: 10,
-        //             yValueFormatString: "###,###,###,###",
-        //             // data: this.state.linearRegressionData.map((item, index) => (item.forecast > 0 && moment(this.state.minMonth).format("YYYY-MM") <= moment(this.props.items.forecastStopDate).format("YYYY-MM") ? item.forecast.toFixed(4) : null))
-        //             data: this.state.jexcelDataArr.map((item, index) => (this.state.linearRegressionData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && item.amount == "")) ? this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].forecast : null))
-        //         })
-        // }
-        // // Linear Regression High
-        // if (this.state.linearRegressionId) {
-        //     datasets.push(
-        //         {
-        //             type: "line",
-        //             pointRadius: 0,
-        //             lineTension: 0,
-        //             label: i18n.t("static.extrapolation.lrUpper"),
-        //             backgroundColor: 'transparent',
-        //             borderColor: '#EDB944',
-        //             borderStyle: 'dotted',
-        //             borderDash: [10, 10],
-        //             borderWidth: this.state.nodeDataExtrapolation.extrapolationMethod != null && this.state.nodeDataExtrapolation.extrapolationMethod.id == 5 ? 4 : 2,
-        //             ticks: {
-        //                 fontSize: 2,
-        //                 fontColor: 'transparent',
-        //             },
-        //             showInLegend: true,
-        //             pointStyle: 'line',
-        //             pointBorderWidth: 5,
-        //             pointHoverBackgroundColor: 'rgba(75,192,192,1)',
-        //             pointHoverBorderColor: 'rgba(220,220,220,1)',
-        //             // pointHoverBorderWidth: 2,
-        //             // pointRadius: 1,
-        //             pointHitRadius: 10,
-        //             yValueFormatString: "###,###,###,###",
-        //             // data: this.state.linearRegressionData.map((item, index) => (item.forecast > 0 && moment(this.state.minMonth).format("YYYY-MM") <= moment(this.props.items.forecastStopDate).format("YYYY-MM") ? item.forecast.toFixed(4) : null))
-        //             data: this.state.jexcelDataArr.map((item, index) => (this.state.linearRegressionData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && item.amount == "")) ? (this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].CI != null && this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].CI != "" && this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].CI != undefined ? this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].forecast : (this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].forecast + this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].ci)) : null))
-        //         })
-        // }
-        // // TES low
-        // if (this.state.smoothingId) {
-        //     datasets.push({
-        //         type: "line",
-        //         pointRadius: 0,
-        //         lineTension: 0,
-        //         label: i18n.t('static.extrapolation.tesLower'),
-        //         backgroundColor: 'transparent',
-        //         borderColor: '#A7C6ED',
-        //         borderStyle: 'dotted',
-        //         borderDash: [10, 10],
-        //         borderWidth: this.state.nodeDataExtrapolation.extrapolationMethod != null && this.state.nodeDataExtrapolation.extrapolationMethod.id == 2 ? 4 : 2,
-        //         ticks: {
-        //             fontSize: 2,
-        //             fontColor: 'transparent',
-        //         },
-        //         showInLegend: true,
-        //         pointStyle: 'line',
-        //         pointBorderWidth: 5,
-        //         pointHoverBackgroundColor: 'rgba(75,192,192,1)',
-        //         pointHoverBorderColor: 'rgba(220,220,220,1)',
-        //         // pointHoverBorderWidth: 2,
-        //         // pointRadius: 1,
-        //         pointHitRadius: 10,
-        //         yValueFormatString: "###,###,###,###",
-        //         // data: this.state.tesData.map((item, index) => (item.forecast > 0 && moment(this.state.minMonth).format("YYYY-MM") <= moment(this.props.items.forecastStopDate).format("YYYY-MM") ? (item.forecast - this.state.CI).toFixed(4) : null))
-        //         // data: this.state.jexcelDataArr.map((item, index) => (this.state.tesData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && item.amount == "")) ? this.state.tesData.filter(x => x.month == item.monthNo)[0].forecast - this.state.CI : null))
-        //         data: this.state.jexcelDataArr.map((item, index) => (this.state.tesData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && item.amount == "")) ? (this.state.tesData.filter(x => x.month == item.monthNo)[0].CI != null && this.state.tesData.filter(x => x.month == item.monthNo)[0].CI != "" && this.state.tesData.filter(x => x.month == item.monthNo)[0].CI != undefined ? this.state.tesData.filter(x => x.month == item.monthNo)[0].forecast : (this.state.tesData.filter(x => x.month == item.monthNo)[0].forecast - this.state.tesData.filter(x => x.month == item.monthNo)[0].ci)) : null))
-        //     })
-        // }
-        // if (this.state.smoothingId) {
-        //     datasets.push({
-        //         type: "line",
-        //         pointRadius: 0,
-        //         lineTension: 0,
-        //         label: i18n.t('static.extrapolation.tes'),
-        //         backgroundColor: 'transparent',
-        //         borderColor: '#A7C6ED',
-        //         borderWidth: this.state.nodeDataExtrapolation.extrapolationMethod != null && this.state.nodeDataExtrapolation.extrapolationMethod.id == 2 ? 4 : 2,
-        //         ticks: {
-        //             fontSize: 2,
-        //             fontColor: 'transparent',
-        //         },
-        //         showInLegend: true,
-        //         pointStyle: 'line',
-        //         pointBorderWidth: 5,
-        //         pointHoverBackgroundColor: 'rgba(75,192,192,1)',
-        //         pointHoverBorderColor: 'rgba(220,220,220,1)',
-        //         // pointHoverBorderWidth: 2,
-        //         // pointRadius: 1,
-        //         pointHitRadius: 10,
-        //         yValueFormatString: "###,###,###,###",
-        //         // data: this.state.tesData.map((item, index) => (item.forecast > 0 && moment(this.state.minMonth).format("YYYY-MM") <= moment(this.props.items.forecastStopDate).format("YYYY-MM") ? item.forecast.toFixed(4) : null))
-        //         data: this.state.jexcelDataArr.map((item, index) => (this.state.tesData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && item.amount == "")) ? this.state.tesData.filter(x => x.month == item.monthNo)[0].forecast : null))
-        //     })
-        // }
-        // if (this.state.smoothingId) {
-        //     datasets.push({
-        //         type: "line",
-        //         pointRadius: 0,
-        //         lineTension: 0,
-        //         label: i18n.t('static.extrapolation.tesUpper'),
-        //         backgroundColor: 'transparent',
-        //         borderColor: '#A7C6ED',
-        //         borderStyle: 'dotted',
-        //         borderDash: [10, 10],
-        //         borderWidth: this.state.nodeDataExtrapolation.extrapolationMethod != null && this.state.nodeDataExtrapolation.extrapolationMethod.id == 2 ? 4 : 2,
-        //         ticks: {
-        //             fontSize: 2,
-        //             fontColor: 'transparent',
-        //         },
-        //         showInLegend: true,
-        //         pointStyle: 'line',
-        //         pointBorderWidth: 5,
-        //         pointHoverBackgroundColor: 'rgba(75,192,192,1)',
-        //         pointHoverBorderColor: 'rgba(220,220,220,1)',
-        //         // pointHoverBorderWidth: 2,
-        //         // pointRadius: 1,
-        //         pointHitRadius: 10,
-        //         yValueFormatString: "###,###,###,###",
-        //         // data: this.state.tesData.map((item, index) => (item.forecast > 0 && moment(this.state.minMonth).format("YYYY-MM") <= moment(this.props.items.forecastStopDate).format("YYYY-MM") ? (item.forecast + this.state.CI).toFixed(4) : null))
-        //         // data: this.state.jexcelDataArr.map((item, index) => (this.state.tesData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && item.amount == "")) ? this.state.tesData.filter(x => x.month == item.monthNo)[0].forecast + this.state.CI : null))
-        //         data: this.state.jexcelDataArr.map((item, index) => (this.state.tesData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && item.amount == "")) ? (this.state.tesData.filter(x => x.month == item.monthNo)[0].CI != null && this.state.tesData.filter(x => x.month == item.monthNo)[0].CI != "" && this.state.tesData.filter(x => x.month == item.monthNo)[0].CI != undefined ? this.state.tesData.filter(x => x.month == item.monthNo)[0].forecast : (this.state.tesData.filter(x => x.month == item.monthNo)[0].forecast + this.state.tesData.filter(x => x.month == item.monthNo)[0].ci)) : null))
-        //     })
-        // }
-        // // Arima Lower
-        // if (this.state.arimaId) {
-        //     datasets.push({
-        //         type: "line",
-        //         pointRadius: 0,
-        //         lineTension: 0,
-        //         label: i18n.t("static.extrapolation.arimaLower"),
-        //         backgroundColor: 'transparent',
-        //         borderColor: '#651D32',
-        //         borderStyle: 'dotted',
-        //         borderDash: [10, 10],
-        //         borderWidth: this.state.nodeDataExtrapolation.extrapolationMethod != null && this.state.nodeDataExtrapolation.extrapolationMethod.id == 4 ? 4 : 2,
-        //         ticks: {
-        //             fontSize: 2,
-        //             fontColor: 'transparent',
-        //         },
-        //         showInLegend: true,
-        //         pointStyle: 'line',
-        //         pointBorderWidth: 5,
-        //         pointHoverBackgroundColor: 'rgba(75,192,192,1)',
-        //         pointHoverBorderColor: 'rgba(220,220,220,1)',
-        //         // pointHoverBorderWidth: 2,
-        //         // pointRadius: 1,
-        //         pointHitRadius: 10,
-        //         yValueFormatString: "###,###,###,###",
-        //         // data: this.state.tesData.map((item, index) => (item.forecast > 0 && moment(this.state.minMonth).format("YYYY-MM") <= moment(this.props.items.forecastStopDate).format("YYYY-MM") ? (item.forecast + this.state.CI).toFixed(4) : null))
-        //         // data: this.state.jexcelDataArr.map((item, index) => (this.state.tesData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && item.amount == "")) ? this.state.tesData.filter(x => x.month == item.monthNo)[0].forecast + this.state.CI : null))
-        //         data: this.state.jexcelDataArr.map((item, index) => (this.state.arimaData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && item.amount == "")) ? (this.state.arimaData.filter(x => x.month == item.monthNo)[0].CI != null && this.state.arimaData.filter(x => x.month == item.monthNo)[0].CI != "" && this.state.arimaData.filter(x => x.month == item.monthNo)[0].CI != undefined ? this.state.arimaData.filter(x => x.month == item.monthNo)[0].forecast : (this.state.arimaData.filter(x => x.month == item.monthNo)[0].forecast - this.state.arimaData.filter(x => x.month == item.monthNo)[0].ci)) : null))
-        //     })
-        // }
-        // //Arima
-        // if (this.state.arimaId) {
-        //     datasets.push({
-        //         type: "line",
-        //         pointRadius: 0,
-        //         lineTension: 0,
-        //         label: i18n.t('static.extrapolation.arima'),
-        //         backgroundColor: 'transparent',
-        //         borderColor: '#651D32',
-        //         borderWidth: this.state.nodeDataExtrapolation.extrapolationMethod != null && this.state.nodeDataExtrapolation.extrapolationMethod.id == 4 ? 4 : 2,
-        //         ticks: {
-        //             fontSize: 2,
-        //             fontColor: 'transparent',
-        //         },
-        //         showInLegend: true,
-        //         pointStyle: 'line',
-        //         pointBorderWidth: 5,
-        //         pointHoverBackgroundColor: 'rgba(75,192,192,1)',
-        //         pointHoverBorderColor: 'rgba(220,220,220,1)',
-        //         // pointHoverBorderWidth: 2,
-        //         // pointRadius: 1,
-        //         pointHitRadius: 10,
-        //         yValueFormatString: "###,###,###,###",
-        //         data: this.state.jexcelDataArr.map((item, index) => (this.state.arimaData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && item.amount == "")) ? this.state.arimaData.filter(x => x.month == item.monthNo)[0].forecast : null))
-        //         // data: this.state.jexcelDataArr.map((item, index) => (this.state.tesData.filter(x => x.month == item.monthNo).length > 0 ? this.state.tesData.filter(x => x.month == item.monthNo)[0].forecast- this.state.CI : null))
-        //     })
-        // }
-        // // arima Upper
-        // if (this.state.arimaId) {
-        //     datasets.push({
-        //         type: "line",
-        //         pointRadius: 0,
-        //         lineTension: 0,
-        //         label: i18n.t("static.extrapolation.arimaUpper"),
-        //         backgroundColor: 'transparent',
-        //         borderColor: '#651D32',
-        //         borderStyle: 'dotted',
-        //         borderDash: [10, 10],
-        //         borderWidth: this.state.nodeDataExtrapolation.extrapolationMethod != null && this.state.nodeDataExtrapolation.extrapolationMethod.id == 4 ? 4 : 2,
-        //         ticks: {
-        //             fontSize: 2,
-        //             fontColor: 'transparent',
-        //         },
-        //         showInLegend: true,
-        //         pointStyle: 'line',
-        //         pointBorderWidth: 5,
-        //         pointHoverBackgroundColor: 'rgba(75,192,192,1)',
-        //         pointHoverBorderColor: 'rgba(220,220,220,1)',
-        //         // pointHoverBorderWidth: 2,
-        //         // pointRadius: 1,
-        //         pointHitRadius: 10,
-        //         yValueFormatString: "###,###,###,###",
-        //         // data: this.state.tesData.map((item, index) => (item.forecast > 0 && moment(this.state.minMonth).format("YYYY-MM") <= moment(this.props.items.forecastStopDate).format("YYYY-MM") ? (item.forecast + this.state.CI).toFixed(4) : null))
-        //         data: this.state.jexcelDataArr.map((item, index) => (this.state.arimaData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && item.amount == "")) ? (this.state.arimaData.filter(x => x.month == item.monthNo)[0].CI != null && this.state.arimaData.filter(x => x.month == item.monthNo)[0].CI != "" && this.state.arimaData.filter(x => x.month == item.monthNo)[0].CI != undefined ? this.state.arimaData.filter(x => x.month == item.monthNo)[0].forecast : (this.state.arimaData.filter(x => x.month == item.monthNo)[0].forecast + this.state.arimaData.filter(x => x.month == item.monthNo)[0].ci)) : null))
-        //     })
-        // }
+        console.log("datasets---", datasets);
+        console.log("this.state.monthArray---", this.state.monthArray);
         let line = {};
         if (true) {
             line = {
@@ -3307,7 +3386,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                         <Formik
                             enableReinitialize={true}
                             initialValues={{
-                                extrapolationMethodId: this.state.nodeDataExtrapolation.extrapolationMethod != null && this.state.nodeDataExtrapolation.extrapolationMethod != "" ? this.state.nodeDataExtrapolation.extrapolationMethod.id : "",
+                                extrapolationMethodId: this.state.nodeDataExtrapolation != null && this.state.nodeDataExtrapolation.extrapolationMethod != null && this.state.nodeDataExtrapolation.extrapolationMethod != "" ? this.state.nodeDataExtrapolation.extrapolationMethod.id : "",
                                 noOfMonthsId: this.state.monthsForMovingAverage,
                                 confidenceLevelId: this.state.confidenceLevelId,
                                 // seasonalityId: this.state.noOfMonthsForASeason,
@@ -3821,6 +3900,22 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                                             />
                                                                             <FormFeedback>{errors.qId}</FormFeedback>
                                                                         </div>
+                                                                        <div className="tab-ml-1 ml-lg-5 ExtraCheckboxFieldWidth" style={{ marginTop: '38px' }}>
+                                                                            <Input
+                                                                                className="form-check-input checkboxMargin"
+                                                                                type="checkbox"
+                                                                                id="seasonality"
+                                                                                name="seasonality"
+                                                                                // checked={true}
+                                                                                checked={this.state.seasonality}
+                                                                                onClick={(e) => { this.seasonalityCheckbox(e); }}
+                                                                            />
+                                                                            <Label
+                                                                                className="form-check-label"
+                                                                                check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                                                <b>{i18n.t('static.extrapolation.seasonality')}</b>
+                                                                            </Label>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                                 {/* } */}
@@ -3833,9 +3928,8 @@ export default class TreeExtrapolationComponent extends React.Component {
                                             <div className="col-md-12 row text-left pt-lg-0 pl-lg-0">
 
                                                 <div className="col-md-6 pl-lg-0">
-                                                    <Button type="button" color="success" className="float-left mr-1" size="md" onClick={this.interpolate}>Interpolate</Button>
-                                                    {/* <Button type="button" id="dataCheck" size="md" color="info" className="mr-1" onClick={() => this.checkActualValuesGap(true)}>Extrapolate</Button> */}
-                                                    <Button type="submit" id="extrapolateButton" size="md" color="info" className="float-left mr-1" onClick={() => this.touchAllExtrapolation(setTouched, errors, 0)}><i className="fa fa-calculator"></i>Extrapolate</Button>
+                                                    {!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && <><Button type="button" color="success" className="float-left mr-1" size="md" onClick={this.interpolate}>Interpolate</Button>
+                                                    <Button type="submit" id="extrapolateButton" size="md" color="info" className="float-left mr-1" onClick={() => this.touchAllExtrapolation(setTouched, errors, 0)}><i className="fa fa-calculator"></i> Extrapolate</Button></>}
                                                 </div>
                                                 <div className="col-md-6 pr-lg-0">
                                                     <Button className="btn btn-info btn-md float-right" onClick={this.toggleJexcelData}>
@@ -4029,12 +4123,12 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                         name="extrapolationMethodId"
                                                         id="extrapolationMethodId"
                                                         bsSize="sm"
-                                                        valid={!errors.extrapolationMethodId && this.state.nodeDataExtrapolation.extrapolationMethod != null ? this.state.nodeDataExtrapolation.extrapolationMethod.id : "" != ""}
+                                                        valid={!errors.extrapolationMethodId && this.state.nodeDataExtrapolation != null && this.state.nodeDataExtrapolation.extrapolationMethod != null ? this.state.nodeDataExtrapolation.extrapolationMethod.id : "" != ""}
                                                         invalid={touched.extrapolationMethodId && !!errors.extrapolationMethodId}
                                                         onBlur={handleBlur}
                                                         onChange={(e) => { handleChange(e); this.extrapolationMethodChange(e) }}
                                                         required
-                                                        value={this.state.nodeDataExtrapolation.extrapolationMethod != null ? this.state.nodeDataExtrapolation.extrapolationMethod.id : ""}
+                                                        value={this.state.nodeDataExtrapolation != null && this.state.nodeDataExtrapolation.extrapolationMethod != null ? this.state.nodeDataExtrapolation.extrapolationMethod.id : ""}
                                                     >
                                                         <option value="">{"Select extrapolation method"}</option>
                                                         {extrapolationMethods}
@@ -4056,7 +4150,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                             name="notesExtrapolation"
                                                             id="notesExtrapolation"
                                                             bsSize="sm"
-                                                            value={this.state.nodeDataExtrapolation.notes}
+                                                            value={this.state.nodeDataExtrapolation != null ? this.state.nodeDataExtrapolation.notes : ''}
                                                             onChange={(e) => { this.changeNotes(e.target.value) }}
                                                         ></Input>
 
@@ -4064,10 +4158,10 @@ export default class TreeExtrapolationComponent extends React.Component {
 
                                                 </FormGroup>
                                                 <FormGroup className="pl-lg-3 ExtrapolateSaveBtn">
-                                                    {!this.state.dataChanged && <Button type="submit" color="success" onClick={() => this.touchAllExtrapolation(setTouched, errors, 1)} className="mr-1 float-right" size="md"><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>}
+                                                    {!this.state.dataChanged && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && <Button type="submit" color="success" onClick={() => this.touchAllExtrapolation(setTouched, errors, 1)} className="mr-1 float-right" size="md"><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>}
                                                 </FormGroup>
                                             </Row>
-                                            <Row>{this.state.dataChanged && <div class="red">{i18n.t('static.message.treeExtrapolationSave')}</div>}</Row>
+                                            {!this.state.dataChanged || !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && <Row>{this.state.dataChanged && <div class="red">{i18n.t('static.message.treeExtrapolationSave')}</div>}</Row>}
                                         </div>
                                     </Form>
                                 )} />
@@ -4088,17 +4182,44 @@ export default class TreeExtrapolationComponent extends React.Component {
                 <Modal isOpen={this.state.showGuidance}
                     className={'modal-lg ' + this.props.className} >
                     <ModalHeader toggle={() => this.toggleShowGuidance()} className="ModalHead modal-info-Headher">
-                        <strong className="TextWhite">Show Guidance</strong>
+                        <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
                     </ModalHeader>
                     <div>
                         <ModalBody>
-
+                            <div>
+                                <h3 className='ShowGuidanceHeading'>{i18n.t('static.extrapolation.ExtrapolationNode')}</h3>
+                            </div>
                             <p>
-                            <b>NOTE:  The minimum values needed to get correct graphs and reports for the various features are below: <br></br>
-                                <span className="ml-lg-5">* TES, Holt-Winters:  Needs at least 24 months of actual consumption data<br></br></span>
-                                <span className="ml-lg-5">* ARIMA:  Needs at least 14 months of actual consumption data<br></br></span>
-                                <span className="ml-lg-5">* Moving Average, Semi-Averages, and Linear Regression:  Needs at least 3 months of actual consumption data</span>
-                            </b>
+                                <p style={{ fontSize: '14px' }}><span className="UnderLineText">{i18n.t('static.listTree.purpose')} :</span>{i18n.t('static.extrapolation.ExtrapolationTabAllowUser')} '<a href="/#/Extrapolation/extrapolateData" target="_blank" style={{textDecoration:'underline'}}>{i18n.t('static.dashboard.extrapolation')}</a>' {i18n.t('static.extrapolation.ExtrapolationMethods')}
+                                </p>
+
+                            </p>
+                            <p>
+                                <p style={{ fontSize: '14px' }}><span className="UnderLineText">{i18n.t('static.ModelingTransfer.UsingThisTab')}:  </span></p>
+                                <p className='pl-lg-4'>
+                                    <ol type="1">
+                                        <li>{i18n.t('static.extrapolation.EnterActualValues')}</li>
+                                        <li>{i18n.t('static.extrapolation.MissingData')}</li>
+                                        <li>{i18n.t('static.extrapolation.OptionalTopScreen')}</li>
+                                        <li>{i18n.t('static.extrapolation.ClickExtrapolate')} </li>
+
+                                        <p className="pl-lg-4"><b>{i18n.t('static.versionSettings.note')}:</b>  {i18n.t('static.extrapolation.MinimumValues')}:<br></br>
+                                            <span className="ml-lg-5">* {i18n.t('static.extrapolation.TESHoltWinters')}:  {i18n.t('static.extrapolation.ActualConsumption')}<br></br></span>
+                                            <span className="ml-lg-5">* {i18n.t('static.extrapolation.ARIMA')}: {i18n.t('static.extrapolation.Seasonality')} : {i18n.t('static.extrapolation.WithoutSeasonality')}<br></br></span>
+                                            <span className="ml-lg-5">* {i18n.t('static.extrapolation.MovingAverage')}</span>
+                                        </p>
+                                        <li>{i18n.t('static.extrapolation.ExtrapolatedValues')}</li>
+                                        <li>{i18n.t('static.extrapolation.AfterReviewing')}
+                                        </li>
+                                    </ol>
+                                </p>
+                            </p>
+                            <p>
+                                {/* <b>NOTE:  The minimum values needed to get correct graphs and reports for the various features are below: <br></br>
+                                    <span className="ml-lg-5">* TES, Holt-Winters:  Needs at least 24 months of actual consumption data<br></br></span>
+                                    <span className="ml-lg-5">* ARIMA:  Needs at least 14 months of actual consumption data<br></br></span>
+                                    <span className="ml-lg-5">* Moving Average, Semi-Averages, and Linear Regression:  Needs at least 3 months of actual consumption data</span>
+                                </b> */}
                             </p>
                         </ModalBody>
                     </div>

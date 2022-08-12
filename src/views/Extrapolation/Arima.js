@@ -5,7 +5,7 @@ import { calculateCI } from "./CalculateCI";
 import { calculateError } from "./ErrorCalculations";
 import jexcel from 'jexcel-pro';
 
-export function calculateArima(inputData, p, d, q, confidenceLevel, noOfProjectionMonths, props, minStartDate, isTreeExtrapolation) {
+export function calculateArima(inputData, p, d, q, confidenceLevel, noOfProjectionMonths, props, minStartDate, isTreeExtrapolation, seasonality) {
     console.log("inputData@@@@@@", inputData);
     console.log("@@@@@@@@noOfMonthsForProjection", noOfProjectionMonths)
     var startYear = moment(minStartDate).format("YYYY");
@@ -28,32 +28,35 @@ export function calculateArima(inputData, p, d, q, confidenceLevel, noOfProjecti
         "p": Number(p),
         "d": Number(d),
         "q": Number(q),
-        "n": Number(noOfProjectionMonths)
+        "n": Number(noOfProjectionMonths),
+        "seasonality": seasonality,
+        "level":Number(confidenceLevel)
     }
     console.log("JsonArima@@@@@@", json);
     ExtrapolationService.arima(json)
         .then(response => {
             if (response.status == 200) {
-                console.log("response.status@@@@@@", response.status);
+                console.log("response.statusArima@@@@@@", response.data);
                 var responseData = response.data;
                 var output = [];
                 var count = 0;
                 for (var k = 0; k < responseData.fits.length; k++) {
                     count += 1;
-                    output.push({ month: count, actual: inputData[k] != undefined && inputData[k].actual != undefined && inputData[k].actual != null && inputData[k].actual != '' ? inputData[k].actual : null, forecast: responseData.fits[k] == 'NA' ? null : responseData.fits[k] > 0 ? responseData.fits[k] : 0 })
+                    output.push({ month: count, actual: inputData[k] != undefined && inputData[k].actual != undefined && inputData[k].actual != null && inputData[k].actual != '' ? inputData[k].actual : null, forecast: responseData.fits[k] == 'NA' ? null : responseData.fits[k] > 0 ? responseData.fits[k] : 0,ci:null })
                 }
-                for (var j = 0; j < responseData.forecasts.length; j++) {
+                for (var j = 0; j < responseData.forecast.length; j++) {
                     count += 1;
-                    output.push({ month: count, actual: inputData[count - 1] != undefined && inputData[count - 1].actual != undefined && inputData[count - 1].actual != null && inputData[count - 1].actual != '' ? inputData[count - 1].actual : null, forecast: responseData.forecasts[j] == 'NA' ? null : responseData.forecasts[j] > 0 ? responseData.forecasts[j] : 0 })
+                    output.push({ month: count, actual: inputData[count - 1] != undefined && inputData[count - 1].actual != undefined && inputData[count - 1].actual != null && inputData[count - 1].actual != '' ? inputData[count - 1].actual : null, forecast: responseData.forecast[j] == 'NA' ? null : responseData.forecast[j] > 0 ? responseData.forecast[j] : 0,ci: responseData.ci[j] > 0 ? responseData.ci[j] : 0 })
                 }
 
-                console.log("OutPut@@@@@@@@@@@@@@@@@@@@@@", output)
-                calculateCI(output, Number(confidenceLevel), "arimaData", props)
+                console.log("OutPutArima@@@@@@@@@@@@@@@@@@@@@@", output)
+                // calculateCI(output, Number(confidenceLevel), "arimaData", props)
+                props.updateState("arimaData", output);
                 calculateError(output, "arimaError", props)
 
             }
         }).catch(error => {
-            console.log("Error@@@@@@", error)
+            console.log("ErrorArima@@@@@@", error)
             if (!isTreeExtrapolation) {
                 // props.updateState("showData", false);
                 // props.updateState("dataEl", "");

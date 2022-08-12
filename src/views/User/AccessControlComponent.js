@@ -1238,7 +1238,7 @@ class AccessControlComponent extends Component {
         } else {
             selHealthArea = this.state.healthAreas
         }
-        
+
         this.setState({
             selHealthArea
         });
@@ -1281,16 +1281,17 @@ class AccessControlComponent extends Component {
 
         if (selProgram.length > 0) {
             for (var i = 0; i < selProgram.length; i++) {
+                var name = selProgram[i].programCode + " (" + (selProgram[i].programTypeId == 1 ? "SP" : selProgram[i].programTypeId == 2 ? "FC" : "") + ")";
                 var paJson = {
-                    // name: (selProgram[i].programTypeId == 1 ? i18n.t('static.common.pr') : i18n.t('static.common.fr')) + "" + getLabelText(selProgram[i].label, this.state.lang),
-                    name: getLabelText(selProgram[i].label, this.state.lang) +' '+ (selProgram[i].programTypeId == 1 ? '(SP)' : '(FC)'),
-                    // name: (getLabelText(selProgram[i].label, this.state.lang)),
+                    // name: getLabelText(selProgram[i].label, this.state.lang),
+                    name: name,
                     id: parseInt(selProgram[i].programId),
                     active: selProgram[i].active
                 }
                 programList[i] = paJson
             }
             var paJson = {
+                // name: "All",
                 name: "All",
                 id: -1,
                 active: true
@@ -1780,7 +1781,7 @@ class AccessControlComponent extends Component {
                                                         DatasetService.getDatasetList()
                                                             .then(response1 => {
                                                                 if (response1.status == "200") {
-                                                                    
+
                                                                     var listArray = [...response.data, ...response1.data]
                                                                     listArray.sort((a, b) => {
                                                                         var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -2246,7 +2247,7 @@ class AccessControlComponent extends Component {
 
                             <Col xs="12" sm="12">
 
-                                <div id="paputableDiv" style={{ display: this.state.loading ? "none" : "block" }}>
+                                <div id="paputableDiv" className="consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
 
                                 </div>
                                 <div style={{ display: this.state.loading ? "block" : "none" }}>

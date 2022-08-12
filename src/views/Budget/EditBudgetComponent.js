@@ -503,6 +503,7 @@ class EditBudgetComponent extends Component {
                                                         loading: false
                                                     });
                                                 } else {
+                                                    console.log("ERROR------->", error.response);
                                                     switch (error.response ? error.response.status : "") {
 
                                                         case 401:
@@ -516,6 +517,13 @@ class EditBudgetComponent extends Component {
                                                         case 406:
                                                             this.setState({
                                                                 message: error.response.data.messageCode,
+                                                                loading: false
+                                                            });
+                                                            break;
+                                                        case 409:
+                                                            this.setState({
+                                                                // message: error.response.data.messageCode,
+                                                                message: i18n.t('static.budget.duplicateDisplayName'),
                                                                 loading: false
                                                             });
                                                             break;
@@ -569,7 +577,7 @@ class EditBudgetComponent extends Component {
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={handleBlur}
 
-                                                        value={getLabelText(this.state.budget.program.label, this.state.lang)}
+                                                        value={this.state.budget.program.code}
                                                     >
                                                     </Input>
 
@@ -770,8 +778,8 @@ class EditBudgetComponent extends Component {
                                                     <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
                                                     <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                     <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
-                                                        &nbsp;
-                                                    </FormGroup>
+                                                    &nbsp;
+                                                </FormGroup>
                                             </CardFooter>
                                         </Form>
 

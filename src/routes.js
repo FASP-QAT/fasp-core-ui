@@ -33,6 +33,11 @@ const EditFundingSource = React.lazy(() => import('./views/FundingSource/EditFun
 const AddProcurementAgent = React.lazy(() => import('./views/ProcurementAgent/AddProcurementAgentComponent'));
 const ListProcurementAgent = React.lazy(() => import('./views/ProcurementAgent/ListProcurementAgentComponent'));
 const EditProcurementAgent = React.lazy(() => import('./views/ProcurementAgent/EditProcurementAgentComponent'));
+
+const AddProcurementAgentType = React.lazy(() => import('./views/ProcurementAgentType/AddProcurementAgentTypeComponent'));
+const ListProcurementAgentType = React.lazy(() => import('./views/ProcurementAgentType/ListProcurementAgentTypeComponent'));
+const EditProcurementAgentType = React.lazy(() => import('./views/ProcurementAgentType/EditProcurementAgentTypeComponent'));
+
 const AddTracerCategory = React.lazy(() => import('./views/TracerCategory/AddTracerCategoryComponent'));
 const ListTracerCategory = React.lazy(() => import('./views/TracerCategory/ListTracerCategoryComponent'));
 const EditTracerCategory = React.lazy(() => import('./views/TracerCategory/EditTracerCategoryComponent'));
@@ -201,6 +206,7 @@ const ProgramOnboarding = React.lazy(() => import('./views/Program/ProgramOnboar
 const DeleteLocalPrograms = React.lazy(() => import('./views/Program/DeleteLocalProgramComponent'));
 const ShipmentList = React.lazy(() => import('./views/Shipment/ShipmentDetails'));
 const ForecastMetricsOverTime = React.lazy(() => import('./views/Report/ForecastMetricsOverTime'));
+const ConsumptionForecastErrorSupplyPlan = React.lazy(() => import('./views/Report/ConsumptionForecastErrorSupplyPlan'));
 const pipeline = React.lazy(() => import('./views/Pipeline/PipelineProgramImport'));
 const pipelineProgramSetup = React.lazy(() => import('./views/Pipeline/PipelineProgramSetup'));
 const StockStatusOverTime = React.lazy(() => import('./views/Report/StockStatusOverTime'));
@@ -368,6 +374,12 @@ const routes = [
   { path: '/procurementAgent/listProcurementAgent/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.procurementagent') }), component: ListProcurementAgent },
   { path: '/procurementAgent/editProcurementAgent/:procurementAgentId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.procurementagentheader') }), component: EditProcurementAgent },
 
+  { path: '/procurementAgentType/addProcurementAgentType', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.procurementagentheadertype') }), component: AddProcurementAgentType },
+  { path: '/procurementAgent/listProcurementAgentType', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.procurementagenttype') }), component: ListProcurementAgentType },
+  // { path: '/procurementAgent/listProcurementAgent/:message', component: ListProcurementAgent },
+  { path: '/procurementAgent/listProcurementAgentType/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.procurementagenttype') }), component: ListProcurementAgentType },
+  { path: '/procurementAgent/editProcurementAgentType/:procurementAgentTypeId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.procurementagenttypeheader') }), component: EditProcurementAgentType },
+
   { path: '/tracerCategory/addTracerCategory', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.tracercategoryheader') }), component: AddTracerCategory },
   { path: '/tracerCategory/listTracerCategory', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.tracercategory') }), component: ListTracerCategory },
   // { path: '/tracerCategory/listTracerCategory/:message', component: ListTracerCategory },
@@ -505,6 +517,7 @@ const routes = [
   { path: '/report/stockStatus', name: i18n.t('static.dashboard.stockstatus'), component: StockStatusReport },
   { path: '/report/globalConsumption', name: i18n.t('static.dashboard.globalconsumption'), component: GlobalConsumptionReport },
   { path: '/report/forecastOverTheTime', name: i18n.t('static.report.forecasterrorovertime'), component: ForecastMetricsOverTime },
+  { path: '/report/consumptionForecastErrorSupplyPlan', name: i18n.t('static.report.forecasterrorovertime'), component: ConsumptionForecastErrorSupplyPlan },
   { path: '/report/stockStatusOverTime', name: i18n.t('static.dashboard.stockstatusovertime'), component: StockStatusOverTime },
   { path: '/report/forecastMetrics', name: i18n.t('static.dashboard.forecastmetrics'), component: ForecastMetrics },
 
@@ -620,7 +633,7 @@ const routes = [
   { path: '/dataset/addDataSet', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dataset.manageProgram') }), component: AddDataSet },
   { path: '/dataset/listDataSet', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dataset.manageProgram') }), component: DataSetList },
   { path: '/dataset/listDataSet/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dataset.manageProgram') }), component: DataSetList },
-  { path: '/dataset/editDataSet/:dataSetId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dataset.manageProgram') }), component: EditDataSet },
+  { path: '/dataset/editDataSet/:dataSetId', name: i18n.t('static.breadcrum.edit', { entityname: '' }), component: EditDataSet },
   { path: '/dataset/listTree/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.common.listtree') }), component: ListTree },
   { path: '/dataset/listTree', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.common.listtree') }), component: ListTree },
 

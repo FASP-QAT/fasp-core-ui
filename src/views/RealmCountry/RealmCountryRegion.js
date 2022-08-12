@@ -513,7 +513,7 @@ class RealmCountryRegion extends Component {
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
                 var index = (instance.jexcel).getValue(`G${parseInt(data[i].y) + 1}`, true);
-                if (index == "" || index == null || index == undefined) {
+                if (index === "" || index == null || index == undefined) {
                     (instance.jexcel).setValueFromCoords(0, data[i].y, this.state.realmCountry.realm.label.label_en + "-" + this.state.realmCountry.country.label.label_en, true);
                     (instance.jexcel).setValueFromCoords(5, data[i].y, this.props.match.params.realmCountryId, true);
                     (instance.jexcel).setValueFromCoords(6, data[i].y, 0, true);
@@ -901,7 +901,7 @@ class RealmCountryRegion extends Component {
 
                             <Col xs="12" sm="12">
 
-                                <div id="paputableDiv" style={{ display: this.state.loading ? "none" : "block" }}>
+                                <div id="paputableDiv" className="consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
                                 </div>
                                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >

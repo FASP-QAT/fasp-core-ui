@@ -206,6 +206,10 @@ class StockStatus extends Component {
     return moment(value).format('MMM YY')
   }
 
+  dateFormatterCSV = value => {
+    return moment(value).format(DATE_FORMAT_CAP)
+  }
+
   addDoubleQuoteToRowContent = (arr) => {
     return arr.map(ele => '"' + ele + '"')
   }
@@ -227,7 +231,7 @@ class StockStatus extends Component {
     csvRow.push('')
     csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
     csvRow.push('')
-    csvRow.push('"' + (i18n.t('static.report.version*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+    csvRow.push('"' + (i18n.t('static.report.versionFinal*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
     csvRow.push('')
     csvRow.push('"' + (i18n.t('static.planningunit.planningunit').replaceAll(' ', '%20') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
     csvRow.push('"' + (i18n.t('static.supplyPlan.minStockMos').replaceAll(' ', '%20') + ' : ' + this.state.stockStatusList[0].minMos + '"'))
@@ -256,7 +260,7 @@ class StockStatus extends Component {
     ])];
 
     var A = headers
-    this.state.stockStatusList.map(ele => A.push(this.addDoubleQuoteToRowContent([this.dateFormatter(ele.dt).replaceAll(' ', '%20'), ele.openingBalance, ele.forecastedConsumptionQty == null ? '' : ele.forecastedConsumptionQty, ele.actualConsumptionQty == null ? '' : ele.actualConsumptionQty, ele.shipmentQty == null ? '' : ele.shipmentQty,
+    this.state.stockStatusList.map(ele => A.push(this.addDoubleQuoteToRowContent([this.dateFormatterCSV(ele.dt).replaceAll(' ', '%20'), ele.openingBalance, ele.forecastedConsumptionQty == null ? '' : ele.forecastedConsumptionQty, ele.actualConsumptionQty == null ? '' : ele.actualConsumptionQty, ele.shipmentQty == null ? '' : ele.shipmentQty,
     (ele.shipmentInfo.map(item => {
       return (
         item.shipmentQty + " | " + item.fundingSource.code + " | " + getLabelText(item.shipmentStatus.label, this.state.lang) + " | " + item.procurementAgent.code
@@ -298,7 +302,7 @@ class StockStatus extends Component {
         ])];
         A = headers
         console.log(' item.data', item.data)
-        item.data.map(ele => A.push(this.addDoubleQuoteToRowContent([this.dateFormatter(ele.dt).replaceAll(' ', '%20'), ele.openingBalance, ele.forecastedConsumptionQty == null ? '' : ele.forecastedConsumptionQty, ele.actualConsumptionQty == null ? '' : ele.actualConsumptionQty, ele.shipmentQty == null ? '' : ele.shipmentQty,
+        item.data.map(ele => A.push(this.addDoubleQuoteToRowContent([this.dateFormatterCSV(ele.dt).replaceAll(' ', '%20'), ele.openingBalance, ele.forecastedConsumptionQty == null ? '' : ele.forecastedConsumptionQty, ele.actualConsumptionQty == null ? '' : ele.actualConsumptionQty, ele.shipmentQty == null ? '' : ele.shipmentQty,
         (ele.shipmentInfo.map(item1 => {
           return (
             item1.shipmentQty + " | " + item1.fundingSource.code + " | " + getLabelText(item1.shipmentStatus.label, this.state.lang) + " | " + item1.procurementAgent.code
@@ -325,7 +329,6 @@ class StockStatus extends Component {
   }
 
   exportPDF = () => {
-    console.log('going to export')
     const addFooters = doc => {
       const pageCount = doc.internal.getNumberOfPages()
       doc.setFont('helvetica', 'bold')
@@ -901,6 +904,7 @@ class StockStatus extends Component {
   //   return txt
   // }
 
+
   filterData() {
     let programId = document.getElementById("programId").value;
     let planningUnitId = document.getElementById("planningUnitId").value;
@@ -1256,6 +1260,31 @@ class StockStatus extends Component {
           "allPlanningUnits": false
 
         }
+        /*        this.setState({
+                  stockStatusList: [{
+                    dt: 'Jan 20', consumptionQty: 17475, actual: true, shipmentQty: 0, shipmentInfo: [
+                    ], adjustmentQty: -10122, closingBalance: 27203, mos: 1.28, minMos: 1.2, maxMos: 2.5
+                  },
+                  {
+                    dt: 'Feb 20', consumptionQty: 25135, actual: false, shipmentQty: 0, shipmentInfo: [], adjustmentQty: 3999
+                    , closingBalance: 6067, mos: 1.21, minMos: 1.0, maxMos: 1.5
+                  },
+                  {
+                    dt: 'Mar 20', consumptionQty: 49880, actual: true, shipmentQty: 78900, shipmentInfo: [
+                      { shipmentQty: 78900, fundingSource: { id: 1, label: { label_en: 'PEPFAR' } }, shipmentStatus: { id: 1, label: { label_en: 'Delivered' } } }
+                    ], adjustmentQty: 105, closingBalance: 36137, mos: 1.34, minMos: 1.0, maxMos: 2.0
+                  }
+                    , { dt: 'Apr 20', consumptionQty: 25177, actual: false, shipmentQty: 0, shipmentInfo: [], adjustmentQty: -135, closingBalance: 10960, mos: 0.54, minMos: 0.5, maxMos: 2.5 },
+                  { dt: 'May 20', consumptionQty: 16750, actual: false, shipmentQty: 0, shipmentInfo: [], adjustmentQty: -579, closingBalance: 0, mos: 1.2, minMos: 1.0, maxMos: 1.5 },
+                  {
+                    dt: 'Jun 20', consumptionQty: 14000, actual: false, shipmentQty: 40000, shipmentInfo: [
+                      { shipmentQty: 40000, fundingSource: { id: 1, label: { label_en: 'PEPFAR' } }, shipmentStatus: { id: 1, label: { label_en: 'Planned' } } }
+        
+                    ], adjustmentQty: 0, closingBalance: 26000, mos: 2.1, minMos: 2.0, maxMos: 3.5
+                  }
+                  ]
+                })*/
+        // AuthenticationService.setupAxiosInterceptors();
         ReportService.getStockStatusData(inputjson)
           .then(response => {
             console.log("Response", JSON.stringify(response.data));
@@ -1326,7 +1355,30 @@ class StockStatus extends Component {
               }
             }
           );
+        // .catch(
+        //   error => {
+        //     this.setState({
+        //       stockStatusList: [], loading: false
+        //     })
 
+        //     if (error.message === "Network Error") {
+        //       this.setState({ message: error.message, loading: false });
+        //     } else {
+        //       switch (error.response ? error.response.status : "") {
+        //         case 500:
+        //         case 401:
+        //         case 404:
+        //         case 406:
+        //         case 412:
+        //           this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+        //           break;
+        //         default:
+        //           this.setState({ loading: false, message: 'static.unkownError' });
+        //           break;
+        //       }
+        //     }
+        //   }
+        // );
       }
     } else if (programId == 0) {
       this.setState({ message: i18n.t('static.common.selectProgram'), stockStatusList: [] });
@@ -1931,7 +1983,7 @@ class StockStatus extends Component {
                                   }
                                   return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
                                 }
-                              }
+                              },intersect: false,
                             },
                             maintainAspectRatio: false,
                             legend: {
@@ -2333,7 +2385,7 @@ class StockStatus extends Component {
                     }
                     return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
                   }
-                }
+                },intersect: false
               },
               maintainAspectRatio: false,
               legend: {
@@ -2900,7 +2952,6 @@ class StockStatus extends Component {
 
   }
 
-
   toggle() {
     this.setState({
       dropdownOpen: !this.state.dropdownOpen,
@@ -2948,7 +2999,8 @@ class StockStatus extends Component {
       && programs.map((item, i) => {
         return (
           <option key={i} value={item.programId}>
-            {getLabelText(item.label, this.state.lang)}
+            {/* {getLabelText(item.label, this.state.lang)} */}
+            {item.programCode}
           </option>
         )
       }, this);
@@ -3074,7 +3126,7 @@ class StockStatus extends Component {
             }
             return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
           }
-        }
+        },intersect: false
       },
       maintainAspectRatio: false,
       legend: {
@@ -3197,7 +3249,7 @@ class StockStatus extends Component {
             }
             return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
           }
-        }
+        },intersect: false
       },
       maintainAspectRatio: false,
       legend: {
@@ -3475,7 +3527,7 @@ class StockStatus extends Component {
                       </FormGroup>
 
                       <FormGroup className="col-md-3">
-                        <Label htmlFor="appendedInputButton">{i18n.t('static.report.version*')}</Label>
+                        <Label htmlFor="appendedInputButton">{i18n.t('static.report.versionFinal*')}</Label>
                         <div className="controls">
                           <InputGroup>
                             <Input
@@ -3562,7 +3614,14 @@ class StockStatus extends Component {
                   {this.state.show && this.state.stockStatusList.length > 0 && <Table responsive className="table-striped table-bordered text-center mt-2">
 
                     <thead>
-                      <tr><th rowSpan="2" style={{ width: "200px" }}>{i18n.t('static.common.month')}</th>  <th className="text-center" colSpan="1"> {i18n.t('static.report.stock')} </th> <th className="text-center" colSpan="2"> {i18n.t('static.supplyPlan.consumption')} </th> <th className="text-center" colSpan="2"> {i18n.t('static.shipment.shipment')} </th> <th className="text-center" colSpan="6"> {i18n.t('static.report.stock')} </th> </tr><tr>
+                      <tr>
+                        <th rowSpan="2" style={{ width: "200px" }}>{i18n.t('static.common.month')}</th>  
+                      <th className="text-center" colSpan="1"> {i18n.t('static.report.stock')} </th>
+                       <th className="text-center" colSpan="2"> {i18n.t('static.supplyPlan.consumption')} </th>
+                        <th className="text-center" colSpan="2"> {i18n.t('static.shipment.shipment')} </th> 
+                        <th className="text-center" colSpan="6"> {i18n.t('static.report.stock')} </th> 
+                        </tr>
+                        <tr>
                         <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.supplyPlan.openingBalance')}</th>
                         <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.forecasted')}</th>
                         <th className="text-center" style={{ width: "200px" }}> {i18n.t('static.report.actual')} </th>
