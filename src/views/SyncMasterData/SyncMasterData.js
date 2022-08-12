@@ -452,6 +452,8 @@ export default class SyncMasterData extends Component {
                                                             lastModifiedDate: curDate,
                                                             tempShipmentId: ppuObject.planningUnit.id.toString().concat(shipmentDataList.length),
                                                             tempParentShipmentId: shipmentDataList[index].tempParentShipmentId,
+                                                            parentLinkedShipmentId:null,
+                                                            tempParentLinkedShipmentId:null
                                                         })
                                                         if(moment(shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].expectedDeliveryDate).format("YYYY-MM")<moment(minDate).format("YYYY-MM")){
                                                             minDate = shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].expectedDeliveryDate;
@@ -623,11 +625,32 @@ export default class SyncMasterData extends Component {
                                                         shipmentDataList[parentShipmentIndex].lastModifiedDate=curDate;
 
                                                         if (moment(minDate).format("YYYY-MM-DD") > moment(shipmentDataList[parentShipmentIndex].expectedDeliveryDate).format("YYYY-MM-DD")) {
-                                                            minDate = moment(shipmentDataList[shipmentIndex].expectedDeliveryDate).format("YYYY-MM-DD");
+                                                            minDate = moment(shipmentDataList[parentShipmentIndex].expectedDeliveryDate).format("YYYY-MM-DD");
                                                         }
                                                         if (shipmentDataList[parentShipmentIndex].receivedDate != null && shipmentDataList[parentShipmentIndex].receivedDate != "" && shipmentDataList[parentShipmentIndex].receivedDate != undefined && moment(minDate).format("YYYY-MM-DD") > moment(shipmentDataList[parentShipmentIndex].receivedDate).format("YYYY-MM-DD")) {
-                                                            minDate = moment(shipmentDataList[shipmentIndex].receivedDate).format("YYYY-MM-DD");
+                                                            minDate = moment(shipmentDataList[parentShipmentIndex].receivedDate).format("YYYY-MM-DD");
                                                         }
+
+                                                        // Activate linked parent shipment Id
+                                    var linkedParentShipmentIdList = shipmentDataList.filter(c => linkedShipmentsListFilter[0].parentShipmentId > 0 ? (c.parentLinkedShipmentId == linkedShipmentsListFilter[0].parentShipmentId) : (c.tempParentLinkedShipmentId == linkedShipmentsListFilter[0].tempParentShipmentId));
+                                    for (var l = 0; l < linkedParentShipmentIdList.length; l++) {
+                                        var parentShipmentIndex1 = shipmentDataList.findIndex(c => linkedParentShipmentIdList[l].shipmentId > 0 ? c.shipmentId == linkedParentShipmentIdList[l].shipmentId : c.tempShipmentId == linkedParentShipmentIdList[l].tempShipmentId);
+                                        shipmentDataList[parentShipmentIndex1].active = true;
+                                        shipmentDataList[parentShipmentIndex1].erpFlag = false;
+                                        shipmentDataList[parentShipmentIndex1].lastModifiedBy.userId = curUser;
+                                        shipmentDataList[parentShipmentIndex1].lastModifiedBy.username = username;
+                                        shipmentDataList[parentShipmentIndex1].lastModifiedDate = curDate;
+                                        shipmentDataList[parentShipmentIndex1].parentLinkedShipmentId = null;
+                                        shipmentDataList[parentShipmentIndex1].tempParentLinkedShipmentId = null;
+
+                                        if (moment(minDate).format("YYYY-MM-DD") > moment(shipmentDataList[parentShipmentIndex1].expectedDeliveryDate).format("YYYY-MM-DD")) {
+                                            minDate = moment(shipmentDataList[parentShipmentIndex1].expectedDeliveryDate).format("YYYY-MM-DD");
+                                        }
+                                        if (shipmentDataList[parentShipmentIndex1].receivedDate != null && shipmentDataList[parentShipmentIndex1].receivedDate != "" && shipmentDataList[parentShipmentIndex1].receivedDate != undefined && moment(minDate).format("YYYY-MM-DD") > moment(shipmentDataList[parentShipmentIndex1].receivedDate).format("YYYY-MM-DD")) {
+                                            minDate = moment(shipmentDataList[parentShipmentIndex1].receivedDate).format("YYYY-MM-DD");
+                                        }
+
+                                    }
                                                     }
                                                 }
                                                 // console.log("In planning unit list", shipArray[j].planningUnit.id);
