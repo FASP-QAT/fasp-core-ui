@@ -503,8 +503,8 @@ class ProductValidation extends Component {
                     }
                     if (finalData[i].parentNodeNodeDataMap.fuNode.usageType.id == 1) {
                         var sharePu;
-                        if (finalData[i].nodeDataMap.puNode.sharePlanningUnit == "true") {
-                            sharePu = (noOfMonthsInUsagePeriod / finalData[i].nodeDataMap.puNode.planningUnit.multiplier);
+                        if (finalData[i].nodeDataMap.puNode.sharePlanningUnit != "true") {
+                            sharePu = finalData[i].nodeDataMap.puNode.puPerVisit;
                         } else {
                             sharePu = this.round((noOfMonthsInUsagePeriod / finalData[i].nodeDataMap.puNode.planningUnit.multiplier));
                         }
