@@ -2782,5 +2782,6 @@
     "static.organisation.organisationheader": "Organización",
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Max = 7",
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18)",
-    "static.loadDeleteProgram.loadDeleteProgram": "Cargar/Borrar programa"
+    "static.loadDeleteProgram.loadDeleteProgram": "Cargar/Borrar programa",
+    "static.editStatus.validCriticality": "Seleccione Criticidad"
 }
