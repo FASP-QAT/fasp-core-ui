@@ -306,7 +306,7 @@ class ProductValidation extends Component {
             cell1 += '';
             var x = cell1.replaceAll(",", "").split('.');
             var x1 = x[0];
-            var x2 = x.length > 1 ? '.' + x[1].slice(0, 2) : '';
+            var x2 = x.length > 1 ? '.' + x[1].slice(0, 4) : '';
             var rgx = /(\d+)(\d{3})/;
             while (rgx.test(x1)) {
                 x1 = x1.replace(rgx, '$1' + ',' + '$2');
@@ -508,7 +508,7 @@ class ProductValidation extends Component {
                         } else {
                             sharePu = this.round((noOfMonthsInUsagePeriod / finalData[i].nodeDataMap.puNode.planningUnit.multiplier));
                         }
-                        usageTextPU = i18n.t('static.tree.forEach') + " " + selectedText + " " + i18n.t('static.tree.weNeed') + " " + sharePu + " " + planningUnit;
+                        usageTextPU = i18n.t('static.tree.forEach') + " " + selectedText + " " + i18n.t('static.tree.weNeed') + " " + this.addCommas(sharePu) + " " + planningUnit;
                     } else {
                         console.log("finalData[i].parentNodeNodeDataMap.fuNode.noOfForecastingUnitsPerPerson+++", finalData[i].parentNodeNodeDataMap.fuNode.noOfForecastingUnitsPerPerson);
                         console.log("noOfMonthsInUsagePeriod+++", noOfMonthsInUsagePeriod);
