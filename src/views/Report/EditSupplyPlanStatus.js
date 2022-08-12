@@ -3316,7 +3316,7 @@ class EditSupplyPlanStatus extends Component {
                             <li><span className="problemList-yellow legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.problemList.low')} </span></li>
                         </ul>
                     </FormGroup>
-                    <div className="table-responsive RemoveStriped qat-problemListSearch">
+                    <div className="consumptionDataEntryTable RemoveStriped qat-problemListSearch EditStatusTable">
                         <div id="problemListDiv" className="" />
                     </div>
                 </TabPane>
