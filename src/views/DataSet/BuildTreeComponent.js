@@ -5945,12 +5945,24 @@ export default class BuildTree extends Component {
                     }
                     if ((this.state.currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usageType.id == 1) {
                         var sharePu;
-                        if (this.state.currentScenario.puNode.sharePlanningUnit == "true") {
-                            sharePu = (this.state.noFURequired / this.state.conversionFactor);
-                        } else {
+// <<<<<<< HEAD
+//                         if (this.state.currentScenario.puNode.sharePlanningUnit == "true") {
+//                             sharePu = (this.state.noFURequired / this.state.conversionFactor);
+//                         } else {
+//                             sharePu = (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.puPerVisit;
+//                             // sharePu = this.round((this.state.noFURequired / this.state.conversionFactor));
+//                         }
+// =======
+                        if (this.state.currentScenario.puNode.sharePlanningUnit != "true") {
                             sharePu = (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.puPerVisit;
-                            // sharePu = this.round((this.state.noFURequired / this.state.conversionFactor));
+                        } else {
+                            sharePu = (this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor);
                         }
+
+                        // } else {
+                        //     sharePu = this.round((this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor));
+                        // }
+
                         console.log("sharePu---", sharePu);
                         usageText = i18n.t('static.tree.forEach') + " " + nodeUnitTxt.trim() + " " + i18n.t('static.tree.weNeed') + " " + addCommas(sharePu) + " " + planningUnit;
                     } else {
