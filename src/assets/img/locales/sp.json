@@ -2356,5 +2356,6 @@
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Max = 7",
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18)",
     "static.editStatus.problemDescText": "Ingrese la descripción del problema",
-    "static.editStatus.problemSuggestionText": "Introducir sugerencia de problema"
+    "static.editStatus.problemSuggestionText": "Introducir sugerencia de problema",
+    "static.editStatus.validCriticality": "Seleccione Criticidad"
 }
