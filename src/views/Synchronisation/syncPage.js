@@ -2527,7 +2527,7 @@ export default class syncPage extends Component {
 
                                             } else {
                                               if (latestProgramDataShipmentLinkedFiltered.length > 0) {
-                                                arr.push(latestProgramDataShipmentLinkedFiltered[latestProgramDataShipmentLinkedFiltered.length - 1].parentShipmentId)
+                                                arr.push(latestProgramDataShipmentLinkedFiltered[latestProgramDataShipmentLinkedFiltered.length - 1].parentShipmentId);
                                                   (latestProgramData.shipmentList.filter(c => latestProgramDataShipmentLinkedFiltered[latestProgramDataShipmentLinkedFiltered.length - 1].parentShipmentId == 0 ? c.tempParentLinkedShipmentId == latestProgramDataShipmentLinkedFiltered[latestProgramDataShipmentLinkedFiltered.length - 1].tempParentShipmentId : c.parentLinkedShipmentId == latestProgramDataShipmentLinkedFiltered[latestProgramDataShipmentLinkedFiltered.length - 1].parentShipmentId)).map(item => {
                                                     arr.push(item.shipmentId)
 
