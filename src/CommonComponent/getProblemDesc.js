@@ -399,7 +399,7 @@ export default function getProblemDesc(row, lang) {
         // label.label_en = "Inventory doen't fall within min/max range";
         return getLabelText(label, lang);
     }
-    if (row.realmProblem.problem.problemId == 26) {
+    if (row.realmProblem.problem.problemId == 26 || row.realmProblem.problem.problemId == 27 || row.realmProblem.problem.problemId == 28) {
         var obj = JSON.parse(row.data5);
         var label = obj.problemDescription;
         return label;

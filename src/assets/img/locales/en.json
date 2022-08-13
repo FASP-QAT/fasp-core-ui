@@ -2789,5 +2789,7 @@
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Max = 7",
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )",
     "static.loadDeleteProgram.loadDeleteProgram": "Load/Delete Program",
-    "static.tree.rootNodeInfoMissing":"Please enter the root node info."
+    "static.tree.rootNodeInfoMissing": "Please enter the root node info.",
+    "static.editStatus.validCriticality": "Please select Criticality",
+    "static.manualTagging.showAllShipments":"Show All Shipments"
 }

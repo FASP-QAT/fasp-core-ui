@@ -52,6 +52,8 @@ const validationSchemaForAddingProblem = function (values) {
             .required(i18n.t('static.procurementUnit.validPlanningUnitText')),
         suggession: Yup.string()
             .required(i18n.t('static.editStatus.problemSuggestionText')),
+        modelCriticalityId: Yup.string()
+            .required(i18n.t('static.editStatus.validCriticality'))
     })
 }
 const validateForAddingProblem = (getValidationSchema) => {
@@ -249,6 +251,9 @@ class EditSupplyPlanStatus extends Component {
             planningUnitList: [],
             regionList: [],
             isSubmitClicked: false,
+            criticalities: [],
+            criticalitiesList: [],
+
         }
         this.formSubmit = this.formSubmit.bind(this);
         this.consumptionDetailsClicked = this.consumptionDetailsClicked.bind(this);
@@ -266,6 +271,40 @@ class EditSupplyPlanStatus extends Component {
         this.loaded1 = this.loaded1.bind(this);
         this.addMannualProblem = this.addMannualProblem.bind(this);
         this.modelOpenClose = this.modelOpenClose.bind(this);
+    }
+
+    getProblemCriticality() {
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['problemCriticality'], 'readwrite');
+            var problemCriticality = transaction.objectStore('problemCriticality');
+            var getRequest = problemCriticality.getAll();
+            var problemCriticalities = [];
+
+            getRequest.onerror = function (event) {
+                // Handle errors!
+            };
+            getRequest.onsuccess = function (event) {
+                var myResult = [];
+                myResult = getRequest.result;
+                var filteredGetRequestList = myResult;
+                for (var i = 0; i < filteredGetRequestList.length; i++) {
+                    problemCriticalities.push({
+                        name: filteredGetRequestList[i].label.label_en,
+                        id: filteredGetRequestList[i].id,
+                    });
+                }
+                // console.log("DATASET-------->", problemCriticalities);
+                this.setState({
+                    criticalitiesList: problemCriticalities,
+                    loading: false
+                })
+            }.bind(this);
+        }.bind(this);
+
     }
 
     updateState(parameterName, value) {
@@ -2535,6 +2574,7 @@ class EditSupplyPlanStatus extends Component {
                 return ({ label: item.name, value: item.id })
             }, this);
 
+
         let bar = {}
         if (this.state.jsonArrForGraph.length > 0)
             bar = {
@@ -3969,6 +4009,7 @@ class EditSupplyPlanStatus extends Component {
         setTouched({
             problemDescription: true,
             modelPlanningUnitId: true,
+            modelCriticalityId: true,
             suggession: true
         }
         )
@@ -3982,6 +4023,7 @@ class EditSupplyPlanStatus extends Component {
 
     addMannualProblem() {
         console.log("-------------------addNewProblem--------------------");
+        this.getProblemCriticality();
         this.setState({
             isModalOpen: !this.state.isModalOpen,
         }, () => {
@@ -4087,6 +4129,15 @@ class EditSupplyPlanStatus extends Component {
             && planningUnits.map((item, i) => {
                 return (
                     <option key={i} value={item.planningUnit.id}>{getLabelText(item.planningUnit.label, this.state.lang)}</option>
+                )
+            }, this);
+
+
+        const { criticalitiesList } = this.state;
+        let criticalities = criticalitiesList.length > 0
+            && criticalitiesList.map((item, i) => {
+                return (
+                    <option key={i} value={item.id}>{item.name}</option>
                 )
             }, this);
 
@@ -4726,15 +4777,18 @@ class EditSupplyPlanStatus extends Component {
                                         initialValues={{
                                             problemDescription: '',
                                             modelPlanningUnitId: '',
+                                            modelCriticalityId: '',
                                             suggession: ''
                                         }}
                                         validate={validateForAddingProblem(validationSchemaForAddingProblem)}
                                         onSubmit={(values, { setSubmitting, setErrors }) => {
                                             if (!this.state.isSubmitClicked) {
                                                 this.setState({ loading: true, isSubmitClicked: true }, () => {
+                                                    var criticalityId = (document.getElementById("modelCriticalityId").value)
+                                                    console.log("criticalityId", criticalityId)
                                                     var json = {
                                                         "realmProblem": {
-                                                            "realmProblemId": "25",
+                                                            "realmProblemId": criticalityId == 1 ? "25" : criticalityId == 2 ? "26" : "27",
                                                             "problemType": {
                                                                 "id": "2"
                                                             }
@@ -4802,50 +4856,70 @@ class EditSupplyPlanStatus extends Component {
                                                                 }
                                                             }
                                                         );
-                                            })
+                                                })
                                             }
 
                                         }}
 
 
-                                    render={
-                                        ({
-                                            values,
-                                            errors,
-                                            touched,
-                                            handleChange,
-                                            handleBlur,
-                                            handleSubmit,
-                                            isSubmitting,
-                                            isValid,
-                                            setTouched,
-                                            handleReset,
-                                            setFieldValue,
-                                            setFieldTouched
-                                        }) => (
-                                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='addProblemForm' autocomplete="off">
-                                                {/* <CardBody> */}
-                                                <div className="col-md-12">
-                                                    <div style={{ display: this.state.treeFlag ? "none" : "block" }} className="">
-                                                        <div className='row'>
-                                                            <FormGroup className="col-md-6">
-                                                                <Label for="programCode">{i18n.t('static.planningunit.planningunit')}<span className="red Reqasterisk">*</span></Label>
-                                                                <Input
-                                                                    type="select"
-                                                                    name="modelPlanningUnitId"
-                                                                    id="modelPlanningUnitId"
-                                                                    bsSize="sm"
-                                                                    valid={!errors.modelPlanningUnitId}
-                                                                    invalid={touched.modelPlanningUnitId && !!errors.modelPlanningUnitId}
-                                                                    onChange={(e) => { handleChange(e) }}
-                                                                    onBlur={handleBlur}
-                                                                    required
-                                                                >
-                                                                    <option value="">{i18n.t('static.common.select')}</option>
-                                                                    {planningUnitList}
-                                                                </Input>
-                                                                <FormFeedback className="red">{errors.modelPlanningUnitId}</FormFeedback>
-                                                            </FormGroup>
+                                        render={
+                                            ({
+                                                values,
+                                                errors,
+                                                touched,
+                                                handleChange,
+                                                handleBlur,
+                                                handleSubmit,
+                                                isSubmitting,
+                                                isValid,
+                                                setTouched,
+                                                handleReset,
+                                                setFieldValue,
+                                                setFieldTouched
+                                            }) => (
+                                                <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='addProblemForm' autocomplete="off">
+                                                    {/* <CardBody> */}
+                                                    <div className="col-md-12">
+                                                        <div style={{ display: this.state.treeFlag ? "none" : "block" }} className="">
+                                                            <div className='row'>
+                                                                <FormGroup className="col-md-6">
+                                                                    <Label for="programCode">{i18n.t('static.planningunit.planningunit')}<span className="red Reqasterisk">*</span></Label>
+                                                                    <Input
+                                                                        type="select"
+                                                                        name="modelPlanningUnitId"
+                                                                        id="modelPlanningUnitId"
+                                                                        bsSize="sm"
+                                                                        valid={!errors.modelPlanningUnitId}
+                                                                        invalid={touched.modelPlanningUnitId && !!errors.modelPlanningUnitId}
+                                                                        onChange={(e) => { handleChange(e) }}
+                                                                        onBlur={handleBlur}
+                                                                        required
+                                                                    >
+                                                                        <option value="">{i18n.t('static.common.select')}</option>
+                                                                        {planningUnitList}
+                                                                    </Input>
+                                                                    <FormFeedback className="red">{errors.modelPlanningUnitId}</FormFeedback>
+                                                                </FormGroup>
+                                                                <FormGroup className="col-md-6">
+                                                                    <Label>{i18n.t('static.report.Criticality')}<span className="red Reqasterisk">*</span></Label>
+                                                                    <Input type="select"
+                                                                        bsSize="sm"
+                                                                        name="modelCriticalityId"
+                                                                        id="modelCriticalityId"
+                                                                        valid={!errors.modelCriticalityId}
+                                                                        invalid={touched.modelCriticalityId && !!errors.modelCriticalityId}
+                                                                        onChange={(e) => { handleChange(e) }}
+                                                                        onBlur={handleBlur}
+                                                                        required
+                                                                    >
+                                                                        <option value="0">{i18n.t('static.common.select')}</option>
+                                                                        {criticalities}
+                                                                    </Input>
+                                                                    <FormFeedback className="red">{errors.modelCriticalityId}</FormFeedback>
+                                                                </FormGroup>
+                                                            </div>
+                                                        </div>
+                                                        <div className="row">
                                                             <FormGroup className="col-md-6">
                                                                 <Label>{i18n.t('static.region.region')}</Label>
                                                                 <Input type="select"
@@ -4857,45 +4931,26 @@ class EditSupplyPlanStatus extends Component {
                                                                     <option value="0">{i18n.t('static.common.select')}</option>
                                                                     {regions}
                                                                 </Input>
-                                                                <FormFeedback className="red">{errors.createdDate}</FormFeedback>
+                                                                <FormFeedback className="red">{errors.modelRegionId}</FormFeedback>
                                                             </FormGroup>
-                                                        </div>
-                                                    </div>
-                                                    <div className="row">
+                                                            <FormGroup className="col-md-6">
+                                                                <Label>{i18n.t('static.report.problemDescription')}<span className="red Reqasterisk">*</span></Label>
+                                                                <Input type="text"
+                                                                    // maxLength={600}
+                                                                    bsSize="sm"
+                                                                    name="problemDescription"
+                                                                    id="problemDescription"
+                                                                    valid={!errors.problemDescription}
+                                                                    invalid={touched.problemDescription && !!errors.problemDescription}
+                                                                    onChange={(e) => { handleChange(e) }}
+                                                                    onBlur={handleBlur}
+                                                                    required
+                                                                >
+                                                                </Input>
+                                                                <FormFeedback className="red">{errors.problemDescription}</FormFeedback>
+                                                            </FormGroup>
 
-                                                        <FormGroup className="col-md-6">
-                                                            <Label>{i18n.t('static.report.problemDescription')}<span className="red Reqasterisk">*</span></Label>
-                                                            <Input type="text"
-                                                                // maxLength={600}
-                                                                bsSize="sm"
-                                                                name="problemDescription"
-                                                                id="problemDescription"
-                                                                valid={!errors.problemDescription}
-                                                                invalid={touched.problemDescription && !!errors.problemDescription}
-                                                                onChange={(e) => { handleChange(e) }}
-                                                                onBlur={handleBlur}
-                                                                required
-                                                            >
-                                                            </Input>
-                                                            <FormFeedback className="red">{errors.problemDescription}</FormFeedback>
-                                                        </FormGroup>
-                                                        <FormGroup className="col-md-6">
-                                                            <Label>{i18n.t('static.report.suggession')}<span className="red Reqasterisk">*</span></Label>
-                                                            <Input type="textarea"
-                                                                // maxLength={600}
-                                                                bsSize="sm"
-                                                                name="suggession"
-                                                                id="suggession"
-                                                                valid={!errors.suggession}
-                                                                invalid={touched.suggession && !!errors.suggession}
-                                                                onChange={(e) => { handleChange(e) }}
-                                                                onBlur={handleBlur}
-                                                                required
-                                                            >
-                                                            </Input>
-                                                            <FormFeedback className="red">{errors.suggession}</FormFeedback>
-                                                        </FormGroup>
-                                                        {/* <FormGroup className="col-md-6">
+                                                            {/* <FormGroup className="col-md-6">
                                                                     <Label>{i18n.t('static.common.notes')}</Label>
                                                                     <Input type="textarea"
                                                                         // maxLength={600}
@@ -4910,18 +4965,36 @@ class EditSupplyPlanStatus extends Component {
                                                                     >
                                                                     </Input>
                                                                 </FormGroup> */}
+                                                        </div>
+                                                        <div className='row'>
+                                                            <FormGroup className="col-md-6">
+                                                                <Label>{i18n.t('static.report.suggession')}<span className="red Reqasterisk">*</span></Label>
+                                                                <Input type="textarea"
+                                                                    // maxLength={600}
+                                                                    bsSize="sm"
+                                                                    name="suggession"
+                                                                    id="suggession"
+                                                                    valid={!errors.suggession}
+                                                                    invalid={touched.suggession && !!errors.suggession}
+                                                                    onChange={(e) => { handleChange(e) }}
+                                                                    onBlur={handleBlur}
+                                                                    required
+                                                                >
+                                                                </Input>
+                                                                <FormFeedback className="red">{errors.suggession}</FormFeedback>
+                                                            </FormGroup>
+                                                        </div>
+
+
+                                                        <FormGroup className="col-md-12 float-right pt-lg-4 pr-lg-0">
+                                                            <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.modelOpenClose}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                            <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                            <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                            &nbsp;
+                                                        </FormGroup>
                                                     </div>
-
-
-                                                    <FormGroup className="col-md-12 float-right pt-lg-4 pr-lg-0">
-                                                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.modelOpenClose}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                                        <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                                        &nbsp;
-                                                    </FormGroup>
-                                                </div>
-                                            </Form>
-                                        )} />
+                                                </Form>
+                                            )} />
                                 </Col>
                                 <br />
                             </ModalBody>
