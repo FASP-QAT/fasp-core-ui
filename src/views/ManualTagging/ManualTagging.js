@@ -2842,7 +2842,7 @@ export default class ManualTagging extends Component {
                         console.log("ShipmentList@@@@@@@@@@@@@@@", shipmentList);
                         for (var sl = 0; sl < shipmentList.length; sl++) {
                             var arr = [];
-                            var list = (fullShipmentList.filter(c => shipmentList[sl].parentShipmentId == 0 ? c.tempParentLinkedShipmentId == shipmentList[sl].tempParentShipmentId : c.parentLinkedShipmentId == shipmentList[sl].parentShipmentId)).map(item => {
+                            var list = (fullShipmentList.filter(c => shipmentList[sl].parentShipmentId == 0 ? shipmentList[sl].tempParentShipmentId!=null && c.tempParentLinkedShipmentId == shipmentList[sl].tempParentShipmentId : shipmentList[sl].parentShipmentId!=null && c.parentLinkedShipmentId == shipmentList[sl].parentShipmentId)).map(item => {
                                 arr.push(item.shipmentId)
                             });
                             shipmentList[sl].parentShipmentIdArr = arr;
@@ -2996,7 +2996,7 @@ export default class ManualTagging extends Component {
             var erpPlanningUnitId = this.state.planningUnitIdUpdated;
             var programId = this.state.active1 ? this.state.programId : this.state.programId1.split("_")[0];
             var shipmentPlanningUnitId = this.state.active1 ? this.state.selectedRowPlanningUnit : (this.state.active3 ? ((this.state.active4 || this.state.active5) && !this.state.checkboxValue ? document.getElementById("planningUnitId1").value : (this.state.active4 || this.state.active5) && this.state.checkboxValue ? this.state.selectedShipment.length > 0 ? this.state.selectedShipment[0].planningUnit.id : 0 : 0) : 0)
-
+            console.log("selectedRowPlanningUnit@@@@@@@@@@@@@@@@",this.state.selectedRowPlanningUnit)
             ManualTaggingService.autocompleteDataOrderNo(term.toUpperCase(), (programId != null && programId != "" ? programId : 0), (erpPlanningUnitId != null && erpPlanningUnitId != "" ? erpPlanningUnitId : 0), shipmentPlanningUnitId)
                 .then(response => {
                     console.log("Response@@@@@@@@@@@@@@@@@@@@@", response)
@@ -4157,6 +4157,7 @@ export default class ManualTagging extends Component {
             ) {
                 row = this.state.outputList.filter(c => (this.el.getValueFromCoords(0, x) != 0 ? c.shipmentId == this.el.getValueFromCoords(0, x) : c.tempShipmentId == this.el.getValueFromCoords(9, x)))[0];
                 outputListAfterSearch.push(row);
+                console.log("outputListAfterSearch@@@@@@@@@@@@@@@@",outputListAfterSearch);
                 var finalShipmentId = []
                 if (outputListAfterSearch[0].orderNo != null && outputListAfterSearch[0].orderNo != "") {
                     json = { id: outputListAfterSearch[0].orderNo, label: outputListAfterSearch[0].orderNo };
@@ -4176,7 +4177,11 @@ export default class ManualTagging extends Component {
                     searchedValue: (outputListAfterSearch[0].orderNo != null && outputListAfterSearch[0].orderNo != "" ? outputListAfterSearch[0].orderNo : ""),
                     selectedRowPlanningUnit: outputListAfterSearch[0].planningUnit.id,
                     finalShipmentId: finalShipmentId,
-                    showAllShipments: false
+                    showAllShipments: false,
+                    planningUnitId: (this.state.active3 ? outputListAfterSearch[0].erpPlanningUnit.id : outputListAfterSearch[0].planningUnit.id),
+                    shipmentId: (this.state.active1 ? this.el.getValueFromCoords(0, x) : (this.state.active2 ? this.el.getValueFromCoords(1, x) : 0)),
+                    procurementAgentId: (this.state.active3 ? 1 : outputListAfterSearch[0].procurementAgent.id),
+                    planningUnitName: (this.state.active3 ? row.erpPlanningUnit.label.label_en + "(" + row.skuCode + ")" : row.planningUnit.label.label_en + '(' + row.skuCode + ')')
                     // planningUnitIdUpdated: outputListAfterSearch[0].planningUnit.id
                 }, () => {
                     this.toggleLarge();
@@ -4217,8 +4222,7 @@ export default class ManualTagging extends Component {
             }
             // outputListAfterSearch.push(row);
             // console.log("1------------------------------>>>>", outputListAfterSearch[0].erpPlanningUnit.id)
-            if ((this.state.active1
-                && this.state.versionId.includes("Local")) || this.state.active3) {
+            if (this.state.active3) {
                 console.log("In function To open popup@@@@@@@@@@@@@@@@@@@@@@@))))))))))))))))")
                 this.setState({
                     planningUnitId: (this.state.active3 ? outputListAfterSearch[0].erpPlanningUnit.id : outputListAfterSearch[0].planningUnit.id),
@@ -4226,9 +4230,7 @@ export default class ManualTagging extends Component {
                     procurementAgentId: (this.state.active3 ? 1 : outputListAfterSearch[0].procurementAgent.id),
                     planningUnitName: (this.state.active3 ? row.erpPlanningUnit.label.label_en + "(" + row.skuCode + ")" : row.planningUnit.label.label_en + '(' + row.skuCode + ')')
                 })
-                if(this.state.active3){
                 this.toggleLarge();
-                }
             }
         }
     }.bind(this);
@@ -4631,6 +4633,7 @@ export default class ManualTagging extends Component {
 
     toggleLarge() {
         // this.getPlanningUnitListByTracerCategory(this.state.planningUnitId, this.state.procurementAgentId);
+        console.log("In selected row planning unit@@@@@@@@@@@",this.state.planningUnitId);
         this.setState({
             displaySubmitButton: false,
             displayTotalQty: false,
