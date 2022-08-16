@@ -239,7 +239,7 @@ export default class ExportProgram extends Component {
                                                                             budgetList = budgetRequest.result;
 
                                                                             var isUnEncrepted = false;
-                                                                            if (window.confirm("Do you want to Encrepte data?")) {
+                                                                            if (window.confirm("Do you want to encrypt data?")) {
                                                                                 isUnEncrepted = true;
                                                                             } else {
                                                                                 isUnEncrepted = false;
