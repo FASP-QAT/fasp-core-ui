@@ -600,12 +600,13 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 PlanningUnitService.getPlanningUnitListByProgramVersionIdForSelectedForecastMap(forecastProgramId, versionId)
                     .then(response => {
                         if (response.status == 200) {
+                            var planningUnitList = response.data.filter(c => c.active)
                             this.setState({
-                                programPlanningUnitList: response.data,
-                                selSource: response.data,
+                                programPlanningUnitList: planningUnitList,
+                                selSource: planningUnitList,
                                 message: ''
                             }, () => {
-                                if (response.data.length == 0) {
+                                if (planningUnitList.length == 0) {
                                     document.getElementById("stepOneBtn").disabled = true;
                                 }
                                 this.buildJexcel();
