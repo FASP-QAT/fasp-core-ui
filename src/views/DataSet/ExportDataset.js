@@ -252,7 +252,7 @@ export default class ExportDataset extends Component {
                                                                                     equivalencyUnitList = equivalencyUnitRequest.result;
 
                                                                                     var isUnEncrepted = false;
-                                                                                    if (window.confirm("Do you want to Encrepte data?")) {
+                                                                                    if (window.confirm("Do you want to encrypt data?")) {
                                                                                         isUnEncrepted = true;
                                                                                     } else {
                                                                                         isUnEncrepted = false;
