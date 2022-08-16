@@ -596,7 +596,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 this.props.updateStepOneData("stopDate", stopDate);
 
 
-                document.getElementById("stepOneBtn").disabled = false;
+                // document.getElementById("stepOneBtn").disabled = false;
                 PlanningUnitService.getPlanningUnitListByProgramVersionIdForSelectedForecastMap(forecastProgramId, versionId)
                     .then(response => {
                         if (response.status == 200) {
@@ -917,6 +917,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             // forecastPlanignUnitListForNotDuplicate: forecastPlanignUnitListForNotDuplicate
         })
         this.props.updateStepOneData("loading", false);
+        document.getElementById("stepOneBtn").disabled = false;
     }
 
     filterPlanningUnitBasedOnTracerCategory = function (instance, cell, c, r, source) {
