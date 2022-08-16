@@ -1334,6 +1334,7 @@
     "static.quantimed.quantimedImportScreenFourth": "Importer des données",
     "static.user.user": "Utilisateur",
     "static.dashboard.dimensionheader": "Dimension",
+    "static.tree.rootNodeInfoMissing": "Veuillez saisir les informations du nœud racine.",
     "static.quantimed.quantimedImportScreenSecond": "Mappage de produit",
     "static.forecastReport.forecastQuantity": "Quantité prévue",
     "static.sync.clickCancelMsg": "* Cliquez sur \"Annuler\" pour conserver votre version locale",
