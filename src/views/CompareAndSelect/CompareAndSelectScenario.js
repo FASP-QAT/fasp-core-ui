@@ -79,7 +79,8 @@ class CompareAndSelectScenario extends Component {
             maxDateForSingleValue: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
             showForecastPeriod: false,
             treeScenarioList: [],
-            actualConsumptionListForMonth: []
+            actualConsumptionListForMonth: [],
+            changed: false
         };
         this.getDatasets = this.getDatasets.bind(this);
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
@@ -770,7 +771,8 @@ class CompareAndSelectScenario extends Component {
                 equivalencyUnitId: equivalencyUnit.length == 1 ? equivalencyUnit[0].equivalencyUnitMappingId : 0,
                 loading: false,
                 viewById: viewById == 3 && equivalencyUnit.length == 0 ? 1 : viewById,
-                equivalencyUnitList: equivalencyUnit
+                equivalencyUnitList: equivalencyUnit,
+                changed:false
             }, () => {
                 if (planningUnitId > 0) {
                     this.showData();
@@ -1452,6 +1454,7 @@ class CompareAndSelectScenario extends Component {
         }
         if (x == 0) {
             this.setState({
+                changed: true,
                 selectedTreeScenarioId: elInstance.getRowData(y)[8]
             }, () => {
                 this.buildJexcel();
@@ -1581,6 +1584,7 @@ class CompareAndSelectScenario extends Component {
         localStorage.setItem("sesDatasetVersionId", versionIdSes);
         this.setState({
             datasetId: datasetId,
+            changed:false
         }, () => {
             if (datasetId != "") {
                 console.log("in if for set@@@", this.state.datasetList);
@@ -1723,7 +1727,8 @@ class CompareAndSelectScenario extends Component {
         var regionId = event.target.value;
         this.setState({
             regionId: event.target.value,
-            regionName: regionName.length > 0 ? getLabelText(regionName[0].label, this.state.lang) : ""
+            regionName: regionName.length > 0 ? getLabelText(regionName[0].label, this.state.lang) : "",
+            changed:false
         }, () => {
             if (regionId > 0) {
                 this.showData()
@@ -1890,6 +1895,7 @@ class CompareAndSelectScenario extends Component {
                 putRequest.onsuccess = function (event) {
                     this.setState({
                         message: 'static.compareAndSelect.dataSaved',
+                        changed: false,
                         color: 'green',
                         datasetJson: datasetForEncryption,
                         planningUnitList: planningUnitList1.filter(c => c.active.toString() == "true").sort(function (a, b) {
@@ -1908,13 +1914,18 @@ class CompareAndSelectScenario extends Component {
 
     setForecastNotes(e) {
         this.setState({
-            forecastNotes: e.target.value
+            forecastNotes: e.target.value,
+            changed: true
         })
     }
 
     cancelClicked() {
-        let id = AuthenticationService.displayDashboardBasedOnRole();
-        this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
+        this.setState({
+            changed: false
+        }, () => {
+            let id = AuthenticationService.displayDashboardBasedOnRole();
+            this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
+        })
     }
 
     toggleShowGuidance() {
@@ -2518,7 +2529,7 @@ class CompareAndSelectScenario extends Component {
                     <CardFooter>
                         <FormGroup>
                             <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                            {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_COMPARE_AND_SELECT') && this.state.showAllData && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={this.submitScenario}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
+                            {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_COMPARE_AND_SELECT') && this.state.showAllData && this.state.changed && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={this.submitScenario}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
                             &nbsp;
                         </FormGroup>
                     </CardFooter>
