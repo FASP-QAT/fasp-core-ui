@@ -1333,6 +1333,7 @@
     "static.quantimed.quantimedImportScreenFourth": "Importar dados",
     "static.user.user": "Usuário",
     "static.dashboard.dimensionheader": "Dimensão",
+    "static.tree.rootNodeInfoMissing": "Insira as informações do nó raiz.",
     "static.quantimed.quantimedImportScreenSecond": "Unidades de planeamento mapeadas",
     "static.forecastReport.forecastQuantity": "Quantidade prevista",
     "static.sync.clickCancelMsg": "* Clique em `Cancelar` para manter sua versão local",

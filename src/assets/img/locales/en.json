@@ -1334,6 +1334,7 @@
     "static.quantimed.quantimedImportScreenFourth": "Import Data",
     "static.user.user": "User",
     "static.dashboard.dimensionheader": "Dimension",
+    "static.tree.rootNodeInfoMissing": "Please enter the root node info.",
     "static.quantimed.quantimedImportScreenSecond": "Map Planning Units",
     "static.forecastReport.forecastQuantity": "Forecast Quantity",
     "static.sync.clickCancelMsg": "* Click `Cancel` to keep your local version",
