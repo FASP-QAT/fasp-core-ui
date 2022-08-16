@@ -246,10 +246,18 @@ class ProgramService {
         );
     }
 
+    checkIfLinkingExistsWithOtherProgram(json) {
+        return axios.post(`${API_URL}/api/erpLinking/otherProgramCheck`, json, {}
+        );
+    }
+
     createManualProblem(json) {
         return axios.post(`${API_URL}/api/problemReport/createManualProblem`, json, {}
         );
     }
 
+    getDatasetVersions(json) {
+        return axios.post(`${API_URL}/api/dataset/versions/`, json, {});
+    }
 }
 export default new ProgramService()

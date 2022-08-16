@@ -624,7 +624,7 @@ export default class ListTreeComponent extends Component {
             console.log("treeTemplateId===", treeTemplateId);
             if (treeTemplateId != "" && treeTemplateId != 0) {
                 var treeTemplate = this.state.treeTemplateList.filter(x => x.treeTemplateId == treeTemplateId)[0];
-                console.log("treeTemplate 123----", treeTemplate);
+                // console.log("treeTemplate 123----", treeTemplate);
                 var flatList = JSON.parse(JSON.stringify(treeTemplate.flatList));
                 for (let i = 0; i < flatList.length; i++) {
                     nodeDataMap = {};
@@ -646,20 +646,10 @@ export default class ListTreeComponent extends Component {
                             (flatList[i].payload.nodeDataMap[0][0].nodeDataModelingList)[j] = modeling;
                         }
                     }
-                    // if (flatList[i].payload.nodeDataMap[0][0].nodeDataMomList.length > 0) {
-                    //     for (let j = 0; j < flatList[i].payload.nodeDataMap[0][0].nodeDataMomList.length; j++) {
-                    //         var mom = (flatList[i].payload.nodeDataMap[0][0].nodeDataMomList)[j];
-                    //         var stopMonthNoMom = mom.monthNo < 0 ? mom.monthNo : parseInt(mom.monthNo)
-                    //         console.log("stopMonthNoMom---", stopMonthNoMom);
-                    //         mom.month = moment(curMonth).startOf('month').add(stopMonthNoMom, 'months').format("YYYY-MM-DD");
-                    //         (flatList[i].payload.nodeDataMap[0][0].nodeDataMomList)[j] = mom;
-                    //     }
-                    // }
-                    // var nodeDataMap[1] = flatList.payload.nodeDataMap[0][0];
-                    console.log("flatList[i]---", flatList[i]);
+                    // console.log("flatList[i]---", flatList[i]);
                     tempJson = flatList[i].payload.nodeDataMap[0][0];
                     if (flatList[i].payload.nodeType.id != 1) {
-                        console.log("month from tree template---", flatList[i].payload.nodeDataMap[0][0].monthNo + " cur month---", curMonth + " final result---", moment(curMonth).startOf('month').add(flatList[i].payload.nodeDataMap[0][0].monthNo, 'months').format("YYYY-MM-DD"))
+                        // console.log("month from tree template---", flatList[i].payload.nodeDataMap[0][0].monthNo + " cur month---", curMonth + " final result---", moment(curMonth).startOf('month').add(flatList[i].payload.nodeDataMap[0][0].monthNo, 'months').format("YYYY-MM-DD"))
                         var monthNo = flatList[i].payload.nodeDataMap[0][0].monthNo < 0 ? flatList[i].payload.nodeDataMap[0][0].monthNo : parseInt(flatList[i].payload.nodeDataMap[0][0].monthNo - 1)
                         tempJson.month = moment(curMonth).startOf('month').add(monthNo, 'months').format("YYYY-MM-DD");
                     }
@@ -667,7 +657,7 @@ export default class ListTreeComponent extends Component {
                     nodeDataMap[1] = tempArray;
                     flatList[i].payload.nodeDataMap = nodeDataMap;
                 }
-                console.log("treeTemplate@@@@@@@@@@@@@@",treeTemplate)
+                // console.log("treeTemplate@@@@@@@@@@@@@@",treeTemplate)
                 tempTree = {
                     treeId: treeId,
                     active: this.state.active,
@@ -787,6 +777,7 @@ export default class ListTreeComponent extends Component {
                             level: 0,
                             parent: null,
                             sortOrder: "00",
+                            newTree: true,
                             payload: {
                                 label: {
                                     label_en: ''
@@ -823,7 +814,7 @@ export default class ListTreeComponent extends Component {
         var programData = (CryptoJS.AES.encrypt(JSON.stringify(tempProgram.programData), SECRET_KEY)).toString();
         tempProgram.programData = programData;
         // if (operationId == 3) {
-        if (operationId == 3 && treeTemplateId != "" && treeTemplateId != null) {
+        if (operationId == 3 && (treeTemplateId != "" && treeTemplateId != null)) {
             console.log("programId 1---", programId);
             calculateModelingData(programCopy, this, programId, 0, 1, 1, treeId, false, true);
         } else {
@@ -1303,7 +1294,7 @@ export default class ListTreeComponent extends Component {
         if (x == 0 && value != 0) {
             // console.log("HEADER SELECTION--------------------------");
         } else {
-            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE')) {
+            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE')) {
                 var treeId = this.el.getValueFromCoords(0, x);
                 var programId = this.el.getValueFromCoords(8, x);
                 console.log("programId>>>", programId);
@@ -1393,7 +1384,7 @@ export default class ListTreeComponent extends Component {
                                 </a>
                                 <Col md="12 pl-0 pr-lg-0">
                                     <div className="d-md-flex">
-                                        {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_TREE') &&
+                                        {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_TREE') && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') &&
                                             // <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.createTreeFromTemplate')}</Button>
                                             // <Col md="3" className="pl-0">
                                             <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
@@ -1408,7 +1399,7 @@ export default class ListTreeComponent extends Component {
                                                             className="addtreebg"
                                                             onChange={(e) => { this.onTemplateChange(e) }}
                                                         >
-                                                            <option value="">Select</option>
+                                                            <option value="">{i18n.t('static.tree.createOrSelect')}</option>
                                                             {/* <option value="">{i18n.t('static.tree.+AddTree')}</option> */}
                                                             <option value="0">+ {i18n.t('static.tree.blank')}</option>
                                                             {treeTemplates}
@@ -1509,7 +1500,7 @@ export default class ListTreeComponent extends Component {
                                 </div>
                                 <p>
                                     <p style={{ fontSize: '14px' }}><span className="UnderLineText">{i18n.t('static.listTree.purpose')} :</span> {i18n.t('static.listTree.enableUsersTo')} :</p>
-                                    <ul type="1">
+                                    <ol type="1">
                                         <li>{i18n.t('static.listTree.listExistingTree')}</li>
                                         <li> {i18n.t('static.listTree.editExistingTree')} </li>
                                         <li>{i18n.t('static.listTree.deleteDuplicateExistingTree')}</li>
@@ -1518,9 +1509,9 @@ export default class ListTreeComponent extends Component {
                                             <li>{i18n.t('static.listTree.manuallySelectAddTree')}</li>
                                             <li>{i18n.t('static.listTree.nameOfDesiredTemplate')}</li>
                                         </ul>
-                                   </ul>
+                                   </ol>
                                 </p>
-                                <p>Note: The table on this screen lists trees for each forecast program that has been loaded. </p>
+                                <p>{i18n.t('static.listTree.NoteTableOnListTree')} </p>
                                 <p>
                                     <p style={{ fontSize: '14px' }}><span className="UnderLineText">{i18n.t('static.listTree.useThisScreen')} :</span></p>
                                     <p className='pl-lg-4'>

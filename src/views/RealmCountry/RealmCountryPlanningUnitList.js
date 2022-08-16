@@ -161,7 +161,7 @@ export default class RealmCountryPlanningUnitList extends Component {
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
                 var index = (instance.jexcel).getValue(`I${parseInt(data[i].y) + 1}`, true);
-                if (index == "" || index == null || index == undefined) {
+                if (index === "" || index == null || index == undefined) {
                     // (instance.jexcel).setValueFromCoords(0, data[i].y, this.state.realmCountry.realm.label.label_en + "-" + this.state.realmCountry.country.label.label_en, true);
                     // (instance.jexcel).setValueFromCoords(0, data[i].y, '', true);
                     (instance.jexcel).setValueFromCoords(6, data[i].y, true, true);
@@ -1452,7 +1452,7 @@ export default class RealmCountryPlanningUnitList extends Component {
                             <div className="pl-0">
                                 <div className="row">
 
-                                    <FormGroup className="col-md-3">
+                                    <FormGroup className="col-md-3 pt-2">
                                         <Label htmlFor="programIds">{i18n.t('static.program.program')}</Label>
                                         <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
 

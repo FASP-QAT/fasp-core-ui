@@ -678,7 +678,7 @@ class ListProcurementAgentComponent extends Component {
 
     buildJExcel() {
         let procurementAgentList = this.state.selProcurementAgent;
-        // console.log("procurementAgentList---->", procurementAgentList);
+        console.log("procurementAgentList---->", procurementAgentList);
         let procurementAgentArray = [];
         let count = 0;
 
@@ -686,15 +686,16 @@ class ListProcurementAgentComponent extends Component {
             data = [];
             data[0] = procurementAgentList[j].procurementAgentId
             data[1] = getLabelText(procurementAgentList[j].realm.label, this.state.lang)
-            data[2] = getLabelText(procurementAgentList[j].label, this.state.lang)
-            data[3] = procurementAgentList[j].procurementAgentCode;
-            data[4] = procurementAgentList[j].colorHtmlCode;
-            data[5] = procurementAgentList[j].submittedToApprovedLeadTime;
-            data[6] = procurementAgentList[j].approvedToShippedLeadTime;
-            data[7] = (procurementAgentList[j].localProcurementAgent ? i18n.t('static.program.yes') : i18n.t('static.program.no'))
-            data[8] = procurementAgentList[j].lastModifiedBy.username;
-            data[9] = (procurementAgentList[j].lastModifiedDate ? moment(procurementAgentList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
-            data[10] = procurementAgentList[j].active;
+            data[2] = procurementAgentList[j].procurementAgentType.code;
+            data[3] = getLabelText(procurementAgentList[j].label, this.state.lang)
+            data[4] = procurementAgentList[j].procurementAgentCode;
+            data[5] = procurementAgentList[j].colorHtmlCode;
+            data[6] = procurementAgentList[j].submittedToApprovedLeadTime;
+            data[7] = procurementAgentList[j].approvedToShippedLeadTime;
+            data[8] = (procurementAgentList[j].localProcurementAgent ? i18n.t('static.program.yes') : i18n.t('static.program.no'))
+            data[9] = procurementAgentList[j].lastModifiedBy.username;
+            data[10] = (procurementAgentList[j].lastModifiedDate ? moment(procurementAgentList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
+            data[11] = procurementAgentList[j].active;
 
 
             procurementAgentArray[count] = data;
@@ -723,6 +724,11 @@ class ListProcurementAgentComponent extends Component {
                 {
                     title: i18n.t('static.realm.realm'),
                     type: (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN') ? 'text' : 'hidden'),
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.procurementagenttype.procurementagenttypecode'),
+                    type: 'text',
                     readOnly: true
                 },
                 {

@@ -276,7 +276,6 @@ export default class IntegrationListComponent extends Component {
 
                     </CardBody>
                 </Card>
-
             </div>
         );
     }

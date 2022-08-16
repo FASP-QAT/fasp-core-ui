@@ -1198,7 +1198,7 @@ class PlanningUnitCapacity extends Component {
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
                 var index = (instance.jexcel).getValue(`G${parseInt(data[i].y) + 1}`, true);
-                if (index == "" || index == null || index == undefined) {
+                if (index === "" || index == null || index == undefined) {
                     (instance.jexcel).setValueFromCoords(6, data[i].y, 0, true);
                     (instance.jexcel).setValueFromCoords(7, data[i].y, 1, true);
                     (instance.jexcel).setValueFromCoords(0, data[i].y, getLabelText(this.state.planningUnit.label, this.state.lang), true);

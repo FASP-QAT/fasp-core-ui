@@ -58,6 +58,24 @@ class ProcurementAgentService {
         return axios.get(`${API_URL}/api/procurementAgent/getDisplayName/realmId/${json1}/name/${json2}`, {}
         );
     }
+
+    addProcurementAgentType(json) {
+        return axios.post(`${API_URL}/api/procurementAgentType/`, json, {}
+        );
+    }
+
+    getProcurementAgentTypeListAll() {
+        return axios.get(`${API_URL}/api/procurementAgentType/`, {
+        });
+    }
+    getProcurementAgentTypeById(json) {
+        return axios.get(`${API_URL}/api/procurementAgentType/${json}`, {}
+        );
+    }
+    updateProcurementAgentType(json) {
+        return axios.put(`${API_URL}/api/procurementAgentType/`, json, {
+        });
+    }
 }
 
 export default new ProcurementAgentService();

@@ -171,7 +171,6 @@ export default class EditPlanningUnitComponent extends Component {
         // AuthenticationService.setupAxiosInterceptors();
         console.log(this.props.match.params.planningUnitId)
         PlanningUnitService.getPlanningUnitById(this.props.match.params.planningUnitId).then(response => {
-            console.log("RESP-------->", response.data);
             if (response.status == 200) {
                 this.setState({
                     planningUnit: response.data, loading: false
@@ -351,36 +350,41 @@ export default class EditPlanningUnitComponent extends Component {
                                                         required />
                                                     <FormFeedback className="red">{errors.multiplier}</FormFeedback>
                                                 </FormGroup>
-                                                <FormGroup>
-                                                    <Label htmlFor="label">{i18n.t('static.product.productName')}<span className="red Reqasterisk">*</span></Label>
-                                                    <Input
-                                                        type="text"
-                                                        name="label"
-                                                        id="label"
-                                                        bsSize="sm"
-                                                        valid={!errors.label}
-                                                        // invalid={touched.label && !!errors.label || this.state.planningUnit.label.label_en == ''}
-                                                        invalid={(touched.label && !!errors.label) || !!errors.label}
-                                                        onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
-                                                        onBlur={handleBlur}
-                                                        value={this.state.planningUnit.label.label_en}
-                                                        required
-                                                    >
-                                                    </Input>
-                                                    <FormFeedback className="red">{errors.label}</FormFeedback>
-                                                </FormGroup>
-                                                <FormGroup>
-                                                    <Label htmlFor="unitId">{i18n.t('static.planningUnit.planningUnitOfMeasure')}<span class="red Reqasterisk">*</span></Label>
-                                                    <Input
-                                                        type="text"
-                                                        name="unitId"
-                                                        id="unitId"
-                                                        bsSize="sm"
-                                                        readOnly
-                                                        value={this.state.planningUnit.unit.label.label_en}
-                                                    >
-                                                    </Input>
-                                                </FormGroup>
+                                                {/* <FormGroup>
+                                                        <Label htmlFor="label">{i18n.t('static.product.productName')}<span className="red Reqasterisk">*</span></Label>
+                                                        <Input
+                                                            type="text"
+                                                            name="label"
+                                                            id="label"
+                                                            bsSize="sm"
+                                                            valid={!errors.label}
+                                                            // invalid={touched.label && !!errors.label || this.state.planningUnit.label.label_en == ''}
+                                                            invalid={(touched.label && !!errors.label) || !!errors.label}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.planningUnit.label.label_en}
+                                                            required
+                                                        >
+                                                        </Input>
+                                                        <FormFeedback className="red">{errors.label}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label htmlFor="unitId">{i18n.t('static.planningUnit.planningUnitOfMeasure')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Input
+                                                            className="form-check-input"
+                                                            type="radio"
+                                                            id="active2"
+                                                            name="active"
+                                                            value={false}
+                                                            checked={this.state.planningUnit.active === false}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        />
+                                                        <Label
+                                                            className="form-check-label"
+                                                            check htmlFor="inline-radio2">
+                                                            {i18n.t('static.common.disabled')}
+                                                        </Label>
+                                                    </FormGroup> */}
                                                 <FormGroup>
                                                     <Label className="P-absltRadio">{i18n.t('static.common.status')}  </Label>
                                                     <FormGroup check inline>

@@ -1476,8 +1476,8 @@ class ProductCatalog extends Component {
 
                         </Col>
 
-                        <div style={{ display: this.state.loading ? "none" : "block" }}>
-                            <div id="tableDiv" className="jexcelremoveReadonlybackground consumptionDataEntryTable">
+                        <div>
+                            <div id="tableDiv" className="jexcelremoveReadonlybackground consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
                             </div>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>
