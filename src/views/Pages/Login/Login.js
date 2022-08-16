@@ -7,7 +7,7 @@ import React, { Component } from 'react';
 import i18n from '../../../i18n';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
-import { Button, CardBody, CardGroup, Col, Container, Form, FormFeedback, Input, InputGroup, InputGroupAddon, InputGroupText, DropdownItem, DropdownMenu, DropdownToggle, ButtonDropdown, Row } from 'reactstrap';
+import { Button, CardBody, CardGroup, Col, Container, Form, FormFeedback, Input, InputGroup, InputGroupAddon, InputGroupText, DropdownItem, DropdownMenu, DropdownToggle, ButtonDropdown, Row, Label,FormGroup } from 'reactstrap';
 import * as Yup from 'yup';
 import InnerBgImg from '../../../../src/assets/img/bg-image/bg-login.jpg';
 import LoginService from '../../../api/LoginService';
@@ -80,7 +80,8 @@ class Login extends Component {
       staticLabel: AuthenticationService.getIconAndStaticLabel("label"),
       languageList: [],
       updatedSyncDate: '',
-      lang: localStorage.getItem('lastLoggedInUsersLanguage')
+      lang: localStorage.getItem('lastLoggedInUsersLanguage'),
+      loginOnline:true
     }
     this.forgotPassword = this.forgotPassword.bind(this);
     this.incorrectPassmessageHide = this.incorrectPassmessageHide.bind(this);
@@ -89,6 +90,7 @@ class Login extends Component {
     this.changeLanguage = this.changeLanguage.bind(this);
     this.getLanguageList = this.getLanguageList.bind(this);
     this.getAllLanguages = this.getAllLanguages.bind(this);
+    this.dataChangeCheckbox=this.dataChangeCheckbox.bind(this);
   }
   getAllLanguages() {
     var db1;
@@ -238,6 +240,7 @@ class Login extends Component {
 
   componentDidMount() {
     // console.log("############## Login component did mount #####################");
+    localStorage.setItem("loginOnline", this.state.loginOnline);
     delete axios.defaults.headers.common["Authorization"];
     this.logoutMessagehide();
     // console.log("--------Going to call version api-----------")
@@ -319,6 +322,12 @@ class Login extends Component {
 
 
       });
+  }
+
+  dataChangeCheckbox(event){
+    this.setState({
+      loginOnline: (event.target.checked ? true : false)
+  })
   }
 
   logoutMessagehide() {
@@ -406,7 +415,8 @@ class Login extends Component {
                           AuthenticationService.setRecordCount(JEXCEL_DEFAULT_PAGINATION);
                           localStorage.setItem("sessionTimedOut", 0);
                           localStorage.setItem("sessionChanged", 0)
-                          if (isSiteOnline()) {
+                          localStorage.setItem("loginOnline", this.state.loginOnline);
+                          if (this.state.loginOnline==true && isSiteOnline()) {
                             var languageCode = AuthenticationService.getDefaultUserLanguage();
                             var lastLoggedInUsersLanguageChanged = localStorage.getItem('lastLoggedInUsersLanguageChanged');
                             console.log("Language change flag---", lastLoggedInUsersLanguageChanged);
@@ -557,7 +567,7 @@ class Login extends Component {
                                     required />
                                   <FormFeedback>{errors.emailId}</FormFeedback>
                                 </InputGroup>
-                                <InputGroup className="mb-4">
+                                <InputGroup className="mb-3">
                                   <InputGroupAddon addonType="prepend">
                                     <InputGroupText>
                                       <i className="cui-lock-locked Loginicon"></i>
@@ -576,6 +586,22 @@ class Login extends Component {
                                     required />
                                   <FormFeedback>{errors.password}</FormFeedback>
                                 </InputGroup>
+                                <Row>
+                                <InputGroup check inline  className="mb-4 ml-3">
+                                  <Input
+                                    type="checkbox"
+                                    id="loginOnline"
+                                    name="loginOnline"
+                                    checked={this.state.loginOnline}
+                                    onChange={(e) => { this.dataChangeCheckbox(e) }}
+                                   />
+                                   <Label
+                                     className="form-check-label ml-2"
+                                     check htmlFor="inline-radio2">
+                                     <b>{i18n.t('static.login.loginOnline')}</b>
+                                   </Label>
+                                </InputGroup>
+                                </Row>
                                 <Row>
                                   <Col xs="6">
                                     <Button type="submit" color="primary" className="px-4" onClick={() => { this.touchAll(setTouched, errors); this.incorrectPassmessageHide() }} >{i18n.t('static.login.login')}</Button>
