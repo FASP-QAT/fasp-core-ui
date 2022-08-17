@@ -939,6 +939,9 @@ class ForecastOutput extends Component {
     }
 
     filterData() {
+        this.setState({
+            show: false
+        });
         console.log("INSIDE FILTERDATA---------------------------------");
         let planningUnitIds = this.state.planningUnitValues.map(ele => (ele.value).toString())
         let forecastingUnitIds = this.state.forecastingUnitValues.map(ele => (ele.value).toString())
