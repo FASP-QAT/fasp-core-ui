@@ -1431,7 +1431,7 @@ class ModelingValidation extends Component {
             && versionList.map((item, i) => {
                 return (
                     <option key={i} value={item}>
-                        {item}
+                        {item} ({(moment(item.createdDate).format(`MMM DD YYYY`))})
                     </option>
                 )
             }, this);
