@@ -239,7 +239,8 @@ export default class ExportProgram extends Component {
                                                                             budgetList = budgetRequest.result;
 
                                                                             var isUnEncrepted = false;
-                                                                            if (window.confirm("Do you want to encrypt data?")) {
+                                                                            var checkboxValue = document.getElementById('isExportData').checked;
+                                                                            if (checkboxValue) {
                                                                                 isUnEncrepted = true;
                                                                             } else {
                                                                                 isUnEncrepted = false;
@@ -483,6 +484,25 @@ export default class ExportProgram extends Component {
                                             <span className="red">{this.state.selectProgramMessage}</span>
                                         </FormGroup>
                                     </CardBody>
+                                    <FormGroup className="col-md-3" id="hideCalculationDiv">
+                                        <div className="controls pl-lg-4 pt-lg-0">
+                                            <Input
+                                                className="form-check-input"
+                                                type="checkbox"
+                                                id="isExportData"
+                                                name="isExportData"
+                                                style={{ marginTop: '3' }}
+                                                value={0}
+                                            // checked={true}
+                                            // onClick={(e) => { this.hideCalculation(e); }}
+                                            />
+                                            <Label
+                                                className="form-check-label"
+                                                check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                {'Do you want to enceypt data?'}
+                                            </Label>
+                                        </div>
+                                    </FormGroup>
                                     <div style={{ display: this.state.loading ? "none" : "block" }}></div>
                                     <div style={{ display: this.state.loading ? "block" : "none" }}>
                                         <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
