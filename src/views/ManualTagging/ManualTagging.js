@@ -2425,9 +2425,9 @@ export default class ManualTagging extends Component {
                 artmisList: [],
                 displayButton: false
             }, () => {
-                if (this.state.buildJexcelRequired) {
+                // if (this.state.buildJexcelRequired) {
                     this.buildJExcelERP();
-                }
+                // }
             })
         }
         // else if (orderNo == "" && primeLineNo == "") {
@@ -2854,7 +2854,7 @@ export default class ManualTagging extends Component {
                         console.log("ShipmentList@@@@@@@@@@@@@@@", shipmentList);
                         for (var sl = 0; sl < shipmentList.length; sl++) {
                             var arr = [];
-                            var list = (fullShipmentList.filter(c => shipmentList[sl].parentShipmentId == 0 ? c.tempParentLinkedShipmentId == shipmentList[sl].tempParentShipmentId : c.parentLinkedShipmentId == shipmentList[sl].parentShipmentId)).map(item => {
+                            var list = (fullShipmentList.filter(c => shipmentList[sl].parentShipmentId == 0 ? shipmentList[sl].tempParentShipmentId!=null && c.tempParentLinkedShipmentId == shipmentList[sl].tempParentShipmentId : shipmentList[sl].parentShipmentId!=null && c.parentLinkedShipmentId == shipmentList[sl].parentShipmentId)).map(item => {
                                 arr.push(item.shipmentId)
                             });
                             shipmentList[sl].parentShipmentIdArr = arr;
@@ -3010,7 +3010,7 @@ export default class ManualTagging extends Component {
             var erpPlanningUnitId = this.state.planningUnitIdUpdated;
             var programId = this.state.active1 ? this.state.programId : this.state.programId1.split("_")[0];
             var shipmentPlanningUnitId = this.state.active1 ? this.state.selectedRowPlanningUnit : (this.state.active3 ? ((this.state.active4 || this.state.active5) && !this.state.checkboxValue ? document.getElementById("planningUnitId1").value : (this.state.active4 || this.state.active5) && this.state.checkboxValue ? this.state.selectedShipment.length > 0 ? this.state.selectedShipment[0].planningUnit.id : 0 : 0) : 0)
-
+            console.log("selectedRowPlanningUnit@@@@@@@@@@@@@@@@",this.state.selectedRowPlanningUnit)
             ManualTaggingService.autocompleteDataOrderNo(term.toUpperCase(), (programId != null && programId != "" ? programId : 0), (erpPlanningUnitId != null && erpPlanningUnitId != "" ? erpPlanningUnitId : 0), shipmentPlanningUnitId)
                 .then(response => {
                     console.log("Response@@@@@@@@@@@@@@@@@@@@@", response)
@@ -3626,7 +3626,7 @@ export default class ManualTagging extends Component {
                 console.log("linkedShipmentsListForTab2@@@@@@@@@@@", linkedShipmentsListForTab2)
                 console.log("manualTaggingList[j]@@@@@@@@@@@@", manualTaggingList[j])
                 data[0] = true;
-                data[1] = (linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].parentShipmentId + (manualTaggingList[j].parentShipmentIdArr.length > 0 ? ", " + manualTaggingList[j].parentShipmentIdArr.toString() : "") : 0) + " (" + (!this.state.versionId.toString().includes("Local") ? manualTaggingList[j].childShipmentId : manualTaggingList[j].shipmentId) + ")";
+                data[1] = (!this.state.versionId.toString().includes("Local") ? (linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].parentShipmentId + (manualTaggingList[j].parentLinkedShipmentId != "" && manualTaggingList[j].parentLinkedShipmentId != null ? ", " + manualTaggingList[j].parentLinkedShipmentId : "") : 0) + " (" + manualTaggingList[j].childShipmentId : (linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].parentShipmentId + (manualTaggingList[j].parentShipmentIdArr.length > 0 ? ", " + manualTaggingList[j].parentShipmentIdArr.toString() : "") : 0) + " (" + manualTaggingList[j].shipmentId) + ")";
                 data[2] = !this.state.versionId.toString().includes("Local") ? manualTaggingList[j].childShipmentId : manualTaggingList[j].shipmentId
                 data[3] = (linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].roNo + " - " + linkedShipmentsListForTab2[0].roPrimeLineNo : "") + " | " + (manualTaggingList[j].orderNo + " - " + manualTaggingList[j].primeLineNo) + (linkedShipmentsListForTab2.length > 0 && linkedShipmentsListForTab2[0].knShipmentNo != "" && linkedShipmentsListForTab2[0].knShipmentNo != null ? " | " + linkedShipmentsListForTab2[0].knShipmentNo : "");
                 data[4] = manualTaggingList[j].orderNo + " | " + manualTaggingList[j].primeLineNo
@@ -4170,12 +4170,14 @@ export default class ManualTagging extends Component {
             ) {
                 row = this.state.outputList.filter(c => (this.el.getValueFromCoords(0, x) != 0 ? c.shipmentId == this.el.getValueFromCoords(0, x) : c.tempShipmentId == this.el.getValueFromCoords(9, x)))[0];
                 outputListAfterSearch.push(row);
+                console.log("outputListAfterSearch@@@@@@@@@@@@@@@@",outputListAfterSearch);
                 var finalShipmentId = []
                 if (outputListAfterSearch[0].orderNo != null && outputListAfterSearch[0].orderNo != "") {
                     json = { id: outputListAfterSearch[0].orderNo, label: outputListAfterSearch[0].orderNo };
                     finalShipmentId.push({ "shipmentId": this.el.getValueFromCoords(0, x), "tempShipmentId": this.el.getValueFromCoords(0, x) > 0 ? null : this.el.getValueFromCoords(9, x), "index": "", "qty": outputListAfterSearch[0].shipmentQty })
                 } else {
                     json = { id: '', label: '' };
+                    finalShipmentId.push({ "shipmentId": this.el.getValueFromCoords(0, x), "tempShipmentId": this.el.getValueFromCoords(0, x) > 0 ? null : this.el.getValueFromCoords(9, x), "index": "", "qty": outputListAfterSearch[0].shipmentQty })
                     buildJexcelRequired = false;
                 }
                 this.setState({
@@ -4188,10 +4190,14 @@ export default class ManualTagging extends Component {
                     searchedValue: (outputListAfterSearch[0].orderNo != null && outputListAfterSearch[0].orderNo != "" ? outputListAfterSearch[0].orderNo : ""),
                     selectedRowPlanningUnit: outputListAfterSearch[0].planningUnit.id,
                     finalShipmentId: finalShipmentId,
-                    showAllShipments: false
+                    showAllShipments: false,
+                    planningUnitId: (this.state.active3 ? outputListAfterSearch[0].erpPlanningUnit.id : outputListAfterSearch[0].planningUnit.id),
+                    shipmentId: (this.state.active1 ? this.el.getValueFromCoords(0, x) : (this.state.active2 ? this.el.getValueFromCoords(1, x) : 0)),
+                    procurementAgentId: (this.state.active3 ? 1 : outputListAfterSearch[0].procurementAgent.id),
+                    planningUnitName: (this.state.active3 ? row.erpPlanningUnit.label.label_en + "(" + row.skuCode + ")" : row.planningUnit.label.label_en + '(' + row.skuCode + ')')
                     // planningUnitIdUpdated: outputListAfterSearch[0].planningUnit.id
                 }, () => {
-
+                    this.toggleLarge();
                     this.getOrderDetails();
                 });
             } else if (this.state.active2 && this.state.versionId.includes("Local")) {
@@ -4229,8 +4235,7 @@ export default class ManualTagging extends Component {
             }
             // outputListAfterSearch.push(row);
             // console.log("1------------------------------>>>>", outputListAfterSearch[0].erpPlanningUnit.id)
-            if ((this.state.active1
-                && this.state.versionId.includes("Local")) || this.state.active3) {
+            if (this.state.active3) {
                 console.log("In function To open popup@@@@@@@@@@@@@@@@@@@@@@@))))))))))))))))")
                 this.setState({
                     planningUnitId: (this.state.active3 ? outputListAfterSearch[0].erpPlanningUnit.id : outputListAfterSearch[0].planningUnit.id),
@@ -4644,6 +4649,7 @@ export default class ManualTagging extends Component {
 
     toggleLarge() {
         // this.getPlanningUnitListByTracerCategory(this.state.planningUnitId, this.state.procurementAgentId);
+        console.log("In selected row planning unit@@@@@@@@@@@",this.state.planningUnitId);
         this.setState({
             displaySubmitButton: false,
             displayTotalQty: false,
@@ -5342,11 +5348,12 @@ export default class ManualTagging extends Component {
                                     <ModalBody>
                                         <div>
                                             {!this.state.active3 && !this.state.active2 &&
-                                                <p><h5><b>{i18n.t('static.manualTagging.qatShipmentTitle')}
+                                                <div className="d-flex">
+                                                    <div className="mr-4"><h5><b>{i18n.t('static.manualTagging.qatShipmentTitle')}</b></h5></div>
                                                     <div className={"check inline pl-lg-3"}>
                                                         <div className="">
                                                             <Input
-                                                                style={{ width: '16px', height: '16px', marginTop: '3px' }}
+                                                                style={{ width: '14px', height: '14px', marginTop: '1px' }}
                                                                 className="form-check-input"
                                                                 type="checkbox"
                                                                 id="showAllShipments"
@@ -5354,18 +5361,12 @@ export default class ManualTagging extends Component {
                                                                 checked={this.state.showAllShipments}
                                                                 onClick={(e) => { this.setShowAllShipments(e); }}
                                                             />
-                                                            <Label
-                                                                className="form-check-label pl-lg-1"
-                                                                check htmlFor="inline-radio2" style={{ fontSize: '16px' }}>
-                                                                <b>Show All Shipments</b>
+                                                                <span><h5><b>{i18n.t('static.manualTagging.showAllShipments')}</b></h5></span>
                                                                 {/* <i class="fa fa-info-circle icons pl-lg-2" id="Popover5" onClick={() => this.toggle('popoverOpenArima', !this.state.popoverOpenArima)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i> */}
-                                                            </Label>
                                                         </div>
                                                     </div>
-                                                </b></h5>
-
-                                                    {/* // </div> */}
-                                                </p>}
+                                                </div>
+                                            }
                                             {!this.state.active3 && !this.state.active2 &&
 
                                                 // <ToolkitProvider
