@@ -54,7 +54,7 @@ export function contrast(colorHex, threshold = 128) {
 
 export function isSiteOnline() {
   let loginOnline = localStorage.getItem("loginOnline");
-  if (loginOnline.toString() == "true") {
+  if (loginOnline==undefined || loginOnline.toString() == "true") {
     let url = APPLICATION_STATUS_URL;
     let request = new XMLHttpRequest;
     request.open('GET', url, false);

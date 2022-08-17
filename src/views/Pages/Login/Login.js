@@ -592,6 +592,10 @@ class Login extends Component {
                                     type="checkbox"
                                     id="loginOnline"
                                     name="loginOnline"
+                                    style={{
+                                      position: "relative",
+                                      marginTop: "0.2rem",
+                                      marginLeft: "0rem"}}
                                     checked={this.state.loginOnline}
                                     onChange={(e) => { this.dataChangeCheckbox(e) }}
                                    />
