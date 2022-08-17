@@ -245,8 +245,8 @@ class ProgramService {
         return axios.get(`${API_URL}/api/user/programId/${programId}`, {}
         );
     }
-    
-    checkIfLinkingExistsWithOtherProgram(json){
+
+    checkIfLinkingExistsWithOtherProgram(json) {
         return axios.post(`${API_URL}/api/erpLinking/otherProgramCheck`, json, {}
         );
     }

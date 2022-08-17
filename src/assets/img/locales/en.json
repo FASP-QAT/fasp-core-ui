@@ -1344,6 +1344,7 @@
     "static.user.user": "User",
     "static.dashboard.dimensionheader": "Dimension",
     "static.loadProgram.loadProgramNotePart1": "Note : When loading, QAT will pull the latest shipment data for ERP-linked shipments, so the supply plan may look different than it was when it was originally committed. To see read-only version(s) of supply plans as they were originally committed, go to the",
+    "static.tree.rootNodeInfoMissing": "Please enter the root node info.",
     "static.quantimed.quantimedImportScreenSecond": "Map Planning Units",
     "static.loadProgram.loadProgramNotePart2": "screen.",
     "static.forecastReport.forecastQuantity": "Forecast Quantity",
@@ -2789,7 +2790,6 @@
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Max = 7",
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )",
     "static.loadDeleteProgram.loadDeleteProgram": "Load/Delete Program",
-    "static.tree.rootNodeInfoMissing": "Please enter the root node info.",
     "static.editStatus.validCriticality": "Please select Criticality",
     "static.manualTagging.showAllShipments":"Show All Shipments"
 }

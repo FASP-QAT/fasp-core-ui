@@ -1341,6 +1341,7 @@
     "static.user.user": "Usuario",
     "static.dashboard.dimensionheader": "Dimensión",
     "static.loadProgram.loadProgramNotePart1": "Nota: Al cargar, QAT extraerá los datos de envío más recientes para los envíos vinculados a ERP, por lo que el plan de suministro puede verse diferente de lo que era cuando se comprometió originalmente. Para ver las versiones de solo lectura de los planes de suministro tal como se comprometieron originalmente, vaya a la",
+    "static.tree.rootNodeInfoMissing": "Ingrese la información del nodo raíz.",
     "static.quantimed.quantimedImportScreenSecond": "Agregar producto",
     "static.loadProgram.loadProgramNotePart2": "pantalla.",
     "static.forecastReport.forecastQuantity": "Cantidad de pronóstico",
