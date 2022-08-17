@@ -587,7 +587,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 this.props.updateStepOneData("stopDate", stopDate);
 
 
-                document.getElementById("stepOneBtn").disabled = false;
+                // document.getElementById("stepOneBtn").disabled = false;
                 PlanningUnitService.getPlanningUnitListByProgramVersionIdForSelectedForecastMap(forecastProgramId, versionId)
                     .then(response => {
                         if (response.status == 200) {
@@ -919,6 +919,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             // forecastPlanignUnitListForNotDuplicate: forecastPlanignUnitListForNotDuplicate
         })
         this.props.updateStepOneData("loading", false);
+        document.getElementById("stepOneBtn").disabled = false;
     }
 
     filterPlanningUnitBasedOnTracerCategory = function (instance, cell, c, r, source) {
@@ -1590,7 +1591,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                             </div>
                         </FormGroup>
                         <FormGroup className="col-md-4">
-                            <Label htmlFor="appendedInputButton">{i18n.t('static.importFromQATSupplyPlan.Range')}<span className="stock-box-icon fa fa-sort-desc"></span> <i>(Forecast: {this.state.forecastPeriod})</i></Label>
+                            <Label htmlFor="appendedInputButton">Range to Import Forecast Consumption<span className="stock-box-icon fa fa-sort-desc"></span> <i>(Forecast: {this.state.forecastPeriod})</i></Label>
                             <div className="controls  Regioncalender">
 
                                 <Picker

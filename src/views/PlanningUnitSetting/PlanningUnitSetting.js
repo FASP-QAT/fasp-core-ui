@@ -2143,7 +2143,7 @@ export default class PlanningUnitSetting extends Component {
                     // readOnly: true //3D
                 },
                 {
-                    title: i18n.t('static.planningUnitSetting.stockEndOf') + this.state.beforeEndDateDisplay + ')',
+                    title: i18n.t('static.planningUnitSetting.stockEndOf') + ' ' + this.state.beforeEndDateDisplay + ')',
                     type: 'numeric',
                     textEditor: true,
                     decimal: '.',
@@ -2163,7 +2163,7 @@ export default class PlanningUnitSetting extends Component {
                     // readOnly: true //5F
                 },
                 {
-                    title: i18n.t('static.planningUnitSetting.desiredMonthsOfStock') + this.state.endDateDisplay + ')',
+                    title: i18n.t('static.planningUnitSetting.desiredMonthsOfStock') + ' ' +this.state.endDateDisplay + ')',
                     type: 'numeric',
                     textEditor: true,
                     decimal: '.',

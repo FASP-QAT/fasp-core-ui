@@ -114,7 +114,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       tempConsumptionUnitObject: { "consumptionDataType": "" },
       dataEnteredInUnitList: [],
       minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
-      singleValue2: localStorage.getItem("sesDataentryDateRange") != "" ? JSON.parse(localStorage.getItem("sesDataentryDateRange")) : { from: { year: Number(moment(startDate).startOf('month').format("YYYY")), month: Number(moment(startDate).startOf('month').format("M")) }, to: { year: Number(moment(stopDate).startOf('month').format("YYYY")), month: Number(moment(stopDate).startOf('month').format("M")) } },
+      singleValue2: localStorage.getItem("sesDataentryStartDateRange") != "" ? JSON.parse(localStorage.getItem("sesDataentryStartDateRange")) : { year: Number(moment(startDate).startOf('month').format("YYYY")), month: Number(moment(startDate).startOf('month').format("M"))},
       maxDate: { year: Number(moment(Date.now()).startOf('month').format("YYYY")), month: Number(moment(Date.now()).startOf('month').format("M")) },
       planningUnitTotalList: [],
       dataEnteredInTableExSpan: 0
@@ -663,8 +663,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     var consumptionUnit = this.state.selectedConsumptionUnitObject;
     var rangeValue = this.state.singleValue2;
     console.log("RangeValuie@@@@@@@@@@@@", rangeValue);
-    var startDate = moment(rangeValue.from.year + '-' + rangeValue.from.month + '-01').format("YYYY-MM-DD");
-    var stopDate = moment(rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate()).format("YYYY-MM-DD");
+    var startDate = moment(rangeValue.year + '-' + rangeValue.month + '-01').format("YYYY-MM-DD");
+    var stopDate = moment(startDate).add(35,'months').format("YYYY-MM-DD");
     var fullConsumptionList = this.state.tempConsumptionList.filter(c => (c.planningUnit.id != consumptionUnit.planningUnit.id) || (c.planningUnit.id == consumptionUnit.planningUnit.id && (moment(c.month).format("YYYY-MM") < moment(startDate).format("YYYY-MM") || moment(c.month).format("YYYY-MM") > moment(stopDate).format("YYYY-MM"))));
     var elInstance = this.state.dataEl;
     for (var i = 0; i < monthArray.length; i++) {
@@ -840,8 +840,10 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           // var fullConsumptionList = this.state.consumptionList.filter(c => c.planningUnit.id != consumptionUnit.planningUnit.id);
           var rangeValue = this.state.singleValue2;
           console.log("RangeValuie@@@@@@@@@@@@", rangeValue);
-          var startDate = moment(rangeValue.from.year + '-' + rangeValue.from.month + '-01').format("YYYY-MM-DD");
-          var stopDate = moment(rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate()).format("YYYY-MM-DD");
+          var startDate = moment(rangeValue.year + '-' + rangeValue.month + '-01').format("YYYY-MM-DD");
+          // var stopDate = moment(rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate()).format("YYYY-MM-DD");
+          var stopDate = moment(startDate).add(35,'months').format("YYYY-MM-DD");
+    
           var fullConsumptionList = this.state.consumptionList.filter(c => (c.planningUnit.id != consumptionUnit.planningUnit.id) || (c.planningUnit.id == consumptionUnit.planningUnit.id && (moment(c.month).format("YYYY-MM") < moment(startDate).format("YYYY-MM") || moment(c.month).format("YYYY-MM") > moment(stopDate).format("YYYY-MM"))));
           console.log("Full ConsumptionList @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@", fullConsumptionList)
           var monthArray = this.state.monthArray;
@@ -926,6 +928,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
 
           datasetJson.actualConsumptionList = fullConsumptionList;
           datasetJson.planningUnitList = planningUnitList;
+          datasetJson.consumptionExtrapolation = [];
+          console.log("datasetJson----------->925", datasetJson);
           datasetData = (CryptoJS.AES.encrypt(JSON.stringify(datasetJson), SECRET_KEY)).toString()
           myResult.programData = datasetData;
           var putRequest = datasetTransaction.put(myResult);
@@ -1536,8 +1540,10 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               });
               var rangeValue = this.state.singleValue2;
               console.log("RangeValuie@@@@@@@@@@@@", rangeValue);
-              var startDate = moment(rangeValue.from.year + '-' + rangeValue.from.month + '-01').format("YYYY-MM-DD");
-              var stopDate = moment(rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate()).format("YYYY-MM-DD");
+              var startDate = moment(rangeValue.year + '-' + rangeValue.month + '-01').format("YYYY-MM-DD");
+              // var stopDate = moment(rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate()).format("YYYY-MM-DD");
+              var stopDate = moment(startDate).add(35,'months').format("YYYY-MM-DD");
+    
               console.log("stopDate@@@@@@@@@@@@", stopDate);
               var daysInMonth = datasetJson.currentVersion.daysInMonth;
               var monthArray = [];
@@ -1908,29 +1914,29 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       cont = true;
     }
     console.log("Value@@@@@@@@@@@@@@@", value)
-    let startDate = moment(value.from.year + '-' + value.from.month + '-01').format("YYYY-MM");
-    let endDate = moment(value.to.year + '-' + value.to.month + '-' + new Date(value.to.year, value.to.month, 0).getDate()).format("YYYY-MM");
-    console.log("startDate-->", startDate);
-    console.log("endDate-->", endDate);
+    // let startDate = moment(value.from.year + '-' + value.from.month + '-01').format("YYYY-MM");
+    // let endDate = moment(value.to.year + '-' + value.to.month + '-' + new Date(value.to.year, value.to.month, 0).getDate()).format("YYYY-MM");
+    // console.log("startDate-->", startDate);
+    // console.log("endDate-->", endDate);
     // var monthsDiff = moment(endDate).diff(startDate, 'months', true);
-    const monthsDiff = moment(new Date(endDate)).diff(new Date(startDate), 'months', true);
+    // const monthsDiff = moment(new Date(endDate)).diff(new Date(startDate), 'months', true);
     if (cont == true) {
-      if (monthsDiff <= 36) {
+      // if (monthsDiff <= 36) {
         this.setState({
           consumptionChanged: false
         }, () => {
           this.setState({ singleValue2: value, }, () => {
-            localStorage.setItem("sesDataentryDateRange", JSON.stringify(value))
+            localStorage.setItem("sesDataentryStartDateRange", JSON.stringify(value))
             this.getDatasetData()
           })
         })
-      } else {
-        alert(i18n.t('static.dataentry.maxRange'));
-        let rangeValue = this.state.singleValue2;
-        let startDate = moment(rangeValue.from.year + '-' + rangeValue.from.month + '-01').format("YYYY-MM");
-        let stopDate = moment(rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate()).format("YYYY-MM");
-        this.setState({ singleValue2: { from: { year: Number(moment(startDate).startOf('month').format("YYYY")), month: Number(moment(startDate).startOf('month').format("M")) }, to: { year: Number(moment(stopDate).startOf('month').format("YYYY")), month: Number(moment(stopDate).startOf('month').format("M")) } } });
-      }
+      // } else {
+      //   alert(i18n.t('static.dataentry.maxRange'));
+      //   let rangeValue = this.state.singleValue2;
+      //   let startDate = moment(rangeValue.from.year + '-' + rangeValue.from.month + '-01').format("YYYY-MM");
+      //   let stopDate = moment(rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate()).format("YYYY-MM");
+      //   this.setState({ singleValue2: { from: { year: Number(moment(startDate).startOf('month').format("YYYY")), month: Number(moment(startDate).startOf('month').format("M")) }, to: { year: Number(moment(stopDate).startOf('month').format("YYYY")), month: Number(moment(stopDate).startOf('month').format("M")) } } });
+      // }
     }
 
   }
@@ -1980,7 +1986,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         yAxes: [{
           scaleLabel: {
             display: true,
-            labelString: getLabelText(this.state.tempConsumptionUnitObject.consumptionDataType == "" ? "" : this.state.tempConsumptionUnitObject.consumptionDataType == 1 ? this.state.tempConsumptionUnitObject.planningUnit.forecastingUnit.label : this.state.tempConsumptionUnitObject.consumptionDataType == 2 ? this.state.tempConsumptionUnitObject.planningUnit.label : this.state.tempConsumptionUnitObject.otherUnit.label, this.state.lang),
+            labelString: this.state.selectedConsumptionUnitId > 0 ? getLabelText(this.state.selectedConsumptionUnitObject.planningUnit.label, this.state.lang):"",
+            // labelString: getLabelText(this.state.tempConsumptionUnitObject.consumptionDataType == "" ? "" : this.state.tempConsumptionUnitObject.consumptionDataType == 1 ? this.state.tempConsumptionUnitObject.planningUnit.forecastingUnit.label : this.state.tempConsumptionUnitObject.consumptionDataType == 2 ? this.state.tempConsumptionUnitObject.planningUnit.label : this.state.tempConsumptionUnitObject.otherUnit.label, this.state.lang),
             fontColor: 'black'
           },
           stacked: true,
@@ -2047,8 +2054,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       if (elInstance != undefined) {
         var colourCount = 0;
         datasetListForGraph.push({
-          label: getLabelText(this.state.tempConsumptionUnitObject.consumptionDataType == 1 ? this.state.tempConsumptionUnitObject.planningUnit.forecastingUnit.label : this.state.tempConsumptionUnitObject.consumptionDataType == 2 ? this.state.tempConsumptionUnitObject.planningUnit.label : this.state.tempConsumptionUnitObject.otherUnit.label, this.state.lang),
-          data: this.state.planningUnitTotalList.filter(c => c.planningUnitId == this.state.selectedConsumptionUnitObject.planningUnit.id).map(item => (item.qty !== "" ? item.qty : null)),
+          // label: getLabelText(this.state.tempConsumptionUnitObject.consumptionDataType == 1 ? this.state.tempConsumptionUnitObject.planningUnit.forecastingUnit.label : this.state.tempConsumptionUnitObject.consumptionDataType == 2 ? this.state.tempConsumptionUnitObject.planningUnit.label : this.state.tempConsumptionUnitObject.otherUnit.label, this.state.lang),
+          label:"Total",
+          data: this.state.planningUnitTotalList.filter(c => c.planningUnitId == this.state.selectedConsumptionUnitObject.planningUnit.id).map(item => (item.qtyInPU !== "" ? item.qtyInPU : null)),
           type: 'line',
           // stack: 1,
           backgroundColor: 'transparent',
@@ -2076,7 +2084,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           // columnData.shift()
           datasetListForGraph.push({
             label: getLabelText(item.label, this.state.lang),
-            data: this.state.planningUnitTotalListRegion.filter(c => c.planningUnitId == this.state.selectedConsumptionUnitObject.planningUnit.id && c.region.regionId == item.regionId).map(item => (item.qty > 0 ? item.qty : null)),
+            data: this.state.planningUnitTotalListRegion.filter(c => c.planningUnitId == this.state.selectedConsumptionUnitObject.planningUnit.id && c.region.regionId == item.regionId).map(item => (item.qtyInPU > 0 ? item.qtyInPU : null)),
             // type: 'line'
             stack: 1,
             // backgroundColor: 'transparent',
@@ -2191,7 +2199,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                       </div>
                     </FormGroup>
                     <FormGroup className="col-md-3">
-                      <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                      <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.startMonth')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                       <div className="controls edit">
                         <Picker
                           ref="pickAMonth2"
@@ -2205,7 +2213,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                         // onChange={this.handleRangeChange}
                         // onDismiss={this.handleRangeDissmis}
                         >
-                          <MonthBox value={makeText(this.state.singleValue2.from) + ' ~ ' + makeText(this.state.singleValue2.to)} onClick={this.handleClickMonthBox2} />
+                          {/* <MonthBox value={makeText(this.state.singleValue2.from) + ' ~ ' + makeText(this.state.singleValue2.to)} onClick={this.handleClickMonthBox2} /> */}
+                          <MonthBox value={makeText(this.state.singleValue2)} onClick={this.handleClickMonthBox2} />
+  
                         </Picker>
                       </div>
                     </FormGroup>
@@ -2296,7 +2306,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                               </Label><br />
                               <Label htmlFor="appendedInputButton">{i18n.t('static.common.dataEnteredIn')}: <b>{this.state.tempConsumptionUnitObject.consumptionDataType == 1 ? (this.state.tempConsumptionUnitObject.planningUnit.forecastingUnit.label.label_en) : this.state.tempConsumptionUnitObject.consumptionDataType == 2 ? this.state.tempConsumptionUnitObject.planningUnit.label.label_en : this.state.tempConsumptionUnitObject.otherUnit.label.label_en}</b>
                                 <a className="card-header-action">
-                                 {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT') && <span style={{ cursor: 'pointer' }} className="hoverDiv" onClick={() => { this.changeUnit(this.state.selectedConsumptionUnitId) }}><u>({i18n.t('static.dataentry.change')})</u></span>}
+                                  {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT') && <span style={{ cursor: 'pointer' }} className="hoverDiv" onClick={() => { this.changeUnit(this.state.selectedConsumptionUnitId) }}><u>({i18n.t('static.dataentry.change')})</u></span>}
                                 </a>
                               </Label><br />
                               <Label htmlFor="appendedInputButton">{i18n.t('static.dataentry.conversionToPu')}: <b>{this.state.tempConsumptionUnitObject.consumptionDataType == 1 ? Number(1 / this.state.tempConsumptionUnitObject.planningUnit.multiplier).toFixed(4) : this.state.tempConsumptionUnitObject.consumptionDataType == 2 ? 1 : Number(1 / this.state.tempConsumptionUnitObject.planningUnit.multiplier * this.state.tempConsumptionUnitObject.otherUnit.multiplier).toFixed(4)}</b>

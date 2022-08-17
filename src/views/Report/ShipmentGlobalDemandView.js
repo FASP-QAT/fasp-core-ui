@@ -38,7 +38,7 @@ import ProgramService from '../../api/ProgramService';
 import FundingSourceService from '../../api/FundingSourceService';
 import ShipmentStatusService from '../../api/ShipmentStatusService';
 import { Online, Offline } from "react-detect-offline";
-import {MultiSelect} from 'react-multi-select-component';
+import { MultiSelect } from 'react-multi-select-component';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { Multiselect } from 'multiselect-react-dropdown';
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
@@ -976,9 +976,9 @@ class ShipmentGlobalDemandView extends Component {
                             }
 
                             //Graph-1
-                            let planningUnitSplitForPlanned = shipmentStatusFilter.filter(c => (1 == c.shipmentStatus.id || 2 == c.shipmentStatus.id || 3 == c.shipmentStatus.id || 9 == c.shipmentStatus.id)).map((item) => { return { planningUnit: item.planningUnit, plannedShipmentQty: item.shipmentQty, orderedShipmentQty: 0 } });
+                            let planningUnitSplitForPlanned = shipmentStatusFilter.filter(c => (1 == c.shipmentStatus.id || 2 == c.shipmentStatus.id || 9 == c.shipmentStatus.id)).map((item) => { return { planningUnit: item.planningUnit, plannedShipmentQty: item.shipmentQty, orderedShipmentQty: 0 } });
 
-                            let planningUnitSplitForOrdered = shipmentStatusFilter.filter(c => (4 == c.shipmentStatus.id || 5 == c.shipmentStatus.id || 6 == c.shipmentStatus.id || 7 == c.shipmentStatus.id)).map((item) => { return { planningUnit: item.planningUnit, plannedShipmentQty: 0, orderedShipmentQty: item.shipmentQty } });
+                            let planningUnitSplitForOrdered = shipmentStatusFilter.filter(c => (3 == c.shipmentStatus.id || 4 == c.shipmentStatus.id || 5 == c.shipmentStatus.id || 6 == c.shipmentStatus.id || 7 == c.shipmentStatus.id)).map((item) => { return { planningUnit: item.planningUnit, plannedShipmentQty: 0, orderedShipmentQty: item.shipmentQty } });
 
                             let mergedPlanningUnitSplit = planningUnitSplitForPlanned.concat(planningUnitSplitForOrdered);
 

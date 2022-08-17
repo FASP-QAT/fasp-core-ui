@@ -1187,9 +1187,9 @@ export default class BuildTree extends Component {
             console.log("PUPERVISIT puPerVisit---", puPerVisit);
         } else if (parentScenario.fuNode.usageType.id == 1) {
             // if (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.sharePlanningUnit == "true" || currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.sharePlanningUnit == true) {
-                puPerVisit = addCommas(this.state.noOfMonthsInUsagePeriod / conversionFactor);
+            puPerVisit = addCommas(this.state.noOfMonthsInUsagePeriod / conversionFactor);
             // } else {
-                // puPerVisit = this.round(this.state.noOfMonthsInUsagePeriod / conversionFactor);
+            // puPerVisit = this.round(this.state.noOfMonthsInUsagePeriod / conversionFactor);
             // }
         }
         currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.puPerVisit = puPerVisit;
@@ -5140,33 +5140,17 @@ export default class BuildTree extends Component {
                 this.setState({ showFUValidation: false }, () => {
                     this.getForecastingUnitUnitByFUId(regionIds.value);
                     this.getPlanningUnitListByFUId(regionIds.value);
+                    this.filterUsageTemplateList(0, regionIds.value);
                 });
             } else {
                 currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.id = "";
                 currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.label.label_en = "";
-                // currentItemConfig.context.payload.label.label_en = "";
-                this.setState({ showFUValidation: true, planningUnitList: [] });
+                this.setState({ showFUValidation: true, planningUnitList: [] }, () => {
+                    this.filterUsageTemplateList(0, 0);
+                });
             }
-            // this.getPlanningUnitListByFUId(regionIds.value);
-            console.log("regionValues---", this.state.fuValues);
-            console.log("regionLabels---", this.state.fuLabels);
-            // if ((this.state.regionValues).length > 0) {
-            // var fuList = [];
-            // var fus = this.state.fuValues;
-            // console.log("fus---", fus)
-            // for (let i = 0; i < fus.length; i++) {
-            //     var json = {
-            //         id: fus[i].value,
-            //         label: {
-            //             label_en: fus[i].label
-            //         }
-            //     }
-            //     fuList.push(json);
-            // }
-            // console.log("final fuList---", fuList);
-            // curTreeObj.regionList = regionList;
+
             this.setState({ currentItemConfig });
-            // }
         })
     }
     getTreeTemplateById(treeTemplateId) {
@@ -5964,7 +5948,7 @@ export default class BuildTree extends Component {
                     if ((this.state.currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usageType.id == 1) {
                         var sharePu;
                         // if (this.state.currentScenario.puNode.sharePlanningUnit == "true") {
-                            sharePu = (this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor);
+                        sharePu = (this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor);
                         // } else {
                         //     sharePu = this.round((this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor));
                         // }
@@ -6430,12 +6414,14 @@ export default class BuildTree extends Component {
         }.bind(this)
     }
 
-    filterUsageTemplateList(tracerCategoryId) {
+    filterUsageTemplateList(tracerCategoryId, forecastingUnitId) {
         var usageTemplateList = [];
         console.log("usage template tc---", tracerCategoryId)
         console.log("usage template list all---", this.state.usageTemplateListAll)
-
-        if (tracerCategoryId != "" && tracerCategoryId != null) {
+        if (forecastingUnitId > 0) {
+            usageTemplateList = this.state.usageTemplateListAll.filter(c => c.forecastingUnit.id == forecastingUnitId);
+        }
+        else if (tracerCategoryId != "" && tracerCategoryId != null) {
             console.log("usage template if")
             usageTemplateList = this.state.usageTemplateListAll.filter(c => c.tracerCategory.id == tracerCategoryId);
         } else {
@@ -6469,7 +6455,7 @@ export default class BuildTree extends Component {
                 myResult = planningunitRequest.result;
                 console.log("myResult===============6", myResult);
                 console.log("fuIdArray---", fuIdArray);
-                var usageTemplateListAll = myResult.filter(el => fuIdArray.indexOf(el.forecastingUnit.id) != -1);
+                var usageTemplateListAll = myResult.filter(el => fuIdArray.indexOf(el.forecastingUnit.id) != -1 && el.active);
                 console.log("before usageTemplateList All===============>", usageTemplateListAll)
                 console.log("before1 usageTemplateList All===============>", myResult.filter(el => el.forecastingUnit.id == 2665))
                 console.log("before2 usageTemplateList All===============>", myResult.filter(el => el.forecastingUnit.id == 915))
@@ -7031,7 +7017,7 @@ export default class BuildTree extends Component {
             var fuNode = (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode;
 
             currentItemConfig.context.payload.nodeDataMap[scenarioId][0].fuNode.forecastingUnit.tracerCategory.id = event.target.value;
-            this.filterUsageTemplateList(event.target.value);
+            this.filterUsageTemplateList(event.target.value, 0);
         }
 
         if (event.target.name === "noOfPersons") {
@@ -7653,7 +7639,7 @@ export default class BuildTree extends Component {
                     this.getNoOfFUPatient();
                     this.getNoOfMonthsInUsagePeriod();
                     this.getNoFURequired();
-                    this.filterUsageTemplateList(this.state.currentScenario.fuNode.forecastingUnit.tracerCategory.id);
+                    this.filterUsageTemplateList(this.state.currentScenario.fuNode.forecastingUnit.tracerCategory.id, 0);
                     this.getUsageText();
                     this.state.currentItemConfig.context.payload.nodeUnit.id = this.state.currentItemConfig.parentItem.payload.nodeUnit.id;
                 } else if (data.context.payload.nodeType.id == 5) {
@@ -8687,10 +8673,10 @@ export default class BuildTree extends Component {
                                                         handleChange(e);
                                                         this.dataChange(e)
                                                     }}
-                                                    value={this.state.currentItemConfig.parentItem != null 
-                                                        && this.state.parentScenario.fuNode != null ? 
-                                                        (this.state.currentScenario.puNode.sharePlanningUnit == "false" || this.state.currentScenario.puNode.sharePlanningUnit == false || this.state.parentScenario.fuNode.usageType.id == 2) ? 
-                                                        addCommas(this.state.currentScenario.puNode.puPerVisit) : addCommas(this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor) : ""}
+                                                    value={this.state.currentItemConfig.parentItem != null
+                                                        && this.state.parentScenario.fuNode != null ?
+                                                        (this.state.currentScenario.puNode.sharePlanningUnit == "false" || this.state.currentScenario.puNode.sharePlanningUnit == false || this.state.parentScenario.fuNode.usageType.id == 2) ?
+                                                            addCommas(this.state.currentScenario.puNode.puPerVisit) : addCommas(this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor) : ""}
                                                 // value={addCommas(this.state.parentScenario.fuNode.usageType.id == 2 ? (((this.state.parentScenario.fuNode.noOfForecastingUnitsPerPerson /
                                                 //     this.state.noOfMonthsInUsagePeriod) / this.state.conversionFactor) * this.state.currentScenario.puNode.refillMonths) : (this.state.currentScenario.puNode.sharePlanningUnit == "true" || this.state.currentScenario.puNode.sharePlanningUnit == true ? (this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor) : Math.round((this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor))))}
                                                 >
@@ -11711,7 +11697,22 @@ export default class BuildTree extends Component {
                                         (this.state.currentItemConfig.context.payload.nodeType.id == 1 ? <i><img src={AggregationNode} className="AggregationNodeSize" /></i> : "")
                                     )))}
                         <b className="supplyplanformulas ScalingheadTitle">{this.state.currentItemConfig.context.payload.label.label_en}</b></div>}
-                    <Button size="md" onClick={() => this.setState({ openAddNodeModal: false, cursorItem: 0, isChanged: false, highlightItem: 0, activeTab1: new Array(3).fill('1') })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
+                    <Button size="md" onClick={() => {
+
+                        var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+                        if (cf == true) {
+                            this.setState({
+                                openAddNodeModal: false, cursorItem: 0, isChanged: false,
+                                highlightItem: 0, activeTab1: new Array(3).fill('1')
+                            })
+                        } else {
+
+                        }
+                    }
+
+                    }
+                        color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }}
+                        className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
                 </ModalHeader>
                 <ModalBody>
                     <Row>
