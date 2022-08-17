@@ -2791,5 +2791,6 @@
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )",
     "static.loadDeleteProgram.loadDeleteProgram": "Load/Delete Program",
     "static.editStatus.validCriticality": "Please select Criticality",
-    "static.manualTagging.showAllShipments":"Show All Shipments"
+    "static.manualTagging.showAllShipments":"Show All Shipments",
+    "static.login.loginOnline":"Online"
 }

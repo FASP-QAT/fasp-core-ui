@@ -90,11 +90,8 @@ class Login extends Component {
     this.changeLanguage = this.changeLanguage.bind(this);
     this.getLanguageList = this.getLanguageList.bind(this);
     this.getAllLanguages = this.getAllLanguages.bind(this);
-<<<<<<< HEAD
     this.getLatestCoreuiVersion = this.getLatestCoreuiVersion.bind(this);
-=======
     this.dataChangeCheckbox=this.dataChangeCheckbox.bind(this);
->>>>>>> QAT-1465
   }
   getAllLanguages() {
     var db1;
