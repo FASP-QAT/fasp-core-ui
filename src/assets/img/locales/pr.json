@@ -1341,6 +1341,7 @@
     "static.user.user": "Usuário",
     "static.dashboard.dimensionheader": "Dimensão",
     "static.loadProgram.loadProgramNotePart1": "Nota: Ao carregar, o QAT extrairá os dados de remessa mais recentes para remessas vinculadas ao ERP, portanto, o plano de fornecimento pode parecer diferente do que era quando foi originalmente confirmado. Para ver a(s) versão(ões) somente leitura dos planos de fornecimento conforme foram originalmente confirmados, vá para o",
+    "static.tree.rootNodeInfoMissing": "Insira as informações do nó raiz.",
     "static.quantimed.quantimedImportScreenSecond": "Unidades de planeamento mapeadas",
     "static.loadProgram.loadProgramNotePart2": "tela.",
     "static.forecastReport.forecastQuantity": "Quantidade prevista",

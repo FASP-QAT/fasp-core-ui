@@ -1342,6 +1342,7 @@
     "static.user.user": "Utilisateur",
     "static.dashboard.dimensionheader": "Dimension",
     "static.loadProgram.loadProgramNotePart1": "Remarque : lors du chargement, QAT extrait les dernières données dexpédition pour les expéditions liées à l`ERP, de sorte que le plan d`approvisionnement peut être différent de ce qu`il était lors de son engagement initial. Pour afficher les versions en lecture seule des plans d`approvisionnement tels qu`ils ont été validés à l`origine, accédez à la",
+    "static.tree.rootNodeInfoMissing": "Veuillez saisir les informations du nœud racine.",
     "static.quantimed.quantimedImportScreenSecond": "Mappage de produit",
     "static.loadProgram.loadProgramNotePart2": "filtrer.",
     "static.forecastReport.forecastQuantity": "Quantité prévue",
