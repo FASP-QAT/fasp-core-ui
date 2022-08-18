@@ -1011,8 +1011,8 @@ class RegionListComponent extends Component {
                                     </div>
                                 </Form>
 
-                                <div className="werehousecapacitySearchposition" style={{ display: this.state.loading ? "none" : "block" }}>
-                                    <div id="tableDiv" className="jexcelremoveReadonlybackground"> </div>
+                                <div className="werehousecapacitySearchposition" >
+                                    <div id="tableDiv" style={{ display: this.state.loading ? "none" : "block" }} className="jexcelremoveReadonlybackground"> </div>
                                 </div>
                                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >

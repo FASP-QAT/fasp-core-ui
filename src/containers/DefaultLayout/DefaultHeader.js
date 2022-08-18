@@ -154,7 +154,7 @@ class DefaultHeader extends Component {
 
           {/*Forecast Module*/}
           {checkOnline === 'Online' && this.props.activeModule == 1 &&
-            AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_DOWNLOAD_PROGARM') &&
+            AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_LOAD_DELETE_DATASET') &&
             <NavItem className="">
               <NavLink to="#" className="nav-link">
                 {localStorage.getItem("sesLatestProgram") == "true" &&
@@ -168,7 +168,7 @@ class DefaultHeader extends Component {
             </NavItem>
           }
           {/* <Online> */}
-          {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_COMMIT_VERSION') && this.props.activeModule == 1 &&
+          {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_COMMIT_DATASET') && this.props.activeModule == 1 &&
             <NavItem className="">
               <NavLink to="#" className="nav-link">
                 {console.log("localStorage.getItem(sesLocalVersionChange)----" + this.props.changeIcon)}

@@ -751,7 +751,7 @@ export default class PlanningUnitListComponent extends Component {
             data = [];
             data[0] = planningUnitList[j].planningUnitId
             data[1] = getLabelText(planningUnitList[j].label, this.state.lang) + " | " + planningUnitList[j].planningUnitId
-            data[2] = getLabelText(planningUnitList[j].forecastingUnit.label, this.state.lang)
+            data[2] = getLabelText(planningUnitList[j].forecastingUnit.label, this.state.lang) +" | "+ planningUnitList[j].forecastingUnit.forecastingUnitId
             data[3] = getLabelText(planningUnitList[j].unit.label, this.state.lang)
             data[4] = (planningUnitList[j].multiplier).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");;
             data[5] = planningUnitList[j].lastModifiedBy.username;
@@ -1221,7 +1221,7 @@ export default class PlanningUnitListComponent extends Component {
                         </Col>
 
                         {/* <div id="loader" className="center"></div> */}
-                        <div className="shipmentconsumptionSearchMarginTop">
+                        <div className="shipmentconsumptionSearchMarginTop consumptionDataEntryTable">
                             <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PLANNING_UNIT') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
                             </div>
                             <div style={{ display: this.state.loading ? "block" : "none" }}>

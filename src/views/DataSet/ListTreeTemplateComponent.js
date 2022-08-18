@@ -365,6 +365,7 @@ export default class ListTreeTemplate extends Component {
                 var items = [];
                 if (y != null) {
                     if (obj.options.allowInsertRow == true) {
+                        if(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_TREE_TEMPLATE')){
                         items.push({
                             title: i18n.t('static.common.duplicateTemplate'),
                             onclick: function () {
@@ -375,6 +376,7 @@ export default class ListTreeTemplate extends Component {
                                 })
                             }.bind(this)
                         });
+                    }
                     }
                 }
 
@@ -442,7 +444,7 @@ export default class ListTreeTemplate extends Component {
         if (x == 0 && value != 0) {
             // console.log("HEADER SELECTION--------------------------");
         } else {
-            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE_TEMPLATE')) {
+            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE_TEMPLATE') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE_TEMPLATES')) {
                 var treeTemplateId = this.el.getValueFromCoords(0, x);
                 this.props.history.push({
                     pathname: `/dataset/createTreeTemplate/${treeTemplateId}`,
@@ -511,7 +513,7 @@ export default class ListTreeTemplate extends Component {
                                 </FormGroup>
                             </div>
                         </Col>
-                        <div className="TreeTemplateTable">
+                        <div className="TreeTemplateTable consumptionDataEntryTable">
                             <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE_TEMPLATE') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
                             </div>
                         </div>

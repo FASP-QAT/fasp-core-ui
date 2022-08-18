@@ -47,6 +47,9 @@ export default class SupplyPlanComponent extends React.Component {
         super(props);
         var value = JSON.parse(localStorage.getItem("sesStartDate"));
         var date = moment(value.year + "-" + value.month + "-01").format("YYYY-MM-DD");
+        if(value.month<=9){
+            date = moment(value.year + "-0" + value.month + "-01").format("YYYY-MM-DD");
+        }
         var currentDate = moment(Date.now()).startOf('month').format("YYYY-MM-DD");
         const monthDifference = moment(new Date(date)).diff(new Date(currentDate), 'months', true) + MONTHS_IN_PAST_FOR_SUPPLY_PLAN;
         this.state = {
@@ -177,6 +180,9 @@ export default class SupplyPlanComponent extends React.Component {
     }
     handleRangeDissmis(value) {
         var date = moment(value.year + "-" + value.month + "-01").format("YYYY-MM-DD");
+        if(value.month<=9){
+            date = moment(value.year + "-0" + value.month + "-01").format("YYYY-MM-DD");
+        }
         var currentDate = moment(Date.now()).startOf('month').format("YYYY-MM-DD");
         const monthDifference = moment(new Date(date)).diff(new Date(currentDate), 'months', true) + MONTHS_IN_PAST_FOR_SUPPLY_PLAN;
         this.setState({ startDate: value, monthCount: monthDifference })
@@ -4319,7 +4325,7 @@ export default class SupplyPlanComponent extends React.Component {
             catalogPrice: programPlanningUnit.catalogPrice,
             programPlanningUnitForPrice: programPlanningUnit
         }, () => {
-            console.log("After state set###", this.refs.shipmentChild)
+            // console.log("After state set###", this.refs.shipmentChild)
             if (this.refs.shipmentChild != undefined) {
                 this.refs.shipmentChild.showShipmentData();
             } else {
@@ -4634,7 +4640,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     if (programJson.supplyPlan != undefined) {
                                         supplyPlanData = (programJson.supplyPlan).filter(c => c.planningUnitId == planningUnitId);
                                     }
-                                    console.log("SupplyPlanData--------------->", supplyPlanData);
+                                    // console.log("SupplyPlanData--------------->", supplyPlanData);
                                     // if (supplyPlanData.length > 0) {
                                     var lastClosingBalance = 0;
                                     var lastIsActualClosingBalance = 0;

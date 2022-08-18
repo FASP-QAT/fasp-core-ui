@@ -1018,7 +1018,7 @@ export default class MapPlanningUnits extends Component {
                 <h4 className="red">{this.props.message}</h4>
                 <div className="table-responsive" style={{ display: this.state.loading ? "none" : "block" }} >
 
-                    <div id="mapPlanningUnit" className="RowheightForjexceladdRow">
+                    <div id="mapPlanningUnit" className="RowheightForjexceladdRow consumptionDataEntryTable">
                     </div>
                 </div>
                 <div style={{ display: this.state.loading ? "block" : "none" }}>

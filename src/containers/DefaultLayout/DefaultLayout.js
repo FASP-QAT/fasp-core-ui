@@ -239,6 +239,7 @@ const GlobalConsumptionReport = React.lazy(() => import('../../views/Report/Glob
 const ProgramOnboarding = React.lazy(() => import('../../views/Program/ProgramOnboarding'));
 const ShipmentList = React.lazy(() => import('../../views/Shipment/ShipmentDetails'));
 const ForecastMetricsOverTime = React.lazy(() => import('../../views/Report/ForecastMetricsOverTime'));
+const ConsumptionForecastErrorSupplyPlan = React.lazy(() => import('../../views/Report/ConsumptionForecastErrorSupplyPlan'));
 const pipeline = React.lazy(() => import('../../views/Pipeline/PipelineProgramImport'));
 const pipelineProgramSetup = React.lazy(() => import('../../views/Pipeline/PipelineProgramSetup'));
 const StockStatusOverTime = React.lazy(() => import('../../views/Report/StockStatusOverTime'));
@@ -603,6 +604,7 @@ const routes = [
   { path: '/report/stockStatus', name: 'static.dashboard.stockstatus', component: StockStatusReport },
   { path: '/report/globalConsumption', name: 'static.dashboard.globalconsumption', component: GlobalConsumptionReport },
   { path: '/report/forecastOverTheTime', name: 'static.report.forecasterrorovertime', component: ForecastMetricsOverTime },
+  { path: '/report/consumptionForecastErrorSupplyPlan', name: 'static.report.forecasterrorovertime', component: ConsumptionForecastErrorSupplyPlan },
   { path: '/report/stockStatusOverTime', name: 'static.dashboard.stockstatusovertime', component: StockStatusOverTime },
   { path: '/report/forecastMetrics', name: 'static.dashboard.forecastmetrics', component: ForecastMetrics },
 
@@ -734,7 +736,7 @@ const routes = [
   { path: '/dataset/listDataSet', exact: true, name: 'static.breadcrum.list', entityname: 'static.dataset.manageProgramInfo', component: DataSetList },
   // { path: '/dataset/listDataSet/:message', component: ListDataSource },
   { path: '/dataset/listDataSet/:color/:message', name: 'static.breadcrum.list', entityname: 'static.dataset.manageProgramInfo', component: DataSetList },
-  { path: '/dataset/editDataSet/:dataSetId', name: 'static.breadcrum.edit', entityname: 'static.dataset.manageProgramInfo', component: EditDataSet },
+  { path: '/dataset/editDataSet/:dataSetId', name: i18n.t('static.dataset.manageProgramInfo'), component: EditDataSet },
 
   { path: '/importFromQATSupplyPlan/listImportFromQATSupplyPlan/:color/:message', name: i18n.t('static.importFromQATSupplyPlan.importFromQATSupplyPlan'), component: ImportFromQATSupplyPlan },
   { path: '/importFromQATSupplyPlan/listImportFromQATSupplyPlan', exact: true, name: i18n.t('static.importFromQATSupplyPlan.importFromQATSupplyPlan'), component: ImportFromQATSupplyPlan },
@@ -913,6 +915,11 @@ class DefaultLayout extends Component {
     // AuthenticationService.setupAxiosInterceptors();
     this.props.history.push(`/changePassword`);
   }
+
+  goToMasterDataSync(e){
+    e.preventDefault();
+    this.props.history.push({ pathname: `/syncProgram`, state: { "isFullSync": true } })
+  }
   signOut(e) {
     e.preventDefault();
     confirmAlert({
@@ -985,19 +992,19 @@ class DefaultLayout extends Component {
   getNotificationCount() {
     if (localStorage.getItem("sessionType") === 'Online') {
       AuthenticationService.setupAxiosInterceptors();
-      ManualTaggingService.getNotificationCount()
-        .then(response => {
-          console.log("notification response===", response.data);
-          this.setState({
-            notificationCount: response.data
-          })
-        }).catch(
-          error => {
-            this.setState({
-              notificationCount: 0
-            })
-          }
-        );
+      // ManualTaggingService.getNotificationCount()
+      //   .then(response => {
+      //     console.log("notification response===", response.data);
+      //     this.setState({
+      //       notificationCount: response.data
+      //     })
+      //   }).catch(
+      //     error => {
+      //       this.setState({
+      //         notificationCount: 0
+      //       })
+      //     }
+      //   );
     }
   }
   getProgramData() {
@@ -1883,7 +1890,7 @@ class DefaultLayout extends Component {
                         // hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true)
                         // },
                         attributes: {
-                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_LIST_IMPORT_FROM_QAT_SUPPLY_PLAN')) || (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT')) || (this.state.businessFunctions.includes('ROLE_BF_EXTRAPOLATION'))) && this.state.activeTab == 1) ? false : true)
+                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_LIST_IMPORT_FROM_QAT_SUPPLY_PLAN')) || (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_CONSUMPTION_DATA_ENTRY_ADJUSTMENT')) || (this.state.businessFunctions.includes('ROLE_BF_EXTRAPOLATION')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_EXTRAPOLATION'))) && this.state.activeTab == 1) ? false : true)
                         },
                         children: [
                           {
@@ -1908,7 +1915,7 @@ class DefaultLayout extends Component {
                             url: '/dataentry/consumptionDataEntryAndAdjustment',
                             icon: 'fa fa-pencil',
                             attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT') && this.state.activeTab == 1 ? false : true),
+                              hidden: ((((this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_CONSUMPTION_DATA_ENTRY_ADJUSTMENT'))) && this.state.activeTab == 1) ? false : true),
                               onClick: e => {
                                 this.refreshPage();
                               }
@@ -1920,7 +1927,7 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-line-chart',
                             // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
                             attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_EXTRAPOLATION') && this.state.activeTab == 1 ? false : true),
+                              hidden: ((((this.state.businessFunctions.includes('ROLE_BF_EXTRAPOLATION')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_EXTRAPOLATION'))) && this.state.activeTab == 1) ? false : true),
                               onClick: e => {
                                 this.refreshPage();
                               }
@@ -2013,7 +2020,7 @@ class DefaultLayout extends Component {
                         // hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true)
                         // },
                         attributes: {
-                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_COMPARE_AND_SELECT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_MONTHLY_FORECAST')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECAST_SUMMARY')) || (this.state.businessFunctions.includes('ROLE_BF_COMPARE_VERSION')) || (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_FORECAST_ERROR'))) && this.state.activeTab == 1) ? false : true)
+                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_COMPARE_AND_SELECT')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_COMPARE_AND_SELECT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_MONTHLY_FORECAST')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECAST_SUMMARY')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_FORECAST_SUMMARY')) || (this.state.businessFunctions.includes('ROLE_BF_COMPARE_VERSION')) || (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_FORECAST_ERROR'))) && this.state.activeTab == 1) ? false : true)
                         },
                         children: [
                           // {
@@ -2028,7 +2035,7 @@ class DefaultLayout extends Component {
                             url: '/report/compareAndSelectScenario',
                             icon: 'fa fa-check-square-o',
                             attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_COMPARE_AND_SELECT') && this.state.activeTab == 1 ? false : true),
+                              hidden: ((((this.state.businessFunctions.includes('ROLE_BF_COMPARE_AND_SELECT')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_COMPARE_AND_SELECT'))) && this.state.activeTab == 1) ? false : true),
                               onClick: e => {
                                 this.refreshPage();
                               }
@@ -2052,7 +2059,7 @@ class DefaultLayout extends Component {
                             url: '/forecastReport/forecastSummary',
                             icon: 'fa fa-table',
                             attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECAST_SUMMARY') && this.state.activeTab == 1 ? false : true),
+                              hidden: ((((this.state.businessFunctions.includes('ROLE_BF_LIST_FORECAST_SUMMARY')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_FORECAST_SUMMARY'))) && this.state.activeTab == 1) ? false : true),
                               onClick: e => {
                                 this.refreshPage();
                               }
@@ -2070,12 +2077,12 @@ class DefaultLayout extends Component {
                               }
                             }
                           },
-                          {
-                            name: 'Consumption Forecast Error',
-                            url: '/forecastReport/consumptionForecastError',
-                            icon: 'fa fa-signal',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_FORECAST_ERROR') && this.state.activeTab == 1 ? false : true) }
-                          },
+                          // {
+                          //   name: 'Consumption Forecast Error',
+                          //   url: '/forecastReport/consumptionForecastError',
+                          //   icon: 'fa fa-signal',
+                          //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_FORECAST_ERROR') && this.state.activeTab == 1 ? false : true) }
+                          // },
                         ]
                       },
                       // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
@@ -2880,6 +2887,17 @@ class DefaultLayout extends Component {
                                   }
                                 }
                               },
+                              // {
+                              //   name: 'Forecast Error (Monthly) (New)',
+                              //   url: '/report/consumptionForecastErrorSupplyPlan',
+                              //   icon: 'fa fa-line-chart',
+                              //   attributes: {
+                              //     hidden: ((this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT') && this.state.activeTab == 2) ? false : true),
+                              //     onClick: e => {
+                              //       this.refreshPage();
+                              //     }
+                              //   }
+                              // },
                               {
                                 name: i18n.t('static.dashboard.forecastmetrics'),
                                 url: '/report/forecastMetrics',
@@ -3415,7 +3433,7 @@ class DefaultLayout extends Component {
                         // hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true)
                         // },
                         attributes: {
-                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT')) || (this.state.businessFunctions.includes('ROLE_BF_EXTRAPOLATION'))) && this.state.activeTab == 1) ? false : true)
+                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT')) || (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT')) || (this.state.businessFunctions.includes('ROLE_BF_EXTRAPOLATION')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_EXTRAPOLATION'))) && this.state.activeTab == 1) ? false : true)
                         },
                         children: [
                           // {
@@ -3434,7 +3452,7 @@ class DefaultLayout extends Component {
                             url: '/dataentry/consumptionDataEntryAndAdjustment',
                             icon: 'fa fa-pencil',
                             attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT') && this.state.activeTab == 1 ? false : true),
+                              hidden: ((((this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_CONSUMPTION_DATA_ENTRY_ADJUSTMENT'))) && this.state.activeTab == 1) ? false : true),
                               onClick: e => {
                                 this.refreshPage();
                               }
@@ -3446,7 +3464,7 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-line-chart',
                             // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
                             attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_EXTRAPOLATION') && this.state.activeTab == 1 ? false : true),
+                              hidden: ((((this.state.businessFunctions.includes('ROLE_BF_EXTRAPOLATION')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_EXTRAPOLATION'))) && this.state.activeTab == 1) ? false : true),
                               onClick: e => {
                                 this.refreshPage();
                               }
@@ -3511,7 +3529,7 @@ class DefaultLayout extends Component {
                         // hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true)
                         // },
                         attributes: {
-                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_COMPARE_AND_SELECT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_MONTHLY_FORECAST')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECAST_SUMMARY')) || (this.state.businessFunctions.includes('ROLE_BF_COMPARE_VERSION')) || (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_FORECAST_ERROR'))) && this.state.activeTab == 1) ? false : true)
+                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_COMPARE_AND_SELECT')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_COMPARE_AND_SELECT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_MONTHLY_FORECAST')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECAST_SUMMARY')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_FORECAST_SUMMARY')) || (this.state.businessFunctions.includes('ROLE_BF_COMPARE_VERSION')) || (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_FORECAST_ERROR'))) && this.state.activeTab == 1) ? false : true)
                         },
                         children: [
                           // {
@@ -3534,7 +3552,7 @@ class DefaultLayout extends Component {
                             url: '/report/compareAndSelectScenario',
                             icon: 'fa fa-check-square-o',
                             attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_COMPARE_AND_SELECT') && this.state.activeTab == 1 ? false : true),
+                              hidden: ((((this.state.businessFunctions.includes('ROLE_BF_COMPARE_AND_SELECT')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_COMPARE_AND_SELECT'))) && this.state.activeTab == 1) ? false : true),
                               onClick: e => {
                                 this.refreshPage();
                               }
@@ -3559,7 +3577,7 @@ class DefaultLayout extends Component {
                             url: '/forecastReport/forecastSummary',
                             icon: 'fa fa-pie-chart',
                             attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECAST_SUMMARY') && this.state.activeTab == 1 ? false : true),
+                              hidden: ((((this.state.businessFunctions.includes('ROLE_BF_LIST_FORECAST_SUMMARY')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_FORECAST_SUMMARY'))) && this.state.activeTab == 1) ? false : true),
                               onClick: e => {
                                 this.refreshPage();
                               }
@@ -3577,17 +3595,17 @@ class DefaultLayout extends Component {
                               }
                             }
                           },
-                          {
-                            name: 'Consumption Forecast Error',
-                            url: '/forecastReport/consumptionForecastError',
-                            icon: 'fa fa-signal',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_FORECAST_ERROR') && this.state.activeTab == 1 ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
+                          // {
+                          //   name: 'Consumption Forecast Error',
+                          //   url: '/forecastReport/consumptionForecastError',
+                          //   icon: 'fa fa-signal',
+                          //   attributes: {
+                          //     hidden: (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_FORECAST_ERROR') && this.state.activeTab == 1 ? false : true),
+                          //     onClick: e => {
+                          //       this.refreshPage();
+                          //     }
+                          //   }
+                          // },
                           // {
                           //   name: i18n.t('static.dashboard.Versioncomarition'),
                           //   url: '/report/compareVersion',
@@ -3936,7 +3954,17 @@ class DefaultLayout extends Component {
                                   }
                                 }
                               },
-
+                              // {
+                              //   name: 'Forecast Error (Monthly) (New)',
+                              //   url: '/report/consumptionForecastErrorSupplyPlan',
+                              //   icon: 'fa fa-line-chart',
+                              //   attributes: {
+                              //     hidden: (this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT') && this.state.activeTab == 2 ? false : true),
+                              //     onClick: e => {
+                              //       this.refreshPage();
+                              //     }
+                              //   }
+                              // },
                             ]
                           },
 
@@ -4207,7 +4235,7 @@ class DefaultLayout extends Component {
         </div>
         <AppFooter>
           <Suspense fallback={this.loading()}>
-            <DefaultFooter />
+            <DefaultFooter syncProgram={e => this.goToMasterDataSync(e)}/>
           </Suspense>
         </AppFooter>
       </div>

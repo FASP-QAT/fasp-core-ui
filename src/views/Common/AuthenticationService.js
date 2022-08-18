@@ -164,7 +164,7 @@ class AuthenticationService {
         } else if (!checkSite && sessionType === 'Online') {
             localStorage.setItem("sessionType", 'Offline')
         }
-        var urlarr = ["/consumptionDetails", "/inventory/addInventory", "/inventory/addInventory/:programId/:versionId/:planningUnitId", "/shipment/shipmentDetails", "/shipment/shipmentDetails/:message", "/shipment/shipmentDetails/:programId/:versionId/:planningUnitId", "/program/importProgram", "/program/exportProgram", "/program/deleteLocalProgram", "/supplyPlan", "/supplyPlanFormulas", "/supplyPlan/:programId/:versionId/:planningUnitId", "/report/whatIf", "/report/stockStatus", "/report/problemList", "/report/productCatalog", "/report/stockStatusOverTime", "/report/stockStatusMatrix", "/report/stockStatusAcrossPlanningUnits", "/report/consumption", "/report/forecastOverTheTime", "/report/shipmentSummery", "/report/procurementAgentExport", "/report/annualShipmentCost", "/report/budgets", "/report/supplierLeadTimes", "/report/expiredInventory", "/report/costOfInventory", "/report/inventoryTurns", "/report/stockAdjustment", "/report/warehouseCapacity", "/supplyPlan/:programId/:planningUnitId/:expiryNo/:expiryDate"];
+        var urlarr = ["/consumptionDetails", "/inventory/addInventory", "/inventory/addInventory/:programId/:versionId/:planningUnitId", "/shipment/shipmentDetails", "/shipment/shipmentDetails/:message", "/shipment/shipmentDetails/:programId/:versionId/:planningUnitId", "/program/importProgram", "/program/exportProgram", "/program/deleteLocalProgram", "/supplyPlan", "/supplyPlanFormulas", "/supplyPlan/:programId/:versionId/:planningUnitId", "/report/whatIf", "/report/stockStatus", "/report/problemList", "/report/productCatalog", "/report/stockStatusOverTime", "/report/stockStatusMatrix", "/report/stockStatusAcrossPlanningUnits", "/report/consumption", "/report/forecastOverTheTime","/report/consumptionForecastErrorSupplyPlan", "/report/shipmentSummery", "/report/procurementAgentExport", "/report/annualShipmentCost", "/report/budgets", "/report/supplierLeadTimes", "/report/expiredInventory", "/report/costOfInventory", "/report/inventoryTurns", "/report/stockAdjustment", "/report/warehouseCapacity", "/supplyPlan/:programId/:planningUnitId/:expiryNo/:expiryDate"];
         if ((typeOfSession === 'Online' && checkSite) || (typeOfSession === 'Offline' && !checkSite) || (typeOfSession === 'Online' && !checkSite && urlarr.includes(url)) || (typeOfSession === 'Offline' && urlarr.includes(url))) {
             return true;
         } else {
@@ -485,7 +485,7 @@ class AuthenticationService {
             console.log("route---" + route);
 
             localStorage.setItem("isOfflinePage", 0);
-            var urlarr = ["/consumptionDetails", "/inventory/addInventory", "/inventory/addInventory/:programId/:versionId/:planningUnitId", "/shipment/shipmentDetails", "/shipment/shipmentDetails/:message", "/shipment/shipmentDetails/:programId/:versionId/:planningUnitId", "/program/importProgram", "/program/exportProgram", "/program/deleteLocalProgram", "/supplyPlan", "/supplyPlanFormulas", "/supplyPlan/:programId/:versionId/:planningUnitId", "/report/whatIf", "/report/stockStatus", "/report/problemList", "/report/productCatalog", "/report/stockStatusOverTime", "/report/stockStatusMatrix", "/report/stockStatusAcrossPlanningUnits", "/report/consumption", "/report/forecastOverTheTime", "/report/shipmentSummery", "/report/procurementAgentExport", "/report/annualShipmentCost", "/report/budgets", "/report/supplierLeadTimes", "/report/expiredInventory", "/report/costOfInventory", "/report/inventoryTurns", "/report/stockAdjustment", "/report/warehouseCapacity", "/supplyPlan/:programId/:planningUnitId/:expiryNo/:expiryDate"];
+            var urlarr = ["/consumptionDetails", "/inventory/addInventory", "/inventory/addInventory/:programId/:versionId/:planningUnitId", "/shipment/shipmentDetails", "/shipment/shipmentDetails/:message", "/shipment/shipmentDetails/:programId/:versionId/:planningUnitId", "/program/importProgram", "/program/exportProgram", "/program/deleteLocalProgram", "/supplyPlan", "/supplyPlanFormulas", "/supplyPlan/:programId/:versionId/:planningUnitId", "/report/whatIf", "/report/stockStatus", "/report/problemList", "/report/productCatalog", "/report/stockStatusOverTime", "/report/stockStatusMatrix", "/report/stockStatusAcrossPlanningUnits", "/report/consumption", "/report/forecastOverTheTime", "/report/consumptionForecastErrorSupplyPlan", "/report/shipmentSummery", "/report/procurementAgentExport", "/report/annualShipmentCost", "/report/budgets", "/report/supplierLeadTimes", "/report/expiredInventory", "/report/costOfInventory", "/report/inventoryTurns", "/report/stockAdjustment", "/report/warehouseCapacity", "/supplyPlan/:programId/:planningUnitId/:expiryNo/:expiryDate"];
             if (urlarr.includes(route)) {
                 localStorage.setItem("isOfflinePage", 1);
             }
@@ -1059,6 +1059,11 @@ class AuthenticationService {
                             return true;
                         }
                         break;
+                    case "/report/consumptionForecastErrorSupplyPlan":
+                            if (bfunction.includes("ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT")) {
+                                return true;
+                            }
+                            break;
                     case "/report/forecastMetrics":
                         if (bfunction.includes("ROLE_BF_FORECAST_MATRIX_REPORT")) {
                             return true;
@@ -1339,7 +1344,7 @@ class AuthenticationService {
                         }
                         break;
                     case "/extrapolation/extrapolateData":
-                        if (bfunction.includes("ROLE_BF_EXTRAPOLATION")) {
+                        if (bfunction.includes("ROLE_BF_EXTRAPOLATION") || bfunction.includes("ROLE_BF_VIEW_EXTRAPOLATION")) {
                             return true;
                         }
                         break;
@@ -1353,7 +1358,7 @@ class AuthenticationService {
                         break;
                     case "/report/compareAndSelectScenario":
                     case "/report/compareAndSelectScenario/:programId/:planningUnitId/:regionId":
-                        if (bfunction.includes("ROLE_BF_COMPARE_AND_SELECT")) {
+                        if (bfunction.includes("ROLE_BF_COMPARE_AND_SELECT") || bfunction.includes("ROLE_BF_VIEW_COMPARE_AND_SELECT")) {
                             return true;
                         }
                         break;
@@ -1380,7 +1385,7 @@ class AuthenticationService {
                     case "/dataentry/consumptionDataEntryAndAdjustment":
                     case "/dataentry/consumptionDataEntryAndAdjustment/:color/:message":
                     case "/dataentry/consumptionDataEntryAndAdjustment/:planningUnitId":
-                        if (bfunction.includes("ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT")) {
+                        if (bfunction.includes("ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT") || bfunction.includes("ROLE_BF_VIEW_CONSUMPTION_DATA_ENTRY_ADJUSTMENT")) {
                             return true;
                         }
                         break;
@@ -1411,13 +1416,13 @@ class AuthenticationService {
                     case "/dataSet/buildTree/tree/:treeId/:programId/:scenarioId":
                     case "/dataSet/buildTree/":
                     case "/dataSet/buildTree/template/:templateId":
-                        if (bfunction.includes("ROLE_BF_ADD_EDIT_TREE")) {
+                        if (bfunction.includes("ROLE_BF_ADD_TREE")) {
                             return true;
                         }
                         break;
 
                     case "/dataset/createTreeTemplate/:templateId":
-                        if (bfunction.includes("ROLE_BF_EDIT_TREE_TEMPLATE")) {
+                        if (bfunction.includes("ROLE_BF_EDIT_TREE_TEMPLATE") || bfunction.includes("ROLE_BF_ADD_TREE_TEMPLATE") || bfunction.includes("ROLE_BF_VIEW_TREE_TEMPLATES")) {
                             return true;
                         }
                         break;
@@ -1470,7 +1475,7 @@ class AuthenticationService {
 
                     case "/forecastReport/forecastSummary":
                     case "/forecastReport/forecastSummary/:programId/:versionId":
-                        if (bfunction.includes("ROLE_BF_LIST_FORECAST_SUMMARY")) {
+                        if (bfunction.includes("ROLE_BF_LIST_FORECAST_SUMMARY") || bfunction.includes("ROLE_BF_VIEW_FORECAST_SUMMARY")) {
                             return true;
                         }
                         break;
@@ -1610,6 +1615,7 @@ class AuthenticationService {
         localStorage.setItem('sesDatasetCompareVersionId', "");
         localStorage.setItem('sesDatasetPlanningUnitId', "");
         localStorage.setItem('sesDataentryDateRange', "");
+        localStorage.setItem('sesDataentryStartDateRange', "");
         localStorage.setItem('sesDatasetRegionId', "");
         localStorage.setItem('sesPlanningUnitId', "");
         // localStorage.setItem('sesLocalVersionChange', false);
@@ -1626,9 +1632,14 @@ class AuthenticationService {
         localStorage.setItem('sesBudFs', "");
         localStorage.setItem('sesBudStatus', "");
         localStorage.setItem('sesForecastProgramIds', "");
-        var currentDate = moment(Date.now()).utcOffset('-0500')
+        var currentDate = moment(Date.now()).utcOffset('-0500');
+        console.log("&&&&&&&&&&&&&&&&&Current Date in authetication service",currentDate);
         var curDate = moment(currentDate).startOf('month').subtract(MONTHS_IN_PAST_FOR_SUPPLY_PLAN, 'months').format("YYYY-MM-DD");
+        console.log("&&&&&&&&&&&&&&&&&Current Date after subtraction in authetication service",curDate);
         localStorage.setItem('sesStartDate', JSON.stringify({ year: parseInt(moment(curDate).format("YYYY")), month: parseInt(moment(curDate).format("M")) }))
+        localStorage.setItem('sesStartDate', JSON.stringify({ year: parseInt(moment(curDate).format("YYYY")), month: parseInt(moment(curDate).format("M")) }))
+ 
+        console.log("&&&&&&&&&&&&&&&&&Current Date json. stringfy",JSON.stringify({ year: parseInt(moment(curDate).format("YYYY")), month: parseInt(moment(curDate).format("M")) }));
     }
 
     getIconAndStaticLabel(val) {
