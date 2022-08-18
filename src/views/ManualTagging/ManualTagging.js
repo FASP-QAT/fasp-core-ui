@@ -20,7 +20,7 @@ import RealmCountryService from '../../api/RealmCountryService';
 import jexcel from 'jspreadsheet';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
-import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
+import { jExcelLoadedFunction, jExcelLoadedFunctionForErp, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
@@ -4135,15 +4135,16 @@ export default class ManualTagging extends Component {
     }
 
     loadedERP1 = function (instance, cell, x, y, value) {
-        jExcelLoadedFunction(instance);
+        jExcelLoadedFunctionOnlyHideRow(instance);
     }
 
     loadedERP = function (instance, cell, x, y, value) {
-        jExcelLoadedFunction(instance, 1);
         console.log("Class List", document.getElementsByClassName("resizable"))
         if (this.state.active1) {
+            jExcelLoadedFunctionForErp(instance, 1);
             var asterisk = document.getElementsByClassName("jss")[2].firstChild.nextSibling;
         } else {
+            jExcelLoadedFunction(instance, 1);
             var asterisk = document.getElementsByClassName("jss")[1].firstChild.nextSibling;
         }
         var tr = asterisk.firstChild;
