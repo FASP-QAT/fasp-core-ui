@@ -3221,7 +3221,6 @@ export default class ManualTagging extends Component {
                             {
                                 title: i18n.t('static.commit.qatshipmentId'),
                                 type: 'numeric',
-                                mask: '#,##', decimal: '.',
                                 readOnly: true,
                                 width: 80
                             },
