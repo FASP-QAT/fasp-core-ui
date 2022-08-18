@@ -4728,7 +4728,8 @@ height: 0px;
   .TemplateTitle, .DepartmentTemplate .DepartmentTitleBackground .DepartmentTitle, .ContactTemplate .ContactTitleBackground .ContactTitle, .PERTTemplate .PERTTitleBackground .PERTTitle, .xlTemplate .xlTitleBackground .xlTitle, .lgTemplate .lgTitleBackground .lgTitle {
     text-overflow: ellipsis;
     -o-text-overflow: ellipsis;
-    white-space: nowrap;
+    // white-space: nowrap;
+    white-space: pre-wrap;
     font-size: 14px;
     line-height: 16px;
     color: white;
@@ -5330,6 +5331,7 @@ height: 0px;
   top: 0px!important;
   left: 0px!important;
   right: 0px!important;
+  height: 47px!important;
 }
 .TitleColorWhite{
   color:#fff!important;
