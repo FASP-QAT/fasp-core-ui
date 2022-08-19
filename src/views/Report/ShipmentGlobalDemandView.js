@@ -2566,17 +2566,21 @@ class ShipmentGlobalDemandView extends Component {
                                                 </InputGroup>
                                             </div>
                                         </FormGroup>
-                                        <FormGroup className="col-md-3">
-                                            <div>
-                                                <Input
-                                                    className="form-check-input"
-                                                    type="checkbox"
-                                                    id="procurementAgentTypeId"
-                                                    name="procurementAgentTypeId"
-                                                    checked={this.state.procurementAgentTypeId}
-                                                    value={this.state.procurementAgentTypeId}
-                                                    onChange={(e) => { this.setProcurementAgentTypeId(e); }}
-                                                />
+                                        <FormGroup className="col-md-3 pl-lg-5 pt-lg-3">
+                                            <div className="controls ">
+                                                <InputGroup>
+
+                                                    <Input
+                                                        className="form-check-input"
+                                                        type="checkbox"
+                                                        id="procurementAgentTypeId"
+                                                        name="procurementAgentTypeId"
+                                                        checked={this.state.procurementAgentTypeId}
+                                                        value={this.state.procurementAgentTypeId}
+                                                        onChange={(e) => { this.setProcurementAgentTypeId(e); }}
+                                                    />
+                                                </InputGroup>
+
                                                 <Label
                                                     className="form-check-label"
                                                     check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
