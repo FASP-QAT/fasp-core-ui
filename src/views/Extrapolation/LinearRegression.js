@@ -3,7 +3,7 @@ import ExtrapolationService from '../../api/ExtrapolationService.js';
 import i18n from '../../i18n.js';
 import { calculateError } from '../Extrapolation/ErrorCalculations.js';
 import { calculateCI } from './CalculateCI.js';
-export function calculateLinearRegression(inputData, confidence, noOfProjectionMonths, props,isTreeExtrapolation) {
+export function calculateLinearRegression(inputData, confidence, noOfProjectionMonths, props, isTreeExtrapolation, page, regionId) {
     // console.log("InputData@@@", inputData)
 
     // const noOfMonthsForProjection = noOfProjectionMonths;
@@ -40,7 +40,7 @@ export function calculateLinearRegression(inputData, confidence, noOfProjectionM
         "n": Number(noOfProjectionMonths),
         "level": Number(confidence)
     }
-    console.log("Json@@@@@@", json);
+    console.log("Json@@@@@@L", json);
     ExtrapolationService.regression(json)
         .then(response => {
             if (response.status == 200) {
@@ -58,10 +58,14 @@ export function calculateLinearRegression(inputData, confidence, noOfProjectionM
                 }
 
                 console.log("OutPut@@@@@@@@@@@@@@@@@@@@@@", output)
-                // calculateCI(output, Number(confidenceLevel), "tesData", props)
-                props.updateState("linearRegressionData", output);
-                calculateError(output, "linearRegressionError", props);
-
+                if (page == "DataEntry" || page == "ImportFromSupplyPlan") {
+                    var linearRegressionData = { "data": output, "PlanningUnitId": props.state.selectedConsumptionUnitId, "regionId": regionId }
+                    props.updateLinearRegressionData(linearRegressionData);
+                } else {
+                    // calculateCI(output, Number(confidenceLevel), "tesData", props)
+                    props.updateState("linearRegressionData", output);
+                    calculateError(output, "linearRegressionError", props);
+                }
             }
         }).catch(error => {
             console.log("Error@@@@@@", error)

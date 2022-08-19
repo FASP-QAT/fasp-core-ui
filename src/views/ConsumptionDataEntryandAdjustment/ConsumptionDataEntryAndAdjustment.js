@@ -44,7 +44,6 @@ import { calculateLinearRegression } from '../Extrapolation/LinearRegression';
 import { calculateTES } from '../Extrapolation/TESNew';
 import { calculateArima } from '../Extrapolation/Arima';
 
-
 const entityname = i18n.t('static.dashboard.dataEntryAndAdjustment');
 const ref = React.createRef();
 const pickerLang = {
@@ -120,20 +119,33 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       tempConsumptionUnitObject: { "consumptionDataType": "" },
       dataEnteredInUnitList: [],
       minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
-      singleValue2: localStorage.getItem("sesDataentryStartDateRange") != "" ? JSON.parse(localStorage.getItem("sesDataentryStartDateRange")) : { year: Number(moment(startDate).startOf('month').format("YYYY")), month: Number(moment(startDate).startOf('month').format("M"))},
+      singleValue2: localStorage.getItem("sesDataentryStartDateRange") != "" ? JSON.parse(localStorage.getItem("sesDataentryStartDateRange")) : { year: Number(moment(startDate).startOf('month').format("YYYY")), month: Number(moment(startDate).startOf('month').format("M")) },
       maxDate: { year: Number(moment(Date.now()).startOf('month').format("YYYY")), month: Number(moment(Date.now()).startOf('month').format("M")) },
       planningUnitTotalList: [],
       dataEnteredInTableExSpan: 0,
+      confidenceLevelId: 0.85,
+      confidenceLevelIdLinearRegression: 0.85,
+      confidenceLevelIdArima: 0.85,
       alpha: 0.2,
       beta: 0.2,
       gamma: 0.2,
       noOfMonthsForASeason: 4,
       confidence: 0.95,
       monthsForMovingAverage: 6,
+      seasonality: 1,
       p: 0,
       d: 1,
       q: 1,
-
+      CI: "",
+      tesData: [],
+      arimaData: [],
+      jsonDataMovingAvg: [],
+      jsonDataSemiAverage: [],
+      jsonDataLinearRegression: [],
+      jsonDataTes: [],
+      jsonDataArima: [],
+      count: 0,
+      countRecived: 0
     }
     this.loaded = this.loaded.bind(this);
     this.loadedJexcel = this.loadedJexcel.bind(this);
@@ -146,6 +158,11 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     this.resetClicked = this.resetClicked.bind(this)
     this.buildJexcel = this.buildJexcel.bind(this);
     this.saveConsumptionList = this.saveConsumptionList.bind(this);
+    this.updateMovingAvgData = this.updateMovingAvgData.bind(this);
+    this.updateSemiAveragesData = this.updateSemiAveragesData.bind(this);
+    this.updateLinearRegressionData = this.updateLinearRegressionData.bind(this);
+    this.updateTESData = this.updateTESData.bind(this);
+    this.updateArimaData = this.updateArimaData.bind(this);
   }
 
   makeText = m => {
@@ -453,213 +470,480 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     }
   }
 
-    //.................................................................. Extrapolate..................................
-    ExtrapolatedParameters() {
-      if (this.state.datasetId > 0 && this.state.regionId > 0) {
-        this.setState({ loading: true })
-        var datasetJson = this.state.datasetJson;
-        // Need to filter
-        var actualConsumptionListForPlanningUnitAndRegion = datasetJson.actualConsumptionList.filter(c => c.planningUnit.id == this.state.datasetId && c.region.id == this.state.regionId);
-        console.log("actualConsumptionListForPlanningUnitAndRegion---->", actualConsumptionListForPlanningUnitAndRegion)
-        if (actualConsumptionListForPlanningUnitAndRegion.length > 1) {
-          let actualMin = moment.min(actualConsumptionListForPlanningUnitAndRegion.map(d => moment(d.month)));
-          let actualMax = moment.max(actualConsumptionListForPlanningUnitAndRegion.map(d => moment(d.month)));
-          var rangeValue1 ="";
-          // if (updateRangeValue == 0) {
-            rangeValue1 = this.state.singleValue2;
-          // } else {
-            // rangeValue1 = { from: { year: new Date(actualMin).getFullYear(), month: new Date(actualMin).getMonth() + 1 }, to: { year: new Date(actualMax).getFullYear(), month: new Date(actualMax).getMonth() + 1 } }
-          // }
-          var rangeValue = rangeValue1;
-          let startDate1 = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
-          let stopDate1 = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
-          var actualConsumptionList = datasetJson.actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") >= moment(startDate1).format("YYYY-MM") && moment(c.month).format("YYYY-MM") <= moment(stopDate1).format("YYYY-MM"));
-          var startDate = moment(datasetJson.currentVersion.forecastStartDate).format("YYYY-MM-DD");
-          var stopDate = moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM-DD");
-          var monthsForMovingAverage = this.state.monthsForMovingAverage;
-          var movingAvgId = this.state.movingAvgId;
-          var semiAvgId = this.state.semiAvgId;
-          var linearRegressionId = this.state.linearRegressionId;
-          var smoothingId = this.state.smoothingId;
-          var arimaId = this.state.arimaId;
-  
-          var confidenceLevel = this.state.confidenceLevelId;
-          var confidenceLevelLinearRegression = this.state.confidenceLevelIdLinearRegression;
-          var confidenceLevelArima = this.state.confidenceLevelIdArima;
-          var confidenceLevelArima = this.state.confidenceLevelIdArima;
-          var seasonality = this.state.noOfMonthsForASeason;
-          var alpha = this.state.alpha;
-          var beta = this.state.beta;
-          var gamma = this.state.gamma;
-          var p = this.state.p;
-          var d = this.state.d;
-          var q = this.state.q;
-          var seasonalityArima = this.state.seasonality;
-          this.setState({
-            actualConsumptionList: actualConsumptionList,
-            startDate: startDate,
-            stopDate: stopDate,
-            minDate: actualMin,
-            monthsForMovingAverage: monthsForMovingAverage,
-            confidenceLevelId: confidenceLevel,
-            confidenceLevelIdLinearRegression: confidenceLevelLinearRegression,
-            confidenceLevelIdArima: confidenceLevelArima,
-            noOfMonthsForASeason: seasonality,
-            alpha: alpha,
-            beta: beta,
-            gamma: gamma,
-            showData: true,
-            movingAvgId: movingAvgId,
-            semiAvgId: semiAvgId,
-            linearRegressionId: linearRegressionId,
-            smoothingId: smoothingId,
-            arimaId: arimaId,
-            noDataMessage: "",
-            dataChanged: true,
-            loading: false,
-            p: p,
-            d: d,
-            q: q,
-            seasonality: seasonalityArima
-          }, () => {
-            this.buildJxl();
-          })
-        }
-      }
-    }
-  
-    buildJxl() {
+  //.................................................................. Extrapolate..................................
+  ExtrapolatedParameters() {
+    console.log("datasetJson--------> inside", this.state.selectedConsumptionUnitId);
+    if (this.state.selectedConsumptionUnitId > 0) {
       this.setState({ loading: true })
-      var actualConsumptionList = this.state.actualConsumptionList;
-      var rangeValue1 = this.state.rangeValue1;
-      let startDate = rangeValue1.from.year + '-' + rangeValue1.from.month + '-01';
-      let stopDate = rangeValue1.to.year + '-' + rangeValue1.to.month + '-' + new Date(rangeValue1.to.year, rangeValue1.to.month, 0).getDate();
-      var rangeValue = this.state.rangeValue;
-      let startDate1 = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
-      let stopDate1 = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
-      var minStartDate = startDate1;
-      var maxStopDate = stopDate1;
-      if (moment(startDate1).format("YYYY-MM") > moment(startDate).format("YYYY-MM")) {
-        minStartDate = startDate;
-      }
-      if (moment(stopDate1).format("YYYY-MM") < moment(stopDate).format("YYYY-MM")) {
-        maxStopDate = stopDate;
-      }
-      var monthArray = [];
-      var curDate1 = minStartDate;
-      for (var m = 0; curDate1 < moment(maxStopDate).add(-1, 'months').format("YYYY-MM-DD"); m++) {
-        curDate1 = moment(minStartDate).add(m, 'months').format("YYYY-MM-DD");
-        monthArray.push(curDate1)
-      }
-  
-      let curDate = startDate;
-      var inputDataMovingAvg = [];
-      var inputDataSemiAverage = [];
-      var inputDataLinearRegression = [];
-      var inputDataTes = [];
-      var inputDataArima = [];
-      var minDateForConsumption = curDate;
-      var dataFound = false;
-      console.log("Data Found@@@@@@@@@@@", dataFound);
-      var maxDateWithinRange1 = moment.max(actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") >= moment(startDate).format("YYYY-MM") && moment(c.month).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM") && c.planningUnit.id == this.state.datasetId && c.region.id == this.state.regionId).map(d => moment(d.month)))
-      for (var j = 0; moment(curDate).format("YYYY-MM") < moment(maxDateWithinRange1).format("YYYY-MM"); j++) {
-        curDate = moment(startDate).startOf('month').add(j, 'months').format("YYYY-MM-DD");
-        var consumptionData = actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM") && c.planningUnit.id == this.state.datasetId && c.region.id == this.state.regionId)
-        if (!dataFound && consumptionData.length == 0) {
-          minDateForConsumption = curDate;
+      var datasetJson = this.state.datasetJson;
+      console.log("datasetJson--", datasetJson)
+      // Need to filter
+      var regionList = this.state.regionList;
+      var count = 0;
+      for (var i = 0; i < regionList.length; i++) {
+        var actualConsumptionListForPlanningUnitAndRegion = datasetJson.actualConsumptionList.filter(c => c.planningUnit.id == this.state.selectedConsumptionUnitId && c.region.id == regionList[i].regionId);
+        if (actualConsumptionListForPlanningUnitAndRegion.length > 1) {
+          let minDate = moment.min(actualConsumptionListForPlanningUnitAndRegion.filter(c => c.puAmount >= 0).map(d => moment(d.month)));
+          let maxDate = moment.max(actualConsumptionListForPlanningUnitAndRegion.filter(c => c.puAmount >= 0).map(d => moment(d.month)));
+          let curDate = minDate;
+          var inputDataMovingAvg = [];
+          var inputDataSemiAverage = [];
+          var inputDataLinearRegression = [];
+          var inputDataTes = [];
+          var inputDataArima = [];
+
+          console.log("minDate", moment(minDate).format("YYYY-MM"));
+          console.log("maxDate", moment(maxDate).format("YYYY-MM"));
+          for (var j = 0; moment(curDate).format("YYYY-MM") < moment(maxDate).format("YYYY-MM"); j++) {
+            curDate = moment(minDate).startOf('month').add(j, 'months').format("YYYY-MM-DD");
+            console.log("curdate", curDate)
+            var consumptionData = actualConsumptionListForPlanningUnitAndRegion.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM"))
+            console.log("consumptionData--->", consumptionData)
+            console.log("Value@@@@@@@@@@@", consumptionData.length > 0 ? Number(consumptionData[0].puAmount) : null);
+            inputDataMovingAvg.push({ "month": inputDataMovingAvg.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].puAmount) : null, "forecast": null })
+            inputDataSemiAverage.push({ "month": inputDataSemiAverage.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].puAmount) : null, "forecast": null })
+            inputDataLinearRegression.push({ "month": inputDataLinearRegression.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].puAmount) : null, "forecast": null })
+            inputDataTes.push({ "month": inputDataTes.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].puAmount) : null, "forecast": null })
+            inputDataArima.push({ "month": inputDataArima.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].puAmount) : null, "forecast": null })
+          }
+          var forecastMinDate = moment(datasetJson.currentVersion.forecastStartDate).format("YYYY-MM-DD");
+          var forecastMaxDate = moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM-DD");
+          const monthsDiff = moment(new Date(forecastMaxDate)).diff(new Date(forecastMinDate), 'months', true);
+
+          const noOfMonthsForProjection = monthsDiff - inputDataMovingAvg.length;
+
+          if (inputDataMovingAvg.filter(c => c.actual != null).length >= 3) {
+            count++;
+            calculateMovingAvg(inputDataMovingAvg, this.state.monthsForMovingAverage, noOfMonthsForProjection, this, "DataEntry", regionList[i].regionId);
+          }
+          if (inputDataMovingAvg.filter(c => c.actual != null).length >= 3) {
+            count++;
+            calculateSemiAverages(inputDataSemiAverage, noOfMonthsForProjection, this, "DataEntry", regionList[i].regionId);
+          }
+          if (inputDataMovingAvg.filter(c => c.actual != null).length >= 3) {
+            count++;
+            calculateLinearRegression(inputDataLinearRegression, this.state.confidenceLevelIdLinearRegression, noOfMonthsForProjection, this, false, "DataEntry", regionList[i].regionId);
+          }
+          if (inputDataMovingAvg.filter(c => c.actual != null).length >= 24) {
+            count++;
+            calculateTES(inputDataTes, this.state.alpha, this.state.beta, this.state.gamma, this.state.confidenceLevelId, noOfMonthsForProjection, this, minDate, false, "DataEntry", regionList[i].regionId);
+          }
+          if (((this.state.seasonality && inputDataMovingAvg.filter(c => c.actual != null).length >= 13) || (!this.state.seasonality && inputDataMovingAvg.filter(c => c.actual != null).length >= 2))) {
+            count++;
+            calculateArima(inputDataArima, this.state.p, this.state.d, this.state.q, this.state.confidenceLevelIdArima, noOfMonthsForProjection, this, minDate, false, this.state.seasonality, "DataEntry", regionList[i].regionId);
+          }
         }
-        if (!dataFound && consumptionData.length > 0) {
-          dataFound = true
-        }
-        console.log("minDateForConsumption@@@@@@@@@@@", minDateForConsumption);
-        //   var consumptionData = actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM"))
-        //    && c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId)
-        console.log("consumptionData--->", consumptionData)
-        if (dataFound) {
-          console.log("Month@@@@@@@@@@@", inputDataLinearRegression.length + 1);
-          console.log("Data1@@@@@@@@@@@", consumptionData)
-          console.log("Value@@@@@@@@@@@", consumptionData.length > 0 ? Number(consumptionData[0].puAmount) : null);
-          inputDataMovingAvg.push({ "month": inputDataMovingAvg.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].puAmount) : null, "forecast": null })
-          inputDataSemiAverage.push({ "month": inputDataSemiAverage.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].puAmount) : null, "forecast": null })
-          inputDataLinearRegression.push({ "month": inputDataLinearRegression.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].puAmount) : null, "forecast": null })
-          inputDataTes.push({ "month": inputDataTes.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].puAmount) : null, "forecast": null })
-          inputDataArima.push({ "month": inputDataArima.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].puAmount) : null, "forecast": null })
-        }
       }
-      const noOfMonthsForProjection = monthArray.length - inputDataMovingAvg.length;
       this.setState({
-        monthArray: monthArray,
-        minDateForConsumption: minDateForConsumption
+        count: count
       })
-      try {
-        if (inputDataMovingAvg.filter(c => c.actual != null).length < 3 || (this.state.smoothingId && inputDataMovingAvg.filter(c => c.actual != null).length < 24) || (this.state.arimaId && inputDataMovingAvg.filter(c => c.actual != null).length < 14)) {
-          // this.el = jexcel(document.getElementById("tableDiv"), '');
-          // this.el.destroy();
-          // this.setState({
-          //     loading: false,
-          //     showData: false,
-          //     dataChanged: false,
-          //     extrapolateClicked: false,
-          //     show: false,
-          //     dataEl: ""
-          // })
-          alert(i18n.t('static.tree.minDataRequiredToExtrapolateNote1') + inputDataMovingAvg.filter(c => c.actual != null).length + i18n.t('static.tree.minDataRequiredToExtrapolateNote2') + i18n.t('static.tree.minDataRequiredToExtrapolate'))
-        }
-        // } else {
-        if (inputDataMovingAvg.filter(c => c.actual != null).length >= 2) {
-          if (this.state.movingAvgId && inputDataMovingAvg.filter(c => c.actual != null).length >= 3) {
-            calculateMovingAvg(inputDataMovingAvg, this.state.monthsForMovingAverage, noOfMonthsForProjection, this);
-          }
-          if (this.state.semiAvgId && inputDataMovingAvg.filter(c => c.actual != null).length >= 3) {
-            calculateSemiAverages(inputDataSemiAverage, noOfMonthsForProjection, this);
-          }
-          if (this.state.linearRegressionId && inputDataMovingAvg.filter(c => c.actual != null).length >= 3) {
-            calculateLinearRegression(inputDataLinearRegression, this.state.confidenceLevelIdLinearRegression, noOfMonthsForProjection, this, false);
-          }
-          console.log("inputDataTes.length+++", inputDataTes.length);
-          // if (inputDataTes.length >= (this.state.noOfMonthsForASeason * 2)) {
-          if (this.state.smoothingId && inputDataMovingAvg.filter(c => c.actual != null).length >= 24) {
-            calculateTES(inputDataTes, this.state.alpha, this.state.beta, this.state.gamma, this.state.confidenceLevelId, noOfMonthsForProjection, this, minStartDate, false);
-          }
-          if (this.state.arimaId && ((this.state.seasonality && inputDataMovingAvg.filter(c => c.actual != null).length >= 13) || (!this.state.seasonality && inputDataMovingAvg.filter(c => c.actual != null).length >= 2))) {
-            calculateArima(inputDataArima, this.state.p, this.state.d, this.state.q, this.state.confidenceLevelIdArima, noOfMonthsForProjection, this, minStartDate, false, this.state.seasonality);
-          } else {
-            this.buildActualJxl();
-          }
-          this.setState({
-            extrapolateClicked: true
-          })
-        } else {
-          // this.setState({
-          //     loading: false
-          // },()=>{
-          this.buildActualJxl();
-          // })
-        }
-        // }
-      } catch (error) {
-        console.log("Error@@@@@@", error)
-        // this.el = jexcel(document.getElementById("tableDiv"), '');
-        // this.el.destroy();
-        this.setState({
-          // showData: false,
-          // dataEl: "",
-          loading: false,
-          noDataMessage: i18n.t('static.extrapolation.errorOccured'),
-          dataChanged: true,
-          // show: false
-        })
+    }
+  }
+
+  updateMovingAvgData(data) {
+
+    var jsonDataMovingAvg = this.state.jsonDataMovingAvg;
+    jsonDataMovingAvg.push(data);
+    console.log("jsonDataMovingAvg--->", jsonDataMovingAvg)
+    var countR = this.state.countRecived
+    console.log("countR--->", countR)
+
+    this.setState({
+      jsonDataMovingAvg: jsonDataMovingAvg,
+      countRecived: countR + 1
+    }, () => {
+      console.log("countRecivedMov", this.state.countRecived)
+      console.log("countMov", this.state.count)
+
+
+      if (this.state.jsonDataMovingAvg.length
+        + this.state.jsonDataSemiAverage.length
+        + this.state.jsonDataLinearRegression.length
+        + this.state.jsonDataTes.length
+        + this.state.jsonDataArima.length
+        == this.state.count) {
+        this.saveForecastConsumptionExtrapolation();
       }
-      // } else {
-      //     this.setState({
-      //         tesData: [],
-      //         CI: 0,
-      //         tesError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" }
-      //     })
-      // }
-     }
-    //------------------------------------------------------------------------------------
-    
+    })
+  }
+
+  updateSemiAveragesData(data) {
+    var jsonDataSemiAverage = this.state.jsonDataSemiAverage;
+    jsonDataSemiAverage.push(data);
+    console.log("jsonDataSemiAverage--->", jsonDataSemiAverage)
+    var countR = this.state.countRecived
+    console.log("countR--->", countR)
+
+    this.setState({
+      jsonDataSemiAverage: jsonDataSemiAverage,
+      countRecived: countR + 1
+    }, () => {
+      console.log("countRecivedSemi", this.state.countRecived)
+      console.log("countSemi", this.state.count)
+
+      if (this.state.jsonDataMovingAvg.length
+        + this.state.jsonDataSemiAverage.length
+        + this.state.jsonDataLinearRegression.length
+        + this.state.jsonDataTes.length
+        + this.state.jsonDataArima.length
+        == this.state.count) {
+        this.saveForecastConsumptionExtrapolation();
+      }
+    })
+  }
+
+  updateLinearRegressionData(data) {
+    var jsonDataLinearRegression = this.state.jsonDataLinearRegression;
+    jsonDataLinearRegression.push(data);
+    console.log("jsonDataLinearRegression--->", jsonDataLinearRegression)
+    this.setState({
+      jsonDataLinearRegression: jsonDataLinearRegression,
+      countRecived: this.state.countRecived++
+    }, () => {
+      console.log("countRecivedL", this.state.countRecived)
+      console.log("countL", this.state.count)
+
+
+      if (this.state.jsonDataMovingAvg.length
+        + this.state.jsonDataSemiAverage.length
+        + this.state.jsonDataLinearRegression.length
+        + this.state.jsonDataTes.length
+        + this.state.jsonDataArima.length
+        == this.state.count) {
+        this.saveForecastConsumptionExtrapolation();
+      }
+    })
+  }
+
+  updateTESData(data) {
+    var jsonDataTes = this.state.jsonDataTes;
+    jsonDataTes.push(data);
+    console.log("jsonDataTes--->", jsonDataTes)
+    this.setState({
+      jsonDataTes: jsonDataTes,
+      countRecived: this.state.countRecived++
+    }, () => {
+      console.log("countRecivedT", this.state.countRecived)
+      console.log("countT", this.state.count)
+
+
+      if (this.state.jsonDataMovingAvg.length
+        + this.state.jsonDataSemiAverage.length
+        + this.state.jsonDataLinearRegression.length
+        + this.state.jsonDataTes.length
+        + this.state.jsonDataArima.length
+        == this.state.count) {
+        this.saveForecastConsumptionExtrapolation();
+      }
+    })
+  }
+
+  updateArimaData(data) {
+    var jsonDataArima = this.state.jsonDataArima;
+    jsonDataArima.push(data);
+    console.log("jsonDataArima--->", jsonDataArima)
+    this.setState({
+      jsonDataArima: jsonDataArima,
+      countRecived: this.state.countRecived++
+    }, () => {
+      console.log("countRecivedA", this.state.countRecived)
+      console.log("countA", this.state.count)
+      if (this.state.jsonDataMovingAvg.length
+        + this.state.jsonDataSemiAverage.length
+        + this.state.jsonDataLinearRegression.length
+        + this.state.jsonDataTes.length
+        + this.state.jsonDataArima.length
+        == this.state.count) {
+        this.saveForecastConsumptionExtrapolation();
+      }
+    })
+  }
+
+  saveForecastConsumptionExtrapolation() {
+    console.log("inside saveForecastConsumptionExtrapolation")
+    this.setState({
+      loading: true
+    })
+    var db1;
+    var storeOS;
+    getDatabase();
+    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+    openRequest.onerror = function (event) {
+      this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+      this.props.updateState("color", "red");
+      this.props.hideFirstComponent();
+    }.bind(this);
+    openRequest.onsuccess = function (e) {
+      db1 = e.target.result;
+      var extrapolationMethodTransaction = db1.transaction(['extrapolationMethod'], 'readwrite');
+      var extrapolationMethodObjectStore = extrapolationMethodTransaction.objectStore('extrapolationMethod');
+      var extrapolationMethodRequest = extrapolationMethodObjectStore.getAll();
+      extrapolationMethodRequest.onerror = function (event) {
+      }.bind(this);
+      extrapolationMethodRequest.onsuccess = function (event) {
+        var transaction = db1.transaction(['datasetData'], 'readwrite');
+        var datasetTransaction = transaction.objectStore('datasetData');
+        console.log("dataset", this.state.datasetId)
+        var datasetRequest = datasetTransaction.get(this.state.datasetId);
+        datasetRequest.onerror = function (event) {
+        }.bind(this);
+        datasetRequest.onsuccess = function (event) {
+          var extrapolationMethodList = extrapolationMethodRequest.result;
+          var myResult = datasetRequest.result;
+          var datasetDataBytes = CryptoJS.AES.decrypt(myResult.programData, SECRET_KEY);
+          var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
+          var datasetJson = JSON.parse(datasetData);
+          var consumptionExtrapolationDataUnFiltered = (datasetJson.consumptionExtrapolation);
+          console.log("consumptionExtrapolationDataUnFiltered@@@@@@@@@@", consumptionExtrapolationDataUnFiltered);
+          console.log("this.state.planningUnitId@@@@@@@@@@", this.state.planningUnitId);
+          var regionList = this.state.regionList;
+          for (var r = 0; r < regionList.length; r++) {
+            var consumptionExtrapolationList = datasetJson.consumptionExtrapolation.filter(c => c.planningUnit.id == this.state.selectedConsumptionUnitId && c.region.id == regionList[i].regionId);
+            console.log("consumptionExtrapolationList@@@@@@@@@@", consumptionExtrapolationList);
+            var consumptionExtrapolationData = -1//Semi Averages
+            var consumptionExtrapolationMovingData = -1//Moving averages
+            var consumptionExtrapolationRegression = -1//Linear Regression
+            var consumptionExtrapolationTESL = -1//TES L
+            console.log("consumptionExtrapolationTESL+++", consumptionExtrapolationTESL)
+            var consumptionExtrapolationTESM = -1//TES M
+            var consumptionExtrapolationTESH = -1//TES H
+            //----------------------------
+            // var rangeValue = this.state.rangeValue1;
+            // let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
+            // let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
+
+            var inputDataFilter = this.state.jsonDataSemiAverage;
+            var inputDataAverageFilter = this.state.movingAvgData;
+            var inputDataRegressionFilter = this.state.linearRegressionData;
+            console.log("consumptionExtrapolationData", consumptionExtrapolationData);
+            console.log("inputDataFilter", inputDataFilter);
+            var id = consumptionExtrapolationDataUnFiltered.length > 0 ? Math.max(...consumptionExtrapolationDataUnFiltered.map(o => o.consumptionExtrapolationId)) + 1 : 1;
+            var planningUnitObj = this.state.planningUnitList.filter(c => c.planningUnit.id == this.state.selectedConsumptionUnitId)[0].planningUnit;
+            console.log("this.state.regionList", this.state.regionList);
+            var regionObj = this.state.regionList.filter(c => c.regionId == regionList[r].regionId)[0];
+            console.log("Planning Unit Obj****", planningUnitObj);
+            console.log("Region Obj****", regionObj);
+            var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+            var curUser = AuthenticationService.getLoggedInUserId();
+            var datasetJson = this.state.datasetJson;
+            var actualConsumptionListForPlanningUnitAndRegion = datasetJson.actualConsumptionList.filter(c => c.planningUnit.id == this.state.selectedConsumptionUnitId && c.region.id == regionList[r].regionId);
+            var minDate = moment.min(actualConsumptionListForPlanningUnitAndRegion.filter(c => c.puAmount >= 0).map(d => moment(d.month)));
+            var maxDate = moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM-DD");
+
+            //Semi - averages
+            console.log("this.state.jsonDataSemiAverage----------->", this.state.jsonDataSemiAverage);
+            var jsonDataSemiAvgFilter = this.state.jsonDataSemiAverage.filter(c => c.PlanningUnitId == this.state.selectedConsumptionUnitId && c.regionId == regionList[r].regionId)
+            if (jsonDataSemiAvgFilter.length > 0) {
+              var jsonSemi = jsonDataSemiAvgFilter[0].data;
+              console.log("this.state.jsonDataSemiAverage--json--------->", jsonSemi);
+              var data = [];
+              for (var i = 0; i < jsonSemi.length; i++) {
+                data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonSemi[i].forecast != null ? (jsonSemi[i].forecast).toFixed(2) : null, ci: null })
+              }
+              console.log("data--------->", data);
+
+              consumptionExtrapolationList.push(
+                {
+                  "consumptionExtrapolationId": id,
+                  "planningUnit": planningUnitObj,
+                  "region": {
+                    id: regionObj.regionId,
+                    label: regionObj.label
+                  },
+                  "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 6)[0],
+                  "jsonProperties": {
+                    startDate: moment(minDate).format("YYYY-MM-DD"),
+                    stopDate: moment(maxDate).format("YYYY-MM-DD")
+                  },
+                  "createdBy": {
+                    "userId": curUser
+                  },
+                  "createdDate": curDate,
+                  "extrapolationDataList": data
+                })
+              id += 1;
+            }
+            console.log("this.state.monthsForMovingAverage+++", this.state.monthsForMovingAverage)
+            //Moving Averages
+            var data = [];
+            var jsonDataMovingFilter = this.state.jsonDataMovingAvg.filter(c => c.PlanningUnitId == this.state.selectedConsumptionUnitId && c.regionId == regionList[r].regionId)
+            if (jsonDataMovingFilter.length > 0) {
+              var jsonDataMoving = jsonDataMovingFilter[0].data;
+              console.log("this.state.jsonDataMovingAvg--json--------->", jsonDataMoving);
+              for (var i = 0; i < jsonDataMoving.length; i++) {
+                data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonDataMoving[i].forecast != null ? (jsonDataMoving[i].forecast).toFixed(2) : null, ci: null })
+              }
+              consumptionExtrapolationList.push(
+                {
+                  "consumptionExtrapolationId": id,
+                  "planningUnit": planningUnitObj,
+                  "region": {
+                    id: regionObj.regionId,
+                    label: regionObj.label
+                  },
+                  "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 7)[0],
+                  "jsonProperties": {
+                    months: this.state.monthsForMovingAverage,
+                    startDate: moment(minDate).format("YYYY-MM-DD"),
+                    stopDate: moment(maxDate).format("YYYY-MM-DD")
+                  },
+                  "createdBy": {
+                    "userId": curUser
+                  },
+                  "createdDate": curDate,
+                  "extrapolationDataList": data
+                })
+            }
+            id += 1;
+            //Linear Regression
+            var data = [];
+            var jsonDataLinearFilter = this.state.jsonDataLinearRegression.filter(c => c.PlanningUnitId == this.state.selectedConsumptionUnitId && c.regionId == regionList[r].regionId)
+            if (jsonDataLinearFilter.length > 0) {
+              var jsonDataLinear = jsonDataLinearFilter[0].data;
+              console.log("this.state.jsonDataLinear--json--------->", jsonDataLinear);
+              for (var i = 0; i < jsonDataLinear.length; i++) {
+                data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonDataLinear[i].forecast != null ? (jsonDataLinear[i].forecast).toFixed(2) : null, ci: (jsonDataLinear[i].ci) })
+              }
+              consumptionExtrapolationList.push(
+                {
+                  "consumptionExtrapolationId": id,
+                  "planningUnit": planningUnitObj,
+                  "region": {
+                    id: regionObj.regionId,
+                    label: regionObj.label
+                  },
+                  "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 5)[0],
+                  "jsonProperties": {
+                    confidenceLevel: this.state.confidenceLevelIdLinearRegression,
+                    startDate: moment(minDate).format("YYYY-MM-DD"),
+                    stopDate: moment(maxDate).format("YYYY-MM-DD")
+                  },
+                  "createdBy": {
+                    "userId": curUser
+                  },
+                  "createdDate": curDate,
+                  "extrapolationDataList": data
+                })
+              id += 1;
+            }
+            //TES L
+            //TES M
+            console.log("in if2")
+            var data = [];
+            var jsonDataTesFilter = this.state.jsonDataTes.filter(c => c.PlanningUnitId == this.state.selectedConsumptionUnitId && c.regionId == regionList[r].regionId)
+            if (jsonDataTesFilter.length > 0) {
+              var jsonDataTes = jsonDataTesFilter[0].data;
+              console.log("this.state.jsonDataTes--json--------->", jsonDataTes);
+
+              for (var i = 0; i < jsonDataTes.length; i++) {
+                data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonDataTes[i].forecast != null ? (jsonDataTes[i].forecast).toFixed(2) : null, ci: (jsonDataTes[i].ci) })
+              }
+              consumptionExtrapolationList.push(
+                {
+                  "consumptionExtrapolationId": id,
+                  "planningUnit": planningUnitObj,
+                  "region": {
+                    id: regionObj.regionId,
+                    label: regionObj.label
+                  },
+                  "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 2)[0],
+                  "jsonProperties": {
+                    confidenceLevel: this.state.confidenceLevelId,
+                    seasonality: this.state.noOfMonthsForASeason,
+                    alpha: this.state.alpha,
+                    beta: this.state.beta,
+                    gamma: this.state.gamma,
+                    startDate: moment(minDate).format("YYYY-MM-DD"),
+                    stopDate: moment(maxDate).format("YYYY-MM-DD")
+                  },
+                  "createdBy": {
+                    "userId": curUser
+                  },
+                  "createdDate": curDate,
+                  "extrapolationDataList": data
+                })
+              id += 1;
+            }
+            //Arima L
+            //TES M
+            console.log("in if2")
+            var data = [];
+            var jsonDataArimaFilter = this.state.jsonDataArima.filter(c => c.PlanningUnitId == this.state.selectedConsumptionUnitId && c.regionId == regionList[r].regionId)
+            if (jsonDataArimaFilter.length > 0) {
+              var jsonDataArima = jsonDataArimaFilter[0].data;
+              console.log("this.state.jsonDataArima--json--------->", jsonDataArima);
+              for (var i = 0; i < jsonDataArima.length; i++) {
+                data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonDataArima[i].forecast != null ? (jsonDataArima[i].forecast).toFixed(2) : null, ci: (jsonDataArima[i].ci) })
+              }
+              consumptionExtrapolationList.push(
+                {
+                  "consumptionExtrapolationId": id,
+                  "planningUnit": planningUnitObj,
+                  "region": {
+                    id: regionObj.regionId,
+                    label: regionObj.label
+                  },
+                  "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 4)[0],
+                  "jsonProperties": {
+                    confidenceLevel: this.state.confidenceLevelIdArima,
+                    seasonality: this.state.seasonality,
+                    p: this.state.p,
+                    d: this.state.d,
+                    q: this.state.q,
+                    startDate: moment(minDate).format("YYYY-MM-DD"),
+                    stopDate: moment(maxDate).format("YYYY-MM-DD")
+                  },
+                  "createdBy": {
+                    "userId": curUser
+                  },
+                  "createdDate": curDate,
+                  "extrapolationDataList": data
+                })
+              id += 1;
+            }
+          }
+          console.log('consumptionExtrapolationRegression', consumptionExtrapolationRegression);
+          datasetJson.consumptionExtrapolation = consumptionExtrapolationList;
+          console.log("consumptionExtrapolationList@@@@@@@@@@", consumptionExtrapolationList)
+          datasetData = (CryptoJS.AES.encrypt(JSON.stringify(datasetJson), SECRET_KEY)).toString()
+          myResult.programData = datasetData;
+          var putRequest = datasetTransaction.put(myResult);
+          this.setState({
+            dataChanged: false
+          })
+          putRequest.onerror = function (event) {
+          }.bind(this);
+          putRequest.onsuccess = function (event) {
+            console.log("save");
+            // let id = AuthenticationService.displayDashboardBasedOnRole();
+            // this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.compareAndSelect.dataSaved'));
+            this.setState({
+              // dataEl: "",
+              loading: false,
+              dataChanged: false,
+              message: i18n.t('static.compareAndSelect.dataSaved'),
+              extrapolateClicked: false,
+              countRecived: 0,
+              count: 0
+            }, () => {
+              this.hideFirstComponent();
+              this.componentDidMount()
+            })
+
+
+            // console.log(" after save",this.state.message);
+            // , () => {
+            //     this.componentDidMount();
+            // })
+
+          }.bind(this);
+        }.bind(this);
+      }.bind(this);
+    }.bind(this);
+    // }
+  }
+  //------------------------------------------------------------------------------------
+
   consumptionDataChanged = function (instance, cell, x, y, value) {
     var possibleActualConsumptionY = [];
     var possibleReportRateY = [];
@@ -883,7 +1167,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     var rangeValue = this.state.singleValue2;
     console.log("RangeValuie@@@@@@@@@@@@", rangeValue);
     var startDate = moment(rangeValue.year + '-' + rangeValue.month + '-01').format("YYYY-MM-DD");
-    var stopDate = moment(startDate).add(35,'months').format("YYYY-MM-DD");
+    var stopDate = moment(startDate).add(35, 'months').format("YYYY-MM-DD");
     var fullConsumptionList = this.state.tempConsumptionList.filter(c => (c.planningUnit.id != consumptionUnit.planningUnit.id) || (c.planningUnit.id == consumptionUnit.planningUnit.id && (moment(c.month).format("YYYY-MM") < moment(startDate).format("YYYY-MM") || moment(c.month).format("YYYY-MM") > moment(stopDate).format("YYYY-MM"))));
     var elInstance = this.state.dataEl;
     for (var i = 0; i < monthArray.length; i++) {
@@ -1061,8 +1345,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           console.log("RangeValuie@@@@@@@@@@@@", rangeValue);
           var startDate = moment(rangeValue.year + '-' + rangeValue.month + '-01').format("YYYY-MM-DD");
           // var stopDate = moment(rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate()).format("YYYY-MM-DD");
-          var stopDate = moment(startDate).add(35,'months').format("YYYY-MM-DD");
-    
+          var stopDate = moment(startDate).add(35, 'months').format("YYYY-MM-DD");
+
           var fullConsumptionList = this.state.consumptionList.filter(c => (c.planningUnit.id != consumptionUnit.planningUnit.id) || (c.planningUnit.id == consumptionUnit.planningUnit.id && (moment(c.month).format("YYYY-MM") < moment(startDate).format("YYYY-MM") || moment(c.month).format("YYYY-MM") > moment(stopDate).format("YYYY-MM"))));
           console.log("Full ConsumptionList @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@", fullConsumptionList)
           var monthArray = this.state.monthArray;
@@ -1195,10 +1479,14 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
   }
 
   hideSecondComponent() {
-    document.getElementById('div2').style.display = 'block';
-    this.state.timeout = setTimeout(function () {
-      document.getElementById('div2').style.display = 'none';
-    }, 30000);
+    try {
+      document.getElementById('div2').style.display = 'block';
+      this.state.timeout = setTimeout(function () {
+        document.getElementById('div2').style.display = 'none';
+      }, 30000);
+    } catch (Expection) {
+
+    }
   }
 
   loadedJexcel = function (instance, cell, x, y, value) {
@@ -1600,6 +1888,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       getRequest.onsuccess = function (event) {
         var myResult = [];
         myResult = getRequest.result;
+        console.log("")
         var datasetList = this.state.datasetList;
         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
         var userId = userBytes.toString(CryptoJS.enc.Utf8);
@@ -1756,8 +2045,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               console.log("RangeValuie@@@@@@@@@@@@", rangeValue);
               var startDate = moment(rangeValue.year + '-' + rangeValue.month + '-01').format("YYYY-MM-DD");
               // var stopDate = moment(rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate()).format("YYYY-MM-DD");
-              var stopDate = moment(startDate).add(35,'months').format("YYYY-MM-DD");
-    
+              var stopDate = moment(startDate).add(35, 'months').format("YYYY-MM-DD");
+
               console.log("stopDate@@@@@@@@@@@@", stopDate);
               var daysInMonth = datasetJson.currentVersion.daysInMonth;
               var monthArray = [];
@@ -2136,14 +2425,14 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     // const monthsDiff = moment(new Date(endDate)).diff(new Date(startDate), 'months', true);
     if (cont == true) {
       // if (monthsDiff <= 36) {
-        this.setState({
-          consumptionChanged: false
-        }, () => {
-          this.setState({ singleValue2: value, }, () => {
-            localStorage.setItem("sesDataentryStartDateRange", JSON.stringify(value))
-            this.getDatasetData()
-          })
+      this.setState({
+        consumptionChanged: false
+      }, () => {
+        this.setState({ singleValue2: value, }, () => {
+          localStorage.setItem("sesDataentryStartDateRange", JSON.stringify(value))
+          this.getDatasetData()
         })
+      })
       // } else {
       //   alert(i18n.t('static.dataentry.maxRange'));
       //   let rangeValue = this.state.singleValue2;
@@ -2196,7 +2485,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         yAxes: [{
           scaleLabel: {
             display: true,
-            labelString: this.state.selectedConsumptionUnitId > 0 ? getLabelText(this.state.selectedConsumptionUnitObject.planningUnit.label, this.state.lang):"",
+            labelString: this.state.selectedConsumptionUnitId > 0 ? getLabelText(this.state.selectedConsumptionUnitObject.planningUnit.label, this.state.lang) : "",
             // labelString: getLabelText(this.state.tempConsumptionUnitObject.consumptionDataType == "" ? "" : this.state.tempConsumptionUnitObject.consumptionDataType == 1 ? this.state.tempConsumptionUnitObject.planningUnit.forecastingUnit.label : this.state.tempConsumptionUnitObject.consumptionDataType == 2 ? this.state.tempConsumptionUnitObject.planningUnit.label : this.state.tempConsumptionUnitObject.otherUnit.label, this.state.lang),
             fontColor: 'black'
           },
@@ -2265,7 +2554,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         var colourCount = 0;
         datasetListForGraph.push({
           // label: getLabelText(this.state.tempConsumptionUnitObject.consumptionDataType == 1 ? this.state.tempConsumptionUnitObject.planningUnit.forecastingUnit.label : this.state.tempConsumptionUnitObject.consumptionDataType == 2 ? this.state.tempConsumptionUnitObject.planningUnit.label : this.state.tempConsumptionUnitObject.otherUnit.label, this.state.lang),
-          label:"Total",
+          label: "Total",
           data: this.state.planningUnitTotalList.filter(c => c.planningUnitId == this.state.selectedConsumptionUnitObject.planningUnit.id).map(item => (item.qtyInPU !== "" ? item.qtyInPU : null)),
           type: 'line',
           // stack: 1,
@@ -2425,7 +2714,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                         >
                           {/* <MonthBox value={makeText(this.state.singleValue2.from) + ' ~ ' + makeText(this.state.singleValue2.to)} onClick={this.handleClickMonthBox2} /> */}
                           <MonthBox value={makeText(this.state.singleValue2)} onClick={this.handleClickMonthBox2} />
-  
+
                         </Picker>
                       </div>
                     </FormGroup>
