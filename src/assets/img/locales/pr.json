@@ -2784,5 +2784,7 @@
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Máx = 7",
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Máx = Menor entre (7,18)",
     "static.loadDeleteProgram.loadDeleteProgram": "Carregar/Excluir Programa",
-    "static.editStatus.validCriticality": "Selecione Criticidade"
+    "static.editStatus.validCriticality": "Selecione Criticidade",
+    "static.shipment.shipmentProcurementAgentType": "Tipo de Agente de Aquisição de Remessa",
+    "static.shipment.groupByProcurementAgentType": "Agrupar por tipo de agente de aquisição"
 }
