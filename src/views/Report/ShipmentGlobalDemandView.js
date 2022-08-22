@@ -309,7 +309,9 @@ class ShipmentGlobalDemandView extends Component {
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
             loading: true,
-            programLst: []
+            programLst: [],
+            procurementAgentTypeId: false,
+
         };
 
 
@@ -357,6 +359,8 @@ class ShipmentGlobalDemandView extends Component {
                 csvRow.push('"' + (i18n.t('static.common.status') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
             csvRow.push('')
             csvRow.push('"' + (i18n.t('static.report.includeapproved') + ' : ' + document.getElementById("includeApprovedVersions").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+            csvRow.push('')
+            csvRow.push('"' + (i18n.t('static.shipment.groupByProcurementAgentType') + ' : ' + (this.state.procurementAgentTypeId ? "Yes" : "No")).replaceAll(' ', '%20') + '"')
 
 
         } else {
@@ -651,6 +655,8 @@ class ShipmentGlobalDemandView extends Component {
             let shipmentStatusIds = this.state.shipmentStatusValues.length == this.state.shipmentStatuses.length ? [] : this.state.shipmentStatusValues.map(ele => (ele.value).toString());
             let realmId = AuthenticationService.getRealmId()
             let useApprovedVersion = document.getElementById("includeApprovedVersions").value
+            let groupByProcurementAgentType = document.getElementById("procurementAgentTypeId").value
+
             let CountryIds = this.state.countryValues.length == this.state.countrys.length ? [] : this.state.countryValues.map(ele => (ele.value).toString());
             let programIds = this.state.programValues.length == this.state.programs.length ? [] : this.state.programValues.map(ele => (ele.value).toString());
 
@@ -672,8 +678,8 @@ class ShipmentGlobalDemandView extends Component {
                     planningUnitIds: planningUnitIds,
                     fundingSourceIds: fundingSourceIds,
                     shipmentStatusIds: shipmentStatusIds,
-                    useApprovedSupplyPlanOnly: useApprovedVersion
-
+                    useApprovedSupplyPlanOnly: useApprovedVersion,
+                    groupByProcurementAgentType: groupByProcurementAgentType
                 }
 
                 ReportService.shipmentOverview(inputjson)
@@ -2109,6 +2115,14 @@ class ShipmentGlobalDemandView extends Component {
         })
     }
 
+    setProcurementAgentTypeId(e) {
+        var procurementAgentTypeId = e.target.checked;
+        this.setState({
+            procurementAgentTypeId: procurementAgentTypeId,
+        }, () => {
+            this.fetchData();
+        })
+    }
 
     render() {
 
@@ -2552,6 +2566,29 @@ class ShipmentGlobalDemandView extends Component {
                                                 </InputGroup>
                                             </div>
                                         </FormGroup>
+                                        <FormGroup className="col-md-3 pl-lg-5 pt-lg-3">
+                                            <div className="controls ">
+                                                <InputGroup>
+
+                                                    <Input
+                                                        className="form-check-input"
+                                                        type="checkbox"
+                                                        id="procurementAgentTypeId"
+                                                        name="procurementAgentTypeId"
+                                                        checked={this.state.procurementAgentTypeId}
+                                                        value={this.state.procurementAgentTypeId}
+                                                        onChange={(e) => { this.setProcurementAgentTypeId(e); }}
+                                                    />
+                                                </InputGroup>
+
+                                                <Label
+                                                    className="form-check-label"
+                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                    <b>{i18n.t('static.shipment.groupByProcurementAgentType')}</b>
+                                                </Label>
+                                            </div>
+                                        </FormGroup>
+
 
                                         {/* <FormGroup className="col-md-3">
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.common.status')}</Label>
@@ -2634,7 +2671,7 @@ class ShipmentGlobalDemandView extends Component {
                                                             <thead className='Theadtablesticky'>
                                                                 <tr>
                                                                     <th rowSpan={2}>{i18n.t('static.dashboard.planningunitheader')}</th>
-                                                                    <th colSpan={this.state.table1Headers.length} align='center'>{i18n.t('static.report.procurementAgentName')}</th>
+                                                                    <th colSpan={this.state.table1Headers.length} align='center'>{this.state.procurementAgentTypeId ? i18n.t('static.dashboard.procurementagentType') : i18n.t('static.report.procurementAgentName')}</th>
                                                                     <th rowSpan={2}>{i18n.t('static.report.totalUnit')}</th>
                                                                 </tr>
                                                                 <tr>
