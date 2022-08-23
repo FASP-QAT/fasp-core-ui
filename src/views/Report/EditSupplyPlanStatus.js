@@ -7,8 +7,8 @@ import NumberFormat from 'react-number-format';
 import { Button, Card, CardBody, CardFooter, Col, Form, FormFeedback, FormGroup, Input, InputGroup, Label, Modal, ModalBody, ModalFooter, ModalHeader, Nav, NavItem, NavLink, Row, TabContent, Table, TabPane } from 'reactstrap';
 import * as Yup from 'yup';
 // import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, DATE_FORMAT_CAP,JEXCEL_PAGINATION_OPTION } from '../../Constants.js'
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import ProgramService from '../../api/ProgramService';
 import getLabelText from '../../CommonComponent/getLabelText';
@@ -31,7 +31,7 @@ import { Link } from 'react-router-dom';
 // import { NavLink } from 'react-router-dom';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import AuthenticationService from '../Common/AuthenticationService';
-import {MultiSelect} from 'react-multi-select-component';
+import { MultiSelect } from 'react-multi-select-component';
 import ProblemListFormulas from '../Report/ProblemListFormulas.js'
 import DataSourceService from '../../api/DataSourceService';
 import RealmCountryService from '../../api/RealmCountryService';
@@ -481,7 +481,8 @@ class EditSupplyPlanStatus extends Component {
         this.setState({ loading: true, consumptionStartDateClicked: startDate });
         var elInstance = this.state.consumptionBatchInfoTableEl;
         if (elInstance != undefined && elInstance != "") {
-            elInstance.destroy();
+            // elInstance.destroy();
+            jexcel.destroy(document.getElementById("consumptionBatchInfoTable"), true);
         }
         var planningUnitId = document.getElementById("planningUnitId").value;
         var programId = document.getElementById("programId").value;
@@ -614,7 +615,9 @@ class EditSupplyPlanStatus extends Component {
         this.setState({ loading: true, inventoryStartDateClicked: moment(endDate).startOf('month').format("YYYY-MM-DD") })
         var elInstance = this.state.inventoryBatchInfoTableEl;
         if (elInstance != undefined && elInstance != "") {
-            elInstance.destroy();
+            // elInstance.destroy();
+            jexcel.destroy(document.getElementById("inventoryBatchInfoTable"), true);
+
         }
         var planningUnitId = document.getElementById("planningUnitId").value;
         var programId = document.getElementById("programId").value;
@@ -1072,8 +1075,11 @@ class EditSupplyPlanStatus extends Component {
     actionCanceledShipments(type) {
         if (type == "qtyCalculator") {
             document.getElementById("showSaveQtyButtonDiv").style.display = 'none';
-            (this.refs.shipmentChild.state.qtyCalculatorTableEl).destroy();
-            (this.refs.shipmentChild.state.qtyCalculatorTableEl1).destroy();
+            // (this.refs.shipmentChild.state.qtyCalculatorTableEl).destroy();
+            // (this.refs.shipmentChild.state.qtyCalculatorTableEl1).destroy();
+            jexcel.destroy(document.getElementById("qtyCalculatorTable"), true);
+            jexcel.destroy(document.getElementById("qtyCalculatorTable1"), true);
+
             this.refs.shipmentChild.state.shipmentQtyChangedFlag = 0;
             this.setState({
                 qtyCalculatorValidationError: "",
@@ -1081,7 +1087,9 @@ class EditSupplyPlanStatus extends Component {
             })
         } else if (type == "shipmentDates") {
             document.getElementById("showSaveShipmentsDatesButtonsDiv").style.display = 'none';
-            (this.refs.shipmentChild.state.shipmentDatesTableEl).destroy();
+            // (this.refs.shipmentChild.state.shipmentDatesTableEl).destroy();
+            jexcel.destroy(document.getElementById("shipmentDatesTable"), true);
+
             this.refs.shipmentChild.state.shipmentDatesChangedFlag = 0;
             this.setState({
                 shipmentDatesChangedFlag: 0,
@@ -1089,7 +1097,9 @@ class EditSupplyPlanStatus extends Component {
             })
         } else if (type == "shipmentBatch") {
             document.getElementById("showShipmentBatchInfoButtonsDiv").style.display = 'none';
-            (this.refs.shipmentChild.state.shipmentBatchInfoTableEl).destroy();
+            // (this.refs.shipmentChild.state.shipmentBatchInfoTableEl).destroy();
+            jexcel.destroy(document.getElementById("shipmentBatchInfoTable"), true);
+
             this.refs.shipmentChild.state.shipmentBatchInfoChangedFlag = 0;
             this.setState({
                 shipmentBatchInfoChangedFlag: 0,
@@ -1101,7 +1111,9 @@ class EditSupplyPlanStatus extends Component {
 
     actionCanceledInventory() {
         document.getElementById("showInventoryBatchInfoButtonsDiv").style.display = 'none';
-        (this.refs.inventoryChild.state.inventoryBatchInfoTableEl).destroy();
+        // (this.refs.inventoryChild.state.inventoryBatchInfoTableEl).destroy();
+        jexcel.destroy(document.getElementById("inventoryBatchInfoTable"), true);
+
         this.refs.inventoryChild.state.inventoryBatchInfoChangedFlag = 0;
         this.setState({
             inventoryBatchInfoChangedFlag: 0,
@@ -1113,7 +1125,9 @@ class EditSupplyPlanStatus extends Component {
 
     actionCanceledConsumption() {
         document.getElementById("showConsumptionBatchInfoButtonsDiv").style.display = 'none';
-        (this.refs.consumptionChild.state.consumptionBatchInfoTableEl).destroy();
+        // (this.refs.consumptionChild.state.consumptionBatchInfoTableEl).destroy();
+        jexcel.destroy(document.getElementById("consumptionBatchInfoTable"), true);
+
         this.refs.consumptionChild.state.consumptionBatchInfoChangedFlag = 0;
         this.setState({
             consumptionBatchInfoChangedFlag: 0,
@@ -3375,7 +3389,8 @@ class EditSupplyPlanStatus extends Component {
             },
                 () => {
                     this.el = jexcel(document.getElementById("problemListDiv"), '');
-                    this.el.destroy();
+                    // this.el.destroy();
+                    jexcel.destroy(document.getElementById("problemListDiv"), true);
                 });
 
             // let problemStatusId = ;
@@ -3473,7 +3488,9 @@ class EditSupplyPlanStatus extends Component {
                 this.setState({ message: i18n.t('static.report.selectProblemStatus'), problemList: [], loading: false },
                     () => {
                         this.el = jexcel(document.getElementById("problemListDiv"), '');
-                        this.el.destroy();
+                        // this.el.destroy();
+                        jexcel.destroy(document.getElementById("problemListDiv"), true);
+
                     });
             }
         }
@@ -3481,7 +3498,7 @@ class EditSupplyPlanStatus extends Component {
 
     filterProblemStatus = function (instance, cell, c, r, source) {
         var mylist = [];
-        var json = instance.jexcel.getJson(null, false)
+        // var json = instance.jexcel.getJson(null, false)
         mylist = this.state.problemStatusListForEdit;
         mylist = mylist.filter(c => c.userManaged == true);
         return mylist;
@@ -3507,7 +3524,9 @@ class EditSupplyPlanStatus extends Component {
             count++;
         }
         this.el = jexcel(document.getElementById("problemTransDiv"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("problemTransDiv"), true);
+
         var json = [];
         var data = dataArray;
 
@@ -3542,7 +3561,7 @@ class EditSupplyPlanStatus extends Component {
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
@@ -3554,11 +3573,11 @@ class EditSupplyPlanStatus extends Component {
             filters: true,
             parseFormulas: true,
             license: JEXCEL_PRO_KEY,
-            text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')} `,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')} `,
+            //     show: '',
+            //     entries: '',
+            // },
         };
         var problemTransEl = jexcel(document.getElementById("problemTransDiv"), options);
         this.el = problemTransEl;
@@ -3621,7 +3640,9 @@ class EditSupplyPlanStatus extends Component {
         // }
         // console.log("problemArray---->", problemArray);
         this.el = jexcel(document.getElementById("problemListDiv"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("problemListDiv"), true);
+
         var json = [];
         var data = problemArray;
 
@@ -3773,7 +3794,7 @@ class EditSupplyPlanStatus extends Component {
 
             ],
             updateTable: function (el, cell, x, y, source, value, id) {
-                var elInstance = el.jexcel;
+                var elInstance = el;
                 if (this.state.editable) {
                     var rowData = elInstance.getRowData(y);
                     if (rowData[12] == 4) {
@@ -3821,17 +3842,17 @@ class EditSupplyPlanStatus extends Component {
                 }
             }.bind(this),
             onsearch: function (el) {
-                el.jexcel.updateTable();
+                // el.jexcel.updateTable();
             },
             onfilter: function (el) {
-                el.jexcel.updateTable();
+                // el.jexcel.updateTable();
             },
             editable: this.state.editable,
-            text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')} `,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')} `,
+            //     show: '',
+            //     entries: '',
+            // },
 
             // updateTable: function (el, cell, x, y, source, value, id) {
             // }.bind(this),
@@ -3840,7 +3861,7 @@ class EditSupplyPlanStatus extends Component {
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
@@ -3926,6 +3947,11 @@ class EditSupplyPlanStatus extends Component {
     }
 
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
         const { statuses } = this.state;
         let statusList = statuses.length > 0
             && statuses.map((item, i) => {

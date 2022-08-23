@@ -361,8 +361,8 @@ import paginationFactory from 'react-bootstrap-table2-paginator';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import moment from 'moment';
 import RealmCountryService from '../../api/RealmCountryService';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js';
 import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY } from "../../Constants";
@@ -465,15 +465,15 @@ export default class ProgramList extends Component {
     console.log("programList---->", programList);
     console.log("healthAreaList---->", programList.healthAreaList);
     let programArray = [];
-    
+
     let count = 0;
 
     for (var j = 0; j < programList.length; j++) {
       data = [];
-      let healthAreaLabels=programList[j].healthAreaList;
-      let haValues=[];
-      healthAreaLabels.map(c=>{
-        haValues.push(getLabelText(c.label,this.state.lang));
+      let healthAreaLabels = programList[j].healthAreaList;
+      let haValues = [];
+      healthAreaLabels.map(c => {
+        haValues.push(getLabelText(c.label, this.state.lang));
       })
       data[0] = programList[j].programId
       data[1] = getLabelText(programList[j].realmCountry.realm.label, this.state.lang)
@@ -495,7 +495,8 @@ export default class ProgramList extends Component {
     // }
     // console.log("programArray---->", programArray);
     this.el = jexcel(document.getElementById("tableDiv"), '');
-    this.el.destroy();
+    // this.el.destroy();
+    jexcel.destroy(document.getElementById("tableDiv"), true);
     var json = [];
     var data = programArray;
 
@@ -512,56 +513,57 @@ export default class ProgramList extends Component {
         {
           title: i18n.t('static.program.realm'),
           type: 'text',
-          readOnly: true
+          // readOnly: true
         },
         {
           title: i18n.t('static.program.program'),
           type: 'text',
-          readOnly: true
+          // readOnly: true
         },
         {
           title: i18n.t('static.program.programDisplayName'),
           type: 'text',
-          readOnly: true
+          // readOnly: true
         },
         {
           title: i18n.t('static.program.realmcountry'),
           type: 'text',
-          readOnly: true
+          // readOnly: true
         },
         {
           title: i18n.t('static.program.organisation'),
           type: 'text',
-          readOnly: true
+          // readOnly: true
         },
         {
           title: i18n.t('static.program.healtharea'),
           type: 'text',
-          readOnly: true
+          // readOnly: true
         },
         {
           title: i18n.t('static.common.lastModifiedBy'),
           type: 'text',
-          readOnly: true
+          // readOnly: true
         },
         {
           title: i18n.t('static.common.lastModifiedDate'),
           type: 'calendar',
           options: { format: JEXCEL_DATE_FORMAT_SM },
-          readOnly: true
+          // readOnly: true
         },
 
       ],
-      text: {
-        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-        show: '',
-        entries: '',
-      },
+      // text: {
+      //   showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+      //   show: '',
+      //   entries: '',
+      // },
+      editable: false,
       onload: this.loaded,
       pagination: localStorage.getItem("sesRecordCount"),
       search: true,
       columnSorting: true,
-      tableOverflow: true,
+      // tableOverflow: true,
       wordWrap: true,
       allowInsertColumn: false,
       allowManualInsertColumn: false,
@@ -812,6 +814,11 @@ export default class ProgramList extends Component {
     return getLabelText(cell, this.state.lang);
   }
   render() {
+    jexcel.setDictionary({
+      Show: " ",
+      entries: " ",
+    });
+
 
     const { SearchBar, ClearSearchButton } = Search;
     const customTotal = (from, to, size) => (
@@ -918,10 +925,10 @@ export default class ProgramList extends Component {
             </Col>
 
             {/* <div id="loader" className="center"></div> */}
-            
-          <div className="consumptionDataEntryTable">
-            <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROGRAM') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
-            </div>
+
+            <div className="consumptionDataEntryTable">
+              <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROGRAM') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
+              </div>
             </div>
             <div style={{ display: this.state.loading ? "block" : "none" }}>
               <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >

@@ -341,8 +341,8 @@ import RealmService from '../../api/RealmService';
 import getLabelText from '../../CommonComponent/getLabelText';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import moment from 'moment';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js';
 import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_SM } from '../../Constants';
@@ -428,7 +428,8 @@ export default class DataSourceTypeListComponent extends Component {
         // }
         // console.log("dataSourceTypeArray---->", dataSourceTypeArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("tableDiv"), true);
         var json = [];
         var data = dataSourceTypeArray;
 
@@ -441,56 +442,56 @@ export default class DataSourceTypeListComponent extends Component {
                 {
                     title: 'DataSourceTypeId',
                     type: 'hidden',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.realm.realm'),
                     type: (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN') ? 'text' : 'hidden'),
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.datasourcetype.datasourcetype'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.common.lastModifiedBy'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.common.lastModifiedDate'),
-                    readOnly: true,
+                    // readOnly: true,
                     type: 'calendar',
                     options: { format: JEXCEL_DATE_FORMAT_SM }
                 },
                 {
                     type: 'dropdown',
                     title: i18n.t('static.common.status'),
-                    readOnly: true,
+                    // readOnly: true,
                     source: [
                         { id: true, name: i18n.t('static.common.active') },
                         { id: false, name: i18n.t('static.common.disabled') }
                     ]
                 },
             ],
-            text: {
-                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
             allowDeleteRow: false,
             onselection: this.selected,
-
+            editable: false,
 
             oneditionend: this.onedit,
             copyCompatibility: true,
@@ -681,6 +682,11 @@ export default class DataSourceTypeListComponent extends Component {
         return getLabelText(cell, this.state.lang);
     }
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
         const { realms } = this.state;
         let realmList = realms.length > 0
             && realms.map((item, i) => {
@@ -741,8 +747,8 @@ export default class DataSourceTypeListComponent extends Component {
                         <div className="SearchMarginTop">
                             {/* <div id="loader" className="center"></div> */}
                             <div className='consumptionDataEntryTable'>
-                            <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DATA_SOURCE_TYPE') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
-                            </div>
+                                <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DATA_SOURCE_TYPE') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
+                                </div>
                             </div>
                             <div style={{ display: this.state.loading ? "block" : "none" }}>
                                 <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
