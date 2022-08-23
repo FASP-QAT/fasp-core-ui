@@ -10,14 +10,14 @@ export function jExcelLoadedFunction(instance, number) {
     }
     var obj = {};
     obj.options = {};
-    var elInstance = instance.jexcel;
+    var elInstance = instance.worksheets[0];
     elInstance.hideIndex(0);
-    var pagignation = document.getElementsByClassName('jexcel_pagination')[number];
+    var pagignation = document.getElementsByClassName('jss_pagination')[number];
     pagignation.classList.add('row');
-    var searchContainer = document.getElementsByClassName('jexcel_filter')[number];
-    var searchDiv = (document.getElementsByClassName('jexcel_filter')[number]).childNodes[1];
-    searchDiv.removeChild(((document.getElementsByClassName('jexcel_filter')[number]).childNodes[1]).childNodes[0]);
-    document.getElementsByClassName("jexcel_search")[number].placeholder = i18n.t('static.jexcel.search');
+    var searchContainer = document.getElementsByClassName('jss_search_container')[number];
+    var searchDiv = (document.getElementsByClassName('jss_search_container')[number]).childNodes[1];
+    searchDiv.removeChild(((document.getElementsByClassName('jss_search_container')[number]).childNodes[1]).childNodes[0]);
+    document.getElementsByClassName("jss_search")[number].placeholder = i18n.t('static.jexcel.search');
     // searchContainer.classList.add('TableCust');
     var clearBtn = document.createElement('button');
     clearBtn.type = "button";
@@ -28,7 +28,7 @@ export function jExcelLoadedFunction(instance, number) {
     var clarText = document.createTextNode(i18n.t('static.jexcel.clear'));
     clearBtn.setAttribute("id", "clearBtnID");
     clearBtn.onclick = function () {
-        document.getElementsByClassName("jexcel_search")[number].value = "";
+        document.getElementsByClassName("jss_search")[number].value = "";
         elInstance.search('')
     };
     clearBtn.appendChild(clarText);
@@ -51,25 +51,28 @@ export function jExcelLoadedFunction(instance, number) {
     // obj.pagination.appendChild(paginationPages);
     //  obj.pagination.appendChild(paginationUpdateContainer);
 
-    var jexcel_pagination = document.getElementsByClassName('jexcel_pagination')[number];
+    var jexcel_pagination = document.getElementsByClassName('jss_pagination')[number];
     jexcel_pagination.lastChild.classList.add('order-3');
     jexcel_pagination.firstChild.classList.add('order-2');
     jexcel_pagination.firstChild.classList.add('mr-auto');
     jexcel_pagination.firstChild.classList.add('pl-0');
     // document.getElementsByClassName('jexcel_pagination')[number].value = localStorage.getItem("sesRecordCount")
     // document.getElementsByClassName('jexcel_pagination')[number].value = 25
-    var pageSelect = document.getElementsByClassName('jexcel_pagination_dropdown')[number];
+    var pageSelect = document.getElementsByClassName('jss_pagination_dropdown')[number];
     pageSelect.options[3].innerHTML = "All";
 
     pageSelect.addEventListener("change", () => paginationChange(number));
 
 
-    var jexcel_filterFirstdiv = document.getElementsByClassName('jexcel_filter')[number];
+    var jexcel_filterFirstdiv = document.getElementsByClassName('jss_search_container')[number];
     var filter = jexcel_filterFirstdiv.firstChild;
     filter.classList.add('order-1');
     filter.classList.add('pr-1');
     filter.classList.add('ml-2');
     jexcel_pagination.appendChild(filter);
+
+    var jexcel_filterFirstdiv1 = document.getElementsByClassName('jss_table_container')[0];
+    jexcel_filterFirstdiv1.firstChild.nextSibling.classList.remove('jss_scrollX')
 
 
 
@@ -101,8 +104,8 @@ export function jExcelLoadedFunctionWithoutSearch(instance, number) {
     // var clarText = document.createTextNode(i18n.t('static.jexcel.clear'));
     // clearBtn.setAttribute("id", "clearBtnID");
     // clearBtn.onclick = function () {
-        // document.getElementsByClassName("jexcel_search")[number].value = "";
-        // elInstance.search('')
+    // document.getElementsByClassName("jexcel_search")[number].value = "";
+    // elInstance.search('')
     // };
     // clearBtn.appendChild(clarText);
     // searchContainer.appendChild(clearBtn);
@@ -210,7 +213,7 @@ export function jExcelLoadedFunctionWithoutPagination(instance, number) {
     }
     var obj = {};
     obj.options = {};
-    var elInstance = instance.jexcel;
+    var elInstance = instance.worksheets[0];
     elInstance.hideIndex(0);
     var searchContainer = document.getElementsByClassName('jexcel_filter')[number];
     var searchDiv = (document.getElementsByClassName('jexcel_filter')[number]).childNodes[1];
@@ -234,7 +237,8 @@ export function jExcelLoadedFunctionWithoutPagination(instance, number) {
 }
 
 export function jExcelLoadedFunctionOnlyHideRow(instance) {
-    var elInstance = instance.jexcel;
+    var elInstance = instance.worksheets[0];
+    console.log("elisn===>", instance)
     elInstance.hideIndex(0);
 }
 
@@ -402,7 +406,7 @@ export function checkValidtion(type, colName, rowNo, value, elInstance, reg, gre
                 elInstance.setComments(col, i18n.t('static.message.invaliddate'));
                 // elInstance.setValueFromCoords(colNo, rowNo, "", true);
                 return false;
-            } else if (moment(value).isAfter(moment(Date.now()).add(MAX_DATE_RESTRICTION_IN_DATA_ENTRY,'years').endOf('month').format("YYYY-MM"))) {
+            } else if (moment(value).isAfter(moment(Date.now()).add(MAX_DATE_RESTRICTION_IN_DATA_ENTRY, 'years').endOf('month').format("YYYY-MM"))) {
                 elInstance.setStyle(col, "background-color", "transparent");
                 elInstance.setStyle(col, "background-color", "yellow");
                 elInstance.setComments(col, i18n.t('static.message.invaliddate'));
@@ -434,7 +438,7 @@ export function checkValidtion(type, colName, rowNo, value, elInstance, reg, gre
                 elInstance.setComments(col, i18n.t('static.message.invaliddate'));
                 elInstance.setValueFromCoords(colNo, rowNo, "", true);
                 return false;
-            }else if (moment(value).format("YYYY-MM").toString().length != 7) {
+            } else if (moment(value).format("YYYY-MM").toString().length != 7) {
                 elInstance.setStyle(col, "background-color", "transparent");
                 elInstance.setStyle(col, "background-color", "yellow");
                 elInstance.setComments(col, i18n.t('static.message.invaliddate'));
@@ -446,7 +450,7 @@ export function checkValidtion(type, colName, rowNo, value, elInstance, reg, gre
                 elInstance.setComments(col, i18n.t('static.message.invaliddate'));
                 // elInstance.setValueFromCoords(colNo, rowNo, "", true);
                 return false;
-            } else if (moment(value).isAfter(moment(Date.now()).add(MAX_DATE_RESTRICTION_IN_DATA_ENTRY,'years').endOf('month').format("YYYY-MM"))) {
+            } else if (moment(value).isAfter(moment(Date.now()).add(MAX_DATE_RESTRICTION_IN_DATA_ENTRY, 'years').endOf('month').format("YYYY-MM"))) {
                 elInstance.setStyle(col, "background-color", "transparent");
                 elInstance.setStyle(col, "background-color", "yellow");
                 elInstance.setComments(col, i18n.t('static.message.invaliddate'));

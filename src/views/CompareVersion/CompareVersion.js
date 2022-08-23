@@ -21,8 +21,6 @@ import getLabelText from '../../CommonComponent/getLabelText'
 import CryptoJS from 'crypto-js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import ProgramService from '../../api/ProgramService';
 import DatasetService from '../../api/DatasetService';
@@ -889,7 +887,7 @@ class CompareVersion extends Component {
                                 {(this.state.firstDataSet == 1 && this.state.secondDataSet == 1) &&
                                     <>
                                         <CompareVersionTableCompareVersion ref="compareVersionTable" datasetData={this.state.datasetData} datasetData1={this.state.datasetData1} datasetData2={this.state.datasetData} page="compareVersion" versionLabel={"V" + document.getElementById("versionId").selectedOptions[0].text} versionLabel1={"V" + document.getElementById("versionId1").selectedOptions[0].text} updateState={this.updateState} />
-                                        <div className="table-responsive consumptionDataEntryTable ForecastSummaryTable">
+                                        <div className="consumptionDataEntryTable ForecastSummaryTable">
                                             <div id="tableDiv" className="compareVersion" style={{ display: !this.state.loading ? "block" : "none" }} />
                                         </div>
                                     </>

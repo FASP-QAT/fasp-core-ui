@@ -13,7 +13,6 @@ import { DATE_FORMAT_CAP_WITHOUT_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXC
 import i18n from '../../i18n';
 import CryptoJS from 'crypto-js'
 import getLabelText from "../../CommonComponent/getLabelText";
-import jexcel from 'jexcel-pro';
 import { DATE_FORMAT_CAP, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY } from '../../Constants.js';
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination } from '../../CommonComponent/JExcelCommonFunctions.js';
 import csvicon from '../../assets/img/csv.png';
@@ -618,6 +617,14 @@ export default class CommitTreeComponent extends React.Component {
                                             } else if (node.payload.nodeType.id == 5) {
                                                 node.payload.nodeDataMap[scenarioList[ndm].id][0].fuNode = null;
                                             }
+                                            var nodeDataModelingList=node.payload.nodeDataMap[scenarioList[ndm].id][0].nodeDataModelingList;
+                                            var nodeDataModelingListUpdated=[];
+                                            for(var nml=0;nml<nodeDataModelingList.length;nml++){
+                                                if(nodeDataModelingList[nml].dataValue!=="" && nodeDataModelingList[nml].dataValue!=="NaN" && nodeDataModelingList[nml].dataValue!==undefined && nodeDataModelingList[nml].increaseDecrease!==""){
+                                                    nodeDataModelingListUpdated.push(nodeDataModelingList[nml]);
+                                                }
+                                            }
+                                            node.payload.nodeDataMap[scenarioList[ndm].id][0].nodeDataModelingList=nodeDataModelingListUpdated;
                                             console.log("commit*** node after---", node);
                                             var findNodeIndex = completeFlatList.findIndex(n => n.id == node.id);
                                             console.log("commit*** findNodeIndex1---", findNodeIndex);
@@ -1026,7 +1033,7 @@ export default class CommitTreeComponent extends React.Component {
                                         </div>
                                         <CompareVersionTable ref="conflictChild" page="commit" datasetData={this.state.programDataLocal} datasetData1={this.state.programDataServer} datasetData2={this.state.programDataDownloaded} versionLabel={"V" + this.state.programDataLocal.currentVersion.versionId + "(Local)"} versionLabel1={"V" + this.state.programDataServer.currentVersion.versionId + "(Server)"} updateState={this.updateState} />
                                         <div className='ForecastSummaryTable'>
-                                            <div className="table-responsive RemoveStriped commitversionTable CommitTableMarginTop consumptionDataEntryTable">
+                                            <div className="RemoveStriped commitversionTable CommitTableMarginTop consumptionDataEntryTable">
                                                 <div id="tableDiv" />
                                             </div>
                                         </div>

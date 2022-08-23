@@ -5,8 +5,8 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
@@ -21,6 +21,8 @@ import { Prompt } from 'react-router';
 import { exportPDF, noForecastSelectedClicked, missingMonthsClicked, missingBranchesClicked, nodeWithPercentageChildrenClicked } from '../DataSet/DataCheckComponent.js';
 import pdfIcon from '../../assets/img/pdf.png';
 import ProgramService from '../../api/ProgramService';
+import DatasetService from '../../api/DatasetService';
+
 const ref = React.createRef();
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -767,7 +769,7 @@ class VersionSettingsComponent extends Component {
     }
 
     oneditionend = function (instance, cell, x, y, value) {
-        var elInstance = instance.jexcel;
+        var elInstance = instance;
         elInstance.setValueFromCoords(12, y, 1, true);
     }
 
@@ -784,7 +786,7 @@ class VersionSettingsComponent extends Component {
         var rangeValue = this.state.rangeValue;
         let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
         let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
-     
+
         var inputjson = {
             programId: programId,
             versionTypeId: versionTypeId,
@@ -843,9 +845,9 @@ class VersionSettingsComponent extends Component {
                 this.setState({
                     dataList: []
                 },
-                () => {
-                    this.buildJExcel();
-                })
+                    () => {
+                        this.buildJExcel();
+                    })
             }
         );
     }
@@ -977,23 +979,24 @@ class VersionSettingsComponent extends Component {
         }
         var dataList = this.state.dataList;
         console.log("dataList------->1", dataList);
-        for(var i = 0;i<dataList.length;i++){
+        for (var i = 0; i < dataList.length; i++) {
             count = (versionSettingsArray.length);
-            versionSettingsArray[count] = dataList[i] ;
+            versionSettingsArray[count] = dataList[i];
             count++;
         }
 
         console.log("versionSettingsArray------->1", versionSettingsArray);
 
         this.el = jexcel(document.getElementById("tableDiv"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("tableDiv"), true);
         var json = [];
         var data = versionSettingsArray;
         console.log("versionSettingsArray------->2", data);
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [100, 120, 60, 80, 150, 100, 110, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+            colWidths: [100, 120, 60, 80, 100, 100, 110, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
@@ -1071,7 +1074,7 @@ class VersionSettingsComponent extends Component {
                     title: i18n.t('static.program.noOfDaysInMonth'),
                     type: 'dropdown',
                     source: this.state.noOfDays,
-                    width: '200',
+                    // width: '150',
                 },//13 N
 
 
@@ -1106,16 +1109,16 @@ class VersionSettingsComponent extends Component {
                 },
 
             ],
-            text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
@@ -1125,7 +1128,7 @@ class VersionSettingsComponent extends Component {
             allowDeleteRow: false,
             onselection: this.selected,
             updateTable: function (el, cell, x, y, source, value, id) {
-                var elInstance = el.jexcel;
+                var elInstance = el;
                 if (y != null) {
                     //left align
                     elInstance.setStyle(`B${parseInt(y) + 1}`, 'text-align', 'left');
@@ -1172,7 +1175,7 @@ class VersionSettingsComponent extends Component {
             }.bind(this),
             onchange: this.changed,
             oneditionend: this.oneditionend,
-            oncreateeditor: this.oncreateeditor,
+            // oncreateeditor: this.oncreateeditor,
             editable: ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_VERSION_SETTINGS')) ? true : false),
             copyCompatibility: true,
             allowExport: false,
@@ -1200,7 +1203,34 @@ class VersionSettingsComponent extends Component {
                                 this.openModalPopup(rowData[18]);
                             }.bind(this)
                         });
+                    } else {
+                        var programId = this.state.programId;
+                        console.log("programId------->", programId);
+                        items.push({
+                            title: i18n.t('static.commitTree.showValidation'),
+                            onclick: function () {
+                                DatasetService.getDatasetData(rowData[0], rowData[2]).then(response => {
+                                    if (response.status == 200) {
+                                        var responseData = response.data;
+                                        console.log("getDatasetData responseData------->", responseData);
+                                        console.log("rowData-->", rowData)
+                                        this.setState({
+                                            programName: rowData[1] + "~v" + rowData[2],
+                                            programCode: rowData[1],
+                                            version: rowData[2],
+                                            pageName: i18n.t('static.versionSettings.versionSettings'),
+                                            programNameOriginal: getLabelText(responseData.label, this.state.lang),
+                                            programId: rowData[0]
+                                        })
+                                        this.openModalPopup(responseData);
+                                    }
+                                }).catch(
+                                );
+                            }.bind(this)
+                        });
+
                     }
+
                     // -------------------------------------
                 }
                 return items;
@@ -1238,7 +1268,8 @@ class VersionSettingsComponent extends Component {
 
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
-        var asterisk = document.getElementsByClassName("resizable")[0];
+        // var asterisk = document.getElementsByClassName("resizable")[0];
+        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
         tr.children[3].classList.add('InfoTr');
         tr.children[14].classList.add('InfoTrAsteriskTheadtrTd');
@@ -1262,7 +1293,7 @@ class VersionSettingsComponent extends Component {
     }
     oncreateeditor = function (el, cell, x, y) {
         if (x == 4) {
-            var config = el.jexcel.options.columns[x].maxlength;
+            var config = el.options.columns[x].maxlength;
             cell.children[0].setAttribute('maxlength', config);
         }
     }
@@ -1329,6 +1360,10 @@ class VersionSettingsComponent extends Component {
     }
 
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
 
         const { uniquePrograms } = this.state;
         let programMultiList = uniquePrograms.length > 0
@@ -1509,7 +1544,7 @@ class VersionSettingsComponent extends Component {
                     <CardBody className="pb-lg-5 pt-lg-2">
                         <Col md="9 pl-0">
                             <div className="d-md-flex">
-                                <FormGroup className="mt-md-2 mb-md-0">
+                                <FormGroup className="mt-md-2 mb-md-0 ZindexFeild">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.programheader')}</Label>
                                     <div className="controls SelectGoVesionSetting">
                                         {/* <InMultiputGroup> */}
@@ -1524,7 +1559,7 @@ class VersionSettingsComponent extends Component {
                                         />
                                     </div>
                                 </FormGroup>
-                                <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
+                                <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ZindexFeild">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.report.versiontype')}</Label>
                                     <div className="controls SelectGoVesionSetting">
                                         <InputGroup>
@@ -1542,7 +1577,7 @@ class VersionSettingsComponent extends Component {
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
-                                <FormGroup className="mt-md-2 mb-md-0 col-md-4">
+                                <FormGroup className="mt-md-2 mb-md-0 col-md-4 ZindexFeild">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.versionSettings.committedDate')}<span className="stock-box-icon fa fa-sort-desc ml-1"></span></Label>
                                     <div className="controls edit">
                                         <Picker
@@ -1596,36 +1631,36 @@ class VersionSettingsComponent extends Component {
                     </ModalHeader>
                     <div>
                         <ModalBody>
-                           <div>
-                               <h3 className='ShowGuidanceHeading'>{i18n.t('static.UpdateversionSettings.UpdateversionSettings')}</h3>
-                           </div>
+                            <div>
+                                <h3 className='ShowGuidanceHeading'>{i18n.t('static.UpdateversionSettings.UpdateversionSettings')}</h3>
+                            </div>
                             <p>
-                                <p style={{fontSize:'13px'}}><span className="UnderLineText">{i18n.t('static.listTree.purpose')}</span> {i18n.t('static.VersionSetting.enableUsersTo')}</p>
+                                <p style={{ fontSize: '13px' }}><span className="UnderLineText">{i18n.t('static.listTree.purpose')}</span> {i18n.t('static.VersionSetting.enableUsersTo')}</p>
                             </p>
                             <p>
-                                <p style={{fontSize:'13px'}}><span className="UnderLineText">{i18n.t('static.listTree.useThisScreen')}:</span></p>
-                                <p style={{fontSize:'13px'}}>
-                                <b>{i18n.t('static.versionSettings.note')}:</b>{i18n.t('static.versionSettings.forecastProgramMustBeLoaded')}
+                                <p style={{ fontSize: '13px' }}><span className="UnderLineText">{i18n.t('static.listTree.useThisScreen')}:</span></p>
+                                <p style={{ fontSize: '13px' }}>
+                                    <b>{i18n.t('static.versionSettings.note')}:</b>{i18n.t('static.versionSettings.forecastProgramMustBeLoaded')}
                                 </p>
                             </p>
-                            <p style={{fontSize:'13px'}}>
-                            {i18n.t('static.versionSettings.OnthisScreen')}:<br></br>
-                            <ol type="1">
-                                <li>{i18n.t('static.versionSettings.Updatethefollowingprogram')}:
-                                <ol type="a">
-                                    <li><b>{i18n.t('static.versionSettings.Forecastperiod')}</b> {i18n.t('static.versionSettings.StartEndDate')}</li>
-                                    <li><b>{i18n.t('static.versionSettings.Freightpercentage')}</b> -{i18n.t('static.versionSettings.usedInThe')} <a href="/#/forecastReport/forecastSummary" target="_blank" style={{textDecoration:'underline'}}> {i18n.t('static.ForecastSummary.ForecastSummary')}</a> {i18n.t('static.versionSettings.ScreenForEstimating')}</li>
-                                    <li><b>{i18n.t('static.versionSettings.Forecastthreshold')} </b> -{i18n.t('static.versionSettings.usedInThe')} <a href="/#/report/compareAndSelectScenario" target="_blank" style={{textDecoration:'underline'}}>{i18n.t('static.dashboard.compareAndSelect')}</a> {i18n.t('static.versionSettings.QATComparesAvailable')}  <span style={{color:'#BA0C2F'}}>{i18n.t('static.versionSettings.RedText')}</span> {i18n.t('static.versionSettings.OutsideThresholdPercentages')} </li>
-                                    <li><b>{i18n.t('static.versionSettings.VersionNotes')}</b> - {i18n.t('static.versionSettings.AlsoVisibleEditable')}</li>
+                            <p style={{ fontSize: '13px' }}>
+                                {i18n.t('static.versionSettings.OnthisScreen')}:<br></br>
+                                <ol type="1">
+                                    <li>{i18n.t('static.versionSettings.Updatethefollowingprogram')}:
+                                        <ol type="a">
+                                            <li><b>{i18n.t('static.versionSettings.Forecastperiod')}</b> {i18n.t('static.versionSettings.StartEndDate')}</li>
+                                            <li><b>{i18n.t('static.versionSettings.Freightpercentage')}</b> -{i18n.t('static.versionSettings.usedInThe')} <a href="/#/forecastReport/forecastSummary" target="_blank" style={{ textDecoration: 'underline' }}> {i18n.t('static.ForecastSummary.ForecastSummary')}</a> {i18n.t('static.versionSettings.ScreenForEstimating')}</li>
+                                            <li><b>{i18n.t('static.versionSettings.Forecastthreshold')} </b> -{i18n.t('static.versionSettings.usedInThe')} <a href="/#/report/compareAndSelectScenario" target="_blank" style={{ textDecoration: 'underline' }}>{i18n.t('static.dashboard.compareAndSelect')}</a> {i18n.t('static.versionSettings.QATComparesAvailable')}  <span style={{ color: '#BA0C2F' }}>{i18n.t('static.versionSettings.RedText')}</span> {i18n.t('static.versionSettings.OutsideThresholdPercentages')} </li>
+                                            <li><b>{i18n.t('static.versionSettings.VersionNotes')}</b> - {i18n.t('static.versionSettings.AlsoVisibleEditable')}</li>
+                                        </ol>
+                                    </li>
+                                    <li>{i18n.t('static.versionSettings.HistoricalLifecycle')}
+                                        <ol type="a">
+                                            <li>{i18n.t('static.versionSettings.ViewAllVersion')} </li>
+                                            <li>{i18n.t('static.versionSettings.ForecastValidationScreen')} <a href="/#/forecastReport/forecastOutput" target="_blank" style={{ textDecoration: 'underline' }}>{i18n.t('static.dashboard.monthlyForecast')}</a>, <a href="/#/forecastReport/forecastSummary" target="_blank" style={{ textDecoration: 'underline' }}>{i18n.t('static.commitTree.forecastSummary')}</a> or <a href="/#/report/compareVersion" target="_blank" style={{ textDecoration: 'underline' }}>{i18n.t('static.dashboard.Versioncomarition')}</a> {i18n.t('static.dashboard.ViewForecastOutputs')} </li>
+                                        </ol>
+                                    </li>
                                 </ol>
-                                </li>
-                                <li>{i18n.t('static.versionSettings.HistoricalLifecycle')}
-                                <ol type="a">
-                                    <li>{i18n.t('static.versionSettings.ViewAllVersion')} </li>
-                                    <li>{i18n.t('static.versionSettings.ForecastValidationScreen')} <a href="/#/forecastReport/forecastOutput" target="_blank" style={{textDecoration:'underline'}}>{i18n.t('static.dashboard.monthlyForecast')}</a>, <a href="/#/forecastReport/forecastSummary" target="_blank" style={{textDecoration:'underline'}}>{i18n.t('static.commitTree.forecastSummary')}</a> or <a href="/#/report/compareVersion" target="_blank" style={{textDecoration:'underline'}}>{i18n.t('static.dashboard.Versioncomarition')}</a> {i18n.t('static.dashboard.ViewForecastOutputs')} </li>
-                                </ol>
-                                </li>
-                            </ol>
                             </p>
                         </ModalBody>
                     </div>
@@ -1667,7 +1702,13 @@ class VersionSettingsComponent extends Component {
                             <span><b>{i18n.t('static.common.forecastPeriod')}: </b> {moment(this.state.forecastStartDate).format('MMM-YYYY')} to {moment(this.state.forecastStopDate).format('MMM-YYYY')} </span>
                             <br />
                             <br />
-                            <span><b>1. {i18n.t('static.commitTree.noForecastSelected')}: </b>(<a href="/#/report/compareAndSelectScenario" target="_blank">{i18n.t('static.commitTree.compare&Select')}</a>, <a href={this.state.programId != -1 && this.state.programId != "" && this.state.programId != undefined ? "/#/forecastReport/forecastSummary/" + this.state.programId.toString().split("_")[0] + "/" + (this.state.programId.toString().split("_")[1]).toString().substring(1) : "/#/forecastReport/forecastSummary/"} target="_blank">{i18n.t('static.commitTree.forecastSummary')}</a>)</span><br />
+                            <span><b>1. {i18n.t('static.commitTree.noForecastSelected')}: </b>
+                            <a href="/#/report/compareAndSelectScenario" target="_blank">{i18n.t('static.commitTree.compare&Select')}</a>,
+                            {/* (<a href="/#/report/compareAndSelectScenario" target="_blank">{i18n.t('static.commitTree.compare&Select')}</a>, <a href={this.state.programId != -1 && this.state.programId != "" && this.state.programId != undefined ? "/#/forecastReport/forecastSummary/" + this.state.programId.toString().split("_")[0] + "/" + (this.state.programId.toString().split("_")[1]).toString().substring(1) : "/#/forecastReport/forecastSummary/"} target="_blank">{i18n.t('static.commitTree.forecastSummary')}</a>)</span><br />   */} 
+                            {(this.state.version != undefined && this.state.version.toString().includes('Local'))?
+                            (<a href={this.state.programId != -1 && this.state.programId != "" && this.state.programId != undefined ? "/#/forecastReport/forecastSummary/" + this.state.programId.toString().split("_")[0] + "/" + (this.state.programId.toString().split("_")[1]).toString().substring(1) : "/#/forecastReport/forecastSummary/"} target="_blank">{i18n.t('static.commitTree.forecastSummary')}</a>)
+                           :(<a href="/#/forecastReport/forecastSummary/" target="_blank">{i18n.t('static.commitTree.forecastSummary')}</a>)}
+                           </span><br />
                             <ul>{noForecastSelected}</ul>
 
                             <span><b>2. {i18n.t('static.commitTree.consumptionForecast')}: </b>(<a href="/#/dataentry/consumptionDataEntryAndAdjustment" target="_blank">{i18n.t('static.commitTree.dataEntry&Adjustment')}</a>, <a href="/#/extrapolation/extrapolateData" target="_blank">{i18n.t('static.commitTree.extrapolation')}</a>)</span><br />
