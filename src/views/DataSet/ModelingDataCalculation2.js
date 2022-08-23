@@ -196,6 +196,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                     // console.log("curDate---", curDate);
                                     curDate = moment(nodeDataMapForScenario.month).add(i, 'months').format("YYYY-MM-DD");
                                     var nodeDataModelingList = (nodeDataModelingListWithTransfer).filter(c => moment(curDate).format("YYYY-MM") >= moment(c.startDate).format("YYYY-MM") && moment(curDate).format("YYYY-MM") <= moment(c.stopDate).format("YYYY-MM"));
+                                    nodeDataModelingList=nodeDataModelingList.filter(c=>c.dataValue!="" && c.dataValue!="NaN" && c.dataValue!=undefined && c.increaseDecrease!="");
                                     var nodeDataOverrideList = (nodeDataMapForScenario.nodeDataOverrideList);
                                     var startValue = 0;
                                     // console.log("nodeDataMapForScenario---", nodeDataMapForScenario)

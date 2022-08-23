@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import i18n from '../../i18n';
 import PipelineService from '../../api/PipelineService';
@@ -1014,7 +1014,9 @@ export default class PipelineProgramShipment extends Component {
         setTimeout('', 10000);
         console.log('initialiseshipment' + JSON.stringify(this.state.pipelineShipmentData))
         this.el = jexcel(document.getElementById("shipmenttableDiv"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("shipmenttableDiv"), true);
+
 
         var data = this.state.pipelineShipmentData.map((item, index) => [
             item.planningUnit,
@@ -1164,11 +1166,12 @@ export default class PipelineProgramShipment extends Component {
                 }
 
             ],
+            editable: true,
             pagination: localStorage.getItem("sesRecordCount"),
             filters: true,
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
@@ -1181,11 +1184,11 @@ export default class PipelineProgramShipment extends Component {
             contextMenu: function (obj, x, y, e) {
                 return false;
             }.bind(this),
-            text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')} `,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')} `,
+            //     show: '',
+            //     entries: '',
+            // },
             onload: this.loadedCommonFunctionJExcel,
             oneditionend: this.oneditionend,
             license: JEXCEL_PRO_KEY,
@@ -1200,7 +1203,7 @@ export default class PipelineProgramShipment extends Component {
     }
 
     oneditionend = function (instance, cell, x, y, value) {
-        var elInstance = instance.jexcel;
+        var elInstance = instance;
         var rowData = elInstance.getRowData(y);
 
         if (x == 6 && !isNaN(rowData[6]) && rowData[6].toString().indexOf('.') != -1) {
@@ -1506,6 +1509,10 @@ export default class PipelineProgramShipment extends Component {
     }
 
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
 
         return (
             <>
@@ -1518,10 +1525,10 @@ export default class PipelineProgramShipment extends Component {
                     <div className="ml-2" >
                         <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.props.previousToStepFour} > <i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
                         &nbsp;
-                                       {this.state.changedData && <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.SubmitShipment}>{i18n.t('static.pipeline.save')}<i className="fa fa-angle-double-right"></i></Button>}
+                        {this.state.changedData && <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.SubmitShipment}>{i18n.t('static.pipeline.save')}<i className="fa fa-angle-double-right"></i></Button>}
                         {this.state.isValidData && !this.state.changedData && <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.SubmitProgram}>{i18n.t('static.program.submitProgram')}</Button>}
                         &nbsp;
-                                        </div>
+                    </div>
                 </div>
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >

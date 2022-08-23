@@ -895,7 +895,7 @@ export default class AddInventory extends Component {
                         </div>
                         <div >
                             <InventoryInSupplyPlanComponent ref="inventoryChild" items={this.state} toggleLarge={this.toggleLarge} updateState={this.updateState} formSubmit={this.formSubmit} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} inventoryPage="inventoryDataEntry" useLocalData={1} />
-                            <div className="table-responsive inventoryDataEntryTable" id="adjustmentsTableDiv">
+                            <div className="inventoryDataEntryTable" id="adjustmentsTableDiv">
                                 <div id="adjustmentsTable" style={{ display: this.state.loading ? "none" : "block" }}/>
                             </div>
                         </div>

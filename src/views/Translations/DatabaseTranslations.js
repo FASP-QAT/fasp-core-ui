@@ -1,6 +1,6 @@
 import React from "react";
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import "../ProductCategory/style.css"
 import {
@@ -43,41 +43,49 @@ export default class DatabaseTranslations extends React.Component {
         LabelsService.getDatabaseLabelsList().then(response => {
             if (response.status == 200) {
                 var json = response.data;
-                console.log("Json@@@@@@@@@@@@",json)
+                console.log("Json@@@@@@@@@@@@", json)
                 var data = [];
                 var label = [];
                 for (var i = 0; i < json.length; i++) {
                     data = [];
                     data[0] = json[i].labelId;// A
                     data[1] = `${i18n.t(json[i].labelFor)}`;//B
-                    data[2] = json[i].relatedTo!=null?getLabelText(json[i].relatedTo,this.state.lang):""
+                    data[2] = json[i].relatedTo != null ? getLabelText(json[i].relatedTo, this.state.lang) : ""
                     data[3] = json[i].label_en;//C
                     data[4] = json[i].label_fr;//D
                     data[5] = json[i].label_pr;//E
                     data[6] = json[i].label_sp;//F
                     label[i] = data;
                 }
+                var colHeadersArray = [];
+                colHeadersArray.push({ type: 'hidden', title: `${i18n.t('static.translation.labelId')}` })
+                colHeadersArray.push({ type: 'text', title: `${i18n.t('static.translation.labelFor')}` })
+                colHeadersArray.push({ type: 'text', title: `${i18n.t('static.databaseTranslations.relatedTo')}` })
+                colHeadersArray.push({ type: 'text', title: `${i18n.t('static.translation.english')}` })
+                colHeadersArray.push({ type: 'text', title: `${i18n.t('static.translation.french')}` })
+                colHeadersArray.push({ type: 'text', title: `${i18n.t('static.translation.pourtegese')}` })
+                colHeadersArray.push({ type: 'text', title: `${i18n.t('static.translation.spanish')}` })
+
+
                 var options = {
                     data: label,
-                    colHeaders: [
-                        `${i18n.t('static.translation.labelId')}`,
-                        `${i18n.t('static.translation.labelFor')}`,
-                        `${i18n.t('static.databaseTranslations.relatedTo')}`,
-                        `${i18n.t('static.translation.english')}`,
-                        `${i18n.t('static.translation.french')}`,
-                        `${i18n.t('static.translation.pourtegese')}`,
-                        `${i18n.t('static.translation.spanish')}`,
-                    ],
+
+                    // colHeaders: [
+                    // `${i18n.t('static.translation.labelId')}`,
+                    // `${i18n.t('static.translation.labelFor')}`,
+                    // `${i18n.t('static.databaseTranslations.relatedTo')}`,
+                    // `${i18n.t('static.translation.english')}`,
+                    // `${i18n.t('static.translation.french')}`,
+                    // `${i18n.t('static.translation.pourtegese')}`,
+                    // `${i18n.t('static.translation.spanish')}`,
+                    // ],
                     colWidths: [80, 80, 80, 80, 80],
-                    columns: [
-                        { type: 'hidden' },
-                        { type: 'text', readOnly: true },
-                        { type: 'text', readOnly: true }
-                    ],
+                    columns: colHeadersArray,
+                    // editable: false,
                     pagination: localStorage.getItem("sesRecordCount"),
                     search: true,
                     columnSorting: true,
-                    tableOverflow: true,
+                    // tableOverflow: true,
                     wordWrap: true,
                     paginationOptions: JEXCEL_PAGINATION_OPTION,
                     position: 'top',
@@ -86,13 +94,13 @@ export default class DatabaseTranslations extends React.Component {
                     onchange: this.changed,
                     oneditionstart: this.editStart,
                     allowDeleteRow: false,
-                    tableOverflow: false,
-                    text: {
-                        // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                        show: '',
-                        entries: '',
-                    },
+                    // tableOverflow: false,
+                    // text: {
+                    //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                    //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                    //     show: '',
+                    //     entries: '',
+                    // },
                     onload: this.loaded,
                     filters: true,
                     license: JEXCEL_PRO_KEY,
@@ -115,7 +123,7 @@ export default class DatabaseTranslations extends React.Component {
             }
         }).catch(
             error => {
-                console.log("Error@@@@@@@@",error)
+                console.log("Error@@@@@@@@", error)
                 if (error.message === "Network Error") {
                     this.setState({
                         message: 'static.unkownError',
@@ -158,7 +166,9 @@ export default class DatabaseTranslations extends React.Component {
 
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
-        var asterisk = document.getElementsByClassName("resizable")[0];
+        // var asterisk = document.getElementsByClassName("resizable")[0];
+        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
+
         var tr = asterisk.firstChild;
         tr.children[4].classList.add('AsteriskTheadtrTd');
     }
@@ -195,7 +205,7 @@ export default class DatabaseTranslations extends React.Component {
                 }
             }).catch(
                 error => {
-                    console.log("Error@@@@@@@@@",error)
+                    console.log("Error@@@@@@@@@", error)
                     if (error.message === "Network Error") {
                         this.setState({
                             message: 'static.unkownError',
@@ -240,6 +250,11 @@ export default class DatabaseTranslations extends React.Component {
     };
 
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
@@ -251,7 +266,7 @@ export default class DatabaseTranslations extends React.Component {
                             {/* <CardHeader>
                                 <strong>{i18n.t('static.label.databaseTranslations')}</strong>
                             </CardHeader> */}
-                            <CardBody className="table-responsive pt-md-1 pb-md-1">
+                            <CardBody className="pt-md-1 pb-md-1">
                                 {/* <div id="loader" className="center"></div> */}
                                 <div id="databaseTranslationTable" className="consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
                                 </div>
@@ -272,7 +287,7 @@ export default class DatabaseTranslations extends React.Component {
                                     <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                     <Button type="button" size="md" color="success" className="float-right mr-1" onClick={() => this.saveData()} ><i className="fa fa-check"></i>{i18n.t('static.common.submit')} </Button>
                                     &nbsp;
-                            </FormGroup>
+                                </FormGroup>
                             </CardFooter>
                         </Card>
                     </Col>

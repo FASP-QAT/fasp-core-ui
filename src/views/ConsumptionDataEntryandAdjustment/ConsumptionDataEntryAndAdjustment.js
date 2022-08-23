@@ -16,12 +16,12 @@ import 'react-select/dist/react-select.min.css';
 import AuthenticationService from "../Common/AuthenticationService.js";
 import '../Forms/ValidationForms/ValidationForms.css';
 import moment from "moment"
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import csvicon from '../../assets/img/csv.png';
 import { JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
-import { jExcelLoadedFunctionOnlyHideRow, checkValidtion, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
+import { jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination, checkValidtion, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
 import NumberFormat from 'react-number-format';
 import { CustomTooltips } from "@coreui/coreui-plugin-chartjs-custom-tooltips";
 import { Prompt } from "react-router-dom";
@@ -207,7 +207,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       }, () => {
         var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN']
         var consumptionList = isInterpolate == 1 ? this.state.tempConsumptionList : this.state.consumptionList;
-        console.log("consumptionList All--->", consumptionList)
+        console.log("consumptionList All--->", this.state.tempConsumptionList)
         var consumptionUnit = {};
         var consumptionNotes = "";
         if (consumptionUnitId > 0) {
@@ -324,7 +324,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           data[0] = i18n.t('static.dataentry.adjustedConsumption')
           for (var j = 0; j < monthArray.length; j++) {
             // data[j + 1] = `=ROUND((${colArr[j + 1]}${parseInt(dataArray.length - 3)}/${colArr[j + 1]}${parseInt(dataArray.length - 2)}/(1-(${colArr[j + 1]}${parseInt(dataArray.length - 1)}/${colArr[j + 1] + "1"})))*100,0)`;
-            data[j + 1] = `=IF(${colArr[j + 1]}${parseInt(dataArray.length - 3)}=='','',ROUND((${colArr[j + 1]}${parseInt(dataArray.length - 3)}/${colArr[j + 1]}${parseInt(dataArray.length - 2)}/(1-(${colArr[j + 1]}${parseInt(dataArray.length - 1)}/${colArr[j + 1] + "1"})))*100,0))`;
+            // data[j + 1] = `=IF(${colArr[j + 1]}${parseInt(dataArray.length - 3)}=='','',ROUND((${colArr[j + 1]}${parseInt(dataArray.length - 3)}/${colArr[j + 1]}${parseInt(dataArray.length - 2)}/(1-(${colArr[j + 1]}${parseInt(dataArray.length - 1)}/${colArr[j + 1] + "1"})))*100,0))`;
+            data[j + 1] = `=IF(ISBLANK(${colArr[j + 1]}${parseInt(dataArray.length - 3)}),'',ROUND((${colArr[j + 1]}${parseInt(dataArray.length - 3)}/${colArr[j + 1]}${parseInt(dataArray.length - 2)}/(1-(${colArr[j + 1]}${parseInt(dataArray.length - 1)}/${colArr[j + 1] + "1"})))*100,0))`;
+
           }
           data[monthArray.length + 1] = multiplier;
           dataArray.push(data);
@@ -334,7 +336,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           for (var j = 0; j < monthArray.length; j++) {
             // data[j + 1] = `=ROUND(${colArr[j + 1]}${parseInt(dataArray.length)}/${colArr[monthArray.length + 1] + "0"},0)`;
             console.log("Multiplier 1@@@@@@@@@@@@@@@", multiplier1);
-            data[j + 1] = `=IF(${colArr[j + 1]}${parseInt(dataArray.length - 4)}=='','',ROUND(${colArr[j + 1]}${parseInt(dataArray.length)}/${colArr[monthArray.length + 1] + "1"},0))`;
+            data[j + 1] = `=IF(ISBLANK(${colArr[j + 1]}${parseInt(dataArray.length - 4)}),'',ROUND(${colArr[j + 1]}${parseInt(dataArray.length)}/${colArr[monthArray.length + 1] + "1"},0))`;
           }
           data[monthArray.length + 1] = multiplier;
 
@@ -367,18 +369,20 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         //   languageArray[count] = data;
         //   count++;
         // }
-        this.el = jexcel(document.getElementById("tableDiv"), '');
-        this.el.destroy();
+        // this.el = jexcel(document.getElementById("tableDiv"), '');
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById('tableDiv'), true);
         var options = {
           data: dataArray,
           columnDrag: true,
           columns: columns,
-          text: {
-            // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-            showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-            show: '',
-            entries: '',
-          },
+          colWidths: [10, 50, 100, 100, 100, 100, 50, 100],
+          // text: {
+          //   // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+          //   showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+          //   show: '',
+          //   entries: '',
+          // },
           updateTable: function (el, cell, x, y, source, value, id) {
           },
           onload: this.loaded,
@@ -393,7 +397,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           pagination: false,
           search: false,
           columnSorting: false,
-          tableOverflow: true,
+          // tableOverflow: true,
           wordWrap: true,
           allowInsertColumn: false,
           allowManualInsertColumn: false,
@@ -405,7 +409,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           paginationOptions: JEXCEL_PAGINATION_OPTION,
           position: 'top',
           filters: false,
-          freezeColumns: 1,
+          // freezeColumns: 1,
           license: JEXCEL_PRO_KEY,
           parseFormulas: true,
           editable: AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT') ? true : false,
@@ -980,45 +984,50 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
   loadedJexcel = function (instance, cell, x, y, value) {
     jExcelLoadedFunctionOnlyHideRow(instance);
 
-    var elInstance = instance.jexcel;
+    var elInstance = instance.worksheets[0];
     var consumptionDataType = this.state.tempConsumptionUnitObject.consumptionDataType;
 
-    var cell1 = elInstance.getCell(`C1`)//other name
-    var cell2 = elInstance.getCell(`C2`)//other name
-    cell1.classList.add('readonly');
-    cell2.classList.add('readonly');
+    var json = elInstance.getJson();
 
-    var cell1 = elInstance.getCell(`D1`)//other name
-    var cell2 = elInstance.getCell(`D2`)//other multiplier
-    cell1.classList.add('readonly');
-    cell2.classList.add('readonly');
+    var colArr = ['A', 'B', 'C', 'D', , 'E', 'F']
+    for (var j = 0; j < json.length; j++) {
+      for (var i = 0; i < colArr.length; i++) {
+        var cell = elInstance.getCell("C1")
+        cell.classList.add('readonly');
+        var cell = elInstance.getCell("C2")
+        cell.classList.add('readonly');
 
-    if (consumptionDataType == 3) {// grade out
-      // console.log("other consumptionDataType")
-      var cell1 = elInstance.getCell(`C3`)//other name
-      var cell2 = elInstance.getCell(`D3`)//other multiplier
-      cell1.classList.remove('readonly');
-      cell2.classList.remove('readonly');
-      document.getElementById("dataEnteredInTableExLabel").style.display = "block";
-      // document.getElementById("dataEnteredInTableExSpan").innerHTML = Math.round(Number(1 / this.state.tempConsumptionUnitObject.planningUnit.multiplier * this.state.tempConsumptionUnitObject.otherUnit.multiplier).toFixed(4) * 1000);
-      this.setState({
-        dataEnteredInTableExSpan: Math.round(Number(1 / this.state.tempConsumptionUnitObject.planningUnit.multiplier * this.state.tempConsumptionUnitObject.otherUnit.multiplier).toFixed(4) * 1000)
-      })
-    } else {
-      // console.log("consumptionDataType", consumptionDataType)
-      var cell1 = elInstance.getCell(`C3`)//other name
-      var cell2 = elInstance.getCell(`D3`)//other multiplier
-      cell1.classList.add('readonly');
-      cell2.classList.add('readonly');
-      document.getElementById("dataEnteredInTableExLabel").style.display = "none";
+        if (consumptionDataType == 3) {// grade out
+          // console.log("other consumptionDataType")
+          var cell1 = elInstance.getCell(`C3`)//other name
+          var cell2 = elInstance.getCell(`D3`)//other multiplier
+          cell1.classList.remove('readonly');
+          cell2.classList.remove('readonly');
+          document.getElementById("dataEnteredInTableExLabel").style.display = "block";
+          // document.getElementById("dataEnteredInTableExSpan").innerHTML = Math.round(Number(1 / this.state.tempConsumptionUnitObject.planningUnit.multiplier * this.state.tempConsumptionUnitObject.otherUnit.multiplier).toFixed(4) * 1000);
+          this.setState({
+            dataEnteredInTableExSpan: Math.round(Number(1 / this.state.tempConsumptionUnitObject.planningUnit.multiplier * this.state.tempConsumptionUnitObject.otherUnit.multiplier).toFixed(4) * 1000)
+          })
+        } else {
+          // console.log("consumptionDataType", consumptionDataType)
+          var cell1 = elInstance.getCell(`C3`)//other name
+          var cell2 = elInstance.getCell(`D3`)//other multiplier
+          cell1.classList.add('readonly');
+          cell2.classList.add('readonly');
+          document.getElementById("dataEnteredInTableExLabel").style.display = "none";
+
+        }
+      }
 
     }
+    // }
+
   }
 
   loaded = function (instance, cell, x, y, value) {
     jExcelLoadedFunctionOnlyHideRow(instance);
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM'];
-    var elInstance = instance.jexcel;
+    var elInstance = instance.worksheets[0];
     var json = elInstance.getJson(null, false);
     var arr = [];
     var count = 1;
@@ -1447,7 +1456,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       }, () => {
         try {
           this.el = jexcel(document.getElementById("tableDiv"), '');
-          this.el.destroy();
+          // this.el.destroy();
+          jexcel.destroy(document.getElementById("tableDiv"), true);
         } catch (error) {
 
         }
@@ -1932,6 +1942,10 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
   }
 
   render() {
+    jexcel.setDictionary({
+      Show: " ",
+      entries: " ",
+    });
 
     const pickerLang = {
       months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -2185,7 +2199,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                       </div>
                     </FormGroup>
                     <FormGroup className="col-md-3">
-                      <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                      <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.startMonth')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                       <div className="controls edit">
                         <Picker
                           ref="pickAMonth2"
@@ -2669,12 +2683,11 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       multiplier = 1;
       // changedConsumptionDataDesc = getLabelText(consumptionUnit.planningUnit.label, this.state.lang) + ' | ' + consumptionUnit.planningUnit.id;;
     } else {
-      multiplier = (1 / Number((elInstance1.D3).toString().replaceAll(",", ""))) * consumptionUnitTemp.planningUnit.multiplier;
-      // multiplier = 1 / (document.getElementById('otherUnitMultiplier').value / consumptionUnitTemp.planningUnit.multiplier);
-
-      // changedConsumptionDataDesc = getLabelText(consumptionUnit.otherUnit.label, this.state.lang);
+      var conversionToFuOtherUnit = elInstance1.getValue(`D3`, true);
+      var descOtherUnit = elInstance1.getValue(`C3`, true);
+      multiplier = (1 / Number(conversionToFuOtherUnit.toString().replaceAll(",", ""))) * consumptionUnitTemp.planningUnit.multiplier;
     }
-    console.log("test", multiplier, "======", Number((elInstance1.D3).toString().replaceAll(",", "")), "======", consumptionUnitTemp.planningUnit.multiplier)
+    // console.log("test", multiplier, "======", Number(conversionToFuOtherUnit.toString().replaceAll(",", "")), "======", consumptionUnitTemp.planningUnit.multiplier)
 
     var consumptionUnitForUpdate = {};
     consumptionUnitForUpdate = {
@@ -2683,14 +2696,14 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       otherUnit: this.state.dataEnteredIn == 3 ? {
         label: {
           labelId: null,
-          label_en: elInstance1.C3,
+          label_en: descOtherUnit,
           // label_en: this.state.otherUnitName,
           label_fr: "",
           label_sp: "",
           label_pr: ""
         },
         // multiplier: this.state.selectedPlanningUnitMultiplier
-        multiplier: Number((elInstance1.D3).toString().replaceAll(",", ""))
+        multiplier: Number(conversionToFuOtherUnit.toString().replaceAll(",", ""))
 
       } : null
     }
@@ -2728,7 +2741,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     // console.log("this.state.tempConsumptionUnitObject", this.el.getValueFromCoords(1, y))
     // console.log("start----", new Date())
 
-    var elInstance = instance.jexcel;
+    var elInstance = instance;
     var rowData = elInstance.getRowData(y);
 
     var consumptionDataType = rowData[5];
@@ -2813,20 +2826,21 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       data[0] = this.state.tempConsumptionUnitObject.consumptionDataType == 3 ? true : false;
       data[1] = 'Other Unit';
       data[2] = this.state.tempConsumptionUnitObject.consumptionDataType == 3 ? this.state.otherUnitName : "";
-      data[3] = this.state.tempConsumptionUnitObject.consumptionDataType == 3 ? this.state.selectedPlanningUnitMultiplier : "";
+      data[3] = this.state.tempConsumptionUnitObject.consumptionDataType == 3 ? this.state.selectedPlanningUnitMultiplier : Number(0);
       data[4] = `=ROUND(1/D1*ROUND(D3,4),4)`;
       data[5] = 3
       dataArray1.push(data);
     }
 
     this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
-    this.el.destroy();
+    // this.el.destroy();
+    jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
 
     var data = dataArray1;
     var options = {
       data: data,
       columnDrag: true,
-      colWidths: [20, 100, 200, 50, 50, 50],
+      // colWidths: [20, 100, 200, 50, 50, 50],
       columns: [
         { title: ' ', type: 'radio' },//0 A
         { title: ' ', type: 'text', readOnly: true },//1 B
@@ -2835,34 +2849,29 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         { title: i18n.t('static.dataentry.conversionToPu'), type: 'numeric', decimal: '.', readOnly: true },//4 E
         { title: 'Conversion Type', type: 'hidden' }//5 F
       ],
-      text: {
-        // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-        show: '',
-        entries: '',
-      },
-      updateTable: function (el, cell, x, y, source, value, id) {
-      },
+      // text: {
+      //   // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+      //   showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+      //   show: '',
+      //   entries: '',
+      // },
       onload: this.loadedJexcel,
-      onchange: this.changed,
       pagination: false,
+      filters: false,
       search: false,
-      columnSorting: false,
-      tableOverflow: true,
+      columnSorting: true,
       wordWrap: true,
-      allowInsertColumn: false,
-      allowManualInsertColumn: false,
-      allowInsertRow: false,
-      allowManualInsertRow: false,
-      allowDeleteRow: false,
-      copyCompatibility: true,
-      allowExport: false,
       paginationOptions: JEXCEL_PAGINATION_OPTION,
       position: 'top',
-      filters: false,
-      freezeColumns: 1,
-      license: JEXCEL_PRO_KEY,
+      allowInsertColumn: false,
+      allowManualInsertColumn: false,
+      allowDeleteRow: false,
+      onchange: this.changed,
+      copyCompatibility: true,
+      allowManualInsertRow: false,
       parseFormulas: true,
+      editable: true,
+      license: JEXCEL_PRO_KEY,
       contextMenu: function (obj, x, y, e) {
         return [];
       }.bind(this),
