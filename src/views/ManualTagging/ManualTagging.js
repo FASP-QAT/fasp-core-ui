@@ -3685,53 +3685,62 @@ export default class ManualTagging extends Component {
             var options = {
                 data: data,
                 columnDrag: true,
-                colWidths: [20, 40, 50, 20, 20, 30, 30, 25, 50],
                 colHeaderClasses: ["Reqasterisk"],
                 columns: [
 
                     {
                         title: i18n.t('static.commit.qatshipmentId'),
-                        type: 'numeric'
+                        type: 'numeric',
+                        width:60,
                         // mask: '#,##', decimal: '.'
                     },
                     {
                         title: "shipmentTransId",
                         type: 'hidden',
+                        width:0,
                     },
                     {
                         title: i18n.t('static.supplyPlan.qatProduct'),
                         type: 'text',
+                        width:150,
                     },
                     {
                         title: i18n.t('static.supplyPlan.mtexpectedDeliveryDate'),
                         type: 'calendar',
                         options: { format: JEXCEL_DATE_FORMAT },
+                        width:80,
                     },
                     {
                         title: i18n.t('static.supplyPlan.mtshipmentStatus'),
                         type: 'text',
+                        width:80,
                     },
                     {
                         title: i18n.t('static.report.procurementAgentName'),
                         type: 'text',
+                        width:100,
                     }
                     ,
                     {
                         title: i18n.t('static.manualTagging.procOrderNo'),
                         type: 'text',
+                        width:80,
                     },
                     {
                         title: i18n.t('static.supplyPlan.shipmentQty'),
                         type: 'numeric',
-                        mask: '#,##', decimal: '.'
+                        mask: '#,##', decimal: '.',
+                        width:60,
                     },
                     {
                         title: i18n.t('static.common.notes'),
                         type: 'text',
+                        width:150,
                     },
                     {
                         title: "Index",
                         type: 'hidden',
+                        width:0,
                     },
                 ],
                 editable: false,
@@ -5413,7 +5422,7 @@ export default class ManualTagging extends Component {
                                                 //         )
                                                 //     }
                                                 // </ToolkitProvider>
-                                                <div id="tab1" className={"jexcelremoveReadonlybackground"}>
+                                                <div id="tab1" className={"jexcelremoveReadonlybackground blackText"}>
                                                 </div>
                                             }
                                             {this.state.active3 &&
