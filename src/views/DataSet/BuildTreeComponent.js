@@ -5933,8 +5933,12 @@ export default class BuildTree extends Component {
                     }
                     if ((this.state.currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usageType.id == 1) {
                         var sharePu;
-                        // if (this.state.currentScenario.puNode.sharePlanningUnit == "true") {
-                        sharePu = (this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor);
+                        if (this.state.currentScenario.puNode.sharePlanningUnit != "true") {
+                            sharePu = (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.puPerVisit;
+                        } else {
+                            sharePu = (this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor);
+                        }
+
                         // } else {
                         //     sharePu = this.round((this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor));
                         // }
