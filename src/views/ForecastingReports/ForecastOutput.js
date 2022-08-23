@@ -941,7 +941,7 @@ class ForecastOutput extends Component {
     filterData() {
         console.log("INSIDE FILTERDATA---------------------------------");
         let planningUnitIds = this.state.planningUnitValues.map(ele => (ele.value).toString())
-        let forecastingUnitIds = this.state.forecastingUnitValues.map(ele => (ele.value).toString())
+        let forecastingUnitIds = this.state.forecastingUnitValues.map(ele => (ele.value))
         let programId = document.getElementById("programId").value;
         let versionId = document.getElementById("versionId").value;
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
@@ -3392,7 +3392,7 @@ class ForecastOutput extends Component {
                 return (
                     <option key={i} value={item.versionId}>
                         {/* {item.versionId} */}
-                        {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)}
+                        {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)} ({(moment(item.createdDate).format(`MMM DD YYYY`))})
                     </option>
                 )
             }, this);

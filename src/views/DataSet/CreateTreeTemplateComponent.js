@@ -11,8 +11,8 @@ import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import pdfIcon from '../../assets/img/pdf.png';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import '../../views/Forms/ValidationForms/ValidationForms.css'
@@ -2814,7 +2814,8 @@ export default class CreateTreeTemplate extends Component {
             count++;
         }
         this.el = jexcel(document.getElementById("momJexcelPer"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("momJexcelPer"), true);
         var data = dataArray;
         console.log("DataArray>>>", dataArray);
 
@@ -2960,8 +2961,8 @@ export default class CreateTreeTemplate extends Component {
 
     loadedMomPer = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance, 1);
-        if (instance.jexcel.getJson(null, false).length > 0) {
-            var cell = instance.jexcel.getCell("D1");
+        if (instance.worksheets[0].getJson(null, false).length > 0) {
+            var cell = instance.worksheets[0].getCell("D1");
             cell.classList.add('readonly');
         }
     }
@@ -2985,7 +2986,9 @@ export default class CreateTreeTemplate extends Component {
             count++;
         }
         this.el = jexcel(document.getElementById("momJexcel"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("momJexcel"), true);
+
         var data = dataArray;
         console.log("DataArray>>>", dataArray);
 
@@ -3075,7 +3078,7 @@ export default class CreateTreeTemplate extends Component {
             allowDeleteRow: false,
             onchange: this.changed1,
             updateTable: function (el, cell, x, y, source, value, id) {
-                var elInstance = el.jexcel;
+                var elInstance = el;
                 if (y != null) {
                     // var rowData = elInstance.getRowData(y);
                     // console.log("this.state.seasonality---", this.state.seasonality);
@@ -3120,10 +3123,10 @@ export default class CreateTreeTemplate extends Component {
 
     loadedMom = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance, 1);
-        if (instance.jexcel.getJson(null, false).length > 0) {
-            var cell = instance.jexcel.getCell("E1");
+        if (instance.worksheets[0].getJson(null, false).length > 0) {
+            var cell = instance.worksheets[0].getCell("E1");
             cell.classList.add('readonly');
-            var cell = instance.jexcel.getCell("F1");
+            var cell = instance.worksheets[0].getCell("F1");
             cell.classList.add('readonly');
         }
     }
@@ -3257,7 +3260,9 @@ export default class CreateTreeTemplate extends Component {
         }
         this.setState({ scalingTotal });
         this.el = jexcel(document.getElementById("modelingJexcel"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("modelingJexcel"), true);
+
         var data = dataArray;
         console.log("DataArray>>>", dataArray);
 
@@ -3354,24 +3359,24 @@ export default class CreateTreeTemplate extends Component {
                 },
 
             ],
-            text: {
-                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
             allowDeleteRow: true,
             onchange: this.changed,
             updateTable: function (el, cell, x, y, source, value, id) {
-                var elInstance = el.jexcel;
+                var elInstance = el;
                 if (y != null) {
                     var rowData = elInstance.getRowData(y);
                     if (rowData[4] != "") {
@@ -3538,7 +3543,8 @@ export default class CreateTreeTemplate extends Component {
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
 
-        var asterisk = document.getElementsByClassName("resizable")[0];
+        // var asterisk = document.getElementsByClassName("resizable")[0];
+        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
         console.log("tr.children[9]---", tr.children[9]);
         tr.children[4].classList.add('InfoTr');
@@ -3712,9 +3718,9 @@ export default class CreateTreeTemplate extends Component {
         if (x == 4) {
             var col = ("E").concat(parseInt(y) + 1);
             if (value == "") {
-                instance.jexcel.setStyle(col, "background-color", "transparent");
-                instance.jexcel.setStyle(col, "background-color", "yellow");
-                instance.jexcel.setComments(col, i18n.t('static.label.fieldRequired'));
+                instance.setStyle(col, "background-color", "transparent");
+                instance.setStyle(col, "background-color", "yellow");
+                instance.setComments(col, i18n.t('static.label.fieldRequired'));
                 this.state.modelingEl.setValueFromCoords(6, y, "", true);
                 this.state.modelingEl.setValueFromCoords(7, y, "", true);
                 // this.state.modelingEl.setValueFromCoords(8, y, '', true);
@@ -3727,8 +3733,8 @@ export default class CreateTreeTemplate extends Component {
                     this.state.modelingEl.setValueFromCoords(7, y, "", true);
                     // this.state.modelingEl.setValueFromCoords(8, y, '', true);
                 }
-                instance.jexcel.setStyle(col, "background-color", "transparent");
-                instance.jexcel.setComments(col, "");
+                instance.setStyle(col, "background-color", "transparent");
+                instance.setComments(col, "");
             }
         }
         // Transfer to/from node
@@ -3745,35 +3751,35 @@ export default class CreateTreeTemplate extends Component {
             var col = ("F").concat(parseInt(y) + 1);
             // var value = this.el.getValueFromCoords(5, y);
             if (value == "") {
-                instance.jexcel.setStyle(col, "background-color", "transparent");
-                instance.jexcel.setStyle(col, "background-color", "yellow");
-                instance.jexcel.setComments(col, i18n.t('static.label.fieldRequired'));
+                instance.setStyle(col, "background-color", "transparent");
+                instance.setStyle(col, "background-color", "yellow");
+                instance.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                instance.jexcel.setStyle(col, "background-color", "transparent");
-                instance.jexcel.setComments(col, "");
+                instance.setStyle(col, "background-color", "transparent");
+                instance.setComments(col, "");
             }
         }
-        var startDate = instance.jexcel.getValue(`B${parseInt(y) + 1}`, true);
-        var stopDate = instance.jexcel.getValue(`C${parseInt(y) + 1}`, true);
+        var startDate = instance.getValue(`B${parseInt(y) + 1}`, true);
+        var stopDate = instance.getValue(`C${parseInt(y) + 1}`, true);
         // Start date
         if (x == 1) {
             var col = ("B").concat(parseInt(y) + 1);
             // var diff1 = moment(stopDate).diff(moment(startDate), 'months');
             if (value == "") {
-                instance.jexcel.setStyle(col, "background-color", "transparent");
-                instance.jexcel.setStyle(col, "background-color", "yellow");
-                instance.jexcel.setComments(col, i18n.t('static.label.fieldRequired'));
+                instance.setStyle(col, "background-color", "transparent");
+                instance.setStyle(col, "background-color", "yellow");
+                instance.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                instance.jexcel.setStyle(col, "background-color", "transparent");
-                instance.jexcel.setComments(col, "");
+                instance.setStyle(col, "background-color", "transparent");
+                instance.setComments(col, "");
                 var col1 = ("C").concat(parseInt(y) + 1)
                 if (stopDate <= startDate) {
-                    instance.jexcel.setStyle(col1, "background-color", "transparent");
-                    instance.jexcel.setStyle(col1, "background-color", "yellow");
-                    instance.jexcel.setComments(col1, 'Please enter valid date');
+                    instance.setStyle(col1, "background-color", "transparent");
+                    instance.setStyle(col1, "background-color", "yellow");
+                    instance.setComments(col1, 'Please enter valid date');
                 } else {
-                    instance.jexcel.setStyle(col1, "background-color", "transparent");
-                    instance.jexcel.setComments(col1, "");
+                    instance.setStyle(col1, "background-color", "transparent");
+                    instance.setComments(col1, "");
                 }
             }
             // this.state.modelingEl.setValueFromCoords(4, y, '', true);
@@ -3784,18 +3790,18 @@ export default class CreateTreeTemplate extends Component {
             var col = ("C").concat(parseInt(y) + 1);
             // var diff = moment(stopDate).diff(moment(startDate), 'months');
             if (value == "") {
-                instance.jexcel.setStyle(col, "background-color", "transparent");
-                instance.jexcel.setStyle(col, "background-color", "yellow");
-                instance.jexcel.setComments(col, i18n.t('static.label.fieldRequired'));
+                instance.setStyle(col, "background-color", "transparent");
+                instance.setStyle(col, "background-color", "yellow");
+                instance.setComments(col, i18n.t('static.label.fieldRequired'));
             }
             else if (stopDate <= startDate) {
-                instance.jexcel.setStyle(col, "background-color", "transparent");
-                instance.jexcel.setStyle(col, "background-color", "yellow");
-                instance.jexcel.setComments(col, 'Please enter valid date');
+                instance.setStyle(col, "background-color", "transparent");
+                instance.setStyle(col, "background-color", "yellow");
+                instance.setComments(col, 'Please enter valid date');
             }
             else {
-                instance.jexcel.setStyle(col, "background-color", "transparent");
-                instance.jexcel.setComments(col, "");
+                instance.setStyle(col, "background-color", "transparent");
+                instance.setComments(col, "");
             }
         }
         var elInstance = this.state.modelingEl;
@@ -3811,18 +3817,18 @@ export default class CreateTreeTemplate extends Component {
                 var col = ("G").concat(parseInt(y) + 1);
                 value = value.toString().replaceAll(",", "").split("%")[0];
                 if (value == "") {
-                    instance.jexcel.setStyle(col, "background-color", "transparent");
-                    instance.jexcel.setStyle(col, "background-color", "yellow");
-                    instance.jexcel.setComments(col, i18n.t('static.label.fieldRequired'));
+                    instance.setStyle(col, "background-color", "transparent");
+                    instance.setStyle(col, "background-color", "yellow");
+                    instance.setComments(col, i18n.t('static.label.fieldRequired'));
                 }
                 else if (!(reg.test(value))) {
-                    instance.jexcel.setStyle(col, "background-color", "transparent");
-                    instance.jexcel.setStyle(col, "background-color", "yellow");
-                    instance.jexcel.setComments(col, i18n.t('static.message.invalidnumber'));
+                    instance.setStyle(col, "background-color", "transparent");
+                    instance.setStyle(col, "background-color", "yellow");
+                    instance.setComments(col, i18n.t('static.message.invalidnumber'));
                 }
                 else {
-                    instance.jexcel.setStyle(col, "background-color", "transparent");
-                    instance.jexcel.setComments(col, "");
+                    instance.setStyle(col, "background-color", "transparent");
+                    instance.setComments(col, "");
                     if (rowData[4] != 5) {
                         calculatedChangeForMonth = parseFloat((nodeValue * value) / 100).toFixed(4);
                     } else {
@@ -3833,8 +3839,8 @@ export default class CreateTreeTemplate extends Component {
 
             }
             if (x == 4 && rowData[4] != 2 && rowData[6] != "") {
-                instance.jexcel.setStyle(col, "background-color", "transparent");
-                instance.jexcel.setComments(col, "");
+                instance.setStyle(col, "background-color", "transparent");
+                instance.setComments(col, "");
                 if (rowData[4] != 5) {
                     calculatedChangeForMonth = parseFloat((nodeValue * rowData[5]) / 100).toFixed(4);
                 } else {
@@ -3848,25 +3854,25 @@ export default class CreateTreeTemplate extends Component {
                 var reg = JEXCEL_DECIMAL_MONTHLY_CHANGE_4_DECIMAL_POSITIVE;
                 value = value.toString().replaceAll(",", "");
                 if (value == "") {
-                    instance.jexcel.setStyle(col, "background-color", "transparent");
-                    instance.jexcel.setStyle(col, "background-color", "yellow");
-                    instance.jexcel.setComments(col, i18n.t('static.label.fieldRequired'));
+                    instance.setStyle(col, "background-color", "transparent");
+                    instance.setStyle(col, "background-color", "yellow");
+                    instance.setComments(col, i18n.t('static.label.fieldRequired'));
                 }
                 else if (!(reg.test(value))) {
-                    instance.jexcel.setStyle(col, "background-color", "transparent");
-                    instance.jexcel.setStyle(col, "background-color", "yellow");
-                    instance.jexcel.setComments(col, i18n.t('static.message.invalidnumber'));
+                    instance.setStyle(col, "background-color", "transparent");
+                    instance.setStyle(col, "background-color", "yellow");
+                    instance.setComments(col, i18n.t('static.message.invalidnumber'));
                 }
                 else {
-                    instance.jexcel.setStyle(col, "background-color", "transparent");
-                    instance.jexcel.setComments(col, "");
+                    instance.setStyle(col, "background-color", "transparent");
+                    instance.setComments(col, "");
                     // this.state.modelingEl.setValueFromCoords(8, y, parseFloat(value).toFixed(4), true);
                 }
 
             }
         }
         if (x != 11) {
-            instance.jexcel.setValueFromCoords(11, y, 1, true);
+            instance.setValueFromCoords(11, y, 1, true);
             this.setState({ isChanged: true });
         }
         // this.calculateScalingTotal();
@@ -3896,7 +3902,9 @@ export default class CreateTreeTemplate extends Component {
             count++;
         }
         this.el = jexcel(document.getElementById("modelingJexcelPercent"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("modelingJexcelPercent"), true);
+
         var data = dataArray;
         console.log("DataArray>>>", dataArray);
 
@@ -3952,17 +3960,18 @@ export default class CreateTreeTemplate extends Component {
                 }
 
             ],
-            text: {
-                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
+            editable: true,
             onload: this.loadedPer,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
@@ -4648,8 +4657,12 @@ export default class CreateTreeTemplate extends Component {
                 }
                 if ((this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 1) {
                     var sharePu;
-                    // if ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.sharePlanningUnit == "true") {
-                    sharePu = (this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor);
+                    if ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.sharePlanningUnit.toString() != "true") {
+                        sharePu = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.puPerVisit != "" ? (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.puPerVisit : "";
+                    } else {
+                        sharePu = (this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor);
+                    }
+                    // (this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor);
                     // } else {
                     //     sharePu = this.round((this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor));
                     // }
@@ -8855,6 +8868,11 @@ export default class CreateTreeTemplate extends Component {
     }
 
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
         const Node = ({ itemConfig, isDragging, connectDragSource, canDrop, isOver, connectDropTarget }) => {
             const opacity = isDragging ? 0.4 : 1
             let itemTitleColor = Colors.RoyalBlue;
