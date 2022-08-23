@@ -1727,7 +1727,18 @@ export default class ExtrapolateDataComponent extends React.Component {
         if (this.state.planningUnitId > 0 && this.state.regionId > 0) {
 
             console.log("Inside if parameter", this.state.loading)
-            this.setState({ loading: true })
+            this.setState({ loading: true,
+                movingAvgData: [],
+                semiAvgData: [],
+                linearRegressionData: [],
+                tesData: [],
+                arimaData: [],
+                movingAvgError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" },
+                semiAvgError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" },
+                linearRegressionError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" },
+                tesError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" },
+                arimaError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" }
+            })
             console.log("after Inside if parameter", this.state.loading)
             var datasetJson = this.state.datasetJson;
             // Need to filter
