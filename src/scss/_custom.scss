@@ -7940,5 +7940,8 @@ legend.scheduler-border {
 
 .jss>tbody>tr>td.readonly {
   color: #212721 !important;
-  ;
+}
+
+.jss > tbody > tr > td.historyBold {
+  font-weight: bold;
 }

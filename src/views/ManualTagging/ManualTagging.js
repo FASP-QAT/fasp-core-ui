@@ -3597,6 +3597,7 @@ export default class ManualTagging extends Component {
 
     buildJExcel() {
         let manualTaggingList = this.state.outputList;
+        console.log("OutputList@@@@",manualTaggingList)
         let manualTaggingArray = [];
         let count = 0;
         if (this.state.active2) {
@@ -3623,6 +3624,7 @@ export default class ManualTagging extends Component {
                 manualTaggingArray.push(data);
             // count++;
             } else if (this.state.active2) {
+                data = [];
                 let shipmentQty = !this.state.versionId.toString().includes("Local") ? manualTaggingList[j].erpQty : manualTaggingList[j].shipmentQty;
                 let linkedShipmentsListForTab2 = this.state.versionId.toString().includes("Local") ? this.state.linkedShipmentsListForTab2.filter(c => manualTaggingList[j].shipmentId > 0 ? c.childShipmentId == manualTaggingList[j].shipmentId : c.tempChildShipmentId == manualTaggingList[j].tempShipmentId) : [manualTaggingList[j]];
                 console.log("linkedShipmentsListForTab2@@@@@@@@@@@", linkedShipmentsListForTab2)
@@ -3658,10 +3660,12 @@ export default class ManualTagging extends Component {
                 data[27] = linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].roPrimeLineNo : "";
                 data[28] = (!this.state.versionId.toString().includes("Local") ? (linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].parentShipmentId + (manualTaggingList[j].parentLinkedShipmentId != "" && manualTaggingList[j].parentLinkedShipmentId != null ? ", " + manualTaggingList[j].parentLinkedShipmentId : "") : 0) : (linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].parentShipmentId + (manualTaggingList[j].parentShipmentIdArr.length > 0 ? ", " + manualTaggingList[j].parentShipmentIdArr.toString() : "") : 0));
                 data[29] = manualTaggingArray.filter(c => (c[28] == data[28])).length>0 ? 1 : 0;
+                manualTaggingArray.push(data);
             }
             else {
                 // data[0] = manualTaggingList[j].erpOrderId
                 console.log("manualTaggingList[j]@@@@@@@@@@@@", manualTaggingList[j])
+                data = [];
                 data[0] = (manualTaggingList[j].roNo + " - " + manualTaggingList[j].roPrimeLineNo) + " | " + (manualTaggingList[j].orderNo + " - " + manualTaggingList[j].primeLineNo) + (manualTaggingList[j].knShipmentNo != "" && manualTaggingList[j].knShipmentNo != null ? " | " + manualTaggingList[j].knShipmentNo : "");
                 data[1] = manualTaggingList[j].orderNo + " - " + manualTaggingList[j].primeLineNo
                 data[2] = manualTaggingList[j].knShipmentNo;
@@ -3671,6 +3675,7 @@ export default class ManualTagging extends Component {
                 data[6] = manualTaggingList[j].erpQty
                 data[7] = j;
                 data[8] = manualTaggingList[j].tracerCategoryId;
+                manualTaggingArray.push(data);
 
             }
         }
@@ -3751,7 +3756,6 @@ export default class ManualTagging extends Component {
                 // },
                 onload: this.loaded,
                 pagination: localStorage.getItem("sesRecordCount"),
-                onchangepage: this.loaded,
                 search: true,
                 columnSorting: true,
                 // tableOverflow: true,
@@ -3777,69 +3781,79 @@ export default class ManualTagging extends Component {
             var options = {
                 data: data,
                 columnDrag: true,
-                colWidths: [40, 40, 0, 50, 0, 80, 80, 30, 35, 25, 35, 35, 80],
                 colHeaderClasses: ["Reqasterisk"],
                 columns: [
                     {
                         title: i18n.t('static.mt.linked'),
                         type: 'checkbox',
+                        width:60,
                         // readOnly: this.state.versionId.toString().includes("Local") ? false : true
                         // mask: '#,##', decimal: '.'
                     },
                     {
                         title: i18n.t('static.mt.parentShipmentId(childShipmentId)'),
                         type: 'text',
-                        readOnly: true
+                        readOnly: true,
+                        width:80,
                         // mask: '#,##', decimal: '.'
                     },
                     {
                         title: i18n.t('static.mt.childShipmentId'),
                         type: 'hidden',
-                        readOnly: true
+                        readOnly: true,
+                        width:0,
                         // mask: '#,##', decimal: '.'
                     },
                     {
                         title: i18n.t('static.manualTagging.RONO'),
                         type: 'text',
-                        readOnly: true
+                        readOnly: true,
+                        width:80,
                     },
                     {
                         title: i18n.t('static.manualTagging.procOrderNo'),
                         type: 'hidden',
-                        readOnly: true
+                        readOnly: true,
+                        width:0,
                     },
                     {
                         title: i18n.t('static.manualTagging.erpPlanningUnit'),
                         type: 'text',
-                        readOnly: true
+                        readOnly: true,
+                        width:150,
                     },
                     {
                         title: i18n.t('static.supplyPlan.qatProduct'),
                         type: 'text',
-                        readOnly: true
+                        readOnly: true,
+                        width:150,
                     },
                     {
                         title: i18n.t('static.manualTagging.currentEstimetedDeliveryDate'),
                         type: 'calendar',
                         options: { format: JEXCEL_DATE_FORMAT },
-                        readOnly: true
+                        readOnly: true,
+                        width:80,
                     },
                     {
                         title: i18n.t('static.common.status'),
                         type: 'text',
-                        readOnly: true
+                        readOnly: true,
+                        width:80,
                     },
 
                     {
                         title: i18n.t('static.supplyPlan.qty'),
                         type: 'numeric',
                         mask: '#,##', decimal: '.',
-                        readOnly: true
+                        readOnly: true,
+                        width:60,
                     },
                     {
                         title: i18n.t('static.manualTagging.conversionFactor'),
                         type: 'numeric',
                         mask: '#,##0.0000', decimal: '.',
+                        width:60,
                         // readOnly: true
                     },
 
@@ -3847,81 +3861,100 @@ export default class ManualTagging extends Component {
                         title: i18n.t('static.manualTagging.convertedQATShipmentQty'),
                         type: 'numeric',
                         mask: '#,##', decimal: '.',
-                        readOnly: true
+                        readOnly: true,
+                        width:60,
                     },
 
                     {
                         title: i18n.t('static.common.notes'),
                         type: 'text',
+                        width:150,
                         // readOnly: true
                     },
                     {
                         title: "orderNo",
                         type: 'hidden',
+                        width:0,
                     },
                     {
                         title: "primeLineNo",
                         type: 'hidden',
+                        width:0,
                     },
                     {
                         title: "tempShipmentId",
                         type: 'hidden',
+                        width:0,
                     },
                     {
                         title: "shipment list",
                         type: 'hidden',
+                        width:0,
                     },
                     {
                         title: "linked shipment list",
                         type: 'hidden',
+                        width:0,
                     },
                     {
                         title: "linked shipment list",
                         type: 'hidden',
+                        width:0,
                     },
                     {
                         title: "linked shipment list",
                         type: 'hidden',
+                        width:0,
                     },
                     {
                         title: "linked shipment list",
                         type: 'hidden',
+                        width:0,
                     },
                     {
                         title: "linked shipment list",
                         type: 'hidden',
+                        width:0,
                     },
                     {
                         title: "linked shipment list",
                         type: 'hidden',
+                        width:0,
                     },
                     {
                         title: "linked shipment list",
                         type: 'hidden',
+                        width:0,
                     },
                     {
                         title: "linked shipment list",
                         type: 'hidden',
+                        width:0,
                     },
                     {
                         title: "Original data",
                         type: 'hidden',
+                        width:0,
                     },
                     {
                         title: "Ro No",
                         type: 'hidden',
+                        width:0,
                     },
                     {
                         title: "Ro Prime line no",
                         type: 'hidden',
+                        width:0,
                     },
                     {
                         title: "Same parent shipment Id check",
                         type: 'hidden',
+                        width:0,
                     },
                     {
                         title: "Same parent shipment Id check",
                         type: 'hidden',
+                        width:0,
                     },
                 ],
                 editable: true,
@@ -4071,40 +4104,47 @@ export default class ManualTagging extends Component {
             var options = {
                 data: data,
                 columnDrag: true,
-                colWidths: [50, 0, 0, 60, 45, 45],
+                // colWidths: [50, 0, 0, 60, 45, 45],
                 colHeaderClasses: ["Reqasterisk"],
                 columns: [
 
                     {
                         title: i18n.t('static.mt.roNoAndRoLineNo'),
                         type: 'text',
+                        width:50
                     },
                     {
                         title: i18n.t('static.mt.orderNoAndPrimeLineNo'),
                         type: 'hidden',
+                        width:0
                     },
                     {
                         title: i18n.t('static.mt.knShipmentNo'),
                         type: 'hidden',
+                        width:0
                     },
                     {
                         title: i18n.t('static.manualTagging.erpPlanningUnit'),
                         type: 'text',
+                        width:80
                     },
                     {
                         title: i18n.t('static.manualTagging.currentEstimetedDeliveryDate'),
                         type: 'calendar',
                         options: { format: JEXCEL_DATE_FORMAT },
+                        width:45
                     },
                     {
                         title: i18n.t('static.common.status'),
                         type: 'text',
+                        width:45
                     },
 
                     {
                         title: i18n.t('static.supplyPlan.shipmentQty'),
                         type: 'numeric',
-                        mask: '#,##', decimal: '.'
+                        mask: '#,##', decimal: '.',
+                        width:45
                     },
                     {
                         title: "Index",
