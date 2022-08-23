@@ -423,8 +423,8 @@ class CompareVersion extends Component {
                     var consumptionExtrapolation = datasetJson.consumptionExtrapolation;
                     for (var pu = 0; pu < planningUnitList.length; pu++) {
                         for (var r = 0; r < regionList.length; r++) {
+                            var label = {label_en:"",label_fr:"",label_pr:"",label_sp:""};
                             if (planningUnitList[pu].selectedForecastMap != undefined && planningUnitList[pu].selectedForecastMap[regionList[r].regionId] != undefined) {
-                                var label = "";
                                 if (planningUnitList[pu].selectedForecastMap[regionList[r].regionId].scenarioId != null && planningUnitList[pu].selectedForecastMap[regionList[r].regionId].scenarioId != "") {
                                     var selectedTree = treeList.filter(c => planningUnitList[pu].selectedForecastMap[regionList[r].regionId].treeId == c.treeId)[0];
                                     var scenarioLabel = selectedTree.scenarioList.filter(c => c.id == planningUnitList[pu].selectedForecastMap[regionList[r].regionId].scenarioId)[0];
@@ -460,6 +460,7 @@ class CompareVersion extends Component {
 
                         }
                     }
+                    console.log("List@@@@@Mohit",list)
                     var json = {
                         currentVersion: {
                             forecastStartDate: datasetJson.currentVersion.forecastStartDate,
@@ -574,8 +575,8 @@ class CompareVersion extends Component {
                     var consumptionExtrapolation = datasetJson.consumptionExtrapolation;
                     for (var pu = 0; pu < planningUnitList.length; pu++) {
                         for (var r = 0; r < regionList.length; r++) {
+                            var label = {label_en:"",label_fr:"",label_pr:"",label_sp:""};
                             if (planningUnitList[pu].selectedForecastMap != undefined && planningUnitList[pu].selectedForecastMap[regionList[r].regionId] != undefined) {
-                                var label = "";
                                 if (planningUnitList[pu].selectedForecastMap[regionList[r].regionId].scenarioId != null && planningUnitList[pu].selectedForecastMap[regionList[r].regionId].scenarioId != "") {
                                     var selectedTree = treeList.filter(c => planningUnitList[pu].selectedForecastMap[regionList[r].regionId].treeId == c.treeId)[0];
                                     var scenarioLabel = selectedTree.scenarioList.filter(c => c.id == planningUnitList[pu].selectedForecastMap[regionList[r].regionId].scenarioId)[0];
@@ -886,7 +887,7 @@ class CompareVersion extends Component {
                                 {(this.state.firstDataSet == 1 && this.state.secondDataSet == 1) &&
                                     <>
                                         <CompareVersionTableCompareVersion ref="compareVersionTable" datasetData={this.state.datasetData} datasetData1={this.state.datasetData1} datasetData2={this.state.datasetData} page="compareVersion" versionLabel={"V" + document.getElementById("versionId").selectedOptions[0].text} versionLabel1={"V" + document.getElementById("versionId1").selectedOptions[0].text} updateState={this.updateState} />
-                                        <div className="table-responsive consumptionDataEntryTable ForecastSummaryTable">
+                                        <div className="consumptionDataEntryTable ForecastSummaryTable">
                                             <div id="tableDiv" className="compareVersion" style={{ display: !this.state.loading ? "block" : "none" }} />
                                         </div>
                                     </>

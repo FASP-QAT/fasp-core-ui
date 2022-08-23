@@ -1249,12 +1249,13 @@ class ForecastSummary extends Component {
                                                             console.log("Test------------>7.1", arrayOfNodeDataMap);
 
                                                             if (arrayOfNodeDataMap.length > 0) {
-                                                                console.log("Test------------>8", arrayOfNodeDataMap[0].nodeDataMomList);
+                                                                console.log("Test------------>8", arrayOfNodeDataMap[0].nodeDataMomList, ' --- ', planningUnitList[j].planningUnit);
                                                                 nodeDataMomList = arrayOfNodeDataMap[0].nodeDataMomList;
                                                                 let consumptionList = nodeDataMomList.map(m => {
                                                                     return {
                                                                         consumptionDate: m.month,
-                                                                        consumptionQty: (m.calculatedMmdValue).toFixed(2)
+                                                                        // consumptionQty: Math.round(m.calculatedMmdValue)
+                                                                        consumptionQty: (m.calculatedMmdValue == null ? 0 : (m.calculatedMmdValue).toFixed(2))
                                                                     }
                                                                 });
 
@@ -1483,9 +1484,9 @@ class ForecastSummary extends Component {
                                             total += Number(ele.amount);
                                         });
                                         console.log("total+++", total);
-                                        if (consumptionExtrapolation[ce].extrapolationMethod.active == true) {
-                                            tsList.push({ id: "C" + consumptionExtrapolation[ce].consumptionExtrapolationId, name: consumptionExtrapolation[ce].extrapolationMethod.label.label_en, planningUnitId: consumptionExtrapolation[ce].planningUnit.id, type: "C", id1: consumptionExtrapolation[ce].consumptionExtrapolationId, totalForecast: total, region: [consumptionExtrapolation[ce].region] });
-                                        }
+                                        // if (consumptionExtrapolation[ce].extrapolationMethod.active == true) {
+                                        tsList.push({ id: "C" + consumptionExtrapolation[ce].consumptionExtrapolationId, name: consumptionExtrapolation[ce].extrapolationMethod.label.label_en, planningUnitId: consumptionExtrapolation[ce].planningUnit.id, type: "C", id1: consumptionExtrapolation[ce].consumptionExtrapolationId, totalForecast: total, region: [consumptionExtrapolation[ce].region] });
+                                        // }
 
                                     }
                                     tsList = tsList.sort(function (a, b) {
@@ -2139,6 +2140,7 @@ class ForecastSummary extends Component {
         var mylist = [];
         // var value = (instance.jexcel.getJson(null, false)[r])[1].id;
         var value = (this.state.dataEl.getJson(null, false)[r])[1].id;
+        var consumptionForecast = this.state.regPlanningUnitList.filter(c => c.planningUnit.id == value)[0].consuptionForecast;
 
         var regionList = this.state.regRegionList;
         // var planningUniObj = this.state.regPlanningUnitList.filter(c => c.planningUnit.id == value);
@@ -2148,7 +2150,7 @@ class ForecastSummary extends Component {
         // console.log("x---------------->2 5", planningUniObj.selectedForecastMap);
         // console.log("x---------------->2 6", selectedForecastMapObj);
         // let selectedForecastMapObj = planningUniObj.selectedForecastMap[regionId];
-        mylist = tsList.filter(e => (e.type == "T" && e.flatList.filter(c => c.payload.nodeDataMap[e.id1][0].puNode != null && c.payload.nodeDataMap[e.id1][0].puNode.planningUnit.id == value).length > 0) || (e.type == "C" && e.planningUnitId == value));
+        mylist = tsList.filter(e => (e.type == "T" && e.flatList.filter(c => c.payload.nodeDataMap[e.id1][0].puNode != null && c.payload.nodeDataMap[e.id1][0].puNode.planningUnit.id == value).length > 0) || (e.type == "C" && e.planningUnitId == value && consumptionForecast.toString() == "true"));
         let mylist1 = [];
         for (var i = 0; i < mylist.length; i++) {
             let regionList = mylist[i].region;
@@ -3322,205 +3324,205 @@ class ForecastSummary extends Component {
                                             </div> */}
                                             <div className="" style={{ display: this.state.loading ? "none" : "block" }}>
                                                 {this.state.summeryData.length > 0 && this.state.displayId == 1 &&
-                                                <div className='table-responsive'>
-                                                    <div className='table-scroll1'>
-                                                        <Table className="table-bordered table-bordered1 text-center mt-2">
-                                                            {/* <Table className="table-bordered text-center mt-2 overflowhide main-table "> */}
+                                                    <div className='table-responsive'>
+                                                        <div className='table-scroll1'>
+                                                            <Table className="table-bordered table-bordered1 text-center mt-2">
+                                                                {/* <Table className="table-bordered text-center mt-2 overflowhide main-table "> */}
 
-                                                            <thead>
-                                                                <tr>
-                                                                    <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th>
-                                                                    {/* <th className="text-center" style={{}}> Forecasting Unit </th> */}
-                                                                    <th className="text-center ForecastSumarydWidth sticky-col first-col clone" style={{ minWidth: '200px' }}>{i18n.t('static.product.product')}</th>
-                                                                    <th className="text-center" title={i18n.t('static.Tooltip.TotalForecastedQuantity')} style={{ minWidth: '120px' }}>{i18n.t('static.forecastOutput.totalForecastQuantity')} <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
-                                                                    {!this.state.hideColumn &&
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th>
+                                                                        {/* <th className="text-center" style={{}}> Forecasting Unit </th> */}
+                                                                        <th className="text-center ForecastSumarydWidth sticky-col first-col clone" style={{ minWidth: '200px' }}>{i18n.t('static.product.product')}</th>
+                                                                        <th className="text-center" title={i18n.t('static.Tooltip.TotalForecastedQuantity')} style={{ minWidth: '120px' }}>{i18n.t('static.forecastOutput.totalForecastQuantity')} <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                        {!this.state.hideColumn &&
+                                                                            <>
+                                                                                <th className="text-center" title={i18n.t('static.Tooltip.StockEndOfDec')} style={{ minWidth: '120px' }}>{i18n.t('static.report.stock')} <span className="FontWeightNormal">{i18n.t('static.forecastReport.endOf')} {this.state.beforeEndDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                                <th className="text-center" title={i18n.t('static.Tooltip.ExistingShipments')} style={{ minWidth: '120px' }}>{i18n.t('static.forecastReport.existingShipments')} <span className="FontWeightNormal">({this.state.startDateDisplay + ' - ' + this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                                {/* <th className="text-center" title={(i18n.t('static.report.stock') + ' ' + i18n.t('static.forecastReport.endOf') + ' ' + this.state.beforeEndDateDisplay) + ' + ' + (i18n.t('static.forecastReport.existingShipments') + '( ' + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ' )') + ' - ' + (i18n.t('static.forecastReport.totalForecastQuantity'))} style={{ width: '8%' }}>{i18n.t('static.report.stock')} <span className="FontWeightNormal">{i18n.t('static.forecastReport.endOf')} {this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th> */}
+                                                                                {/* <th className="text-center" style={{ minWidth: '120px' }} title={(i18n.t('static.report.stock') + ' ' + i18n.t('static.forecastReport.endOf') + ' ' + this.state.beforeEndDateDisplay) + ' + ' + (i18n.t('static.forecastReport.existingShipments') + '( ' + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ' )') + ' - ' + (i18n.t('static.forecastReport.totalForecastQuantity'))} >{'Stock or Unmet Demand'} <span className="FontWeightNormal">{i18n.t('static.forecastReport.endOf')} {this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th> */}
+                                                                                <th className="text-center" style={{ minWidth: '120px' }} title={i18n.t('static.Tooltip.StockorUnmetDemand')}>{i18n.t('static.forecastOutput.stockOrUnmedDemand')} <span className="FontWeightNormal">{i18n.t('static.forecastReport.endOf')} {this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                                <th className="text-center" title={i18n.t('static.Tooltip.desiredMonthsOfStock')} style={{ minWidth: '120px' }}>{i18n.t('static.forecastReport.desiredMonthsOfStock')} <span className="FontWeightNormal">{i18n.t('static.forecastReport.endOf')} {this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                                {/* <th className="text-center" style={{ minWidth: '120px' }} title={(i18n.t('static.forecastReport.desiredMonthsOfStock') + ' ' + i18n.t('static.forecastReport.endOf') + ' ' + this.state.endDateDisplay) + ') * ' + i18n.t('static.forecastReport.totalForecastQuantity') + ' / ' + 'Difference between months'} >{i18n.t('static.forecastReport.desiredStock')} <span className="FontWeightNormal">{i18n.t('static.forecastReport.endOf')} {this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th> */}
+                                                                                <th className="text-center" style={{ minWidth: '120px' }} title={i18n.t('static.Tooltip.DesiredStock')} >{i18n.t('static.forecastReport.desiredStock')} <span className="FontWeightNormal">{i18n.t('static.forecastReport.endOf')} {this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                            </>
+                                                                        }
+                                                                        {/* <th className="text-center" style={{ minWidth: '120px' }} title={i18n.t('static.report.stock') + ' ' + i18n.t('static.forecastReport.endOf') + ' ' + this.state.endDateDisplay + ') - ' + i18n.t('static.forecastReport.desiredStock') + ' ' + i18n.t('static.forecastReport.endOf') + ' ' + this.state.endDateDisplay + ')'} >{i18n.t('static.forecastReport.procurementSurplus')} <i className="fa fa-info-circle icons ToltipInfoicon"></i></th> */}
+                                                                        <th className="text-center" style={{ minWidth: '120px' }} title={i18n.t('static.Tooltip.ProcurementSurplusGap')} >{i18n.t('static.forecastReport.procurementSurplus')} <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                        {!this.state.hideColumn &&
+                                                                            <>
+                                                                                <th className="text-center" title={i18n.t('static.Tooltip.forecastReportpriceType')} style={{ minWidth: '120px' }}>{i18n.t('static.forecastReport.priceType')} <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                                <th className="text-center" title={i18n.t('static.Tooltip.forecastReportUnitPrice')} style={{ minWidth: '120px' }}>{i18n.t('static.forecastReport.unitPrice')} <span className="FontWeightNormal">(USD)</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                            </>
+                                                                        }
+                                                                        <th className="text-center" title={i18n.t('static.Tooltip.ProcurementsNeeded')} style={{ minWidth: '120px' }}>{i18n.t('static.forecastReport.ProcurementsNeeded')} <span className="FontWeightNormal">(USD)</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                        <th className="text-center" style={{ minWidth: '140px' }}>{i18n.t('static.program.notes')} </th>
+
+                                                                    </tr>
+                                                                </thead>
+
+                                                                <tbody>
+                                                                    {this.state.summeryData.map(item1 => (
                                                                         <>
-                                                                            <th className="text-center" title={i18n.t('static.Tooltip.StockEndOfDec')} style={{ minWidth: '120px' }}>{i18n.t('static.report.stock')} <span className="FontWeightNormal">{i18n.t('static.forecastReport.endOf')} {this.state.beforeEndDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
-                                                                            <th className="text-center" title={i18n.t('static.Tooltip.ExistingShipments')} style={{ minWidth: '120px' }}>{i18n.t('static.forecastReport.existingShipments')} <span className="FontWeightNormal">({this.state.startDateDisplay + ' - ' + this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
-                                                                            {/* <th className="text-center" title={(i18n.t('static.report.stock') + ' ' + i18n.t('static.forecastReport.endOf') + ' ' + this.state.beforeEndDateDisplay) + ' + ' + (i18n.t('static.forecastReport.existingShipments') + '( ' + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ' )') + ' - ' + (i18n.t('static.forecastReport.totalForecastQuantity'))} style={{ width: '8%' }}>{i18n.t('static.report.stock')} <span className="FontWeightNormal">{i18n.t('static.forecastReport.endOf')} {this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th> */}
-                                                                            {/* <th className="text-center" style={{ minWidth: '120px' }} title={(i18n.t('static.report.stock') + ' ' + i18n.t('static.forecastReport.endOf') + ' ' + this.state.beforeEndDateDisplay) + ' + ' + (i18n.t('static.forecastReport.existingShipments') + '( ' + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ' )') + ' - ' + (i18n.t('static.forecastReport.totalForecastQuantity'))} >{'Stock or Unmet Demand'} <span className="FontWeightNormal">{i18n.t('static.forecastReport.endOf')} {this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th> */}
-                                                                            <th className="text-center" style={{ minWidth: '120px' }} title={i18n.t('static.Tooltip.StockorUnmetDemand')}>{i18n.t('static.forecastOutput.stockOrUnmedDemand')} <span className="FontWeightNormal">{i18n.t('static.forecastReport.endOf')} {this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
-                                                                            <th className="text-center" title={i18n.t('static.Tooltip.desiredMonthsOfStock')} style={{ minWidth: '120px' }}>{i18n.t('static.forecastReport.desiredMonthsOfStock')} <span className="FontWeightNormal">{i18n.t('static.forecastReport.endOf')} {this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
-                                                                            {/* <th className="text-center" style={{ minWidth: '120px' }} title={(i18n.t('static.forecastReport.desiredMonthsOfStock') + ' ' + i18n.t('static.forecastReport.endOf') + ' ' + this.state.endDateDisplay) + ') * ' + i18n.t('static.forecastReport.totalForecastQuantity') + ' / ' + 'Difference between months'} >{i18n.t('static.forecastReport.desiredStock')} <span className="FontWeightNormal">{i18n.t('static.forecastReport.endOf')} {this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th> */}
-                                                                            <th className="text-center" style={{ minWidth: '120px' }} title={i18n.t('static.Tooltip.DesiredStock')} >{i18n.t('static.forecastReport.desiredStock')} <span className="FontWeightNormal">{i18n.t('static.forecastReport.endOf')} {this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
-                                                                        </>
-                                                                    }
-                                                                    {/* <th className="text-center" style={{ minWidth: '120px' }} title={i18n.t('static.report.stock') + ' ' + i18n.t('static.forecastReport.endOf') + ' ' + this.state.endDateDisplay + ') - ' + i18n.t('static.forecastReport.desiredStock') + ' ' + i18n.t('static.forecastReport.endOf') + ' ' + this.state.endDateDisplay + ')'} >{i18n.t('static.forecastReport.procurementSurplus')} <i className="fa fa-info-circle icons ToltipInfoicon"></i></th> */}
-                                                                    <th className="text-center" style={{ minWidth: '120px' }} title={i18n.t('static.Tooltip.ProcurementSurplusGap')} >{i18n.t('static.forecastReport.procurementSurplus')} <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
-                                                                    {!this.state.hideColumn &&
-                                                                        <>
-                                                                            <th className="text-center" title={i18n.t('static.Tooltip.forecastReportpriceType')} style={{ minWidth: '120px' }}>{i18n.t('static.forecastReport.priceType')} <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
-                                                                            <th className="text-center" title={i18n.t('static.Tooltip.forecastReportUnitPrice')} style={{ minWidth: '120px' }}>{i18n.t('static.forecastReport.unitPrice')} <span className="FontWeightNormal">(USD)</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
-                                                                        </>
-                                                                    }
-                                                                    <th className="text-center" title={i18n.t('static.Tooltip.ProcurementsNeeded')} style={{ minWidth: '120px' }}>{i18n.t('static.forecastReport.ProcurementsNeeded')} <span className="FontWeightNormal">(USD)</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
-                                                                    <th className="text-center" style={{ minWidth: '140px' }}>{i18n.t('static.program.notes')} </th>
+                                                                            <tr>
+                                                                                {item1.id == 0 ?
+                                                                                    <>
+                                                                                        <td className="BorderNoneSupplyPlan sticky-col first-col clone1">
+                                                                                            {
+                                                                                                item1.display == false ?
+                                                                                                    // <><i className="fa fa-plus-square-o supplyPlanIcon" onClick={() => this.checkedChanged(item1.tempTracerCategoryId)} ></i> <>{item1.tracerCategory.label.label_en}</></>
+                                                                                                    <><i className="fa fa-plus-square-o supplyPlanIcon" onClick={() => this.checkedChanged(item1.tempTracerCategoryId)} ></i> </>
+                                                                                                    :
+                                                                                                    // <><i className="fa fa-minus-square-o supplyPlanIcon" onClick={() => this.checkedChanged(item1.tempTracerCategoryId)} ></i> <>{item1.tracerCategory.label.label_en}</></>
+                                                                                                    <><i className="fa fa-minus-square-o supplyPlanIcon" onClick={() => this.checkedChanged(item1.tempTracerCategoryId)} ></i> </>
+                                                                                            }
 
-                                                                </tr>
-                                                            </thead>
-
-                                                            <tbody>
-                                                                {this.state.summeryData.map(item1 => (
-                                                                    <>
-                                                                        <tr>
-                                                                            {item1.id == 0 ?
-                                                                                <>
-                                                                                    <td className="BorderNoneSupplyPlan sticky-col first-col clone1">
-                                                                                        {
-                                                                                            item1.display == false ?
-                                                                                                // <><i className="fa fa-plus-square-o supplyPlanIcon" onClick={() => this.checkedChanged(item1.tempTracerCategoryId)} ></i> <>{item1.tracerCategory.label.label_en}</></>
-                                                                                                <><i className="fa fa-plus-square-o supplyPlanIcon" onClick={() => this.checkedChanged(item1.tempTracerCategoryId)} ></i> </>
-                                                                                                :
-                                                                                                // <><i className="fa fa-minus-square-o supplyPlanIcon" onClick={() => this.checkedChanged(item1.tempTracerCategoryId)} ></i> <>{item1.tracerCategory.label.label_en}</></>
-                                                                                                <><i className="fa fa-minus-square-o supplyPlanIcon" onClick={() => this.checkedChanged(item1.tempTracerCategoryId)} ></i> </>
+                                                                                        </td>
+                                                                                        {/* <td></td> */}
+                                                                                        <td className='text-left sticky-col first-col clone'><b>{item1.tracerCategory.label.label_en}</b></td>
+                                                                                        <td></td>
+                                                                                        {!this.state.hideColumn &&
+                                                                                            <>
+                                                                                                <td></td>
+                                                                                                <td></td>
+                                                                                                <td></td>
+                                                                                                <td></td>
+                                                                                                <td></td>
+                                                                                            </>
                                                                                         }
+                                                                                        <td></td>
+                                                                                        {!this.state.hideColumn &&
+                                                                                            <>
+                                                                                                <td></td>
+                                                                                                <td></td>
+                                                                                            </>
+                                                                                        }
+                                                                                        <td></td>
+                                                                                        <td></td>
+                                                                                    </>
+                                                                                    :
+                                                                                    <>
+                                                                                        {item1.display == true &&
+                                                                                            <>
+                                                                                                <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                                                                {/* <td>{item1.forecastingUnit.label.label_en}</td> */}
+                                                                                                <td className='text-left  sticky-col first-col clone'>{getLabelText(item1.planningUnit.label, this.state.lang) + " | " + item1.planningUnit.id}</td>
+                                                                                                <td>{(item1.totalForecastedQuantity != null ? (item1.totalForecastedQuantity).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '')}</td>
+                                                                                                {!this.state.hideColumn &&
+                                                                                                    <>
+                                                                                                        <td>{(item1.stock1 != null ? (item1.stock1).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '')}</td>
+                                                                                                        <td>{(item1.existingShipments != null ? (item1.existingShipments).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '')}</td>
+                                                                                                        {/* <td>{item1.stock2}</td> */}
+                                                                                                        {item1.isStock2Red == true ? <td className="red" style={{ fontSize: '12px' }}>{(item1.stock2 != null ? (item1.stock2).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '')}</td> : <td>{(item1.stock2 != null ? (item1.stock2).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '')}</td>}
+                                                                                                        <td>{(item1.desiredMonthOfStock1 != null ? (item1.desiredMonthOfStock1).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '')}</td>
+                                                                                                        <td>{(item1.desiredMonthOfStock2 != null ? (item1.desiredMonthOfStock2).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '')}</td>
+                                                                                                    </>
+                                                                                                }
+                                                                                                {item1.isProcurementGapRed == true ? <td className="red" style={{ fontSize: '12px' }}>{(item1.procurementGap != null ? (item1.procurementGap).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '')}</td> : <td>{(item1.procurementGap != null ? (item1.procurementGap).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '')}</td>}
+                                                                                                {!this.state.hideColumn &&
+                                                                                                    <>
+                                                                                                        {item1.isPriceTypeRed == true ? <td className="red" style={{ fontSize: '12px' }}>{item1.priceType}</td> : <td>{item1.priceType}</td>}
+                                                                                                        <td>{(item1.unitPrice != null ? (item1.unitPrice).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '')}</td>
+                                                                                                    </>
+                                                                                                }
+                                                                                                <td>{(item1.procurementNeeded != null ? (item1.procurementNeeded).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '')}</td>
+                                                                                                <td>{item1.notes}</td>
+                                                                                            </>
+                                                                                        }
+                                                                                    </>
+                                                                                }
 
-                                                                                    </td>
-                                                                                    {/* <td></td> */}
-                                                                                    <td className='text-left sticky-col first-col clone'><b>{item1.tracerCategory.label.label_en}</b></td>
-                                                                                    <td></td>
-                                                                                    {!this.state.hideColumn &&
-                                                                                        <>
-                                                                                            <td></td>
-                                                                                            <td></td>
-                                                                                            <td></td>
-                                                                                            <td></td>
-                                                                                            <td></td>
-                                                                                        </>
-                                                                                    }
-                                                                                    <td></td>
-                                                                                    {!this.state.hideColumn &&
-                                                                                        <>
-                                                                                            <td></td>
-                                                                                            <td></td>
-                                                                                        </>
-                                                                                    }
-                                                                                    <td></td>
-                                                                                    <td></td>
-                                                                                </>
-                                                                                :
-                                                                                <>
-                                                                                    {item1.display == true &&
-                                                                                        <>
-                                                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                                                                            {/* <td>{item1.forecastingUnit.label.label_en}</td> */}
-                                                                                            <td className='text-left  sticky-col first-col clone'>{getLabelText(item1.planningUnit.label, this.state.lang) + " | " + item1.planningUnit.id}</td>
-                                                                                            <td>{(item1.totalForecastedQuantity != null ? (item1.totalForecastedQuantity).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '')}</td>
-                                                                                            {!this.state.hideColumn &&
-                                                                                                <>
-                                                                                                    <td>{(item1.stock1 != null ? (item1.stock1).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '')}</td>
-                                                                                                    <td>{(item1.existingShipments != null ? (item1.existingShipments).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '')}</td>
-                                                                                                    {/* <td>{item1.stock2}</td> */}
-                                                                                                    {item1.isStock2Red == true ? <td className="red" style={{ fontSize: '12px' }}>{(item1.stock2 != null ? (item1.stock2).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '')}</td> : <td>{(item1.stock2 != null ? (item1.stock2).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '')}</td>}
-                                                                                                    <td>{(item1.desiredMonthOfStock1 != null ? (item1.desiredMonthOfStock1).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '')}</td>
-                                                                                                    <td>{(item1.desiredMonthOfStock2 != null ? (item1.desiredMonthOfStock2).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '')}</td>
-                                                                                                </>
-                                                                                            }
-                                                                                            {item1.isProcurementGapRed == true ? <td className="red" style={{ fontSize: '12px' }}>{(item1.procurementGap != null ? (item1.procurementGap).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '')}</td> : <td>{(item1.procurementGap != null ? (item1.procurementGap).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '')}</td>}
-                                                                                            {!this.state.hideColumn &&
-                                                                                                <>
-                                                                                                    {item1.isPriceTypeRed == true ? <td className="red" style={{ fontSize: '12px' }}>{item1.priceType}</td> : <td>{item1.priceType}</td>}
-                                                                                                    <td>{(item1.unitPrice != null ? (item1.unitPrice).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '')}</td>
-                                                                                                </>
-                                                                                            }
-                                                                                            <td>{(item1.procurementNeeded != null ? (item1.procurementNeeded).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '')}</td>
-                                                                                            <td>{item1.notes}</td>
-                                                                                        </>
-                                                                                    }
-                                                                                </>
-                                                                            }
+                                                                            </tr>
 
+                                                                        </>
+                                                                    ))}
+                                                                </tbody>
+                                                                {!this.state.hideColumn &&
+                                                                    <tfoot>
+                                                                        <tr>
+                                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                                            {/* <td></td> */}
+                                                                            <td className='text-left sticky-col first-col clone' style={{ border: 'none' }}></td>
+                                                                            <td style={{ border: 'none' }}></td>
+                                                                            <td style={{ border: 'none' }}></td>
+                                                                            <td style={{ border: 'none' }}></td>
+                                                                            <td style={{ border: 'none' }}></td>
+                                                                            <td style={{ border: 'none' }}></td>
+                                                                            <td style={{ border: 'none' }}></td>
+                                                                            <td style={{ border: 'none' }}></td>
+                                                                            <td style={{ border: 'none' }}></td>
+                                                                            <td><b>{i18n.t('static.forecastReport.productCost')}</b></td>
+                                                                            <td><b>{'$ ' + (this.state.totalProductCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
+                                                                            <td style={{ border: 'none' }}></td>
                                                                         </tr>
-
-                                                                    </>
-                                                                ))}
-                                                            </tbody>
-                                                            {!this.state.hideColumn &&
-                                                                <tfoot>
-                                                                    <tr>
-                                                                        <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                                                        {/* <td></td> */}
-                                                                        <td className='text-left sticky-col first-col clone' style={{ border: 'none' }}></td>
-                                                                        <td style={{ border: 'none' }}></td>
-                                                                        <td style={{ border: 'none' }}></td>
-                                                                        <td style={{ border: 'none' }}></td>
-                                                                        <td style={{ border: 'none' }}></td>
-                                                                        <td style={{ border: 'none' }}></td>
-                                                                        <td style={{ border: 'none' }}></td>
-                                                                        <td style={{ border: 'none' }}></td>
-                                                                        <td style={{ border: 'none' }}></td>
-                                                                        <td><b>{i18n.t('static.forecastReport.productCost')}</b></td>
-                                                                        <td><b>{'$ ' + (this.state.totalProductCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
-                                                                        <td style={{ border: 'none' }}></td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                                                        {/* <td></td> */}
-                                                                        <td className='text-left sticky-col first-col clone' style={{ border: 'none' }}></td>
-                                                                        <td style={{ border: 'none' }}></td>
-                                                                        <td style={{ border: 'none' }}></td>
-                                                                        <td style={{ border: 'none' }}></td>
-                                                                        <td style={{ border: 'none' }}></td>
-                                                                        <td style={{ border: 'none' }}></td>
-                                                                        <td style={{ border: 'none' }}></td>
-                                                                        <td style={{ border: 'none' }}></td>
-                                                                        <td style={{ border: 'none' }}></td>
-                                                                        <td><b>{i18n.t('static.forecastReport.freight')} ({this.state.freightPerc}%)</b></td>
-                                                                        <td><b>{'$ ' + (((this.state.freightPerc / 100) * this.state.totalProductCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
-                                                                        <td style={{ border: 'none' }}></td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                                                        {/* <td></td> */}
-                                                                        <td className='text-left sticky-col first-col clone' style={{ border: 'none' }}></td>
-                                                                        <td style={{ border: 'none' }}></td>
-                                                                        <td style={{ border: 'none' }}></td>
-                                                                        <td style={{ border: 'none' }}></td>
-                                                                        <td style={{ border: 'none' }}></td>
-                                                                        <td style={{ border: 'none' }}></td>
-                                                                        <td style={{ border: 'none' }}></td>
-                                                                        <td style={{ border: 'none' }}></td>
-                                                                        <td style={{ border: 'none' }}></td>
-                                                                        <td><b>{i18n.t('static.shipment.totalCost')}</b></td>
-                                                                        <td><b>{'$ ' + (parseFloat(parseFloat(this.state.totalProductCost) + parseFloat((this.state.freightPerc / 100) * this.state.totalProductCost)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
-                                                                        <td style={{ border: 'none' }}></td>
-                                                                    </tr>
-                                                                </tfoot>
-                                                            }
-                                                            {this.state.hideColumn &&
-                                                                <tfoot>
-                                                                    <tr>
-                                                                        <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                                                        {/* <td></td> */}
-                                                                        <td className='text-left sticky-col first-col clone'></td>
-                                                                        <td></td>
-                                                                        <td><b>{i18n.t('static.forecastReport.productCost')}</b></td>
-                                                                        <td><b>{'$ ' + (this.state.totalProductCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
-                                                                        <td></td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                                                        {/* <td></td> */}
-                                                                        <td className='text-left sticky-col first-col clone'></td>
-                                                                        <td></td>
-                                                                        <td><b>{i18n.t('static.forecastReport.freight')} ({this.state.freightPerc}%)</b></td>
-                                                                        <td><b>{'$ ' + (parseFloat((this.state.freightPerc / 100) * this.state.totalProductCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
-                                                                        <td></td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                                                        {/* <td></td> */}
-                                                                        <td className='text-left sticky-col first-col clone'></td>
-                                                                        <td></td>
-                                                                        <td><b>{i18n.t('static.shipment.totalCost')}</b></td>
-                                                                        <td><b>{'$ ' + (parseFloat(parseFloat(this.state.totalProductCost) + parseFloat((this.state.freightPerc / 100) * this.state.totalProductCost)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
-                                                                        {/* <td><b>{'$ ' + (parseFloat(this.state.totalProductCost + 0.07 * this.state.totalProductCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td> */}
-                                                                        <td></td>
-                                                                    </tr>
-                                                                </tfoot>
-                                                            }
-                                                        </Table>
-                                                    </div>
+                                                                        <tr>
+                                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                                            {/* <td></td> */}
+                                                                            <td className='text-left sticky-col first-col clone' style={{ border: 'none' }}></td>
+                                                                            <td style={{ border: 'none' }}></td>
+                                                                            <td style={{ border: 'none' }}></td>
+                                                                            <td style={{ border: 'none' }}></td>
+                                                                            <td style={{ border: 'none' }}></td>
+                                                                            <td style={{ border: 'none' }}></td>
+                                                                            <td style={{ border: 'none' }}></td>
+                                                                            <td style={{ border: 'none' }}></td>
+                                                                            <td style={{ border: 'none' }}></td>
+                                                                            <td><b>{i18n.t('static.forecastReport.freight')} ({this.state.freightPerc}%)</b></td>
+                                                                            <td><b>{'$ ' + (((this.state.freightPerc / 100) * this.state.totalProductCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
+                                                                            <td style={{ border: 'none' }}></td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                                            {/* <td></td> */}
+                                                                            <td className='text-left sticky-col first-col clone' style={{ border: 'none' }}></td>
+                                                                            <td style={{ border: 'none' }}></td>
+                                                                            <td style={{ border: 'none' }}></td>
+                                                                            <td style={{ border: 'none' }}></td>
+                                                                            <td style={{ border: 'none' }}></td>
+                                                                            <td style={{ border: 'none' }}></td>
+                                                                            <td style={{ border: 'none' }}></td>
+                                                                            <td style={{ border: 'none' }}></td>
+                                                                            <td style={{ border: 'none' }}></td>
+                                                                            <td><b>{i18n.t('static.shipment.totalCost')}</b></td>
+                                                                            <td><b>{'$ ' + (parseFloat(parseFloat(this.state.totalProductCost) + parseFloat((this.state.freightPerc / 100) * this.state.totalProductCost)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
+                                                                            <td style={{ border: 'none' }}></td>
+                                                                        </tr>
+                                                                    </tfoot>
+                                                                }
+                                                                {this.state.hideColumn &&
+                                                                    <tfoot>
+                                                                        <tr>
+                                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                                            {/* <td></td> */}
+                                                                            <td className='text-left sticky-col first-col clone'></td>
+                                                                            <td></td>
+                                                                            <td><b>{i18n.t('static.forecastReport.productCost')}</b></td>
+                                                                            <td><b>{'$ ' + (this.state.totalProductCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
+                                                                            <td></td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                                            {/* <td></td> */}
+                                                                            <td className='text-left sticky-col first-col clone'></td>
+                                                                            <td></td>
+                                                                            <td><b>{i18n.t('static.forecastReport.freight')} ({this.state.freightPerc}%)</b></td>
+                                                                            <td><b>{'$ ' + (parseFloat((this.state.freightPerc / 100) * this.state.totalProductCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
+                                                                            <td></td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                                            {/* <td></td> */}
+                                                                            <td className='text-left sticky-col first-col clone'></td>
+                                                                            <td></td>
+                                                                            <td><b>{i18n.t('static.shipment.totalCost')}</b></td>
+                                                                            <td><b>{'$ ' + (parseFloat(parseFloat(this.state.totalProductCost) + parseFloat((this.state.freightPerc / 100) * this.state.totalProductCost)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
+                                                                            {/* <td><b>{'$ ' + (parseFloat(this.state.totalProductCost + 0.07 * this.state.totalProductCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td> */}
+                                                                            <td></td>
+                                                                        </tr>
+                                                                    </tfoot>
+                                                                }
+                                                            </Table>
+                                                        </div>
                                                     </div>
                                                 }
                                                 {/* {this.state.regPlanningUnitList.length > 0 && this.state.displayId == 2 && */}
@@ -3619,7 +3621,7 @@ class ForecastSummary extends Component {
                                 <b>{i18n.t('static.ForecastSummary.CalculatingProcurement')} </b>
                                 <ul>
                                     <li><img className="formula-img-mr-showGuidance" src={ProjectStockatForecastend} /><br></br></li>
-                                    <li><img style={{border:'1px solid #fff',padding:'10px',borderRadius:'5px'}} src={DesiredStockatForecasend} /><br></br></li>
+                                    <li><img style={{ border: '1px solid #fff', padding: '10px', borderRadius: '5px' }} src={DesiredStockatForecasend} /><br></br></li>
                                     <li><img className="formula-img-mr-showGuidance" src={ProcurementSurplusGap} /><br></br></li>
                                     {/* <li>Project Stock at Forecast end = (Starting Stock) + (Existing Shipments) - (Forecasted Quantity) </li>
             <li>Desired Stock at Forecast end = (Forecasted Quantity) / (Forecast Period) * (Desired Months of Stock) </li>

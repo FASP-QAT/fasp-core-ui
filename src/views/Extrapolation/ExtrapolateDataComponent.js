@@ -918,7 +918,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 alert(i18n.t('static.tree.minDataRequiredToExtrapolateNote1') + inputDataMovingAvg.filter(c => c.actual != null).length + i18n.t('static.tree.minDataRequiredToExtrapolateNote2') + i18n.t('static.tree.minDataRequiredToExtrapolate'))
             }
             // } else {
-            if (inputDataMovingAvg.filter(c => c.actual != null).length >= 3) {
+            if (inputDataMovingAvg.filter(c => c.actual != null).length >= 2) {
                 if (this.state.movingAvgId && inputDataMovingAvg.filter(c => c.actual != null).length >= 3) {
                     calculateMovingAvg(inputDataMovingAvg, this.state.monthsForMovingAverage, noOfMonthsForProjection, this);
                 }
@@ -933,8 +933,10 @@ export default class ExtrapolateDataComponent extends React.Component {
                 if (this.state.smoothingId && inputDataMovingAvg.filter(c => c.actual != null).length >= 24) {
                     calculateTES(inputDataTes, this.state.alpha, this.state.beta, this.state.gamma, this.state.confidenceLevelId, noOfMonthsForProjection, this, minStartDate, false);
                 }
-                if (this.state.arimaId && inputDataMovingAvg.filter(c => c.actual != null).length >= 14) {
+                if (this.state.arimaId && ((this.state.seasonality && inputDataMovingAvg.filter(c => c.actual != null).length >= 13) || (!this.state.seasonality && inputDataMovingAvg.filter(c => c.actual != null).length >= 2))) {
                     calculateArima(inputDataArima, this.state.p, this.state.d, this.state.q, this.state.confidenceLevelIdArima, noOfMonthsForProjection, this, minStartDate, false, this.state.seasonality);
+                } else {
+                    this.buildActualJxl();
                 }
                 this.setState({
                     extrapolateClicked: true
@@ -1617,19 +1619,20 @@ export default class ExtrapolateDataComponent extends React.Component {
                     }
                 }
                 console.log("@@@@@@@@@@##############", inputDataSemiAverage)
-                if (this.state.semiAvgId) {
+                if (this.state.semiAvgId && inputDataSemiAverage.length > 0) {
                     calculateError(inputDataSemiAverage, "semiAvgError", this);
                 }
-                if (this.state.movingAvgId) {
+                if (this.state.movingAvgId && inputDataMovingAvg.length > 0) {
                     calculateError(inputDataMovingAvg, "movingAvgError", this);
                 }
-                if (this.state.linearRegressionId) {
+                if (this.state.linearRegressionId && inputDataLinearRegression.length > 0) {
                     calculateError(inputDataLinearRegression, "linearRegressionError", this);
                 }
-                if (this.state.smoothingId) {
+                if (this.state.smoothingId && inputDataTes.length > 0) {
+                    console.log("inputDataTes---->Error", inputDataTes)
                     calculateError(inputDataTes, "tesError", this);
                 }
-                if (this.state.arimaId) {
+                if (this.state.arimaId && inputDataArima.length > 0) {
                     calculateError(inputDataArima, "arimaError", this);
                 }
                 console.log("ActualConsumptionList@@@@@@@@@@@@@", actualConsumptionList)
@@ -2090,22 +2093,37 @@ export default class ExtrapolateDataComponent extends React.Component {
             var semiAvgDataFilter = this.state.semiAvgData.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM"))
             var linearRegressionDataFilter = this.state.linearRegressionData.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM"))
             var tesDataFilter = this.state.tesData.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM"))
+            var arimaDataFilter = this.state.arimaData.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM"))
             console.log("consumptionData--->", consumptionData)
             B.push(
                 moment(monthArray[j]).format(DATE_FORMAT_CAP_WITHOUT_DATE).toString().replaceAll(',', ' ').replaceAll(' ', '%20'),
                 consumptionData.length > 0 ? consumptionData[0].puAmount : "")
             if (this.state.movingAvgId && movingAvgDataFilter.length > 0 && movingAvgDataFilter[0].forecast != null) {
                 B.push(movingAvgDataFilter[0].forecast.toFixed(2))
-            } if (this.state.semiAvgId && semiAvgDataFilter.length > 0 && semiAvgDataFilter[0].forecast != null) {
+            } else {
+                B.push("")
+            }
+            if (this.state.semiAvgId && semiAvgDataFilter.length > 0 && semiAvgDataFilter[0].forecast != null) {
                 B.push(semiAvgDataFilter[0].forecast.toFixed(2))
-            } if (this.state.linearRegressionId && linearRegressionDataFilter.length > 0 && linearRegressionDataFilter[0].forecast != null) {
+            } else {
+                B.push("")
+            }
+            if (this.state.linearRegressionId && linearRegressionDataFilter.length > 0 && linearRegressionDataFilter[0].forecast != null) {
                 B.push(linearRegressionDataFilter[0].forecast.toFixed(2))
+            } else {
+                B.push("")
             }
             if (this.state.smoothingId && tesDataFilter.length > 0 && tesDataFilter[0].forecast != null) {
                 B.push((Number(tesDataFilter[0].forecast) - CI) > 0 ? (Number(tesDataFilter[0].forecast)) - Number(CI).toFixed(2) : '')
-            } if (this.state.arimaId) {
-                B.push(Number(this.state.dataEl.getColumnData(8)).toFixed(2))
+            } else {
+                B.push("")
             }
+            if (this.state.arimaId && arimaDataFilter.length > 0 && arimaDataFilter[0].forecast != null) {
+                B.push(Number(arimaDataFilter[0].forecast).toFixed(2))
+            } else {
+                B.push("")
+            }
+
 
             // B.push(
             //     moment(monthArray[j]).format(DATE_FORMAT_CAP_WITHOUT_DATE).toString().replaceAll(',', ' ').replaceAll(' ', '%20'),
@@ -3992,7 +4010,9 @@ export default class ExtrapolateDataComponent extends React.Component {
                         <FormGroup>
                             <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                             {this.state.forecastProgramId != "" && this.state.planningUnitId > 0 && <button className="mr-1 float-right btn btn-info btn-md" onClick={this.toggledata}>{this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}</button>}
-                            {this.state.showData && <> <Button type="button" id="dataCheck" size="md" color="info" className="float-right mr-1" onClick={() => this.openDataCheckModel()}><i className="fa fa-check"></i>{i18n.t('static.common.dataCheck')}</Button></>}
+                            {this.state.forecastProgramId != "" && this.state.planningUnitId > 0 &&  <> <Button type="button" id="dataCheck" size="md" color="info" className="float-right mr-1" onClick={() => this.openDataCheckModel()}><i className="fa fa-check"></i>{i18n.t('static.common.dataCheck')}</Button></>}
+                            {/* {this.state.showData && <> <Button type="button" id="dataCheck" size="md" color="info" className="float-right mr-1" onClick={() => this.openDataCheckModel()}><i className="fa fa-check"></i>{i18n.t('static.common.dataCheck')}</Button></>} */}
+                            
                             &nbsp;
                         </FormGroup>
                     </CardFooter>
@@ -4073,20 +4093,20 @@ export default class ExtrapolateDataComponent extends React.Component {
                                             <ul>
                                                 <li>{i18n.t('static.extrapolation.ARIMAModel')}</li>
                                                 {/* <li>{i18n.t('static.extrapolation.WintersExponential')}</li> */}
-                                                <li>Triple Exponential Smoothing (Holt-Winters) <br></br> 
+                                                <li>Triple Exponential Smoothing (Holt-Winters) <br></br>
 
-Seasonal without trend, where the observed values have a seasonal component but no trend. Models applied to such datasets may include </li>
-<li>Triple Exponential Smoothing (Holt-Winters)<br></br>  
+                                                    Seasonal without trend, where the observed values have a seasonal component but no trend. Models applied to such datasets may include </li>
+                                                <li>Triple Exponential Smoothing (Holt-Winters)<br></br>
 
-The models suggested here are neither exhaustive nor exclusive. QAT enables the user to apply a variety of extrapolation methods and then to compare them using best fit or forecast error metrics. </li>
+                                                    The models suggested here are neither exhaustive nor exclusive. QAT enables the user to apply a variety of extrapolation methods and then to compare them using best fit or forecast error metrics. </li>
                                             </ul>
                                         </li><br></br>
                                         {/* <li>{i18n.t('static.extrapolation.SeasonalWithout')}
                                             <ul>
                                                 <li>{i18n.t('static.extrapolation.Multiplicative')}</li><br></br> */}
 
-                                                <p>{i18n.t('static.extrapolation.SecondStep')} {i18n.t('static.extrapolation.ChoosingToDisregard')} </p>
-                                            {/* </ul>
+                                        <p>{i18n.t('static.extrapolation.SecondStep')} {i18n.t('static.extrapolation.ChoosingToDisregard')} </p>
+                                        {/* </ul>
                                         </li> */}
                                     </ul>
                                 </p>
