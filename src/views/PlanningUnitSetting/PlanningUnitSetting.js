@@ -2146,8 +2146,8 @@ export default class PlanningUnitSetting extends Component {
                     title: i18n.t('static.planningUnitSetting.stockEndOf') + ' ' + this.state.beforeEndDateDisplay + ')',
                     type: 'numeric',
                     textEditor: true,
-                    decimal: '.',
-                    mask: '#,##.00',
+                    // decimal: '.',
+                    mask: '#,##',
                     width: '150',
                     disabledMaskOnEdition: true
                     // readOnly: true //4E
@@ -2156,18 +2156,18 @@ export default class PlanningUnitSetting extends Component {
                     title: i18n.t('static.planningUnitSetting.existingShipments') + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ')',
                     type: 'numeric',
                     textEditor: true,
-                    decimal: '.',
-                    mask: '#,##.00',
+                    // decimal: '.',
+                    mask: '#,##',
                     width: '150',
                     disabledMaskOnEdition: true
                     // readOnly: true //5F
                 },
                 {
-                    title: i18n.t('static.planningUnitSetting.desiredMonthsOfStock') + ' ' +this.state.endDateDisplay + ')',
+                    title: i18n.t('static.planningUnitSetting.desiredMonthsOfStock') + ' ' + this.state.endDateDisplay + ')',
                     type: 'numeric',
                     textEditor: true,
-                    decimal: '.',
-                    mask: '#,##.00',
+                    // decimal: '.',
+                    mask: '#,##',
                     disabledMaskOnEdition: true,
                     width: '150'
                     // readOnly: true //6G
