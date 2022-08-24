@@ -4183,7 +4183,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 </FormGroup>
                                 {(this.state.programQPLDetails.filter(c => c.id == this.state.programId)).length > 0 && (this.state.programQPLDetails.filter(c => c.id == this.state.programId))[0].readonly == 1 && <h5 style={{ color: 'red' }}>{i18n.t('static.dataentry.readonly')}</h5>}
                                 <Row>
-                                    <Col xs="12" md="12" className="mb-4  mt-3">
+                                    <Col xs="12" md="12" className="mb-4  mt-3 loadProgramHeight">
                                         <Nav tabs>
                                             <NavItem>
                                                 <NavLink
