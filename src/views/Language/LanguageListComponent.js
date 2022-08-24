@@ -265,8 +265,8 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import data from '../Tables/DataTable/_data';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY } from '../../Constants.js';
@@ -378,7 +378,8 @@ export default class LanguageListComponent extends Component {
                             // }
                             // console.log("languageArray---->", languageArray);
                             this.el = jexcel(document.getElementById("tableDiv"), '');
-                            this.el.destroy();
+                            // this.el.destroy();
+                            jexcel.destroy(document.getElementById("tableDiv"), true);
                             var json = [];
                             var data = languageArray;
 
@@ -391,55 +392,56 @@ export default class LanguageListComponent extends Component {
                                     {
                                         title: 'LanguageId',
                                         type: 'hidden',
-                                        readOnly: true
+                                        // readOnly: true
                                     },
                                     {
                                         title: i18n.t('static.language.language'),
                                         type: 'text',
-                                        readOnly: true
+                                        // readOnly: true
                                     },
                                     {
                                         title: i18n.t('static.language.languageCode'),
                                         type: 'text',
-                                        readOnly: true
+                                        // readOnly: true
                                     },
                                     {
                                         title: i18n.t('static.language.countryCode'),
                                         type: 'text',
-                                        readOnly: true
+                                        // readOnly: true
                                     },
                                     {
                                         title: i18n.t('static.common.lastModifiedBy'),
                                         type: 'text',
-                                        readOnly: true
+                                        // readOnly: true
                                     },
                                     {
                                         title: i18n.t('static.common.lastModifiedDate'),
                                         type: 'calendar',
                                         options: { format: JEXCEL_DATE_FORMAT_SM },
-                                        readOnly: true
+                                        // readOnly: true
                                     },
                                     {
                                         type: 'dropdown',
                                         title: i18n.t('static.common.status'),
-                                        readOnly: true,
+                                        // readOnly: true,
                                         source: [
                                             { id: true, name: i18n.t('static.common.active') },
                                             { id: false, name: i18n.t('static.common.disabled') }
                                         ]
                                     },
                                 ],
-                                text: {
-                                    // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                                    showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                                    show: '',
-                                    entries: '',
-                                },
+                                editable: false,
+                                // text: {
+                                //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                                //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                                //     show: '',
+                                //     entries: '',
+                                // },
                                 onload: this.loaded,
                                 pagination: localStorage.getItem("sesRecordCount"),
                                 search: true,
                                 columnSorting: true,
-                                tableOverflow: true,
+                                // tableOverflow: true,
                                 wordWrap: true,
                                 allowInsertColumn: false,
                                 allowManualInsertColumn: false,
@@ -537,6 +539,11 @@ export default class LanguageListComponent extends Component {
     }
 
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
         const { SearchBar, ClearSearchButton } = Search;
         const customTotal = (from, to, size) => (
             <span className="react-bootstrap-table-pagination-total">

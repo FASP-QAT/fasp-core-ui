@@ -5,8 +5,8 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
@@ -769,7 +769,7 @@ class VersionSettingsComponent extends Component {
     }
 
     oneditionend = function (instance, cell, x, y, value) {
-        var elInstance = instance.jexcel;
+        var elInstance = instance;
         elInstance.setValueFromCoords(12, y, 1, true);
     }
 
@@ -988,14 +988,15 @@ class VersionSettingsComponent extends Component {
         console.log("versionSettingsArray------->1", versionSettingsArray);
 
         this.el = jexcel(document.getElementById("tableDiv"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("tableDiv"), true);
         var json = [];
         var data = versionSettingsArray;
         console.log("versionSettingsArray------->2", data);
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [100, 120, 60, 80, 150, 100, 110, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+            colWidths: [100, 120, 60, 80, 100, 100, 110, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
@@ -1073,7 +1074,7 @@ class VersionSettingsComponent extends Component {
                     title: i18n.t('static.program.noOfDaysInMonth'),
                     type: 'dropdown',
                     source: this.state.noOfDays,
-                    width: '200',
+                    // width: '150',
                 },//13 N
 
 
@@ -1108,16 +1109,16 @@ class VersionSettingsComponent extends Component {
                 },
 
             ],
-            text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
@@ -1127,7 +1128,7 @@ class VersionSettingsComponent extends Component {
             allowDeleteRow: false,
             onselection: this.selected,
             updateTable: function (el, cell, x, y, source, value, id) {
-                var elInstance = el.jexcel;
+                var elInstance = el;
                 if (y != null) {
                     //left align
                     elInstance.setStyle(`B${parseInt(y) + 1}`, 'text-align', 'left');
@@ -1174,7 +1175,7 @@ class VersionSettingsComponent extends Component {
             }.bind(this),
             onchange: this.changed,
             oneditionend: this.oneditionend,
-            oncreateeditor: this.oncreateeditor,
+            // oncreateeditor: this.oncreateeditor,
             editable: ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_VERSION_SETTINGS')) ? true : false),
             copyCompatibility: true,
             allowExport: false,
@@ -1267,7 +1268,8 @@ class VersionSettingsComponent extends Component {
 
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
-        var asterisk = document.getElementsByClassName("resizable")[0];
+        // var asterisk = document.getElementsByClassName("resizable")[0];
+        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
         tr.children[3].classList.add('InfoTr');
         tr.children[14].classList.add('InfoTrAsteriskTheadtrTd');
@@ -1291,7 +1293,7 @@ class VersionSettingsComponent extends Component {
     }
     oncreateeditor = function (el, cell, x, y) {
         if (x == 4) {
-            var config = el.jexcel.options.columns[x].maxlength;
+            var config = el.options.columns[x].maxlength;
             cell.children[0].setAttribute('maxlength', config);
         }
     }
@@ -1358,6 +1360,10 @@ class VersionSettingsComponent extends Component {
     }
 
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
 
         const { uniquePrograms } = this.state;
         let programMultiList = uniquePrograms.length > 0
@@ -1538,7 +1544,7 @@ class VersionSettingsComponent extends Component {
                     <CardBody className="pb-lg-5 pt-lg-2">
                         <Col md="9 pl-0">
                             <div className="d-md-flex">
-                                <FormGroup className="mt-md-2 mb-md-0">
+                                <FormGroup className="mt-md-2 mb-md-0 ZindexFeild">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.programheader')}</Label>
                                     <div className="controls SelectGoVesionSetting">
                                         {/* <InMultiputGroup> */}
@@ -1553,7 +1559,7 @@ class VersionSettingsComponent extends Component {
                                         />
                                     </div>
                                 </FormGroup>
-                                <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
+                                <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ZindexFeild">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.report.versiontype')}</Label>
                                     <div className="controls SelectGoVesionSetting">
                                         <InputGroup>
@@ -1571,7 +1577,7 @@ class VersionSettingsComponent extends Component {
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
-                                <FormGroup className="mt-md-2 mb-md-0 col-md-4">
+                                <FormGroup className="mt-md-2 mb-md-0 col-md-4 ZindexFeild">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.versionSettings.committedDate')}<span className="stock-box-icon fa fa-sort-desc ml-1"></span></Label>
                                     <div className="controls edit">
                                         <Picker

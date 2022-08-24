@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import PlanningUnitService from '../../api/PlanningUnitService';
 import AuthenticationService from '../Common/AuthenticationService.js';
@@ -257,7 +257,7 @@ export default class MapPlanningUnits extends Component {
                 this.el.setComments(col, "");
             }
             var columnName = jexcel.getColumnNameFromId([x + 1, y]);
-            instance.jexcel.setValue(columnName, '');
+            instance.worksheets[0].setValue(columnName, '');
         }
         if (x == 1) {
             var json = this.el.getJson(null, false);
@@ -439,7 +439,8 @@ export default class MapPlanningUnits extends Component {
 
     dropdownFilter = function (instance, cell, c, r, source) {
         var mylist = [];
-        var value = (instance.jexcel.getJson(null, false)[r])[c - 1];
+        // var value = (instance.jexcel.getJson(null, false)[r])[c - 1];
+        var value = (this.state.mapPlanningUnitEl.getJson(null, false)[r])[c - 1];
         // AuthenticationService.setupAxiosInterceptors();
         // PlanningUnitService.getActivePlanningUnitList()
         //     .then(response => {
@@ -576,7 +577,9 @@ export default class MapPlanningUnits extends Component {
                                 // }
 
                                 this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
-                                this.el.destroy();
+                                // this.el.destroy();
+                                jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
+
                                 var json = [];
                                 var data = productDataArr;
                                 var options = {
@@ -662,7 +665,7 @@ export default class MapPlanningUnits extends Component {
                                     pagination: false,
                                     search: true,
                                     columnSorting: true,
-                                    tableOverflow: true,
+                                    // tableOverflow: true,
                                     wordWrap: true,
                                     parseFormulas: true,
                                     filters: true,
@@ -675,11 +678,12 @@ export default class MapPlanningUnits extends Component {
                                     // oneditionend: this.onedit,
                                     copyCompatibility: true,
                                     allowManualInsertRow: false,
-                                    text: {
-                                        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                                        show: '',
-                                        entries: '',
-                                    },
+                                    editable: true,
+                                    // text: {
+                                    //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                                    //     show: '',
+                                    //     entries: '',
+                                    // },
                                     onload: this.loaded,
                                     oneditionend: this.oneditionend,
                                     license: JEXCEL_PRO_KEY,
@@ -942,7 +946,7 @@ export default class MapPlanningUnits extends Component {
     }
 
     oneditionend = function (instance, cell, x, y, value) {
-        var elInstance = instance.jexcel;
+        var elInstance = instance;
         var rowData = elInstance.getRowData(y);
 
         if (x == 2 && !isNaN(rowData[2]) && rowData[2].toString().indexOf('.') != -1) {
@@ -966,7 +970,9 @@ export default class MapPlanningUnits extends Component {
 
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunctionWithoutPagination(instance);
-        var asterisk = document.getElementsByClassName("resizable")[0];
+        // var asterisk = document.getElementsByClassName("resizable")[0];
+        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
+
         var tr = asterisk.firstChild;
         tr.children[1].classList.add('AsteriskTheadtrTd');
         tr.children[2].classList.add('AsteriskTheadtrTd');
@@ -1012,11 +1018,16 @@ export default class MapPlanningUnits extends Component {
     }
 
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
         return (
             <>
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h4 className="red">{this.props.message}</h4>
-                <div className="table-responsive" style={{ display: this.state.loading ? "none" : "block" }} >
+                <div className="" style={{ display: this.state.loading ? "none" : "block" }} >
 
                     <div id="mapPlanningUnit" className="RowheightForjexceladdRow consumptionDataEntryTable">
                     </div>

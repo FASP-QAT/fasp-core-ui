@@ -31,8 +31,8 @@ import ProcurementAgentService from "../../api/ProcurementAgentService";
 import { Online, Offline } from "react-detect-offline";
 import FundingSourceService from '../../api/FundingSourceService';
 import { MultiSelect } from 'react-multi-select-component';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
@@ -562,7 +562,8 @@ class ProcurementAgentExport extends Component {
             if (versionId == 0) {
                 this.setState({ message: i18n.t('static.program.validversion'), data: [] }, () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
-                    this.el.destroy();
+                    // this.el.destroy();
+                    jexcel.destroy(document.getElementById("tableDiv"), true);
                 })
             } else {
                 localStorage.setItem("sesVersionIdReport", versionId);
@@ -996,7 +997,8 @@ class ProcurementAgentExport extends Component {
         // }
         // console.log("shipmentCostArray---->", shipmentCostArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("tableDiv"), true);
         var json = [];
         var data = shipmentCostArray;
 
@@ -1019,7 +1021,7 @@ class ProcurementAgentExport extends Component {
 
                 title: i18n.t('static.procurementagent.procurementagent'),
                 type: 'text',
-                readOnly: true
+                // readOnly: true
             }
 
             obj2 = {
@@ -1032,7 +1034,7 @@ class ProcurementAgentExport extends Component {
 
                 title: i18n.t('static.report.procurementagentcode'),
                 type: 'text',
-                readOnly: true
+                // readOnly: true
             }
 
         } else if (viewby == 2) {
@@ -1049,7 +1051,7 @@ class ProcurementAgentExport extends Component {
 
                 title: i18n.t('static.budget.fundingsource'),
                 type: 'text',
-                readOnly: true
+                // readOnly: true
             }
 
             obj2 = {
@@ -1062,7 +1064,7 @@ class ProcurementAgentExport extends Component {
 
                 title: i18n.t('static.fundingsource.fundingsourceCode'),
                 type: 'text',
-                readOnly: true
+                // readOnly: true
             }
         } else {
             obj1 = {
@@ -1088,44 +1090,45 @@ class ProcurementAgentExport extends Component {
                 {
                     title: i18n.t('static.report.planningUnit'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.report.qty'),
                     type: 'numeric', mask: '#,##.00', decimal: '.',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.report.productCost'),
                     type: 'numeric', mask: '#,##.00', decimal: '.',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.report.freightPer'),
                     type: 'numeric', mask: '#,##.00', decimal: '.',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.report.freightCost'),
                     type: 'numeric', mask: '#,##.00', decimal: '.',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.report.totalCost'),
                     type: 'numeric', mask: '#,##.00', decimal: '.',
-                    readOnly: true
+                    // readOnly: true
                 },
             ],
-            text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
+            editable: false,
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
@@ -1406,7 +1409,8 @@ class ProcurementAgentExport extends Component {
                                     // this.consolidatedProgramList();
                                     this.consolidatedProcurementAgentList();
                                     this.el = jexcel(document.getElementById("tableDiv"), '');
-                                    this.el.destroy();
+                                    // this.el.destroy();
+                                    jexcel.destroy(document.getElementById("tableDiv"), true);
                                 })
                                 if (error.message === "Network Error") {
                                     this.setState({
@@ -1480,25 +1484,29 @@ class ProcurementAgentExport extends Component {
             } else if (programId == 0) {
                 this.setState({ message: i18n.t('static.report.selectProgram'), data: [] }, () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
-                    this.el.destroy();
+                    // this.el.destroy();
+                    jexcel.destroy(document.getElementById("tableDiv"), true);
                 })
 
             } else if (versionId == 0) {
                 this.setState({ message: i18n.t('static.program.validversion'), data: [] }, () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
-                    this.el.destroy();
+                    // this.el.destroy();
+                    jexcel.destroy(document.getElementById("tableDiv"), true);
                 })
 
             } else if (this.state.planningUnitValues.length == 0) {
                 this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: [] }, () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
-                    this.el.destroy();
+                    // this.el.destroy();
+                    jexcel.destroy(document.getElementById("tableDiv"), true);
                 })
 
             } else if (this.state.procurementAgentValues.length == 0) {
                 this.setState({ message: i18n.t('static.procurementAgent.selectProcurementAgent'), data: [] }, () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
-                    this.el.destroy();
+                    // this.el.destroy();
+                    jexcel.destroy(document.getElementById("tableDiv"), true);
                 })
             }
         } else if (viewby == 2) {
@@ -1730,7 +1738,8 @@ class ProcurementAgentExport extends Component {
                                     // this.consolidatedProgramList();
                                     this.consolidatedFundingSourceList();
                                     this.el = jexcel(document.getElementById("tableDiv"), '');
-                                    this.el.destroy();
+                                    // this.el.destroy();
+                                    jexcel.destroy(document.getElementById("tableDiv"), true);
 
                                 })
                                 if (error.message === "Network Error") {
@@ -1806,25 +1815,29 @@ class ProcurementAgentExport extends Component {
             } else if (programId == 0) {
                 this.setState({ message: i18n.t('static.report.selectProgram'), data: [] }, () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
-                    this.el.destroy();
+                    // this.el.destroy();
+                    jexcel.destroy(document.getElementById("tableDiv"), true);
                 })
 
             } else if (versionId == 0) {
                 this.setState({ message: i18n.t('static.program.validversion'), data: [] }, () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
-                    this.el.destroy();
+                    // this.el.destroy();
+                    jexcel.destroy(document.getElementById("tableDiv"), true);
                 })
 
             } else if (this.state.planningUnitValues.length == 0) {
                 this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: [] }, () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
-                    this.el.destroy();
+                    // this.el.destroy();
+                    jexcel.destroy(document.getElementById("tableDiv"), true);
                 })
 
             } else if (this.state.fundingSourceValues.length == 0) {
                 this.setState({ message: i18n.t('static.fundingSource.selectFundingSource'), data: [] }, () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
-                    this.el.destroy();
+                    // this.el.destroy();
+                    jexcel.destroy(document.getElementById("tableDiv"), true);
                 })
             }
         } else {
@@ -2035,7 +2048,8 @@ class ProcurementAgentExport extends Component {
                                     // this.consolidatedProgramList();
                                     this.consolidatedProcurementAgentList();
                                     this.el = jexcel(document.getElementById("tableDiv"), '');
-                                    this.el.destroy();
+                                    // this.el.destroy();
+                                    jexcel.destroy(document.getElementById("tableDiv"), true);
                                 })
                                 if (error.message === "Network Error") {
                                     this.setState({
@@ -2109,19 +2123,22 @@ class ProcurementAgentExport extends Component {
             } else if (programId == 0) {
                 this.setState({ message: i18n.t('static.report.selectProgram'), data: [] }, () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
-                    this.el.destroy();
+                    // this.el.destroy();
+                    jexcel.destroy(document.getElementById("tableDiv"), true);
                 })
 
             } else if (versionId == 0) {
                 this.setState({ message: i18n.t('static.program.validversion'), data: [] }, () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
-                    this.el.destroy();
+                    // this.el.destroy();
+                    jexcel.destroy(document.getElementById("tableDiv"), true);
                 })
 
             } else if (this.state.planningUnitValues.length == 0) {
                 this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: [] }, () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
-                    this.el.destroy();
+                    // this.el.destroy();
+                    jexcel.destroy(document.getElementById("tableDiv"), true);
                 })
 
             }
@@ -2142,7 +2159,8 @@ class ProcurementAgentExport extends Component {
             }, () => {
                 this.fetchData();
                 this.el = jexcel(document.getElementById("tableDiv"), '');
-                this.el.destroy();
+                // this.el.destroy();
+                jexcel.destroy(document.getElementById("tableDiv"), true);
                 // this.consolidatedProgramList();
                 // this.consolidatedProcurementAgentList();
             })
@@ -2156,7 +2174,8 @@ class ProcurementAgentExport extends Component {
             }, () => {
                 this.fetchData();
                 this.el = jexcel(document.getElementById("tableDiv"), '');
-                this.el.destroy();
+                // this.el.destroy();
+                jexcel.destroy(document.getElementById("tableDiv"), true);
                 // this.consolidatedProgramList();
                 // this.consolidatedProcurementAgentList();
             })
@@ -2172,7 +2191,8 @@ class ProcurementAgentExport extends Component {
                 // this.consolidatedProcurementAgentList();
                 this.fetchData();
                 this.el = jexcel(document.getElementById("tableDiv"), '');
-                this.el.destroy();
+                // this.el.destroy();
+                jexcel.destroy(document.getElementById("tableDiv"), true);
             })
 
 
@@ -2388,6 +2408,11 @@ class ProcurementAgentExport extends Component {
     }
 
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
 
         const { SearchBar, ClearSearchButton } = Search;
         const customTotal = (from, to, size) => (

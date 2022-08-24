@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import i18n from '../../i18n';
 import PipelineService from '../../api/PipelineService.js';
@@ -439,7 +439,9 @@ export default class PipelineProgramConsumption extends Component {
                                     }
                                     console.log('consumptionDataArr', consumptionDataArr)
                                     this.el = jexcel(document.getElementById("consumptiontableDiv"), '');
-                                    this.el.destroy();
+                                    // this.el.destroy();
+                                    jexcel.destroy(document.getElementById("consumptiontableDiv"), true);
+
                                     var json = [];
                                     var data = consumptionDataArr;
                                     // var data = [{}, {}, {}, {}, {}];
@@ -523,7 +525,7 @@ export default class PipelineProgramConsumption extends Component {
                                         }.bind(this),
                                         search: true,
                                         columnSorting: true,
-                                        tableOverflow: true,
+                                        // tableOverflow: true,
                                         wordWrap: true,
                                         allowInsertColumn: false,
                                         allowManualInsertColumn: false,
@@ -536,11 +538,12 @@ export default class PipelineProgramConsumption extends Component {
                                         position: 'top',
                                         license: JEXCEL_PRO_KEY,
                                         filters: true,
-                                        text: {
-                                            showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')} `,
-                                            show: '',
-                                            entries: '',
-                                        },
+                                        // text: {
+                                        //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')} `,
+                                        //     show: '',
+                                        //     entries: '',
+                                        // },
+                                        editable: true,
                                         onload: this.loadedJexcelCommonFunctionTwo,
                                         oneditionend: this.oneditionend,
                                     };
@@ -868,7 +871,7 @@ export default class PipelineProgramConsumption extends Component {
     }
 
     oneditionend = function (instance, cell, x, y, value) {
-        var elInstance = instance.jexcel;
+        var elInstance = instance;
         var rowData = elInstance.getRowData(y);
 
         if (x == 4 && !isNaN(rowData[4]) && rowData[4].toString().indexOf('.') != -1) {
@@ -883,6 +886,11 @@ export default class PipelineProgramConsumption extends Component {
     }
 
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
         return (
             <>
                 <AuthenticationServiceComponent history={this.props.history} />

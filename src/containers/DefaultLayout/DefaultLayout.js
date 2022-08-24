@@ -793,10 +793,18 @@ class DefaultLayout extends Component {
   }
 
   refreshPage() {
+    // setTimeout(()=>{
+    //     window.location.reload(false);
+    // }, 500);
+    // console.log('page to reload')
+    // this.componentDidMount()
+}
+ 
+  // refreshPage() {
     // setTimeout(() => {
     // window.location.reload(false);
     // }, 0);
-  }
+  // }
 
   checkEvent = (e) => {
     // console.log("checkEvent called---", e);

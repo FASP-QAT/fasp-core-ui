@@ -1,6 +1,6 @@
-import React from "react";
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import React, { useEffect } from "react";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import i18n from '../../i18n';
 import getLabelText from '../../CommonComponent/getLabelText';
@@ -46,18 +46,18 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
                 console.log("+++in data[i and z not equal", data[i].y, "Z------------>", z);
-                (instance.jexcel).setValueFromCoords(7, data[i].y, `=ROUND(F${parseInt(data[i].y) + 1}*G${parseInt(data[i].y) + 1},0)`, true);
-                var index = (instance.jexcel).getValue(`M${parseInt(data[i].y) + 1}`, true);
-                if (index === "" || index == null || index == undefined) {
-                    (instance.jexcel).setValueFromCoords(11, data[i].y, "", true);
-                    (instance.jexcel).setValueFromCoords(12, data[i].y, -1, true);
-                    (instance.jexcel).setValueFromCoords(13, data[i].y, 1, true);
-                    (instance.jexcel).setValueFromCoords(14, data[i].y, 0, true);
+                (instance).setValueFromCoords(7, data[i].y, `=ROUND(F${parseInt(data[i].y) + 1}*G${parseInt(data[i].y) + 1},0)`, true);
+                var index = (instance).getValue(`M${parseInt(data[i].y) + 1}`, true);
+                if (index == "" || index == null || index == undefined) {
+                    (instance).setValueFromCoords(11, data[i].y, "", true);
+                    (instance).setValueFromCoords(12, data[i].y, -1, true);
+                    (instance).setValueFromCoords(13, data[i].y, 1, true);
+                    (instance).setValueFromCoords(14, data[i].y, 0, true);
                     z = data[i].y;
                 }
             }
             if (data[i].x == 0 && data[i].value != "") {
-                (instance.jexcel).setValueFromCoords(0, data[i].y, moment(data[i].value).format("YYYY-MM-DD"), true);
+                (instance).setValueFromCoords(0, data[i].y, moment(data[i].value).format("YYYY-MM-DD"), true);
             }
         }
     }
@@ -66,12 +66,12 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
-                var index = (instance.jexcel).getValue(`D${parseInt(data[i].y) + 1}`, true);
-                if (index === "" || index == null || index == undefined) {
-                    var rowData = (instance.jexcel).getRowData(0);
-                    (instance.jexcel).setValueFromCoords(3, data[i].y, 0, true);
-                    (instance.jexcel).setValueFromCoords(4, data[i].y, rowData[4], true);
-                    (instance.jexcel).setValueFromCoords(5, data[i].y, rowData[5], true);
+                var index = (instance).getValue(`D${parseInt(data[i].y) + 1}`, true);
+                if (index == "" || index == null || index == undefined) {
+                    var rowData = (instance).getRowData(0);
+                    (instance).setValueFromCoords(3, data[i].y, 0, true);
+                    (instance).setValueFromCoords(4, data[i].y, rowData[4], true);
+                    (instance).setValueFromCoords(5, data[i].y, rowData[5], true);
                     z = data[i].y;
                 }
             }
@@ -82,7 +82,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         // var checkBoxValue = document.getElementById("showErrors");
         // var elInstance = this.state.consumptionEl;
         // var json = elInstance.getJson(null, false);
-        // var showOption = (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+        // var showOption = (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
         // if (json.length < showOption) {
         //     showOption = json.length;
         // }
@@ -111,7 +111,8 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
     }
 
     oneditionend = function (instance, cell, x, y, value) {
-        var elInstance = instance.jexcel;
+        console.log("instance@@#################", instance)
+        var elInstance = instance;
         var rowData = elInstance.getRowData(y);
 
         if (x == 5 && !isNaN(rowData[5]) && rowData[5].toString().indexOf('.') != -1) {
@@ -185,18 +186,18 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                     var dataSourceResult = [];
                     dataSourceResult = dataSourceRequest.result;
                     for (var k = 0; k < dataSourceResult.length; k++) {
-                        if (dataSourceResult[k].program==null || dataSourceResult[k].program.id == generalProgramJson.programId || dataSourceResult[k].program.id == 0) {
-                            if (dataSourceResult[k].realm.id == generalProgramJson.realmCountry.realm.realmId && (dataSourceResult[k].dataSourceType.id == ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE || dataSourceResult[k].dataSourceType.id == FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE)) {
-                                var dataSourceJson = {
-                                    name: getLabelText(dataSourceResult[k].label, this.props.items.lang),
-                                    id: dataSourceResult[k].dataSourceId,
-                                    dataSourceTypeId: dataSourceResult[k].dataSourceType.id,
-                                    active: dataSourceResult[k].active,
-                                    label: dataSourceResult[k].label
-                                }
-                                dataSourceList.push(dataSourceJson);
+                        // if (dataSourceResult[k].program.id == generalProgramJson.programId || dataSourceResult[k].program.id == 0) {
+                        if (dataSourceResult[k].realm.id == generalProgramJson.realmCountry.realm.realmId && (dataSourceResult[k].dataSourceType.id == ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE || dataSourceResult[k].dataSourceType.id == FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE)) {
+                            var dataSourceJson = {
+                                name: getLabelText(dataSourceResult[k].label, this.props.items.lang),
+                                id: dataSourceResult[k].dataSourceId,
+                                dataSourceTypeId: dataSourceResult[k].dataSourceType.id,
+                                active: dataSourceResult[k].active,
+                                label: dataSourceResult[k].label
                             }
+                            dataSourceList.push(dataSourceJson);
                         }
+                        // }
                     }
                     if (this.props.useLocalData == 0) {
                         dataSourceList = this.props.items.dataSourceList;
@@ -207,10 +208,12 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         this.props.updateState("dataSourceList", dataSourceList);
                     })
                     if (this.state.consumptionEl != "" && this.state.consumptionEl != undefined) {
-                        this.state.consumptionEl.destroy();
+                        jexcel.destroy(document.getElementById("consumptionTable"), true);
                     }
                     if (this.state.consumptionBatchInfoTableEl != "" && this.state.consumptionBatchInfoTableEl != undefined) {
-                        this.state.consumptionBatchInfoTableEl.destroy();
+                        // this.state.consumptionBatchInfoTableEl.destroy();
+                        jexcel.destroy(document.getElementById("consumptionBatchInfoTable"), true);
+
                     }
                     var data = [];
                     var consumptionDataArr = [];
@@ -312,15 +315,15 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         data: consumptionDataArr,
                         columnDrag: true,
                         columns: [
-                            { title: i18n.t('static.pipeline.consumptionDate'), type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker',validRange: [moment(MIN_DATE_RESTRICTION_IN_DATA_ENTRY).startOf('month').format("YYYY-MM-DD"), moment(Date.now()).add(MAX_DATE_RESTRICTION_IN_DATA_ENTRY,'years').endOf('month').format("YYYY-MM-DD")] }, width: 100, readOnly: readonlyRegionAndMonth },
+                            { title: i18n.t('static.pipeline.consumptionDate'), type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker', validRange: [moment(MIN_DATE_RESTRICTION_IN_DATA_ENTRY).startOf('month').format("YYYY-MM-DD"), moment(Date.now()).add(MAX_DATE_RESTRICTION_IN_DATA_ENTRY, 'years').endOf('month').format("YYYY-MM-DD")] }, width: 100, readOnly: readonlyRegionAndMonth },
                             { title: i18n.t('static.region.region'), type: 'dropdown', readOnly: readonlyRegionAndMonth, source: this.props.items.regionList, width: 100 },
                             { type: 'dropdown', title: i18n.t('static.consumption.consumptionType'), source: [{ id: 1, name: i18n.t('static.consumption.actual') }, { id: 2, name: i18n.t('static.consumption.forcast') }], width: 100 },
                             { title: i18n.t('static.inventory.dataSource'), type: 'dropdown', source: dataSourceList, width: 120, filter: this.filterDataSourceBasedOnConsumptionType },
                             { title: i18n.t('static.supplyPlan.alternatePlanningUnit'), type: 'dropdown', source: realmCountryPlanningUnitList, filter: this.filterRealmCountryPlanningUnit, width: 150 },
-                            { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: 'numeric', textEditor: true, mask: '#,##.00', decimal: '.', textEditor: true, disabledMaskOnEdition: true, width: 120, },
+                            { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: 'numeric', textEditor: true, mask: '#,##', decimal: '.', textEditor: true, disabledMaskOnEdition: true, width: 120, },
                             { title: i18n.t('static.unit.multiplierFromARUTOPU'), type: 'numeric', mask: '#,##0.000000', decimal: '.', width: 90, readOnly: true },
                             { title: i18n.t('static.supplyPlan.quantityPU'), type: 'numeric', mask: '#,##.00', decimal: '.', width: 120, readOnly: true },
-                            { title: i18n.t('static.consumption.daysofstockout'), type: 'numeric', mask: '#,##.00', decimal: '.', disabledMaskOnEdition: true, textEditor: true, width: 80 },
+                            { title: i18n.t('static.consumption.daysofstockout'), type: 'numeric', mask: '#,##', decimal: '.', disabledMaskOnEdition: true, textEditor: true, width: 80 },
                             { title: i18n.t('static.program.notes'), type: 'text', width: 400 },
                             { title: i18n.t('static.inventory.active'), type: 'checkbox', width: 100, readOnly: !consumptionEditable },
                             { type: 'hidden', title: i18n.t('static.supplyPlan.batchInfo'), width: 0 },
@@ -333,7 +336,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         paginationOptions: paginationArray,
                         search: searchOption,
                         columnSorting: true,
-                        tableOverflow: true,
+                        // tableOverflow: true,
                         wordWrap: true,
                         allowInsertColumn: false,
                         allowManualInsertColumn: false,
@@ -347,22 +350,22 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         onpaste: this.onPaste,
                         oneditionend: this.oneditionend,
                         onchangepage: this.onchangepage,
-                        text: {
-                            // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                            showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                            show: '',
-                            entries: '',
-                        },
+                        // text: {
+                        //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                        //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                        //     show: '',
+                        //     entries: '',
+                        // },
                         onload: this.loadedConsumption,
                         editable: consumptionEditable,
                         onchange: this.consumptionChanged,
                         updateTable: function (el, cell, x, y, source, value, id) {
                         }.bind(this),
                         onsearch: function (el) {
-                            el.jexcel.updateTable();
+                            // el.jexcel.updateTable();
                         },
                         onfilter: function (el) {
-                            el.jexcel.updateTable();
+                            // el.jexcel.updateTable();
                         },
                         contextMenu: function (obj, x, y, e) {
                             var items = [];
@@ -455,7 +458,8 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             batchInfoList: batchList
         })
         if (this.state.consumptionBatchInfoTableEl != "" && this.state.consumptionBatchInfoTableEl != undefined) {
-            this.state.consumptionBatchInfoTableEl.destroy();
+            // this.state.consumptionBatchInfoTableEl.destroy();
+            jexcel.destroy(document.getElementById("consumptionBatchInfoTable"), true);
         }
         var json = [];
         var consumptionQty = 0;
@@ -539,11 +543,11 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             editable: consumptionBatchEditable,
             license: JEXCEL_PRO_KEY,
             onpaste: this.onPasteForBatchInfo,
-            text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
             onload: this.loadedBatchInfoConsumption,
             updateTable: function (el, cell, x, y, source, value, id) {
             }.bind(this),
@@ -625,7 +629,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         data[15] = 0;
         obj.insertRow(data);
         if (this.props.consumptionPage == "consumptionDataEntry") {
-            var showOption = (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+            var showOption = (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
             if (showOption != 5000000) {
                 var pageNo = parseInt(parseInt(json.length - 1) / parseInt(showOption));
                 obj.page(pageNo);
@@ -652,7 +656,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         } else {
             jExcelLoadedFunction(instance);
         }
-        var asterisk = document.getElementsByClassName("resizable")[0];
+        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
         tr.children[1].classList.add('AsteriskTheadtrTd');
         tr.children[2].classList.add('AsteriskTheadtrTd');
@@ -660,12 +664,12 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         tr.children[4].classList.add('AsteriskTheadtrTd');
         tr.children[5].classList.add('AsteriskTheadtrTd');
         tr.children[6].classList.add('AsteriskTheadtrTd');
-        var elInstance = instance.jexcel;
+        var elInstance = instance.worksheets[0];
         var json = elInstance.getJson(null, false);
         var jsonLength;
         if (this.props.consumptionPage == "consumptionDataEntry") {
-            if ((document.getElementsByClassName("jexcel_pagination_dropdown")[0] != undefined)) {
-                jsonLength = 1 * (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+            if ((document.getElementsByClassName("jss_pagination_dropdown")[0] != undefined)) {
+                jsonLength = 1 * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
             }
         } else {
             jsonLength = json.length;
@@ -752,17 +756,17 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
     }
 
     onchangepage(el, pageNo, oldPageNo) {
-        var elInstance = el.jexcel;
+        var elInstance = el;
         var json = elInstance.getJson(null, false);
         var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q']
-        var jsonLength = (pageNo + 1) * (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+        var jsonLength = (pageNo + 1) * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
         if (jsonLength == undefined) {
             jsonLength = 15
         }
         if (json.length < jsonLength) {
             jsonLength = json.length;
         }
-        var start = pageNo * (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+        var start = pageNo * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
         for (var y = start; y < jsonLength; y++) {
             var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O']
             var rowData = elInstance.getRowData(y);
@@ -837,9 +841,10 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         }
     }
 
-    filterDataSourceBasedOnConsumptionType = function (instance, cell, c, r, source) {
+    filterDataSourceBasedOnConsumptionType = function (instance, cell, c, r, source, conf) {
+        console.log("instance@@@@@@@@@@@############", instance)
         var mylist = [];
-        var value = (instance.jexcel.getJson(null, false)[r])[2];
+        var value = (this.state.consumptionEl.getJson(null, false)[r])[2];
         if (value == 1) {
             mylist = this.state.dataSourceList.filter(c => c.dataSourceTypeId == ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE && c.active.toString() == "true");
         } else {
@@ -1054,7 +1059,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
 
     filterBatchInfoForExistingDataForConsumption = function (instance, cell, c, r, source) {
         var mylist = [];
-        var json = instance.jexcel.getJson(null, false)
+        var json = instance.worksheets[0].getJson(null, false)
         var value = (json[r])[3];
         var date = (json[r])[5];
         // if (value != 0) {
@@ -1308,7 +1313,9 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                 if (this.props.consumptionPage == "consumptionDataEntry") {
                     this.props.toggleLarge("submit");
                 }
-                elInstance.destroy();
+                // elInstance.destroy();
+                jexcel.destroy(document.getElementById("consumptionTable"), true);
+
             }
             this.props.updateState("loading", false);
         } else {
@@ -1738,5 +1745,11 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         }
     }
 
-    render() { return (<div></div>) }
+    render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+        return (<div></div>)
+    }
 }
