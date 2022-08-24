@@ -20,8 +20,8 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import { LABEL_REGEX, SPECIAL_CHARECTER_WITH_NUM, SPECIAL_CHARECTER_WITH_NUM_NODOUBLESPACE } from '../../Constants.js';
 import { ALPHABET_NUMBER_REGEX, SPACE_REGEX } from '../../Constants.js';
 import classNames from 'classnames';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import { JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from "../../Constants";
@@ -143,6 +143,7 @@ class EditUserComponent extends Component {
             rows: [],
             loading1: true,
             programListForFilter: [],
+            addUserEL: ''
         }
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
@@ -721,7 +722,9 @@ class EditUserComponent extends Component {
     filterProgramByCountryId = function (instance, cell, c, r, source) {
 
         var mylist = [];
-        var value = (instance.jexcel.getJson(null, false)[r])[1];
+        // var value = (instance.jexcel.getJson(null, false)[r])[1];
+        var value = (this.state.addUserEL.getJson(null, false)[r])[1];
+
         console.log("mylist--------->3.2", value);
 
         // const { selProgram } = this.state;
@@ -748,6 +751,7 @@ class EditUserComponent extends Component {
         let countryList = [];
         let organisationList = [];
         let healthAreaList = [];
+        var varEL = "";
 
         if (selProgram.length > 0) {
             for (var i = 0; i < selProgram.length; i++) {
@@ -864,7 +868,9 @@ class EditUserComponent extends Component {
             papuDataArr[0] = data;
         }
         this.el = jexcel(document.getElementById("paputableDiv"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("paputableDiv"), true);
+
         var json = [];
         var data = papuDataArr;
 
@@ -914,7 +920,8 @@ class EditUserComponent extends Component {
             filters: true,
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
+            editable: true,
             wordWrap: true,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
@@ -926,12 +933,12 @@ class EditUserComponent extends Component {
             copyCompatibility: true,
             parseFormulas: true,
             onpaste: this.onPaste,
-            text: {
-                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
             onload: this.loaded,
             license: JEXCEL_PRO_KEY,
             contextMenu: function (obj, x, y, e) {
@@ -1085,7 +1092,9 @@ class EditUserComponent extends Component {
         };
 
         this.el = jexcel(document.getElementById("paputableDiv"), options);
+        varEL = this.el
         this.setState({
+            addUserEL: varEL,
             loading: false,
             loading1: false
         })
@@ -1093,7 +1102,9 @@ class EditUserComponent extends Component {
 
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
-        var asterisk = document.getElementsByClassName("resizable")[0];
+        // var asterisk = document.getElementsByClassName("resizable")[0];
+        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
+
         var tr = asterisk.firstChild;
         // tr.children[1].classList.add('AsteriskTheadtrTd');
         tr.children[2].classList.add('AsteriskTheadtrTd');
@@ -1118,7 +1129,7 @@ class EditUserComponent extends Component {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
-                (instance.jexcel).setValueFromCoords(0, data[i].y, this.state.user.username, true);
+                (instance).setValueFromCoords(0, data[i].y, this.state.user.username, true);
                 z = data[i].y;
             }
         }
@@ -1445,6 +1456,11 @@ class EditUserComponent extends Component {
     }
 
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
         const { realms } = this.state;
         const { languages } = this.state;
 

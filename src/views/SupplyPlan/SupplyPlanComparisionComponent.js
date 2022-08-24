@@ -22,6 +22,8 @@ import ConsumptionInSupplyPlanComponent from "./ConsumptionInSupplyPlan";
 import { calculateSupplyPlan } from "./SupplyPlanCalculations";
 import AuthenticationServiceComponent from "../Common/AuthenticationServiceComponent";
 import { Link } from "react-router-dom";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 
 const entityname = i18n.t('static.dashboard.supplyPlan')
 export default class SupplyPlanComponent extends React.Component {
@@ -710,7 +712,7 @@ export default class SupplyPlanComponent extends React.Component {
                     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                     var programJson = JSON.parse(programData);
                     var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
-                    console.log("List@@@@@@@@@@@",planningUnitDataList)
+                    console.log("List@@@@@@@@@@@", planningUnitDataList)
                     for (var i = 0; i < programJson.regionList.length; i++) {
                         var regionJson = {
                             // name: // programJson.regionList[i].regionId,
@@ -1859,7 +1861,9 @@ export default class SupplyPlanComponent extends React.Component {
         this.setState({ loading: true, consumptionStartDateClicked: startDate });
         var elInstance = this.state.consumptionBatchInfoTableEl;
         if (elInstance != undefined && elInstance != "") {
-            elInstance.destroy();
+            // elInstance.destroy();
+            jexcel.destroy(document.getElementById("consumptionBatchInfoTable"), true);
+
         }
         var planningUnitId = document.getElementById("planningUnitId").value;
         var programId = document.getElementById("programId").value;
@@ -1942,7 +1946,9 @@ export default class SupplyPlanComponent extends React.Component {
         this.setState({ loading: true, inventoryStartDateClicked: moment(endDate).startOf('month').format("YYYY-MM-DD") })
         var elInstance = this.state.inventoryBatchInfoTableEl;
         if (elInstance != undefined && elInstance != "") {
-            elInstance.destroy();
+            // elInstance.destroy();
+            jexcel.destroy(document.getElementById("inventoryBatchInfoTable"), true);
+
         }
         var planningUnitId = document.getElementById("planningUnitId").value;
         var programId = document.getElementById("programId").value;
@@ -3316,8 +3322,11 @@ export default class SupplyPlanComponent extends React.Component {
     actionCanceledShipments(type) {
         if (type == "qtyCalculator") {
             document.getElementById("showSaveQtyButtonDiv").style.display = 'none';
-            (this.refs.shipmentChild.state.qtyCalculatorTableEl).destroy();
-            (this.refs.shipmentChild.state.qtyCalculatorTableEl1).destroy();
+            // (this.refs.shipmentChild.state.qtyCalculatorTableEl).destroy();
+            // (this.refs.shipmentChild.state.qtyCalculatorTableEl1).destroy();
+            jexcel.destroy(document.getElementById("qtyCalculatorTable"), true);
+            jexcel.destroy(document.getElementById("qtyCalculatorTable1"), true);
+
             this.refs.shipmentChild.state.shipmentQtyChangedFlag = 0;
             this.setState({
                 qtyCalculatorValidationError: "",
@@ -3325,7 +3334,9 @@ export default class SupplyPlanComponent extends React.Component {
             })
         } else if (type == "shipmentDates") {
             document.getElementById("showSaveShipmentsDatesButtonsDiv").style.display = 'none';
-            (this.refs.shipmentChild.state.shipmentDatesTableEl).destroy();
+            // (this.refs.shipmentChild.state.shipmentDatesTableEl).destroy();
+            jexcel.destroy(document.getElementById("shipmentDatesTable"), true);
+
             this.refs.shipmentChild.state.shipmentDatesChangedFlag = 0;
             this.setState({
                 shipmentDatesChangedFlag: 0,
@@ -3333,7 +3344,9 @@ export default class SupplyPlanComponent extends React.Component {
             })
         } else if (type == "shipmentBatch") {
             document.getElementById("showShipmentBatchInfoButtonsDiv").style.display = 'none';
-            (this.refs.shipmentChild.state.shipmentBatchInfoTableEl).destroy();
+            // (this.refs.shipmentChild.state.shipmentBatchInfoTableEl).destroy();
+            jexcel.destroy(document.getElementById("shipmentBatchInfoTable"), true);
+
             this.refs.shipmentChild.state.shipmentBatchInfoChangedFlag = 0;
             this.setState({
                 shipmentBatchInfoChangedFlag: 0,
@@ -3345,7 +3358,9 @@ export default class SupplyPlanComponent extends React.Component {
 
     actionCanceledInventory() {
         document.getElementById("showInventoryBatchInfoButtonsDiv").style.display = 'none';
-        (this.refs.inventoryChild.state.inventoryBatchInfoTableEl).destroy();
+        // (this.refs.inventoryChild.state.inventoryBatchInfoTableEl).destroy();
+        jexcel.destroy(document.getElementById("inventoryBatchInfoTable"), true);
+
         this.refs.inventoryChild.state.inventoryBatchInfoChangedFlag = 0;
         this.setState({
             inventoryBatchInfoChangedFlag: 0,
@@ -3357,7 +3372,9 @@ export default class SupplyPlanComponent extends React.Component {
 
     actionCanceledConsumption() {
         document.getElementById("showConsumptionBatchInfoButtonsDiv").style.display = 'none';
-        (this.refs.consumptionChild.state.consumptionBatchInfoTableEl).destroy();
+        // (this.refs.consumptionChild.state.consumptionBatchInfoTableEl).destroy();
+        jexcel.destroy(document.getElementById("consumptionBatchInfoTable"), true);
+
         this.refs.consumptionChild.state.consumptionBatchInfoChangedFlag = 0;
         this.setState({
             consumptionBatchInfoChangedFlag: 0,

@@ -690,8 +690,8 @@ import StatusUpdateButtonFeature from "../../CommonComponent/StatusUpdateButtonF
 import UpdateButtonFeature from '../../CommonComponent/UpdateButtonFeature';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import CryptoJS from 'crypto-js';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import moment from "moment";
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
@@ -937,7 +937,9 @@ class PlanningUnitCapacity extends Component {
             papuDataArr[0] = data;
         }
         this.el = jexcel(document.getElementById("paputableDiv"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("paputableDiv"), true);
+
         var json = [];
         var data = papuDataArr;
 
@@ -996,11 +998,12 @@ class PlanningUnitCapacity extends Component {
                 }
 
             ],
+            editbale: true,
             pagination: localStorage.getItem("sesRecordCount"),
             filters: true,
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             parseFormulas: true,
@@ -1013,11 +1016,11 @@ class PlanningUnitCapacity extends Component {
             copyCompatibility: true,
             onpaste: this.onPaste,
             oneditionend: this.oneditionend,
-            text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
             onload: this.loaded,
             license: JEXCEL_PRO_KEY,
             contextMenu: function (obj, x, y, e) {
@@ -1183,7 +1186,7 @@ class PlanningUnitCapacity extends Component {
     }
 
     oneditionend = function (instance, cell, x, y, value) {
-        var elInstance = instance.jexcel;
+        var elInstance = instance;
         var rowData = elInstance.getRowData(y);
 
         if (x == 4 && !isNaN(rowData[4]) && rowData[4].toString().indexOf('.') != -1) {
@@ -1197,11 +1200,11 @@ class PlanningUnitCapacity extends Component {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
-                var index = (instance.jexcel).getValue(`G${parseInt(data[i].y) + 1}`, true);
+                var index = (instance).getValue(`G${parseInt(data[i].y) + 1}`, true);
                 if (index === "" || index == null || index == undefined) {
-                    (instance.jexcel).setValueFromCoords(6, data[i].y, 0, true);
-                    (instance.jexcel).setValueFromCoords(7, data[i].y, 1, true);
-                    (instance.jexcel).setValueFromCoords(0, data[i].y, getLabelText(this.state.planningUnit.label, this.state.lang), true);
+                    (instance).setValueFromCoords(6, data[i].y, 0, true);
+                    (instance).setValueFromCoords(7, data[i].y, 1, true);
+                    (instance).setValueFromCoords(0, data[i].y, getLabelText(this.state.planningUnit.label, this.state.lang), true);
                     z = data[i].y;
                 }
             }
@@ -1551,7 +1554,9 @@ class PlanningUnitCapacity extends Component {
 
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
-        var asterisk = document.getElementsByClassName("resizable")[0];
+        // var asterisk = document.getElementsByClassName("resizable")[0];
+        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
+
         var tr = asterisk.firstChild;
         tr.children[2].classList.add('AsteriskTheadtrTd');
         tr.children[3].classList.add('AsteriskTheadtrTd');
@@ -1716,7 +1721,7 @@ class PlanningUnitCapacity extends Component {
                             <Button type="submit" size="md" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                             <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> {i18n.t('static.common.addRow')}</Button>
                             &nbsp;
-                </FormGroup>
+                        </FormGroup>
                     </CardFooter>
                 </Card>
 

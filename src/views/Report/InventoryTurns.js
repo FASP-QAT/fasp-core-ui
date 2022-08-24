@@ -23,8 +23,8 @@ import { Link } from "react-router-dom";
 import CryptoJS from 'crypto-js'
 import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
@@ -644,7 +644,8 @@ export default class InventoryTurns extends Component {
         }
         // console.log("costOfInventoryArray---->", costOfInventoryArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("tableDiv"), true);
         var json = [];
         var data = costOfInventoryArray;
 
@@ -658,39 +659,40 @@ export default class InventoryTurns extends Component {
                 {
                     title: i18n.t('static.report.planningUnit'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.report.totconsumption'),
                     type: 'numeric', mask: '#,##',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.report.avergeStock'),
                     type: 'numeric', mask: '#,##',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.report.noofmonth'),
                     type: 'numeric', mask: '#,##',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.dashboard.inventoryTurns'),
                     type: 'numeric', mask: '#,##.00', decimal: '.',
-                    readOnly: true
+                    // readOnly: true
                 },
             ],
-            text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
+            editable: false,
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
@@ -907,7 +909,8 @@ export default class InventoryTurns extends Component {
                             loading: false
                         }, () => {
                             this.el = jexcel(document.getElementById("tableDiv"), '');
-                            this.el.destroy();
+                            // this.el.destroy();
+                            jexcel.destroy(document.getElementById("tableDiv"), true);
                         });
                         if (error.message === "Network Error") {
                             this.setState({
@@ -951,12 +954,14 @@ export default class InventoryTurns extends Component {
         } else if (this.state.CostOfInventoryInput.programId == 0) {
             this.setState({ loading: false, costOfInventory: [], message: i18n.t('static.common.selectProgram') }, () => {
                 this.el = jexcel(document.getElementById("tableDiv"), '');
-                this.el.destroy();
+                // this.el.destroy();
+                jexcel.destroy(document.getElementById("tableDiv"), true);
             });
         } else {
             this.setState({ loading: false, costOfInventory: [], message: i18n.t('static.program.validversion') }, () => {
                 this.el = jexcel(document.getElementById("tableDiv"), '');
-                this.el.destroy();
+                // this.el.destroy();
+                jexcel.destroy(document.getElementById("tableDiv"), true);
             });
         }
     }
@@ -969,6 +974,11 @@ export default class InventoryTurns extends Component {
 
 
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
         const { singleValue2 } = this.state
 
         const { programs } = this.state;

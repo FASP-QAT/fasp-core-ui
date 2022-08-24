@@ -307,8 +307,8 @@ import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import moment from 'moment';
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
@@ -400,7 +400,8 @@ export default class CurrencyListComponent extends Component {
                         // }
                         // console.log("currencyArray---->", currencyArray);
                         this.el = jexcel(document.getElementById("tableDiv"), '');
-                        this.el.destroy();
+                        // this.el.destroy();
+                        jexcel.destroy(document.getElementById("tableDiv"),true);
                         var json = [];
                         var data = currencyArray;
 
@@ -418,41 +419,42 @@ export default class CurrencyListComponent extends Component {
                                 {
                                     title: i18n.t('static.currency.currency'),
                                     type: 'text',
-                                    readOnly: true
+                                    // readOnly: true
                                 },
                                 {
                                     title: i18n.t('static.currency.currencycode'),
                                     type: 'text',
-                                    readOnly: true
+                                    // readOnly: true
                                 },
                                 {
                                     title: i18n.t('static.currency.conversionrateusd'),
                                     type: 'numeric', mask: '#,##.00', decimal: '.',
-                                    readOnly: true
+                                    // readOnly: true
                                 },
                                 {
                                     title: i18n.t('static.common.lastModifiedBy'),
                                     type: 'text',
-                                    readOnly: true
+                                    // readOnly: true
                                 },
                                 {
                                     title: i18n.t('static.common.lastModifiedDate'),
-                                    readOnly: true,
+                                    // readOnly: true,
                                     type: 'calendar',
                                     options: { format: JEXCEL_DATE_FORMAT_SM },
                                 },
                             ],
-                            text: {
-                                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                                show: '',
-                                entries: '',
-                            },
+                            // text: {
+                            //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                            //     show: '',
+                            //     entries: '',
+                            // },
+                            editable: false,
                             onload: this.loaded,
                             pagination: localStorage.getItem("sesRecordCount"),
                             search: true,
                             columnSorting: true,
-                            tableOverflow: true,
+                            // tableOverflow: true,
                             wordWrap: true,
                             allowInsertColumn: false,
                             allowManualInsertColumn: false,
@@ -574,6 +576,11 @@ export default class CurrencyListComponent extends Component {
         return getLabelText(cell, this.state.lang);
     }
     render() {
+
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
 
         const { SearchBar, ClearSearchButton } = Search;
         const customTotal = (from, to, size) => (
