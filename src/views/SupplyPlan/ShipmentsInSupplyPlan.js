@@ -602,7 +602,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                 { type: 'checkbox', title: i18n.t('static.shipmentDataEntry.localProcurement'), width: 80, readOnly: !shipmentEditable },
                                                 { type: 'text', title: i18n.t('static.shipmentDataentry.procurementAgentOrderNo'), width: 100 },
                                                 { type: erpType, title: i18n.t('static.shipmentDataentry.procurementAgentPrimeLineNo'), width: 100, readOnly: true },
-                                                { type: 'numeric', title: i18n.t("static.supplyPlan.adjustesOrderQty"), width: 130, mask: '#,##.00', decimal: '.', textEditor: true, disabledMaskOnEdition: true },
+                                                { type: 'numeric', title: i18n.t("static.supplyPlan.adjustesOrderQty"), width: 130, mask: '#,##', textEditor: true, disabledMaskOnEdition: true },
                                                 { type: 'checkbox', title: i18n.t('static.supplyPlan.emergencyOrder'), width: 100, readOnly: !shipmentEditable },
                                                 { type: 'dropdown', title: i18n.t('static.subfundingsource.fundingsource'), source: fundingSourceList, filter: this.filterFundingSource, width: 120 },
                                                 { type: 'dropdown', title: i18n.t('static.dashboard.budget'), source: budgetList, filter: this.budgetDropdownFilter, width: 120 },
@@ -1690,7 +1690,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     type: 'numeric',
                     textEditor: true,
                     disabledMaskOnEdition: true,
-                    mask: '#,##.00', decimal: '.'
+                    mask: '#,##',
+                    // decimal: '.'
                 },
                 {
                     title: i18n.t('static.supplyPlan.shipmentTransBatchInfoId'),
@@ -4053,11 +4054,11 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 columnDrag: true,
                 columns: [
                     { title: i18n.t('static.supplyPlan.adjustesOrderQty'), type: 'dropdown', source: adjustedOrderQty, width: 120 },
-                    { title: i18n.t('static.supplyPlan.suggestedOrderQty'), type: 'numeric', textEditor: true, mask: '#,##.00', decimal: '.', width: 120, readOnly: true },
-                    { title: i18n.t('static.supplyPlan.manualOrderQty'), type: 'numeric', textEditor: true, mask: '#,##.00', decimal: '.', width: 120 },
+                    { title: i18n.t('static.supplyPlan.suggestedOrderQty'), type: 'numeric', textEditor: true, mask: '#,##', width: 120, readOnly: true },
+                    { title: i18n.t('static.supplyPlan.manualOrderQty'), type: 'numeric', textEditor: true, mask: '#,##', width: 120 },
                     { type: roundingOptionType, title: i18n.t('static.supplyPlan.orderBasedOn'), source: orderBasedOn, width: 120 },
                     { type: roundingOptionType, title: i18n.t('static.supplyPlan.roundingOption'), source: [{ id: 1, name: i18n.t('static.supplyPlan.roundDown') }, { id: 2, name: i18n.t('static.supplyPlan.roundUp') }], width: 120 },
-                    { title: i18n.t('static.supplyPlan.finalOrderQty'), type: 'numeric', textEditor: true, readOnly: true, mask: '#,##.00', decimal: '.', width: 120 },
+                    { title: i18n.t('static.supplyPlan.finalOrderQty'), type: 'numeric', textEditor: true, readOnly: true, mask: '#,##', width: 120 },
                     { title: i18n.t('static.supplyPlan.rowNumber'), type: 'hidden', width: 0 },
                     { type: 'hidden', readOnly: true, title: i18n.t('static.procurementAgentPlanningUnit.moq'), width: 0 },
                     { type: 'hidden', title: i18n.t('static.procurementAgentPlanningUnit.unitPerPalletEuro1'), width: 0 },

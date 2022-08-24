@@ -1829,11 +1829,11 @@ export default class SupplyPlanComponent extends React.Component {
                                     </tfoot>
                                 </Table>
                                 {this.state.showConsumption == 1 && <ConsumptionInSupplyPlanComponent ref="consumptionChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} consumptionPage="supplyPlan" useLocalData={1} />}
-                                <div className="table-responsive mt-3">
+                                <div className=" mt-3">
                                     <div id="consumptionTable" />
                                 </div>
                                 <h6 className="red" id="div3">{this.state.consumptionBatchInfoDuplicateError || this.state.consumptionBatchInfoNoStockError || this.state.consumptionBatchError}</h6>
-                                <div className="table-responsive">
+                                <div className="">
                                     <div id="consumptionBatchInfoTable" className="AddListbatchtrHeight"></div>
                                 </div>
 
@@ -2043,11 +2043,11 @@ export default class SupplyPlanComponent extends React.Component {
                                     </>
                                 }
                                 {this.state.showInventory == 1 && <InventoryInSupplyPlanComponent ref="inventoryChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} inventoryPage="supplyPlan" hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} adjustmentsDetailsClicked={this.adjustmentsDetailsClicked} useLocalData={1} />}
-                                <div className="table-responsive mt-3">
-                                    <div id="adjustmentsTable" className="table-responsive " />
+                                <div className=" mt-3">
+                                    <div id="adjustmentsTable" className=" " />
                                 </div>
                                 <h6 className="red" id="div3">{this.state.inventoryBatchInfoDuplicateError || this.state.inventoryBatchInfoNoStockError || this.state.inventoryBatchError}</h6>
-                                <div className="table-responsive">
+                                <div className="">
                                     <div id="inventoryBatchInfoTable" className="AddListbatchtrHeight"></div>
                                 </div>
 
@@ -2099,16 +2099,16 @@ export default class SupplyPlanComponent extends React.Component {
                             <ModalBody>
                                 <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} hideFourthComponent={this.hideFourthComponent} hideFifthComponent={this.hideFifthComponent} shipmentPage="supplyPlan" useLocalData={1} />
                                 <h6 className="red" id="div2">{this.state.noFundsBudgetError || this.state.shipmentBatchError || this.state.shipmentError}</h6>
-                                <div className="table-responsive">
+                                <div className="">
                                     <div id="shipmentsDetailsTable" />
                                 </div>
 
                                 <h6 className="red" id="div3">{this.state.qtyCalculatorValidationError}</h6>
-                                <div className="table-responsive RemoveStriped">
+                                <div className=" RemoveStriped">
                                     <div id="qtyCalculatorTable"></div>
                                 </div>
 
-                                <div className="table-responsive RemoveStriped">
+                                <div className=" RemoveStriped">
                                     <div id="qtyCalculatorTable1"></div>
                                 </div>
 
@@ -2118,7 +2118,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 </div>
 
                                 <h6 className="red" id="div4">{this.state.shipmentDatesError}</h6>
-                                <div className="table-responsive">
+                                <div className="">
                                     <div id="shipmentDatesTable"></div>
                                 </div>
                                 <div id="showSaveShipmentsDatesButtonsDiv" style={{ display: 'none' }}>
@@ -2126,7 +2126,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     {this.state.shipmentDatesChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipmentsDate()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveShipmentDates')}</Button>}
                                 </div>
                                 <h6 className="red" id="div5">{this.state.shipmentBatchInfoDuplicateError || this.state.shipmentValidationBatchError}</h6>
-                                <div className="table-responsive">
+                                <div className="">
                                     <div id="shipmentBatchInfoTable" className="AddListbatchtrHeight"></div>
                                 </div>
                                 <div id="showShipmentBatchInfoButtonsDiv" style={{ display: 'none' }}>

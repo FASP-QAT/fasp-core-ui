@@ -1197,8 +1197,10 @@ class AddprogramPlanningUnit extends Component {
                 this.el.setValueFromCoords(11, y, 1, true);
                 valid = true;
             }
-            var columnName = jexcel.getColumnNameFromId([parseInt(x) + 1, y]);
-            instance.worksheets[0].setValue(columnName, '');
+            console.log("test11111", jexcel);
+
+            // var columnName = jexcel.getColumnNameFromId([parseInt(x) + 1, y]);
+            // instance.worksheets[0].setValue(columnName, '');
         }
 
         //Planning Unit
