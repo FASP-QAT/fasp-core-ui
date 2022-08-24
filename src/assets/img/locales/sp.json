@@ -2276,7 +2276,7 @@
     "static.login.passwordtext": "Ingresar la contraseña",
     "static.commitVersion.linkedShipments": "Envío vinculado",
     "static.common.jul": "Jul",
-    "static.tree.minDataRequiredToExtrapolate": "Los valores mínimos necesarios para las distintas características son los siguientes:\n* TES, Holt-Winters: al menos 24 meses de datos históricos\n* ARIMA: con estacionalidad: se requieren al menos 13 meses de datos históricos. Sin estacionalidad: al menos 2 meses de historial datos requeridos.\n* Promedio móvil, semipromedios y regresión lineal: al menos 3 meses de datos históricos",
+    "static.tree.minDataRequiredToExtrapolate": "Los valores mínimos necesarios para las diversas funciones se encuentran a continuación:\n* TES, Holt-Winters: al menos 24 meses de datos históricos\n* ARIMA: QAT no puede calcular el pronóstico ARIMA en función del consumo real seleccionado. En general, ARIMA debería poder calcular con 14 meses de datos.\n* Promedio móvil, semipromedios y regresión lineal: al menos 3 meses de datos históricos\n",
     "static.importIntoQATSupplyPlan.forecastFinalVersion": "Versión de previsión (solo versiones finales)",
     "static.message.invalidStringLength": "Las notas de la versión no deben exceder los 1000 caracteres",
     "static.problemList.problemStatus": "Abierto / Tratado",

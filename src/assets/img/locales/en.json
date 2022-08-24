@@ -2281,7 +2281,7 @@
     "static.login.passwordtext": "Enter password",
     "static.commitVersion.linkedShipments": "Linked Shipment",
     "static.common.jul": "Jul",
-    "static.tree.minDataRequiredToExtrapolate": "The minimum values needed for the various features are below:\n* TES, Holt-Winters: At least 24 months of historical data\n* ARIMA: With seasonality : At least 13 months historical data required.Without seasonality : At least 2 months historical data required.\n* Moving Average, Semi-Averages, and Linear Regression: At least 3 months of historical data",
+    "static.tree.minDataRequiredToExtrapolate": "The minimum values needed for the various features are below:\n* TES, Holt-Winters: At least 24 months of historical data\n* ARIMA: QAT is unable to calculate ARIMA forecast based on the selected actual consumption. Generally, ARIMA should be able to calculate with 14 months of data.\n* Moving Average, Semi-Averages, and Linear Regression: At least 3 months of historical data\n",
     "static.importIntoQATSupplyPlan.forecastFinalVersion": "Forecast version (Final Versions Only)",
     "static.message.invalidStringLength": "Version Notes should not exceed 1000 characters",
     "static.problemList.problemStatus": "Open / Addressed",
