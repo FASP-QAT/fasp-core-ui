@@ -256,8 +256,8 @@ export default class MapPlanningUnits extends Component {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
             }
-            var columnName = jexcel.getColumnNameFromId([x + 1, y]);
-            instance.worksheets[0].setValue(columnName, '');
+            // var columnName = jexcel.getColumnNameFromId([x + 1, y]);
+            // instance.worksheets[0].setValue(columnName, '');
         }
         if (x == 1) {
             var json = this.el.getJson(null, false);
