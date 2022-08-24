@@ -598,6 +598,7 @@ export default class ConsumptionDetails extends React.Component {
         problemList = problemList.filter(c => c.planningUnitActive != false && c.regionActive != false);
         // we set this in state becasue we need to use it on modal popup
         this.setState({ problemList: problemList });
+        console.log("problemList", problemList)
         let problemArray = [];
         let count = 0;
         for (var j = 0; j < problemList.length; j++) {
@@ -610,7 +611,8 @@ export default class ConsumptionDetails extends React.Component {
             data[5] = getLabelText(problemList[j].planningUnit.label, this.state.lang)
             data[6] = (problemList[j].dt != null) ? (moment(problemList[j].dt).format('MMM-YY')) : ''
             // data[7] = moment(problemList[j].createdDate).format('MMM-YY')
-            data[7] = problemList[j].problemCategory.id
+            // data[7] = problemList[j].problemCategory.id
+            data[7] = problemList[j].problemType.id == 1 ? problemList[j].problemCategory.id : (problemList[j].realmProblem.criticality.id == 1 ? 4 : (problemList[j].realmProblem.criticality.id == 2 ? 5 : 6))
             data[8] = getProblemDesc(problemList[j], this.state.lang)
             data[9] = getSuggestion(problemList[j], this.state.lang)
             // data[10] = getLabelText(problemList[j].problemStatus.label, this.state.lang)
@@ -627,6 +629,8 @@ export default class ConsumptionDetails extends React.Component {
             data[18] = problemList[j].reviewNotes != null ? problemList[j].reviewNotes : ''
             data[19] = (problemList[j].reviewedDate != null && problemList[j].reviewedDate != '') ? moment(problemList[j].reviewedDate).format(`${DATE_FORMAT_CAP}`) : ''
             data[21] = 0
+            data[22] = problemList[j].problemType.id
+
             problemArray[count] = data;
             count++;
         }
@@ -748,6 +752,10 @@ export default class ConsumptionDetails extends React.Component {
                 },
                 {
                     title: 'isChanged',
+                    type: 'hidden',
+                },
+                {
+                    title: 'problemType',
                     type: 'hidden',
                 },
             ],
@@ -1052,7 +1060,7 @@ export default class ConsumptionDetails extends React.Component {
 
     selected = function (instance, cell, x, y, value) {
         // console.log("y+++", y);
-        if (y == 5 || y == 7 || y == 8 || y == 9) {
+        if ((this.el.getValueFromCoords(22, x) == 1) && (y == 5 || y == 7 || y == 8 || y == 9)) {
             if ((x == 0 && value != 0) || (y == 0)) {
                 // console.log("HEADER SELECTION--------------------------");
             } else {
@@ -1820,8 +1828,8 @@ export default class ConsumptionDetails extends React.Component {
 
                             {/* <div className="ProgramListSearch"> */}
                             <div className='ProgramListSearchAlignment'>
-                            <div id="tableDiv" className='consumptionDataEntryTable' style={{ display: this.state.loading ? "none" : "block" }}>
-                            </div>
+                                <div id="tableDiv" className='consumptionDataEntryTable' style={{ display: this.state.loading ? "none" : "block" }}>
+                                </div>
                             </div>
                             {/* </div> */}
                         </div>

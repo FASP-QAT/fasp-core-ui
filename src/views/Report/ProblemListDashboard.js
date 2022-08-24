@@ -18,7 +18,7 @@ export default class ProblemListDashboardComponent extends React.Component {
     componentDidMount() {
         var problemListUnFilttered = this.props.problemListUnFilttered.filter(c => c.planningUnitActive != false && c.regionActive != false);
         var problemCategoryList = this.props.problemCategoryList;
-
+        console.log("problemListUnFilttered", problemListUnFilttered)
         var problemCategoryListFiltered = [];
         var problemStatusList = this.props.problemStatusList.filter(c => c.id != PROBLEM_STATUS_IN_COMPLIANCE);
         var problemStatusListSorted = [];
@@ -31,7 +31,7 @@ export default class ProblemListDashboardComponent extends React.Component {
         for (var pc = 0; pc < problemListUnFilttered.length; pc++) {
             if (problemListUnFilttered[pc].problemCategory != undefined) {
                 if (problemListUnFilttered[pc].problemCategory.id == 4 || problemListUnFilttered[pc].problemCategory.id == 5 || problemListUnFilttered[pc].problemCategory.id == 6) {
-                    var problemCategory = { id: 4, name: 'Other' }
+                    var problemCategory = { id: -1, name: 'Other' }
                     problemListUnFilttered.push(problemListUnFilttered[pc].problemCategory = problemCategory);
                 }
             }
@@ -44,7 +44,7 @@ export default class ProblemListDashboardComponent extends React.Component {
             }
         }
         problemCategoryListFiltered.push(
-            { id: 4, name: 'Other' }
+            { id: -1, name: 'Other' }
         )
         for (var ps = 0; ps < problemStatusList.length; ps++) {
             for (var pc = 0; pc < problemCategoryListFiltered.length; pc++) {
@@ -78,7 +78,7 @@ export default class ProblemListDashboardComponent extends React.Component {
         // console.log("problemListUnFilttered", problemCategoryListFiltered)
 
         this.setState({
-            problemListUnFilttered: problemListUnFilttered,
+            // problemListUnFilttered1: problemListUnFilttered,
             problemCategoryListFiltered: problemCategoryListFiltered,
             problemStatusList: problemStatusList,
             problemDashboardList: problemDashboardList

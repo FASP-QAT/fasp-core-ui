@@ -42,7 +42,7 @@ import BudgetService from '../../api/BudgetService';
 import ProcurementAgentService from '../../api/ProcurementAgentService';
 import CryptoJS from 'crypto-js'
 
-const entityname = i18n.t('static.program.program');
+const entityname = i18n.t('static.report.problem');
 
 const validationSchemaForAddingProblem = function (values) {
     return Yup.object().shape({
@@ -4826,7 +4826,7 @@ class EditSupplyPlanStatus extends Component {
                                                         "problemStatus": {
                                                             "id": "1"
                                                         },
-                                                        "dt": moment(new Date()),
+                                                        "dt": moment(new Date()).format("YYYY-MM-DD"),
                                                         "region": {
                                                             "id": (document.getElementById("modelRegionId").value)
                                                         },
