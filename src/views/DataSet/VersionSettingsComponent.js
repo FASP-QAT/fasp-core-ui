@@ -1259,10 +1259,13 @@ class VersionSettingsComponent extends Component {
         })
     }
 
-    selected = function (instance, cell, x, y, value) {
-        if ((x == 0 && value != 0) || (y == 0)) {
-            // console.log("HEADER SELECTION--------------------------");
-        } else {
+    selected = function (instance, cell, x, y, value, e) {
+        if (e.buttons == 1) {
+
+            if ((x == 0 && value != 0) || (y == 0)) {
+                // console.log("HEADER SELECTION--------------------------");
+            } else {
+            }
         }
     }.bind(this);
 

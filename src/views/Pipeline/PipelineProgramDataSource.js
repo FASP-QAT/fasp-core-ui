@@ -86,8 +86,8 @@ export default class PipelineProgramDataSource extends Component {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
             }
-            var columnName = jexcel.getColumnNameFromId([parseInt(x) + 1, y]);
-            instance.setValue(columnName, '');
+            // var columnName = jexcel.getColumnNameFromId([parseInt(x) + 1, y]);
+            // instance.setValue(columnName, '');
         }
 
         //Data source

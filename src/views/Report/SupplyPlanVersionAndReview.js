@@ -19,7 +19,7 @@ import paginationFactory from 'react-bootstrap-table2-paginator'
 import BootstrapTable from 'react-bootstrap-table-next';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { SECRET_KEY, DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH } from '../../Constants.js';
+import { SECRET_KEY, DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, SPV_REPORT_DATEPICKER_START_MONTH } from '../../Constants.js';
 import jexcel from 'jspreadsheet';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
@@ -1279,7 +1279,7 @@ class SupplyPlanVersionAndReview extends Component {
                                                     >  <option value="-1">{i18n.t('static.common.all')}</option>
                                                         {versionTypes}</Input>
                                                 </InputGroup>    </div></FormGroup>
-                                        <FormGroup className="col-md-3" style={{zIndex:'1'}}>
+                                        <FormGroup className="col-md-3" style={{ zIndex: '1' }}>
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.common.status')}</Label>
                                             <div className="controls">
                                                 <InputGroup>

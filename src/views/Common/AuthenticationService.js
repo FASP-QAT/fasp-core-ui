@@ -465,6 +465,7 @@ class AuthenticationService {
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != '') {
             let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
             // console.log("decryptedCurUser---", decryptedCurUser);
+            try{
             let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
             // console.log("decryptedUser---", decryptedUser);
             let businessFunctionList = decryptedUser.businessFunctionList;
@@ -476,6 +477,10 @@ class AuthenticationService {
             }
             // console.log("bfuntion---", bfunction);
             return bfunction;
+        }catch(err){
+            localStorage.setItem('curUser','')
+            return [];
+        }
         } else {
             return [];
         }
