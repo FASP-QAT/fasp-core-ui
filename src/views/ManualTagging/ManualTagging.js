@@ -4213,101 +4213,83 @@ export default class ManualTagging extends Component {
         tr.children[11].classList.add('AsteriskTheadtrTd');
     }
 
-    selected = function (instance, cell, x, y, value) {
-        console.log("x$$$$$$$$$$$$$$$$", x);
-        console.log("y$$$$$$$$$$$$$$$$", y);
-        console.log("value$$$$$$$$$$$$$$$$", value);
-        if ((x == 0 && value != 0) || (y == 0 && value != 0)) {
-            // console.log("HEADER SELECTION--------------------------");
-        } else {
-            console.log("Loading 6 Mohit#############")
-            this.setState({
-                loading: true
-            })
-            var outputListAfterSearch = [];
-            let row;
-            let json;
-            let buildJexcelRequired = true;
-            if (this.state.active1
-                && this.state.versionId.includes("Local")
-            ) {
-                row = this.state.outputList.filter(c => (this.el.getValueFromCoords(0, x) != 0 ? c.shipmentId == this.el.getValueFromCoords(0, x) : c.tempShipmentId == this.el.getValueFromCoords(9, x)))[0];
-                outputListAfterSearch.push(row);
-                console.log("outputListAfterSearch@@@@@@@@@@@@@@@@",outputListAfterSearch);
-                var finalShipmentId = []
-                if (outputListAfterSearch[0].orderNo != null && outputListAfterSearch[0].orderNo != "") {
-                    json = { id: outputListAfterSearch[0].orderNo, label: outputListAfterSearch[0].orderNo };
-                    finalShipmentId.push({ "shipmentId": this.el.getValueFromCoords(0, x), "tempShipmentId": this.el.getValueFromCoords(0, x) > 0 ? null : this.el.getValueFromCoords(9, x), "index": "", "qty": outputListAfterSearch[0].shipmentQty })
-                } else {
-                    json = { id: '', label: '' };
-                    finalShipmentId.push({ "shipmentId": this.el.getValueFromCoords(0, x), "tempShipmentId": this.el.getValueFromCoords(0, x) > 0 ? null : this.el.getValueFromCoords(9, x), "index": "", "qty": outputListAfterSearch[0].shipmentQty })
-                    buildJexcelRequired = false;
-                }
-                this.setState({
-                    tempNotes: (outputListAfterSearch[0].notes != null && outputListAfterSearch[0].notes != "" ? outputListAfterSearch[0].notes : ""),
-                    originalQty: outputListAfterSearch[0].shipmentQty,
-                    outputListAfterSearch,
-                    buildJexcelRequired,
-                    roNoOrderNo: json,
-                    table1Loader: outputListAfterSearch[0].orderNo != null && outputListAfterSearch[0].orderNo != "" ? false : true,
-                    searchedValue: (outputListAfterSearch[0].orderNo != null && outputListAfterSearch[0].orderNo != "" ? outputListAfterSearch[0].orderNo : ""),
-                    selectedRowPlanningUnit: outputListAfterSearch[0].planningUnit.id,
-                    selectedRowPlanningUnitLabel:getLabelText(outputListAfterSearch[0].planningUnit.label,this.state.lang),
-                    finalShipmentId: finalShipmentId,
-                    showAllShipments: false,
-                    planningUnitId: (this.state.active3 ? outputListAfterSearch[0].erpPlanningUnit.id : outputListAfterSearch[0].planningUnit.id),
-                    shipmentId: (this.state.active1 ? this.el.getValueFromCoords(0, x) : (this.state.active2 ? this.el.getValueFromCoords(1, x) : 0)),
-                    procurementAgentId: (this.state.active3 ? 1 : outputListAfterSearch[0].procurementAgent.id),
-                    planningUnitName: (this.state.active3 ? row.erpPlanningUnit.label.label_en + "(" + row.skuCode + ")" : row.planningUnit.label.label_en + '(' + row.skuCode + ')')
-                    // planningUnitIdUpdated: outputListAfterSearch[0].planningUnit.id
-                }, () => {
-                    this.toggleLarge();
-                    this.getOrderDetails();
-                });
-            } else if (this.state.active2 && this.state.versionId.includes("Local")) {
-                // var index = this.state.outputList.findIndex(c => (this.el.getValueFromCoords(1, x))>0?c.shipmentId == (this.el.getValueFromCoords(1, x)):c.tempShipmentId==(this.el.getValueFromCoords(14, x)))[0];
-                var rowData = this.el.getRowData(x);
-                // outputListAfterSearch.push(row);
-                this.toggleLarge();
-                this.getShipmentsForTab2(rowData[1], rowData[14], rowData[2].split("|")[0], rowData[2].split("|")[1]);
-                // this.getOrderDetails();
+    selected = function (instance, cell, x, y, value, e) {
+        if (e.buttons == 1) {
 
-            } else if (this.state.active3) {
-                this.setState({
-                    loading1: true
-                })
-                row = this.state.outputList.filter((c, index) => (index == this.el.getValueFromCoords(7, x)))[0];
-                outputListAfterSearch.push(row);
-                json = { id: outputListAfterSearch[0].roNo, label: outputListAfterSearch[0].roNo };
-
-                this.setState({
-                    originalQty: 0,
-                    outputListAfterSearch,
-                    selectedShipment: [],
-                    roNoOrderNo: json,
-                    searchedValue: outputListAfterSearch[0].roNo,
-                    roPrimeLineNoForTab3: outputListAfterSearch[0].roPrimeLineNo,
-                    // planningUnitIdUpdated: outputListAfterSearch[0].erpPlanningUnit.id
-                }, () => {
-                    this.filterProgramByCountry();
-                    // this.getOrderDetails();
-                });
+            console.log("x$$$$$$$$$$$$$$$$", x);
+            console.log("y$$$$$$$$$$$$$$$$", y);
+            console.log("value$$$$$$$$$$$$$$$$", value);
+            if ((x == 0 && value != 0) || (y == 0 && value != 0)) {
+                // console.log("HEADER SELECTION--------------------------");
             } else {
                 this.setState({
-                    loading: false
+                    loading: true
                 })
-            }
-            // outputListAfterSearch.push(row);
-            // console.log("1------------------------------>>>>", outputListAfterSearch[0].erpPlanningUnit.id)
-            if (this.state.active3) {
-                console.log("In function To open popup@@@@@@@@@@@@@@@@@@@@@@@))))))))))))))))")
-                this.setState({
-                    planningUnitId: (this.state.active3 ? outputListAfterSearch[0].erpPlanningUnit.id : outputListAfterSearch[0].planningUnit.id),
-                    shipmentId: (this.state.active1 ? this.el.getValueFromCoords(0, x) : (this.state.active2 ? this.el.getValueFromCoords(1, x) : 0)),
-                    procurementAgentId: (this.state.active3 ? 1 : outputListAfterSearch[0].procurementAgent.id),
-                    planningUnitName: (this.state.active3 ? row.erpPlanningUnit.label.label_en + "(" + row.skuCode + ")" : row.planningUnit.label.label_en + '(' + row.skuCode + ')')
-                })
-                this.toggleLarge();
+                var outputListAfterSearch = [];
+                let row;
+                let json;
+                let buildJexcelRequired = true;
+                if (this.state.active1
+                    && this.state.versionId.includes("Local")
+                ) {
+                    row = this.state.outputList.filter(c => (this.el.getValueFromCoords(0, x) != 0 ? c.shipmentId == this.el.getValueFromCoords(0, x) : c.tempShipmentId == this.el.getValueFromCoords(9, x)))[0];
+                    outputListAfterSearch.push(row);
+                    if (outputListAfterSearch[0].orderNo != null && outputListAfterSearch[0].orderNo != "") {
+                        json = { id: outputListAfterSearch[0].orderNo, label: outputListAfterSearch[0].orderNo };
+                    } else {
+                        json = { id: '', label: '' };
+                        buildJexcelRequired = false;
+                    }
+                    this.setState({
+                        tempNotes: (outputListAfterSearch[0].notes != null && outputListAfterSearch[0].notes != "" ? outputListAfterSearch[0].notes : ""),
+                        originalQty: outputListAfterSearch[0].shipmentQty,
+                        outputListAfterSearch,
+                        buildJexcelRequired,
+                        roNoOrderNo: json,
+                        table1Loader: outputListAfterSearch[0].orderNo != null && outputListAfterSearch[0].orderNo != "" ? false : true,
+                        searchedValue: (outputListAfterSearch[0].orderNo != null && outputListAfterSearch[0].orderNo != "" ? outputListAfterSearch[0].orderNo : ""),
+                        selectedRowPlanningUnit: outputListAfterSearch[0].planningUnit.id
+                        // planningUnitIdUpdated: outputListAfterSearch[0].planningUnit.id
+                    }, () => {
+
+                        this.getOrderDetails();
+                    });
+                } else if (this.state.active2 && this.state.versionId.includes("Local")) {
+                    // var index = this.state.outputList.findIndex(c => (this.el.getValueFromCoords(1, x))>0?c.shipmentId == (this.el.getValueFromCoords(1, x)):c.tempShipmentId==(this.el.getValueFromCoords(14, x)))[0];
+                    var rowData = this.el.getRowData(x);
+                    // outputListAfterSearch.push(row);
+                    this.toggleLarge();
+                    this.getShipmentsForTab2(rowData[1], rowData[14], rowData[2].split("|")[0], rowData[2].split("|")[1]);
+                    // this.getOrderDetails();
+
+                } else if (this.state.active3) {
+                    row = this.state.outputList.filter((c, index) => (index == this.el.getValueFromCoords(7, x)))[0];
+                    outputListAfterSearch.push(row);
+                    json = { id: outputListAfterSearch[0].roNo, label: outputListAfterSearch[0].roNo };
+
+                    this.setState({
+                        originalQty: 0,
+                        outputListAfterSearch,
+                        selectedShipment: [],
+                        roNoOrderNo: json,
+                        searchedValue: outputListAfterSearch[0].roNo
+                        // planningUnitIdUpdated: outputListAfterSearch[0].erpPlanningUnit.id
+                    }, () => {
+                        this.filterProgramByCountry();
+                        // this.getOrderDetails();
+                    });
+                }
+                // outputListAfterSearch.push(row);
+                // console.log("1------------------------------>>>>", outputListAfterSearch[0].erpPlanningUnit.id)
+                if (!this.state.active2) {
+                    this.setState({
+                        planningUnitId: (this.state.active3 ? outputListAfterSearch[0].erpPlanningUnit.id : outputListAfterSearch[0].planningUnit.id),
+                        shipmentId: (this.state.active1 ? this.el.getValueFromCoords(0, x) : (this.state.active2 ? this.el.getValueFromCoords(1, x) : 0)),
+                        procurementAgentId: (this.state.active3 ? 1 : outputListAfterSearch[0].procurementAgent.id),
+                        planningUnitName: (this.state.active3 ? row.erpPlanningUnit.label.label_en + "(" + row.skuCode + ")" : row.planningUnit.label.label_en + '(' + row.skuCode + ')')
+                    })
+                    this.toggleLarge();
+                }
             }
         }
     }.bind(this);

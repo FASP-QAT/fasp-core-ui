@@ -1058,19 +1058,22 @@ export default class ExpiredInventory extends Component {
         })
     }
 
-    selected = function (instance, cell, x, y, value) {
-        var elInstance = instance.jexcel;
-        var rowData = elInstance.getRowData(x);
-        if (y == 1) {
-            console.log("+++in y==1")
-            this.toggleLarge(rowData[2], rowData[4], rowData[6], rowData[7]);
-        }
-        if (y == 2) {
-            let versionId = document.getElementById("versionId").value;
-            if (versionId.includes('Local')) {
-                localStorage.setItem("batchNo", rowData[2]);
-                localStorage.setItem("expiryDate", rowData[6]);
-                window.open(window.location.origin + `/#/supplyPlan/${this.state.localProgramId}/${rowData[8]}/${rowData[2]}/${rowData[6]}`);
+    selected = function (instance, cell, x, y, value, e) {
+        if (e.buttons == 1) {
+
+            var elInstance = instance;
+            var rowData = elInstance.getRowData(x);
+            if (y == 1) {
+                console.log("+++in y==1")
+                this.toggleLarge(rowData[2], rowData[4], rowData[6], rowData[7]);
+            }
+            if (y == 2) {
+                let versionId = document.getElementById("versionId").value;
+                if (versionId.includes('Local')) {
+                    localStorage.setItem("batchNo", rowData[2]);
+                    localStorage.setItem("expiryDate", rowData[6]);
+                    window.open(window.location.origin + `/#/supplyPlan/${this.state.localProgramId}/${rowData[8]}/${rowData[2]}/${rowData[6]}`);
+                }
             }
         }
     }.bind(this);

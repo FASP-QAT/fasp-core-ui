@@ -1058,39 +1058,43 @@ export default class ConsumptionDetails extends React.Component {
         doc.save(i18n.t('static.report.qatProblemActionReport') + '.pdf')
     }
 
-    selected = function (instance, cell, x, y, value) {
-        // console.log("y+++", y);
-        if ((this.el.getValueFromCoords(22, x) == 1) && (y == 5 || y == 7 || y == 8 || y == 9)) {
-            if ((x == 0 && value != 0) || (y == 0)) {
-                // console.log("HEADER SELECTION--------------------------");
-            } else {
-                // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
-                if (this.state.data.length != 0) {
-                    if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROBLEM')) {
-                        // console.log("this.el.getValueFromCoords(12, y)===>", this.el.getRowData(x));
-                        if (this.el.getValueFromCoords(12, x) != 4 && this.el.getValueFromCoords(12, x) != 2) {
-                            // console.log("onclick------>", this.el.getValueFromCoords(12, x));
-                            var planningunitId = this.el.getValueFromCoords(13, x);
-                            var programId = document.getElementById('programId').value;
-                            var versionId = this.el.getValueFromCoords(3, x)
-                            window.open(window.location.origin + `/#${this.el.getValueFromCoords(15, x)}/${programId}/${versionId}/${planningunitId}`);
-                            // let problemStatusId = document.getElementById('problemStatusId').value;
-                            // let problemTypeId = document.getElementById('problemTypeId').value;
-                            // var index = 0;
-                            // if (this.el.getValueFromCoords(1, x) == "") {
-                            //     var index = 0;
-                            // } else {
-                            //     index = this.el.getValueFromCoords(1, x);
-                            // }
-                            // console.log("URL====>", `/report/editProblem/${this.el.getValueFromCoords(0, x)}/${this.state.programId}/${index}/${this.el.getValueFromCoords(12, x)}/${this.el.getValueFromCoords(17, x)}`);
-                            // this.props.history.push({
-                            //     pathname: `/report/editProblem/${this.el.getValueFromCoords(0, x)}/${this.state.programId}/${index}/${this.el.getValueFromCoords(12, x)}/${this.el.getValueFromCoords(17, x)}`,
-                            // });
-                            // this.props.history.push({
-                            //     pathname: `/report/editProblem/${this.el.getValueFromCoords(0, x)}/${this.state.programId}/${index}/${problemStatusId}/${problemTypeId}`,
-                            // });
-                        }
 
+    selected = function (instance, cell, x, y, value, e) {
+        if (e.buttons == 1) {
+
+            // console.log("y+++", y);
+            if (y == 5 || y == 7 || y == 8 || y == 9) {
+                if ((x == 0 && value != 0) || (y == 0)) {
+                    // console.log("HEADER SELECTION--------------------------");
+                } else {
+                    // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
+                    if (this.state.data.length != 0) {
+                        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROBLEM')) {
+                            // console.log("this.el.getValueFromCoords(12, y)===>", this.el.getRowData(x));
+                            if (this.el.getValueFromCoords(12, x) != 4 && this.el.getValueFromCoords(12, x) != 2) {
+                                // console.log("onclick------>", this.el.getValueFromCoords(12, x));
+                                var planningunitId = this.el.getValueFromCoords(13, x);
+                                var programId = document.getElementById('programId').value;
+                                var versionId = this.el.getValueFromCoords(3, x)
+                                window.open(window.location.origin + `/#${this.el.getValueFromCoords(15, x)}/${programId}/${versionId}/${planningunitId}`);
+                                // let problemStatusId = document.getElementById('problemStatusId').value;
+                                // let problemTypeId = document.getElementById('problemTypeId').value;
+                                // var index = 0;
+                                // if (this.el.getValueFromCoords(1, x) == "") {
+                                //     var index = 0;
+                                // } else {
+                                //     index = this.el.getValueFromCoords(1, x);
+                                // }
+                                // console.log("URL====>", `/report/editProblem/${this.el.getValueFromCoords(0, x)}/${this.state.programId}/${index}/${this.el.getValueFromCoords(12, x)}/${this.el.getValueFromCoords(17, x)}`);
+                                // this.props.history.push({
+                                //     pathname: `/report/editProblem/${this.el.getValueFromCoords(0, x)}/${this.state.programId}/${index}/${this.el.getValueFromCoords(12, x)}/${this.el.getValueFromCoords(17, x)}`,
+                                // });
+                                // this.props.history.push({
+                                //     pathname: `/report/editProblem/${this.el.getValueFromCoords(0, x)}/${this.state.programId}/${index}/${problemStatusId}/${problemTypeId}`,
+                                // });
+                            }
+
+                        }
                     }
                 }
             }
@@ -1833,12 +1837,12 @@ export default class ConsumptionDetails extends React.Component {
                             </div>
                             {/* </div> */}
                         </div>
-                    </CardBody>
+                    </CardBody >
                     <CardFooter>
                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => this.cancelClicked(id)}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                         {this.state.showUpdateButton && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={this.updateChangedProblems}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>}
                     </CardFooter>
-                </Card>
+                </Card >
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
