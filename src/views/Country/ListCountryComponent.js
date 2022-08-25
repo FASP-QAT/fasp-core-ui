@@ -622,16 +622,18 @@ export default class CountryListComponent extends Component {
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
     }
-    selected = function (instance, cell, x, y, value) {
+    selected = function (instance, cell, x, y, value, e) {
+        if (e.buttons == 1) {
 
-        if ((x == 0 && value != 0) || (y == 0)) {
-            // console.log("HEADER SELECTION--------------------------");
-        } else {
-            // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
-            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_COUNTRY')) {
-                this.props.history.push({
-                    pathname: `/country/editCountry/${this.el.getValueFromCoords(0, x)}`,
-                });
+            if ((x == 0 && value != 0) || (y == 0)) {
+                // console.log("HEADER SELECTION--------------------------");
+            } else {
+                // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
+                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_COUNTRY')) {
+                    this.props.history.push({
+                        pathname: `/country/editCountry/${this.el.getValueFromCoords(0, x)}`,
+                    });
+                }
             }
         }
     }.bind(this);

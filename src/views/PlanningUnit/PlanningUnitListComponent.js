@@ -751,7 +751,7 @@ export default class PlanningUnitListComponent extends Component {
             data = [];
             data[0] = planningUnitList[j].planningUnitId
             data[1] = getLabelText(planningUnitList[j].label, this.state.lang) + " | " + planningUnitList[j].planningUnitId
-            data[2] = getLabelText(planningUnitList[j].forecastingUnit.label, this.state.lang) +" | "+ planningUnitList[j].forecastingUnit.forecastingUnitId
+            data[2] = getLabelText(planningUnitList[j].forecastingUnit.label, this.state.lang) + " | " + planningUnitList[j].forecastingUnit.forecastingUnitId
             data[3] = getLabelText(planningUnitList[j].unit.label, this.state.lang)
             data[4] = (planningUnitList[j].multiplier).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");;
             data[5] = planningUnitList[j].lastModifiedBy.username;
@@ -882,17 +882,19 @@ export default class PlanningUnitListComponent extends Component {
         })
     }
 
-    selected = function (instance, cell, x, y, value) {
+    selected = function (instance, cell, x, y, value, e) {
+        if (e.buttons == 1) {
 
-        if ((x == 0 && value != 0) || (y == 0)) {
-            // console.log("HEADER SELECTION--------------------------");
-        } else {
-            // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
-            if (this.state.selSource.length != 0) {
-                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PLANNING_UNIT')) {
-                    this.props.history.push({
-                        pathname: `/planningUnit/editPlanningUnit/${this.el.getValueFromCoords(0, x)}`,
-                    });
+            if ((x == 0 && value != 0) || (y == 0)) {
+                // console.log("HEADER SELECTION--------------------------");
+            } else {
+                // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
+                if (this.state.selSource.length != 0) {
+                    if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PLANNING_UNIT')) {
+                        this.props.history.push({
+                            pathname: `/planningUnit/editPlanningUnit/${this.el.getValueFromCoords(0, x)}`,
+                        });
+                    }
                 }
             }
         }
@@ -1144,7 +1146,7 @@ export default class PlanningUnitListComponent extends Component {
 
                     </div>
                     <CardBody className="pb-lg-0 pt-lg-0">
-                        <Col md="9 pl-0" style={{zIndex:'1'}}>
+                        <Col md="9 pl-0" style={{ zIndex: '1' }}>
                             <div className="row">
                                 <FormGroup className="col-md-3" id="realmDiv">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>

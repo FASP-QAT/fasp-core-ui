@@ -535,15 +535,18 @@ class FundingSourceListComponent extends Component {
             });
         }
     }
-    selected = function (instance, cell, x, y, value) {
-        if ((x == 0 && value != 0) || (y == 0)) {
-            // console.log("HEADER SELECTION--------------------------");
-        } else {
-            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_FUNDING_SOURCE')) {
-                this.props.history.push({
-                    pathname: `/fundingSource/editFundingSource/${this.el.getValueFromCoords(0, x)}`,
-                    // state: { currency: currency }
-                });
+    selected = function (instance, cell, x, y, value, e) {
+        if (e.buttons == 1) {
+
+            if ((x == 0 && value != 0) || (y == 0)) {
+                // console.log("HEADER SELECTION--------------------------");
+            } else {
+                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_FUNDING_SOURCE')) {
+                    this.props.history.push({
+                        pathname: `/fundingSource/editFundingSource/${this.el.getValueFromCoords(0, x)}`,
+                        // state: { currency: currency }
+                    });
+                }
             }
         }
     }.bind(this);

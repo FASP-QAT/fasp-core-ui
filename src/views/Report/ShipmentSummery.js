@@ -985,26 +985,29 @@ class ShipmentSummery extends Component {
         }
     }
 
-    selected = function (instance, cell, x, y, value) {
-        if ((x == 0 && value != 0) || (y == 0)) {
-            // console.log("HEADER SELECTION--------------------------");
-        } else {
-            // if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROBLEM')) {
-            let versionId = document.getElementById("versionId").value;
-            let programId = document.getElementById("programId").value;
-            let userId = AuthenticationService.getLoggedInUserId();
+    selected = function (instance, cell, x, y, value, e) {
+        if (e.buttons == 1) {
 
-            if (versionId.includes('Local')) {
-                var planningUnitId = this.el.getValueFromCoords(16, x);
-                var rangeValue = this.state.rangeValue;
-                var programIdd = programId + '_v' + versionId.split(' ')[0] + '_uId_' + userId;
-                console.log("proId***", programIdd);
-                console.log("p***", planningUnitId);
-                console.log("rangeVlaue***", this.state.rangeValue);
-                localStorage.setItem('sesRangeValue', JSON.stringify(rangeValue));
-                window.open(window.location.origin + `/#/shipment/shipmentDetails/${programIdd}/${versionId}/${planningUnitId}`);
+            if ((x == 0 && value != 0) || (y == 0)) {
+                // console.log("HEADER SELECTION--------------------------");
+            } else {
+                // if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROBLEM')) {
+                let versionId = document.getElementById("versionId").value;
+                let programId = document.getElementById("programId").value;
+                let userId = AuthenticationService.getLoggedInUserId();
+
+                if (versionId.includes('Local')) {
+                    var planningUnitId = this.el.getValueFromCoords(16, x);
+                    var rangeValue = this.state.rangeValue;
+                    var programIdd = programId + '_v' + versionId.split(' ')[0] + '_uId_' + userId;
+                    console.log("proId***", programIdd);
+                    console.log("p***", planningUnitId);
+                    console.log("rangeVlaue***", this.state.rangeValue);
+                    localStorage.setItem('sesRangeValue', JSON.stringify(rangeValue));
+                    window.open(window.location.origin + `/#/shipment/shipmentDetails/${programIdd}/${versionId}/${planningUnitId}`);
+                }
+                // }
             }
-            // }
         }
     }
     getPrograms = () => {

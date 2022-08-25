@@ -784,7 +784,7 @@ class VersionSettingsComponent extends Component {
         var rangeValue = this.state.rangeValue;
         let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
         let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
-     
+
         var inputjson = {
             programId: programId,
             versionTypeId: versionTypeId,
@@ -843,9 +843,9 @@ class VersionSettingsComponent extends Component {
                 this.setState({
                     dataList: []
                 },
-                () => {
-                    this.buildJExcel();
-                })
+                    () => {
+                        this.buildJExcel();
+                    })
             }
         );
     }
@@ -977,9 +977,9 @@ class VersionSettingsComponent extends Component {
         }
         var dataList = this.state.dataList;
         console.log("dataList------->1", dataList);
-        for(var i = 0;i<dataList.length;i++){
+        for (var i = 0; i < dataList.length; i++) {
             count = (versionSettingsArray.length);
-            versionSettingsArray[count] = dataList[i] ;
+            versionSettingsArray[count] = dataList[i];
             count++;
         }
 
@@ -1230,10 +1230,13 @@ class VersionSettingsComponent extends Component {
         })
     }
 
-    selected = function (instance, cell, x, y, value) {
-        if ((x == 0 && value != 0) || (y == 0)) {
-            // console.log("HEADER SELECTION--------------------------");
-        } else {
+    selected = function (instance, cell, x, y, value, e) {
+        if (e.buttons == 1) {
+
+            if ((x == 0 && value != 0) || (y == 0)) {
+                // console.log("HEADER SELECTION--------------------------");
+            } else {
+            }
         }
     }.bind(this);
 
