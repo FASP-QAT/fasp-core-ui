@@ -652,7 +652,7 @@ export default class DataSourceListComponent extends Component {
             data[2] = getLabelText(dataSourceList[j].dataSourceType.label, this.state.lang)
             data[3] = getLabelText(dataSourceList[j].label, this.state.lang)
             // data[4] = getLabelText(dataSourceList[j].program.label, this.state.lang)
-            data[4] = dataSourceList[j].program!=null?dataSourceList[j].program.code:null;
+            data[4] = dataSourceList[j].program != null ? dataSourceList[j].program.code : null;
             data[5] = dataSourceList[j].lastModifiedBy.username;
             data[6] = (dataSourceList[j].lastModifiedDate ? moment(dataSourceList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
             data[7] = dataSourceList[j].active;
@@ -666,7 +666,7 @@ export default class DataSourceListComponent extends Component {
         // console.log("dataSourceArray---->", dataSourceArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         // this.el.destroy();
-        jexcel.destroy(document.getElementById("tableDiv"),true);
+        jexcel.destroy(document.getElementById("tableDiv"), true);
         var json = [];
         var data = dataSourceArray;
 
@@ -1005,18 +1005,21 @@ export default class DataSourceListComponent extends Component {
         }
     }
 
-    selected = function (instance, cell, x, y, value) {
-        console.log("selected x--->", x);
-        console.log("selected y--->", y);
-        console.log("selected value--->", value);
-        if ((x == 0 && value != 0) || (y == 0)) {
-            // console.log("HEADER SELECTION--------------------------");
-        } else {
-            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DATA_SOURCE')) {
-                this.props.history.push({
-                    pathname: `/dataSource/editDataSource/${this.el.getValueFromCoords(0, x)}`,
-                    // state: { currency: currency }
-                });
+    selected = function (instance, cell, x, y, value, e) {
+        if (e.buttons == 1) {
+
+            console.log("selected x--->", x);
+            console.log("selected y--->", y);
+            console.log("selected value--->", value);
+            if ((x == 0 && value != 0) || (y == 0)) {
+                // console.log("HEADER SELECTION--------------------------");
+            } else {
+                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DATA_SOURCE')) {
+                    this.props.history.push({
+                        pathname: `/dataSource/editDataSource/${this.el.getValueFromCoords(0, x)}`,
+                        // state: { currency: currency }
+                    });
+                }
             }
         }
     }.bind(this);
@@ -1158,8 +1161,8 @@ export default class DataSourceListComponent extends Component {
                             </div>
                         </Col>
                         <div className='consumptionDataEntryTable'>
-                        <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DATA_SOURCE') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
-                        </div>
+                            <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DATA_SOURCE') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
+                            </div>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>
                             <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >

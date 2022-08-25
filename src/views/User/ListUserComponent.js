@@ -444,7 +444,7 @@ class ListUserComponent extends Component {
         // console.log("userArray---->", userArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         // this.el.destroy();
-        jexcel.destroy(document.getElementById("tableDiv"),true);
+        jexcel.destroy(document.getElementById("tableDiv"), true);
         var json = [];
         var data = userArray;
 
@@ -570,17 +570,18 @@ class ListUserComponent extends Component {
         })
     }
 
-    selected = function (instance, cell, x, y, value) {
-
-        if ((x == 0 && value != 0) || (y == 0)) {
-            // console.log("HEADER SELECTION--------------------------");
-        } else {
-            // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
-            if (this.state.selUserList.length != 0) {
-                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USER')) {
-                    this.props.history.push({
-                        pathname: `/user/editUser/${this.el.getValueFromCoords(0, x)}`,
-                    });
+    selected = function (instance, cell, x, y, value, e) {
+        if (e.buttons == 1) {
+            if ((x == 0 && value != 0) || (y == 0)) {
+                // console.log("HEADER SELECTION--------------------------");
+            } else {
+                // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
+                if (this.state.selUserList.length != 0) {
+                    if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USER')) {
+                        this.props.history.push({
+                            pathname: `/user/editUser/${this.el.getValueFromCoords(0, x)}`,
+                        });
+                    }
                 }
             }
         }
@@ -2101,7 +2102,7 @@ class ListUserComponent extends Component {
         // }
         this.el = jexcel(document.getElementById("tableDiv2"), '');
         // this.el.destroy();
-        jexcel.destroy(document.getElementById("tableDiv2"),true);
+        jexcel.destroy(document.getElementById("tableDiv2"), true);
         var json = [];
         var data = userArray;
 

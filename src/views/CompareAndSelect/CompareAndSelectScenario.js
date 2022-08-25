@@ -20,10 +20,10 @@ import pdfIcon from '../../assets/img/pdf.png';
 import csvicon from '../../assets/img/csv.png'
 import "jspdf-autotable";
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import jexcel from 'jspreadsheet';
-import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
-import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions';
+import { jExcelLoadedFunction, jExcelLoadedFunctionOld, jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionOnlyHideRowOld } from '../../CommonComponent/JExcelCommonFunctions';
 import NumberFormat from 'react-number-format';
 import jsPDF from "jspdf";
 import { LOGO } from '../../CommonComponent/Logo';
@@ -79,8 +79,7 @@ class CompareAndSelectScenario extends Component {
             maxDateForSingleValue: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
             showForecastPeriod: false,
             treeScenarioList: [],
-            actualConsumptionListForMonth: [],
-            changed: false
+            actualConsumptionListForMonth: []
         };
         this.getDatasets = this.getDatasets.bind(this);
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
@@ -168,7 +167,6 @@ class CompareAndSelectScenario extends Component {
         if (this.state.planningUnitId != "" && this.state.regionId != "") {
             this.setState({ loading: true })
             var datasetJson = this.state.datasetJson;
-            console.log("Dataset json@@@@@@@@@@@@", datasetJson)
             var multiplier = 1;
             var selectedPlanningUnit = this.state.planningUnitList.filter(c => c.planningUnit.id == this.state.planningUnitId);
             // if (this.state.viewById == 2) {
@@ -221,13 +219,12 @@ class CompareAndSelectScenario extends Component {
                 var regionList = tree.regionList.filter(c => c.id == this.state.regionId);
                 var scenarioList = regionList.length > 0 ? treeList[tl].scenarioList : [];
                 for (var sl = 0; sl < scenarioList.length; sl++) {
-                    var flatList = tree.tree.flatList.filter(c => c.payload.nodeDataMap[scenarioList[sl].id] != undefined && c.payload.nodeDataMap[scenarioList[sl].id][0].puNode != null && c.payload.nodeDataMap[scenarioList[sl].id][0].puNode.planningUnit.id == this.state.planningUnitId && (c.payload).nodeType.id == 5);
-                    console.log("FlatList@@@@@@@@@@", flatList)
+                    var flatList = tree.tree.flatList.filter(c => c.payload.nodeDataMap[scenarioList[sl].id][0].puNode != null && c.payload.nodeDataMap[scenarioList[sl].id][0].puNode.planningUnit.id == this.state.planningUnitId && (c.payload).nodeType.id == 5);
                     if (colourArrayCount > 10) {
                         colourArrayCount = 0;
                     }
                     var readonly = flatList.length > 0 ? false : true
-                    var dataForPlanningUnit = treeList[tl].tree.flatList.filter(c => c.payload.nodeDataMap[scenarioList[sl].id] != undefined && (c.payload.nodeDataMap[scenarioList[sl].id])[0].puNode != null && (c.payload.nodeDataMap[scenarioList[sl].id])[0].puNode.planningUnit.id == this.state.planningUnitId && (c.payload).nodeType.id == 5);
+                    var dataForPlanningUnit = treeList[tl].tree.flatList.filter(c => (c.payload.nodeDataMap[scenarioList[sl].id])[0].puNode != null && (c.payload.nodeDataMap[scenarioList[sl].id])[0].puNode.planningUnit.id == this.state.planningUnitId && (c.payload).nodeType.id == 5);
                     console.log("dataForPlanningUnit####", dataForPlanningUnit);
                     var data = [];
                     if (dataForPlanningUnit.length > 0) {
@@ -299,8 +296,7 @@ class CompareAndSelectScenario extends Component {
             loading: true
         })
         this.el = jexcel(document.getElementById("tableDiv"), '');
-        // this.el.destroy();
-        jexcel.destroy(document.getElementById("tableDiv"), true);
+        this.el.destroy();
         var columns = [];
         columns.push({ title: i18n.t('static.inventoryDate.inventoryReport'), width: 100, type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' } });
         columns.push({ title: i18n.t('static.compareAndSelect.actuals'), width: 100, type: 'numeric', mask: '#,##.00' });
@@ -564,17 +560,17 @@ class CompareAndSelectScenario extends Component {
             colWidths: [0, 150, 150, 150, 100, 100, 100],
             colHeaderClasses: ["Reqasterisk"],
             columns: columns,
-            // text: {
-            //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-            //     show: '',
-            //     entries: '',
-            // },
+            text: {
+                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                show: '',
+                entries: '',
+            },
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
-            // tableOverflow: true,
+            tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
@@ -626,9 +622,7 @@ class CompareAndSelectScenario extends Component {
             // console.log("languageArray---->", languageArray);
             try {
                 this.el = jexcel(document.getElementById("table1"), '');
-                // this.el.destroy();
-                jexcel.destroy(document.getElementById("table1"), true);
-
+                this.el.destroy();
             } catch (error) {
 
             }
@@ -694,18 +688,18 @@ class CompareAndSelectScenario extends Component {
 
 
                 ],
-                // text: {
-                //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                //     show: '',
-                //     entries: '',
-                // },
+                text: {
+                    // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                    showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                    show: '',
+                    entries: '',
+                },
                 onload: this.loadedTable1,
                 onchange: this.changeTable1,
                 pagination: false,
                 search: false,
                 columnSorting: true,
-                // tableOverflow: true,
+                tableOverflow: true,
                 wordWrap: true,
                 allowInsertColumn: false,
                 allowManualInsertColumn: false,
@@ -776,8 +770,7 @@ class CompareAndSelectScenario extends Component {
                 equivalencyUnitId: equivalencyUnit.length == 1 ? equivalencyUnit[0].equivalencyUnitMappingId : 0,
                 loading: false,
                 viewById: viewById == 3 && equivalencyUnit.length == 0 ? 1 : viewById,
-                equivalencyUnitList: equivalencyUnit,
-                changed: false
+                equivalencyUnitList: equivalencyUnit
             }, () => {
                 if (planningUnitId > 0) {
                     this.showData();
@@ -1384,10 +1377,9 @@ class CompareAndSelectScenario extends Component {
     }
 
     loadedTable1 = function (instance, cell, x, y, value) {
-        jExcelLoadedFunctionOnlyHideRow(instance);
-        var elInstance = instance.worksheets[0];
-        // var asterisk = document.getElementsByClassName("resizable")[0];
-        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
+        jExcelLoadedFunctionOnlyHideRowOld(instance);
+        var elInstance = instance.jexcel;
+        var asterisk = document.getElementsByClassName("resizable")[0];
         var tr = asterisk.firstChild;
         tr.children[1].classList.add('InfoTr');
         tr.children[1].title = i18n.t('static.tooltip.SelectAsForecast');
@@ -1447,7 +1439,7 @@ class CompareAndSelectScenario extends Component {
         this.setState({
             loading: true
         })
-        var elInstance = instance.worksheets[0];
+        var elInstance = instance.jexcel;
         if (x == 1) {
             var treeScenarioList = this.state.treeScenarioList;
             var index = this.state.treeScenarioList.findIndex(c => c.id == elInstance.getRowData(y)[8]);
@@ -1460,7 +1452,6 @@ class CompareAndSelectScenario extends Component {
         }
         if (x == 0) {
             this.setState({
-                changed: true,
                 selectedTreeScenarioId: elInstance.getRowData(y)[8]
             }, () => {
                 this.buildJexcel();
@@ -1492,12 +1483,12 @@ class CompareAndSelectScenario extends Component {
     }
 
     loaded = function (instance, cell, x, y, value) {
-        jExcelLoadedFunction(instance);
-        var elInstance = instance.worksheets[0];
+        jExcelLoadedFunctionOld(instance);
+        var elInstance = instance.jexcel;
         var json = elInstance.getJson(null, false);
         var jsonLength;
-        if ((document.getElementsByClassName("jss_pagination_dropdown")[0] != undefined)) {
-            jsonLength = 1 * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
+        if ((document.getElementsByClassName("jexcel_pagination_dropdown")[0] != undefined)) {
+            jsonLength = 1 * (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
         }
 
         if (jsonLength == undefined) {
@@ -1536,16 +1527,16 @@ class CompareAndSelectScenario extends Component {
     }
 
     onchangepage(el, pageNo, oldPageNo) {
-        var elInstance = el;
+        var elInstance = el.jexcel;
         var json = elInstance.getJson(null, false);
-        var jsonLength = (pageNo + 1) * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
+        var jsonLength = (pageNo + 1) * (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
         if (jsonLength == undefined) {
             jsonLength = 15
         }
         if (json.length < jsonLength) {
             jsonLength = json.length;
         }
-        var start = pageNo * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
+        var start = pageNo * (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
         var tList = this.state.treeScenarioList;
         for (var y = start; y < jsonLength; y++) {
             var rowData = elInstance.getRowData(y);
@@ -1590,7 +1581,6 @@ class CompareAndSelectScenario extends Component {
         localStorage.setItem("sesDatasetVersionId", versionIdSes);
         this.setState({
             datasetId: datasetId,
-            changed: false
         }, () => {
             if (datasetId != "") {
                 console.log("in if for set@@@", this.state.datasetList);
@@ -1733,8 +1723,7 @@ class CompareAndSelectScenario extends Component {
         var regionId = event.target.value;
         this.setState({
             regionId: event.target.value,
-            regionName: regionName.length > 0 ? getLabelText(regionName[0].label, this.state.lang) : "",
-            changed: false
+            regionName: regionName.length > 0 ? getLabelText(regionName[0].label, this.state.lang) : ""
         }, () => {
             if (regionId > 0) {
                 this.showData()
@@ -1901,7 +1890,6 @@ class CompareAndSelectScenario extends Component {
                 putRequest.onsuccess = function (event) {
                     this.setState({
                         message: 'static.compareAndSelect.dataSaved',
-                        changed: false,
                         color: 'green',
                         datasetJson: datasetForEncryption,
                         planningUnitList: planningUnitList1.filter(c => c.active.toString() == "true").sort(function (a, b) {
@@ -1920,18 +1908,13 @@ class CompareAndSelectScenario extends Component {
 
     setForecastNotes(e) {
         this.setState({
-            forecastNotes: e.target.value,
-            changed: true
+            forecastNotes: e.target.value
         })
     }
 
     cancelClicked() {
-        this.setState({
-            changed: false
-        }, () => {
-            let id = AuthenticationService.displayDashboardBasedOnRole();
-            this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
-        })
+        let id = AuthenticationService.displayDashboardBasedOnRole();
+        this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
     toggleShowGuidance() {
@@ -1941,11 +1924,6 @@ class CompareAndSelectScenario extends Component {
     }
 
     render() {
-        jexcel.setDictionary({
-            Show: " ",
-            entries: " ",
-        });
-
         var chartOptions = {
             title: {
                 display: true,
@@ -2307,7 +2285,7 @@ class CompareAndSelectScenario extends Component {
                                                 <li><span className="greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.extrapolation.lowestError')} </span></li>
                                                 <li><span className="bluelegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.compareVersion.selectedForecast')} </span></li>
                                             </ul><br />
-                                            <div className="RemoveStriped">
+                                            <div className="table-responsive RemoveStriped">
                                                 <div id="table1" className="compareAndSelect"></div>
                                             </div>
 
@@ -2540,7 +2518,7 @@ class CompareAndSelectScenario extends Component {
                     <CardFooter>
                         <FormGroup>
                             <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                            {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_COMPARE_AND_SELECT') && this.state.showAllData && this.state.changed && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={this.submitScenario}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
+                            {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_COMPARE_AND_SELECT') && this.state.showAllData && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={this.submitScenario}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
                             &nbsp;
                         </FormGroup>
                     </CardFooter>

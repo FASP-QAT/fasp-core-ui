@@ -931,17 +931,18 @@ class ListBudgetComponent extends Component {
     })
   }
 
-  selected = function (instance, cell, x, y, value) {
-
-    if ((x == 0 && value != 0) || (y == 0)) {
-      // console.log("HEADER SELECTION--------------------------");
-    } else {
-      // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
-      if (this.state.selBudget.length != 0) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_BUDGET')) {
-          this.props.history.push({
-            pathname: `/budget/editBudget/${this.el.getValueFromCoords(0, x)}`,
-          });
+  selected = function (instance, cell, x, y, value, e) {
+    if (e.buttons == 1) {
+      if ((x == 0 && value != 0) || (y == 0)) {
+        // console.log("HEADER SELECTION--------------------------");
+      } else {
+        // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
+        if (this.state.selBudget.length != 0) {
+          if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_BUDGET')) {
+            this.props.history.push({
+              pathname: `/budget/editBudget/${this.el.getValueFromCoords(0, x)}`,
+            });
+          }
         }
       }
     }
