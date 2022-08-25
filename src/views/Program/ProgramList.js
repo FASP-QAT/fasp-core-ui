@@ -462,8 +462,13 @@ export default class ProgramList extends Component {
 
   buildJExcel() {
     let programList = this.state.selProgram;
-    console.log("programList---->", programList);
-    console.log("healthAreaList---->", programList.healthAreaList);
+    programList.sort((a, b) => {
+      var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+      var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+      return itemLabelA > itemLabelB ? 1 : -1;
+    });
+    // console.log("programList---->", programList);
+    // console.log("healthAreaList---->", programList.healthAreaList);
     let programArray = [];
 
     let count = 0;
@@ -635,17 +640,19 @@ export default class ProgramList extends Component {
     })
   }
 
-  selected = function (instance, cell, x, y, value) {
+  selected = function (instance, cell, x, y, value, e) {
+    if (e.buttons == 1) {
 
-    // if (x == 0 && value != 0) {
-    if ((x == 0 && value != 0) || (y == 0)) {
-      // console.log("HEADER SELECTION--------------------------");
-    } else {
-      // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
-      if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROGRAM')) {
-        this.props.history.push({
-          pathname: `/program/editProgram/${this.el.getValueFromCoords(0, x)}`,
-        });
+      // if (x == 0 && value != 0) {
+      if ((x == 0 && value != 0) || (y == 0)) {
+        // console.log("HEADER SELECTION--------------------------");
+      } else {
+        // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROGRAM')) {
+          this.props.history.push({
+            pathname: `/program/editProgram/${this.el.getValueFromCoords(0, x)}`,
+          });
+        }
       }
     }
   }.bind(this);

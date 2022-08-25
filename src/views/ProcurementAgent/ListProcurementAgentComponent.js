@@ -708,7 +708,7 @@ class ListProcurementAgentComponent extends Component {
         // console.log("procurementAgentArray---->", procurementAgentArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         // this.el.destroy();
-        jexcel.destroy(document.getElementById("tableDiv"),true);
+        jexcel.destroy(document.getElementById("tableDiv"), true);
         var json = [];
         var data = procurementAgentArray;
 
@@ -789,7 +789,7 @@ class ListProcurementAgentComponent extends Component {
             //     show: '',
             //     entries: '',
             // },
-            editable:true,
+            editable: true,
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
@@ -855,16 +855,18 @@ class ListProcurementAgentComponent extends Component {
         })
     }
 
-    selected = function (instance, cell, x, y, value) {
+    selected = function (instance, cell, x, y, value, e) {
+        if (e.buttons == 1) {
 
-        if ((x == 0 && value != 0) || (y == 0)) {
-            // console.log("HEADER SELECTION--------------------------");
-        } else {
-            // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
-            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROCUREMENT_AGENT')) {
-                this.props.history.push({
-                    pathname: `/procurementAgent/editProcurementAgent/${this.el.getValueFromCoords(0, x)}`,
-                });
+            if ((x == 0 && value != 0) || (y == 0)) {
+                // console.log("HEADER SELECTION--------------------------");
+            } else {
+                // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
+                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROCUREMENT_AGENT')) {
+                    this.props.history.push({
+                        pathname: `/procurementAgent/editProcurementAgent/${this.el.getValueFromCoords(0, x)}`,
+                    });
+                }
             }
         }
     }.bind(this);
@@ -1179,8 +1181,8 @@ class ListProcurementAgentComponent extends Component {
                             </Col>
                         }
                         <div className='consumptionDataEntryTable'>
-                        {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROCUREMENT_AGENT') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
-                        </div>
+                            {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROCUREMENT_AGENT') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
+                            </div>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>
                             <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >

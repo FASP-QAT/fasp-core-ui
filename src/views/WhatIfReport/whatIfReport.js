@@ -4845,7 +4845,8 @@ export default class WhatIfReportComponent extends React.Component {
                             </Col>
                         </Col>
                     </Row>
-                    <div className="animated fadeIn">
+                    <div className="col-md-12 loadProgramHeight">
+                    <div className="animated fadeIn ">
                         <Row className="float-right">
                             <div className="col-md-12">
                                 <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF()} />
@@ -5242,6 +5243,7 @@ export default class WhatIfReportComponent extends React.Component {
                             </div>}
 
                     </div> */}
+                </div>
                 </div>
 
                 {/* Consumption modal */}

@@ -4113,50 +4113,53 @@ export default class BuildTree extends Component {
         return sameLevelNodeList;
 
     }.bind(this)
-    selected = function (instance, cell, x, y, value) {
-        if (y == 8 && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE')) {
-            var elInstance = this.state.modelingEl;
-            var rowData = elInstance.getRowData(x);
-            if (rowData[4] != "" && rowData[4] != null && rowData[1] != "" && rowData[1] != null && rowData[2] != "" && rowData[2] != null) {
-                this.setState({
-                    currentRowIndex: '',
-                    currentTransferData: '',
-                    currentModelingType: '',
-                    currentCalculatorStartDate: '',
-                    currentCalculatorStopDate: '',
-                    currentCalculatorStartValue: '',
-                }, () => {
-                    // console.log("x row data===>", this.el.getRowData(x));
-                    var startValue = this.getMomValueForDateRange(rowData[1]);
-                    console.log("***MOM final start value---", startValue)
-                    this.setState({
-                        currentRowIndex: x,
-                        showCalculatorFields: this.state.aggregationNode ? !this.state.showCalculatorFields : false,
-                        currentModelingType: rowData[4],
-                        currentTransferData: rowData[3],
-                        currentCalculatorStartDate: rowData[1],
-                        currentCalculatorStopDate: rowData[2],
-                        currentCalculatorStartValue: startValue,
-                        currentCalculatedMomChange: '',
-                        currentTargetChangeNumber: '',
-                        currentTargetChangeNumberEdit: false,
-                        currentTargetChangePercentage: '',
-                        currentTargetChangePercentageEdit: false,
-                        currentEndValue: '',
-                        currentEndValueEdit: false
-                    }, () => {
-                        // this.calculateMOMData(0, 3);
-                    });
-                })
+    selected = function (instance, cell, x, y, value, e) {
+        if (e.buttons == 1) {
 
-            } else if (rowData[4] == "" || rowData[4] == null) {
-                alert("Please select modeling type before proceeding.");
-            }
-            else if (rowData[1] == "" || rowData[1] == null) {
-                alert("Please select start date before proceeding.");
-            }
-            else if (rowData[2] == "" || rowData[2] == null) {
-                alert("Please select end date before proceeding.");
+            if (y == 8 && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE')) {
+                var elInstance = this.state.modelingEl;
+                var rowData = elInstance.getRowData(x);
+                if (rowData[4] != "" && rowData[4] != null && rowData[1] != "" && rowData[1] != null && rowData[2] != "" && rowData[2] != null) {
+                    this.setState({
+                        currentRowIndex: '',
+                        currentTransferData: '',
+                        currentModelingType: '',
+                        currentCalculatorStartDate: '',
+                        currentCalculatorStopDate: '',
+                        currentCalculatorStartValue: '',
+                    }, () => {
+                        // console.log("x row data===>", this.el.getRowData(x));
+                        var startValue = this.getMomValueForDateRange(rowData[1]);
+                        console.log("***MOM final start value---", startValue)
+                        this.setState({
+                            currentRowIndex: x,
+                            showCalculatorFields: this.state.aggregationNode ? !this.state.showCalculatorFields : false,
+                            currentModelingType: rowData[4],
+                            currentTransferData: rowData[3],
+                            currentCalculatorStartDate: rowData[1],
+                            currentCalculatorStopDate: rowData[2],
+                            currentCalculatorStartValue: startValue,
+                            currentCalculatedMomChange: '',
+                            currentTargetChangeNumber: '',
+                            currentTargetChangeNumberEdit: false,
+                            currentTargetChangePercentage: '',
+                            currentTargetChangePercentageEdit: false,
+                            currentEndValue: '',
+                            currentEndValueEdit: false
+                        }, () => {
+                            // this.calculateMOMData(0, 3);
+                        });
+                    })
+
+                } else if (rowData[4] == "" || rowData[4] == null) {
+                    alert("Please select modeling type before proceeding.");
+                }
+                else if (rowData[1] == "" || rowData[1] == null) {
+                    alert("Please select start date before proceeding.");
+                }
+                else if (rowData[2] == "" || rowData[2] == null) {
+                    alert("Please select end date before proceeding.");
+                }
             }
         }
     }.bind(this)
