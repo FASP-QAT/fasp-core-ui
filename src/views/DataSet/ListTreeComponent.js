@@ -1295,20 +1295,21 @@ export default class ListTreeComponent extends Component {
         jExcelLoadedFunction(instance, 0);
     }
 
-    selected = function (instance, cell, x, y, value) {
-        if (x == 0 && value != 0) {
-            // console.log("HEADER SELECTION--------------------------");
-        } else {
-            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE')) {
-                var treeId = this.el.getValueFromCoords(0, x);
-                var programId = this.el.getValueFromCoords(8, x);
-                console.log("programId>>>", programId);
-                this.props.history.push({
-                    pathname: `/dataSet/buildTree/tree/${treeId}/${programId}`,
-                    // state: { role }
-                });
+    selected = function (instance, cell, x, y, value, e) {
+        if (e.buttons == 1) {
+            if (x == 0 && value != 0) {
+                // console.log("HEADER SELECTION--------------------------");
+            } else {
+                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE')) {
+                    var treeId = this.el.getValueFromCoords(0, x);
+                    var programId = this.el.getValueFromCoords(8, x);
+                    console.log("programId>>>", programId);
+                    this.props.history.push({
+                        pathname: `/dataSet/buildTree/tree/${treeId}/${programId}`,
+                        // state: { role }
+                    });
+                }
             }
-
         }
     }.bind(this);
 

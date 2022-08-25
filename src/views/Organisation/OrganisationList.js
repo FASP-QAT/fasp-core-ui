@@ -459,16 +459,19 @@ export default class OrganisationListComponent extends Component {
             });
         }
     }
-    selected = function (instance, cell, x, y, value) {
-        if ((x == 0 && value != 0) || (y == 0)) {
-            // console.log("HEADER SELECTION--------------------------");
-        } else {
-            if (this.state.selSource.length != 0) {
-                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_ORGANIZATION')) {
-                    this.props.history.push({
-                        pathname: `/organisation/editOrganisation/${this.el.getValueFromCoords(0, x)}`,
-                        // state: { role }
-                    });
+    selected = function (instance, cell, x, y, value, e) {
+        if (e.buttons == 1) {
+
+            if ((x == 0 && value != 0) || (y == 0)) {
+                // console.log("HEADER SELECTION--------------------------");
+            } else {
+                if (this.state.selSource.length != 0) {
+                    if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_ORGANIZATION')) {
+                        this.props.history.push({
+                            pathname: `/organisation/editOrganisation/${this.el.getValueFromCoords(0, x)}`,
+                            // state: { role }
+                        });
+                    }
                 }
             }
         }

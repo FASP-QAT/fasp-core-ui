@@ -1050,39 +1050,42 @@ export default class ConsumptionDetails extends React.Component {
         doc.save(i18n.t('static.report.qatProblemActionReport') + '.pdf')
     }
 
-    selected = function (instance, cell, x, y, value) {
-        // console.log("y+++", y);
-        if (y == 5 || y == 7 || y == 8 || y == 9) {
-            if ((x == 0 && value != 0) || (y == 0)) {
-                // console.log("HEADER SELECTION--------------------------");
-            } else {
-                // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
-                if (this.state.data.length != 0) {
-                    if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROBLEM')) {
-                        // console.log("this.el.getValueFromCoords(12, y)===>", this.el.getRowData(x));
-                        if (this.el.getValueFromCoords(12, x) != 4 && this.el.getValueFromCoords(12, x) != 2) {
-                            // console.log("onclick------>", this.el.getValueFromCoords(12, x));
-                            var planningunitId = this.el.getValueFromCoords(13, x);
-                            var programId = document.getElementById('programId').value;
-                            var versionId = this.el.getValueFromCoords(3, x)
-                            window.open(window.location.origin + `/#${this.el.getValueFromCoords(15, x)}/${programId}/${versionId}/${planningunitId}`);
-                            // let problemStatusId = document.getElementById('problemStatusId').value;
-                            // let problemTypeId = document.getElementById('problemTypeId').value;
-                            // var index = 0;
-                            // if (this.el.getValueFromCoords(1, x) == "") {
-                            //     var index = 0;
-                            // } else {
-                            //     index = this.el.getValueFromCoords(1, x);
-                            // }
-                            // console.log("URL====>", `/report/editProblem/${this.el.getValueFromCoords(0, x)}/${this.state.programId}/${index}/${this.el.getValueFromCoords(12, x)}/${this.el.getValueFromCoords(17, x)}`);
-                            // this.props.history.push({
-                            //     pathname: `/report/editProblem/${this.el.getValueFromCoords(0, x)}/${this.state.programId}/${index}/${this.el.getValueFromCoords(12, x)}/${this.el.getValueFromCoords(17, x)}`,
-                            // });
-                            // this.props.history.push({
-                            //     pathname: `/report/editProblem/${this.el.getValueFromCoords(0, x)}/${this.state.programId}/${index}/${problemStatusId}/${problemTypeId}`,
-                            // });
-                        }
+    selected = function (instance, cell, x, y, value, e) {
+        if (e.buttons == 1) {
 
+            // console.log("y+++", y);
+            if (y == 5 || y == 7 || y == 8 || y == 9) {
+                if ((x == 0 && value != 0) || (y == 0)) {
+                    // console.log("HEADER SELECTION--------------------------");
+                } else {
+                    // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
+                    if (this.state.data.length != 0) {
+                        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROBLEM')) {
+                            // console.log("this.el.getValueFromCoords(12, y)===>", this.el.getRowData(x));
+                            if (this.el.getValueFromCoords(12, x) != 4 && this.el.getValueFromCoords(12, x) != 2) {
+                                // console.log("onclick------>", this.el.getValueFromCoords(12, x));
+                                var planningunitId = this.el.getValueFromCoords(13, x);
+                                var programId = document.getElementById('programId').value;
+                                var versionId = this.el.getValueFromCoords(3, x)
+                                window.open(window.location.origin + `/#${this.el.getValueFromCoords(15, x)}/${programId}/${versionId}/${planningunitId}`);
+                                // let problemStatusId = document.getElementById('problemStatusId').value;
+                                // let problemTypeId = document.getElementById('problemTypeId').value;
+                                // var index = 0;
+                                // if (this.el.getValueFromCoords(1, x) == "") {
+                                //     var index = 0;
+                                // } else {
+                                //     index = this.el.getValueFromCoords(1, x);
+                                // }
+                                // console.log("URL====>", `/report/editProblem/${this.el.getValueFromCoords(0, x)}/${this.state.programId}/${index}/${this.el.getValueFromCoords(12, x)}/${this.el.getValueFromCoords(17, x)}`);
+                                // this.props.history.push({
+                                //     pathname: `/report/editProblem/${this.el.getValueFromCoords(0, x)}/${this.state.programId}/${index}/${this.el.getValueFromCoords(12, x)}/${this.el.getValueFromCoords(17, x)}`,
+                                // });
+                                // this.props.history.push({
+                                //     pathname: `/report/editProblem/${this.el.getValueFromCoords(0, x)}/${this.state.programId}/${index}/${problemStatusId}/${problemTypeId}`,
+                                // });
+                            }
+
+                        }
                     }
                 }
             }
@@ -1820,8 +1823,8 @@ export default class ConsumptionDetails extends React.Component {
 
                             {/* <div className="ProgramListSearch"> */}
                             <div className='ProgramListSearchAlignment'>
-                            <div id="tableDiv" className='consumptionDataEntryTable' style={{ display: this.state.loading ? "none" : "block" }}>
-                            </div>
+                                <div id="tableDiv" className='consumptionDataEntryTable' style={{ display: this.state.loading ? "none" : "block" }}>
+                                </div>
                             </div>
                             {/* </div> */}
                         </div>
