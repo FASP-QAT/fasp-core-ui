@@ -446,7 +446,7 @@ export default class OrganisationTypeListComponent extends Component {
             });
         }
     }
-    selected = function (instance, cell, x, y, value) {
+    selected = function (instance, cell, x, y, value, e) {
         if (e.buttons == 1) {
 
             if ((x == 0 && value != 0) || (y == 0)) {
