@@ -263,18 +263,20 @@ export default class ProgramList extends Component {
         })
     }
 
-    selected = function (instance, cell, x, y, value) {
+    selected = function (instance, cell, x, y, value, e) {
+        if (e.buttons == 1) {
 
-        // if (x == 0 && value != 0) {
-        if ((x == 0 && value != 0) || (y == 0)) {
-            // console.log("HEADER SELECTION--------------------------");
-        } else {
-            // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
-            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DATASET')) {
-                this.props.history.push({
-                    pathname: `/dataset/editDataSet/${this.el.getValueFromCoords(0, x)}`,
-                    // pathname: `/demographic/scenarioOne`,
-                });
+            // if (x == 0 && value != 0) {
+            if ((x == 0 && value != 0) || (y == 0)) {
+                // console.log("HEADER SELECTION--------------------------");
+            } else {
+                // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
+                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DATASET')) {
+                    this.props.history.push({
+                        pathname: `/dataset/editDataSet/${this.el.getValueFromCoords(0, x)}`,
+                        // pathname: `/demographic/scenarioOne`,
+                    });
+                }
             }
         }
     }.bind(this);

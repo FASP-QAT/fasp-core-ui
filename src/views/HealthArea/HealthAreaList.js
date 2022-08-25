@@ -402,7 +402,7 @@ export default class HealthAreaListComponent extends Component {
         // console.log("healthAreasArray---->", healthAreasArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         // this.el.destroy();
-        jexcel.destroy(document.getElementById("tableDiv"),true);
+        jexcel.destroy(document.getElementById("tableDiv"), true);
         var json = [];
         var data = healthAreasArray;
 
@@ -458,7 +458,7 @@ export default class HealthAreaListComponent extends Component {
             //     show: '',
             //     entries: '',
             // },
-            editable:true,
+            editable: true,
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
@@ -750,8 +750,8 @@ export default class HealthAreaListComponent extends Component {
                             </Col>
                         }
                         <div className='consumptionDataEntryTable'>
-                        <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_HEALTH_AREA') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
-                        </div>
+                            <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_HEALTH_AREA') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
+                            </div>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>
                             <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
@@ -783,16 +783,19 @@ export default class HealthAreaListComponent extends Component {
             });
         }
     }
-    selected = function (instance, cell, x, y, value) {
-        if ((x == 0 && value != 0) || (y == 0)) {
-            // console.log("HEADER SELECTION--------------------------");
-        } else {
-            if (this.state.selSource.length != 0) {
-                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_HEALTH_AREA')) {
-                    this.props.history.push({
-                        pathname: `/healthArea/editHealthArea/${this.el.getValueFromCoords(0, x)}`,
-                        // state: { role }
-                    });
+    selected = function (instance, cell, x, y, value, e) {
+        if (e.buttons == 1) {
+
+            if ((x == 0 && value != 0) || (y == 0)) {
+                // console.log("HEADER SELECTION--------------------------");
+            } else {
+                if (this.state.selSource.length != 0) {
+                    if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_HEALTH_AREA')) {
+                        this.props.history.push({
+                            pathname: `/healthArea/editHealthArea/${this.el.getValueFromCoords(0, x)}`,
+                            // state: { role }
+                        });
+                    }
                 }
             }
         }
