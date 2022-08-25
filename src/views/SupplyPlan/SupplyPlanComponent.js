@@ -3977,6 +3977,8 @@ export default class SupplyPlanComponent extends React.Component {
         if (isEmergencyOrder == 0) {
             emergencyOrder = false;
         }
+        var seaFreightPercentage = this.state.generalProgramJson.seaFreightPerc;
+        var freightCost = Number(catalogPrice) * Number(suggestedShipmentList[0].suggestedOrderQty) * (Number(Number(seaFreightPercentage) / 100));
         var json = {
             shipmentQty: suggestedShipmentList[0].suggestedOrderQty,
             index: -1,
@@ -4009,7 +4011,9 @@ export default class SupplyPlanComponent extends React.Component {
             expectedDeliveryDate: moment(month).format("YYYY-MM-DD"),
             planningUnit: {
                 id: document.getElementById("planningUnitId").value
-            }
+            },
+            rate: catalogPrice,
+            freightCost: freightCost
         }
         shipmentList.push(json);
         this.setState({
