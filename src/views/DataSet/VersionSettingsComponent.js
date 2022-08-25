@@ -806,9 +806,9 @@ class VersionSettingsComponent extends Component {
         let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
         let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
         var dataList1 = [];
-        for (var i = 0; i < programIdsarr.length; i++) {
+        // for (var i = 0; i < programIdsarr.length; i++) {
             var inputjson = {
-                programId: programIdsarr[i],
+                programIds: programIdsarr,
                 versionTypeId: versionTypeId,
                 startDate: startDate,
                 stopDate: stopDate
@@ -818,12 +818,12 @@ class VersionSettingsComponent extends Component {
             ProgramService.getDatasetVersions(inputjson).then(response => {
                 if (response.status == 200) {
                     var responseData = response.data;
-                    console.log("responseData------->", responseData);
+                    console.log("responseData------->[0]", responseData[0]);
                     for (var i = 0; i < responseData.length; i++) {
                         var data = [];
                         data[0] = programIdsarr[i]
                         data[1] = responseData[i].programCode
-                        data[2] = responseData[i].versionId + "(Live)"
+                        data[2] = responseData[i].versionId
                         data[3] = getLabelText(responseData[i].versionType.label, this.state.lang);
                         data[4] = responseData[i].notes
                         data[5] = responseData[i].createdDate
@@ -860,7 +860,7 @@ class VersionSettingsComponent extends Component {
             );
             console.log("Final dataList1---------->", dataList1[0])
             
-        }
+        // }
         this.setState({
             dataList: dataList1
         },
@@ -1005,6 +1005,8 @@ class VersionSettingsComponent extends Component {
             }
         }
         var dataLists = this.state.dataList;
+        console.log("dataLists",dataLists)
+        console.log("dataLists length",dataLists.length)
        for (var i = 0; i < this.state.dataList.length; i++) {
             console.log("dataList----1009--->3");
             
