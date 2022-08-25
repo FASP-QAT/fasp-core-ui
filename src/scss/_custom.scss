@@ -6467,3 +6467,13 @@ top: calc(20em + 3px);
   width: 467px;
 }
 
+.NodeTitletext{
+  font-size: 12px;
+  font-weight: bold;
+  width: 138px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  float: left;
+}
