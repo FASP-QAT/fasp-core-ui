@@ -566,10 +566,10 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                 data[17] = shipmentList[i].budget.id;//R
                                                 data[18] = shipmentList[i].currency.currencyId;//S
                                                 data[19] = shipmentList[i].rate != undefined ? Number(shipmentList[i].rate).toFixed(2) : "";//T
-                                                data[20] = `=ROUND(M${parseInt(i) + 1}*T${parseInt(i) + 1},2)`;//U
+                                                data[20] = `=ROUND(O${parseInt(i) + 1}*T${parseInt(i) + 1},2)`;//U
                                                 data[21] = shipmentList[i].freightCost != undefined ? Number(shipmentList[i].freightCost).toFixed(2) : "";//V
 
-                                                data[22] = `=ROUND(ROUND(M${parseInt(i) + 1}*T${parseInt(i) + 1},2)+V${parseInt(i) + 1},2)`;
+                                                data[22] = `=ROUND(ROUND(O${parseInt(i) + 1}*T${parseInt(i) + 1},2)+V${parseInt(i) + 1},2)`;
 
                                                 data[23] = shipmentList[i].dataSource.id;//X
                                                 data[24] = shipmentList[i].notes;//Y
