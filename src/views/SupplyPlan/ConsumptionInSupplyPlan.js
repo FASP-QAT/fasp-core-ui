@@ -34,6 +34,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         this.onPasteForBatchInfo = this.onPasteForBatchInfo.bind(this);
         this.oneditionend = this.oneditionend.bind(this);
         this.batchDetailsClicked = this.batchDetailsClicked.bind(this);
+        this.formulaChanged=this.formulaChanged.bind(this)
         this.state = {
             consumptionEl: "",
             consumptionBatchInfoTableEl: ""
@@ -333,6 +334,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                             { type: 'hidden', width: 0 }
                         ],
                         pagination: paginationOption,
+                        onformulachain:this.formulaChanged,
                         paginationOptions: paginationArray,
                         search: searchOption,
                         columnSorting: true,
@@ -864,6 +866,13 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             return a < b ? -1 : a > b ? 1 : 0;
         });
     }.bind(this);
+
+    formulaChanged  = function (instance, executions) {
+        var executions=executions;
+        for(var e=0;e<executions.length;e++){
+            this.consumptionChanged(instance,executions[e].cell,executions[e].x,executions[e].y,executions[e].v)
+        }
+    }
 
     consumptionChanged = function (instance, cell, x, y, value) {
         var elInstance = this.state.consumptionEl;
