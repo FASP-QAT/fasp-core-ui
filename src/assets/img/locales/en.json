@@ -2794,5 +2794,11 @@
     "static.manualTagging.showAllShipments": "Show All Shipments",
     "static.login.loginOnline": "Online",
     "static.shipment.shipmentProcurementAgentType": "Shipment Procurement Agent Type",
-    "static.shipment.groupByProcurementAgentType": "Group by Procurement Agent Type"
+    "static.shipment.groupByProcurementAgentType": "Group by Procurement Agent Type",
+    "static.shipment.shipmentQtyARU":"Order Quantity (ARU)",
+    "static.shipment.shipmentQtyPU":"Order Quantity (PU)",
+    "static.manualTagging.aruQty":"ARU Qty",
+    "static.manualTagging.conversionARUToPU":"Conversion (ARU to PU)",
+    "static.manualTagging.qtyPU":"Qty (PU)",
+    "static.manualTagging.aru":"ARU"
 }
