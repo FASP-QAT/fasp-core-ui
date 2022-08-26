@@ -786,8 +786,10 @@ class ForecastMetrics extends Component {
         for (var i = 0; i < colArr.length; i++) {
           elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
           //  elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', '#f48282');
-          let textColor = '#BA0C2F'//contrast('#f48282');
-          elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'color', textColor);
+          // let textColor = '#BA0C2F'//contrast('#f48282');
+          // elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'color', textColor);
+          var cell = elInstance.getCell((colArr[i]).concat(parseInt(j) + 1))
+          cell.classList.add('jexcelRedCell');
         }
       } else {
         for (var i = 0; i < colArr.length; i++) {
@@ -1602,7 +1604,7 @@ class ForecastMetrics extends Component {
                       </div>
                     </FormGroup>
 
-                    <FormGroup className="col-md-3" style={{zIndex:'2'}}>
+                    <FormGroup className="col-md-3" style={{ zIndex: '2' }}>
                       <Label htmlFor="countrysId">{i18n.t('static.program.realmcountry')}</Label>
                       <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
 
@@ -1647,7 +1649,7 @@ class ForecastMetrics extends Component {
 
                     </FormGroup>
 
-                    <FormGroup className="col-md-3" style={{zIndex:'1'}}>
+                    <FormGroup className="col-md-3" style={{ zIndex: '1' }}>
                       <Label htmlFor="appendedInputButton">{i18n.t('static.tracercategory.tracercategory')}</Label>
                       <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                       <div className="controls">
@@ -1670,7 +1672,7 @@ class ForecastMetrics extends Component {
                     </FormGroup>
 
 
-                    <FormGroup className="col-sm-3" id="hideDiv" style={{zIndex:'1'}}>
+                    <FormGroup className="col-sm-3" id="hideDiv" style={{ zIndex: '1' }}>
                       <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
                       <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                       <div className="controls">
@@ -1689,7 +1691,7 @@ class ForecastMetrics extends Component {
                       </div>
                     </FormGroup>
 
-                    <FormGroup className="col-md-3" style={{zIndex:'1'}}>
+                    <FormGroup className="col-md-3" style={{ zIndex: '1' }}>
                       <Label htmlFor="appendedInputButton">{i18n.t('static.report.includeapproved')}</Label>
                       <div className="controls ">
                         <InputGroup>
