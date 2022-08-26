@@ -114,7 +114,7 @@ class ListProcurementAgentComponent extends Component {
         // console.log("procurementAgentArray---->", procurementAgentArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         // this.el.destroy();
-        jexcel.destroy(document.getElementById("tableDiv"),true);
+        jexcel.destroy(document.getElementById("tableDiv"), true);
         var json = [];
         var data = procurementAgentTypeArray;
 
@@ -171,7 +171,7 @@ class ListProcurementAgentComponent extends Component {
             //     show: '',
             //     entries: '',
             // },
-            editable:true,
+            editable: true,
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
@@ -201,16 +201,18 @@ class ListProcurementAgentComponent extends Component {
         })
     }
 
-    selected = function (instance, cell, x, y, value) {
+    selected = function (instance, cell, x, y, value, e) {
+        if (e.buttons == 1) {
 
-        if ((x == 0 && value != 0) || (y == 0)) {
-            // console.log("HEADER SELECTION--------------------------");
-        } else {
-            // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
-            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROCUREMENT_AGENT')) {
-                this.props.history.push({
-                    pathname: `/procurementAgentType/editProcurementAgentType/${this.el.getValueFromCoords(0, x)}`,
-                });
+            if ((x == 0 && value != 0) || (y == 0)) {
+                // console.log("HEADER SELECTION--------------------------");
+            } else {
+                // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
+                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROCUREMENT_AGENT')) {
+                    this.props.history.push({
+                        pathname: `/procurementAgentType/editProcurementAgentType/${this.el.getValueFromCoords(0, x)}`,
+                    });
+                }
             }
         }
     }.bind(this);

@@ -3567,46 +3567,49 @@ export default class CreateTreeTemplate extends Component {
 
     }.bind(this)
 
-    selected = function (instance, cell, x, y, value) {
-        if (y == 8 && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE_TEMPLATES')) {
-            var elInstance = this.state.modelingEl;
-            var rowData = elInstance.getRowData(x);
-            if (rowData[4] != "" && rowData[4] != null && rowData[1] != "" && rowData[1] != null && rowData[2] != "" && rowData[2] != null) {
-                this.setState({
-                    currentRowIndex: '',
-                    currentTransferData: '',
-                    currentModelingType: '',
-                    currentCalculatorStartDate: '',
-                    currentCalculatorStopDate: '',
-                    currentCalculatorStartValue: '',
-                }, () => {
-                    // console.log("x row data===>", this.el.getRowData(x));
-                    var startValue = this.getMomValueForDateRange(rowData[1]);
+    selected = function (instance, cell, x, y, value, e) {
+        if (e.buttons == 1) {
+
+            if (y == 8 && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE_TEMPLATES')) {
+                var elInstance = this.state.modelingEl;
+                var rowData = elInstance.getRowData(x);
+                if (rowData[4] != "" && rowData[4] != null && rowData[1] != "" && rowData[1] != null && rowData[2] != "" && rowData[2] != null) {
                     this.setState({
-                        currentRowIndex: x,
-                        showCalculatorFields: this.state.aggregationNode ? !this.state.showCalculatorFields : false,
-                        currentModelingType: rowData[4],
-                        currentTransferData: rowData[3],
-                        currentCalculatorStartDate: rowData[1],
-                        currentCalculatorStopDate: rowData[2],
-                        currentCalculatorStartValue: startValue,
-                        currentCalculatedMomChange: '',
-                        currentTargetChangeNumber: '',
-                        currentTargetChangeNumberEdit: false,
-                        currentTargetChangePercentage: '',
-                        currentTargetChangePercentageEdit: false,
-                        currentEndValue: '',
-                        currentEndValueEdit: false
-                    });
-                })
-            } else if (rowData[4] == "" || rowData[4] == null) {
-                alert("Please select modeling type before proceeding.");
-            }
-            else if (rowData[1] == "" || rowData[1] == null) {
-                alert("Please select start date before proceeding.");
-            }
-            else if (rowData[2] == "" || rowData[2] == null) {
-                alert("Please select end date before proceeding.");
+                        currentRowIndex: '',
+                        currentTransferData: '',
+                        currentModelingType: '',
+                        currentCalculatorStartDate: '',
+                        currentCalculatorStopDate: '',
+                        currentCalculatorStartValue: '',
+                    }, () => {
+                        // console.log("x row data===>", this.el.getRowData(x));
+                        var startValue = this.getMomValueForDateRange(rowData[1]);
+                        this.setState({
+                            currentRowIndex: x,
+                            showCalculatorFields: this.state.aggregationNode ? !this.state.showCalculatorFields : false,
+                            currentModelingType: rowData[4],
+                            currentTransferData: rowData[3],
+                            currentCalculatorStartDate: rowData[1],
+                            currentCalculatorStopDate: rowData[2],
+                            currentCalculatorStartValue: startValue,
+                            currentCalculatedMomChange: '',
+                            currentTargetChangeNumber: '',
+                            currentTargetChangeNumberEdit: false,
+                            currentTargetChangePercentage: '',
+                            currentTargetChangePercentageEdit: false,
+                            currentEndValue: '',
+                            currentEndValueEdit: false
+                        });
+                    })
+                } else if (rowData[4] == "" || rowData[4] == null) {
+                    alert("Please select modeling type before proceeding.");
+                }
+                else if (rowData[1] == "" || rowData[1] == null) {
+                    alert("Please select start date before proceeding.");
+                }
+                else if (rowData[2] == "" || rowData[2] == null) {
+                    alert("Please select end date before proceeding.");
+                }
             }
         }
     }.bind(this)
@@ -4657,8 +4660,12 @@ export default class CreateTreeTemplate extends Component {
                 }
                 if ((this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 1) {
                     var sharePu;
-                    // if ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.sharePlanningUnit == "true") {
-                    sharePu = (this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor);
+                    if ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.sharePlanningUnit.toString() != "true") {
+                        sharePu = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.puPerVisit != "" ? (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.puPerVisit : "";
+                    } else {
+                        sharePu = (this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor);
+                    }
+                    // (this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor);
                     // } else {
                     //     sharePu = this.round((this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor));
                     // }

@@ -50,6 +50,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         this.onPasteForBatchInfo = this.onPasteForBatchInfo.bind(this);
         this.oneditionend = this.oneditionend.bind(this);
         this.batchDetailsClicked = this.batchDetailsClicked.bind(this);
+        this.formulaChanged=this.formulaChanged.bind(this)
+        this.formulaChanged3=this.formulaChanged3.bind(this)
     }
 
     formatter = value => {
@@ -678,6 +680,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                 editable: true,
                                                 pagination: paginationOption,
                                                 paginationOptions: paginationArray,
+                                                onformulachain:this.formulaChanged,
                                                 search: searchOption,
                                                 columnSorting: true,
                                                 // tableOverflow: true,
@@ -1715,7 +1718,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     type: 'numeric',
                     textEditor: true,
                     disabledMaskOnEdition: true,
-                    mask: '#,##.00', decimal: '.'
+                    mask: '#,##',
+                    // decimal: '.'
                 },
                 {
                     title: i18n.t('static.supplyPlan.shipmentTransBatchInfoId'),
@@ -1924,6 +1928,20 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     shipmentInstance.setValueFromCoords(15, y, false, true);
                 }
             }
+        }
+    }
+
+    formulaChanged  = function (instance, executions) {
+        var executions=executions;
+        for(var e=0;e<executions.length;e++){
+            this.shipmentChanged(instance,executions[e].cell,executions[e].x,executions[e].y,executions[e].v)
+        }
+    }
+
+    formulaChanged3  = function (instance, executions) {
+        var executions=executions;
+        for(var e=0;e<executions.length;e++){
+            this.this.shipmentQtyChanged(instance,executions[e].cell,executions[e].x,executions[e].y,executions[e].v)
         }
     }
 
@@ -4094,11 +4112,11 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 columnDrag: true,
                 columns: [
                     { title: i18n.t('static.supplyPlan.adjustesOrderQty'), type: 'dropdown', source: adjustedOrderQty, width: 120 },
-                    { title: i18n.t('static.supplyPlan.suggestedOrderQty'), type: 'numeric', textEditor: true, mask: '#,##.00', decimal: '.', width: 120, readOnly: true },
-                    { title: i18n.t('static.supplyPlan.manualOrderQty'), type: 'numeric', textEditor: true, mask: '#,##.00', decimal: '.', width: 120 },
+                    { title: i18n.t('static.supplyPlan.suggestedOrderQty'), type: 'numeric', textEditor: true, mask: '#,##', width: 120, readOnly: true },
+                    { title: i18n.t('static.supplyPlan.manualOrderQty'), type: 'numeric', textEditor: true, mask: '#,##', width: 120 },
                     { type: roundingOptionType, title: i18n.t('static.supplyPlan.orderBasedOn'), source: orderBasedOn, width: 120 },
                     { type: roundingOptionType, title: i18n.t('static.supplyPlan.roundingOption'), source: [{ id: 1, name: i18n.t('static.supplyPlan.roundDown') }, { id: 2, name: i18n.t('static.supplyPlan.roundUp') }], width: 120 },
-                    { title: i18n.t('static.supplyPlan.finalOrderQty'), type: 'numeric', textEditor: true, readOnly: true, mask: '#,##.00', decimal: '.', width: 120 },
+                    { title: i18n.t('static.supplyPlan.finalOrderQty'), type: 'numeric', textEditor: true, readOnly: true, mask: '#,##', width: 120 },
                     { title: i18n.t('static.supplyPlan.rowNumber'), type: 'hidden', width: 0 },
                     { type: 'hidden', readOnly: true, title: i18n.t('static.procurementAgentPlanningUnit.moq'), width: 0 },
                     { type: 'hidden', title: i18n.t('static.procurementAgentPlanningUnit.unitPerPalletEuro1'), width: 0 },
@@ -4109,6 +4127,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     { type: 'hidden', title: i18n.t('static.procurementUnit.noOfContainers'), width: 0 },
                 ],
                 pagination: false,
+                onformulachain:this.formulaChanged3,
                 search: false,
                 columnSorting: true,
                 // tableOverflow: true,

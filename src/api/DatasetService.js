@@ -51,5 +51,10 @@ class DatasetService {
         );
     }
 
+    getDatasetData(programId,versionId) {
+        return axios.get(`${API_URL}/api/datasetData/programId/${programId}/versionId/${versionId}`, {
+        });
+    }
+
 }
 export default new DatasetService()

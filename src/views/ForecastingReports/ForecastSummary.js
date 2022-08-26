@@ -715,7 +715,7 @@ class ForecastSummary extends Component {
                     //     align: 'left'
                     // })
 
-                    doc.fromHTML("<span style = 'font-family:helvetica;'><font size = '1' color = '#002f6c'><b>" + i18n.t('static.report.dateRange') + ":</b> " + document.getElementById("forecastPeriod").value + "</font></span>", (doc.internal.pageSize.width / 8) - 50, 90)
+                    doc.fromHTML("<span style = 'font-family:helvetica;'><font size = '1' color = '#002f6c'><b>" + i18n.t('static.common.forecastPeriod') + ":</b> " + document.getElementById("forecastPeriod").value + "</font></span>", (doc.internal.pageSize.width / 8) - 50, 90)
                     doc.fromHTML("<span style = 'font-family:helvetica;'><font size = '1' color = '#002f6c'><b>" + i18n.t('static.forecastReport.display') + ":</b> " + this.state.displayName + "</font></span>", (doc.internal.pageSize.width / 8) - 50, 100)
 
                     // doc.setFont('helvetica', 'bold')
@@ -3038,7 +3038,7 @@ class ForecastSummary extends Component {
                 return (
                     <option key={i} value={item.versionId}>
                         {/* {item.versionId} */}
-                        {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)}
+                        {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)} ({(moment(item.createdDate).format(`MMM DD YYYY`))})
                     </option>
                 )
             }, this);

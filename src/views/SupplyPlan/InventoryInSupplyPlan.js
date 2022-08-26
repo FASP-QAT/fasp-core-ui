@@ -34,6 +34,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         this.onPasteForBatchInfo = this.onPasteForBatchInfo.bind(this);
         this.oneditionend = this.oneditionend.bind(this);
         this.batchDetailsClicked = this.batchDetailsClicked.bind(this);
+        this.formulaChanged=this.formulaChanged.bind(this)
         this.state = {
             inventoryEl: "",
             inventoryBatchInfoTableEl: ""
@@ -374,6 +375,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         // },
                         onload: this.loadedInventory,
                         editable: inventoryEditable,
+                        onformulachain:this.formulaChanged,
                         onchange: this.inventoryChanged,
                         updateTable: function (el, cell, x, y, source, value, id) {
 
@@ -573,7 +575,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 { title: i18n.t('static.supplyPlan.expiryDate'), type: 'text', readOnly: true, width: 150 },
                 { title: i18n.t('static.supplyPlan.adjustmentType'), type: 'hidden', source: [{ id: 1, name: i18n.t('static.consumption.actual') }, { id: 2, name: i18n.t('static.inventoryType.adjustment') }], readOnly: true },
                 { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: adjustmentColumnType, mask: '[-]#,##', textEditor: true, disabledMaskOnEdition: true, width: 80 },
-                { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: actualColumnType, mask: '#,##.00', textEditor: true, decimal: '.', disabledMaskOnEdition: true, width: 80 },
+                { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: actualColumnType, mask: '#,##', textEditor: true, disabledMaskOnEdition: true, width: 80 },
                 { title: i18n.t('static.supplyPlan.inventoryTransBatchInfoId'), type: 'hidden', width: 0 },
                 { title: i18n.t('static.supplyPlan.rowNumber'), type: 'hidden', width: 0 },
                 { type: 'hidden' }
@@ -868,6 +870,13 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 }
 
             }
+        }
+    }
+
+    formulaChanged  = function (instance, executions) {
+        var executions=executions;
+        for(var e=0;e<executions.length;e++){
+            this.inventoryChanged(instance,executions[e].cell,executions[e].x,executions[e].y,executions[e].v)
         }
     }
 

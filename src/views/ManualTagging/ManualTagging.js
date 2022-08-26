@@ -4464,7 +4464,8 @@ export default class ManualTagging extends Component {
         tr.children[12].classList.add('AsteriskTheadtrTd');
     }
 
-    selected = function (instance, cell, x, y, value) {
+    selected = function (instance, cell, x, y, value, e) {
+        if (e.buttons == 1) {
         console.log("x$$$$$$$$$$$$$$$$", x);
         console.log("y$$$$$$$$$$$$$$$$", y);
         console.log("value$$$$$$$$$$$$$$$$", value);
@@ -4561,6 +4562,7 @@ export default class ManualTagging extends Component {
                 this.toggleLarge();
             }
         }
+    }
     }.bind(this);
 
     getShipmentsForTab2 = (shipmentId, tempShipmentId, roNo, roPrimeLineNo) => {

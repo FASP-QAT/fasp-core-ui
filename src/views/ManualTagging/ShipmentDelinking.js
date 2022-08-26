@@ -727,38 +727,41 @@ export default class ShipmentDelinking extends Component {
         jExcelLoadedFunction(instance);
     }
 
-    selected = function (instance, cell, x, y, value) {
-        if ((x == 0 && value != 0) || (y == 0)) {
-            console.log("HEADER SELECTION--------------------------");
-        } else {
-            this.setState({
-                shipmentId: `${this.el.getValueFromCoords(0, x)}`
-            })
-            this.toggleLarge();
-            // confirmAlert({
-            //     message: i18n.t('static.mt.confirmDelink'),
-            //     buttons: [
-            //         {
-            //             label: i18n.t('static.program.yes'),
-            //             onClick: () => {
-            //                 var userName = prompt('Please Enter your Name')
+    selected = function (instance, cell, x, y, value, e) {
+        if (e.buttons == 1) {
 
-            //             }
-            //         },
-            //         {
-            //             label: i18n.t('static.program.no')
-            //         }
-            //     ]
-            // });
-            // var outputListAfterSearch = [];
-            // let row = this.state.outputList.filter(c => (c.shipmentId == this.el.getValueFromCoords(0, x)))[0];
-            // outputListAfterSearch.push(row);
+            if ((x == 0 && value != 0) || (y == 0)) {
+                console.log("HEADER SELECTION--------------------------");
+            } else {
+                this.setState({
+                    shipmentId: `${this.el.getValueFromCoords(0, x)}`
+                })
+                this.toggleLarge();
+                // confirmAlert({
+                //     message: i18n.t('static.mt.confirmDelink'),
+                //     buttons: [
+                //         {
+                //             label: i18n.t('static.program.yes'),
+                //             onClick: () => {
+                //                 var userName = prompt('Please Enter your Name')
 
-            // this.setState({
-            //     shipmentId: this.el.getValueFromCoords(0, x),
-            //     outputListAfterSearch
-            // })
-            // this.toggleLarge();
+                //             }
+                //         },
+                //         {
+                //             label: i18n.t('static.program.no')
+                //         }
+                //     ]
+                // });
+                // var outputListAfterSearch = [];
+                // let row = this.state.outputList.filter(c => (c.shipmentId == this.el.getValueFromCoords(0, x)))[0];
+                // outputListAfterSearch.push(row);
+
+                // this.setState({
+                //     shipmentId: this.el.getValueFromCoords(0, x),
+                //     outputListAfterSearch
+                // })
+                // this.toggleLarge();
+            }
         }
     }.bind(this);
 

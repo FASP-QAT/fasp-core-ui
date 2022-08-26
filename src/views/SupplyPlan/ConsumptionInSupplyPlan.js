@@ -34,6 +34,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         this.onPasteForBatchInfo = this.onPasteForBatchInfo.bind(this);
         this.oneditionend = this.oneditionend.bind(this);
         this.batchDetailsClicked = this.batchDetailsClicked.bind(this);
+        this.formulaChanged=this.formulaChanged.bind(this)
         this.state = {
             consumptionEl: "",
             consumptionBatchInfoTableEl: ""
@@ -333,6 +334,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                             { type: 'hidden', width: 0 }
                         ],
                         pagination: paginationOption,
+                        onformulachain:this.formulaChanged,
                         paginationOptions: paginationArray,
                         search: searchOption,
                         columnSorting: true,
@@ -522,7 +524,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             columns: [
                 { title: i18n.t('static.supplyPlan.batchId'), type: 'dropdown', source: batchList, filter: this.filterBatchInfoForExistingDataForConsumption, width: 100 },
                 { title: i18n.t('static.supplyPlan.expiryDate'), type: 'text', readOnly: true, width: 150 },
-                { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: 'numeric', mask: '#,##.00', disabledMaskOnEdition: true, textEditor: true, decimal: '.', width: 80 },
+                { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: 'numeric', mask: '#,##', disabledMaskOnEdition: true, textEditor: true, width: 80 },
                 { title: i18n.t('static.supplyPlan.consumptionTransBatchInfoId'), type: 'hidden', width: 0 },
                 { title: i18n.t('static.supplyPlan.rowNumber'), type: 'hidden', width: 0 },
                 { type: 'hidden' }
@@ -865,6 +867,13 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         });
     }.bind(this);
 
+    formulaChanged  = function (instance, executions) {
+        var executions=executions;
+        for(var e=0;e<executions.length;e++){
+            this.consumptionChanged(instance,executions[e].cell,executions[e].x,executions[e].y,executions[e].v)
+        }
+    }
+
     consumptionChanged = function (instance, cell, x, y, value) {
         var elInstance = this.state.consumptionEl;
         var rowData = elInstance.getRowData(y);
@@ -1059,7 +1068,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
 
     filterBatchInfoForExistingDataForConsumption = function (instance, cell, c, r, source) {
         var mylist = [];
-        var json = instance.worksheets[0].getJson(null, false)
+        var json = this.state.consumptionBatchInfoTableEl.getJson(null, false)
         var value = (json[r])[3];
         var date = (json[r])[5];
         // if (value != 0) {
@@ -1073,7 +1082,9 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
 
     loadedBatchInfoConsumption = function (instance, cell, x, y, value) {
         jExcelLoadedFunctionOnlyHideRow(instance);
-        var asterisk = document.getElementsByClassName("resizable")[1];
+        // var asterisk = document.getElementsByClassName("resizable")[1];
+        var asterisk = document.getElementsByClassName("jss")[1].firstChild.nextSibling;
+
         var tr = asterisk.firstChild;
         tr.children[1].classList.add('AsteriskTheadtrTd');
         tr.children[3].classList.add('AsteriskTheadtrTd');

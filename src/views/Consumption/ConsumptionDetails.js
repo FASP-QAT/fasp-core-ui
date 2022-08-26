@@ -975,7 +975,7 @@ export default class ConsumptionDetails extends React.Component {
                     </ModalHeader>
                     <ModalBody>
                         <h6 className="red" id="div3">{this.state.consumptionBatchInfoDuplicateError || this.state.consumptionBatchInfoNoStockError || this.state.consumptionBatchError}</h6>
-                        <div className="table-responsive">
+                        <div className="">
                             <div id="consumptionBatchInfoTable" className="AddListbatchtrHeight"></div>
                         </div>
                         <br /><span>{i18n.t("static.dataEntry.missingBatchNote")}</span>

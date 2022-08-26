@@ -21,6 +21,8 @@ import { Prompt } from 'react-router';
 import { exportPDF, noForecastSelectedClicked, missingMonthsClicked, missingBranchesClicked, nodeWithPercentageChildrenClicked } from '../DataSet/DataCheckComponent.js';
 import pdfIcon from '../../assets/img/pdf.png';
 import ProgramService from '../../api/ProgramService';
+import DatasetService from '../../api/DatasetService';
+
 const ref = React.createRef();
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -784,7 +786,7 @@ class VersionSettingsComponent extends Component {
         var rangeValue = this.state.rangeValue;
         let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
         let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
-     
+
         var inputjson = {
             programId: programId,
             versionTypeId: versionTypeId,
@@ -843,9 +845,9 @@ class VersionSettingsComponent extends Component {
                 this.setState({
                     dataList: []
                 },
-                () => {
-                    this.buildJExcel();
-                })
+                    () => {
+                        this.buildJExcel();
+                    })
             }
         );
     }
@@ -977,9 +979,9 @@ class VersionSettingsComponent extends Component {
         }
         var dataList = this.state.dataList;
         console.log("dataList------->1", dataList);
-        for(var i = 0;i<dataList.length;i++){
+        for (var i = 0; i < dataList.length; i++) {
             count = (versionSettingsArray.length);
-            versionSettingsArray[count] = dataList[i] ;
+            versionSettingsArray[count] = dataList[i];
             count++;
         }
 
@@ -1201,7 +1203,34 @@ class VersionSettingsComponent extends Component {
                                 this.openModalPopup(rowData[18]);
                             }.bind(this)
                         });
+                    } else {
+                        var programId = this.state.programId;
+                        console.log("programId------->", programId);
+                        items.push({
+                            title: i18n.t('static.commitTree.showValidation'),
+                            onclick: function () {
+                                DatasetService.getDatasetData(rowData[0], rowData[2]).then(response => {
+                                    if (response.status == 200) {
+                                        var responseData = response.data;
+                                        console.log("getDatasetData responseData------->", responseData);
+                                        console.log("rowData-->", rowData)
+                                        this.setState({
+                                            programName: rowData[1] + "~v" + rowData[2],
+                                            programCode: rowData[1],
+                                            version: rowData[2],
+                                            pageName: i18n.t('static.versionSettings.versionSettings'),
+                                            programNameOriginal: getLabelText(responseData.label, this.state.lang),
+                                            programId: rowData[0]
+                                        })
+                                        this.openModalPopup(responseData);
+                                    }
+                                }).catch(
+                                );
+                            }.bind(this)
+                        });
+
                     }
+
                     // -------------------------------------
                 }
                 return items;
@@ -1230,10 +1259,13 @@ class VersionSettingsComponent extends Component {
         })
     }
 
-    selected = function (instance, cell, x, y, value) {
-        if ((x == 0 && value != 0) || (y == 0)) {
-            // console.log("HEADER SELECTION--------------------------");
-        } else {
+    selected = function (instance, cell, x, y, value, e) {
+        if (e.buttons == 1) {
+
+            if ((x == 0 && value != 0) || (y == 0)) {
+                // console.log("HEADER SELECTION--------------------------");
+            } else {
+            }
         }
     }.bind(this);
 
@@ -1673,7 +1705,13 @@ class VersionSettingsComponent extends Component {
                             <span><b>{i18n.t('static.common.forecastPeriod')}: </b> {moment(this.state.forecastStartDate).format('MMM-YYYY')} to {moment(this.state.forecastStopDate).format('MMM-YYYY')} </span>
                             <br />
                             <br />
-                            <span><b>1. {i18n.t('static.commitTree.noForecastSelected')}: </b>(<a href="/#/report/compareAndSelectScenario" target="_blank">{i18n.t('static.commitTree.compare&Select')}</a>, <a href={this.state.programId != -1 && this.state.programId != "" && this.state.programId != undefined ? "/#/forecastReport/forecastSummary/" + this.state.programId.toString().split("_")[0] + "/" + (this.state.programId.toString().split("_")[1]).toString().substring(1) : "/#/forecastReport/forecastSummary/"} target="_blank">{i18n.t('static.commitTree.forecastSummary')}</a>)</span><br />
+                            <span><b>1. {i18n.t('static.commitTree.noForecastSelected')}: </b>
+                            <a href="/#/report/compareAndSelectScenario" target="_blank">{i18n.t('static.commitTree.compare&Select')}</a>,
+                            {/* (<a href="/#/report/compareAndSelectScenario" target="_blank">{i18n.t('static.commitTree.compare&Select')}</a>, <a href={this.state.programId != -1 && this.state.programId != "" && this.state.programId != undefined ? "/#/forecastReport/forecastSummary/" + this.state.programId.toString().split("_")[0] + "/" + (this.state.programId.toString().split("_")[1]).toString().substring(1) : "/#/forecastReport/forecastSummary/"} target="_blank">{i18n.t('static.commitTree.forecastSummary')}</a>)</span><br />   */} 
+                            {(this.state.version != undefined && this.state.version.toString().includes('Local'))?
+                            (<a href={this.state.programId != -1 && this.state.programId != "" && this.state.programId != undefined ? "/#/forecastReport/forecastSummary/" + this.state.programId.toString().split("_")[0] + "/" + (this.state.programId.toString().split("_")[1]).toString().substring(1) : "/#/forecastReport/forecastSummary/"} target="_blank">{i18n.t('static.commitTree.forecastSummary')}</a>)
+                           :(<a href="/#/forecastReport/forecastSummary/" target="_blank">{i18n.t('static.commitTree.forecastSummary')}</a>)}
+                           </span><br />
                             <ul>{noForecastSelected}</ul>
 
                             <span><b>2. {i18n.t('static.commitTree.consumptionForecast')}: </b>(<a href="/#/dataentry/consumptionDataEntryAndAdjustment" target="_blank">{i18n.t('static.commitTree.dataEntry&Adjustment')}</a>, <a href="/#/extrapolation/extrapolateData" target="_blank">{i18n.t('static.commitTree.extrapolation')}</a>)</span><br />

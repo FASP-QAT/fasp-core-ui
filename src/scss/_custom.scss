@@ -1834,6 +1834,30 @@ h5,
   background-color: #d1e3f5;
 }
 
+.jexcel>tbody>tr>td.readonly.selectedForecast {
+  background-color: #d1e3f5 !important;
+}
+
+.jexcel>tbody>tr>td.readonly.readonlyForecast {
+  background-color: #CFCDC9 !important;
+}
+
+.jexcel>tbody>tr>td.selectedForecast {
+  background-color: #d1e3f5 !important;
+}
+
+.jexcel>tbody>tr>td.readonlyForecast {
+  background-color: #CFCDC9 !important;
+}
+
+.jexcel>tbody>tr>td.notSelectedForecast {
+  background-color: transparent !important;
+}
+
+.jexcel>tbody>tr>td.readonly.notSelectedForecast {
+  background-color: transparent !important;
+}
+
 // .table thead tr th{position: sticky;
 //   background: #fff;
 //   top: 0px;}
@@ -7938,10 +7962,74 @@ legend.scheduler-border {
   padding-right: 33px !important;
 }
 
+.compareAndSelect .jexcel>tbody>tr>td:nth-child(5) {
+  text-align: left !important;
+}
+
+.compareAndSelect .jexcel>tbody>tr>td>input[type=radio] {
+  width: 100% !important;
+  height: 1.5em !important
+}
+
+.jexcel>tbody>tr>td.lowestError {
+  color: #118b70 !important;
+}
+
+.jexcel>tbody>tr>td.readonly.lowestError {
+  color: #118b70 !important;
+}
+
+.jexcel>tbody>tr>td.notLowestError {
+  color: #000000 !important;
+}
+
+.jexcel>tbody>tr>td.readonly.notLowestError {
+  color: #000000 !important;
+}
+
+.jexcel>tbody>tr>td.red {
+  color: #BA0C2F !important;
+  font-size: 14px;
+}
+
+.jexcel>tbody>tr>td.readonly.red {
+  color: #BA0C2F !important;
+  font-size: 14px;
+}
+
 .jss>tbody>tr>td.readonly {
   color: #212721 !important;
 }
 
 .jss > tbody > tr > td.historyBold {
   font-weight: bold;
+  ;
+}
+
+.jss>tbody>tr>td.readonly.selectedForecast {
+  background-color: #d1e3f5 !important;
+}
+
+.jss>tbody>tr>td.readonly.readonlyForecast {
+  background-color: #CFCDC9 !important;
+}
+
+.jss>tbody>tr>td.selectedForecast {
+  background-color: #d1e3f5 !important;
+}
+
+.jss>tbody>tr>td.readonlyForecast {
+  background-color: #CFCDC9 !important;
+}
+
+.jss>tbody>tr>td.notSelectedForecast {
+  background-color: transparent !important;
+}
+
+.jss>tbody>tr>td.readonly.notSelectedForecast {
+  background-color: transparent !important;
+}
+
+.jexcelRedCell {
+  color: #BA0C2F !important;
 }
