@@ -80,7 +80,8 @@ class Login extends Component {
       staticLabel: AuthenticationService.getIconAndStaticLabel("label"),
       languageList: [],
       updatedSyncDate: '',
-      lang: localStorage.getItem('lastLoggedInUsersLanguage')
+      lang: localStorage.getItem('lastLoggedInUsersLanguage'),
+      popupShown:0
     }
     this.forgotPassword = this.forgotPassword.bind(this);
     this.incorrectPassmessageHide = this.incorrectPassmessageHide.bind(this);
@@ -89,7 +90,6 @@ class Login extends Component {
     this.changeLanguage = this.changeLanguage.bind(this);
     this.getLanguageList = this.getLanguageList.bind(this);
     this.getAllLanguages = this.getAllLanguages.bind(this);
-    this.getLatestCoreuiVersion = this.getLatestCoreuiVersion.bind(this);
   }
   getAllLanguages() {
     var db1;
@@ -253,41 +253,6 @@ class Login extends Component {
     this.getLanguageList();
     i18n.changeLanguage(AuthenticationService.getDefaultUserLanguage())
     this.checkIfApiIsActive();
-    this.getLatestCoreuiVersion();
-  }
-
-  getLatestCoreuiVersion() {
-    console.log("version inside api success----------->")
-    LoginService.getLatestCoreuiVersion()
-      .then(response => {
-        console.log("version api success----------->",`${APP_VERSION_REACT}`.replace(/[\[\]']+/g,''))
-        if (response != null && response.data != null) {
-          if (`${APP_VERSION_REACT}`.replace(/[\[\]']+/g,'') != response.data) {
-            confirmAlert({
-              message: i18n.t('static.coreui.oldVersion'),
-              buttons: [
-                {
-                  label: i18n.t('static.report.ok')
-                }
-              ]
-            });
-            // alert("You are using an older version of the application.");
-          }
-        }
-        //   this.setState({
-        //     apiVersionForDisplay: response.data.app.version,
-        //     apiVersion:response.data.app.version,
-
-        //   },()=>{
-        //     setTimeout(function () {
-        //       this.checkIfApiIsActive();
-        //     }.bind(this), 10000);
-        //   })
-        //   // console.log("response---", response.data.app.version)
-        // }
-      }).catch(error => {
-        console.log("--------version api error----------->", error)
-      })
   }
 
   checkIfApiIsActive() {
@@ -296,7 +261,7 @@ class Login extends Component {
       apiVersionForDisplay = "Offline"
       setTimeout(function () {
         this.checkIfApiIsActive();
-      }.bind(this), 10000);
+      }.bind(this), 20000);
     } else {
       LoginService.getApiVersion()
         .then(response => {
@@ -305,8 +270,20 @@ class Login extends Component {
             this.setState({
               apiVersionForDisplay: response.data.app.version,
               apiVersion: response.data.app.version,
-
             }, () => {
+              if (this.state.popupShown==0 && response.data.app.frontEndVersion != APP_VERSION_REACT) {
+                this.setState({
+                  popupShown:1
+                })
+                confirmAlert({
+                  message: i18n.t('static.coreui.oldVersion'),
+                  buttons: [
+                    {
+                      label: i18n.t('static.report.ok')
+                    }
+                  ]
+                });
+              }
               setTimeout(function () {
                 this.checkIfApiIsActive();
               }.bind(this), 10000);
