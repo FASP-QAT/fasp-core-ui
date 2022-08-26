@@ -8941,6 +8941,10 @@ legend.scheduler-border {
 
 .jss>tbody>tr>td.readonly {
   color: #212721 !important;
+}
+
+.jss > tbody > tr > td.historyBold {
+  font-weight: bold;
   ;
 }
 
@@ -8970,4 +8974,59 @@ legend.scheduler-border {
 
 .jexcelRedCell {
   color: #BA0C2F !important;
+}
+
+.jexcel > tbody > tr > td.readonly.commitShipmentAlreadyLinkedToOtherPro {
+  background-color: yellow !important;
+  color: #BA0C2F!important;
+  font-weight: bold!important;
+}
+
+.jexcel > tbody > tr > td.commitShipmentAlreadyLinkedToOtherPro {
+  background-color: yellow !important;
+  color: red!important;
+  font-weight: bold!important;
+}
+
+.jexcel > tbody > tr > td.readonly.commitConflict {
+  background-color: yellow !important;
+}
+
+.jexcel > tbody > tr > td.commitConflict {
+  background-color: yellow !important;
+}
+
+.jexcel > tbody > tr > td.readonly.commitLocal {
+  background-color: #86cd99 !important;
+}
+
+.jexcel > tbody > tr > td.commitLocal {
+  background-color: #86cd99 !important;
+}
+
+.jexcel > tbody > tr > td.readonly.commitServer {
+  background-color: #e5edf5 !important;
+}
+
+.jexcel > tbody > tr > td.commitServer {
+  background-color: #e5edf5 !important;
+}
+
+.jexcel > tbody > tr > td.readonly.commitNoChange {
+  background-color: transparent !important;
+}
+
+.jexcel > tbody > tr > td.commitNoChange {
+  background-color: transparent !important;
+}
+
+.rightClickColors .jcontextmenu > div:nth-of-type(2){
+  background-color: #86cd99;
+}
+
+.rightClickColors .jcontextmenu > div:nth-of-type(3){
+  background-color: #e5edf5;
+}
+.ERPLinkTable .jexcel{
+  width: unset!important;
 }
