@@ -2599,7 +2599,7 @@
     "static.graph.costInUSD": "Cost (USD)",
     "static.forecastOutput.stockOrUnmedDemand": "Stock or Unmet Demand",
     "static.dashboard.shipmentGlobalDemandView": "Shipments - Global Demand View",
-    "static.coreui.oldVersion": "You are using an older version of the application.Please do CTRL + F5 to get the latest version of application.",
+    "static.coreui.oldVersion": "You might have an older version. You should control+F5 now.",
     "static.dataentry.showErrors": "Show only errors",
     "static.procurementAgent.UnitPerContainer": "Unit Per Container",
     "static.report.timeWindow": "Time Window",
