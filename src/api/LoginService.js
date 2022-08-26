@@ -14,11 +14,6 @@ class LoginService {
         });
     }
 
-    getLatestCoreuiVersion() {
-        return axios.get(`${API_URL}/api/coreui/version`, {
-        });
-    }
-
 
 }
 
