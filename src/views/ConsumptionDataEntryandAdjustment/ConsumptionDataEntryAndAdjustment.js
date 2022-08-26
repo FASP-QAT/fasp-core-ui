@@ -1394,7 +1394,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                       userId: curUser
                     },
                     createdDate: curDate,
-                    daysOfStockOut: daysOfStockOutValue,
+                    daysOfStockOut: daysOfStockOutValue!==""?Math.round(daysOfStockOutValue):daysOfStockOutValue,
                     exculde: false,
                     forecastConsumptionId: 0,
                     month: moment(monthArray[i].date).startOf('month').format("YYYY-MM-DD"),

@@ -50,6 +50,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         this.onPasteForBatchInfo = this.onPasteForBatchInfo.bind(this);
         this.oneditionend = this.oneditionend.bind(this);
         this.batchDetailsClicked = this.batchDetailsClicked.bind(this);
+        this.formulaChanged=this.formulaChanged.bind(this)
+        this.formulaChanged3=this.formulaChanged3.bind(this)
     }
 
     formatter = value => {
@@ -631,6 +633,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                 { type: 'hidden' }
                                             ],
                                             editable: true,
+                                            onformulachain:this.formulaChanged,
                                             pagination: paginationOption,
                                             paginationOptions: paginationArray,
                                             search: searchOption,
@@ -1900,6 +1903,20 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     shipmentInstance.setValueFromCoords(11, y, false, true);
                 }
             }
+        }
+    }
+
+    formulaChanged  = function (instance, executions) {
+        var executions=executions;
+        for(var e=0;e<executions.length;e++){
+            this.shipmentChanged(instance,executions[e].cell,executions[e].x,executions[e].y,executions[e].v)
+        }
+    }
+
+    formulaChanged3  = function (instance, executions) {
+        var executions=executions;
+        for(var e=0;e<executions.length;e++){
+            this.this.shipmentQtyChanged(instance,executions[e].cell,executions[e].x,executions[e].y,executions[e].v)
         }
     }
 
@@ -4069,6 +4086,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     { type: 'hidden', title: i18n.t('static.procurementUnit.noOfContainers'), width: 0 },
                 ],
                 pagination: false,
+                onformulachain:this.formulaChanged3,
                 search: false,
                 columnSorting: true,
                 // tableOverflow: true,
