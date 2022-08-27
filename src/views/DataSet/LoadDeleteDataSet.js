@@ -651,7 +651,7 @@ class LoadDeleteDataSet extends Component {
                                     <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.loadProgram.oldVersion')}</span></li>
                                     <li><span className="greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.loadProgram.latestVersion')} </span></li>
                                     <li><span className=" blacklegend legendcolor"></span> <span className="legendcommitversionText">Version is not loaded.</span></li>
-                                    {/* <li><span><img width="18" title="Clean up" src={cleanUp} className="CleanUpIcon"></img></span> <span className="legendDeleteCleanupText">Keep latest  version and delete older versions.</span></li> */}
+                                    <li><span><img width="18" title="Clean up" src={cleanUp} className="CleanUpIcon"></img></span> <span className="legendDeleteCleanupText">Keep latest  version and delete older versions.</span></li>
                                     <li><span className=""><i title="Delete" className="fa fa-trash DeleteIcon"></i></span> <span className="legendDeleteCleanupText">Delete the version</span></li>
                                 </ul>
                                 <Col md="3 pl-0" id="realmDiv">
@@ -720,7 +720,7 @@ class LoadDeleteDataSet extends Component {
                                                                                 </span>
                                                                                 <input type="checkbox" defaultChecked id={"fpm".concat(item.realmCountry.id).concat(item2.program.id)} />
                                                                                 <label className="arrow_label" htmlFor={"fpm".concat(item.realmCountry.id).concat(item2.program.id)}></label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                                                                {this.state.programList.filter(c => c.programId == item2.program.id).length > 1 ? <i title="Clean Up" className="" onClick={() => this.deleteCleanUpIcon(item2.program.id)}><img src={cleanUp} className="DeleteIcontree CleanUpSize"/></i> : ""}
+                                                                                {this.state.programList.filter(c => c.programId == item2.program.id).length > 1 ? <img onClick={() => this.deleteCleanUpIcon(item2.program.id)} onClick={() => this.deleteCleanUpIcon(item2.program.id)} src={cleanUp} className="DeleteIcontree CleanUpSize ml-1" width="16" title="Clean Up"/> : ""}
                                                                                 {/* {this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == Math.max.apply(Math, item2.versionList.map(function (o) { return o.versionId; }))).length > 0 ? "" : this.state.programList.filter(c => c.programId == item2.program.id).length > 0 ? <i title="Clean Up" className="ml-1 fa fa-trash DeleteIcontree" onClick={() => this.deleteCleanUpIcon(item2.program.id)}></i> : ""} */}
                                                                                 {/* {this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == Math.max.apply(Math, item2.versionList.map(function (o) { return o.versionId; }))).length > 0 && <i title="Clean Up" className="ml-1 fa fa-trash DeleteIcontree" onClick={() => this.deleteCleanUpIcon(item2.program.id)}></i>} */}
 
