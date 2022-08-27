@@ -15,7 +15,7 @@ import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import InnerBgImg from '../../../src/assets/img/bg-image/bg-login.jpg';
 import image1 from '../../assets/img/QAT-logo.png';
-import { SECRET_KEY, TOTAL_NO_OF_MASTERS_IN_SYNC, INDEXED_DB_VERSION, INDEXED_DB_NAME, SHIPMENT_MODIFIED, DELIVERED_SHIPMENT_STATUS, BATCH_PREFIX } from '../../Constants.js'
+import { SECRET_KEY, TOTAL_NO_OF_MASTERS_IN_SYNC, INDEXED_DB_VERSION, INDEXED_DB_NAME, SHIPMENT_MODIFIED, DELIVERED_SHIPMENT_STATUS, BATCH_PREFIX, PLANNED_SHIPMENT_STATUS } from '../../Constants.js'
 import CryptoJS from 'crypto-js'
 import UserService from '../../api/UserService';
 import { qatProblemActions } from '../../CommonComponent/QatProblemActions'
@@ -220,7 +220,7 @@ export default class SyncMasterData extends Component {
         }.bind(this)
     }
 
-    syncProgramData(date, programList, programQPLDetailsList, readonlyProgramIds, programPlanningUnitList) {
+    syncProgramData(date, programList, programQPLDetailsList, readonlyProgramIds, programPlanningUnitList, procurementAgentPlanningUnitList) {
         console.log("Date Last sync date above", date);
         // console.log('Program List', programList);
         var valid = true;
@@ -276,7 +276,7 @@ export default class SyncMasterData extends Component {
                                 //Code to Sync Country list
                                 MasterSyncService.syncProgram(programList[i].programId, programList[i].version, programList[i].userId, date)
                                     .then(response => {
-                                        // console.log("Response", response);
+                                        console.log("Response Mohit", response);
                                         if (response.status == 200) {
                                             // console.log("Response=========================>", response.data);
                                             // console.log("i", i);
@@ -693,6 +693,68 @@ export default class SyncMasterData extends Component {
                                                 }
 
                                             }
+                                            // CR - Update price when program planning unit price changes
+                                            var changedPlanningUnits = [];
+                                            var minDateForModify = this.props.location.state != undefined && this.props.location.state.programIds.includes(prog.id) ? generalJson.currentVersion.createdDate : date;
+                                            programPlanningUnitList.map(c => {
+                                                var programPlanningUnitProcurementAgentPrices = c.programPlanningUnitProcurementAgentPrices.filter(c => moment(c.lastModifiedDate).format("YYYY-MM-DD") >= moment(minDateForModify).format("YYYY-MM-DD"));
+                                                if (programPlanningUnitProcurementAgentPrices.length > 0) {
+                                                    changedPlanningUnits.push(c.planningUnit.id)
+                                                }
+                                            });
+
+                                            var planningUnitListsFromProcurementAgentPlanningUnit = [...new Set(procurementAgentPlanningUnitList.filter(c => moment(c.lastModifiedDate).format("YYYY-MM-DD") >= moment(minDateForModify).format("YYYY-MM-DD")).map(ele => ele.planningUnit.id))];
+                                            var programPlanningUnitUpdated=[...new Set(programPlanningUnitList.filter(c=>moment(c.lastModifiedDate).format("YYYY-MM-DD")>=moment(date).format("YYYY-MM-DD")).map(ele=>ele.planningUnit.id))];
+                                            var overallList = [...new Set(changedPlanningUnits.concat(planningUnitListsFromProcurementAgentPlanningUnit).concat(programPlanningUnitUpdated)).map(ele => ele)]
+                                            console.log("OverallList@@@@@@@@@@@Mohit", overallList)
+                                            for (var ol = 0; ol < overallList.length; ol++) {
+                                                var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == overallList[ol]);
+                                                var programJson = {}
+                                                if (planningUnitDataIndex != -1) {
+                                                    var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == overallList[ol]))[0];
+                                                    var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                                                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                                                    programJson = JSON.parse(programData);
+                                                } else {
+                                                    programJson = {
+                                                        consumptionList: [],
+                                                        inventoryList: [],
+                                                        shipmentList: [],
+                                                        batchInfoList: [],
+                                                        supplyPlan: []
+                                                    }
+                                                }
+                                                var shipmentDataList = programJson.shipmentList;
+                                                var getPlannedShipments = shipmentDataList.filter(c => c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS);
+                                                for (var pss = 0; pss < getPlannedShipments.length; pss++) {
+                                                    var pricePerUnit = 0;
+                                                    var ppu = programPlanningUnitList.filter(c => c.program.id == generalJson.programId && c.planningUnit.id == getPlannedShipments[pss].planningUnit.id);
+                                                    var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.program.id == generalJson.programId && c.procurementAgent.id == getPlannedShipments[pss].procurementAgent.id && c.planningUnit.id == getPlannedShipments[pss].planningUnit.id && c.active);
+                                                    if (programPriceList.length > 0) {
+                                                        pricePerUnit = Number(programPriceList[0].price);
+                                                    } else {
+                                                        var procurementAgentPlanningUnit = procurementAgentPlanningUnitList.filter(c => c.procurementAgent.id == getPlannedShipments[pss].procurementAgent.id && c.planningUnit.id == getPlannedShipments[pss].planningUnit.id && c.active);
+                                                        if (procurementAgentPlanningUnit.length > 0) {
+                                                            pricePerUnit = Number(procurementAgentPlanningUnit[0].catalogPrice);
+                                                        } else {
+                                                            pricePerUnit = ppu[0].catalogPrice
+                                                        }
+                                                    }
+                                                    var shipmentIndex = shipmentDataList.findIndex(c => c.shipmentId > 0 ? c.shipmentId == getPlannedShipments[pss].shipmentId : c.tempShipmentId == getPlannedShipments[pss].tempShipmentId)
+                                                    shipmentDataList[shipmentIndex].rate = Number(pricePerUnit / shipmentDataList[shipmentIndex].currency.conversionRateToUsd).toFixed(2)
+                                                    var productCost = Math.round(Number(pricePerUnit / shipmentDataList[shipmentIndex].currency.conversionRateToUsd).toFixed(2) * shipmentDataList[shipmentIndex].shipmentQty)
+                                                    shipmentDataList[shipmentIndex].productCost = productCost;
+                                                    shipmentDataList[shipmentIndex].freightCost = shipmentDataList[shipmentIndex].shipmentMode == "Air" ? Number(Number(productCost) * (Number(Number(generalJson.airFreightPerc) / 100))).toFixed(2) : Number(Number(productCost) * (Number(Number(generalJson.seaFreightPerc) / 100))).toFixed(2)
+
+                                                }
+                                                programJson.shipmentList = shipmentDataList;
+                                                if (planningUnitDataIndex != -1) {
+                                                    planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                                                } else {
+                                                    planningUnitDataList.push({ planningUnitId: planningUnitList[pu], planningUnitData: (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString() });
+                                                }
+                                            }
+                                            // CR - Update price when program planning unit price changes
                                             if (pplModified.length > 0) {
                                                 minDate = null;
                                             }
@@ -1344,7 +1406,7 @@ export default class SyncMasterData extends Component {
                                                                                                                                                                                                                             syncedMasters: this.state.syncedMasters + 1,
                                                                                                                                                                                                                             syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
                                                                                                                                                                                                                         }, () => {
-                                                                                                                                                                                                                            this.syncProgramData(lastSyncDate, myResult, programQPLDetailsJson, readonlyProgramIds, response.programPlanningUnitList);
+                                                                                                                                                                                                                            this.syncProgramData(lastSyncDate, myResult, programQPLDetailsJson, readonlyProgramIds, response.programPlanningUnitList, response.procurementAgentPlanningUnitList);
 
                                                                                                                                                                                                                             this.syncDatasetData(datasetListFiltered, datasetDetailsList, readonlyDatasetIds);
                                                                                                                                                                                                                             // currency
