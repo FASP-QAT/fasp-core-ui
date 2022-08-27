@@ -522,6 +522,7 @@ export default class SyncMasterData extends Component {
                                                             var batchInfo = [];
                                                             var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                                                             var curUser = AuthenticationService.getLoggedInUserId();
+                                                            var username = AuthenticationService.getLoggedInUsername();
                                                             shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo.map(item => {
                                                                 console.log("Item@@@@@@@@@@@@@@@@", item)
                                                                 shipmentQty += Number(item.erpQty) * Number(linkedShipmentsList[checkIfAlreadyExists].conversionFactor) * Number(shipmentDataList[index].realmCountryPlanningUnit.multiplier);
@@ -704,9 +705,12 @@ export default class SyncMasterData extends Component {
                                             });
 
                                             var planningUnitListsFromProcurementAgentPlanningUnit = [...new Set(procurementAgentPlanningUnitList.filter(c => moment(c.lastModifiedDate).format("YYYY-MM-DD") >= moment(minDateForModify).format("YYYY-MM-DD")).map(ele => ele.planningUnit.id))];
-                                            var programPlanningUnitUpdated=[...new Set(programPlanningUnitList.filter(c=>moment(c.lastModifiedDate).format("YYYY-MM-DD")>=moment(date).format("YYYY-MM-DD")).map(ele=>ele.planningUnit.id))];
+                                            var programPlanningUnitUpdated = [...new Set(programPlanningUnitList.filter(c => moment(c.lastModifiedDate).format("YYYY-MM-DD") >= moment(date).format("YYYY-MM-DD")).map(ele => ele.planningUnit.id))];
                                             var overallList = [...new Set(changedPlanningUnits.concat(planningUnitListsFromProcurementAgentPlanningUnit).concat(programPlanningUnitUpdated)).map(ele => ele)]
                                             console.log("OverallList@@@@@@@@@@@Mohit", overallList)
+                                            var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+                                            var curUser = AuthenticationService.getLoggedInUserId();
+                                            var username = AuthenticationService.getLoggedInUsername();
                                             for (var ol = 0; ol < overallList.length; ol++) {
                                                 var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == overallList[ol]);
                                                 var programJson = {}
@@ -745,6 +749,9 @@ export default class SyncMasterData extends Component {
                                                     var productCost = Math.round(Number(pricePerUnit / shipmentDataList[shipmentIndex].currency.conversionRateToUsd).toFixed(2) * shipmentDataList[shipmentIndex].shipmentQty)
                                                     shipmentDataList[shipmentIndex].productCost = productCost;
                                                     shipmentDataList[shipmentIndex].freightCost = shipmentDataList[shipmentIndex].shipmentMode == "Air" ? Number(Number(productCost) * (Number(Number(generalJson.airFreightPerc) / 100))).toFixed(2) : Number(Number(productCost) * (Number(Number(generalJson.seaFreightPerc) / 100))).toFixed(2)
+                                                    shipmentDataList[shipmentIndex].lastModifiedBy.userId = curUser;
+                                                    shipmentDataList[shipmentIndex].lastModifiedBy.username = username;
+                                                    shipmentDataList[shipmentIndex].lastModifiedDate = curDate;
 
                                                 }
                                                 programJson.shipmentList = shipmentDataList;
