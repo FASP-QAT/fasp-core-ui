@@ -704,7 +704,8 @@ export default class SyncMasterData extends Component {
                                             });
 
                                             var planningUnitListsFromProcurementAgentPlanningUnit = [...new Set(procurementAgentPlanningUnitList.filter(c => moment(c.lastModifiedDate).format("YYYY-MM-DD") >= moment(minDateForModify).format("YYYY-MM-DD")).map(ele => ele.planningUnit.id))];
-                                            var overallList = [...new Set(changedPlanningUnits.concat(planningUnitListsFromProcurementAgentPlanningUnit)).map(ele => ele)]
+                                            var programPlanningUnitUpdated=[...new Set(programPlanningUnitList.filter(c=>moment(c.lastModifiedDate).format("YYYY-MM-DD")>=moment(date).format("YYYY-MM-DD")).map(ele=>ele.planningUnit.id))];
+                                            var overallList = [...new Set(changedPlanningUnits.concat(planningUnitListsFromProcurementAgentPlanningUnit).concat(programPlanningUnitUpdated)).map(ele => ele)]
                                             console.log("OverallList@@@@@@@@@@@Mohit", overallList)
                                             for (var ol = 0; ol < overallList.length; ol++) {
                                                 var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == overallList[ol]);
