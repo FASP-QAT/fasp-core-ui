@@ -324,6 +324,7 @@ export default class TreeExtrapolationComponent extends React.Component {
             linearRegressionError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" },
             tesError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" },
             arimaError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" },
+            noDataMessage: "",
         }
         this.toggleChooseMethod = this.toggleChooseMethod.bind(this);
         this.toggleQ = this.toggleQ.bind(this);
@@ -1052,11 +1053,21 @@ export default class TreeExtrapolationComponent extends React.Component {
                             })
                         }
                         if (this.state.arimaId) {
-                            calculateArima(JSON.parse(JSON.stringify(inputDataArima)), this.state.p, this.state.d, this.state.q, this.state.confidenceLevelIdArima, Math.trunc(noOfMonthsForProjection), this, jexcelDataArr[0].month, 1, this.state.seasonality);
+                            try {
+                                calculateArima(JSON.parse(JSON.stringify(inputDataArima)), this.state.p, this.state.d, this.state.q, this.state.confidenceLevelIdArima, Math.trunc(noOfMonthsForProjection), this, jexcelDataArr[0].month, 1, this.state.seasonality);
+                            } catch (error) {
+                                this.setState({
+                                    noDataMessage: i18n.t('static.extrapolation.errorOccured'),
+                                    arimaData: [],
+                                    arimaError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" }
+                                })
+                            }
+
                         } else {
                             this.setState({
                                 arimaData: [],
-                                arimaError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" }
+                                arimaError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" },
+                                noDataMessage:""
                             })
                         }
                     } else {
@@ -3937,6 +3948,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                             <div className="col-md-12 row text-left pt-lg-0 pl-lg-0">
 
                                                 <div className="col-md-6 pl-lg-0">
+                                                <h5 className={"red"} id="div9">{this.state.noDataMessage}</h5>
                                                     {!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && <><Button type="button" color="success" className="float-left mr-1" size="md" onClick={this.interpolate}>Interpolate</Button>
                                                         <Button type="submit" id="extrapolateButton" size="md" color="info" className="float-left mr-1" onClick={() => this.touchAllExtrapolation(setTouched, errors, 0)}><i className="fa fa-calculator"></i> Extrapolate</Button></>}
                                                 </div>

@@ -56,7 +56,7 @@ export function calculateArima(inputData, p, d, q, confidenceLevel, noOfProjecti
             }
         }).catch(error => {
             console.log("ErrorArima@@@@@@", error)
-            if (!isTreeExtrapolation) {
+            // if (!isTreeExtrapolation) {
                 console.log("ErrorArima@@@@@@", error.status)
                 console.log("ErrorArima@@@@@@1", error.response.status == 500)
                 props.updateState("loading", false);
@@ -71,7 +71,7 @@ export function calculateArima(inputData, p, d, q, confidenceLevel, noOfProjecti
                 // props.updateState("show", false);
                 // props.el = jexcel(document.getElementById("tableDiv"), '');
                 // props.el.destroy();
-            }
+            // }
         })
 
 }
