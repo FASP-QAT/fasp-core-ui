@@ -968,7 +968,7 @@ export default class TreeExtrapolationComponent extends React.Component {
         nodeDataExtrapolation.extrapolationDataList = jexcelDataArr;
         console.log("jexcel data final data available---", jexcelDataArr);
 
-        this.setState({ jexcelDataArr, nodeDataExtrapolation, isChanged: true }, () => {
+        this.setState({ jexcelDataArr, nodeDataExtrapolation, isChanged: true, noDataMessage:""}, () => {
             // setTimeout(() => {
             console.log("tableJson for extrapolation---", this.state.jexcelDataArr);
             if (jexcelDataArr.length > 0) {
@@ -1099,7 +1099,8 @@ export default class TreeExtrapolationComponent extends React.Component {
                             else {
                                 this.setState({
                                     arimaData: [],
-                                    arimaError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" }
+                                    arimaError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" },
+                                    noDataMessage:""
                                 });
                             }
                         }
@@ -1117,7 +1118,7 @@ export default class TreeExtrapolationComponent extends React.Component {
     }
 
     interpolate() {
-        this.setState({ extrapolationLoader: true, isChanged: true }, () => {
+        this.setState({ extrapolationLoader: true, isChanged: true,noDataMessage:"" }, () => {
             setTimeout(() => {
                 var monthArray = this.state.monthArray;
                 var jexcelDataArr = [];
