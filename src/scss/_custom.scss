@@ -721,12 +721,26 @@ label.arrow_label:after {
   color: #BA0C2F !important;
 }
 
+.jss>tbody>tr>td.readonly.shipmentEntryEmergency {
+  color: #BA0C2F !important;
+}
+
 .jexcel>tbody>tr>td.readonly.shipmentEntryActive {
   color: #808080 !important;
   background-color: #808080 !important;
 }
 
+.jss>tbody>tr>td.readonly.shipmentEntryActive {
+  color: #808080 !important;
+  background-color: #808080 !important;
+}
+
+
 .jexcel>tbody>tr>td.readonly.shipmentEntryDoNotInclude {
+  background-color: #D3D3D3 !important;
+}
+
+.jss>tbody>tr>td.readonly.shipmentEntryDoNotInclude {
   background-color: #D3D3D3 !important;
 }
 
@@ -735,7 +749,16 @@ label.arrow_label:after {
   background-color: #808080 !important;
 }
 
+.jss>tbody>tr>td.readonly.shipmentEntryDelete {
+  color: #808080 !important;
+  background-color: #808080 !important;
+}
+
 .jexcel>tbody>tr>td.shipmentEntryEmergency {
+  color: #BA0C2F !important;
+}
+
+.jss>tbody>tr>td.shipmentEntryEmergency {
   color: #BA0C2F !important;
 }
 
@@ -744,7 +767,16 @@ label.arrow_label:after {
   background-color: #808080 !important;
 }
 
+.jss>tbody>tr>td.shipmentEntryActive {
+  color: #808080 !important;
+  background-color: #808080 !important;
+}
+
 .jexcel>tbody>tr>td.shipmentEntryDoNotInclude {
+  background-color: #D3D3D3 !important;
+}
+
+.jss>tbody>tr>td.shipmentEntryDoNotInclude {
   background-color: #D3D3D3 !important;
 }
 
@@ -752,6 +784,12 @@ label.arrow_label:after {
   color: #808080 !important;
   background-color: #808080 !important;
 }
+
+.jss>tbody>tr>td.shipmentEntryDelete {
+  color: #808080 !important;
+  background-color: #808080 !important;
+}
+
 
 .shipmentNotActive {
   color: #808080 !important;

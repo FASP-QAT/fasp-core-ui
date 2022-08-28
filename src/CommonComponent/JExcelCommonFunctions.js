@@ -154,7 +154,7 @@ export function jExcelLoadedFunctionWithoutSearch(instance, number) {
 }
 
 export function paginationChange(number) {
-    var recordCount = document.getElementsByClassName('jexcel_pagination_dropdown')[number].value;
+    var recordCount = document.getElementsByClassName('jss_pagination_dropdown')[number].value;
     localStorage.setItem("sesRecordCount", recordCount)
 }
 
