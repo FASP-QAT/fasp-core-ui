@@ -1003,7 +1003,13 @@ export default class SyncMasterData extends Component {
                     let id = AuthenticationService.displayDashboardBasedOnRole();
                     // console.log("M sync role based dashboard done");
                     // console.log("End date", Date.now());
-                    this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.masterDataSync.success'))
+                    if (this.props.location.state != undefined && this.props.location.state.programIds.length > 0) {
+                        this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.programLoadedAndmasterDataSync.success'))
+                    } else {
+                        this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.masterDataSync.success'))
+                    }
+
+
                 }.bind(this)
             }.bind(this)
         }
