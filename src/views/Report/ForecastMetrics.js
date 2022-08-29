@@ -691,11 +691,11 @@ class ForecastMetrics extends Component {
         {
           title: i18n.t('static.report.error'),
           type: 'numeric',
-          mask: '#,##%',
+          mask: '#,##.00%', decimal: '.'
         },
         {
           title: i18n.t('static.report.noofmonth'),
-          type: 'numeric', mask: '#,##.00', decimal: '.',
+          type: 'numeric', mask: '#,##'
         },
         {
           title: i18n.t('static.report.error'),
