@@ -537,20 +537,20 @@ export default class QunatimedImportStepTwo extends Component {
                         var options = {
                             data: products,
                             contextMenu: function () { return false; },
-                            colHeaders: [
-                                i18n.t('static.quantimed.quantimedProductIdLabel'),
-                                i18n.t('static.quantimed.quantimedPlanningUnitLabel'),
-                                i18n.t('static.supplyPlan.qatProduct'),
-                                'Previous Program Planning Unit',
-                                i18n.t('static.quantimed.conversionFactor')
-                            ],
+                            // colHeaders: [
+                            //     i18n.t('static.quantimed.quantimedProductIdLabel'),
+                            //     i18n.t('static.quantimed.quantimedPlanningUnitLabel'),
+                            //     i18n.t('static.supplyPlan.qatProduct'),
+                            //     'Previous Program Planning Unit',
+                            //     i18n.t('static.quantimed.conversionFactor')
+                            // ],
                             colWidths: [80, 120, 120, 0, 80],
                             columns: [
-                                { type: 'text', readOnly: true },
-                                { type: 'text', readOnly: true },
-                                { type: 'dropdown', source: programPlanningUnitsArr, autocomplete: true },
-                                { type: 'hidden' },
-                                { type: 'numeric', mask: '#,##.00', decimal: '.', readOnly: true },
+                                { type: 'text', title: i18n.t('static.quantimed.quantimedProductIdLabel'), readOnly: true },
+                                { type: 'text', title: i18n.t('static.quantimed.quantimedPlanningUnitLabel'), readOnly: true },
+                                { type: 'dropdown', source: programPlanningUnitsArr, title: i18n.t('static.supplyPlan.qatProduct'), autocomplete: true },
+                                { type: 'hidden', title: 'Previous Program Planning Unit' },
+                                { type: 'numeric', title: i18n.t('static.quantimed.conversionFactor'), mask: '#,##.00', decimal: '.', readOnly: true },
                             ],
                             // text: {
                             //     // showingPage: 'Showing {0} to {1} of {1}',
@@ -611,7 +611,7 @@ export default class QunatimedImportStepTwo extends Component {
                     {/* <Card> */}
                     <CardBody className="pl-0 pr-0 pt-lg-0">
                         {/* <Col xs="12" sm="12"> */}
-                        <div className="table-responsive consumptionDataEntryTable">
+                        <div className="consumptionDataEntryTable">
                             <div id="paputableDiv" >
                             </div>
                         </div>
