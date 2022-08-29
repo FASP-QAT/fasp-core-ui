@@ -795,84 +795,88 @@ class VersionSettingsComponent extends Component {
     }
 
     getOnLineDatasetsVersion() {
-        var programIds = this.state.programValues.map(x => x.value).join(", ");
+        var programIds = this.state.programValues.map(x => x.value).join(",");
         var programIdsarr = Array.from(new Set(programIds.split(',')));
-
+        // var programCode =  this.state.programValues.map(x => x.lable);
+        // console.log("programCode--->",programCode);
         var versionTypeId = document.getElementById('versionTypeId').value;
-        if(versionTypeId==''){
-            versionTypeId=-1
+        if (versionTypeId == '') {
+            versionTypeId = -1
         }
         var rangeValue = this.state.rangeValue;
         let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
         let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
         var dataList1 = [];
         // for (var i = 0; i < programIdsarr.length; i++) {
-            var inputjson = {
-                programIds: programIdsarr,
-                versionTypeId: versionTypeId,
-                startDate: startDate,
-                stopDate: stopDate
-            }
-            console.log("inputjson------->", inputjson);
+        var inputjson = {
+            programIds: programIdsarr,
+            versionTypeId: versionTypeId,
+            startDate: startDate,
+            stopDate: stopDate
+        }
+        console.log("inputjson------->", inputjson);
 
-            ProgramService.getDatasetVersions(inputjson).then(response => {
-                if (response.status == 200) {
-                    var responseData = response.data;
-                    console.log("responseData------->[0]", responseData[0]);
-                    for (var i = 0; i < responseData.length; i++) {
-                        var data = [];
-                        data[0] = programIdsarr[i]
-                        data[1] = responseData[i].programCode
-                        data[2] = responseData[i].versionId
-                        data[3] = getLabelText(responseData[i].versionType.label, this.state.lang);
-                        data[4] = responseData[i].notes
-                        data[5] = responseData[i].createdDate
-                        data[6] = responseData[i].createdBy.username
-                        data[7] = responseData[i].forecastStartDate
-                        if (responseData[i].forecastStartDate != null && responseData[i].forecastStopDate != null) {
-                            let d1 = new Date(responseData[i].forecastStartDate);
-                            let d2 = new Date(responseData[i].forecastStopDate)
-                            var months;
-                            months = (d2.getFullYear() - d1.getFullYear()) * 12;
-                            months += d2.getMonth() - d1.getMonth();
-                            data[8] = months + 1
-                        } else {
-                            data[8] = 0
-                        }
-                        data[9] = responseData[i].forecastStopDate
-                        data[10] = 0
-                        data[11] = responseData[i].versionId
-                        data[12] = 0
-                        data[13] = responseData[i].daysInMonth
-                        data[14] = responseData[i].freightPerc
-                        data[15] = responseData[i].forecastThresholdHighPerc
-                        data[16] = responseData[i].forecastThresholdLowPerc
-                        data[17] = 0;
-                        data[18] = {};
-                        console.log("data---------->", data)
-                        dataList1.push(data);
+        ProgramService.getDatasetVersions(inputjson).then(response => {
+            if (response.status == 200) {
+                var responseData = response.data;
+                console.log("responseData------->", responseData);
+                for (var i = 0; i < responseData.length; i++) {
+                    var data = [];
+                    data[0] = programIdsarr[i]
+                    data[1] = responseData[i].programCode
+                    data[2] = responseData[i].versionId
+                    data[3] = getLabelText(responseData[i].versionType.label, this.state.lang);
+                    data[4] = responseData[i].notes
+                    data[5] = responseData[i].createdDate
+                    data[6] = responseData[i].createdBy.username
+                    data[7] = responseData[i].forecastStartDate
+                    if (responseData[i].forecastStartDate != null && responseData[i].forecastStopDate != null) {
+                        let d1 = new Date(responseData[i].forecastStartDate);
+                        let d2 = new Date(responseData[i].forecastStopDate)
+                        var months;
+                        months = (d2.getFullYear() - d1.getFullYear()) * 12;
+                        months += d2.getMonth() - d1.getMonth();
+                        data[8] = months + 1
+                    } else {
+                        data[8] = 0
                     }
-                    console.log("dataList1---------->", dataList1)
+                    data[9] = responseData[i].forecastStopDate
+                    data[10] = 0
+                    data[11] = responseData[i].versionId
+                    data[12] = 0
+                    data[13] = responseData[i].daysInMonth
+                    data[14] = responseData[i].freightPerc
+                    data[15] = responseData[i].forecastThresholdHighPerc
+                    data[16] = responseData[i].forecastThresholdLowPerc
+                    data[17] = 0;
+                    data[18] = {};
+                    console.log("data---------->", data)
+                    dataList1.push(data);
                 }
-            }).catch(
-                error => {
-                }
-            );
+                console.log("dataList1---------->", dataList1)
+                this.setState({
+                    dataList: dataList1
+                },
+                    () => {
+                        this.buildJExcel();
+                    })
             console.log("Final dataList1---------->", dataList1[0])
-            
+
+                }
+          
+
+        }).catch(
+            error => {
+            }
+        );
+    
         // }
-        this.setState({
-            dataList: dataList1
-        },
-            () => {
-                this.buildJExcel();
-            })
     }
 
 
     buildJExcel() {
-        console.log("buildJExcel dataList--->",this.state.dataList)
-         
+        console.log("buildJExcel dataList--->", this.state.dataList)
+
         let versionSettingsListUnSorted = this.state.versionSettingsList;
         let versionSettingsListForOther = this.state.versionSettingsListForOther;
         console.log("versionSettingsListUnSorted-->", versionSettingsListUnSorted)
@@ -1005,11 +1009,11 @@ class VersionSettingsComponent extends Component {
             }
         }
         var dataLists = this.state.dataList;
-        console.log("dataLists",dataLists)
-        console.log("dataLists length",dataLists.length)
-       for (var i = 0; i < this.state.dataList.length; i++) {
+        console.log("dataLists", dataLists)
+        console.log("dataLists length", dataLists.length)
+        for (var i = 0; i < this.state.dataList.length; i++) {
             console.log("dataList----1009--->3");
-            
+
             count = (versionSettingsArray.length);
             versionSettingsArray[count] = dataLists[i];
             count++;
