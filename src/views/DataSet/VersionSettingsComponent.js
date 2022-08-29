@@ -21,6 +21,7 @@ import { Prompt } from 'react-router';
 import { exportPDF, noForecastSelectedClicked, missingMonthsClicked, missingBranchesClicked, nodeWithPercentageChildrenClicked } from '../DataSet/DataCheckComponent.js';
 import pdfIcon from '../../assets/img/pdf.png';
 import ProgramService from '../../api/ProgramService';
+import showguidance from '../../../src/ShowGuidanceFiles/UpdateVersionSettingsEn.html'
 const ref = React.createRef();
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -1596,7 +1597,9 @@ class VersionSettingsComponent extends Component {
                     </ModalHeader>
                     <div>
                         <ModalBody>
-                           <div>
+                        <div dangerouslySetInnerHTML={ {__html: showguidance} } />
+                       
+                           {/* <div>
                                <h3 className='ShowGuidanceHeading'>{i18n.t('static.UpdateversionSettings.UpdateversionSettings')}</h3>
                            </div>
                             <p>
@@ -1626,7 +1629,7 @@ class VersionSettingsComponent extends Component {
                                 </ol>
                                 </li>
                             </ol>
-                            </p>
+                            </p> */}
                         </ModalBody>
                     </div>
                 </Modal>
