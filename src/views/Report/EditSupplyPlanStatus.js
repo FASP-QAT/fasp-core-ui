@@ -4591,7 +4591,7 @@ class EditSupplyPlanStatus extends Component {
                                     </div>
 
                                     <div className="RemoveStriped">
-                                        <div id="qtyCalculatorTable1"></div>
+                                        <div id="qtyCalculatorTable1" className="jexcelremoveReadonlybackground"></div>
                                     </div>
 
                                     <div id="showSaveQtyButtonDiv" style={{ display: 'none' }}>
