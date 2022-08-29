@@ -635,27 +635,45 @@ class VersionSettingsComponent extends Component {
     }
 
     getDatasetById(datasetIds) {
+        var versionSettingsListOffLine = [];
         var versionSettingsList = [];
-        var versionSettingsListForOther = []
-        // this.state.datasetList.map(dataset => {
-        //     if (datasetIds.includes(dataset.programId)) {
-        //         versionSettingsList.push(dataset);
-        //     }
-        // })
-        console.log("uniquePrograms!!!!", this.state.uniquePrograms)
-
-        this.state.uniquePrograms.map(dataset => {
-            console.log("datasetIds--->", datasetIds)
-            console.log("datasetIds--->dataset.programId", dataset.programId)
+        this.state.datasetList.map(dataset => {
             if (datasetIds.includes(dataset.programId)) {
-                versionSettingsListForOther.push(dataset);
+                versionSettingsList.push(dataset);
             }
         })
-        console.log("versionSettingsListForOther!!!!", versionSettingsListForOther)
-        // this.setState({ versionSettingsList, versionSettingsListForOther }, () => { this.getOnLineDatasetsVersion() });
-        this.setState({ versionSettingsListForOther, datasetIds }, () => { this.getOnLineDatasetsVersion() });
+        versionSettingsListOffLine= versionSettingsList.filter(c=>c.id)
+        console.log("versionSettingsListOffLine!!!!", versionSettingsListOffLine)
+        console.log("versionSettingsList!!!!", versionSettingsList)
+        this.setState({ 
+            versionSettingsList:versionSettingsListOffLine,
+            datasetIds }, () => { this.getOnLineDatasetsVersion() 
+            });
 
     }
+
+    // getDatasetById(datasetIds) {
+    //     var versionSettingsList = [];
+    //     var versionSettingsListForOther = []
+    //     // this.state.datasetList.map(dataset => {
+    //     //     if (datasetIds.includes(dataset.programId)) {
+    //     //         versionSettingsList.push(dataset);
+    //     //     }
+    //     // })
+    //     console.log("uniquePrograms!!!!", this.state.uniquePrograms)
+
+    //     this.state.uniquePrograms.map(dataset => {
+    //         console.log("datasetIds--->", datasetIds)
+    //         console.log("datasetIds--->dataset.programId", dataset.programId)
+    //         if (datasetIds.includes(dataset.programId)) {
+    //             versionSettingsListForOther.push(dataset);
+    //         }
+    //     })
+    //     console.log("versionSettingsListForOther!!!!", versionSettingsListForOther)
+    //     // this.setState({ versionSettingsList, versionSettingsListForOther }, () => { this.getOnLineDatasetsVersion() });
+    //     this.setState({ versionSettingsListForOther, datasetIds }, () => { this.getOnLineDatasetsVersion() });
+
+    // }
     getVersionTypeList() {
         var db1;
         getDatabase();
@@ -797,8 +815,6 @@ class VersionSettingsComponent extends Component {
     getOnLineDatasetsVersion() {
         var programIds = this.state.programValues.map(x => x.value).join(",");
         var programIdsarr = Array.from(new Set(programIds.split(',')));
-        // var programCode =  this.state.programValues.map(x => x.lable);
-        // console.log("programCode--->",programCode);
         var versionTypeId = document.getElementById('versionTypeId').value;
         if (versionTypeId == '') {
             versionTypeId = -1
@@ -814,15 +830,13 @@ class VersionSettingsComponent extends Component {
             startDate: startDate,
             stopDate: stopDate
         }
-        console.log("inputjson------->", inputjson);
-
         ProgramService.getDatasetVersions(inputjson).then(response => {
             if (response.status == 200) {
                 var responseData = response.data;
                 console.log("responseData------->", responseData);
                 for (var i = 0; i < responseData.length; i++) {
                     var data = [];
-                    data[0] = programIdsarr[i]
+                    data[0] = responseData[i].programId
                     data[1] = responseData[i].programCode
                     data[2] = responseData[i].versionId
                     data[3] = getLabelText(responseData[i].versionType.label, this.state.lang);
@@ -861,10 +875,7 @@ class VersionSettingsComponent extends Component {
                         this.buildJExcel();
                     })
             console.log("Final dataList1---------->", dataList1[0])
-
                 }
-          
-
         }).catch(
             error => {
             }
@@ -876,13 +887,7 @@ class VersionSettingsComponent extends Component {
 
     buildJExcel() {
         console.log("buildJExcel dataList--->", this.state.dataList)
-
         let versionSettingsListUnSorted = this.state.versionSettingsList;
-        let versionSettingsListForOther = this.state.versionSettingsListForOther;
-        console.log("versionSettingsListUnSorted-->", versionSettingsListUnSorted)
-        console.log("versionSettingsListForOther-->", versionSettingsListForOther)
-
-
         let versionSettingsList = versionSettingsListUnSorted.sort(
             function (a, b) {
                 if (a.programCode === b.programCode) {
@@ -896,7 +901,7 @@ class VersionSettingsComponent extends Component {
         var versionTypeId = document.getElementById('versionTypeId').value;
         console.log("versionSettingsList-->", versionSettingsList)
         for (var j = 0; j < versionSettingsList.length; j++) {
-            if (versionSettingsListForOther[j].programData) {
+            if (versionSettingsList[j].programData) {
                 var bytes = CryptoJS.AES.decrypt(versionSettingsList[j].programData, SECRET_KEY);
                 var pd = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
                 data = [];
@@ -925,9 +930,6 @@ class VersionSettingsComponent extends Component {
                 } else {
                     data[8] = 0
                 }
-
-
-
                 if (pd.currentVersion.forecastStopDate != null && pd.currentVersion.forecastStopDate != "") {
                     var parts2 = pd.currentVersion.forecastStopDate.split('-');
                     data[9] = parts2[0] + "-" + parts2[1] + "-01 00:00:00"
@@ -939,8 +941,6 @@ class VersionSettingsComponent extends Component {
                 data[11] = versionSettingsList[j].id
                 data[12] = 0
                 data[13] = pd.currentVersion.daysInMonth != null ? pd.currentVersion.daysInMonth : '0'
-
-
                 data[14] = (pd.currentVersion.freightPerc == null ? '' : pd.currentVersion.freightPerc)
                 data[15] = (pd.currentVersion.forecastThresholdHighPerc == null ? '' : pd.currentVersion.forecastThresholdHighPerc)
                 data[16] = (pd.currentVersion.forecastThresholdLowPerc == null ? '' : pd.currentVersion.forecastThresholdLowPerc)
@@ -952,62 +952,62 @@ class VersionSettingsComponent extends Component {
                 }
             }
         }
-        console.log("versionSettingsListForOther------->", versionSettingsListForOther);
+        console.log("versionSettingsArray------->", versionSettingsArray);
 
-        for (var j = 0; j < versionSettingsListForOther.length; j++) {
-            if (versionSettingsListForOther[j].programData) {
-                var databytes = CryptoJS.AES.decrypt(versionSettingsListForOther[j].programData, SECRET_KEY);
-                var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
-                var rangeValue = this.state.rangeValue;
-                let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
-                let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
-                var versionList = programData.versionList.filter(c => moment(c.createdDate).format("YYYY-MM") >= moment(startDate).format("YYYY-MM") && moment(c.createdDate).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM"));
-                for (var k = versionList.length - 1; k >= 0; k--) {
+        // for (var j = 0; j < versionSettingsListForOther.length; j++) {
+        //     if (versionSettingsListForOther[j].programData) {
+        //         var databytes = CryptoJS.AES.decrypt(versionSettingsListForOther[j].programData, SECRET_KEY);
+        //         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+        //         var rangeValue = this.state.rangeValue;
+        //         let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
+        //         let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
+        //         var versionList = programData.versionList.filter(c => moment(c.createdDate).format("YYYY-MM") >= moment(startDate).format("YYYY-MM") && moment(c.createdDate).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM"));
+        //         for (var k = versionList.length - 1; k >= 0; k--) {
 
-                    data = [];
-                    data[0] = versionSettingsListForOther[j].programId
-                    data[1] = versionSettingsListForOther[j].programCode
-                    data[2] = versionList[k].versionId
-                    data[3] = getLabelText(versionList[k].versionType.label, this.state.lang);
-                    data[4] = versionList[k].notes
-                    data[5] = versionList[k].createdDate
-                    data[6] = versionList[k].createdBy.username
-                    data[7] = versionList[k].forecastStartDate
-                    if (versionList[k].forecastStartDate != null && versionList[k].forecastStopDate != null) {
-                        let d1 = new Date(versionList[k].forecastStartDate);
-                        let d2 = new Date(versionList[k].forecastStopDate)
-                        var months;
-                        months = (d2.getFullYear() - d1.getFullYear()) * 12;
-                        months += d2.getMonth() - d1.getMonth();
-                        data[8] = months + 1
-                    } else {
-                        data[8] = 0
-                    }
-                    data[9] = versionList[k].forecastStopDate
-                    data[10] = 0
-                    data[11] = versionList[k].versionId
-                    data[12] = 0
-                    data[13] = versionList[k].daysInMonth
+        //             data = [];
+        //             data[0] = versionSettingsListForOther[j].programId
+        //             data[1] = versionSettingsListForOther[j].programCode
+        //             data[2] = versionList[k].versionId
+        //             data[3] = getLabelText(versionList[k].versionType.label, this.state.lang);
+        //             data[4] = versionList[k].notes
+        //             data[5] = versionList[k].createdDate
+        //             data[6] = versionList[k].createdBy.username
+        //             data[7] = versionList[k].forecastStartDate
+        //             if (versionList[k].forecastStartDate != null && versionList[k].forecastStopDate != null) {
+        //                 let d1 = new Date(versionList[k].forecastStartDate);
+        //                 let d2 = new Date(versionList[k].forecastStopDate)
+        //                 var months;
+        //                 months = (d2.getFullYear() - d1.getFullYear()) * 12;
+        //                 months += d2.getMonth() - d1.getMonth();
+        //                 data[8] = months + 1
+        //             } else {
+        //                 data[8] = 0
+        //             }
+        //             data[9] = versionList[k].forecastStopDate
+        //             data[10] = 0
+        //             data[11] = versionList[k].versionId
+        //             data[12] = 0
+        //             data[13] = versionList[k].daysInMonth
 
 
-                    data[14] = versionList[k].freightPerc
-                    data[15] = versionList[k].forecastThresholdHighPerc
-                    data[16] = versionList[k].forecastThresholdLowPerc
-                    data[17] = 0;
-                    data[18] = {};
+        //             data[14] = versionList[k].freightPerc
+        //             data[15] = versionList[k].forecastThresholdHighPerc
+        //             data[16] = versionList[k].forecastThresholdLowPerc
+        //             data[17] = 0;
+        //             data[18] = {};
 
-                    if (versionTypeId != "") {
-                        if (versionList[k].versionType.id == versionTypeId) {
-                            versionSettingsArray[count] = data;
-                            count++;
-                        }
-                    } else {
-                        versionSettingsArray[count] = data;
-                        count++;
-                    }
-                }
-            }
-        }
+        //             if (versionTypeId != "") {
+        //                 if (versionList[k].versionType.id == versionTypeId) {
+        //                     versionSettingsArray[count] = data;
+        //                     count++;
+        //                 }
+        //             } else {
+        //                 versionSettingsArray[count] = data;
+        //                 count++;
+        //             }
+        //         }
+        //     }
+        // }
         var dataLists = this.state.dataList;
         console.log("dataLists", dataLists)
         console.log("dataLists length", dataLists.length)
@@ -1251,6 +1251,8 @@ class VersionSettingsComponent extends Component {
         })
     }
 
+
+
     openModalPopup(programData) {
         this.setState({
             showValidation: !this.state.showValidation,
@@ -1314,7 +1316,7 @@ class VersionSettingsComponent extends Component {
                         programId: responseData[rd].programId,
                         name: getLabelText(responseData[rd].label, this.state.lang),
                         programCode: responseData[rd].programCode,
-                        // versionList: responseData[rd].versionList
+                        isOnline:1
                     }
                     datasetList.push(json);
                 }
