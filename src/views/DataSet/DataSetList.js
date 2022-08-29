@@ -113,7 +113,13 @@ export default class ProgramList extends Component {
 
     buildJExcel() {
         let programList = this.state.selProgram;
-        // console.log("programList---->", programList);
+
+        programList.sort((a, b) => {
+            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+            return itemLabelA > itemLabelB ? 1 : -1;
+        });
+        console.log("programList---->", programList);
         let programArray = [];
         let count = 0;
 
