@@ -1285,6 +1285,7 @@
     "static.procurementUnit.labeling": "Rótulo",
     "static.tree.nodeValue": "Valor do Nó",
     "static.masterDataSync.success": "Dados mestre sincronizados com sucesso",
+    "static.programLoadedAndmasterDataSync.success":"Programa carregado e sincronização de dados mestre com sucesso",
     "static.dataValidation.treeNotes": "Notas de Árvore de previsão",
     "static.compareAndSelect.forecastError": "Erro de previsão (%)",
     "static.pipeline.productToPlanningUnit": "Produto PipeLine para Unidade de Planeamento ",

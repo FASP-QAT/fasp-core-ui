@@ -65,10 +65,18 @@ export default class ExportDataset extends Component {
             message: '',
             selectProgramMessage: '',
             loading: true,
+            encryptCheck: true,
         }
         this.formSubmit = this.formSubmit.bind(this)
         this.cancelClicked = this.cancelClicked.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
+    }
+
+    setEncryptCheck(e) {
+        var encryptCheck = e.target.checked;
+        this.setState({
+            encryptCheck: encryptCheck,
+        })
     }
 
     componentDidMount() {
@@ -253,7 +261,7 @@ export default class ExportDataset extends Component {
 
                                                                                     var isUnEncrepted = false;
                                                                                     var checkboxValue = document.getElementById('isExportData').checked;
-                                                                                    // console.log("checkboxValue-----------> ", checkboxValue);
+                                                                                    console.log("checkboxValue-----------> ", checkboxValue);
                                                                                     if (checkboxValue) {
                                                                                         isUnEncrepted = true;
                                                                                     } else {
@@ -485,14 +493,15 @@ export default class ExportDataset extends Component {
                                                 id="isExportData"
                                                 name="isExportData"
                                                 style={{ marginTop: '3' }}
-                                                value={0}
-                                                // checked={true}
+                                                checked={this.state.encryptCheck}
+                                                onClick={(e) => { this.setEncryptCheck(e); }}
+                                            // checked={true}
                                             // onClick={(e) => { this.hideCalculation(e); }}
                                             />
                                             <Label
                                                 className="form-check-label"
                                                 check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                {'Do you want to enceypt data?'}
+                                                {'Do you want to encrypt data?'}
                                             </Label>
                                         </div>
                                     </FormGroup>

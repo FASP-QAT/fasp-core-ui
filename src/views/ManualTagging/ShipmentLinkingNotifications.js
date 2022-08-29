@@ -110,7 +110,7 @@ export default class ShipmentLinkingNotifications extends Component {
 
     displayButton() {
         var validation = true;
-        var tableJson = this.el.getJson(null, false).filter(c => c[18] == 1);
+        var tableJson = this.el.getJson(null, false).filter(c => c[19] == 1);
         if (validation == true) {
 
             this.setState({
@@ -140,12 +140,12 @@ export default class ShipmentLinkingNotifications extends Component {
         var validation = true;
         var changedmtList = []
         if (validation == true) {
-            var tableJson = this.el.getJson(null, false).filter(c => c[18] == 1);
+            var tableJson = this.el.getJson(null, false).filter(c => c[19] == 1);
             for (var i = 0; i < tableJson.length; i++) {
                 let json = {
                     addressed: tableJson[i][0],
                     notificationType: {},
-                    notificationId: tableJson[i][14],
+                    notificationId: tableJson[i][15],
                     shipmentLinkingId: 0
                 }
                 changedmtList.push(json);
@@ -326,7 +326,7 @@ export default class ShipmentLinkingNotifications extends Component {
         //     }
         // }
         if (x == 0) {
-            this.el.setValueFromCoords(18, y, 1, true);
+            this.el.setValueFromCoords(19, y, 1, true);
         }
         this.displayButton();
 
@@ -462,8 +462,10 @@ export default class ShipmentLinkingNotifications extends Component {
                                 shipmentQty: shipmentListFilter[0].shipmentQty,
                                 conversionFactor: linkedShipmentListFilter[0].conversionFactor,
                                 notes: shipmentListFilter[0].notes,
-                                shipmentLinkingId: list[l].shipmentLinkingId
+                                shipmentLinkingId: list[l].shipmentLinkingId,
+                                realmCountryPlanningUnit: shipmentListFilter[0].realmCountryPlanningUnit
                             }
+                            console.log("Json@@@@@@@@", json)
                             outputList.push(json);
                         }
 
@@ -757,18 +759,19 @@ export default class ShipmentLinkingNotifications extends Component {
             data[4] = manualTaggingList[j].roNo + " - " + manualTaggingList[j].roPrimeLineNo + " | " + (manualTaggingList[j].orderNo + " - " + manualTaggingList[j].primeLineNo) + (manualTaggingList[j].knShipmentNo != "" && manualTaggingList[j].knShipmentNo != null ? " | " + manualTaggingList[j].knShipmentNo : "");
             data[5] = getLabelText(manualTaggingList[j].erpPlanningUnit.label, this.state.lang)
             data[6] = getLabelText(manualTaggingList[j].qatPlanningUnit.label, this.state.lang)
-            data[7] = manualTaggingList[j].expectedDeliveryDate
-            data[8] = manualTaggingList[j].erpShipmentStatus
-            data[9] = Math.round((manualTaggingList[j].shipmentQty) / (manualTaggingList[j].conversionFactor))
-            data[10] = manualTaggingList[j].conversionFactor
-            data[11] = `=ROUND(J${parseInt(j) + 1}*K${parseInt(j) + 1},0)`;
-            data[12] = manualTaggingList[j].notes
-            data[13] = this.state.roPrimeNoListOriginal.filter(c => c.roNo == manualTaggingList[j].roNo && c.roPrimeLineNo == manualTaggingList[j].roPrimeLineNo)[0];
-            data[14] = manualTaggingList[j].notificationId;
-            data[15] = manualTaggingList[j].shipmentLinkingId;
-            data[16] = manualTaggingList[j].roNo;
-            data[17] = manualTaggingList[j].roPrimeLineNo;
-            data[18] = 0;
+            data[7] = getLabelText(manualTaggingList[j].realmCountryPlanningUnit.label, this.state.lang)
+            data[8] = manualTaggingList[j].expectedDeliveryDate
+            data[9] = manualTaggingList[j].erpShipmentStatus
+            data[10] = Math.round((manualTaggingList[j].shipmentQty) / (manualTaggingList[j].conversionFactor) / manualTaggingList[j].realmCountryPlanningUnit.multiplier)
+            data[11] = manualTaggingList[j].conversionFactor
+            data[12] = `=ROUND(K${parseInt(j) + 1}*L${parseInt(j) + 1}*${manualTaggingList[j].realmCountryPlanningUnit.multiplier},0)`;
+            data[13] = manualTaggingList[j].notes
+            data[14] = this.state.roPrimeNoListOriginal.filter(c => c.roNo == manualTaggingList[j].roNo && c.roPrimeLineNo == manualTaggingList[j].roPrimeLineNo)[0];
+            data[15] = manualTaggingList[j].notificationId;
+            data[16] = manualTaggingList[j].shipmentLinkingId;
+            data[17] = manualTaggingList[j].roNo;
+            data[18] = manualTaggingList[j].roPrimeLineNo;
+            data[19] = 0;
             manualTaggingArray[count] = data;
             count++;
         }
@@ -820,6 +823,11 @@ export default class ShipmentLinkingNotifications extends Component {
                 },
                 {
                     title: i18n.t('static.supplyPlan.qatProduct'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.manualTagging.aru'),
                     type: 'text',
                     readOnly: true
                 },
@@ -956,8 +964,8 @@ export default class ShipmentLinkingNotifications extends Component {
                             // title: i18n.t('static.dashboard.linkShipment'),
                             title: i18n.t('static.mt.viewArtmisHistory'),
                             onclick: function () {
-                                let roNo = obj.getValueFromCoords(16, y).toString().trim();
-                                let roPrimeLineNo = obj.getValueFromCoords(17, y).toString().trim();
+                                let roNo = obj.getValueFromCoords(17, y).toString().trim();
+                                let roPrimeLineNo = obj.getValueFromCoords(18, y).toString().trim();
                                 ManualTaggingService.getARTMISHistory(roNo, roPrimeLineNo)
                                     .then(response => {
                                         this.setState({
@@ -1066,14 +1074,14 @@ export default class ShipmentLinkingNotifications extends Component {
                 {
                     title: i18n.t('static.program.programName'),
                     type: 'text',
-                    // readOnly: true
+                    readOnly: true
                 },
 
                 {
                     title: i18n.t('static.mt.notificationCount'),
                     type: 'numeric',
-                    mask: '#,##.00', decimal: '.',
-                    // readOnly: true
+                    mask: '#,##',
+                    readOnly: true
                 },
                 {
                     title: "programId",
@@ -1121,14 +1129,16 @@ export default class ShipmentLinkingNotifications extends Component {
         })
     }
 
-    selectedForNotification = function (instance, cell, x, y, value) {
-        if (y != 0) {
-            console.log("ProgramId@@@@@@@", this.state.programId.split("_")[0]);
-            console.log("VersionId@@@@@@@", this.state.programId.split("_")[1].substring(1) + "  (Local)");
-            localStorage.setItem("sesProgramIdReport", this.state.programId.split("_")[0]);
-            localStorage.setItem("sesVersionIdReport", this.state.programId.split("_")[1].substring(1) + "  (Local)");
+    selectedForNotification = function (instance, cell, x, y, value, e) {
+        if (e.buttons == 1) {
+            if (y != 0) {
+                console.log("ProgramId@@@@@@@", this.state.programId.split("_")[0]);
+                console.log("VersionId@@@@@@@", this.state.programId.split("_")[1].substring(1) + "  (Local)");
+                localStorage.setItem("sesProgramIdReport", this.state.programId.split("_")[0]);
+                localStorage.setItem("sesVersionIdReport", this.state.programId.split("_")[1].substring(1) + "  (Local)");
 
-            window.open(window.location.origin + `/#/shipment/manualTagging/2`);
+                window.open(window.location.origin + `/#/shipment/manualTagging/2`);
+            }
         }
     }
 
@@ -1192,11 +1202,14 @@ export default class ShipmentLinkingNotifications extends Component {
     }
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance, 1);
-        console.log("asterisk---", document.getElementsByClassName("resizable")[2])
-        var asterisk = document.getElementsByClassName("resizable")[2];
+        // console.log("asterisk---", document.getElementsByClassName("resizable")[2])
+        // var asterisk = document.getElementsByClassName("resizable")[2];
+        // console.log("asterisk---", document.getElementsByClassName("jss")[2].firstChild.nextSibling)
+
+        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
 
         var tr = asterisk.firstChild;
-        tr.children[10].classList.add('AsteriskTheadtrTd');
+        // tr.children[10].classList.add('AsteriskTheadtrTd');
     }
 
 
@@ -1307,7 +1320,9 @@ export default class ShipmentLinkingNotifications extends Component {
     buildJexcel() {
         try {
             this.el = jexcel(document.getElementById("tableDivOrderDetails"), '');
-            this.el.destroy();
+            // this.el.destroy();
+            jexcel.destroy(document.getElementById("tableDivOrderDetails"), true);
+
         } catch (err) {
 
         }
@@ -1348,7 +1363,7 @@ export default class ShipmentLinkingNotifications extends Component {
             pagination: false,
             search: false,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
@@ -1359,15 +1374,15 @@ export default class ShipmentLinkingNotifications extends Component {
             allowExport: false,
             editable: false,
             license: JEXCEL_PRO_KEY,
-            text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
             onload: this.loadedOrderHistory,
             updateTable: function (el, cell, x, y, source, value, id) {
                 var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
-                var elInstance = el.jexcel;
+                var elInstance = el;
                 var index = elInstance.getJson(null, false).findIndex(c => c[8] == 0);
                 for (var j = 0; j < colArr.length; j++) {
                     var col = (colArr[j]).concat(parseInt(index) + 1);
@@ -1385,7 +1400,9 @@ export default class ShipmentLinkingNotifications extends Component {
 
         try {
             this.el = jexcel(document.getElementById("tableDivShipmentDetails"), '');
-            this.el.destroy();
+            // this.el.destroy();
+            jexcel.destroy(document.getElementById("tableDivShipmentDetails"), true);
+
         } catch (err) {
 
         }
@@ -1424,7 +1441,7 @@ export default class ShipmentLinkingNotifications extends Component {
             pagination: false,
             search: false,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
@@ -1435,15 +1452,15 @@ export default class ShipmentLinkingNotifications extends Component {
             allowExport: false,
             editable: false,
             license: JEXCEL_PRO_KEY,
-            text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
             onload: this.loadedShipmentHistory,
             updateTable: function (el, cell, x, y, source, value, id) {
                 var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
-                var elInstance = el.jexcel;
+                var elInstance = el;
                 var index = elInstance.getJson(null, false).findIndex(c => c[7] == 0);
                 for (var j = 0; j < colArr.length; j++) {
                     var col = (colArr[j]).concat(parseInt(index) + 1);
@@ -1462,16 +1479,20 @@ export default class ShipmentLinkingNotifications extends Component {
 
     loadedOrderHistory(instance, cell, x, y, value) {
         jExcelLoadedFunctionOnlyHideRow(instance);
-        var asterisk = document.getElementsByClassName("resizable")[4];
-        console.log("Astrisk Mohit@@@@@@@@@", document.getElementsByClassName("resizable"))
+        // var asterisk = document.getElementsByClassName("resizable")[4];
+        console.log("document.getElementsByClassName@Mohit", document.getElementsByClassName("jss"))
+        var asterisk = document.getElementsByClassName("jss")[2].firstChild.nextSibling;
+        // console.log("Astrisk Mohit@@@@@@@@@", document.getElementsByClassName("resizable"))
         var tr = asterisk.firstChild;
         tr.children[8].title = i18n.t('static.manualTagging.changeOrderOrder');
     }
 
     loadedShipmentHistory(instance, cell, x, y, value) {
         jExcelLoadedFunctionOnlyHideRow(instance);
-        var asterisk = document.getElementsByClassName("resizable")[6];
-        console.log("Astrisk Mohit@@@@@@@@@", document.getElementsByClassName("resizable"))
+        // var asterisk = document.getElementsByClassName("resizable")[6];
+        var asterisk = document.getElementsByClassName("jss")[3].firstChild.nextSibling;
+
+        // console.log("Astrisk Mohit@@@@@@@@@", document.getElementsByClassName("resizable"))
         var tr = asterisk.firstChild;
         tr.children[7].title = i18n.t('static.manualTagging.changeOrderShipment');
     }
@@ -1647,7 +1668,6 @@ export default class ShipmentLinkingNotifications extends Component {
 
 
     render() {
-
         jexcel.setDictionary({
             Show: " ",
             entries: " ",
@@ -1899,7 +1919,7 @@ export default class ShipmentLinkingNotifications extends Component {
                             <Row>
 
 
-                                <FormGroup className="col-md-3 ">
+                                <FormGroup className="col-md-3 ZindexFeild">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.inventory.program')}</Label>
                                     <div className="controls ">
                                         <InputGroup>
@@ -1920,7 +1940,7 @@ export default class ShipmentLinkingNotifications extends Component {
                                 </FormGroup>
 
 
-                                <FormGroup className="col-md-3">
+                                <FormGroup className="col-md-3 ZindexFeild">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.procurementUnit.planningUnit')}</Label>
                                     <div className="controls ">
                                         {/* <InMultiputGroup> */}
@@ -1936,7 +1956,7 @@ export default class ShipmentLinkingNotifications extends Component {
 
                                     </div>
                                 </FormGroup>
-                                <FormGroup className="col-md-3 ">
+                                <FormGroup className="col-md-3 ZindexFeild">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.mt.addressed')}</Label>
                                     <div className="controls ">
                                         <InputGroup>

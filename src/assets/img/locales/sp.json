@@ -1252,6 +1252,7 @@
     "static.procurementUnit.labeling": "Etiquetado",
     "static.tree.nodeValue": "Valor de nodo",
     "static.masterDataSync.success": "Datos maestros sincronizados correctamente",
+    "static.programLoadedAndmasterDataSync.success":"Programa cargado y sincronización de datos maestros con éxito",
     "static.dataValidation.treeNotes": "Notas del árbol de estimación",
     "static.compareAndSelect.forecastError": "Error de estimación (%)",
     "static.pipeline.productToPlanningUnit": "Producto PipeLine a Producto QAT",

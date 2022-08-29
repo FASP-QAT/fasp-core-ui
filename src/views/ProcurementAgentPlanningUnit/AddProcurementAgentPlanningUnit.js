@@ -990,13 +990,13 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                                 title: i18n.t('static.procurementAgent.MOQ'),
                                                                 type: 'numeric',
                                                                 textEditor: true,
-                                                                mask: '#,##.00',
+                                                                mask: '#,##',
                                                                 disabledMaskOnEdition: true
                                                             },
                                                             {
                                                                 title: i18n.t('static.procurementAgent.UnitPerPalletEuro1'),
                                                                 type: 'numeric',
-                                                                mask: '#,##.00',
+                                                                mask: '#,##',
                                                                 textEditor: true,
                                                                 disabledMaskOnEdition: true
                                                             },
@@ -1004,14 +1004,14 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                                 title: i18n.t('static.procurementAgent.UnitPerPalletEuro2'),
                                                                 type: 'numeric',
                                                                 textEditor: true,
-                                                                mask: '#,##.00',
+                                                                mask: '#,##',
                                                                 disabledMaskOnEdition: true
                                                             },
                                                             {
                                                                 title: i18n.t('static.procurementAgent.UnitPerContainer'),
                                                                 type: 'numeric',
                                                                 // decimal: '.',
-                                                                mask: '#,##.00',
+                                                                mask: '#,##',
                                                                 textEditor: true,
                                                                 disabledMaskOnEdition: true
                                                             },

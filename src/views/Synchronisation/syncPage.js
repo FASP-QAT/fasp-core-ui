@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Formik } from 'formik';
-import jexcel from 'jspreadsheet';
-import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import {
   Col, Row, Card, CardBody, Form,
@@ -18,7 +18,7 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import ProgramService from '../../api/ProgramService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import { jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunctionOnlyHideRow, inValid, inValidWithColor, jExcelLoadedFunction, } from '../../CommonComponent/JExcelCommonFunctions.js'
+import { jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunctionOnlyHideRow, inValid, inValidWithColor, jExcelLoadedFunction, jExcelLoadedFunctionOld, jExcelLoadedFunctionOnlyHideRowOld, } from '../../CommonComponent/JExcelCommonFunctions.js'
 import moment from "moment";
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
@@ -254,11 +254,11 @@ export default class syncPage extends Component {
         { type: 'hidden', title: 'downloaded data' },
         { type: 'hidden', title: 'result of compare' },
       ],
-      // text: {
-      //   showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-      //   show: '',
-      //   entries: '',
-      // },
+      text: {
+        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+        show: '',
+        entries: '',
+      },
       pagination: false,
       search: false,
       filters: false,
@@ -267,12 +267,12 @@ export default class syncPage extends Component {
         return false;
       }.bind(this),
       columnSorting: false,
-      // tableOverflow: false,
+      tableOverflow: false,
       wordWrap: true,
       allowInsertColumn: false,
       allowManualInsertColumn: false,
       allowDeleteRow: false,
-      // tableOverflow: false,
+      tableOverflow: false,
       editable: false,
       onload: this.loadedResolveConflicts
     };
@@ -287,8 +287,8 @@ export default class syncPage extends Component {
   }
 
   loadedResolveConflicts = function (instance) {
-    jExcelLoadedFunctionOnlyHideRow(instance);
-    var elInstance = instance.worksheets[0];
+    jExcelLoadedFunctionOnlyHideRowOld(instance);
+    var elInstance = instance.jexcel;
     var jsonData = elInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R']
     for (var j = 1; j < 13; j++) {
@@ -433,20 +433,20 @@ export default class syncPage extends Component {
         { type: 'hidden', title: 'downloaded data' },
         { type: 'hidden', title: 'result of compare' },
       ],
-      // text: {
-      //   showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-      //   show: '',
-      //   entries: '',
-      // },
+      text: {
+        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+        show: '',
+        entries: '',
+      },
       pagination: false,
       search: false,
       columnSorting: false,
-      // tableOverflow: false,
+      tableOverflow: false,
       wordWrap: true,
       allowInsertColumn: false,
       allowManualInsertColumn: false,
       allowDeleteRow: false,
-      // tableOverflow: false,
+      tableOverflow: false,
       editable: false,
       filters: false,
       license: JEXCEL_PRO_KEY,
@@ -466,8 +466,8 @@ export default class syncPage extends Component {
   }
 
   loadedResolveConflictsInventory = function (instance) {
-    jExcelLoadedFunctionOnlyHideRow(instance);
-    var elInstance = instance.worksheets[0];
+    jExcelLoadedFunctionOnlyHideRowOld(instance);
+    var elInstance = instance.jexcel;
     var jsonData = elInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S']
     for (var j = 1; j < 14; j++) {
@@ -601,8 +601,11 @@ export default class syncPage extends Component {
         { type: 'text', title: i18n.t('static.supplyPlan.orderNoAndPrimeLineNo'), width: 150 },
         { type: 'dropdown', title: i18n.t('static.datasource.datasource'), source: this.state.dataSourceList, width: 150 },
         { type: 'dropdown', title: i18n.t("static.supplyPlan.shipmentMode"), source: [{ id: 1, name: i18n.t('static.supplyPlan.sea') }, { id: 2, name: i18n.t('static.supplyPlan.air') }], width: 100 },
+        { type: 'dropdown', title: i18n.t('static.supplyPlan.alternatePlanningUnit'), source: this.state.realmCountryPlanningUnitList, width: 150 },
         { type: 'numeric', title: i18n.t("static.shipment.suggestedQty"), width: 100, mask: '#,##' },
-        { type: 'numeric', title: i18n.t("static.supplyPlan.adjustesOrderQty"), width: 100, mask: '#,##' },
+        { type: 'numeric', title: i18n.t("static.shipment.shipmentQtyARU"), width: 100, mask: '#,##' },
+        { title: i18n.t('static.unit.multiplierFromARUTOPU'), type: 'numeric', mask: '#,##0.000000', decimal: '.', width: 90 },
+        { title: i18n.t('static.shipment.shipmentQtyPU'), type: 'numeric', mask: '#,##', width: 120 },
         { type: 'dropdown', title: i18n.t('static.dashboard.currency'), source: this.state.currencyList, width: 120 },
         { type: 'numeric', title: i18n.t('static.supplyPlan.pricePerPlanningUnit'), width: 80, mask: '#,##.00', decimal: '.' },
         { type: 'numeric', title: i18n.t('static.shipment.productcost'), width: 80, mask: '#,##.00', decimal: '.' },
@@ -626,20 +629,20 @@ export default class syncPage extends Component {
         { type: 'hidden', title: 'downloaded data' },
         { type: 'hidden', title: 'result of compare' },
       ],
-      // text: {
-      //   showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-      //   show: '',
-      //   entries: '',
-      // },
+      text: {
+        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+        show: '',
+        entries: '',
+      },
       pagination: false,
       search: false,
       columnSorting: false,
-      // tableOverflow: false,
+      tableOverflow: false,
       wordWrap: true,
       allowInsertColumn: false,
       allowManualInsertColumn: false,
       allowDeleteRow: false,
-      // tableOverflow: false,
+      tableOverflow: false,
       editable: false,
       filters: false,
       license: JEXCEL_PRO_KEY,
@@ -741,20 +744,20 @@ export default class syncPage extends Component {
         { type: 'hidden', title: 'downloaded data' },
         { type: 'hidden', title: 'result of compare' },
       ],
-      // text: {
-      //   showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-      //   show: '',
-      //   entries: '',
-      // },
+      text: {
+        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+        show: '',
+        entries: '',
+      },
       pagination: false,
       search: false,
       columnSorting: false,
-      // tableOverflow: false,
+      tableOverflow: false,
       wordWrap: true,
       allowInsertColumn: false,
       allowManualInsertColumn: false,
       allowDeleteRow: false,
-      // tableOverflow: false,
+      tableOverflow: false,
       editable: false,
       filters: false,
       license: JEXCEL_PRO_KEY,
@@ -774,11 +777,11 @@ export default class syncPage extends Component {
   }
 
   loadedResolveConflictsShipment = function (instance) {
-    jExcelLoadedFunctionOnlyHideRow(instance);
-    var elInstance = instance.worksheets[0];
+    jExcelLoadedFunctionOnlyHideRowOld(instance);
+    var elInstance = instance.jexcel;
     var jsonData = elInstance.getJson();
-    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF']
-    for (var j = 1; j < 28; j++) {
+    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI']
+    for (var j = 1; j < 31; j++) {
       var col = (colArr[j]).concat(1);
       var col1 = (colArr[j]).concat(2);
       var valueToCompare = (jsonData[0])[j];
@@ -792,10 +795,10 @@ export default class syncPage extends Component {
       }
     }
 
-    var col = (colArr[29]).concat(1);
-    var col1 = (colArr[29]).concat(2);
-    var valueToCompare = (jsonData[0])[28];
-    var valueToCompareWith = (jsonData[1])[28];
+    var col = (colArr[32]).concat(1);
+    var col1 = (colArr[32]).concat(2);
+    var valueToCompare = (jsonData[0])[31];
+    var valueToCompareWith = (jsonData[1])[31];
     if ((valueToCompare == valueToCompareWith) || (valueToCompare == "" && valueToCompareWith == null) || (valueToCompare == null && valueToCompareWith == "")) {
       elInstance.setStyle(col, "background-color", "transparent");
       elInstance.setStyle(col1, "background-color", "transparent");
@@ -813,8 +816,8 @@ export default class syncPage extends Component {
     shipmentInstance.options.editable = true;
     shipmentInstance.setRowData(index, resolveConflictsInstance.getRowData(0));
     var jsonData = resolveConflictsInstance.getJson();
-    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF']
-    for (var j = 0; j < 28; j++) {
+    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI']
+    for (var j = 0; j < 31; j++) {
       var col = (colArr[j]).concat(parseInt(index) + 1);
       var valueToCompare = (jsonData[0])[j];
       var valueToCompareWith = (jsonData[1])[j];
@@ -822,20 +825,20 @@ export default class syncPage extends Component {
         shipmentInstance.setStyle(col, "background-color", "transparent");
       } else {
         shipmentInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
-        shipmentInstance.setValueFromCoords(33, index, 2, true);
+        shipmentInstance.setValueFromCoords(36, index, 2, true);
       }
     }
 
-    var col = (colArr[29]).concat(parseInt(index) + 1);
-    var valueToCompare = (jsonData[0])[28];
-    var valueToCompareWith = (jsonData[1])[28];
+    var col = (colArr[32]).concat(parseInt(index) + 1);
+    var valueToCompare = (jsonData[0])[31];
+    var valueToCompareWith = (jsonData[1])[31];
     if ((valueToCompare == valueToCompareWith) || (valueToCompare == "" && valueToCompareWith == null) || (valueToCompare == null && valueToCompareWith == "")) {
       shipmentInstance.setStyle(col, "background-color", "transparent");
     } else {
       shipmentInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
-      shipmentInstance.setValueFromCoords(33, index, 2, true);
+      shipmentInstance.setValueFromCoords(36, index, 2, true);
     }
-    shipmentInstance.orderBy(33, 0);
+    shipmentInstance.orderBy(36, 0);
     shipmentInstance.options.editable = false;
     this.setState({
       conflictsCount: this.state.conflictsCount - 1
@@ -856,8 +859,8 @@ export default class syncPage extends Component {
     shipmentInstance.options.editable = true;
     shipmentInstance.setRowData(index, resolveConflictsInstance.getRowData(1));
     var jsonData = resolveConflictsInstance.getJson();
-    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF']
-    for (var j = 0; j < 28; j++) {
+    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI']
+    for (var j = 0; j < 31; j++) {
       var col = (colArr[j]).concat(parseInt(index) + 1);
       var valueToCompare = (jsonData[0])[j];
       var valueToCompareWith = (jsonData[1])[j];
@@ -865,20 +868,20 @@ export default class syncPage extends Component {
         shipmentInstance.setStyle(col, "background-color", "transparent");
       } else {
         shipmentInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
-        shipmentInstance.setValueFromCoords(33, (index), 3, true);
+        shipmentInstance.setValueFromCoords(36, (index), 3, true);
       }
     }
 
-    var col = (colArr[29]).concat(parseInt(index) + 1);
-    var valueToCompare = (jsonData[0])[28];
-    var valueToCompareWith = (jsonData[1])[28];
+    var col = (colArr[32]).concat(parseInt(index) + 1);
+    var valueToCompare = (jsonData[0])[31];
+    var valueToCompareWith = (jsonData[1])[31];
     if ((valueToCompare == valueToCompareWith) || (valueToCompare == "" && valueToCompareWith == null) || (valueToCompare == null && valueToCompareWith == "")) {
       shipmentInstance.setStyle(col, "background-color", "transparent");
     } else {
       shipmentInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
-      shipmentInstance.setValueFromCoords(33, (index), 3, true);
+      shipmentInstance.setValueFromCoords(36, (index), 3, true);
     }
-    shipmentInstance.orderBy(33, 0);
+    shipmentInstance.orderBy(36, 0);
     shipmentInstance.options.editable = false;
     this.setState({
       conflictsCount: this.state.conflictsCount - 1
@@ -893,7 +896,7 @@ export default class syncPage extends Component {
 
 
   loadedResolveConflictsProblem = function (instance) {
-    jExcelLoadedFunctionOnlyHideRow(instance);
+    jExcelLoadedFunctionOnlyHideRowOld(instance);
     var elInstance = instance.jexcel;
     var jsonData = elInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T']
@@ -1114,9 +1117,9 @@ export default class syncPage extends Component {
       var oldProgramDataShipment = this.state.oldProgramDataShipment;
       var latestProgramDataShipment = this.state.latestProgramDataShipment;
       for (var c = 0; c < shipmentJson.length; c++) {
-        if (((shipmentJson[c])[33] == 2 || (shipmentJson[c])[33] == 4) && (shipmentJson[c])[0] != 0) {
+        if (((shipmentJson[c])[36] == 2 || (shipmentJson[c])[36] == 4) && (shipmentJson[c])[0] != 0) {
           // shipmentData.push(oldProgramDataShipment.filter(a => a.shipmentId == (shipmentJson[c])[0])[0]);
-        } else if ((shipmentJson[c])[33] == 3 && (shipmentJson[c])[0] != 0) {
+        } else if ((shipmentJson[c])[36] == 3 && (shipmentJson[c])[0] != 0) {
           var index = shipmentData.findIndex(p => p.shipmentId == (shipmentJson[c])[0]);
           if (index == -1) {
             shipmentData.push(latestProgramDataShipment.filter(a => a.shipmentId == (shipmentJson[c])[0])[0]);
@@ -1487,24 +1490,16 @@ export default class syncPage extends Component {
       mergedProblemListJexcel: ""
     })
     if (this.state.mergedConsumptionJexcel != "" && this.state.mergedConsumptionJexcel != undefined) {
-      // this.state.mergedConsumptionJexcel.destroy();
-      jexcel.destroy(document.getElementById("mergedVersionConsumption"), true);
-
+      this.state.mergedConsumptionJexcel.destroy();
     }
     if (this.state.mergedInventoryJexcel != "" && this.state.mergedInventoryJexcel != undefined) {
-      // this.state.mergedInventoryJexcel.destroy();
-      jexcel.destroy(document.getElementById("mergedVersionInventory"), true);
-
+      this.state.mergedInventoryJexcel.destroy();
     }
     if (this.state.mergedShipmentJexcel != "" && this.state.mergedShipmentJexcel != undefined) {
-      // this.state.mergedShipmentJexcel.destroy();
-      jexcel.destroy(document.getElementById("mergedVersionShipment"), true);
-
+      this.state.mergedShipmentJexcel.destroy();
     }
     if (this.state.mergedProblemListJexcel != "" && this.state.mergedProblemListJexcel != undefined) {
-      // this.state.mergedProblemListJexcel.destroy();
-      jexcel.destroy(document.getElementById("mergedVersionProblemList"), true);
-
+      this.state.mergedProblemListJexcel.destroy();
     }
 
     var programId = value != "" && value != undefined ? value.value : 0;
@@ -2062,18 +2057,18 @@ export default class syncPage extends Component {
                                             paginationOptions: JEXCEL_PAGINATION_OPTION,
                                             search: true,
                                             columnSorting: true,
-                                            // tableOverflow: true,
+                                            tableOverflow: true,
                                             wordWrap: true,
                                             allowInsertColumn: false,
                                             allowManualInsertColumn: false,
                                             allowDeleteRow: false,
                                             editable: false,
                                             onload: this.loadedFunctionForMerge,
-                                            // text: {
-                                            //   showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                                            //   show: '',
-                                            //   entries: '',
-                                            // },
+                                            text: {
+                                              showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                                              show: '',
+                                              entries: '',
+                                            },
                                             filters: true,
                                             license: JEXCEL_PRO_KEY,
                                             contextMenu: function (obj, x, y, e) {
@@ -2248,18 +2243,18 @@ export default class syncPage extends Component {
                                             paginationOptions: JEXCEL_PAGINATION_OPTION,
                                             search: true,
                                             columnSorting: true,
-                                            // tableOverflow: true,
+                                            tableOverflow: true,
                                             wordWrap: true,
                                             allowInsertColumn: false,
                                             allowManualInsertColumn: false,
                                             allowDeleteRow: false,
                                             editable: false,
                                             onload: this.loadedFunctionForMergeInventory,
-                                            // text: {
-                                            //   showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                                            //   show: '',
-                                            //   entries: '',
-                                            // },
+                                            text: {
+                                              showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                                              show: '',
+                                              entries: '',
+                                            },
                                             filters: true,
                                             license: JEXCEL_PRO_KEY,
                                             contextMenu: function (obj, x, y, e) {
@@ -2347,45 +2342,48 @@ export default class syncPage extends Component {
                                             data[7] = mergedShipmentData[cd].orderNo != "" && mergedShipmentData[cd].orderNo != null ? mergedShipmentData[cd].orderNo.toString().concat(mergedShipmentData[cd].primeLineNo != null ? "~" : "").concat(mergedShipmentData[cd].primeLineNo != null ? mergedShipmentData[cd].primeLineNo : "") : "";
                                             data[8] = mergedShipmentData[cd].dataSource.id;
                                             data[9] = mergedShipmentData[cd].shipmentMode == "Air" ? 2 : 1;
-                                            data[10] = mergedShipmentData[cd].suggestedQty;
-                                            data[11] = mergedShipmentData[cd].shipmentQty;
-                                            data[12] = mergedShipmentData[cd].currency.currencyId;
-                                            data[13] = parseFloat(mergedShipmentData[cd].rate).toFixed(2);
-                                            data[14] = parseFloat(mergedShipmentData[cd].rate).toFixed(2) * mergedShipmentData[cd].shipmentQty;
-                                            data[15] = parseFloat(mergedShipmentData[cd].freightCost).toFixed(2);
-                                            data[16] = mergedShipmentData[cd].plannedDate != "" && mergedShipmentData[cd].plannedDate != null ? moment(mergedShipmentData[cd].plannedDate).format(DATE_FORMAT_CAP) : "";
-                                            data[17] = mergedShipmentData[cd].submittedDate != "" && mergedShipmentData[cd].submittedDate != null ? moment(mergedShipmentData[cd].submittedDate).format(DATE_FORMAT_CAP) : "";
-                                            data[18] = mergedShipmentData[cd].approvedDate != "" && mergedShipmentData[cd].approvedDate != null ? moment(mergedShipmentData[cd].approvedDate).format(DATE_FORMAT_CAP) : "";
-                                            data[19] = mergedShipmentData[cd].shippedDate != "" && mergedShipmentData[cd].shippedDate != null ? moment(mergedShipmentData[cd].shippedDate).format(DATE_FORMAT_CAP) : "";
-                                            data[20] = mergedShipmentData[cd].arrivedDate != "" && mergedShipmentData[cd].arrivedDate != null ? moment(mergedShipmentData[cd].arrivedDate).format(DATE_FORMAT_CAP) : "";
-                                            data[21] = mergedShipmentData[cd].receivedDate != "" && mergedShipmentData[cd].receivedDate != null ? moment(mergedShipmentData[cd].receivedDate).format(DATE_FORMAT_CAP) : "";
-                                            data[22] = mergedShipmentData[cd].notes;
-                                            data[23] = mergedShipmentData[cd].erpFlag;
-                                            data[24] = mergedShipmentData[cd].emergencyOrder;
-                                            data[25] = mergedShipmentData[cd].accountFlag;
-                                            data[26] = mergedShipmentData[cd].active;
-                                            data[27] = mergedShipmentData[cd].localProcurement;
-                                            data[28] = JSON.stringify(mergedShipmentData[cd].batchInfoList != "" ? ((mergedShipmentData[cd].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.shipmentQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : "");
-                                            data[29] = "";
+                                            data[10] = mergedShipmentData[cd].realmCountryPlanningUnit.id;
+                                            data[11] = mergedShipmentData[cd].suggestedQty;
+                                            data[12] = mergedShipmentData[cd].shipmentRcpuQty;
+                                            data[13] = mergedShipmentData[cd].realmCountryPlanningUnit.multiplier;
+                                            data[14] = mergedShipmentData[cd].shipmentQty;
+                                            data[15] = mergedShipmentData[cd].currency.currencyId;
+                                            data[16] = parseFloat(mergedShipmentData[cd].rate).toFixed(2);
+                                            data[17] = parseFloat(mergedShipmentData[cd].rate).toFixed(2) * mergedShipmentData[cd].shipmentQty;
+                                            data[18] = parseFloat(mergedShipmentData[cd].freightCost).toFixed(2);
+                                            data[19] = mergedShipmentData[cd].plannedDate != "" && mergedShipmentData[cd].plannedDate != null ? moment(mergedShipmentData[cd].plannedDate).format(DATE_FORMAT_CAP) : "";
+                                            data[20] = mergedShipmentData[cd].submittedDate != "" && mergedShipmentData[cd].submittedDate != null ? moment(mergedShipmentData[cd].submittedDate).format(DATE_FORMAT_CAP) : "";
+                                            data[21] = mergedShipmentData[cd].approvedDate != "" && mergedShipmentData[cd].approvedDate != null ? moment(mergedShipmentData[cd].approvedDate).format(DATE_FORMAT_CAP) : "";
+                                            data[22] = mergedShipmentData[cd].shippedDate != "" && mergedShipmentData[cd].shippedDate != null ? moment(mergedShipmentData[cd].shippedDate).format(DATE_FORMAT_CAP) : "";
+                                            data[23] = mergedShipmentData[cd].arrivedDate != "" && mergedShipmentData[cd].arrivedDate != null ? moment(mergedShipmentData[cd].arrivedDate).format(DATE_FORMAT_CAP) : "";
+                                            data[24] = mergedShipmentData[cd].receivedDate != "" && mergedShipmentData[cd].receivedDate != null ? moment(mergedShipmentData[cd].receivedDate).format(DATE_FORMAT_CAP) : "";
+                                            data[25] = mergedShipmentData[cd].notes;
+                                            data[26] = mergedShipmentData[cd].erpFlag;
+                                            data[27] = mergedShipmentData[cd].emergencyOrder;
+                                            data[28] = mergedShipmentData[cd].accountFlag;
+                                            data[29] = mergedShipmentData[cd].active;
+                                            data[30] = mergedShipmentData[cd].localProcurement;
+                                            data[31] = JSON.stringify(mergedShipmentData[cd].batchInfoList != "" ? ((mergedShipmentData[cd].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.shipmentQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : "");
+                                            data[32] = "";
                                             var oldDataList = oldProgramDataShipment.filter(c => c.shipmentId == mergedShipmentData[cd].shipmentId);
                                             var oldData = ""
                                             if (oldDataList.length > 0) {
                                               oldData = [oldDataList[0].shipmentId, oldDataList[0].planningUnit.id, oldDataList[0].shipmentStatus.id, moment(oldDataList[0].expectedDeliveryDate).format(DATE_FORMAT_CAP), oldDataList[0].procurementAgent.id, oldDataList[0].fundingSource.id, oldDataList[0].budget.id, oldDataList[0].orderNo != "" && oldDataList[0].orderNo != null ? oldDataList[0].orderNo.toString().concat(oldDataList[0].primeLineNo != null ? "~" : "").concat(oldDataList[0].primeLineNo != null ? oldDataList[0].primeLineNo : "") : "", oldDataList[0].dataSource.id, oldDataList[0].shipmentMode == "Air" ? 2 : 1, oldDataList[0].suggestedQty, oldDataList[0].shipmentQty, oldDataList[0].currency.currencyId, parseFloat(oldDataList[0].rate).toFixed(2), parseFloat(oldDataList[0].rate).toFixed(2) * oldDataList[0].shipmentQty, parseFloat(oldDataList[0].freightCost).toFixed(2), oldDataList[0].plannedDate != "" && oldDataList[0].plannedDate != null ? moment(oldDataList[0].plannedDate).format(DATE_FORMAT_CAP) : "", oldDataList[0].submittedDate != "" && oldDataList[0].submittedDate != null ? moment(oldDataList[0].submittedDate).format(DATE_FORMAT_CAP) : "", oldDataList[0].approvedDate != "" && oldDataList[0].approvedDate != null ? moment(oldDataList[0].approvedDate).format(DATE_FORMAT_CAP) : "", oldDataList[0].shippedDate != "" && oldDataList[0].shippedDate != null ? moment(oldDataList[0].shippedDate).format(DATE_FORMAT_CAP) : "", oldDataList[0].arrivedDate != "" && oldDataList[0].arrivedDate != null ? moment(oldDataList[0].arrivedDate).format(DATE_FORMAT_CAP) : "", oldDataList[0].receivedDate != "" && oldDataList[0].receivedDate != null ? moment(oldDataList[0].receivedDate).format(DATE_FORMAT_CAP) : "", oldDataList[0].notes, oldDataList[0].erpFlag, oldDataList[0].emergencyOrder, oldDataList[0].accountFlag, oldDataList[0].active, oldDataList[0].localProcurement, JSON.stringify(oldDataList[0].batchInfoList != "" ? ((oldDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.shipmentQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
                                             }
-                                            data[30] = oldData;//Old data
+                                            data[33] = oldData;//Old data
                                             var latestDataList = latestProgramDataShipment.filter(c => c.shipmentId == mergedShipmentData[cd].shipmentId);
                                             var latestData = ""
                                             if (latestDataList.length > 0) {
                                               latestData = [latestDataList[0].shipmentId, latestDataList[0].planningUnit.id, latestDataList[0].shipmentStatus.id, moment(latestDataList[0].expectedDeliveryDate).format(DATE_FORMAT_CAP), latestDataList[0].procurementAgent.id, latestDataList[0].fundingSource.id, latestDataList[0].budget.id, latestDataList[0].orderNo != "" && latestDataList[0].orderNo != null ? latestDataList[0].orderNo.toString().concat(latestDataList[0].primeLineNo != null ? "~" : "").concat(latestDataList[0].primeLineNo != null ? latestDataList[0].primeLineNo : "") : "", latestDataList[0].dataSource.id, latestDataList[0].shipmentMode == "Air" ? 2 : 1, latestDataList[0].suggestedQty, latestDataList[0].shipmentQty, latestDataList[0].currency.currencyId, parseFloat(latestDataList[0].rate).toFixed(2), parseFloat(latestDataList[0].rate).toFixed(2) * latestDataList[0].shipmentQty, parseFloat(latestDataList[0].freightCost).toFixed(2), latestDataList[0].plannedDate != "" && latestDataList[0].plannedDate != null ? moment(latestDataList[0].plannedDate).format(DATE_FORMAT_CAP) : "", latestDataList[0].submittedDate != "" && latestDataList[0].submittedDate != null ? moment(latestDataList[0].submittedDate).format(DATE_FORMAT_CAP) : "", latestDataList[0].approvedDate != "" && latestDataList[0].approvedDate != null ? moment(latestDataList[0].approvedDate).format(DATE_FORMAT_CAP) : "", latestDataList[0].shippedDate != "" && latestDataList[0].shippedDate != null ? moment(latestDataList[0].shippedDate).format(DATE_FORMAT_CAP) : "", latestDataList[0].arrivedDate != "" && latestDataList[0].arrivedDate != null ? moment(latestDataList[0].arrivedDate).format(DATE_FORMAT_CAP) : "", latestDataList[0].receivedDate != "" && latestDataList[0].receivedDate != null ? moment(latestDataList[0].receivedDate).format(DATE_FORMAT_CAP) : "", latestDataList[0].notes, latestDataList[0].erpFlag, latestDataList[0].emergencyOrder, latestDataList[0].accountFlag, latestDataList[0].active, latestDataList[0].localProcurement, JSON.stringify(latestDataList[0].batchInfoList != "" ? ((latestDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.shipmentQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
                                             }
-                                            data[31] = latestData;//Latest data
+                                            data[34] = latestData;//Latest data
                                             var downloadedDataList = downloadedProgramDataShipment.filter(c => c.shipmentId == mergedShipmentData[cd].shipmentId);
                                             var downloadedData = "";
                                             if (downloadedDataList.length > 0) {
                                               downloadedData = [downloadedDataList[0].shipmentId, downloadedDataList[0].planningUnit.id, downloadedDataList[0].shipmentStatus.id, moment(downloadedDataList[0].expectedDeliveryDate).format(DATE_FORMAT_CAP), downloadedDataList[0].procurementAgent.id, downloadedDataList[0].fundingSource.id, downloadedDataList[0].budget.id, downloadedDataList[0].orderNo != "" && downloadedDataList[0].orderNo != null ? downloadedDataList[0].orderNo.toString().concat(downloadedDataList[0].primeLineNo != null ? "~" : "").concat(downloadedDataList[0].primeLineNo != null ? downloadedDataList[0].primeLineNo : "") : "", downloadedDataList[0].dataSource.id, downloadedDataList[0].shipmentMode == "Air" ? 2 : 1, downloadedDataList[0].suggestedQty, downloadedDataList[0].shipmentQty, downloadedDataList[0].currency.currencyId, parseFloat(downloadedDataList[0].rate).toFixed(2), parseFloat(downloadedDataList[0].rate).toFixed(2) * downloadedDataList[0].shipmentQty, parseFloat(downloadedDataList[0].freightCost).toFixed(2), downloadedDataList[0].plannedDate != "" && downloadedDataList[0].plannedDate != null ? moment(downloadedDataList[0].plannedDate).format(DATE_FORMAT_CAP) : "", downloadedDataList[0].submittedDate != "" && downloadedDataList[0].submittedDate != null ? moment(downloadedDataList[0].submittedDate).format(DATE_FORMAT_CAP) : "", downloadedDataList[0].approvedDate != "" && downloadedDataList[0].approvedDate != null ? moment(downloadedDataList[0].approvedDate).format(DATE_FORMAT_CAP) : "", downloadedDataList[0].shippedDate != "" && downloadedDataList[0].shippedDate != null ? moment(downloadedDataList[0].shippedDate).format(DATE_FORMAT_CAP) : "", downloadedDataList[0].arrivedDate != "" && downloadedDataList[0].arrivedDate != null ? moment(downloadedDataList[0].arrivedDate).format(DATE_FORMAT_CAP) : "", downloadedDataList[0].receivedDate != "" && downloadedDataList[0].receivedDate != null ? moment(downloadedDataList[0].receivedDate).format(DATE_FORMAT_CAP) : "", downloadedDataList[0].notes, downloadedDataList[0].erpFlag, downloadedDataList[0].emergencyOrder, downloadedDataList[0].accountFlag, downloadedDataList[0].active, downloadedDataList[0].localProcurement, JSON.stringify(downloadedDataList[0].batchInfoList != "" ? ((downloadedDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.shipmentQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
                                             }
-                                            data[32] = downloadedData;//Downloaded data
-                                            data[33] = 4;
+                                            data[35] = downloadedData;//Downloaded data
+                                            data[36] = 4;
                                             mergedShipmentJexcel.push(data);
                                             // }
                                           }
@@ -2404,8 +2402,11 @@ export default class syncPage extends Component {
                                               { type: 'text', title: i18n.t('static.supplyPlan.orderNoAndPrimeLineNo'), width: 150 },
                                               { type: 'dropdown', title: i18n.t('static.datasource.datasource'), source: dataSourceList, width: 150 },
                                               { type: 'dropdown', title: i18n.t("static.supplyPlan.shipmentMode"), source: [{ id: 1, name: i18n.t('static.supplyPlan.sea') }, { id: 2, name: i18n.t('static.supplyPlan.air') }], width: 100 },
+                                              { type: 'dropdown', title: i18n.t('static.supplyPlan.alternatePlanningUnit'), source: this.state.realmCountryPlanningUnitList, width: 150 },
                                               { type: 'numeric', title: i18n.t("static.shipment.suggestedQty"), width: 100, mask: '#,##' },
-                                              { type: 'numeric', title: i18n.t("static.supplyPlan.adjustesOrderQty"), width: 100, mask: '#,##' },
+                                              { type: 'numeric', title: i18n.t("static.shipment.shipmentQtyARU"), width: 100, mask: '#,##' },
+                                              { title: i18n.t('static.unit.multiplierFromARUTOPU'), type: 'numeric', mask: '#,##0.000000', decimal: '.', width: 90 },
+                                              { title: i18n.t('static.shipment.shipmentQtyPU'), type: 'numeric', mask: '#,##', width: 120 },
                                               { type: 'dropdown', title: i18n.t('static.dashboard.currency'), source: currencyList, width: 120 },
                                               { type: 'numeric', title: i18n.t('static.supplyPlan.pricePerPlanningUnit'), width: 80, mask: '#,##.00', decimal: '.' },
                                               { type: 'numeric', title: i18n.t('static.shipment.productcost'), width: 80, mask: '#,##.00', decimal: '.' },
@@ -2433,7 +2434,7 @@ export default class syncPage extends Component {
                                             paginationOptions: JEXCEL_PAGINATION_OPTION,
                                             search: true,
                                             columnSorting: true,
-                                            // tableOverflow: true,
+                                            tableOverflow: true,
                                             wordWrap: true,
                                             allowInsertColumn: false,
                                             allowManualInsertColumn: false,
@@ -2442,11 +2443,11 @@ export default class syncPage extends Component {
                                             onload: this.loadedFunctionForMergeShipment,
                                             filters: true,
                                             license: JEXCEL_PRO_KEY,
-                                            // text: {
-                                            //   showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                                            //   show: '',
-                                            //   entries: '',
-                                            // },
+                                            text: {
+                                              showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                                              show: '',
+                                              entries: '',
+                                            },
                                             contextMenu: function (obj, x, y, e) {
                                               var items = [];
                                               //Resolve conflicts
@@ -2536,10 +2537,10 @@ export default class syncPage extends Component {
                                             } else {
                                               if (latestProgramDataShipmentLinkedFiltered.length > 0) {
                                                 arr.push(latestProgramDataShipmentLinkedFiltered[latestProgramDataShipmentLinkedFiltered.length - 1].parentShipmentId);
-                                                  (latestProgramData.shipmentList.filter(c => latestProgramDataShipmentLinkedFiltered[latestProgramDataShipmentLinkedFiltered.length - 1].parentShipmentId == 0 ? c.tempParentLinkedShipmentId == latestProgramDataShipmentLinkedFiltered[latestProgramDataShipmentLinkedFiltered.length - 1].tempParentShipmentId : c.parentLinkedShipmentId == latestProgramDataShipmentLinkedFiltered[latestProgramDataShipmentLinkedFiltered.length - 1].parentShipmentId)).map(item => {
-                                                    arr.push(item.shipmentId)
+                                                (latestProgramData.shipmentList.filter(c => latestProgramDataShipmentLinkedFiltered[latestProgramDataShipmentLinkedFiltered.length - 1].parentShipmentId == 0 ? c.tempParentLinkedShipmentId == latestProgramDataShipmentLinkedFiltered[latestProgramDataShipmentLinkedFiltered.length - 1].tempParentShipmentId : c.parentLinkedShipmentId == latestProgramDataShipmentLinkedFiltered[latestProgramDataShipmentLinkedFiltered.length - 1].parentShipmentId)).map(item => {
+                                                  arr.push(item.shipmentId)
 
-                                                  })
+                                                })
                                               }
                                             }
                                             console.log("oldProgramDataShipmentLinkedFiltered@@@@@@@@", oldProgramDataShipmentLinkedFiltered)
@@ -2692,7 +2693,7 @@ export default class syncPage extends Component {
                                             paginationOptions: JEXCEL_PAGINATION_OPTION,
                                             search: true,
                                             columnSorting: true,
-                                            // tableOverflow: true,
+                                            tableOverflow: true,
                                             wordWrap: true,
                                             allowInsertColumn: false,
                                             allowManualInsertColumn: false,
@@ -2701,11 +2702,11 @@ export default class syncPage extends Component {
                                             onload: this.loadedFunctionForMergeShipmentLinked,
                                             filters: true,
                                             license: JEXCEL_PRO_KEY,
-                                            // text: {
-                                            //   showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                                            //   show: '',
-                                            //   entries: '',
-                                            // },
+                                            text: {
+                                              showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                                              show: '',
+                                              entries: '',
+                                            },
                                             contextMenu: function (obj, x, y, e) {
                                               var items = [];
                                               //Resolve conflicts
@@ -2987,8 +2988,8 @@ export default class syncPage extends Component {
   }
 
   loadedFunctionForMerge = function (instance) {
-    jExcelLoadedFunction(instance, 0);
-    var elInstance = instance.worksheets[0];
+    jExcelLoadedFunctionOld(instance, 0);
+    var elInstance = instance.jexcel;
     var jsonData = elInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R']
     elInstance.options.editable = true;
@@ -3094,8 +3095,8 @@ export default class syncPage extends Component {
 
 
   loadedFunctionForMergeInventory = function (instance) {
-    jExcelLoadedFunction(instance, 1);
-    var elInstance = instance.worksheets[0];
+    jExcelLoadedFunctionOld(instance, 1);
+    var elInstance = instance.jexcel;
     var jsonData = elInstance.getJson();
 
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S']
@@ -3305,42 +3306,45 @@ export default class syncPage extends Component {
   }
 
   loadedFunctionForMergeShipmentLinked = function (instance) {
-    jExcelLoadedFunction(instance, 3);
-    this.recursiveConflictsForShipmentLinking(instance.worksheets[0])
+    jExcelLoadedFunctionOld(instance, 3);
+    this.recursiveConflictsForShipmentLinking(instance.jexcel)
   }
 
   loadedFunctionForMergeShipment = function (instance) {
-    jExcelLoadedFunction(instance, 2);
-    var elInstance = instance.worksheets[0];
+    jExcelLoadedFunctionOld(instance, 2);
+    var elInstance = instance.jexcel;
     var jsonData = elInstance.getJson();
-    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF']
+    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI']
     elInstance.options.editable = true;
     for (var c = 0; c < jsonData.length; c++) {
-      if ((jsonData[c])[31] == "") {
+      console.log("(jsonData[c])[34] Mohit", (jsonData[c])[34] == "")
+      if ((jsonData[c])[34] == "") {
         for (var i = 0; i < colArr.length; i++) {
           var col = (colArr[i]).concat(parseInt(c) + 1);
+          console.log("Col@@@@@@", col)
           elInstance.setStyle(col, "background-color", "transparent");
           elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
-          elInstance.setValueFromCoords(33, c, 2, true);
+          elInstance.setValueFromCoords(36, c, 2, true);
         }
         this.setState({
           isChanged: true
         })
-      } else if ((jsonData[c])[30] == "") {
+      } else if ((jsonData[c])[33] == "") {
         for (var i = 0; i < colArr.length; i++) {
           var col = (colArr[i]).concat(parseInt(c) + 1);
           elInstance.setStyle(col, "background-color", "transparent");
+          console.log("Mohit above latest")
           elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
-          elInstance.setValueFromCoords(33, c, 3, true);
+          elInstance.setValueFromCoords(36, c, 3, true);
         }
         this.setState({
           isChanged: true
         })
-      } else if ((jsonData[c])[30] != "" && (jsonData[c])[31] != "" && (jsonData[c])[33] != 1) {
-        var oldData = (jsonData[c])[30];
-        var latestData = (jsonData[c])[31];
-        var downloadedData = (jsonData[c])[32];
-        for (var j = 1; j < 28; j++) {
+      } else if ((jsonData[c])[33] != "" && (jsonData[c])[34] != "" && (jsonData[c])[36] != 1) {
+        var oldData = (jsonData[c])[33];
+        var latestData = (jsonData[c])[34];
+        var downloadedData = (jsonData[c])[35];
+        for (var j = 1; j < 31; j++) {
           if ((oldData[j] == latestData[j]) || (oldData[j] == "" && latestData[j] == null) || (oldData[j] == null && latestData[j] == "")) {
             var col = (colArr[j]).concat(parseInt(c) + 1);
             elInstance.setStyle(col, "background-color", "transparent");
@@ -3348,25 +3352,26 @@ export default class syncPage extends Component {
             this.setState({
               isChanged: true
             })
-            if ((jsonData[c])[32] != "" && oldData[j] == downloadedData[j]) {
+            if ((jsonData[c])[35] != "" && oldData[j] == downloadedData[j]) {
               var col = (colArr[j]).concat(parseInt(c) + 1);
               elInstance.setValueFromCoords(j, c, latestData[j], true);
               elInstance.setStyle(col, "background-color", "transparent");
+              console.log("Mohit above latest 1")
               elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
-              elInstance.setValueFromCoords(33, c, 3, true);
-              (jsonData[c])[33] = 3;
-            } else if ((jsonData[c])[32] != "" && latestData[j] == downloadedData[j]) {
+              elInstance.setValueFromCoords(36, c, 3, true);
+              (jsonData[c])[36] = 3;
+            } else if ((jsonData[c])[35] != "" && latestData[j] == downloadedData[j]) {
               var col = (colArr[j]).concat(parseInt(c) + 1);
               elInstance.setStyle(col, "background-color", "transparent");
               elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
-              elInstance.setValueFromCoords(33, c, 2, true);
-              (jsonData[c])[33] = 2;
+              elInstance.setValueFromCoords(36, c, 2, true);
+              (jsonData[c])[36] = 2;
             } else {
               this.setState({
                 conflictsCount: this.state.conflictsCount + 1
               })
-              elInstance.setValueFromCoords(33, c, 1, true);
-              (jsonData[c])[33] = 1;
+              elInstance.setValueFromCoords(36, c, 1, true);
+              (jsonData[c])[36] = 1;
               for (var j = 0; j < colArr.length; j++) {
                 var col = (colArr[j]).concat(parseInt(c) + 1);
                 elInstance.setStyle(col, "background-color", "transparent");
@@ -3377,30 +3382,31 @@ export default class syncPage extends Component {
         }
 
         // Checking batch details
-        if ((jsonData[c])[30] != "" && (jsonData[c])[31] != "" && (jsonData[c])[33] != 1) {
-          if ((oldData[28] == latestData[28]) || (oldData[28] == "" && latestData[28] == null) || (oldData[28] == null && latestData[28] == "")) {
-            var col = (colArr[29]).concat(parseInt(c) + 1);
+        if ((jsonData[c])[33] != "" && (jsonData[c])[34] != "" && (jsonData[c])[36] != 1) {
+          if ((oldData[31] == latestData[31]) || (oldData[31] == "" && latestData[31] == null) || (oldData[31] == null && latestData[31] == "")) {
+            var col = (colArr[32]).concat(parseInt(c) + 1);
             elInstance.setStyle(col, "background-color", "transparent");
           } else {
             this.setState({
               isChanged: true
             })
-            if ((jsonData[c])[32] != "" && oldData[28] == downloadedData[28]) {
-              var col = (colArr[29]).concat(parseInt(c) + 1);
-              elInstance.setValueFromCoords(28, c, latestData[j], true);
+            if ((jsonData[c])[35] != "" && oldData[31] == downloadedData[31]) {
+              var col = (colArr[32]).concat(parseInt(c) + 1);
+              elInstance.setValueFromCoords(31, c, latestData[j], true);
               elInstance.setStyle(col, "background-color", "transparent");
+              console.log("Mohit above latest 3")
               elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
-              elInstance.setValueFromCoords(33, c, 3, true);
-            } else if ((jsonData[c])[32] != "" && latestData[28] == downloadedData[28]) {
-              var col = (colArr[29]).concat(parseInt(c) + 1);
+              elInstance.setValueFromCoords(36, c, 3, true);
+            } else if ((jsonData[c])[35] != "" && latestData[31] == downloadedData[31]) {
+              var col = (colArr[32]).concat(parseInt(c) + 1);
               elInstance.setStyle(col, "background-color", "transparent");
               elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
-              elInstance.setValueFromCoords(33, c, 2, true);
+              elInstance.setValueFromCoords(36, c, 2, true);
             } else {
               this.setState({
                 conflictsCount: this.state.conflictsCount + 1
               })
-              elInstance.setValueFromCoords(33, c, 1, true);
+              elInstance.setValueFromCoords(36, c, 1, true);
               for (var j = 0; j < colArr.length; j++) {
                 var col = (colArr[j]).concat(parseInt(c) + 1);
                 elInstance.setStyle(col, "background-color", "transparent");
@@ -3411,7 +3417,8 @@ export default class syncPage extends Component {
         }
       }
     }
-    elInstance.orderBy(33, 0);
+    elInstance.orderBy(36, 0);
+    console.log("ElInstance.getJsonMohit", elInstance.getJson(null, false))
     elInstance.options.editable = false;
   }
 
@@ -3427,8 +3434,8 @@ export default class syncPage extends Component {
   }
 
   loadedFunctionForMergeProblemList = function (instance) {
-    jExcelLoadedFunction(instance, 4);
-    var elInstance = instance.worksheets[0];
+    jExcelLoadedFunctionOld(instance, 4);
+    var elInstance = instance.jexcel;
     var jsonData = elInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T']
     elInstance.options.editable = true;
@@ -3669,11 +3676,6 @@ export default class syncPage extends Component {
   }
 
   render = () => {
-    jexcel.setDictionary({
-      Show: " ",
-      entries: " ",
-    });
-
     const { versionTypeList } = this.state;
     let versionTypes = versionTypeList.length > 0
       && versionTypeList.map((item, i) => {
@@ -5215,7 +5217,7 @@ export default class syncPage extends Component {
           paginationOptions: JEXCEL_PAGINATION_OPTION,
           search: true,
           columnSorting: true,
-          // tableOverflow: true,
+          tableOverflow: true,
           wordWrap: true,
           allowInsertColumn: false,
           allowManualInsertColumn: false,
@@ -5224,11 +5226,11 @@ export default class syncPage extends Component {
           onload: this.loadedFunctionForMergeProblemList,
           filters: true,
           license: JEXCEL_PRO_KEY,
-          // text: {
-          //   showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-          //   show: '',
-          //   entries: '',
-          // },
+          text: {
+            showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            show: '',
+            entries: '',
+          },
           contextMenu: function (obj, x, y, e) {
             var items = [];
             //Resolve conflicts
