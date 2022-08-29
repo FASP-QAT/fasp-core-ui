@@ -1256,6 +1256,7 @@
     "static.procurementUnit.labeling": "Labeling",
     "static.tree.nodeValue": "Node Value",
     "static.masterDataSync.success": "Master data synced successfully",
+    "static.programLoadedAndmasterDataSync.success":"Program loaded and master data sync successfully",
     "static.dataValidation.treeNotes": "Tree Notes",
     "static.compareAndSelect.forecastError": "Forecast Error (%)",
     "static.pipeline.productToPlanningUnit": "PipeLine product to Planning Unit",
