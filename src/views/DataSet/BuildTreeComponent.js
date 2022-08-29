@@ -10004,8 +10004,8 @@ export default class BuildTree extends Component {
 
                 <div className="ContactTemplate boxContactTemplate" title={itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined ? itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].notes : ''}>
                     <div className={itemConfig.payload.nodeType.id == 5
-                        || itemConfig.payload.nodeType.id == 4 ? "ContactTitleBackground TemplateTitleBgblue" :
-                        "ContactTitleBackground TemplateTitleBg"}
+                        || itemConfig.payload.nodeType.id == 4 ? (itemConfig.payload.label.label_en.length<=20?"ContactTitleBackground TemplateTitleBgblueSingle":"ContactTitleBackground TemplateTitleBgblue") :
+                        (itemConfig.payload.label.label_en.length<=20?"ContactTitleBackground TemplateTitleBgSingle":"ContactTitleBackground TemplateTitleBg")}
                     >
                         <div className={itemConfig.payload.nodeType.id == 5 ||
                             itemConfig.payload.nodeType.id == 4 ? "ContactTitle TitleColorWhite" :

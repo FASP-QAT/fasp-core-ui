@@ -8869,8 +8869,12 @@ export default class CreateTreeTemplate extends Component {
             return connectDropTarget(connectDragSource(
                 // <div className="ContactTemplate " style={{ opacity, backgroundColor: Colors.White, borderColor: Colors.Black }}>
                 <div className="ContactTemplate boxContactTemplate" title={itemConfig.payload.nodeDataMap[0][0].notes}>
-                    <div className={itemConfig.payload.nodeType.id == 5 || itemConfig.payload.nodeType.id == 4 ? "ContactTitleBackground TemplateTitleBgblue" : "ContactTitleBackground TemplateTitleBg"}
+                     <div className={itemConfig.payload.nodeType.id == 5
+                        || itemConfig.payload.nodeType.id == 4 ? (itemConfig.payload.label.label_en.length<=20?"ContactTitleBackground TemplateTitleBgblueSingle":"ContactTitleBackground TemplateTitleBgblue") :
+                        (itemConfig.payload.label.label_en.length<=20?"ContactTitleBackground TemplateTitleBgSingle":"ContactTitleBackground TemplateTitleBg")}
                     >
+                    {/* <div className={itemConfig.payload.nodeType.id == 5 || itemConfig.payload.nodeType.id == 4 ? "ContactTitleBackground TemplateTitleBgblue" : "ContactTitleBackground TemplateTitleBg"}
+                    > */}
                         <div className={itemConfig.payload.nodeType.id == 5 || itemConfig.payload.nodeType.id == 4 ? "ContactTitle TitleColorWhite" : "ContactTitle TitleColor"}>
                             {/* <div title={itemConfig.payload.label.label_en} style={{ fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '137px', float: 'left', fontWeight: 'bold' }}>{itemConfig.payload.label.label_en}</div> */}
                             <div title={itemConfig.payload.label.label_en} style={{overflowWrap:'break-word',wordWrap:'break-word',hyphens:'auto',whiteSpace:'pre-line',fontSize:'12px',fontWeight:'bold',float:'left',width:'138px'}}>{itemConfig.payload.label.label_en}</div>
