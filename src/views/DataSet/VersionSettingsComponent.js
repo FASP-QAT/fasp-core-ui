@@ -1596,10 +1596,10 @@ class VersionSettingsComponent extends Component {
                         <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
                     </ModalHeader>
                     <div>
-                        <ModalBody>
-                        <div dangerouslySetInnerHTML={ {__html: showguidance} } />
+                        <ModalBody className="ModalBodyPadding">
+                        {/* <div dangerouslySetInnerHTML={ {__html: showguidance} } /> */}
                        
-                           {/* <div>
+                            <div>
                                <h3 className='ShowGuidanceHeading'>{i18n.t('static.UpdateversionSettings.UpdateversionSettings')}</h3>
                            </div>
                             <p>
@@ -1629,7 +1629,7 @@ class VersionSettingsComponent extends Component {
                                 </ol>
                                 </li>
                             </ol>
-                            </p> */}
+                            </p> 
                         </ModalBody>
                     </div>
                 </Modal>
