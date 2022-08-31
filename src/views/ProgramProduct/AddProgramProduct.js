@@ -15,6 +15,8 @@ import { JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_INTEGER_
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { Prompt } from 'react-router';
+
 const entityname = i18n.t('static.dashboard.programPlanningUnit');
 
 
@@ -47,6 +49,7 @@ class AddprogramPlanningUnit extends Component {
             batchNoRequired: false,
             localProcurementLeadTime: '',
             isValidData: true,
+            isChanged: false,
             loading: true,
             productCategoryList: [],
             programs: [],
@@ -1446,7 +1449,7 @@ class AddprogramPlanningUnit extends Component {
         if (x != 11) {
             this.el.setValueFromCoords(11, y, 1, true);
         }
-        this.setState({ isValidData: valid });
+        this.setState({ isValidData: valid, isChanged: true });
     }
 
 
@@ -1500,7 +1503,7 @@ class AddprogramPlanningUnit extends Component {
                 .then(response => {
                     if (response.status == "200") {
                         this.setState({
-                            message: i18n.t('static.message.planningUnitUpdate'), loading: false, color: 'green'
+                            message: i18n.t('static.message.planningUnitUpdate'), loading: false, color: 'green', isChanged: false
                         },
                             () => {
                                 this.hideSecondComponent();
@@ -1606,6 +1609,10 @@ class AddprogramPlanningUnit extends Component {
             }, this);
         return (
             <div className="animated fadeIn">
+                <Prompt
+                    when={this.state.isChanged == true}
+                    message={i18n.t("static.dataentry.confirmmsg")}
+                />
                 <AuthenticationServiceComponent history={this.props.history} />
                 {/* <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5> */}
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
@@ -1675,7 +1682,7 @@ class AddprogramPlanningUnit extends Component {
                             <FormGroup>
                                 {this.state.isValidData && this.state.programId != 0 && <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>}
                                 &nbsp;
-                                {this.state.isValidData && this.state.programId != 0 && <Button type="submit" size="md" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
+                                {this.state.isChanged && this.state.isValidData && this.state.programId != 0 && <Button type="submit" size="md" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
                                 &nbsp;
                                 {this.state.isValidData && this.state.programId != 0 && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.addRowInJexcel}> {i18n.t('static.common.addRow')}</Button>}
                                 &nbsp;
