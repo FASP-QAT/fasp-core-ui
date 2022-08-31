@@ -2555,7 +2555,7 @@
     "static.supplyPlanFormula.openingBalanceEx3": "Saldo inicial para el mes actual",
     "static.extrapolation.missingDataNotePart1": "Tiene meses sin datos de consumo real, lo que provocará resultados inesperados en la extrapolación. Volver a la ",
     "static.conversion.ConversionFactorFUPU": "Factor de conversión (FU: PU)",
-    "static.report.expectedReceiveddate": "Fecha esperada de recepción ",
+    "static.report.expectedReceiveddate": "Fecha de recepción",
     "static.message.user.accountUnlocked": "Cuenta desbloqueada con éxito. Se ha enviado una nueva contraseña a la dirección de correo electrónico registrada",
     "static.consumption.consumptionFlag": "Marcador de consumo",
     "static.dataentry.conversionToFu": "Conversión a FU",
