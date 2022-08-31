@@ -1063,7 +1063,7 @@ export default class ConsumptionDetails extends React.Component {
         if (e.buttons == 1) {
 
             // console.log("y+++", y);
-            if (y == 5 || y == 7 || y == 8 || y == 9) {
+            if ((this.el.getValueFromCoords(22, x) == 1) && (y == 5 || y == 7 || y == 8 || y == 9)) {
                 if ((x == 0 && value != 0) || (y == 0)) {
                     // console.log("HEADER SELECTION--------------------------");
                 } else {
