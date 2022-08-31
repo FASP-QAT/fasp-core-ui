@@ -2585,7 +2585,7 @@
     "static.supplyPlanFormula.openingBalanceEx3": "Solde d`ouverture du mois en cours",
     "static.extrapolation.missingDataNotePart1": "Vous avez des mois sans données de consommation réelle, ce qui entraînera des résultats inattendus dans l`extrapolation. Retourner à ",
     "static.conversion.ConversionFactorFUPU": "Facteur de conversion (UPr:UP)",
-    "static.report.expectedReceiveddate": "Date de réception prévue",
+    "static.report.expectedReceiveddate": "date de réception",
     "static.message.user.accountUnlocked": "Compte déverrouillé avec succès. Le nouveau mot de passe a été envoyé à l`adresse e-mail enregistrée",
     "static.consumption.consumptionFlag": "Marque sur la consommation",
     "static.dataentry.conversionToFu": "Conversion en UPr",
