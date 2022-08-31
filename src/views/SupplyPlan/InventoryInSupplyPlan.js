@@ -1399,7 +1399,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     this.props.toggleLarge("submit");
                 }
                 // elInstance.destroy();
-                jexcel.destroy(document.getElementById("tableDiv"), true);
+                jexcel.destroy(document.getElementById("inventoryBatchInfoTable"), true);
             }
             this.props.updateState("loading", false);
 
