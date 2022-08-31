@@ -2584,7 +2584,7 @@
     "static.supplyPlanFormula.openingBalanceEx3": "Opening Balance for current month",
     "static.extrapolation.missingDataNotePart1": "You have months with no actual consumption data, which will cause unexpected results in the extrapolation. Return to the ",
     "static.conversion.ConversionFactorFUPU": "Conversion Factor (FU:PU)",
-    "static.report.expectedReceiveddate": "Expected Receive Date",
+    "static.report.expectedReceiveddate": "Receive Date",
     "static.message.user.accountUnlocked": "Account unlocked successfully. A new password has been sent to the registered email address",
     "static.consumption.consumptionFlag": "Consumption Flag",
     "static.dataentry.conversionToFu": "Conversion to FU",

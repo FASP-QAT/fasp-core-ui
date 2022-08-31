@@ -407,7 +407,7 @@ export default class DatabaseTranslations extends React.Component {
     }.bind(this)
 
     editStart = function (instance, cell, x, y, value) {
-        var elInstance = instance.jexcel;
+        var elInstance = instance;
         elInstance.setValueFromCoords(2, y, 1, true);
     }.bind(this)
 }
