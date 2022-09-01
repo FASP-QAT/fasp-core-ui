@@ -693,10 +693,10 @@ export default class ManualTagging extends Component {
             if (rowData[21] == 0) {
 
 
-                var col = ("L").concat(parseInt(y) + 1);
+                var col = ("K").concat(parseInt(y) + 1);
                 if (this.state.languageEl.getValueFromCoords(0, y)) {
                     var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
-                    var value = this.state.languageEl.getValue(`L${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                    var value = this.state.languageEl.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                     value = value.replace(/,/g, "");
                     if (value == "") {
                         this.state.languageEl.setStyle(col, "background-color", "transparent");
@@ -717,8 +717,8 @@ export default class ManualTagging extends Component {
 
                     }
 
-                    var col = ("J").concat(parseInt(y) + 1);
-                    value = this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                    var col = ("I").concat(parseInt(y) + 1);
+                    value = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                     if (value == "") {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
@@ -732,10 +732,10 @@ export default class ManualTagging extends Component {
                         this.el.setComments(col, "");
                     }
                 } else {
-                    var col = ("L").concat(parseInt(y) + 1);
+                    var col = ("K").concat(parseInt(y) + 1);
                     this.state.languageEl.setStyle(col, "background-color", "transparent");
                     this.state.languageEl.setComments(col, "");
-                    var col = ("J").concat(parseInt(y) + 1);
+                    var col = ("I").concat(parseInt(y) + 1);
                     this.state.languageEl.setStyle(col, "background-color", "transparent");
                     this.state.languageEl.setComments(col, "");
                 }
@@ -830,7 +830,7 @@ export default class ManualTagging extends Component {
                     }
                 } else {
                     for (var j = 0; j < json.length; j++) {
-                        this.el.setValueFromCoords(11, j, this.el.getValueFromCoords(24, j), true);
+                        this.el.setValueFromCoords(10, j, this.el.getValueFromCoords(24, j), true);
                         this.el.setValueFromCoords(13, j, this.el.getValueFromCoords(25, j), true);
                         if (j != y && json[j][29] == this.el.getValueFromCoords(29, y, true)) {
                             this.el.setValueFromCoords(0, j, false, true);
@@ -840,13 +840,10 @@ export default class ManualTagging extends Component {
             }
         }
         if (rowData[21] == 0) {
-            if (x == 11) {
-                var col = ("L").concat(parseInt(y) + 1);
-                value = this.el.getValue(`L${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            if (x == 10) {
+                var col = ("K").concat(parseInt(y) + 1);
+                value = this.el.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
-                console.log("x@@@@@@@@@@@@", x)
-                console.log("y@@@@@@@@@@@@", y)
-                console.log("Value@@@@@@@@@@@@", value)
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
@@ -862,21 +859,21 @@ export default class ManualTagging extends Component {
                         this.el.setComments(col, "");
                         this.el.setComments(col, "");
                         var json = this.el.getJson(null, false);
-                        this.el.setValueFromCoords(12, y, Math.round(this.el.getValueFromCoords(32, y) * this.el.getValueFromCoords(31, y) * this.el.getValueFromCoords(11, y)), true);
+                        this.el.setValueFromCoords(11, y, Math.round(this.el.getValueFromCoords(32, y) * this.el.getValueFromCoords(31, y) * this.el.getValueFromCoords(10, y)), true);
                         // var checkboxValue = this.el.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                         for (var j = 0; j < json.length; j++) {
                             if (j != y && json[j][22] == this.el.getValueFromCoords(22, y, true)) {
-                                this.el.setValueFromCoords(12, j, Math.round(this.el.getValueFromCoords(32, j) * this.el.getValueFromCoords(31, j) * this.el.getValueFromCoords(11, j)), true);
-                                this.el.setValueFromCoords(11, j, value, true);
+                                this.el.setValueFromCoords(11, j, Math.round(this.el.getValueFromCoords(32, j) * this.el.getValueFromCoords(31, j) * this.el.getValueFromCoords(10, j)), true);
+                                this.el.setValueFromCoords(10, j, value, true);
                             }
                         }
                     }
                 }
             }
 
-            if (x == 9) {
-                var col = ("J").concat(parseInt(y) + 1);
-                value = this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            if (x == 8) {
+                var col = ("I").concat(parseInt(y) + 1);
+                value = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
@@ -888,16 +885,16 @@ export default class ManualTagging extends Component {
                     this.el.setComments(col, "");
                     this.el.setComments(col, "");
                     var json = this.el.getJson(null, false);
-                    var rcpu = this.state.realmCountryPlanningUnitList.filter(c => c.id == this.el.getValueFromCoords(9, y))[0];
+                    var rcpu = this.state.realmCountryPlanningUnitList.filter(c => c.id == this.el.getValueFromCoords(8, y))[0];
 
-                    this.el.setValueFromCoords(12, y, Math.round(this.el.getValueFromCoords(32, y) * rcpu.multiplier * this.el.getValueFromCoords(11, y)), true);
+                    this.el.setValueFromCoords(11, y, Math.round(this.el.getValueFromCoords(32, y) * rcpu.multiplier * this.el.getValueFromCoords(10, y)), true);
                     this.el.setValueFromCoords(31, y, rcpu.multiplier, true);
                     // var checkboxValue = this.el.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                     for (var j = 0; j < json.length; j++) {
                         if (j != y && json[j][22] == this.el.getValueFromCoords(22, y, true)) {
-                            this.el.setValueFromCoords(12, j, Math.round(this.el.getValueFromCoords(32, j) * rcpu.multiplier * this.el.getValueFromCoords(11, j)), true);
+                            this.el.setValueFromCoords(11, j, Math.round(this.el.getValueFromCoords(32, j) * rcpu.multiplier * this.el.getValueFromCoords(10, j)), true);
                             this.el.setValueFromCoords(31, j, rcpu.multiplier, true);
-                            this.el.setValueFromCoords(9, j, value, true);
+                            this.el.setValueFromCoords(8, j, value, true);
                         }
                     }
                 }
@@ -1913,18 +1910,15 @@ export default class ManualTagging extends Component {
                             if (modifiedDataFilter[mdf][0] == true && modifiedDataFilter[mdf][23] == 1 && modifiedDataFilter[mdf][17].planningUnit.id == planningUnitId) {
                                 var linkedShipmentsListIndex = linkedShipmentsList.findIndex(c => (modifiedDataFilter[mdf][17].shipmentId > 0 ? modifiedDataFilter[mdf][17].shipmentId == c.childShipmentId : modifiedDataFilter[mdf][17].tempShipmentId == c.tempChildShipmentId) && c.active.toString() == "true");
                                 var linkedShipmentsListFilter = linkedShipmentsList.filter(c => (modifiedDataFilter[ss][17].shipmentId > 0 ? modifiedDataFilter[mdf][17].shipmentId == c.childShipmentId : modifiedDataFilter[mdf][17].tempShipmentId == c.tempChildShipmentId) && c.active.toString() == "true");
-                                linkedShipmentsList[linkedShipmentsListIndex].conversionFactor = Number(this.state.languageEl.getValue(`L${parseInt(mdf) + 1}`, true).toString().replaceAll("\,", ""));
+                                linkedShipmentsList[linkedShipmentsListIndex].conversionFactor = Number(this.state.languageEl.getValue(`K${parseInt(mdf) + 1}`, true).toString().replaceAll("\,", ""));
                                 linkedShipmentsList[linkedShipmentsListIndex].lastModifiedBy.userId = curUser;
                                 linkedShipmentsList[linkedShipmentsListIndex].lastModifiedBy.username = username;
                                 linkedShipmentsList[linkedShipmentsListIndex].lastModifiedDate = curDate;
                                 var shipmentIndex = shipmentList.findIndex(c => modifiedDataFilter[ss][17].shipmentId > 0 ? c.shipmentId == modifiedDataFilter[mdf][17].shipmentId : c.tempShipmentId == modifiedDataFilter[mdf][17].tempShipmentId);
-                                var rcpu = this.state.realmCountryPlanningUnitList.filter(c => c.id == this.state.languageEl.getValueFromCoords(9, mdf))[0];
-                                console.log("Conversion factorMohit@@@@@@@@@@@@@@@@@", Number(this.state.languageEl.getValue(`L${parseInt(mdf) + 1}`, true).toString().replaceAll("\,", "")));
-                                console.log("QtyMohit@@@@@@@@@@@@@@@@@", Number(this.state.languageEl.getValue(`AG${parseInt(mdf) + 1}`, true).toString().replaceAll("\,", "")));
-                                console.log("MultiplierMohit@@@@@@@@@@@@@@@@@", Number(this.state.languageEl.getValue(`AF${parseInt(mdf) + 1}`, true).toString().replaceAll("\,", "")));
+                                var rcpu = this.state.realmCountryPlanningUnitList.filter(c => c.id == this.state.languageEl.getValueFromCoords(8, mdf))[0];
                                 shipmentList[shipmentIndex].notes = this.state.languageEl.getValue(`N${parseInt(mdf) + 1}`, true);
-                                shipmentList[shipmentIndex].shipmentQty = Math.round(Number(this.state.languageEl.getValue(`L${parseInt(mdf) + 1}`, true).toString().replaceAll("\,", "")) * Number(this.state.languageEl.getValue(`AG${parseInt(mdf) + 1}`, true).toString().replaceAll("\,", "")) * Number(this.state.languageEl.getValue(`AF${parseInt(mdf) + 1}`, true).toString().replaceAll("\,", "")));
-                                shipmentList[shipmentIndex].shipmentRcpuQty = Math.round(Number(this.state.languageEl.getValue(`L${parseInt(mdf) + 1}`, true).toString().replaceAll("\,", "")) * Number(this.state.languageEl.getValue(`AG${parseInt(mdf) + 1}`, true).toString().replaceAll("\,", "")));
+                                shipmentList[shipmentIndex].shipmentQty = Math.round(Number(this.state.languageEl.getValue(`K${parseInt(mdf) + 1}`, true).toString().replaceAll("\,", "")) * Number(this.state.languageEl.getValue(`AG${parseInt(mdf) + 1}`, true).toString().replaceAll("\,", "")) * Number(this.state.languageEl.getValue(`AF${parseInt(mdf) + 1}`, true).toString().replaceAll("\,", "")));
+                                shipmentList[shipmentIndex].shipmentRcpuQty = Math.round(Number(this.state.languageEl.getValue(`K${parseInt(mdf) + 1}`, true).toString().replaceAll("\,", "")) * Number(this.state.languageEl.getValue(`AG${parseInt(mdf) + 1}`, true).toString().replaceAll("\,", "")));
                                 shipmentList[shipmentIndex].realmCountryPlanningUnit = {
                                     id: rcpu.id,
                                     label: rcpu.label,
@@ -1933,14 +1927,11 @@ export default class ManualTagging extends Component {
 
                                 var batchInfoList = shipmentList[shipmentIndex].batchInfoList;
                                 var batchInfoListOriginal = this.state.languageEl.getValueFromCoords(26, mdf).batchDetailsList;
-                                console.log("BatchNoOriginalMohit@@@@@@@@@@@@@@@@=====================>", batchInfoListOriginal);
-                                console.log("VatchNoMohit@@@@@@@@@@@@@@@@=====================>", batchInfoList);
-                                console.log("MultiplierMohit@@@@@@@@@@@@", this.state.languageEl.getValue(`L${parseInt(mdf) + 1}`, true).toString().replaceAll("\,", ""))
                                 for (var bi = 0; bi < batchInfoList.length; bi++) {
 
                                     var batchInfoListOriginalFilter = batchInfoListOriginal.filter(c => c.batchNo == batchInfoList[bi].batch.batchNo);
                                     if (batchInfoListOriginalFilter.length > 0) {
-                                        batchInfoList[bi].shipmentQty = Math.round(batchInfoListOriginalFilter[0].quantity * this.state.languageEl.getValue(`L${parseInt(mdf) + 1}`, true).toString().replaceAll("\,", ""));
+                                        batchInfoList[bi].shipmentQty = Math.round(batchInfoListOriginalFilter[0].quantity * this.state.languageEl.getValue(`K${parseInt(mdf) + 1}`, true).toString().replaceAll("\,", ""));
                                     }
 
                                 }
@@ -3846,15 +3837,15 @@ export default class ManualTagging extends Component {
                     data[2] = !this.state.versionId.toString().includes("Local") ? manualTaggingList[j].childShipmentId : manualTaggingList[j].shipmentId
                     data[3] = (linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].roNo + " - " + linkedShipmentsListForTab2[0].roPrimeLineNo : "") + " | " + (manualTaggingList[j].orderNo + " - " + manualTaggingList[j].primeLineNo) + (linkedShipmentsListForTab2.length > 0 && linkedShipmentsListForTab2[0].knShipmentNo != "" && linkedShipmentsListForTab2[0].knShipmentNo != null ? " | " + linkedShipmentsListForTab2[0].knShipmentNo : "");
                     data[4] = manualTaggingList[j].orderNo + " | " + manualTaggingList[j].primeLineNo
-                    data[5] = linkedShipmentsListForTab2.length > 0 ? getLabelText(linkedShipmentsListForTab2[0].erpPlanningUnit.label, this.state.lang) : ""
-                    data[6] = !this.state.versionId.toString().includes("Local") ? getLabelText(manualTaggingList[j].qatPlanningUnit.label, this.state.lang) : getLabelText(manualTaggingList[j].planningUnit.label, this.state.lang)
-                    data[7] = manualTaggingList[j].expectedDeliveryDate
-                    data[8] = linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].erpShipmentStatus : ""
+                    data[7] = linkedShipmentsListForTab2.length > 0 ? getLabelText(linkedShipmentsListForTab2[0].erpPlanningUnit.label, this.state.lang) : ""
+                    data[12] = !this.state.versionId.toString().includes("Local") ? getLabelText(manualTaggingList[j].qatPlanningUnit.label, this.state.lang) : getLabelText(manualTaggingList[j].planningUnit.label, this.state.lang)
+                    data[5] = manualTaggingList[j].expectedDeliveryDate
+                    data[6] = linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].erpShipmentStatus : ""
                     // data[7] = ""
-                    data[9] = !this.state.versionId.toString().includes("Local") ? getLabelText(manualTaggingList[j].qatRealmCountryPlanningUnit.label, this.state.lang) : getLabelText(manualTaggingList[j].realmCountryPlanningUnit.label, this.state.lang)
-                    data[10] = !this.state.versionId.toString().includes("Local") ? Math.round((shipmentQty)) : Math.round((shipmentQty) / (linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].conversionFactor : 1) / (!this.state.versionId.toString().includes("Local") ? manualTaggingList[j].qatRealmCountryPlanningUnit.multiplier : manualTaggingList[j].realmCountryPlanningUnit.multiplier))
-                    data[11] = linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].conversionFactor : 1
-                    data[12] = `=ROUND(AG${parseInt(j) + 1}*L${parseInt(j) + 1}*AF${parseInt(j) + 1},0)`;
+                    data[8] = !this.state.versionId.toString().includes("Local") ? getLabelText(manualTaggingList[j].qatRealmCountryPlanningUnit.label, this.state.lang) : getLabelText(manualTaggingList[j].realmCountryPlanningUnit.label, this.state.lang)
+                    data[9] = !this.state.versionId.toString().includes("Local") ? Math.round((shipmentQty)) : Math.round((shipmentQty) / (linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].conversionFactor : 1) / (!this.state.versionId.toString().includes("Local") ? manualTaggingList[j].qatRealmCountryPlanningUnit.multiplier : manualTaggingList[j].realmCountryPlanningUnit.multiplier))
+                    data[10] = linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].conversionFactor : 1
+                    data[11] = `=ROUND(AG${parseInt(j) + 1}*K${parseInt(j) + 1}*AF${parseInt(j) + 1},0)`;
                     data[13] = manualTaggingList[j].notes
                     data[14] = manualTaggingList[j].orderNo
                     data[15] = manualTaggingList[j].primeLineNo
@@ -4034,18 +4025,6 @@ export default class ManualTagging extends Component {
                             width: 0,
                         },
                         {
-                            title: i18n.t('static.manualTagging.erpPlanningUnit'),
-                            type: 'text',
-                            readOnly: true,
-                            width: 150,
-                        },
-                        {
-                            title: i18n.t('static.supplyPlan.qatProduct'),
-                            type: 'text',
-                            readOnly: true,
-                            width: 150,
-                        },
-                        {
                             title: i18n.t('static.manualTagging.currentEstimetedDeliveryDate'),
                             type: 'calendar',
                             options: { format: JEXCEL_DATE_FORMAT },
@@ -4059,14 +4038,20 @@ export default class ManualTagging extends Component {
                             width: 80,
                         },
                         {
-                            title: i18n.t('static.manualTagging.aru'),
+                            title: i18n.t('static.manualTagging.erpProduct'),
+                            type: 'text',
+                            readOnly: true,
+                            width: 150,
+                        },
+                        {
+                            title: i18n.t('static.supplyPlan.alternatePlanningUnit'),
                             type: 'dropdown',
                             source: rcpuList,
                             width: 150,
                             filter: this.filterRealmCountryPlanningUnit
                         },
                         {
-                            title: i18n.t('static.supplyPlan.qty'),
+                            title: i18n.t('static.manualTagging.erpQty'),
                             type: 'numeric',
                             mask: '#,##', decimal: '.',
                             readOnly: true,
@@ -4079,7 +4064,6 @@ export default class ManualTagging extends Component {
                             width: 60,
                             // readOnly: true
                         },
-
                         {
                             title: i18n.t('static.manualTagging.convertedQATShipmentQty'),
                             type: 'numeric',
@@ -4087,7 +4071,12 @@ export default class ManualTagging extends Component {
                             readOnly: true,
                             width: 60,
                         },
-
+                        {
+                            title: i18n.t('static.supplyPlan.qatProduct'),
+                            type: 'text',
+                            readOnly: true,
+                            width: 150,
+                        },
                         {
                             title: i18n.t('static.common.notes'),
                             type: 'text',
@@ -4231,34 +4220,34 @@ export default class ManualTagging extends Component {
                                 cell.classList.add('readonly');
                             }
                             if (rowData[21] == 1 || !this.state.versionId.toString().includes("Local")) {
-                                var cell = elInstance.getCell(("J").concat(parseInt(y) + 1))
+                                var cell = elInstance.getCell(("I").concat(parseInt(y) + 1))
                                 cell.classList.add('readonly');
                                 var cell = elInstance.getCell(("N").concat(parseInt(y) + 1))
                                 cell.classList.add('readonly');
-                                var cell = elInstance.getCell(("L").concat(parseInt(y) + 1))
+                                var cell = elInstance.getCell(("K").concat(parseInt(y) + 1))
                                 cell.classList.add('readonly');
                                 if (rowData[0] == false) {
-                                    var cell = elInstance.getCell(("J").concat(parseInt(y) + 1))
+                                    var cell = elInstance.getCell(("I").concat(parseInt(y) + 1))
                                     cell.classList.add('readonly');
                                     var cell = elInstance.getCell(("N").concat(parseInt(y) + 1))
                                     cell.classList.add('readonly');
-                                    var cell = elInstance.getCell(("L").concat(parseInt(y) + 1))
+                                    var cell = elInstance.getCell(("K").concat(parseInt(y) + 1))
                                     cell.classList.add('readonly');
                                 }
                             } else {
                                 if (rowData[0] == false) {
-                                    var cell = elInstance.getCell(("J").concat(parseInt(y) + 1))
+                                    var cell = elInstance.getCell(("I").concat(parseInt(y) + 1))
                                     cell.classList.add('readonly');
                                     var cell = elInstance.getCell(("N").concat(parseInt(y) + 1))
                                     cell.classList.add('readonly');
-                                    var cell = elInstance.getCell(("L").concat(parseInt(y) + 1))
+                                    var cell = elInstance.getCell(("K").concat(parseInt(y) + 1))
                                     cell.classList.add('readonly');
                                 } else {
-                                    var cell = elInstance.getCell(("J").concat(parseInt(y) + 1))
+                                    var cell = elInstance.getCell(("I").concat(parseInt(y) + 1))
                                     cell.classList.remove('readonly');
                                     var cell = elInstance.getCell(("N").concat(parseInt(y) + 1))
                                     cell.classList.remove('readonly');
-                                    var cell = elInstance.getCell(("L").concat(parseInt(y) + 1))
+                                    var cell = elInstance.getCell(("K").concat(parseInt(y) + 1))
                                     cell.classList.remove('readonly');
                                 }
                             }
