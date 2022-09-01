@@ -763,8 +763,8 @@ export default class ShipmentLinkingNotifications extends Component {
             data[8] = manualTaggingList[j].expectedDeliveryDate
             data[9] = manualTaggingList[j].erpShipmentStatus
             data[10] = Math.round((manualTaggingList[j].shipmentQty) / (manualTaggingList[j].conversionFactor) / manualTaggingList[j].realmCountryPlanningUnit.multiplier)
-            data[11] = manualTaggingList[j].conversionFactor
-            data[12] = `=ROUND(K${parseInt(j) + 1}*L${parseInt(j) + 1}*${manualTaggingList[j].realmCountryPlanningUnit.multiplier},0)`;
+            data[11] = manualTaggingList[j].realmCountryPlanningUnit.multiplier
+            data[12] = `=ROUND(K${parseInt(j) + 1}*L${parseInt(j) + 1},0)`;
             data[13] = manualTaggingList[j].notes
             data[14] = this.state.roPrimeNoListOriginal.filter(c => c.roNo == manualTaggingList[j].roNo && c.roPrimeLineNo == manualTaggingList[j].roPrimeLineNo)[0];
             data[15] = manualTaggingList[j].notificationId;
@@ -850,7 +850,7 @@ export default class ShipmentLinkingNotifications extends Component {
                     readOnly: true
                 },
                 {
-                    title: i18n.t('static.manualTagging.conversionFactor'),
+                    title: i18n.t('static.manualTagging.conversionERPToPU'),
                     type: 'numeric',
                     mask: '#,##0.0000', decimal: '.',
                     readOnly: true
