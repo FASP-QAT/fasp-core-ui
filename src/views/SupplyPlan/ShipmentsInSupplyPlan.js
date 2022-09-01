@@ -1714,7 +1714,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     }
                 },
                 {
-                    title: i18n.t('static.supplyPlan.shipmentQty'),
+                    title: i18n.t('static.supplyPlan.quantityCountryProduct'),
                     type: 'numeric',
                     textEditor: true,
                     disabledMaskOnEdition: true,
