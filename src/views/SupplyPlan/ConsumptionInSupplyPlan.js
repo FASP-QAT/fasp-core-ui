@@ -34,7 +34,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         this.onPasteForBatchInfo = this.onPasteForBatchInfo.bind(this);
         this.oneditionend = this.oneditionend.bind(this);
         this.batchDetailsClicked = this.batchDetailsClicked.bind(this);
-        this.formulaChanged=this.formulaChanged.bind(this)
+        this.formulaChanged = this.formulaChanged.bind(this)
         this.state = {
             consumptionEl: "",
             consumptionBatchInfoTableEl: ""
@@ -322,9 +322,9 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                             { title: i18n.t('static.inventory.dataSource'), type: 'dropdown', source: dataSourceList, width: 120, filter: this.filterDataSourceBasedOnConsumptionType },
                             { title: i18n.t('static.supplyPlan.alternatePlanningUnit'), type: 'dropdown', source: realmCountryPlanningUnitList, filter: this.filterRealmCountryPlanningUnit, width: 150 },
                             { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: 'numeric', textEditor: true, mask: '#,##', decimal: '.', textEditor: true, disabledMaskOnEdition: true, width: 120, },
-                            { title: i18n.t('static.unit.multiplierFromARUTOPU'), type: 'numeric', mask: '#,##0.000000', decimal: '.', width: 90, readOnly: true },
-                            { title: i18n.t('static.supplyPlan.quantityPU'), type: 'numeric', mask: '#,##.00', decimal: '.', width: 120, readOnly: true },
-                            { title: i18n.t('static.consumption.daysofstockout'), type: 'numeric', mask: '#,##', decimal: '.', disabledMaskOnEdition: true, textEditor: true, width: 80 },
+                            { title: i18n.t('static.unit.multiplierFromARUTOPU'), type: 'numeric', mask: '#,##0', width: 90, readOnly: true },
+                            { title: i18n.t('static.supplyPlan.quantityPU'), type: 'numeric', mask: '#,##', width: 120, readOnly: true },
+                            { title: i18n.t('static.consumption.daysofstockout'), type: 'numeric', mask: '#,##', disabledMaskOnEdition: true, textEditor: true, width: 80 },
                             { title: i18n.t('static.program.notes'), type: 'text', width: 400 },
                             { title: i18n.t('static.inventory.active'), type: 'checkbox', width: 100, readOnly: !consumptionEditable },
                             { type: 'hidden', title: i18n.t('static.supplyPlan.batchInfo'), width: 0 },
@@ -334,7 +334,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                             { type: 'hidden', width: 0 }
                         ],
                         pagination: paginationOption,
-                        onformulachain:this.formulaChanged,
+                        onformulachain: this.formulaChanged,
                         paginationOptions: paginationArray,
                         search: searchOption,
                         columnSorting: true,
@@ -867,10 +867,10 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         });
     }.bind(this);
 
-    formulaChanged  = function (instance, executions) {
-        var executions=executions;
-        for(var e=0;e<executions.length;e++){
-            this.consumptionChanged(instance,executions[e].cell,executions[e].x,executions[e].y,executions[e].v)
+    formulaChanged = function (instance, executions) {
+        var executions = executions;
+        for (var e = 0; e < executions.length; e++) {
+            this.consumptionChanged(instance, executions[e].cell, executions[e].x, executions[e].y, executions[e].v)
         }
     }
 
