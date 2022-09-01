@@ -2801,5 +2801,7 @@
     "static.manualTagging.aruQty":"ARU Qty",
     "static.manualTagging.conversionARUToPU":"Conversion (ARU to PU)",
     "static.manualTagging.qtyPU":"Qty (PU)",
-    "static.manualTagging.aru":"ARU"
+    "static.manualTagging.aru":"ARU",
+    "static.manualTagging.erpProduct":"ERP Product",
+    "static.manualTagging.erpQty":"ERP Qty"
 }
