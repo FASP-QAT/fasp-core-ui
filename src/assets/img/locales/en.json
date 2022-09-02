@@ -2803,5 +2803,10 @@
     "static.manualTagging.qtyPU":"Qty (PU)",
     "static.manualTagging.aru":"ARU",
     "static.manualTagging.erpProduct":"ERP Product",
-    "static.manualTagging.erpQty":"ERP Qty"
+    "static.manualTagging.erpQty":"ERP Qty",
+    "static.manualTagging.conversionERPToPU":"Conversion Factor (ERP to QAT PU)",
+    "static.supplyPlan.planShipmentsByDate":"Plan shipments by date",
+    "static.supplyPlan.plan":"Plan",
+    "static.supplyPlan.planByDateNote":"Planned by date",
+    "static.supplyPlan.listOfNewShipmentsCreated":"List of new shipments created"
 }

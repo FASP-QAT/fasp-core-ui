@@ -695,30 +695,30 @@ export default class ManualTagging extends Component {
 
                 var col = ("K").concat(parseInt(y) + 1);
                 if (this.state.languageEl.getValueFromCoords(0, y)) {
-                    var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
-                    var value = this.state.languageEl.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                    value = value.replace(/,/g, "");
-                    if (value == "") {
-                        this.state.languageEl.setStyle(col, "background-color", "transparent");
-                        this.state.languageEl.setStyle(col, "background-color", "yellow");
-                        this.state.languageEl.setComments(col, i18n.t('static.label.fieldRequired'));
-                        valid = false;
-                    } else {
-                        // if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
-                        if (!(reg.test(value))) {
-                            this.state.languageEl.setStyle(col, "background-color", "transparent");
-                            this.state.languageEl.setStyle(col, "background-color", "yellow");
-                            this.state.languageEl.setComments(col, i18n.t('static.message.invalidnumber'));
-                            valid = false;
-                        } else {
-                            this.state.languageEl.setStyle(col, "background-color", "transparent");
-                            this.state.languageEl.setComments(col, "");
-                        }
+                    // var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
+                    // var value = this.state.languageEl.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                    // value = value.replace(/,/g, "");
+                    // if (value == "") {
+                    //     this.state.languageEl.setStyle(col, "background-color", "transparent");
+                    //     this.state.languageEl.setStyle(col, "background-color", "yellow");
+                    //     this.state.languageEl.setComments(col, i18n.t('static.label.fieldRequired'));
+                    //     valid = false;
+                    // } else {
+                    //     // if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
+                    //     if (!(reg.test(value))) {
+                    //         this.state.languageEl.setStyle(col, "background-color", "transparent");
+                    //         this.state.languageEl.setStyle(col, "background-color", "yellow");
+                    //         this.state.languageEl.setComments(col, i18n.t('static.message.invalidnumber'));
+                    //         valid = false;
+                    //     } else {
+                    //         this.state.languageEl.setStyle(col, "background-color", "transparent");
+                    //         this.state.languageEl.setComments(col, "");
+                    //     }
 
-                    }
+                    // }
 
                     var col = ("I").concat(parseInt(y) + 1);
-                    value = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                    var value = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                     if (value == "") {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
@@ -732,9 +732,9 @@ export default class ManualTagging extends Component {
                         this.el.setComments(col, "");
                     }
                 } else {
-                    var col = ("K").concat(parseInt(y) + 1);
-                    this.state.languageEl.setStyle(col, "background-color", "transparent");
-                    this.state.languageEl.setComments(col, "");
+                    // var col = ("K").concat(parseInt(y) + 1);
+                    // this.state.languageEl.setStyle(col, "background-color", "transparent");
+                    // this.state.languageEl.setComments(col, "");
                     var col = ("I").concat(parseInt(y) + 1);
                     this.state.languageEl.setStyle(col, "background-color", "transparent");
                     this.state.languageEl.setComments(col, "");
@@ -756,27 +756,27 @@ export default class ManualTagging extends Component {
 
                 var col = ("L").concat(parseInt(y) + 1);
                 if (this.el.getValueFromCoords(0, y)) {
-                    var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
-                    var value = this.el.getValue(`L${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                    value = value.replace(/,/g, "");
-                    if (value == "") {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                        valid = false;
-                    } else {
-                        // if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
-                        if (!(reg.test(value))) {
-                            this.el.setStyle(col, "background-color", "transparent");
-                            this.el.setStyle(col, "background-color", "yellow");
-                            this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                            valid = false;
-                        } else {
-                            this.el.setStyle(col, "background-color", "transparent");
-                            this.el.setComments(col, "");
-                        }
+                    // var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
+                    // var value = this.el.getValue(`L${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                    // value = value.replace(/,/g, "");
+                    // if (value == "") {
+                    //     this.el.setStyle(col, "background-color", "transparent");
+                    //     this.el.setStyle(col, "background-color", "yellow");
+                    //     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    //     valid = false;
+                    // } else {
+                    //     // if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
+                    //     if (!(reg.test(value))) {
+                    //         this.el.setStyle(col, "background-color", "transparent");
+                    //         this.el.setStyle(col, "background-color", "yellow");
+                    //         this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    //         valid = false;
+                    //     } else {
+                    //         this.el.setStyle(col, "background-color", "transparent");
+                    //         this.el.setComments(col, "");
+                    //     }
 
-                    }
+                    // }
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
@@ -807,6 +807,7 @@ export default class ManualTagging extends Component {
     // -----------start of changed function
 
     changeTab2 = function (instance, cell, x, y, value) {
+        console.log("Y Mohit",y)
         if (!this.state.changedDataForTab2) {
             this.setState({
                 changedDataForTab2: true
@@ -830,8 +831,9 @@ export default class ManualTagging extends Component {
                     }
                 } else {
                     for (var j = 0; j < json.length; j++) {
-                        this.el.setValueFromCoords(10, j, this.el.getValueFromCoords(24, j), true);
-                        this.el.setValueFromCoords(13, j, this.el.getValueFromCoords(25, j), true);
+                        // this.el.setValueFromCoords(10, j, this.el.getValueFromCoords(35, j), true);
+                        // this.el.setValueFromCoords(8, j, this.el.getValueFromCoords(34, j), true);
+                        // this.el.setValueFromCoords(13, j, this.el.getValueFromCoords(25, j), true);
                         if (j != y && json[j][29] == this.el.getValueFromCoords(29, y, true)) {
                             this.el.setValueFromCoords(0, j, false, true);
                         }
@@ -840,36 +842,36 @@ export default class ManualTagging extends Component {
             }
         }
         if (rowData[21] == 0) {
-            if (x == 10) {
-                var col = ("K").concat(parseInt(y) + 1);
-                value = this.el.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
-                if (value == "") {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                } else {
-                    // if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
-                    if (!(reg.test(value))) {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                    } else {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setComments(col, "");
-                        this.el.setComments(col, "");
-                        var json = this.el.getJson(null, false);
-                        this.el.setValueFromCoords(11, y, Math.round(this.el.getValueFromCoords(32, y) * this.el.getValueFromCoords(31, y) * this.el.getValueFromCoords(10, y)), true);
-                        // var checkboxValue = this.el.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                        for (var j = 0; j < json.length; j++) {
-                            if (j != y && json[j][22] == this.el.getValueFromCoords(22, y, true)) {
-                                this.el.setValueFromCoords(11, j, Math.round(this.el.getValueFromCoords(32, j) * this.el.getValueFromCoords(31, j) * this.el.getValueFromCoords(10, j)), true);
-                                this.el.setValueFromCoords(10, j, value, true);
-                            }
-                        }
-                    }
-                }
-            }
+            // if (x == 10) {
+            //     var col = ("K").concat(parseInt(y) + 1);
+            //     value = this.el.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            //     var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
+            //     if (value == "") {
+            //         this.el.setStyle(col, "background-color", "transparent");
+            //         this.el.setStyle(col, "background-color", "yellow");
+            //         this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            //     } else {
+            //         // if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
+            //         if (!(reg.test(value))) {
+            //             this.el.setStyle(col, "background-color", "transparent");
+            //             this.el.setStyle(col, "background-color", "yellow");
+            //             this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+            //         } else {
+            //             this.el.setStyle(col, "background-color", "transparent");
+            //             this.el.setComments(col, "");
+            //             this.el.setComments(col, "");
+            //             var json = this.el.getJson(null, false);
+            //             this.el.setValueFromCoords(11, y, Math.round(this.el.getValueFromCoords(32, y) * this.el.getValueFromCoords(31, y) * this.el.getValueFromCoords(10, y)), true);
+            //             // var checkboxValue = this.el.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            //             for (var j = 0; j < json.length; j++) {
+            //                 if (j != y && json[j][22] == this.el.getValueFromCoords(22, y, true)) {
+            //                     this.el.setValueFromCoords(11, j, Math.round(this.el.getValueFromCoords(32, j) * this.el.getValueFromCoords(31, j) * this.el.getValueFromCoords(10, j)), true);
+            //                     this.el.setValueFromCoords(10, j, value, true);
+            //                 }
+            //             }
+            //         }
+            //     }
+            // }
 
             if (x == 8) {
                 var col = ("I").concat(parseInt(y) + 1);
@@ -887,13 +889,13 @@ export default class ManualTagging extends Component {
                     var json = this.el.getJson(null, false);
                     var rcpu = this.state.realmCountryPlanningUnitList.filter(c => c.id == this.el.getValueFromCoords(8, y))[0];
 
-                    this.el.setValueFromCoords(11, y, Math.round(this.el.getValueFromCoords(32, y) * rcpu.multiplier * this.el.getValueFromCoords(10, y)), true);
-                    this.el.setValueFromCoords(31, y, rcpu.multiplier, true);
+                    this.el.setValueFromCoords(11, y, Math.round(this.el.getValueFromCoords(32, y) * rcpu.multiplier), true);
+                    this.el.setValueFromCoords(10, y, rcpu.multiplier, true);
                     // var checkboxValue = this.el.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                     for (var j = 0; j < json.length; j++) {
                         if (j != y && json[j][22] == this.el.getValueFromCoords(22, y, true)) {
-                            this.el.setValueFromCoords(11, j, Math.round(this.el.getValueFromCoords(32, j) * rcpu.multiplier * this.el.getValueFromCoords(10, j)), true);
-                            this.el.setValueFromCoords(31, j, rcpu.multiplier, true);
+                            this.el.setValueFromCoords(11, j, Math.round(this.el.getValueFromCoords(32, j) * rcpu.multiplier), true);
+                            this.el.setValueFromCoords(10, j, rcpu.multiplier, true);
                             this.el.setValueFromCoords(8, j, value, true);
                         }
                     }
@@ -974,51 +976,51 @@ export default class ManualTagging extends Component {
                         }
                     }
                 }
-                if (x == 11) {
-                    var col = ("L").concat(parseInt(y) + 1);
-                    value = this.el.getValue(`L${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                    var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
-                    var qty = this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                    console.log("x@@@@@@@@@@@@", x)
-                    console.log("y@@@@@@@@@@@@", y)
-                    console.log("Value@@@@@@@@@@@@", value)
-                    if (value == "") {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                    } else {
-                        // if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
-                        if (!(reg.test(value))) {
-                            this.el.setStyle(col, "background-color", "transparent");
-                            this.el.setStyle(col, "background-color", "yellow");
-                            this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                        } else {
-                            this.el.setStyle(col, "background-color", "transparent");
-                            this.el.setComments(col, "");
-                            this.el.setComments(col, "");
-                            if (rowData[0].toString() == "true") {
-                                this.state.instance.setValueFromCoords(12, y, Math.round(this.el.getValue(`L${parseInt(y) + 1}`, true).toString().replaceAll(",", "") * this.state.instance.getValueFromCoords(10, y) * this.state.instance.getValueFromCoords(18, y)), true);
-                                this.state.instance.setValueFromCoords(19, y, Math.round(this.el.getValue(`L${parseInt(y) + 1}`, true).toString().replaceAll(",", "") * this.state.instance.getValueFromCoords(10, y)), true);
-                                for (var j = 0; j < json.length; j++) {
-                                    // console.log("J@@@@@@@@################",j)
-                                    // console.log("y@@@@@@@@################",y)
-                                    // console.log("value@@@@@@@@################",this.state.instance.getValueFromCoords(1, y, true))
-                                    // console.log("jsonvalue@@@@@@@@################",json[j][1])
-                                    if (json[j][17] == this.state.instance.getValueFromCoords(17, y, true)) {
-                                        if (j != y) {
-                                            this.state.instance.setValueFromCoords(11, j, value, true);
-                                            this.state.instance.setValueFromCoords(12, j, Math.round(this.el.getValue(`L${parseInt(j) + 1}`, true).toString().replaceAll(",", "") * this.state.instance.getValueFromCoords(10, j) * this.state.instance.getValueFromCoords(18, y)), true);
-                                            this.state.instance.setValueFromCoords(19, j, Math.round(this.el.getValue(`L${parseInt(j) + 1}`, true).toString().replaceAll(",", "") * this.state.instance.getValueFromCoords(10, j)), true);
-                                        }
-                                    }
-                                }
-                            }
+                // if (x == 11) {
+                //     var col = ("L").concat(parseInt(y) + 1);
+                //     value = this.el.getValue(`L${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                //     var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
+                //     var qty = this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                //     console.log("x@@@@@@@@@@@@", x)
+                //     console.log("y@@@@@@@@@@@@", y)
+                //     console.log("Value@@@@@@@@@@@@", value)
+                //     if (value == "") {
+                //         this.el.setStyle(col, "background-color", "transparent");
+                //         this.el.setStyle(col, "background-color", "yellow");
+                //         this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                //     } else {
+                //         // if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
+                //         if (!(reg.test(value))) {
+                //             this.el.setStyle(col, "background-color", "transparent");
+                //             this.el.setStyle(col, "background-color", "yellow");
+                //             this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                //         } else {
+                //             this.el.setStyle(col, "background-color", "transparent");
+                //             this.el.setComments(col, "");
+                //             this.el.setComments(col, "");
+                //             if (rowData[0].toString() == "true") {
+                //                 this.state.instance.setValueFromCoords(12, y, Math.round(this.el.getValue(`L${parseInt(y) + 1}`, true).toString().replaceAll(",", "") * this.state.instance.getValueFromCoords(10, y) * this.state.instance.getValueFromCoords(18, y)), true);
+                //                 this.state.instance.setValueFromCoords(19, y, Math.round(this.el.getValue(`L${parseInt(y) + 1}`, true).toString().replaceAll(",", "") * this.state.instance.getValueFromCoords(10, y)), true);
+                //                 for (var j = 0; j < json.length; j++) {
+                //                     // console.log("J@@@@@@@@################",j)
+                //                     // console.log("y@@@@@@@@################",y)
+                //                     // console.log("value@@@@@@@@################",this.state.instance.getValueFromCoords(1, y, true))
+                //                     // console.log("jsonvalue@@@@@@@@################",json[j][1])
+                //                     if (json[j][17] == this.state.instance.getValueFromCoords(17, y, true)) {
+                //                         if (j != y) {
+                //                             this.state.instance.setValueFromCoords(11, j, value, true);
+                //                             this.state.instance.setValueFromCoords(12, j, Math.round(this.el.getValue(`L${parseInt(j) + 1}`, true).toString().replaceAll(",", "") * this.state.instance.getValueFromCoords(10, j) * this.state.instance.getValueFromCoords(18, y)), true);
+                //                             this.state.instance.setValueFromCoords(19, j, Math.round(this.el.getValue(`L${parseInt(j) + 1}`, true).toString().replaceAll(",", "") * this.state.instance.getValueFromCoords(10, j)), true);
+                //                         }
+                //                     }
+                //                 }
+                //             }
 
-                        }
+                //         }
 
-                    }
-                    // this.state.instance.setValueFromCoords(8, y, Math.round(qty * (value != null && value != "" ? value : 1)), true);
-                }
+                //     }
+                //     // this.state.instance.setValueFromCoords(8, y, Math.round(qty * (value != null && value != "" ? value : 1)), true);
+                // }
 
                 if (x == 9) {
                     var col = ("J").concat(parseInt(y) + 1);
@@ -1035,10 +1037,11 @@ export default class ManualTagging extends Component {
                         console.log("this.state.realmCountryPlanningUnitList@@@@@@@@@@@Mohit", this.state.realmCountryPlanningUnitList)
                         console.log("this.state.Value@@@@@@@@@@@Mohit", this.state.instance.getValueFromCoords(9, y))
                         var rcpuFilter = this.state.realmCountryPlanningUnitList.filter(c => c.id == this.state.instance.getValueFromCoords(9, y))[0];
+
                         if (rowData[0].toString() == "true") {
-                            this.state.instance.setValueFromCoords(12, y, Math.round(this.el.getValue(`L${parseInt(y) + 1}`, true).toString().replaceAll(",", "") * this.state.instance.getValueFromCoords(10, y) * rcpuFilter.multiplier), true);
-                            this.state.instance.setValueFromCoords(18, y, Number(rcpuFilter.multiplier, true));
-                            this.state.instance.setValueFromCoords(19, y, Math.round(this.el.getValue(`L${parseInt(y) + 1}`, true).toString().replaceAll(",", "") * this.state.instance.getValueFromCoords(10, y)), true);
+                            this.state.instance.setValueFromCoords(12, y, Math.round(this.state.instance.getValueFromCoords(10, y) * rcpuFilter.multiplier), true);
+                            this.state.instance.setValueFromCoords(11, y, Number(rcpuFilter.multiplier), true);
+                            this.state.instance.setValueFromCoords(19, y, Math.round(this.state.instance.getValueFromCoords(10, y)), true);
                             for (var j = 0; j < json.length; j++) {
                                 // console.log("J@@@@@@@@################",j)
                                 // console.log("y@@@@@@@@################",y)
@@ -1047,9 +1050,9 @@ export default class ManualTagging extends Component {
                                 if (json[j][17] == this.state.instance.getValueFromCoords(17, y, true)) {
                                     if (j != y) {
                                         this.state.instance.setValueFromCoords(9, j, value, true);
-                                        this.state.instance.setValueFromCoords(12, j, Math.round(this.el.getValue(`L${parseInt(j) + 1}`, true).toString().replaceAll(",", "") * this.state.instance.getValueFromCoords(10, j) * rcpuFilter.multiplier), true);
-                                        this.state.instance.setValueFromCoords(18, j, Number(rcpuFilter.multiplier), true);
-                                        this.state.instance.setValueFromCoords(19, j, Math.round(this.el.getValue(`L${parseInt(j) + 1}`, true).toString().replaceAll(",", "") * this.state.instance.getValueFromCoords(10, j)), true);
+                                        this.state.instance.setValueFromCoords(12, j, Math.round(this.state.instance.getValueFromCoords(10, j) * rcpuFilter.multiplier), true);
+                                        this.state.instance.setValueFromCoords(11, j, Number(rcpuFilter.multiplier), true);
+                                        this.state.instance.setValueFromCoords(19, j, Math.round(this.state.instance.getValueFromCoords(10, j)), true);
                                     }
                                 }
                             }
@@ -1127,12 +1130,13 @@ export default class ManualTagging extends Component {
                         // this.state.instance.setValueFromCoords(9, y, this.state.tempNotes, true)
                     } else {
                         console.log("inside else---", checkboxValue);
+                        this.state.instance.setValueFromCoords(9, y, "", true);
                         this.state.instance.setValueFromCoords(11, y, "", true);
-                        this.state.instance.setValueFromCoords(13, y, "", true);
                         this.state.instance.setValueFromCoords(13, y, "", true);
                         for (var j = 0; j < json.length; j++) {
                             if (j != y && json[j][17] == this.state.instance.getValueFromCoords(17, y, true)) {
                                 this.state.instance.setValueFromCoords(0, j, false, true);
+                                this.state.instance.setValueFromCoords(9, j, "", true);
                                 this.state.instance.setValueFromCoords(11, j, "", true);
                                 this.state.instance.setValueFromCoords(13, j, "", true);
                             }
@@ -1908,17 +1912,21 @@ export default class ManualTagging extends Component {
                         for (var mdf = 0; mdf < modifiedDataFilter.length; mdf++) {
                             console.log("@@@@@@@@@@@@@@@@=====================>Mdf", modifiedDataFilter[mdf]);
                             if (modifiedDataFilter[mdf][0] == true && modifiedDataFilter[mdf][23] == 1 && modifiedDataFilter[mdf][17].planningUnit.id == planningUnitId) {
+                                console.log("@@@@@@@@@@@@@@@@=====================>in if",modifiedDataFilter[mdf][17]);
                                 var linkedShipmentsListIndex = linkedShipmentsList.findIndex(c => (modifiedDataFilter[mdf][17].shipmentId > 0 ? modifiedDataFilter[mdf][17].shipmentId == c.childShipmentId : modifiedDataFilter[mdf][17].tempShipmentId == c.tempChildShipmentId) && c.active.toString() == "true");
-                                var linkedShipmentsListFilter = linkedShipmentsList.filter(c => (modifiedDataFilter[ss][17].shipmentId > 0 ? modifiedDataFilter[mdf][17].shipmentId == c.childShipmentId : modifiedDataFilter[mdf][17].tempShipmentId == c.tempChildShipmentId) && c.active.toString() == "true");
-                                linkedShipmentsList[linkedShipmentsListIndex].conversionFactor = Number(this.state.languageEl.getValue(`K${parseInt(mdf) + 1}`, true).toString().replaceAll("\,", ""));
+                                var linkedShipmentsListFilter = linkedShipmentsList.filter(c => (modifiedDataFilter[mdf][17].shipmentId > 0 ? modifiedDataFilter[mdf][17].shipmentId == c.childShipmentId : modifiedDataFilter[mdf][17].tempShipmentId == c.tempChildShipmentId) && c.active.toString() == "true");
+                                linkedShipmentsList[linkedShipmentsListIndex].conversionFactor = 1;
                                 linkedShipmentsList[linkedShipmentsListIndex].lastModifiedBy.userId = curUser;
                                 linkedShipmentsList[linkedShipmentsListIndex].lastModifiedBy.username = username;
                                 linkedShipmentsList[linkedShipmentsListIndex].lastModifiedDate = curDate;
-                                var shipmentIndex = shipmentList.findIndex(c => modifiedDataFilter[ss][17].shipmentId > 0 ? c.shipmentId == modifiedDataFilter[mdf][17].shipmentId : c.tempShipmentId == modifiedDataFilter[mdf][17].tempShipmentId);
+                                var shipmentIndex = shipmentList.findIndex(c => modifiedDataFilter[mdf][17].shipmentId > 0 ? c.shipmentId == modifiedDataFilter[mdf][17].shipmentId : c.tempShipmentId == modifiedDataFilter[mdf][17].tempShipmentId);
                                 var rcpu = this.state.realmCountryPlanningUnitList.filter(c => c.id == this.state.languageEl.getValueFromCoords(8, mdf))[0];
+                                console.log("ARU Mohit",this.state.languageEl.getValueFromCoords(8, mdf))
+                                console.log("RCPU Mohit",rcpu)
+                                console.log("shipmentIndex Mohit",shipmentIndex)
                                 shipmentList[shipmentIndex].notes = this.state.languageEl.getValue(`N${parseInt(mdf) + 1}`, true);
-                                shipmentList[shipmentIndex].shipmentQty = Math.round(Number(this.state.languageEl.getValue(`K${parseInt(mdf) + 1}`, true).toString().replaceAll("\,", "")) * Number(this.state.languageEl.getValue(`AG${parseInt(mdf) + 1}`, true).toString().replaceAll("\,", "")) * Number(this.state.languageEl.getValue(`AF${parseInt(mdf) + 1}`, true).toString().replaceAll("\,", "")));
-                                shipmentList[shipmentIndex].shipmentRcpuQty = Math.round(Number(this.state.languageEl.getValue(`K${parseInt(mdf) + 1}`, true).toString().replaceAll("\,", "")) * Number(this.state.languageEl.getValue(`AG${parseInt(mdf) + 1}`, true).toString().replaceAll("\,", "")));
+                                shipmentList[shipmentIndex].shipmentQty = Math.round(Number(Number(this.state.languageEl.getValue(`AG${parseInt(mdf) + 1}`, true).toString().replaceAll("\,", "")) * Number(this.state.languageEl.getValue(`K${parseInt(mdf) + 1}`, true).toString().replaceAll("\,", ""))));
+                                shipmentList[shipmentIndex].shipmentRcpuQty = Math.round(Number(this.state.languageEl.getValue(`AG${parseInt(mdf) + 1}`, true).toString().replaceAll("\,", "")));
                                 shipmentList[shipmentIndex].realmCountryPlanningUnit = {
                                     id: rcpu.id,
                                     label: rcpu.label,
@@ -1931,7 +1939,7 @@ export default class ManualTagging extends Component {
 
                                     var batchInfoListOriginalFilter = batchInfoListOriginal.filter(c => c.batchNo == batchInfoList[bi].batch.batchNo);
                                     if (batchInfoListOriginalFilter.length > 0) {
-                                        batchInfoList[bi].shipmentQty = Math.round(batchInfoListOriginalFilter[0].quantity * this.state.languageEl.getValue(`K${parseInt(mdf) + 1}`, true).toString().replaceAll("\,", ""));
+                                        batchInfoList[bi].shipmentQty = Math.round(batchInfoListOriginalFilter[0].quantity);
                                     }
 
                                 }
@@ -2155,7 +2163,7 @@ export default class ManualTagging extends Component {
                                                     tableJson.filter(c => c[16].roNo == getUniqueOrderNoAndPrimeLineNoList[uq][16].roNo && c[16].roPrimeLineNo == getUniqueOrderNoAndPrimeLineNoList[uq][16].roPrimeLineNo && c[16].knShipmentNo == getUniqueOrderNoAndPrimeLineNoList[uq][16].knShipmentNo && c[16].orderNo == getUniqueOrderNoAndPrimeLineNoList[uq][16].orderNo && c[16].primeLineNo == getUniqueOrderNoAndPrimeLineNoList[uq][16].primeLineNo).map(item => {
                                                         console.log("Item@@@@@@@@@@@@@@@@", item)
                                                         shipmentQty += Number(item[10]) * Number(this.state.instance.getValue(`L${parseInt(y) + 1}`, true).toString().replaceAll("\,", "")) * Number(this.state.instance.getValue(`S${parseInt(y) + 1}`, true).toString().replaceAll("\,", ""));
-                                                        shipmentARUQty += Number(item[10]) * Number(this.state.instance.getValue(`L${parseInt(y) + 1}`, true).toString().replaceAll("\,", ""));
+                                                        shipmentARUQty += Number(item[10]);
                                                         var batchNo = item[7];
                                                         var expiryDate = item[8];
                                                         var autoGenerated = false;
@@ -2177,7 +2185,7 @@ export default class ManualTagging extends Component {
                                                                 autoGenerated: autoGenerated,
                                                                 createdDate: curDate
                                                             },
-                                                            shipmentQty: Math.round(Number(item[10]) * Number(this.state.instance.getValue(`L${parseInt(y) + 1}`, true).toString().replaceAll("\,", "")))
+                                                            shipmentQty: Math.round(Number(item[10]))
                                                         })
                                                     }
                                                     );
@@ -2276,7 +2284,7 @@ export default class ManualTagging extends Component {
                                                         erpShipmentStatus: getUniqueOrderNoAndPrimeLineNoList[uq][16].erpShipmentStatus,
                                                         orderNo: getUniqueOrderNoAndPrimeLineNoList[uq][16].orderNo,
                                                         primeLineNo: getUniqueOrderNoAndPrimeLineNoList[uq][16].primeLineNo,
-                                                        conversionFactor: Number(this.state.instance.getValue(`L${parseInt(y) + 1}`, true).toString().replaceAll("\,", "")),
+                                                        conversionFactor: 1,
                                                         qatPlanningUnitId: ppuObject.planningUnit.id,
                                                         active: true,
                                                         createdBy: {
@@ -3544,7 +3552,7 @@ export default class ManualTagging extends Component {
                     data[15] = erpDataList[j].qatEquivalentShipmentStatus;
                     data[16] = erpDataList[j];
                     data[17] = erpDataList[j].roNo + ' | ' + erpDataList[j].roPrimeLineNo
-                    data[18] = ""
+                    data[18] = 1;
                     data[19] = ""
                     data[20] = planningUnitId;
                     // data[9] = "";
@@ -3651,7 +3659,7 @@ export default class ManualTagging extends Component {
                             width: 80
                         },
                         {
-                            title: i18n.t('static.manualTagging.conversionFactor'),
+                            title: i18n.t('static.manualTagging.conversionERPToPU'),
                             type: 'numeric',
                             mask: '#,##0.0000',
                             decimal: '.',
@@ -3735,7 +3743,7 @@ export default class ManualTagging extends Component {
                                 var cell = elInstance.getCell(("J").concat(parseInt(y) + 1))
                                 cell.classList.remove('readonly');
                                 var cell = elInstance.getCell(("L").concat(parseInt(y) + 1))
-                                cell.classList.remove('readonly');
+                                cell.classList.add('readonly');
                                 var cell = elInstance.getCell(("N").concat(parseInt(y) + 1))
                                 cell.classList.remove('readonly');
                             } else {
@@ -3844,7 +3852,7 @@ export default class ManualTagging extends Component {
                     // data[7] = ""
                     data[8] = !this.state.versionId.toString().includes("Local") ? getLabelText(manualTaggingList[j].qatRealmCountryPlanningUnit.label, this.state.lang) : getLabelText(manualTaggingList[j].realmCountryPlanningUnit.label, this.state.lang)
                     data[9] = !this.state.versionId.toString().includes("Local") ? Math.round((shipmentQty)) : Math.round((shipmentQty) / (linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].conversionFactor : 1) / (!this.state.versionId.toString().includes("Local") ? manualTaggingList[j].qatRealmCountryPlanningUnit.multiplier : manualTaggingList[j].realmCountryPlanningUnit.multiplier))
-                    data[10] = linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].conversionFactor : 1
+                    data[31] = linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].conversionFactor : 1
                     data[11] = `=ROUND(AG${parseInt(j) + 1}*K${parseInt(j) + 1}*AF${parseInt(j) + 1},0)`;
                     data[13] = manualTaggingList[j].notes
                     data[14] = manualTaggingList[j].orderNo
@@ -3864,9 +3872,11 @@ export default class ManualTagging extends Component {
                     data[28] = linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].roPrimeLineNo : "";
                     data[29] = (!this.state.versionId.toString().includes("Local") ? (linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].parentShipmentId + (manualTaggingList[j].parentLinkedShipmentId != "" && manualTaggingList[j].parentLinkedShipmentId != null ? ", " + manualTaggingList[j].parentLinkedShipmentId : "") : 0) : (linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].parentShipmentId + (manualTaggingList[j].parentShipmentIdArr.length > 0 ? ", " + manualTaggingList[j].parentShipmentIdArr.toString() : "") : 0));
                     data[30] = manualTaggingArray.filter(c => (c[29] == data[29])).length > 0 ? 1 : 0;
-                    data[31] = !this.state.versionId.toString().includes("Local") ? manualTaggingList[j].qatRealmCountryPlanningUnit.multiplier : manualTaggingList[j].realmCountryPlanningUnit.multiplier
+                    data[10] = !this.state.versionId.toString().includes("Local") ? manualTaggingList[j].qatRealmCountryPlanningUnit.multiplier : manualTaggingList[j].realmCountryPlanningUnit.multiplier
                     data[32] = !this.state.versionId.toString().includes("Local") ? Math.round((shipmentQty)) : Math.round((shipmentQty) / (linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].conversionFactor : 1) / (!this.state.versionId.toString().includes("Local") ? manualTaggingList[j].qatRealmCountryPlanningUnit.multiplier : manualTaggingList[j].realmCountryPlanningUnit.multiplier))
                     data[33] = !this.state.versionId.toString().includes("Local") ? manualTaggingList[j].qatPlanningUnit.id : manualTaggingList[j].planningUnit.id
+                    data[34] = !this.state.versionId.toString().includes("Local") ? manualTaggingList[j].qatRealmCountryPlanningUnit.id : manualTaggingList[j].realmCountryPlanningUnit.id;
+                    data[35] = !this.state.versionId.toString().includes("Local") ? manualTaggingList[j].qatRealmCountryPlanningUnit.multiplier : manualTaggingList[j].realmCountryPlanningUnit.multiplier;
                     manualTaggingArray.push(data);
                 }
                 else {
@@ -4058,7 +4068,7 @@ export default class ManualTagging extends Component {
                             width: 60,
                         },
                         {
-                            title: i18n.t('static.manualTagging.conversionFactor'),
+                            title: i18n.t('static.manualTagging.conversionERPToPU'),
                             type: 'numeric',
                             mask: '#,##0.0000', decimal: '.',
                             width: 60,
@@ -4183,6 +4193,16 @@ export default class ManualTagging extends Component {
                             type: 'hidden',
                             width: 0,
                         },
+                        {
+                            title: "Same parent shipment Id check",
+                            type: 'hidden',
+                            width: 0,
+                        },
+                        {
+                            title: "Same parent shipment Id check",
+                            type: 'hidden',
+                            width: 0,
+                        },
                     ],
                     editable: true,
                     // text: {
@@ -4248,7 +4268,7 @@ export default class ManualTagging extends Component {
                                     var cell = elInstance.getCell(("N").concat(parseInt(y) + 1))
                                     cell.classList.remove('readonly');
                                     var cell = elInstance.getCell(("K").concat(parseInt(y) + 1))
-                                    cell.classList.remove('readonly');
+                                    cell.classList.add('readonly');
                                 }
                             }
                         }
