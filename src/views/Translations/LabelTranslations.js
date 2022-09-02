@@ -79,6 +79,8 @@ export default class DatabaseTranslations extends React.Component {
                         for (var l = 0; l < languageList.length; l++) {
                             colHeadersArray.push({ type: 'text', title: languageList[l].label.label_en })
                         }
+                        jexcel.destroy(document.getElementById("labelTranslationTable"), true);
+
                         var options = {
                             data: label,
                             colWidths: [80, 80, 80, 80, 80],
