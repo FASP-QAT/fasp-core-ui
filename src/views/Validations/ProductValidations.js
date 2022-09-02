@@ -563,21 +563,21 @@ class ProductValidation extends Component {
                 data[9] = 0;
 
                 dataArray.push(data);
-                if (parentId != finalData[i].parentNodeFlatItem.id || i == finalData.length - 1) {
-                    data = [];
-                    data[0] = "";
-                    data[1] = "";
-                    data[2] = "";
-                    data[3] = "";
-                    data[4] = "";
-                    data[5] = "";
-                    data[6] = "";
-                    data[7] = i18n.t('static.productValidation.subTotal');
-                    data[8] = totalCost.toFixed(2);
-                    data[9] = 1;
-                    totalCost = 0;
-                    dataArray.push(data);
-                }
+                // if (parentId != finalData[i].parentNodeFlatItem.id || i == finalData.length - 1) {
+                //     data = [];
+                //     data[0] = "";
+                //     data[1] = "";
+                //     data[2] = "";
+                //     data[3] = "";
+                //     data[4] = "";
+                //     data[5] = "";
+                //     data[6] = "";
+                //     data[7] = i18n.t('static.productValidation.subTotal');
+                //     data[8] = totalCost.toFixed(2);
+                //     data[9] = 1;
+                //     totalCost = 0;
+                //     dataArray.push(data);
+                // }
             }
             console.log("DataArray+++", dataArray)
             this.el = jexcel(document.getElementById("tableDiv"), '');
@@ -1167,7 +1167,7 @@ class ProductValidation extends Component {
         columns.map((item, idx) => { headers[idx] = (item).replaceAll(' ', '%20') });
 
         var A = [this.addDoubleQuoteToRowContent(headers)];
-        this.state.dataEl.getJson(null, false).map(ele => A.push(this.addDoubleQuoteToRowContent([ele[0].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[1].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[2].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[3].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[4].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[5].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[6].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[7].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[8].toString().replaceAll(',', ' ').replaceAll(' ', '%20')])));
+        this.state.dataEl.getJson(null, false).map(ele => A.push(this.addDoubleQuoteToRowContent([ele[0].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[1].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[2].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[3].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[4].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[5].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[6].toString().replaceAll(',', ' ').replaceAll(' ', '%20'), ele[7].toString().replaceAll(',', ' ').replaceAll(' ', '%20'), ele[8].toString().replaceAll(',', ' ').replaceAll(' ', '%20')])));
 
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
