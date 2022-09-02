@@ -110,7 +110,10 @@ export default class DatabaseTranslations extends React.Component {
                             }.bind(this),
                             // tableHeight: '500px',
                         };
+                        console.log("optionsss===1", options)
                         this.el = jexcel(document.getElementById("labelTranslationTable"), options);
+                        console.log("optionsss===2", options)
+
                         this.setState({
                             loading: false
                         })
@@ -411,5 +414,3 @@ export default class DatabaseTranslations extends React.Component {
         elInstance.setValueFromCoords(2, y, 1, true);
     }.bind(this)
 }
-
-
