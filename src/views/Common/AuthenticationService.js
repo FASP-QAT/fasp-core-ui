@@ -164,7 +164,7 @@ class AuthenticationService {
         } else if (!checkSite && sessionType === 'Online') {
             localStorage.setItem("sessionType", 'Offline')
         }
-        var urlarr = ["/consumptionDetails", "/inventory/addInventory", "/inventory/addInventory/:programId/:versionId/:planningUnitId", "/shipment/shipmentDetails", "/shipment/shipmentDetails/:message", "/shipment/shipmentDetails/:programId/:versionId/:planningUnitId", "/program/importProgram", "/program/exportProgram", "/program/deleteLocalProgram", "/supplyPlan", "/supplyPlanFormulas", "/supplyPlan/:programId/:versionId/:planningUnitId", "/report/whatIf", "/report/stockStatus", "/report/problemList", "/report/productCatalog", "/report/stockStatusOverTime", "/report/stockStatusMatrix", "/report/stockStatusAcrossPlanningUnits", "/report/consumption", "/report/forecastOverTheTime","/report/consumptionForecastErrorSupplyPlan", "/report/shipmentSummery", "/report/procurementAgentExport", "/report/annualShipmentCost", "/report/budgets", "/report/supplierLeadTimes", "/report/expiredInventory", "/report/costOfInventory", "/report/inventoryTurns", "/report/stockAdjustment", "/report/warehouseCapacity", "/supplyPlan/:programId/:planningUnitId/:expiryNo/:expiryDate"];
+        var urlarr = ["/consumptionDetails", "/inventory/addInventory", "/inventory/addInventory/:programId/:versionId/:planningUnitId", "/shipment/shipmentDetails", "/shipment/shipmentDetails/:message", "/shipment/shipmentDetails/:programId/:versionId/:planningUnitId", "/program/importProgram", "/program/exportProgram", "/program/deleteLocalProgram", "/supplyPlan", "/supplyPlanFormulas", "/supplyPlan/:programId/:versionId/:planningUnitId", "/report/whatIf", "/report/stockStatus", "/report/problemList", "/report/productCatalog", "/report/stockStatusOverTime", "/report/stockStatusMatrix", "/report/stockStatusAcrossPlanningUnits", "/report/consumption", "/report/forecastOverTheTime", "/report/consumptionForecastErrorSupplyPlan", "/report/shipmentSummery", "/report/procurementAgentExport", "/report/annualShipmentCost", "/report/budgets", "/report/supplierLeadTimes", "/report/expiredInventory", "/report/costOfInventory", "/report/inventoryTurns", "/report/stockAdjustment", "/report/warehouseCapacity", "/supplyPlan/:programId/:planningUnitId/:expiryNo/:expiryDate"];
         if ((typeOfSession === 'Online' && checkSite) || (typeOfSession === 'Offline' && !checkSite) || (typeOfSession === 'Online' && !checkSite && urlarr.includes(url)) || (typeOfSession === 'Offline' && urlarr.includes(url))) {
             return true;
         } else {
@@ -465,22 +465,22 @@ class AuthenticationService {
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != '') {
             let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
             // console.log("decryptedCurUser---", decryptedCurUser);
-            try{
-            let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
-            // console.log("decryptedUser---", decryptedUser);
-            let businessFunctionList = decryptedUser.businessFunctionList;
-            // console.log("decryptedUser.businessfunctions---" + decryptedUser.businessFunctionList);
+            try {
+                let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+                // console.log("decryptedUser---", decryptedUser);
+                let businessFunctionList = decryptedUser.businessFunctionList;
+                // console.log("decryptedUser.businessfunctions---" + decryptedUser.businessFunctionList);
 
-            var bfunction = [];
-            for (let i = 0; i < businessFunctionList.length; i++) {
-                bfunction.push(businessFunctionList[i]);
+                var bfunction = [];
+                for (let i = 0; i < businessFunctionList.length; i++) {
+                    bfunction.push(businessFunctionList[i]);
+                }
+                // console.log("bfuntion---", bfunction);
+                return bfunction;
+            } catch (err) {
+                localStorage.setItem('curUser', '')
+                return [];
             }
-            // console.log("bfuntion---", bfunction);
-            return bfunction;
-        }catch(err){
-            localStorage.setItem('curUser','')
-            return [];
-        }
         } else {
             return [];
         }
@@ -1065,10 +1065,10 @@ class AuthenticationService {
                         }
                         break;
                     case "/report/consumptionForecastErrorSupplyPlan":
-                            if (bfunction.includes("ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT")) {
-                                return true;
-                            }
-                            break;
+                        if (bfunction.includes("ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT")) {
+                            return true;
+                        }
+                        break;
                     case "/report/forecastMetrics":
                         if (bfunction.includes("ROLE_BF_FORECAST_MATRIX_REPORT")) {
                             return true;
@@ -1431,12 +1431,24 @@ class AuthenticationService {
                             return true;
                         }
                         break;
+                    case "/dataset/branchTemplate/:templateId":
+                        if (bfunction.includes("ROLE_BF_EDIT_TREE_TEMPLATE") || bfunction.includes("ROLE_BF_ADD_TREE_TEMPLATE") || bfunction.includes("ROLE_BF_VIEW_TREE_TEMPLATES")) {
+                            return true;
+                        }
+                        break;
                     case "/dataset/listTreeTemplate/":
                     case "/dataset/listTreeTemplate/:color/:message":
                         if (bfunction.includes("ROLE_BF_LIST_TREE_TEMPLATE")) {
                             return true;
                         }
                         break;
+                    case "/dataset/listBranchTreeTemplate/":
+                    case "/dataset/listBranchTreeTemplate/:color/:message":
+                        if (bfunction.includes("ROLE_BF_LIST_TREE_TEMPLATE")) {
+                            return true;
+                        }
+                        break;
+
                     case "/dataset/listTree/:color/:message":
                         if (bfunction.includes("ROLE_BF_LIST_TREE")) {
                             return true;
@@ -1638,13 +1650,13 @@ class AuthenticationService {
         localStorage.setItem('sesBudStatus', "");
         localStorage.setItem('sesForecastProgramIds', "");
         var currentDate = moment(Date.now()).utcOffset('-0500');
-        console.log("&&&&&&&&&&&&&&&&&Current Date in authetication service",currentDate);
+        console.log("&&&&&&&&&&&&&&&&&Current Date in authetication service", currentDate);
         var curDate = moment(currentDate).startOf('month').subtract(MONTHS_IN_PAST_FOR_SUPPLY_PLAN, 'months').format("YYYY-MM-DD");
-        console.log("&&&&&&&&&&&&&&&&&Current Date after subtraction in authetication service",curDate);
+        console.log("&&&&&&&&&&&&&&&&&Current Date after subtraction in authetication service", curDate);
         localStorage.setItem('sesStartDate', JSON.stringify({ year: parseInt(moment(curDate).format("YYYY")), month: parseInt(moment(curDate).format("M")) }))
         localStorage.setItem('sesStartDate', JSON.stringify({ year: parseInt(moment(curDate).format("YYYY")), month: parseInt(moment(curDate).format("M")) }))
- 
-        console.log("&&&&&&&&&&&&&&&&&Current Date json. stringfy",JSON.stringify({ year: parseInt(moment(curDate).format("YYYY")), month: parseInt(moment(curDate).format("M")) }));
+
+        console.log("&&&&&&&&&&&&&&&&&Current Date json. stringfy", JSON.stringify({ year: parseInt(moment(curDate).format("YYYY")), month: parseInt(moment(curDate).format("M")) }));
     }
 
     getIconAndStaticLabel(val) {
