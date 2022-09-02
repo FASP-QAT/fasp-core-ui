@@ -91,7 +91,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                             }
                             programPlanningUnitList = ppList;
                         }
-                        if ((page == 'masterDataSync' || page == 'syncPage' || page=='erpDelink') && planningUnitList.length == 0) {
+                        if ((page == 'masterDataSync' || page == 'syncPage' || page == 'erpDelink') && planningUnitList.length == 0) {
                             programPlanningUnitList = [];
                         }
                         try {
@@ -2110,7 +2110,63 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     }
                                     props.updateState("loading", false);
                                     props.hideFirstComponent()
-                                } else if (page == "whatIf") {
+                                } else if (page == "shipment1") {
+                                    // props.updateState("message", i18n.t('static.message.shipmentsSaved'));
+                                    // props.updateState("color", 'green');
+                                    // props.updateState("shipmentChangedFlag", 0);
+                                    // props.updateState("budgetChangedFlag", 0);
+                                    console.log("props.shipmentPage Mohit", props)
+                                    props.updateState("shipmentsEl", "");
+                                    if (props.shipmentPage != "shipmentDataEntry") {
+                                        if (props.shipmentPage != undefined) {
+                                            props.toggleLarge('shipments');
+                                        }
+                                        if (props.shipmentPage != "supplyPlanCompare") {
+                                            var programDataJson = programRequest.result.programData;
+                                            var planningUnitDataList = programDataJson.planningUnitDataList;
+                                            var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == props.state.planningUnit.value);
+                                            var programJson = {};
+                                            if (planningUnitDataIndex != -1) {
+                                                var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == props.state.planningUnit.value))[0];
+                                                var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                                                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                                                programJson = JSON.parse(programData);
+                                            } else {
+                                                programJson = {
+                                                    consumptionList: [],
+                                                    inventoryList: [],
+                                                    shipmentList: [],
+                                                    batchInfoList: [],
+                                                    supplyPlan: []
+                                                }
+                                            }
+                                            props.updateState("programJson", programJson);
+                                            props.updateState("planningUnitDataList", planningUnitDataList);
+                                            try {
+                                                props.formSubmit(props.items.planningUnit, props.items.monthCount);
+                                            } catch (err) {
+
+                                            }
+                                        }
+                                    }
+                                    if (props.shipmentPage == "shipmentDataEntry") {
+                                        props.formSubmit(props.items.planningUnit, props.items.rangeValue);
+                                    }
+                                    if (page == "shipment1") {
+                                        try {
+                                            props.formSubmit(props.state.planningUnit, props.state.rangeValue);
+                                        } catch (err) {
+
+                                        }
+                                    }
+                                    if (props.shipmentPage == "whatIf") {
+                                        props.updateState("programModified", 1);
+                                    }
+                                    props.updateState("showPlanningUnitAndQty", 1)
+                                    props.updateState("loading", false);
+                                    props.hideFirstComponent()
+                                }
+                                else if (page == "whatIf") {
                                     console.log("In WHat If Mohit Pooja", props.state.scenarioId)
                                     if (props.state.scenarioId != 7) {
                                         props.updateState("programJson", programJsonForStoringTheResult);
@@ -2121,11 +2177,11 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     } else {
                                         var rangeValue = props.state.rangeValue1;
                                         let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
-                                        if(rangeValue.from.month<=9){
+                                        if (rangeValue.from.month <= 9) {
                                             startDate = rangeValue.from.year + '-0' + rangeValue.from.month + '-01';
                                         }
                                         let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
-                                        if(rangeValue.to.month<=9){
+                                        if (rangeValue.to.month <= 9) {
                                             stopDate = rangeValue.to.year + '-0' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
                                         }
                                         convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDate, programJsonForStoringTheResult, generalProgramJson, props, planningUnitId, programPlanningUnitList.filter(c => c.planningUnit.id == planningUnitId)[0], regionListFiltered, programId, programJsonForStoringTheResult, programDataJson, programRequest)
@@ -2169,7 +2225,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     console.log("ProgramJson@@@@@@@@@@@@@@@@", props)
                                     props.updateState("message", (props.state.active2 ? i18n.t('static.mt.linkingUpdateSuccess') : i18n.t('static.shipment.linkingsuccess')))
                                     props.updateState("color", "green");
-                                    props.updateState("changedDataForTab2",false);
+                                    props.updateState("changedDataForTab2", false);
                                     props.updateState("loading", false);
                                     props.updateState("planningUnitIdUpdated", "");
                                     props.hideSecondComponent();
