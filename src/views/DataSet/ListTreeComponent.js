@@ -13,6 +13,8 @@ import { JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY } from 
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { Formik } from 'formik';
 import * as Yup from 'yup'
+import ProgramService from '../../api/ProgramService';
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 import '../Forms/ValidationForms/ValidationForms.css';
 import { INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY } from '../../Constants.js'
 import CryptoJS from 'crypto-js'
@@ -870,7 +872,7 @@ export default class ListTreeComponent extends Component {
         console.log("filter tree---", datasetList);
         if (datasetId != 0) {
             datasetList = datasetList.filter(x => x.id == datasetId);
-            console.log('inside if')
+            console.log('inside if',datasetList[0])
             realmCountryId = datasetList[0].programData.realmCountry.realmCountryId;
             // proList.push(datasetList)
         }
@@ -885,52 +887,142 @@ export default class ListTreeComponent extends Component {
             this.buildJexcel();
         });
     }
+
+    getPrograms = () => {
+        if (isSiteOnline()) {
+            // AuthenticationService.setupAxiosInterceptors();
+            ProgramService.getDataSetList().then(response => {
+                if (response.status == 200) {
+                    var responseData = response.data;
+                    console.log("responseData------->", responseData);
+                    var datasetList = [];
+                    for (var rd = 0; rd < responseData.length; rd++) {
+                        var json = {
+                            id: responseData[rd].programId,
+                            name: getLabelText(responseData[rd].label, this.state.lang),
+                            code: responseData[rd].programCode,
+                            versionList: responseData[rd].versionList
+                        }
+                        datasetList.push(json);
+                    }
+                    this.setState({
+                        datasetList: datasetList,
+                        loading: false
+                    }, () => {
+                        this.getDatasetList();
+                    })
+                } else {
+                    this.setState({
+                        message: response.data.messageCode, loading: false
+                    }, () => {
+                        this.hideSecondComponent();
+                    })
+                }
+            }).catch(
+                error => {
+                    this.getDatasetList();
+                }
+            );
+        } else {
+            console.log('offline')
+            this.setState({ loading: false })
+            this.getDatasetList()
+        }
+
+    }
+
     getDatasetList() {
+        this.setState({
+            loading: true
+        })
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onerror = function (event) {
+        }.bind(this);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
-            var transaction = db1.transaction(['datasetData'], 'readwrite');
-            var program = transaction.objectStore('datasetData');
-            var getRequest = program.getAll();
-
+            var datasetTransaction = db1.transaction(['datasetData'], 'readwrite');
+            var datasetOs = datasetTransaction.objectStore('datasetData');
+            var getRequest = datasetOs.getAll();
             getRequest.onerror = function (event) {
-                // Handle errors!
-            };
+            }.bind(this);
             getRequest.onsuccess = function (event) {
-                var myResult = [];
-                myResult = getRequest.result;
-                for (var i = 0; i < myResult.length; i++) {
-                    console.log("myResult[i].programData---", myResult[i].programData);
-                    var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
-                    var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
-                    console.log("myResult[i].programData after---", programData);
-                    myResult[i].programData = programData;
-                }
-                myResult = myResult.sort(function (a, b) {
-                    a = a.programCode.toLowerCase();
-                    b = b.programCode.toLowerCase();
-                    return a < b ? -1 : a > b ? 1 : 0;
-                });
-                this.setState({
-                    datasetList: myResult
-                }, () => {
+
+
+                var unitTransaction = db1.transaction(['unit'], 'readwrite');
+                var unitOs = unitTransaction.objectStore('unit');
+                var unitRequest = unitOs.getAll();
+                unitRequest.onerror = function (event) {
+                }.bind(this);
+                unitRequest.onsuccess = function (event) {
+                    var unitList = unitRequest.result;
+                    var myResult = [];
+                    myResult = getRequest.result;
+                    var datasetList = this.state.datasetList;
+                    for (var mr = 0; mr < myResult.length; mr++) {
+                        var index = datasetList.findIndex(c => c.id == myResult[mr].programId);
+                        console.log("myResult[mr]", myResult[mr])
+
+                        if (index == -1) {
+                            var programNameBytes = CryptoJS.AES.decrypt(myResult[mr].programName, SECRET_KEY);
+                            var programNameLabel = programNameBytes.toString(CryptoJS.enc.Utf8);
+                            var programNameJson = JSON.parse(programNameLabel)
+                            var json = {
+                                id: myResult[mr].programId,
+                                name: getLabelText(programNameJson, this.state.lang),
+                                code: myResult[mr].programCode,
+                                versionList: [{ versionId: myResult[mr].version + "  (Local)" }],
+                                // programData:myResult[i].programData = programData;
+                            }
+                            datasetList.push(json)
+                        } else {
+                            var existingVersionList = datasetList[index].versionList;
+                            existingVersionList.push({ versionId: myResult[mr].version + "  (Local)" })
+                            datasetList[index].versionList = existingVersionList
+                        }
+                        var databytes = CryptoJS.AES.decrypt(myResult[mr].programData, SECRET_KEY);
+                        var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+                        console.log("myResult[i].programData after---", programData);
+                        datasetList[mr].programData = programData;
+                    }
                     var datasetId = "", realmCountryId = "";
-                    if (this.state.datasetList.length == 1) {
-                        datasetId = this.state.datasetList[0].id;
+                    var event = {
+                        target: {
+                            value: ""
+                        }
+                    };
+                    if (datasetList.length == 1) {
+                        datasetId = datasetList[0].id;
+                        event.target.value = datasetList[0].id;
                         realmCountryId = this.state.datasetList[0].programData.realmCountry.realmCountryId;
-                    } else if (localStorage.getItem("sesDatasetId") != "" && this.state.datasetList.filter(c => c.id == localStorage.getItem("sesDatasetId")).length > 0) {
-                        datasetId = localStorage.getItem("sesDatasetId");
+                    } else if (localStorage.getItem("sesLiveDatasetId") != "" && datasetList.filter(c => c.id == localStorage.getItem("sesLiveDatasetId")).length > 0) {
+                        datasetId = localStorage.getItem("sesLiveDatasetId");
+                        event.target.value = localStorage.getItem("sesLiveDatasetId");
+                        console.log("tetststfet", this.state.datasetList.filter(x => x.id == datasetId)[0])
                         realmCountryId = this.state.datasetList.filter(x => x.id == datasetId)[0].programData.realmCountry.realmCountryId;
                     }
-                    console.log("datasetId---", datasetId);
-                    this.setState({ datasetId, datasetIdModal: datasetId, realmCountryId }, () => { this.getTreeList(); })
-
-                });
-
-            }.bind(this);
-        }.bind(this);
+                    this.setState({
+                        datasetList: datasetList.sort(function (a, b) {
+                            a = a.code.toLowerCase();
+                            b = b.code.toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        }),
+                        unitList: unitList,
+                        loading: false,
+                        datasetId,
+                        datasetIdModal: datasetId,
+                        realmCountryId
+                    }, () => {
+                        console.log("datasetList", datasetList)
+                        // if (datasetId != "") {
+                        // this.setDatasetId(event);
+                        this.getTreeList();
+                        // }
+                    })
+                }.bind(this)
+            }.bind(this)
+        }.bind(this)
     }
 
     onTemplateChange(event) {
@@ -1226,7 +1318,8 @@ export default class ListTreeComponent extends Component {
     }
     componentDidMount() {
         this.hideFirstComponent();
-        this.getDatasetList();
+        // this.getDatasetList();
+        this.getPrograms();
         this.getTreeTemplateList();
         this.getForecastMethodList();
     }
@@ -1344,7 +1437,7 @@ export default class ListTreeComponent extends Component {
             && datasetList.map((item, i) => {
                 return (
                     <option key={i} value={item.id}>
-                        {item.programCode + "~v" + item.programData.currentVersion.versionId}
+                        {item.code}
                     </option>
                 )
             }, this);
