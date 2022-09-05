@@ -8239,7 +8239,7 @@ export default class BuildTree extends Component {
                                         </FormGroup> */}
 
                                         {/* {this.state.aggregationNode && */}
-
+                                        {this.state.currentItemConfig.context.payload.nodeType.id!=5 &&
                                         <FormGroup className="col-md-4" style={{ display: this.state.aggregationNode ? 'block' : 'none' }}>
                                             <Label htmlFor="currencyId">{i18n.t('static.tree.nodeUnit')}<span class="red Reqasterisk">*</span></Label>
                                             <Input
@@ -8267,7 +8267,7 @@ export default class BuildTree extends Component {
                                             </Input>
                                             <FormFeedback className="red">{errors.nodeUnitId}</FormFeedback>
                                         </FormGroup>
-
+                        }
                                         {/* } */}
                                         {/* {this.state.currentItemConfig.context.payload.nodeType.id != 1 && */}
                                         <FormGroup className="col-md-4" style={{ display: this.state.aggregationNode ? 'block' : 'none' }}>
