@@ -710,7 +710,7 @@ export default class ConsumptionDetails extends React.Component {
                 },
                 {
                     title: i18n.t('static.common.action'),
-                    type: 'hidden',
+                    type: 'text',
                 },
                 {
                     title: 'planningUnitId',
@@ -1058,12 +1058,10 @@ export default class ConsumptionDetails extends React.Component {
         doc.save(i18n.t('static.report.qatProblemActionReport') + '.pdf')
     }
 
-
     selected = function (instance, cell, x, y, value, e) {
         if (e.buttons == 1) {
-
             // console.log("y+++", y);
-            if ((this.el.getValueFromCoords(22, x) == 1) && (y == 5 || y == 7 || y == 8 || y == 9)) {
+            if (y == 5 || y == 7 || y == 8 || y == 9) {
                 if ((x == 0 && value != 0) || (y == 0)) {
                     // console.log("HEADER SELECTION--------------------------");
                 } else {
@@ -1076,6 +1074,8 @@ export default class ConsumptionDetails extends React.Component {
                                 var planningunitId = this.el.getValueFromCoords(13, x);
                                 var programId = document.getElementById('programId').value;
                                 var versionId = this.el.getValueFromCoords(3, x)
+                                console.log("onclick------>", this.el.getValueFromCoords(15, x), "==", programId, "===", versionId, "===", planningunitId);
+
                                 window.open(window.location.origin + `/#${this.el.getValueFromCoords(15, x)}/${programId}/${versionId}/${planningunitId}`);
                                 // let problemStatusId = document.getElementById('problemStatusId').value;
                                 // let problemTypeId = document.getElementById('problemTypeId').value;
@@ -1093,7 +1093,6 @@ export default class ConsumptionDetails extends React.Component {
                                 //     pathname: `/report/editProblem/${this.el.getValueFromCoords(0, x)}/${this.state.programId}/${index}/${problemStatusId}/${problemTypeId}`,
                                 // });
                             }
-
                         }
                     }
                 }

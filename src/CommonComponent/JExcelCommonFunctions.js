@@ -234,6 +234,11 @@ export function paginationChange(number) {
     localStorage.setItem("sesRecordCount", recordCount)
 }
 
+export function paginationChange1(number) {
+    var recordCount = document.getElementsByClassName('jexcel_pagination_dropdown')[number].value;
+    localStorage.setItem("sesRecordCount", recordCount)
+}
+
 
 export function jExcelLoadedFunctionPipeline(instance, number) {
     var obj = {};
@@ -641,7 +646,7 @@ export function jExcelLoadedFunctionOld(instance, number) {
     var pageSelect = document.getElementsByClassName('jexcel_pagination_dropdown')[number];
     pageSelect.options[3].innerHTML = "All";
 
-    pageSelect.addEventListener("change", () => paginationChange(number));
+    pageSelect.addEventListener("change", () => paginationChange1(number));
 
 
     var jexcel_filterFirstdiv = document.getElementsByClassName('jexcel_filter')[number];
