@@ -362,9 +362,10 @@ class EditProcurementAgentComponent extends Component {
                 this.setState({ rgba: color })
                 var proramListArray = [];
                 let { procurementAgent } = this.state;
-
                 for (var i = 0; i < this.state.procurementAgent.programList.length; i++) {
-                    proramListArray[i] = { value: this.state.procurementAgent.programList[i].id, label: getLabelText(this.state.procurementAgent.programList[i].label, this.state.lang) }
+                    if (this.state.procurementAgent.programList[i].id != 0) {
+                        proramListArray[i] = { value: this.state.procurementAgent.programList[i].id, label: getLabelText(this.state.procurementAgent.programList[i].label, this.state.lang) }
+                    }
                 }
                 this.setState({ programId: proramListArray })
             } else {
@@ -551,8 +552,16 @@ class EditProcurementAgentComponent extends Component {
                                         loading: true
                                     })
                                     console.log("COLOR----->", this.state.procurementAgent);
+                                    var pAgent = this.state.procurementAgent;
+                                    for (var i = 0; i < pAgent.programList.length; i++) {
+                                        if (pAgent.programList[i].id == 0) {
+                                            pAgent.programList = []
+                                        }
+                                    }
+                                    console.log("COLOR----->", pAgent);
+
                                     // AuthenticationService.setupAxiosInterceptors();
-                                    ProcurementAgentService.updateProcurementAgent(this.state.procurementAgent)
+                                    ProcurementAgentService.updateProcurementAgent(pAgent)
                                         .then(response => {
                                             if (response.status == 200) {
                                                 this.props.history.push(`/procurementAgent/listProcurementAgent/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
@@ -638,7 +647,7 @@ class EditProcurementAgentComponent extends Component {
                                                     {/* </InputGroupAddon> */}
                                                 </FormGroup>
                                                 <FormGroup className="Selectcontrol-bdrNone">
-                                                    <Label htmlFor="programId">{i18n.t('static.dataSource.program')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Label htmlFor="programId">{i18n.t('static.dataSource.program')}</Label>
                                                     <Select
                                                         className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
                                                             { 'is-valid': !errors.programId && this.state.procurementAgent.programList.length != 0 },
@@ -661,7 +670,7 @@ class EditProcurementAgentComponent extends Component {
                                                     <FormFeedback className="red">{errors.programId}</FormFeedback>
                                                 </FormGroup>
                                                 <FormGroup>
-                                                    <Label htmlFor="procurementAgentTypeId">{i18n.t('static.dashboard.procurementagenttype')}<span className="red Reqasterisk">*</span></Label>
+                                                    <Label htmlFor="procurementAgentTypeId">{i18n.t('static.dashboard.procurementagenttype')}</Label>
                                                     {/* <InputGroupAddon addonType="prepend"> */}
                                                     {/* <InputGroupText><i className="fa fa-pencil"></i></InputGroupText> */}
                                                     <Input
