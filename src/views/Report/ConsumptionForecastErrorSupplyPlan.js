@@ -786,12 +786,12 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                 document.getElementById("equivelencyUnitDiv").style.display = "none";
                                 console.log("filteredEquList---Result-->", filteredEquList);
                                 console.log("No EquivalencyUnitData")
-                                this.setState({ message: "No EquivalencyUnitData Available", equivalencyUnitList: [] });
+                                this.setState({ message: "No equivalency unit data available", equivalencyUnitList: [] });
                             }
                         } else {
 
                             document.getElementById("equivelencyUnitDiv").style.display = "none";
-                            this.setState({ message: "No EquivalencyUnitData Available for the selected forcecastingUnit ", equivalencyUnitList: [] });
+                            this.setState({ message: "No equivalency unit data available for the selected forcecasting Unit ", equivalencyUnitList: [] });
                             console.log("No FU associated");
                         }
                         console.log("filteredEQUnit---Result-->", filteredEQUnit);
@@ -831,7 +831,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                         var listArray = response.data;
                         if (listArray.length == 0) {
                             document.getElementById("equivelencyUnitDiv").style.display = "none";
-                            this.setState({ message: 'No EquivalencyUnitData Available for the selected forcecastingUnit' });
+                            this.setState({ message: 'No equivalency unit data available for the selected forcecasting unit' });
                         } else {
                             var listArray = response.data;
                             listArray.sort((a, b) => {
@@ -2358,7 +2358,6 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                 <Bar id="cool-canvas" data={bar} options={chartOptions} /> <div>
                                                 </div>
                                             </div>
-                                            <b>* The error calculations here are not real - would be WAPE calculation we've been using</b>
                                         </div>
                                     }
                                     <div className="col-md-12">
