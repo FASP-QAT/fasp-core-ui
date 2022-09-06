@@ -544,6 +544,7 @@
     "static.forecastReport.xAxisAggregateByYear": "Agrégation de l'abscisse par année",
     "static.ForecastSummary.ForecastSummary": "Résumé des prévisions",
     "static.supplyPlanFormula.amcNote": "* Considérez uniquement les valeurs non nulles. Le mois en cours est également inclus dans les mois à venir pour le CMM",
+    "static.loadDeleteProgram.loadDeleteProgram": "Charger/Supprimer le programme",
     "static.equivalancyUnit.DisplayTheirForecast": "pourraient choisir d'afficher leurs prévisions dans l'UE  \"Traitements pour QATitis\" et d'afficher leurs prévisions comme 5 000 \"Traitements pour QATitis\" par mois à la place.",
     "static.report.lastmodifieddate": "Date de la dernière modification",
     "static.report.selectProgram": "Sélectionnez le programme et la version",
@@ -1384,6 +1385,7 @@
     "static.common.pr": "PR",
     "static.message.login.invalidCredentials": "Identifiant ou mot de passe incorrect",
     "static.common.backTo": "Retour à",
+    "static.programLoadedAndmasterDataSync.success": "Programme chargé et données de base synchronisées avec succès",
     "static.dataEntryAndAdjustments.HistoricalActual": "écran. La consommation réelle historique peut être des quantités vendues, des quantités distribuées à l'utilisateur ou des quantités émises par les installations de stockage. Sur cet écran, les utilisateurs peuvent ajuster les données historiques de consommation qui ont été saisies manuellement sur cet écran ou qui ont été importées d'un programme de plan dapprovisionnement QAT (si vous souhaitez importer, veuillez dabord passer à la",
     "static.message.inventorySaved": "Données d`inventaire enregistrées",
     "static.month.dec": "Dec",
@@ -2759,6 +2761,5 @@
     "static.supplyPlanFormula.maxMonthOfStockEx2": "Max = MIN ([MAX (4,3) +3], 18)",
     "static.organisation.organisationheader": "Organisation",
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Max = 7",
-    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18)",
-    "static.loadDeleteProgram.loadDeleteProgram": "Charger/Supprimer le programme"
+    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18)"
 }

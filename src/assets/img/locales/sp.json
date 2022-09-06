@@ -544,6 +544,7 @@
     "static.forecastReport.xAxisAggregateByYear": "Agregado del eje X por año",
     "static.ForecastSummary.ForecastSummary": "Resumen de estimación",
     "static.supplyPlanFormula.amcNote": "* Considere solo valores distintos de cero. También el mes actual se incluye en los meses futuros para calcular el CMM",
+    "static.loadDeleteProgram.loadDeleteProgram": "Cargar/Borrar programa",
     "static.equivalancyUnit.DisplayTheirForecast": "podría optar por mostrar su estimación en la EU de Tratamientos para QATitis y mostrar su estimación como 5,000 Tratamientos para QATitis por mes en su lugar.",
     "static.report.lastmodifieddate": "Fecha de última modificación",
     "static.report.selectProgram": "Seleccionar programa y versión",
@@ -1384,6 +1385,7 @@
     "static.common.pr": "PR",
     "static.message.login.invalidCredentials": "Usuario o contraseña incorrecta",
     "static.common.backTo": "De regreso",
+    "static.programLoadedAndmasterDataSync.success": "Programa cargado y datos maestros sincronizados con éxito",
     "static.dataEntryAndAdjustments.HistoricalActual": "pantalla. El consumo real histórico puede ser cantidades vendidas, cantidades entregadas al usuario o cantidades emitidas por las instalaciones de almacenamiento. En esta pantalla, los usuarios pueden ajustar los datos de consumo históricos que se ingresaron manualmente en esta pantalla o que se importaron de un programa de plan de suministro de QAT (si desea importar, vaya primero a la",
     "static.message.inventorySaved": "Datos de inventario guardados",
     "static.month.dec": "Dic",
@@ -2759,6 +2761,5 @@
     "static.supplyPlanFormula.maxMonthOfStockEx2": "Max = MIN ([MAX (4,3) +3], 18)",
     "static.organisation.organisationheader": "Organización",
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Max = 7",
-    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18)",
-    "static.loadDeleteProgram.loadDeleteProgram": "Cargar/Borrar programa"
+    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18)"
 }
