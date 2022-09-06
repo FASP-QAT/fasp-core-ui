@@ -401,7 +401,7 @@ export default class CurrencyListComponent extends Component {
                         // console.log("currencyArray---->", currencyArray);
                         this.el = jexcel(document.getElementById("tableDiv"), '');
                         // this.el.destroy();
-                        jexcel.destroy(document.getElementById("tableDiv"),true);
+                        jexcel.destroy(document.getElementById("tableDiv"), true);
                         var json = [];
                         var data = currencyArray;
 
@@ -542,16 +542,18 @@ export default class CurrencyListComponent extends Component {
             });
         }
     }
-    selected = function (instance, cell, x, y, value) {
+    selected = function (instance, cell, x, y, value, e) {
+        if (e.buttons == 1) {
 
-        if ((x == 0 && value != 0) || (y == 0)) {
-            // console.log("HEADER SELECTION--------------------------");
-        } else {
-            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_CURRENCY')) {
-                this.props.history.push({
-                    pathname: `/currency/editCurrency/${this.el.getValueFromCoords(0, x)}`,
-                    // state: { currency: currency }
-                });
+            if ((x == 0 && value != 0) || (y == 0)) {
+                // console.log("HEADER SELECTION--------------------------");
+            } else {
+                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_CURRENCY')) {
+                    this.props.history.push({
+                        pathname: `/currency/editCurrency/${this.el.getValueFromCoords(0, x)}`,
+                        // state: { currency: currency }
+                    });
+                }
             }
         }
     }.bind(this);

@@ -1210,6 +1210,7 @@ class ProductValidation extends Component {
             }, this);
 
         const { versionList } = this.state;
+        console.log("versionList111", versionList)
         let versions = versionList.length > 0
             && versionList.map((item, i) => {
                 return (
