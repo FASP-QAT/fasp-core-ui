@@ -544,6 +544,7 @@
     "static.forecastReport.xAxisAggregateByYear": "X-axis Aggregate By Year",
     "static.ForecastSummary.ForecastSummary": "Forecast Summary",
     "static.supplyPlanFormula.amcNote": "* Consider only non zero values. Also current month is included in the months in future for AMC",
+    "static.loadDeleteProgram.loadDeleteProgram": "Load/Delete Program",
     "static.equivalancyUnit.DisplayTheirForecast": "could elect to display their forecast in the EU of “Treatments for QATitis” and display their forecast as 5,000 “Treatments for QATitis” per month instead.",
     "static.report.lastmodifieddate": "Last modified date",
     "static.report.selectProgram": "Select Program and Version",
@@ -1384,6 +1385,7 @@
     "static.common.pr": "PR",
     "static.message.login.invalidCredentials": "Incorrect login or password",
     "static.common.backTo": "Back to",
+    "static.programLoadedAndmasterDataSync.success": "Program loaded and master data sync successfully",
     "static.dataEntryAndAdjustments.HistoricalActual": "screen. Historical actual consumption can be quantities sold, quantities dispensed to user or quantities issued by storage facilities. On this screen, users can adjust historical consumption data that has been either manually entered on this screen or that has been imported from a QAT supply plan program (if you desire to import, please proceed first to the",
     "static.message.inventorySaved": "Inventory data saved",
     "static.month.dec": "Dec",
@@ -2759,6 +2761,5 @@
     "static.supplyPlanFormula.maxMonthOfStockEx2": "Max = MIN ([ MAX(4,3)+3 ] ,18 )",
     "static.organisation.organisationheader": "Organization",
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Max = 7",
-    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )",
-    "static.loadDeleteProgram.loadDeleteProgram": "Load/Delete Program"
+    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )"
 }

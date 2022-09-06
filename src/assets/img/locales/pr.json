@@ -544,6 +544,7 @@
     "static.forecastReport.xAxisAggregateByYear": "Agregado do eixo X por ano",
     "static.ForecastSummary.ForecastSummary": "Resumo da previsão",
     "static.supplyPlanFormula.amcNote": "* Considere apenas valores diferentes de zero. Além disso, o mês atual está incluído nos meses no futuros para o cálculo do CMM",
+    "static.loadDeleteProgram.loadDeleteProgram": "Carregar/Excluir Programa",
     "static.equivalancyUnit.DisplayTheirForecast": "podem optar por exibir sua previsão na EU de “Tratamentos para QATite” e exibir sua previsão como 5.000 “Tratamentos para QATite” por mês.",
     "static.report.lastmodifieddate": "Data da última alteração",
     "static.report.selectProgram": "Selecione o programa e a versão",
@@ -1384,6 +1385,7 @@
     "static.common.pr": "PR",
     "static.message.login.invalidCredentials": "Login ou senha incorreta",
     "static.common.backTo": "De volta a",
+    "static.programLoadedAndmasterDataSync.success": "Programa carregado e dados mestre sincronizados com sucesso",
     "static.dataEntryAndAdjustments.HistoricalActual": "tela. O consumo real histórico pode ser quantidades vendidas, quantidades dispensadas ao usuário ou quantidades emitidas por instalações de armazenamento. Nesta tela, os usuários podem ajustar os dados históricos de consumo que foram inseridos manualmente nesta tela ou que foram importados de um programa de plano de abastecimento QAT (se desejar importar, prossiga primeiro para o",
     "static.message.inventorySaved": "Dados de stock salvos",
     "static.month.dec": "dez.",
@@ -2759,6 +2761,5 @@
     "static.supplyPlanFormula.maxMonthOfStockEx2": "Máx = Menor entre ([Maior entre (4,3) +3], 18)",
     "static.organisation.organisationheader": "Organização",
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Máx = 7",
-    "static.supplyPlanFormula.maxMonthOfStockEx4": "Máx = Menor entre (7,18)",
-    "static.loadDeleteProgram.loadDeleteProgram": "Carregar/Excluir Programa"
+    "static.supplyPlanFormula.maxMonthOfStockEx4": "Máx = Menor entre (7,18)"
 }
