@@ -559,13 +559,19 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       console.log("countRecivedMov", this.state.countRecived)
       console.log("countMov", this.state.count)
 
-
+console.log("outSide****",(this.state.jsonDataMovingAvg.length
+  + this.state.jsonDataSemiAverage.length
+  + this.state.jsonDataLinearRegression.length
+  + this.state.jsonDataTes.length
+  + this.state.jsonDataArima.length
+  == this.state.count))
       if (this.state.jsonDataMovingAvg.length
         + this.state.jsonDataSemiAverage.length
         + this.state.jsonDataLinearRegression.length
         + this.state.jsonDataTes.length
         + this.state.jsonDataArima.length
         == this.state.count) {
+          console.log("inside if")
         this.saveForecastConsumptionExtrapolation();
       }
     })
@@ -584,7 +590,12 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     }, () => {
       console.log("countRecivedSemi", this.state.countRecived)
       console.log("countSemi", this.state.count)
-
+console.log("Semi outside if", this.state.jsonDataMovingAvg.length
++ this.state.jsonDataSemiAverage.length
++ this.state.jsonDataLinearRegression.length
++ this.state.jsonDataTes.length
++ this.state.jsonDataArima.length
+== this.state.count)
       if (this.state.jsonDataMovingAvg.length
         + this.state.jsonDataSemiAverage.length
         + this.state.jsonDataLinearRegression.length
@@ -606,7 +617,12 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     }, () => {
       console.log("countRecivedL", this.state.countRecived)
       console.log("countL", this.state.count)
-
+console.log("linear outside***",this.state.jsonDataMovingAvg.length
++ this.state.jsonDataSemiAverage.length
++ this.state.jsonDataLinearRegression.length
++ this.state.jsonDataTes.length
++ this.state.jsonDataArima.length
+== this.state.count)
 
       if (this.state.jsonDataMovingAvg.length
         + this.state.jsonDataSemiAverage.length
@@ -629,7 +645,12 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     }, () => {
       console.log("countRecivedT", this.state.countRecived)
       console.log("countT", this.state.count)
-
+console.log("TES",this.state.jsonDataMovingAvg.length
++ this.state.jsonDataSemiAverage.length
++ this.state.jsonDataLinearRegression.length
++ this.state.jsonDataTes.length
++ this.state.jsonDataArima.length
+== this.state.count)
 
       if (this.state.jsonDataMovingAvg.length
         + this.state.jsonDataSemiAverage.length
@@ -652,6 +673,12 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     }, () => {
       console.log("countRecivedA", this.state.countRecived)
       console.log("countA", this.state.count)
+      console.log("Arima", this.state.jsonDataMovingAvg.length
+      + this.state.jsonDataSemiAverage.length
+      + this.state.jsonDataLinearRegression.length
+      + this.state.jsonDataTes.length
+      + this.state.jsonDataArima.length
+      == this.state.count)
       if (this.state.jsonDataMovingAvg.length
         + this.state.jsonDataSemiAverage.length
         + this.state.jsonDataLinearRegression.length
