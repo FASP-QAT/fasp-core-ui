@@ -3435,7 +3435,7 @@ export default class ManualTagging extends Component {
                             {
                                 title: i18n.t('static.manualTagging.conversionARUToPU'),
                                 type: 'numeric',
-                                mask: '#,##0.000000',
+                                mask: '#,##0.00',
                                 decimal: '.',
                                 width: 90,
                                 readOnly: true
@@ -3661,7 +3661,7 @@ export default class ManualTagging extends Component {
                         {
                             title: i18n.t('static.manualTagging.conversionERPToPU'),
                             type: 'numeric',
-                            mask: '#,##0.0000',
+                            mask: '#,##0.00',
                             decimal: '.',
                             textEditor: true,
                             disabledMaskOnEdition: true,
@@ -4070,7 +4070,7 @@ export default class ManualTagging extends Component {
                         {
                             title: i18n.t('static.manualTagging.conversionERPToPU'),
                             type: 'numeric',
-                            mask: '#,##0.0000', decimal: '.',
+                            mask: '#,##0.00', decimal: '.',
                             width: 60,
                             // readOnly: true
                         },

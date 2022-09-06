@@ -852,7 +852,7 @@ export default class ShipmentLinkingNotifications extends Component {
                 {
                     title: i18n.t('static.manualTagging.conversionERPToPU'),
                     type: 'numeric',
-                    mask: '#,##0.0000', decimal: '.',
+                    mask: '#,##0.00', decimal: '.',
                     readOnly: true
                     // readOnly: true
                 },
