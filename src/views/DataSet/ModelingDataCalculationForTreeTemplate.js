@@ -377,6 +377,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                             if (payload.nodeType.id == 2) {
                                 calculatedValue = endValue;
                             } else if (payload.nodeType.id == 3 || payload.nodeType.id == 4 || payload.nodeType.id == 5) {
+                                if(flatList[fl].level!=0){
                                 // Jo uske parent ki calculated value hai Uska endValue %
                                 var parent = flatList[fl].parent;
                                 // console.log("parent---", parent);
@@ -396,6 +397,9 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                 } else {
                                     calculatedValue = 0;
                                 }
+                            }else{
+                                calculatedValue=0;
+                            }
                             }
 
                             if (payload.nodeType.id == 4) {
