@@ -18,8 +18,8 @@ import { Formik } from "formik";
 import getLabelText from '../../CommonComponent/getLabelText';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import CryptoJS from 'crypto-js';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import moment from "moment";
 import { JEXCEL_DECIMAL_NO_REGEX_NEW, JEXCEL_INTEGER_REGEX, JEXCEL_DECIMAL_CATELOG_PRICE, DECIMAL_NO_REGEX, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
@@ -948,7 +948,9 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                         papuDataArr[0] = data;
                                                     }
                                                     this.el = jexcel(document.getElementById("paputableDiv"), '');
-                                                    this.el.destroy();
+                                                    // this.el.destroy();
+                                                    jexcel.destroy(document.getElementById("paputableDiv"), true);
+
                                                     var json = [];
                                                     var data = papuDataArr;
 
@@ -988,13 +990,13 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                                 title: i18n.t('static.procurementAgent.MOQ'),
                                                                 type: 'numeric',
                                                                 textEditor: true,
-                                                                mask: '#,##.00',
+                                                                mask: '#,##',
                                                                 disabledMaskOnEdition: true
                                                             },
                                                             {
                                                                 title: i18n.t('static.procurementAgent.UnitPerPalletEuro1'),
                                                                 type: 'numeric',
-                                                                mask: '#,##.00',
+                                                                mask: '#,##',
                                                                 textEditor: true,
                                                                 disabledMaskOnEdition: true
                                                             },
@@ -1002,14 +1004,14 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                                 title: i18n.t('static.procurementAgent.UnitPerPalletEuro2'),
                                                                 type: 'numeric',
                                                                 textEditor: true,
-                                                                mask: '#,##.00',
+                                                                mask: '#,##',
                                                                 disabledMaskOnEdition: true
                                                             },
                                                             {
                                                                 title: i18n.t('static.procurementAgent.UnitPerContainer'),
                                                                 type: 'numeric',
                                                                 // decimal: '.',
-                                                                mask: '#,##.00',
+                                                                mask: '#,##',
                                                                 textEditor: true,
                                                                 disabledMaskOnEdition: true
                                                             },
@@ -1044,11 +1046,12 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                             }
 
                                                         ],
+                                                        editable: true,
                                                         pagination: localStorage.getItem("sesRecordCount"),
                                                         filters: true,
                                                         search: true,
                                                         columnSorting: true,
-                                                        tableOverflow: true,
+                                                        // tableOverflow: true,
                                                         wordWrap: true,
                                                         paginationOptions: JEXCEL_PAGINATION_OPTION,
                                                         position: 'top',
@@ -1061,12 +1064,12 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                         parseFormulas: true,
                                                         onpaste: this.onPaste,
                                                         oneditionend: this.oneditionend,
-                                                        text: {
-                                                            // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                                                            showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                                                            show: '',
-                                                            entries: '',
-                                                        },
+                                                        // text: {
+                                                        //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                                                        //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                                                        //     show: '',
+                                                        //     entries: '',
+                                                        // },
                                                         onload: this.loaded,
                                                         license: JEXCEL_PRO_KEY,
                                                         contextMenu: function (obj, x, y, e) {
@@ -1417,7 +1420,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
     }
 
     oneditionend = function (instance, cell, x, y, value) {
-        var elInstance = instance.jexcel;
+        var elInstance = instance;
         var rowData = elInstance.getRowData(y);
 
         if (x == 3 && !isNaN(rowData[3]) && rowData[3].toString().indexOf('.') != -1) {
@@ -1466,11 +1469,11 @@ export default class AddProcurementAgentPlanningUnit extends Component {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
-                var index = (instance.jexcel).getValue(`L${parseInt(data[i].y) + 1}`, true);
+                var index = (instance).getValue(`L${parseInt(data[i].y) + 1}`, true);
                 if (index === "" || index == null || index == undefined) {
-                    (instance.jexcel).setValueFromCoords(0, data[i].y, this.props.match.params.procurementAgentId, true);
-                    (instance.jexcel).setValueFromCoords(11, data[i].y, 0, true);
-                    (instance.jexcel).setValueFromCoords(12, data[i].y, 1, true);
+                    (instance).setValueFromCoords(0, data[i].y, this.props.match.params.procurementAgentId, true);
+                    (instance).setValueFromCoords(11, data[i].y, 0, true);
+                    (instance).setValueFromCoords(12, data[i].y, 1, true);
                     z = data[i].y;
                 }
             }
@@ -1634,7 +1637,9 @@ export default class AddProcurementAgentPlanningUnit extends Component {
 
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
-        var asterisk = document.getElementsByClassName("resizable")[0];
+        // var asterisk = document.getElementsByClassName("resizable")[0];
+        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
+
         var tr = asterisk.firstChild;
 
         tr.children[2].classList.add('AsteriskTheadtrTd');
@@ -2095,6 +2100,11 @@ export default class AddProcurementAgentPlanningUnit extends Component {
 
 
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
         return (
 
             <div className="animated fadeIn">

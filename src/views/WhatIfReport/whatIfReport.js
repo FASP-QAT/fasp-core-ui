@@ -37,7 +37,9 @@ import AuthenticationService from "../Common/AuthenticationService";
 import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 // import SupplyPlanFormulas from "./SupplyPlanFormulas";
-import { Prompt } from 'react-router';
+import { Prompt } from 'react-router'
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import { MultiSelect } from "react-multi-select-component";
 
 const entityname = i18n.t('static.dashboard.whatIf')
@@ -3890,7 +3892,9 @@ export default class WhatIfReportComponent extends React.Component {
             this.setState({ loading: true, consumptionStartDateClicked: startDate });
             var elInstance = this.state.consumptionBatchInfoTableEl;
             if (elInstance != undefined && elInstance != "") {
-                elInstance.destroy();
+                // elInstance.destroy();
+                jexcel.destroy(document.getElementById("consumptionBatchInfoTable"), true);
+
             }
             var planningUnitId = document.getElementById("planningUnitId").value;
             var programId = document.getElementById("programId").value;
@@ -3987,7 +3991,9 @@ export default class WhatIfReportComponent extends React.Component {
             this.setState({ loading: true, inventoryStartDateClicked: moment(endDate).startOf('month').format("YYYY-MM-DD") });
             var elInstance = this.state.inventoryBatchInfoTableEl;
             if (elInstance != undefined && elInstance != "") {
-                elInstance.destroy();
+                // elInstance.destroy();
+                jexcel.destroy(document.getElementById("inventoryBatchInfoTable"), true);
+
             }
             var planningUnitId = document.getElementById("planningUnitId").value;
             var programId = document.getElementById("programId").value;
@@ -4127,6 +4133,8 @@ export default class WhatIfReportComponent extends React.Component {
         if (isEmergencyOrder == 0) {
             emergencyOrder = false;
         }
+        var seaFreightPercentage = this.state.generalProgramJson.seaFreightPerc;
+        var freightCost = Number(programPlanningUnit.catalogPrice) * Number(suggestedShipmentList[0].suggestedOrderQty) * (Number(Number(seaFreightPercentage) / 100));
         var json = {
             shipmentQty: suggestedShipmentList[0].suggestedOrderQty,
             index: -1,
@@ -4159,7 +4167,9 @@ export default class WhatIfReportComponent extends React.Component {
             expectedDeliveryDate: moment(month).format("YYYY-MM-DD"),
             planningUnit: {
                 id: document.getElementById("planningUnitId").value
-            }
+            },
+            rate: programPlanningUnit.catalogPrice,
+            freightCost: freightCost
         }
         shipmentList.push(json);
         this.setState({
@@ -5129,7 +5139,7 @@ export default class WhatIfReportComponent extends React.Component {
                                                 this.state.expiredStockArr.map(item1 => {
                                                     if (item1.toString() != "") {
                                                         if (item1.qty != 0) {
-                                                            return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('expiredStock', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, '')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                            return (<td align="right" className="hoverTd redColor" onClick={() => this.toggleLarge('expiredStock', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, '')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                                         } else {
                                                             return (<td align="right"></td>)
                                                         }
@@ -5313,11 +5323,11 @@ export default class WhatIfReportComponent extends React.Component {
                                 </tfoot>
                             </Table>
                             {this.state.showConsumption == 1 && <ConsumptionInSupplyPlanComponent ref="consumptionChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} consumptionPage="whatIf" useLocalData={1} />}
-                            <div className="table-responsive mt-3">
+                            <div className=" mt-3">
                                 <div id="consumptionTable" />
                             </div>
                             <h6 className="red" id="div3">{this.state.consumptionBatchInfoDuplicateError || this.state.consumptionBatchInfoNoStockError || this.state.consumptionBatchError}</h6>
-                            <div className="table-responsive">
+                            <div className="">
                                 <div id="consumptionBatchInfoTable" className="AddListbatchtrHeight"></div>
                             </div>
 
@@ -5526,11 +5536,11 @@ export default class WhatIfReportComponent extends React.Component {
                                 </>
                             }
                             {this.state.showInventory == 1 && <InventoryInSupplyPlanComponent ref="inventoryChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} inventoryPage="whatIf" hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} adjustmentsDetailsClicked={this.adjustmentsDetailsClicked} useLocalData={1} />}
-                            <div className="table-responsive mt-3">
-                                <div id="adjustmentsTable" className="table-responsive " />
+                            <div className=" mt-3">
+                                <div id="adjustmentsTable" className=" " />
                             </div>
                             <h6 className="red" id="div3">{this.state.inventoryBatchInfoDuplicateError || this.state.inventoryBatchInfoNoStockError || this.state.inventoryBatchError}</h6>
-                            <div className="table-responsive">
+                            <div className="">
                                 <div id="inventoryBatchInfoTable" className="AddListbatchtrHeight"></div>
                             </div>
 
@@ -5582,17 +5592,17 @@ export default class WhatIfReportComponent extends React.Component {
                         <ModalBody>
                             <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} hideFourthComponent={this.hideFourthComponent} hideFifthComponent={this.hideFifthComponent} shipmentPage="whatIf" useLocalData={1} />
                             <h6 className="red" id="div2">{this.state.noFundsBudgetError || this.state.shipmentBatchError || this.state.shipmentError}</h6>
-                            <div className="table-responsive">
+                            <div className="">
                                 <div id="shipmentsDetailsTable" />
                             </div>
 
                             <h6 className="red" id="div3">{this.state.qtyCalculatorValidationError}</h6>
-                            <div className="table-responsive RemoveStriped">
+                            <div className=" RemoveStriped">
                                 <div id="qtyCalculatorTable"></div>
                             </div>
 
-                            <div className="table-responsive RemoveStriped">
-                                <div id="qtyCalculatorTable1"></div>
+                            <div className=" RemoveStriped">
+                                <div id="qtyCalculatorTable1" className="jexcelremoveReadonlybackground"></div>
                             </div>
 
                             <div id="showSaveQtyButtonDiv" style={{ display: 'none' }}>
@@ -5601,7 +5611,7 @@ export default class WhatIfReportComponent extends React.Component {
                             </div>
 
                             <h6 className="red" id="div4">{this.state.shipmentDatesError}</h6>
-                            <div className="table-responsive">
+                            <div className="">
                                 <div id="shipmentDatesTable"></div>
                             </div>
                             <div id="showSaveShipmentsDatesButtonsDiv" style={{ display: 'none' }}>
@@ -5609,7 +5619,7 @@ export default class WhatIfReportComponent extends React.Component {
                                 {this.state.shipmentDatesChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipmentsDate()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveShipmentDates')}</Button>}
                             </div>
                             <h6 className="red" id="div5">{this.state.shipmentBatchInfoDuplicateError || this.state.shipmentValidationBatchError}</h6>
-                            <div className="table-responsive">
+                            <div className="">
                                 <div id="shipmentBatchInfoTable" className="AddListbatchtrHeight"></div>
                             </div>
                             <div id="showShipmentBatchInfoButtonsDiv" style={{ display: 'none' }}>
@@ -6124,8 +6134,11 @@ export default class WhatIfReportComponent extends React.Component {
             }
             if (cont == true) {
                 document.getElementById("showSaveQtyButtonDiv").style.display = 'none';
-                (this.refs.shipmentChild.state.qtyCalculatorTableEl).destroy();
-                (this.refs.shipmentChild.state.qtyCalculatorTableEl1).destroy();
+                // (this.refs.shipmentChild.state.qtyCalculatorTableEl).destroy();
+                // (this.refs.shipmentChild.state.qtyCalculatorTableEl1).destroy();
+                jexcel.destroy(document.getElementById("qtyCalculatorTable"), true);
+                jexcel.destroy(document.getElementById("qtyCalculatorTable1"), true);
+
                 this.refs.shipmentChild.state.shipmentQtyChangedFlag = 0;
                 this.setState({
                     qtyCalculatorValidationError: "",
@@ -6146,7 +6159,9 @@ export default class WhatIfReportComponent extends React.Component {
             }
             if (cont == true) {
                 document.getElementById("showSaveShipmentsDatesButtonsDiv").style.display = 'none';
-                (this.refs.shipmentChild.state.shipmentDatesTableEl).destroy();
+                // (this.refs.shipmentChild.state.shipmentDatesTableEl).destroy();
+                jexcel.destroy(document.getElementById("shipmentDatesTable"), true);
+
                 this.refs.shipmentChild.state.shipmentDatesChangedFlag = 0;
                 this.setState({
                     shipmentDatesChangedFlag: 0,
@@ -6167,7 +6182,9 @@ export default class WhatIfReportComponent extends React.Component {
             }
             if (cont == true) {
                 document.getElementById("showShipmentBatchInfoButtonsDiv").style.display = 'none';
-                (this.refs.shipmentChild.state.shipmentBatchInfoTableEl).destroy();
+                // (this.refs.shipmentChild.state.shipmentBatchInfoTableEl).destroy();
+                jexcel.destroy(document.getElementById("shipmentBatchInfoTable"), true);
+
                 this.refs.shipmentChild.state.shipmentBatchInfoChangedFlag = 0;
                 this.setState({
                     shipmentBatchInfoChangedFlag: 0,
@@ -6192,7 +6209,9 @@ export default class WhatIfReportComponent extends React.Component {
         }
         if (cont == true) {
             document.getElementById("showInventoryBatchInfoButtonsDiv").style.display = 'none';
-            (this.refs.inventoryChild.state.inventoryBatchInfoTableEl).destroy();
+            // (this.refs.inventoryChild.state.inventoryBatchInfoTableEl).destroy();
+            jexcel.destroy(document.getElementById("inventoryBatchInfoTable"), true);
+
             this.refs.inventoryChild.state.inventoryBatchInfoChangedFlag = 0;
             this.setState({
                 inventoryBatchInfoChangedFlag: 0,
@@ -6217,7 +6236,9 @@ export default class WhatIfReportComponent extends React.Component {
         }
         if (cont == true) {
             document.getElementById("showConsumptionBatchInfoButtonsDiv").style.display = 'none';
-            (this.refs.consumptionChild.state.consumptionBatchInfoTableEl).destroy();
+            // (this.refs.consumptionChild.state.consumptionBatchInfoTableEl).destroy();
+            jexcel.destroy(document.getElementById("consumptionBatchInfoTable"), true);
+
             this.refs.consumptionChild.state.consumptionBatchInfoChangedFlag = 0;
             this.setState({
                 consumptionBatchInfoChangedFlag: 0,

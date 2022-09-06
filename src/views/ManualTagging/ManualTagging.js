@@ -17,8 +17,8 @@ import ProductService from '../../api/ProductService';
 import ManualTaggingService from '../../api/ManualTaggingService.js';
 import PlanningUnitService from '../../api/PlanningUnitService.js';
 import RealmCountryService from '../../api/RealmCountryService';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
@@ -155,7 +155,7 @@ export default class ManualTagging extends Component {
 
     versionChange(event) {
         this.setState({
-            loading:true
+            loading: true
         })
         var versionId = event.target.value;
         localStorage.setItem("sesVersionIdReport", versionId);
@@ -168,7 +168,7 @@ export default class ManualTagging extends Component {
             } else {
                 this.setState({
                     planningUnits: [],
-                    loading:false
+                    loading: false
                 })
             }
         })
@@ -660,7 +660,7 @@ export default class ManualTagging extends Component {
     }.bind(this);
 
     oneditionend = function (instance, cell, x, y, value) {
-        var elInstance = instance.jexcel;
+        var elInstance = instance;
         var rowData = elInstance.getRowData(y);
 
         if (x == 7 && !isNaN(rowData[7]) && rowData[7].toString().indexOf('.') != -1) {
@@ -676,11 +676,11 @@ export default class ManualTagging extends Component {
 
 
         if (data.length == 1 && Object.keys(data[0])[2] == "value") {
-            (instance.jexcel).setValueFromCoords(7, data[0].y, parseFloat(data[0].value), true);
+            (instance).setValueFromCoords(7, data[0].y, parseFloat(data[0].value), true);
         }
         else {
             for (var i = 0; i < data.length; i++) {
-                (instance.jexcel).setValueFromCoords(10, data[i].y, 1, true);
+                (instance).setValueFromCoords(10, data[i].y, 1, true);
             }
         }
 
@@ -692,7 +692,7 @@ export default class ManualTagging extends Component {
     dataChangeCheckbox(event) {
         this.setState({
             selectedShipment: [],
-            originalQty:0,
+            originalQty: 0,
             checkboxValue: (event.target.checked ? true : false)
         })
     }
@@ -847,7 +847,9 @@ export default class ManualTagging extends Component {
             });
         }
         try {
-            this.state.languageEl.destroy();
+            // this.state.languageEl.destroy();
+            jexcel.destroy(document.getElementById("tableDiv"), true);
+
         } catch (e) {
 
         }
@@ -1017,7 +1019,9 @@ export default class ManualTagging extends Component {
                         outputList: []
                     }, () => {
                         try {
-                            this.state.languageEl.destroy();
+                            // this.state.languageEl.destroy();
+                            jexcel.destroy(document.getElementById("tableDiv"), true);
+
                         } catch (e) {
 
                         }
@@ -1069,7 +1073,7 @@ export default class ManualTagging extends Component {
             versionList: versionList,
             loading: false
         }, () => {
-            if (localStorage.getItem("sesVersionIdReport") != '' && localStorage.getItem("sesVersionIdReport") != undefined && versionList.filter(c=>c.versionId==localStorage.getItem("sesVersionIdReport")).length>0) {
+            if (localStorage.getItem("sesVersionIdReport") != '' && localStorage.getItem("sesVersionIdReport") != undefined && versionList.filter(c => c.versionId == localStorage.getItem("sesVersionIdReport")).length > 0) {
                 var event = {
                     target: {
                         value: localStorage.getItem("sesVersionIdReport")
@@ -1077,17 +1081,19 @@ export default class ManualTagging extends Component {
                 };
                 this.versionChange(event)
 
-            }else{
-            this.getPlanningUnitList()
+            } else {
+                this.getPlanningUnitList()
             }
             if (this.state.versionId.toString() != -1) {
-                
+
             } else {
                 this.setState({
                     outputList: []
                 }, () => {
                     try {
-                        this.state.languageEl.destroy();
+                        // this.state.languageEl.destroy();
+                        jexcel.destroy(document.getElementById("tableDiv"), true);
+
                     } catch (e) {
 
                     }
@@ -1261,8 +1267,8 @@ export default class ManualTagging extends Component {
                         var curUser = AuthenticationService.getLoggedInUserId();
                         var username = AuthenticationService.getLoggedInUsername();
                         for (var ss = 0; ss < selectedShipment.length; ss++) {
-                            var linkedShipmentsListIndex = linkedShipmentsList.findIndex(c => (selectedShipment[ss][16].shipmentId > 0 ? selectedShipment[ss][16].shipmentId == c.childShipmentId : selectedShipment[ss][16].tempShipmentId == c.tempChildShipmentId) && c.active.toString()=="true");
-                            var linkedShipmentsListFilter = linkedShipmentsList.filter(c => (selectedShipment[ss][16].shipmentId > 0 ? selectedShipment[ss][16].shipmentId == c.childShipmentId : selectedShipment[ss][16].tempShipmentId == c.tempChildShipmentId) && c.active.toString()=="true");
+                            var linkedShipmentsListIndex = linkedShipmentsList.findIndex(c => (selectedShipment[ss][16].shipmentId > 0 ? selectedShipment[ss][16].shipmentId == c.childShipmentId : selectedShipment[ss][16].tempShipmentId == c.tempChildShipmentId) && c.active.toString() == "true");
+                            var linkedShipmentsListFilter = linkedShipmentsList.filter(c => (selectedShipment[ss][16].shipmentId > 0 ? selectedShipment[ss][16].shipmentId == c.childShipmentId : selectedShipment[ss][16].tempShipmentId == c.tempChildShipmentId) && c.active.toString() == "true");
                             linkedShipmentsList[linkedShipmentsListIndex].active = false;
                             linkedShipmentsList[linkedShipmentsListIndex].lastModifiedBy.userId = curUser;
                             linkedShipmentsList[linkedShipmentsListIndex].lastModifiedBy.username = username;
@@ -1995,7 +2001,7 @@ export default class ManualTagging extends Component {
                 })
             }
         }
-        var shipmentPlanningUnitId = this.state.active1 ? this.state.selectedRowPlanningUnit : (this.state.active3 ? ((this.state.active4 || this.state.active5) && !this.state.checkboxValue ? document.getElementById("planningUnitId1").value : (this.state.active4 || this.state.active5) && this.state.checkboxValue ? this.state.selectedShipment.length>0?this.state.selectedShipment[0].planningUnit.id:0 : 0) : 0)
+        var shipmentPlanningUnitId = this.state.active1 ? this.state.selectedRowPlanningUnit : (this.state.active3 ? ((this.state.active4 || this.state.active5) && !this.state.checkboxValue ? document.getElementById("planningUnitId1").value : (this.state.active4 || this.state.active5) && this.state.checkboxValue ? this.state.selectedShipment.length > 0 ? this.state.selectedShipment[0].planningUnit.id : 0 : 0) : 0)
         if ((roNoOrderNo != "" && roNoOrderNo != "0") || (erpPlanningUnitId != 0)) {
             // roNoOrderNo, programId, erpPlanningUnitId, (this.state.active1 ? 1 : (this.state.active2 ? 2 : 3)), (this.state.active2 ? this.state.parentShipmentId : 0)
             var json = {
@@ -2220,7 +2226,7 @@ export default class ManualTagging extends Component {
                 var generalProgramJson = JSON.parse(generalProgramData);
                 var linkedShipmentsList = generalProgramJson.shipmentLinkingList != null ? generalProgramJson.shipmentLinkingList : [];
                 var linkedRoNoAndRoPrimeLineNo = [];
-                console.log("linkedShipmentsList@@@@@@@@@@@@@@@",linkedShipmentsList);
+                console.log("linkedShipmentsList@@@@@@@@@@@@@@@", linkedShipmentsList);
                 linkedShipmentsList.filter(c => c.shipmentLinkingId == 0 && c.active == true).map(c => {
                     linkedRoNoAndRoPrimeLineNo.push(c.roNo + "|" + c.roPrimeLineNo)
                 })
@@ -2229,7 +2235,7 @@ export default class ManualTagging extends Component {
             ManualTaggingService.getShipmentListForTab3(json)
                 .then(response => {
                     var outputList = response.data;
-                    console.log("output list@@@@@@@@@@@@@@@",outputList)
+                    console.log("output list@@@@@@@@@@@@@@@", outputList)
                     var filterOnLinkedData = outputList.filter(c => !linkedRoNoAndRoPrimeLineNo.includes(c.roNo + "|" + c.roPrimeLineNo));
                     let resultTrue = Object.values(filterOnLinkedData.reduce((a, { roNo, roPrimeLineNo, knShipmentNo, erpQty, orderNo, primeLineNo, erpShipmentStatus, expectedDeliveryDate, batchNo, expiryDate, erpPlanningUnit, price, shippingCost, shipBy, qatEquivalentShipmentStatus, parentShipmentId, childShipmentId, notes, qatPlanningUnit }) => {
                         if (!a[roNo + "|" + roPrimeLineNo + "|" + knShipmentNo])
@@ -2470,7 +2476,9 @@ export default class ManualTagging extends Component {
                     outputList: []
                 }, () => {
                     try {
-                        this.state.languageEl.destroy();
+                        // this.state.languageEl.destroy();
+                        jexcel.destroy(document.getElementById("tableDiv"), true);
+
                     } catch (e) {
 
                     }
@@ -2658,7 +2666,7 @@ export default class ManualTagging extends Component {
                         this.setState({
                             programs: listArray,
                             loading: false
-                        },()=>{
+                        }, () => {
                             if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
                                 this.setState({
                                     programId: localStorage.getItem("sesProgramIdReport")
@@ -2800,7 +2808,9 @@ export default class ManualTagging extends Component {
                 });
                 console.log("TableDiv1@@@@@@@@@@@@@@@@@@@@@", document.getElementById("tableDiv1"))
                 this.el = jexcel(document.getElementById("tableDiv1"), '');
-                this.el.destroy();
+                // this.el.destroy();
+                jexcel.destroy(document.getElementById("tableDiv1"), true);
+
                 var json = [];
                 var data = erpDataArray;
                 // var data = [];
@@ -2897,23 +2907,23 @@ export default class ManualTagging extends Component {
                     ],
                     // footers: [['Total','1','1','1','1',0,0,0,0]],
                     editable: true,
-                    text: {
-                        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                        show: '',
-                        entries: '',
-                    },
+                    // text: {
+                    //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                    //     show: '',
+                    //     entries: '',
+                    // },
                     onsearch: function (el) {
-                        el.jexcel.updateTable();
+                        // el.jexcel.updateTable();
                     },
                     onfilter: function (el) {
-                        el.jexcel.updateTable();
+                        // el.jexcel.updateTable();
                     },
                     onload: this.loadedERP,
                     pagination: localStorage.getItem("sesRecordCount"),
                     filters: true,
                     search: true,
                     columnSorting: true,
-                    tableOverflow: true,
+                    // tableOverflow: true,
                     wordWrap: true,
                     paginationOptions: JEXCEL_PAGINATION_OPTION,
                     position: 'top',
@@ -2922,7 +2932,7 @@ export default class ManualTagging extends Component {
                     allowDeleteRow: false,
                     onchange: this.changed,
                     updateTable: function (el, cell, x, y, source, value, id) {
-                        var elInstance = el.jexcel;
+                        var elInstance = el;
                         if (y != null) {
                             var rowData = elInstance.getRowData(y);
                             if (rowData[13] == 0 && rowData[0]) {
@@ -3040,7 +3050,9 @@ export default class ManualTagging extends Component {
         }
 
         this.el = jexcel(document.getElementById("tableDiv"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("tableDiv"), true);
+
         var json = [];
         var data = manualTaggingArray;
         if (this.state.active1) {
@@ -3097,16 +3109,16 @@ export default class ManualTagging extends Component {
                     },
                 ],
                 editable: false,
-                text: {
-                    showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                    show: '',
-                    entries: '',
-                },
+                // text: {
+                //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                //     show: '',
+                //     entries: '',
+                // },
                 onload: this.loaded,
                 pagination: localStorage.getItem("sesRecordCount"),
                 search: true,
                 columnSorting: true,
-                tableOverflow: true,
+                // tableOverflow: true,
                 wordWrap: true,
                 allowInsertColumn: false,
                 allowManualInsertColumn: false,
@@ -3243,16 +3255,16 @@ export default class ManualTagging extends Component {
                     },
                 ],
                 editable: true,
-                text: {
-                    showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                    show: '',
-                    entries: '',
-                },
+                // text: {
+                //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                //     show: '',
+                //     entries: '',
+                // },
                 onload: this.loaded,
                 pagination: localStorage.getItem("sesRecordCount"),
                 search: true,
                 columnSorting: true,
-                tableOverflow: true,
+                // tableOverflow: true,
                 wordWrap: true,
                 allowInsertColumn: false,
                 allowManualInsertColumn: false,
@@ -3269,7 +3281,7 @@ export default class ManualTagging extends Component {
                 filters: true,
                 license: JEXCEL_PRO_KEY,
                 updateTable: function (el, cell, x, y, source, value, id) {
-                    var elInstance = el.jexcel;
+                    var elInstance = el;
                     if (y != null) {
                         var rowData = elInstance.getRowData(y);
                         console.log("RowData@@@@@@@@", rowData)
@@ -3280,10 +3292,10 @@ export default class ManualTagging extends Component {
                     }
                 }.bind(this),
                 onsearch: function (el) {
-                    el.jexcel.updateTable();
+                    // el.jexcel.updateTable();
                 },
                 onfilter: function (el) {
-                    el.jexcel.updateTable();
+                    // el.jexcel.updateTable();
                 },
                 contextMenu: function (obj, x, y, e) {
                     var items = [];
@@ -3419,16 +3431,16 @@ export default class ManualTagging extends Component {
                     },
                 ],
                 editable: false,
-                text: {
-                    showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                    show: '',
-                    entries: '',
-                },
+                // text: {
+                //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                //     show: '',
+                //     entries: '',
+                // },
                 onload: this.loaded,
                 pagination: localStorage.getItem("sesRecordCount"),
                 search: true,
                 columnSorting: true,
-                tableOverflow: true,
+                // tableOverflow: true,
                 wordWrap: true,
                 allowInsertColumn: false,
                 allowManualInsertColumn: false,
@@ -3465,80 +3477,83 @@ export default class ManualTagging extends Component {
         tr.children[8].classList.add('AsteriskTheadtrTd');
     }
 
-    selected = function (instance, cell, x, y, value) {
-        console.log("x$$$$$$$$$$$$$$$$",x);
-        console.log("y$$$$$$$$$$$$$$$$",y);
-        console.log("value$$$$$$$$$$$$$$$$",value);
-        if ((x == 0 && value != 0) || (y == 0 && value!=0)) {
-            // console.log("HEADER SELECTION--------------------------");
-        } else {
-            this.setState({
-                loading:true
-            })
-            var outputListAfterSearch = [];
-            let row;
-            let json;
-            let buildJexcelRequired = true;
-            if (this.state.active1
-                && this.state.versionId.includes("Local")
-            ) {
-                row = this.state.outputList.filter(c => (this.el.getValueFromCoords(0, x) != 0 ? c.shipmentId == this.el.getValueFromCoords(0, x) : c.tempShipmentId == this.el.getValueFromCoords(9, x)))[0];
-                outputListAfterSearch.push(row);
-                if (outputListAfterSearch[0].orderNo != null && outputListAfterSearch[0].orderNo != "") {
-                    json = { id: outputListAfterSearch[0].orderNo, label: outputListAfterSearch[0].orderNo };
-                } else {
-                    json = { id: '', label: '' };
-                    buildJexcelRequired = false;
-                }
-                this.setState({
-                    tempNotes: (outputListAfterSearch[0].notes != null && outputListAfterSearch[0].notes != "" ? outputListAfterSearch[0].notes : ""),
-                    originalQty: outputListAfterSearch[0].shipmentQty,
-                    outputListAfterSearch,
-                    buildJexcelRequired,
-                    roNoOrderNo: json,
-                    table1Loader: outputListAfterSearch[0].orderNo != null && outputListAfterSearch[0].orderNo != "" ? false : true,
-                    searchedValue: (outputListAfterSearch[0].orderNo != null && outputListAfterSearch[0].orderNo != "" ? outputListAfterSearch[0].orderNo : ""),
-                    selectedRowPlanningUnit: outputListAfterSearch[0].planningUnit.id
-                    // planningUnitIdUpdated: outputListAfterSearch[0].planningUnit.id
-                }, () => {
+    selected = function (instance, cell, x, y, value, e) {
+        if (e.buttons == 1) {
 
-                    this.getOrderDetails();
-                });
-            } else if (this.state.active2 && this.state.versionId.includes("Local")) {
-                // var index = this.state.outputList.findIndex(c => (this.el.getValueFromCoords(1, x))>0?c.shipmentId == (this.el.getValueFromCoords(1, x)):c.tempShipmentId==(this.el.getValueFromCoords(14, x)))[0];
-                var rowData = this.el.getRowData(x);
-                // outputListAfterSearch.push(row);
-                this.toggleLarge();
-                this.getShipmentsForTab2(rowData[1], rowData[14], rowData[2].split("|")[0], rowData[2].split("|")[1]);
-                // this.getOrderDetails();
-
-            } else if (this.state.active3) {
-                row = this.state.outputList.filter((c, index) => (index == this.el.getValueFromCoords(7, x)))[0];
-                outputListAfterSearch.push(row);
-                json = { id: outputListAfterSearch[0].roNo, label: outputListAfterSearch[0].roNo };
-
+            console.log("x$$$$$$$$$$$$$$$$", x);
+            console.log("y$$$$$$$$$$$$$$$$", y);
+            console.log("value$$$$$$$$$$$$$$$$", value);
+            if ((x == 0 && value != 0) || (y == 0 && value != 0)) {
+                // console.log("HEADER SELECTION--------------------------");
+            } else {
                 this.setState({
-                    originalQty: 0,
-                    outputListAfterSearch,
-                    selectedShipment: [],
-                    roNoOrderNo: json,
-                    searchedValue: outputListAfterSearch[0].roNo
-                    // planningUnitIdUpdated: outputListAfterSearch[0].erpPlanningUnit.id
-                }, () => {
-                    this.filterProgramByCountry();
-                    // this.getOrderDetails();
-                });
-            }
-            // outputListAfterSearch.push(row);
-            // console.log("1------------------------------>>>>", outputListAfterSearch[0].erpPlanningUnit.id)
-            if (!this.state.active2) {
-                this.setState({
-                    planningUnitId: (this.state.active3 ? outputListAfterSearch[0].erpPlanningUnit.id : outputListAfterSearch[0].planningUnit.id),
-                    shipmentId: (this.state.active1 ? this.el.getValueFromCoords(0, x) : (this.state.active2 ? this.el.getValueFromCoords(1, x) : 0)),
-                    procurementAgentId: (this.state.active3 ? 1 : outputListAfterSearch[0].procurementAgent.id),
-                    planningUnitName: (this.state.active3 ? row.erpPlanningUnit.label.label_en + "(" + row.skuCode + ")" : row.planningUnit.label.label_en + '(' + row.skuCode + ')')
+                    loading: true
                 })
-                this.toggleLarge();
+                var outputListAfterSearch = [];
+                let row;
+                let json;
+                let buildJexcelRequired = true;
+                if (this.state.active1
+                    && this.state.versionId.includes("Local")
+                ) {
+                    row = this.state.outputList.filter(c => (this.el.getValueFromCoords(0, x) != 0 ? c.shipmentId == this.el.getValueFromCoords(0, x) : c.tempShipmentId == this.el.getValueFromCoords(9, x)))[0];
+                    outputListAfterSearch.push(row);
+                    if (outputListAfterSearch[0].orderNo != null && outputListAfterSearch[0].orderNo != "") {
+                        json = { id: outputListAfterSearch[0].orderNo, label: outputListAfterSearch[0].orderNo };
+                    } else {
+                        json = { id: '', label: '' };
+                        buildJexcelRequired = false;
+                    }
+                    this.setState({
+                        tempNotes: (outputListAfterSearch[0].notes != null && outputListAfterSearch[0].notes != "" ? outputListAfterSearch[0].notes : ""),
+                        originalQty: outputListAfterSearch[0].shipmentQty,
+                        outputListAfterSearch,
+                        buildJexcelRequired,
+                        roNoOrderNo: json,
+                        table1Loader: outputListAfterSearch[0].orderNo != null && outputListAfterSearch[0].orderNo != "" ? false : true,
+                        searchedValue: (outputListAfterSearch[0].orderNo != null && outputListAfterSearch[0].orderNo != "" ? outputListAfterSearch[0].orderNo : ""),
+                        selectedRowPlanningUnit: outputListAfterSearch[0].planningUnit.id
+                        // planningUnitIdUpdated: outputListAfterSearch[0].planningUnit.id
+                    }, () => {
+
+                        this.getOrderDetails();
+                    });
+                } else if (this.state.active2 && this.state.versionId.includes("Local")) {
+                    // var index = this.state.outputList.findIndex(c => (this.el.getValueFromCoords(1, x))>0?c.shipmentId == (this.el.getValueFromCoords(1, x)):c.tempShipmentId==(this.el.getValueFromCoords(14, x)))[0];
+                    var rowData = this.el.getRowData(x);
+                    // outputListAfterSearch.push(row);
+                    this.toggleLarge();
+                    this.getShipmentsForTab2(rowData[1], rowData[14], rowData[2].split("|")[0], rowData[2].split("|")[1]);
+                    // this.getOrderDetails();
+
+                } else if (this.state.active3) {
+                    row = this.state.outputList.filter((c, index) => (index == this.el.getValueFromCoords(7, x)))[0];
+                    outputListAfterSearch.push(row);
+                    json = { id: outputListAfterSearch[0].roNo, label: outputListAfterSearch[0].roNo };
+
+                    this.setState({
+                        originalQty: 0,
+                        outputListAfterSearch,
+                        selectedShipment: [],
+                        roNoOrderNo: json,
+                        searchedValue: outputListAfterSearch[0].roNo
+                        // planningUnitIdUpdated: outputListAfterSearch[0].erpPlanningUnit.id
+                    }, () => {
+                        this.filterProgramByCountry();
+                        // this.getOrderDetails();
+                    });
+                }
+                // outputListAfterSearch.push(row);
+                // console.log("1------------------------------>>>>", outputListAfterSearch[0].erpPlanningUnit.id)
+                if (!this.state.active2) {
+                    this.setState({
+                        planningUnitId: (this.state.active3 ? outputListAfterSearch[0].erpPlanningUnit.id : outputListAfterSearch[0].planningUnit.id),
+                        shipmentId: (this.state.active1 ? this.el.getValueFromCoords(0, x) : (this.state.active2 ? this.el.getValueFromCoords(1, x) : 0)),
+                        procurementAgentId: (this.state.active3 ? 1 : outputListAfterSearch[0].procurementAgent.id),
+                        planningUnitName: (this.state.active3 ? row.erpPlanningUnit.label.label_en + "(" + row.skuCode + ")" : row.planningUnit.label.label_en + '(' + row.skuCode + ')')
+                    })
+                    this.toggleLarge();
+                }
             }
         }
     }.bind(this);
@@ -3644,7 +3659,7 @@ export default class ManualTagging extends Component {
 
                         this.setState({
                             message: response.data.messageCode,
-                            loading:false,
+                            loading: false,
                             color: '#BA0C2F'
                         },
                             () => {
@@ -3730,7 +3745,9 @@ export default class ManualTagging extends Component {
                 outputList: []
             }, () => {
                 try {
-                    this.state.languageEl.destroy();
+                    // this.state.languageEl.destroy();
+                    jexcel.destroy(document.getElementById("tableDiv"), true);
+
                 } catch (e) {
 
                 }
@@ -3821,6 +3838,11 @@ export default class ManualTagging extends Component {
     }
 
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
         const selectRow = {
             mode: 'radio',
             clickToSelect: true,

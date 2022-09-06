@@ -12,7 +12,7 @@ import {
     Nav, NavItem, NavLink, TabContent, TabPane, CardFooter, Modal, ModalBody, ModalFooter, ModalHeader,
     FormFeedback
 } from 'reactstrap';
-import { jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunctionOnlyHideRow, inValid, inValidWithColor, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
+import { jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunctionOnlyHideRow, inValid, inValidWithColor, jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRowOld, jExcelLoadedFunctionOld } from '../../CommonComponent/JExcelCommonFunctions.js'
 import jsPDF from "jspdf";
 import { LOGO } from '../../CommonComponent/Logo';
 import moment from "moment";
@@ -677,7 +677,7 @@ export default class CompareVersion extends Component {
     }
 
     loadedResolveConflicts = function (instance) {
-        jExcelLoadedFunctionOnlyHideRow(instance);
+        jExcelLoadedFunctionOnlyHideRowOld(instance);
         var elInstance = instance.jexcel;
         var jsonData = elInstance.getJson();
         var colArr = ['A', 'B', 'C', 'D', 'E']
@@ -718,7 +718,7 @@ export default class CompareVersion extends Component {
     }
 
     loaded = function (instance, cell, x, y, value) {
-        jExcelLoadedFunction(instance);
+        jExcelLoadedFunctionOld(instance);
         if (this.props.page == "commit") {
             var elInstance = instance.jexcel;
             var json = elInstance.getJson(null, false);

@@ -14,7 +14,7 @@ import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import jsPDF from "jspdf";
 import AuthenticationService from '../Common/AuthenticationService.js';
-import {MultiSelect} from 'react-multi-select-component';
+import { MultiSelect } from 'react-multi-select-component';
 import "jspdf-autotable";
 import { Formik } from 'formik';
 import CryptoJS from 'crypto-js'
@@ -26,8 +26,8 @@ import i18n from '../../i18n';
 import { qatProblemActions } from '../../CommonComponent/QatProblemActions';
 import getProblemDesc from '../../CommonComponent/getProblemDesc';
 import getSuggestion from '../../CommonComponent/getSuggestion';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
 import actualIcon from '../../assets/img/actual.png';
@@ -191,7 +191,7 @@ export default class ConsumptionDetails extends React.Component {
                     this.setState({
                         problemListForUpdate: myResult,
                         problemStatusList: proListProblemStatus,
-                        programQPLDetails:getRequest.result
+                        programQPLDetails: getRequest.result
                     }, () => {
                         if (localStorage.getItem("sesProblemStatus") != '' && localStorage.getItem("sesProblemStatus") != undefined) {
                             let sessionProblemList = JSON.parse(localStorage.getItem("sesProblemStatus"));
@@ -365,7 +365,7 @@ export default class ConsumptionDetails extends React.Component {
         });
 
         var mylist = [];
-        var json = instance.jexcel.getJson(null, false)
+        // var json = instance.jexcel.getJson(null, false)
         mylist = this.state.problemStatusList;
         // console.log(">>>",mylist);
         mylist = hasRole == true ? mylist.filter(c => c.id != 4) : mylist.filter(c => c.id != 2 && c.id != 4);
@@ -479,7 +479,7 @@ export default class ConsumptionDetails extends React.Component {
                             // var problemListDate = moment(Date.now()).subtract(12, 'months').endOf('month').format("YYYY-MM-DD");
                             let problemList = this.state.data;
                             let problemReportListForUpdate = this.state.problemReportListForUpdate;
-                            problemList = problemList.filter(c =>c.planningUnitActive != false);
+                            problemList = problemList.filter(c => c.planningUnitActive != false);
                             console.log("changedProblemsList+++", changedProblemsList);
                             for (var i = 0; i < changedProblemsList.length; i++) {
                                 if ((changedProblemsList[i])[0] != 0) {
@@ -631,10 +631,11 @@ export default class ConsumptionDetails extends React.Component {
             count++;
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("tableDiv"), true);
         var json = [];
         var data = problemArray;
-        var qplEditable=this.state.programQPLDetails.filter(c=>c.id==this.state.programId)[0].readonly;
+        var qplEditable = this.state.programQPLDetails.filter(c => c.id == this.state.programId)[0].readonly;
 
         var options = {
             data: data,
@@ -751,16 +752,16 @@ export default class ConsumptionDetails extends React.Component {
                 },
             ],
             editable: !qplEditable,
-            text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
@@ -828,7 +829,7 @@ export default class ConsumptionDetails extends React.Component {
                 return items;
             }.bind(this),
             updateTable: function (el, cell, x, y, source, value, id) {
-                var elInstance = el.jexcel;
+                var elInstance = el;
                 var lastY = -1;
                 if (y != null && lastY != y) {
                     var rowData = elInstance.getRowData(y);
@@ -1049,39 +1050,42 @@ export default class ConsumptionDetails extends React.Component {
         doc.save(i18n.t('static.report.qatProblemActionReport') + '.pdf')
     }
 
-    selected = function (instance, cell, x, y, value) {
-        // console.log("y+++", y);
-        if (y == 5 || y == 7 || y == 8 || y == 9) {
-            if ((x == 0 && value != 0) || (y == 0)) {
-                // console.log("HEADER SELECTION--------------------------");
-            } else {
-                // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
-                if (this.state.data.length != 0) {
-                    if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROBLEM')) {
-                        // console.log("this.el.getValueFromCoords(12, y)===>", this.el.getRowData(x));
-                        if (this.el.getValueFromCoords(12, x) != 4 && this.el.getValueFromCoords(12, x) != 2) {
-                            // console.log("onclick------>", this.el.getValueFromCoords(12, x));
-                            var planningunitId = this.el.getValueFromCoords(13, x);
-                            var programId = document.getElementById('programId').value;
-                            var versionId = this.el.getValueFromCoords(3, x)
-                            window.open(window.location.origin + `/#${this.el.getValueFromCoords(15, x)}/${programId}/${versionId}/${planningunitId}`);
-                            // let problemStatusId = document.getElementById('problemStatusId').value;
-                            // let problemTypeId = document.getElementById('problemTypeId').value;
-                            // var index = 0;
-                            // if (this.el.getValueFromCoords(1, x) == "") {
-                            //     var index = 0;
-                            // } else {
-                            //     index = this.el.getValueFromCoords(1, x);
-                            // }
-                            // console.log("URL====>", `/report/editProblem/${this.el.getValueFromCoords(0, x)}/${this.state.programId}/${index}/${this.el.getValueFromCoords(12, x)}/${this.el.getValueFromCoords(17, x)}`);
-                            // this.props.history.push({
-                            //     pathname: `/report/editProblem/${this.el.getValueFromCoords(0, x)}/${this.state.programId}/${index}/${this.el.getValueFromCoords(12, x)}/${this.el.getValueFromCoords(17, x)}`,
-                            // });
-                            // this.props.history.push({
-                            //     pathname: `/report/editProblem/${this.el.getValueFromCoords(0, x)}/${this.state.programId}/${index}/${problemStatusId}/${problemTypeId}`,
-                            // });
-                        }
+    selected = function (instance, cell, x, y, value, e) {
+        if (e.buttons == 1) {
 
+            // console.log("y+++", y);
+            if (y == 5 || y == 7 || y == 8 || y == 9) {
+                if ((x == 0 && value != 0) || (y == 0)) {
+                    // console.log("HEADER SELECTION--------------------------");
+                } else {
+                    // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
+                    if (this.state.data.length != 0) {
+                        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROBLEM')) {
+                            // console.log("this.el.getValueFromCoords(12, y)===>", this.el.getRowData(x));
+                            if (this.el.getValueFromCoords(12, x) != 4 && this.el.getValueFromCoords(12, x) != 2) {
+                                // console.log("onclick------>", this.el.getValueFromCoords(12, x));
+                                var planningunitId = this.el.getValueFromCoords(13, x);
+                                var programId = document.getElementById('programId').value;
+                                var versionId = this.el.getValueFromCoords(3, x)
+                                window.open(window.location.origin + `/#${this.el.getValueFromCoords(15, x)}/${programId}/${versionId}/${planningunitId}`);
+                                // let problemStatusId = document.getElementById('problemStatusId').value;
+                                // let problemTypeId = document.getElementById('problemTypeId').value;
+                                // var index = 0;
+                                // if (this.el.getValueFromCoords(1, x) == "") {
+                                //     var index = 0;
+                                // } else {
+                                //     index = this.el.getValueFromCoords(1, x);
+                                // }
+                                // console.log("URL====>", `/report/editProblem/${this.el.getValueFromCoords(0, x)}/${this.state.programId}/${index}/${this.el.getValueFromCoords(12, x)}/${this.el.getValueFromCoords(17, x)}`);
+                                // this.props.history.push({
+                                //     pathname: `/report/editProblem/${this.el.getValueFromCoords(0, x)}/${this.state.programId}/${index}/${this.el.getValueFromCoords(12, x)}/${this.el.getValueFromCoords(17, x)}`,
+                                // });
+                                // this.props.history.push({
+                                //     pathname: `/report/editProblem/${this.el.getValueFromCoords(0, x)}/${this.state.programId}/${index}/${problemStatusId}/${problemTypeId}`,
+                                // });
+                            }
+
+                        }
                     }
                 }
             }
@@ -1092,7 +1096,7 @@ export default class ConsumptionDetails extends React.Component {
 
         jExcelLoadedFunction(instance);
 
-        var elInstance = instance.jexcel;
+        var elInstance = instance.worksheets[0];
         var json = elInstance.getJson();
         for (var j = 0; j < json.length; j++) {
             // var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'S']
@@ -1133,7 +1137,8 @@ export default class ConsumptionDetails extends React.Component {
         },
             () => {
                 this.el = jexcel(document.getElementById("tableDiv"), '');
-                this.el.destroy();
+                // this.el.destroy();
+                jexcel.destroy(document.getElementById("tableDiv"), true);
             });
         // alert("hello");
 
@@ -1177,7 +1182,8 @@ export default class ConsumptionDetails extends React.Component {
             },
                 () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
-                    this.el.destroy();
+                    // this.el.destroy();
+                    jexcel.destroy(document.getElementById("tableDiv"), true);
                     localStorage.setItem("sesProblemType", document.getElementById('problemTypeId').value);
                     localStorage.setItem("sesProblemCategory", document.getElementById('problemCategoryId').value);
                     localStorage.setItem("sesReviewed", document.getElementById('reviewedStatusId').value);
@@ -1257,21 +1263,24 @@ export default class ConsumptionDetails extends React.Component {
                 this.setState({ message: i18n.t('static.common.selectProgram'), data: [], loading: false },
                     () => {
                         this.el = jexcel(document.getElementById("tableDiv"), '');
-                        this.el.destroy();
+                        // this.el.destroy();
+                        jexcel.destroy(document.getElementById("tableDiv"), true);
                     });
             }
             else if (problemStatusIds != []) {
                 this.setState({ message: i18n.t('static.report.selectProblemStatus'), data: [], loading: false },
                     () => {
                         this.el = jexcel(document.getElementById("tableDiv"), '');
-                        this.el.destroy();
+                        // this.el.destroy();
+                        jexcel.destroy(document.getElementById("tableDiv"), true);
                     });
             }
             else if (problemTypeId == 0) {
                 this.setState({ message: i18n.t('static.report.selectProblemType'), data: [], loading: false },
                     () => {
                         this.el = jexcel(document.getElementById("tableDiv"), '');
-                        this.el.destroy();
+                        // this.el.destroy();
+                        jexcel.destroy(document.getElementById("tableDiv"), true);
                     });
             }
         }
@@ -1328,13 +1337,13 @@ export default class ConsumptionDetails extends React.Component {
 
     getNote(row, lang) {
         var transList = row.problemTransList.filter(c => c.reviewed == false);
-        if(transList.length==0){
-            console.log("this problem report id do not have trans+++",row.problemReportId);
+        if (transList.length == 0) {
+            console.log("this problem report id do not have trans+++", row.problemReportId);
             return ""
-        }else{
-        var listLength = transList.length;
-        return transList[listLength - 1].notes;
-        } 
+        } else {
+            var listLength = transList.length;
+            return transList[listLength - 1].notes;
+        }
     }
     handleProblemStatusChange = (event) => {
 
@@ -1370,6 +1379,11 @@ export default class ConsumptionDetails extends React.Component {
     }
 
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
         let id = AuthenticationService.displayDashboardBasedOnRole();
         const { SearchBar, ClearSearchButton } = Search;
         const customTotal = (from, to, size) => (
@@ -1808,7 +1822,9 @@ export default class ConsumptionDetails extends React.Component {
                             {this.state.showProblemDashboard == 1 && <ProblemListDashboard problemListUnFilttered={this.state.problemReportListUnFiltered} problemCategoryList={this.state.problemCategoryList} problemStatusList={this.state.problemStatusList} />}
 
                             {/* <div className="ProgramListSearch"> */}
+                            <div className='ProblemListTableBorder'>
                             <div id="tableDiv" className='consumptionDataEntryTable' style={{ display: this.state.loading ? "none" : "block" }}>
+                            </div>
                             </div>
                             {/* </div> */}
                         </div>

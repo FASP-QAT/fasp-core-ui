@@ -25,8 +25,8 @@ import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import CryptoJS from 'crypto-js';
 import csvicon from '../../assets/img/csv.png'
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import {
@@ -324,7 +324,8 @@ export default class ExpiredInventory extends Component {
                 outPutList: []
             }, () => {
                 this.el = jexcel(document.getElementById("tableDiv"), '');
-                this.el.destroy();
+                // this.el.destroy();
+                jexcel.destroy(document.getElementById("tableDiv"), true);
             });
         }
     }
@@ -418,7 +419,8 @@ export default class ExpiredInventory extends Component {
             if (versionId == 0) {
                 this.setState({ message: i18n.t('static.program.validversion'), stockStatusList: [], outPutList: [] }, () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
-                    this.el.destroy();
+                    // this.el.destroy();
+                    jexcel.destroy(document.getElementById("tableDiv"), true);
                 });
             } else {
                 localStorage.setItem("sesVersionIdReport", versionId);
@@ -624,15 +626,15 @@ export default class ExpiredInventory extends Component {
 
                         var generalProgramJson = JSON.parse(generalProgramData);
 
-                        var planningUnitDataList=programRequest.result.programData.planningUnitDataList;
-                        var supplyPlan=[]
-                        for(var pu=0;pu<planningUnitDataList.length;pu++){
-                            var planningUnitData=planningUnitDataList[pu];
+                        var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
+                        var supplyPlan = []
+                        for (var pu = 0; pu < planningUnitDataList.length; pu++) {
+                            var planningUnitData = planningUnitDataList[pu];
                             var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
                             var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                             var programJson = JSON.parse(programData);
-                            var spList=programJson.supplyPlan;
-                            supplyPlan=supplyPlan.concat(spList);
+                            var spList = programJson.supplyPlan;
+                            supplyPlan = supplyPlan.concat(spList);
                         }
 
                         this.setState({
@@ -643,7 +645,7 @@ export default class ExpiredInventory extends Component {
                         // console.log("D-----------------> supply plan", (programJson.supplyPlan).filter(c => (c.expiredStock > 0)));
                         var data = []
                         list.map(ele => {
-                            var pu = (this.state.planningUnits.filter(c => c.planningUnit.id == ele.planningUnitId))[0]                            
+                            var pu = (this.state.planningUnits.filter(c => c.planningUnit.id == ele.planningUnitId))[0]
                             if (pu != null) {
                                 var list1 = [];
                                 if (document.getElementById("includePlanningShipments").value.toString() == 'true') {
@@ -765,7 +767,8 @@ export default class ExpiredInventory extends Component {
         } else if (programId == 0) {
             this.setState({ message: i18n.t('static.common.selectProgram'), outPutList: [] }, () => {
                 this.el = jexcel(document.getElementById("tableDiv"), '');
-                this.el.destroy();
+                // this.el.destroy();
+                jexcel.destroy(document.getElementById("tableDiv"), true);
             });
 
         } else if (versionId == 0) {
@@ -774,7 +777,8 @@ export default class ExpiredInventory extends Component {
                 , message: i18n.t('static.program.validversion')
             }, () => {
                 this.el = jexcel(document.getElementById("tableDiv"), '');
-                this.el.destroy();
+                // this.el.destroy();
+                jexcel.destroy(document.getElementById("tableDiv"), true);
             });
 
         }
@@ -963,7 +967,8 @@ export default class ExpiredInventory extends Component {
         // }
         // console.log("outPutListArray---->", outPutListArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("tableDiv"), true);
         var json = [];
         var data = outPutListArray;
 
@@ -976,39 +981,39 @@ export default class ExpiredInventory extends Component {
                 {
                     title: i18n.t('static.report.planningUnit'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.report.expiredQty'),
                     type: 'numeric', mask: '#,##.00', decimal: '.',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.inventory.batchNumber'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.report.autogenerated'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.report.batchstartdt'),
                     type: 'calendar',
                     options: { format: JEXCEL_DATE_FORMAT_SM },
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.report.shelfLife'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.supplyPlan.expiryDate'),
                     type: 'calendar',
                     options: { format: JEXCEL_DATE_FORMAT_SM },
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     type: 'hidden'
@@ -1017,16 +1022,17 @@ export default class ExpiredInventory extends Component {
                     type: 'hidden'
                 }
             ],
-            text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
+            editable: false,
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
@@ -1052,19 +1058,22 @@ export default class ExpiredInventory extends Component {
         })
     }
 
-    selected = function (instance, cell, x, y, value) {
-        var elInstance = instance.jexcel;
-        var rowData = elInstance.getRowData(x);
-        if (y == 1) {
-            console.log("+++in y==1")
-            this.toggleLarge(rowData[2], rowData[4], rowData[6], rowData[7]);
-        }
-        if (y == 2) {
-            let versionId = document.getElementById("versionId").value;
-            if (versionId.includes('Local')) {
-                localStorage.setItem("batchNo", rowData[2]);
-                localStorage.setItem("expiryDate", rowData[6]);
-                window.open(window.location.origin + `/#/supplyPlan/${this.state.localProgramId}/${rowData[8]}/${rowData[2]}/${rowData[6]}`);
+    selected = function (instance, cell, x, y, value, e) {
+        if (e.buttons == 1) {
+
+            var elInstance = instance;
+            var rowData = elInstance.getRowData(x);
+            if (y == 1) {
+                console.log("+++in y==1")
+                this.toggleLarge(rowData[2], rowData[4], rowData[6], rowData[7]);
+            }
+            if (y == 2) {
+                let versionId = document.getElementById("versionId").value;
+                if (versionId.includes('Local')) {
+                    localStorage.setItem("batchNo", rowData[2]);
+                    localStorage.setItem("expiryDate", rowData[6]);
+                    window.open(window.location.origin + `/#/supplyPlan/${this.state.localProgramId}/${rowData[8]}/${rowData[2]}/${rowData[6]}`);
+                }
             }
         }
     }.bind(this);
@@ -1093,6 +1102,10 @@ export default class ExpiredInventory extends Component {
     }
 
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
 
         const { SearchBar, ClearSearchButton } = Search;
         const customTotal = (from, to, size) => (
@@ -1106,7 +1119,7 @@ export default class ExpiredInventory extends Component {
             && versions.map((item, i) => {
                 return (
                     <option key={i} value={item.versionId}>
-                        {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)}
+                        {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)} ({(moment(item.createdDate).format(`MMM DD YYYY`))})
                     </option>
                 )
             }, this);
@@ -1391,8 +1404,8 @@ export default class ExpiredInventory extends Component {
 
                             </div>
                         </div>
-                        {this.state.outPutList.length > 0 && <span style={{ float: "left" }}><b>{i18n.t("static.expiryReport.batchInfoNote")}</b></span>}
-                        <div className="table-responsive consumptionDataEntryTable">
+                        {this.state.outPutList.length > 0 && <span style={{ textAlign:'left'}}><b>{i18n.t("static.expiryReport.batchInfoNote")}</b></span>}
+                        <div className="consumptionDataEntryTable ProgramListSearchAlignment">
                             <div id="tableDiv" className={document.getElementById("versionId") != null && document.getElementById("versionId").value.includes('Local') ? "jexcelremoveReadonlybackground RowClickableExpiredInventory" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
                             </div>
                         </div>

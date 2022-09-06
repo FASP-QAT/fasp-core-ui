@@ -14,8 +14,8 @@ import IntegrationService from '../../api/IntegrationService.js';
 import AuthenticationService from "../Common/AuthenticationService";
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import ProgramService from "../../api/ProgramService.js";
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import { JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from "../../Constants";
@@ -37,7 +37,8 @@ class ProgramIntegration extends Component {
                 label: {
                     label_en: ''
                 }
-            }
+            },
+            dataEL: ""
         }
         this.cancelClicked = this.cancelClicked.bind(this);
         this.addRow = this.addRow.bind(this);
@@ -55,9 +56,11 @@ class ProgramIntegration extends Component {
     }
 
     filterVersionStatus = function (instance, cell, c, r, source) {
-        var elInstance = instance.jexcel;
-        var rowData = elInstance.getRowData(r);
-        console.log("RESPO---------2", rowData[2]);
+        // var elInstance = instance.jexcel;
+        // var rowData = elInstance.getRowData(r);
+        // console.log("RESPO---------2", rowData[2]);
+        var rowData = (this.state.dataEL.getJson(null, false)[r]);
+
         // return this.state.countryArr.filter(c => c.active.toString() == "true");
         // if (rowData[2] == 1) {
         //     elInstance.setValueFromCoords(3, r, 1, true);
@@ -208,7 +211,9 @@ class ProgramIntegration extends Component {
                                                         papuDataArr[0] = data;
                                                     }
                                                     this.el = jexcel(document.getElementById("paputableDiv"), '');
-                                                    this.el.destroy();
+                                                    // this.el.destroy();
+                                                    jexcel.destroy(document.getElementById("paputableDiv"), true);
+
                                                     var json = [];
                                                     var data = papuDataArr;
                                                     var options = {
@@ -255,7 +260,7 @@ class ProgramIntegration extends Component {
                                                         ],
                                                         updateTable: function (el, cell, x, y, source, value, id) {
                                                             if (y != null) {
-                                                                var elInstance = el.jexcel;
+                                                                var elInstance = el;
                                                                 var rowData = elInstance.getRowData(y);
                                                                 // var productCategoryId = rowData[0];
                                                                 var integrationProgramId = rowData[5];
@@ -279,16 +284,16 @@ class ProgramIntegration extends Component {
                                                             }
                                                         },
                                                         onsearch: function (el) {
-                                                            el.jexcel.updateTable();
+                                                            // el.jexcel.updateTable();
                                                         },
                                                         onfilter: function (el) {
-                                                            el.jexcel.updateTable();
+                                                            // el.jexcel.updateTable();
                                                         },
                                                         pagination: localStorage.getItem("sesRecordCount"),
                                                         filters: true,
                                                         search: true,
                                                         columnSorting: true,
-                                                        tableOverflow: true,
+                                                        // tableOverflow: true,
                                                         wordWrap: true,
                                                         paginationOptions: JEXCEL_PAGINATION_OPTION,
                                                         parseFormulas: true,
@@ -304,12 +309,13 @@ class ProgramIntegration extends Component {
                                                         onpaste: this.onPaste,
                                                         allowManualInsertRow: false,
                                                         license: JEXCEL_PRO_KEY,
-                                                        text: {
-                                                            // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                                                            showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                                                            show: '',
-                                                            entries: '',
-                                                        },
+                                                        editable: true,
+                                                        // text: {
+                                                        //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                                                        //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                                                        //     show: '',
+                                                        //     entries: '',
+                                                        // },
                                                         onload: this.loaded,
                                                         contextMenu: function (obj, x, y, e) {
                                                             var items = [];
@@ -464,9 +470,11 @@ class ProgramIntegration extends Component {
                                                             return items;
                                                         }.bind(this)
                                                     };
-
+                                                    var varEL = ""
                                                     this.el = jexcel(document.getElementById("paputableDiv"), options);
+                                                    varEL = this.el
                                                     this.setState({
+                                                        dataEL: varEL,
                                                         loading: false
                                                     })
 
@@ -743,11 +751,11 @@ class ProgramIntegration extends Component {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
-                var index = (instance.jexcel).getValue(`F${parseInt(data[i].y) + 1}`, true);
+                var index = (instance).getValue(`F${parseInt(data[i].y) + 1}`, true);
                 if (index === "" || index == null || index == undefined) {
-                    (instance.jexcel).setValueFromCoords(0, data[i].y, this.state.program.label.label_en, true);
-                    (instance.jexcel).setValueFromCoords(5, data[i].y, 0, true);
-                    (instance.jexcel).setValueFromCoords(6, data[i].y, 1, true);
+                    (instance).setValueFromCoords(0, data[i].y, this.state.program.label.label_en, true);
+                    (instance).setValueFromCoords(5, data[i].y, 0, true);
+                    (instance).setValueFromCoords(6, data[i].y, 1, true);
                     z = data[i].y;
                 }
             }
@@ -847,7 +855,9 @@ class ProgramIntegration extends Component {
 
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
-        var asterisk = document.getElementsByClassName("resizable")[0];
+        // var asterisk = document.getElementsByClassName("resizable")[0];
+        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
+
         var tr = asterisk.firstChild;
         // tr.children[].classList.add('AsteriskTheadtrTd');
         tr.children[2].classList.add('AsteriskTheadtrTd');
@@ -915,7 +925,7 @@ class ProgramIntegration extends Component {
         console.log("------------onedit called")
         this.el.setValueFromCoords(6, y, 1, true);
 
-        var elInstance = instance.jexcel;
+        var elInstance = instance;
         var rowData = elInstance.getRowData(y);
         if (x == 2 && rowData[2] == 1) {
             elInstance.setValueFromCoords(3, y, 1, true);
@@ -974,6 +984,11 @@ class ProgramIntegration extends Component {
         return valid;
     }
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
@@ -1007,7 +1022,7 @@ class ProgramIntegration extends Component {
                                 <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                 <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>
                                 &nbsp;
-</FormGroup>
+                            </FormGroup>
                         </CardFooter>
                     </Card>
                 </div>
