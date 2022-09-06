@@ -836,8 +836,8 @@ class VersionSettingsComponent extends Component {
                 console.log("responseData------->", responseData);
                 for (var i = 0; i < responseData.length; i++) {
                     var data = [];
-                    data[0] = responseData[i].programId
-                    data[1] = responseData[i].programCode
+                    data[0] = responseData[i].program.id
+                    data[1] = responseData[i].program.code
                     data[2] = responseData[i].versionId
                     data[3] = getLabelText(responseData[i].versionType.label, this.state.lang);
                     data[4] = responseData[i].notes
