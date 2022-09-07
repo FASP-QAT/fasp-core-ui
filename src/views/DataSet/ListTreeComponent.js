@@ -1588,11 +1588,10 @@ export default class ListTreeComponent extends Component {
                     var isLocal = this.el.getValueFromCoords(11, x);
                     if (isLocal == 1) {
                         this.props.history.push({
-                            pathname: `/dataSet/buildTree/tree/${treeId}/${programId}/${isLocal}`,
-                            // state: { role }
+                            pathname: `/dataSet/buildTree/tree/${treeId}/${programId}`,
                         });
                     } else {
-                        this.downloadClicked();
+                        this.downloadClicked(treeId);
                     }
 
                 }
@@ -1620,7 +1619,7 @@ export default class ListTreeComponent extends Component {
         });
     }
 
-    downloadClicked() {
+    downloadClicked(treeId) {
         this.setState({ loading: true })
 
         var programId = this.state.datasetId;
@@ -1676,14 +1675,14 @@ export default class ListTreeComponent extends Component {
                         var program = transaction.objectStore('datasetDataServer');
                         var putRequest = program.put(item);
                         transaction.oncomplete = function (event) {
-                            console.log("hellloooo===", programId, "===", versionId, "=====", item)
+                            console.log("hellloooo===", programId, "===", versionId, "=====", treeId)
                             this.setState({
                                 message: 'static.program.downloadsuccess',
                                 color: 'green',
                                 loading: false
                             }, () => {
                                 // this.hideFirstComponent()
-                                this.props.history.push({ pathname: `/syncProgram`, state: { "programIds": programIds } })
+                                this.props.history.push({ pathname: `/syncProgram`, state: { "programIds": programIds, "treeId": treeId } })
 
                             })
                         }.bind(this);

@@ -4858,8 +4858,14 @@ export default class BuildTree extends Component {
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
-            var transaction = db1.transaction(['datasetData'], 'readwrite');
-            var program = transaction.objectStore('datasetData');
+            var transaction, program;
+            if (this.props.match.params.isLocal == 2) {
+                transaction = db1.transaction(['datasetDataServer'], 'readwrite');
+                program = transaction.objectStore('datasetDataServer');
+            } else {
+                transaction = db1.transaction(['datasetData'], 'readwrite');
+                program = transaction.objectStore('datasetData');
+            }
             var getRequest = program.getAll();
 
             getRequest.onerror = function (event) {
@@ -5304,8 +5310,14 @@ export default class BuildTree extends Component {
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
-            var transaction = db1.transaction(['datasetData'], 'readwrite');
-            var program = transaction.objectStore('datasetData');
+            var transaction, program;
+            if (this.props.match.params.isLocal == 2) {
+                transaction = db1.transaction(['datasetDataServer'], 'readwrite');
+                program = transaction.objectStore('datasetDataServer');
+            } else {
+                transaction = db1.transaction(['datasetData'], 'readwrite');
+                program = transaction.objectStore('datasetData');
+            }
             var getRequest = program.getAll();
 
             getRequest.onerror = function (event) {
@@ -6514,6 +6526,34 @@ export default class BuildTree extends Component {
     componentWillUnmount() {
         clearTimeout(this.timeout);
         window.onbeforeunload = null;
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onerror = function (event) {
+            this.setState({
+                message: i18n.t('static.program.errortext'),
+                color: 'red'
+            })
+            this.hideFirstComponent()
+        }.bind(this);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var programDataTransaction1 = db1.transaction(['datasetDataServer'], 'readwrite');
+            var programDataOs1 = programDataTransaction1.objectStore('datasetDataServer');
+            var ddatasetDataServerRequest = programDataOs1.getAll();
+            ddatasetDataServerRequest.onsuccess = function (event) {
+                var myResult = [];
+                myResult = ddatasetDataServerRequest.result;
+                var userId = AuthenticationService.getLoggedInUserId();
+
+                console.log("Myresult+++", myResult);
+                for (var dpd = 0; dpd < myResult.length; dpd++) {
+                    var programRequest3 = programDataOs1.delete(myResult[dpd].id);
+                }
+            }.bind(this)
+        }.bind(this)
+
+
     }
 
     componentDidUpdate = () => {
