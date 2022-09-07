@@ -10,7 +10,7 @@ import getLabelText from '../../CommonComponent/getLabelText'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import ShipmentsInSupplyPlanComponent from "../SupplyPlan/ShipmentsInSupplyPlan";
+import ShipmentsInSupplyPlanComponent from "../SupplyPlan/ShipmentsInSupplyPlanForDataEntry";
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import AuthenticationService from "../Common/AuthenticationService.js";
@@ -82,6 +82,8 @@ export default class ShipmentDetails extends React.Component {
             consumptionDataList: [],
             changedFlag: 0,
             planningUnitList: [],
+            planningUnitListForJexcel: [],
+            planningUnitListForJexcelAll: [],
             productCategoryId: '',
             shipmentsEl: '',
             timeout: 0,
@@ -117,7 +119,11 @@ export default class ShipmentDetails extends React.Component {
             budgetListPlanAll: [],
             programResult: "",
             showPlanningUnitAndQty: 0,
-            showPlanningUnitAndQtyList: []
+            showPlanningUnitAndQtyList: [],
+            planningUnit: [],
+            puData: [],
+            shipmentListForSelectedPlanningUnits: [],
+            shipmentListForSelectedPlanningUnitsUnfiltered: []
         }
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this)
         this.formSubmit = this.formSubmit.bind(this);
@@ -556,7 +562,7 @@ export default class ShipmentDetails extends React.Component {
                 if (document.getElementById("addRowButtonId") != null) {
                     document.getElementById("addRowButtonId").style.display = "none";
                 }
-                if (this.state.planningUnit != 0 && (value != "" && value != undefined ? value.value : 0) != 0) {
+                if (this.state.planningUnit.length > 0 && (value != "" && value != undefined ? value.value : 0) != 0) {
                     this.formSubmit(this.state.planningUnit, this.state.rangeValue);
                 }
             })
@@ -703,8 +709,8 @@ export default class ShipmentDetails extends React.Component {
             cont = true;
         }
         if (cont == true) {
-            document.getElementById("planningUnitId").value = 0;
-            document.getElementById("planningUnit").value = "";
+            // document.getElementById("planningUnitId").value = 0;
+            // document.getElementById("planningUnit").value = "";
             document.getElementById("shipmentsDetailsTableDiv").style.display = "none";
             if (document.getElementById("addRowButtonId") != null) {
                 document.getElementById("addRowButtonId").style.display = "none";
@@ -712,8 +718,8 @@ export default class ShipmentDetails extends React.Component {
             this.setState({
                 programSelect: value,
                 programId: value != "" && value != undefined ? value != "" && value != undefined ? value.value : 0 : 0,
-                planningUnit: "",
-                planningUnitId: "",
+                planningUnit: [],
+                // planningUnitId: "",
                 loading: true,
                 shipmentChangedFlag: 0
             })
@@ -776,7 +782,8 @@ export default class ShipmentDetails extends React.Component {
                                     console.log("budgetListPlan", budgetListPlan)
                                     var myResult = [];
                                     myResult = planningunitRequest.result.filter(c => c.program.id == programId);
-                                    var proList = []
+                                    var proList = [];
+                                    var planningUnitListForJexcel = [];
                                     for (var i = 0; i < myResult.length; i++) {
                                         if (myResult[i].program.id == programId && myResult[i].active == true) {
                                             var productJson = {
@@ -784,12 +791,22 @@ export default class ShipmentDetails extends React.Component {
                                                 value: myResult[i].planningUnit.id
                                             }
                                             proList.push(productJson)
+                                            var productJson1 = {
+                                                name: getLabelText(myResult[i].planningUnit.label, this.state.lang),
+                                                id: myResult[i].planningUnit.id
+                                            }
+                                            planningUnitListForJexcel.push(productJson1)
                                         }
                                     }
                                     this.setState({
                                         planningUnitList: proList.sort(function (a, b) {
                                             a = a.label.toLowerCase();
                                             b = b.label.toLowerCase();
+                                            return a < b ? -1 : a > b ? 1 : 0;
+                                        }),
+                                        planningUnitListForJexcelAll: planningUnitListForJexcel.sort(function (a, b) {
+                                            a = a.name.toLowerCase();
+                                            b = b.name.toLowerCase();
                                             return a < b ? -1 : a > b ? 1 : 0;
                                         }),
                                         planningUnitListAll: myResult,
@@ -814,19 +831,38 @@ export default class ShipmentDetails extends React.Component {
                                     var planningUnitIdProp = '';
                                     if (this.props.match.params.planningUnitId != '' && this.props.match.params.planningUnitId != undefined) {
                                         planningUnitIdProp = this.props.match.params.planningUnitId;
-                                    } else if (localStorage.getItem("sesPlanningUnitId") != '' && localStorage.getItem("sesPlanningUnitId") != undefined) {
-                                        planningUnitIdProp = localStorage.getItem("sesPlanningUnitId");
-                                    } else if (proList.length == 1) {
+                                        if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
+                                            var planningUnit = [{ value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label }];
+                                            this.setState({
+                                                planningUnit: planningUnit,
+                                                // planningUnitId: planningUnitIdProp
+                                            })
+                                            this.formSubmit(planningUnit, this.state.rangeValue);
+                                        }
+                                    }
+                                    else if (localStorage.getItem("sesPlanningUnitIdMulti") != '' && localStorage.getItem("sesPlanningUnitIdMulti") != undefined) {
+                                        planningUnitIdProp = localStorage.getItem("sesPlanningUnitIdMulti");
+                                        if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
+                                            // var planningUnit = [{ value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label }];
+                                            this.setState({
+                                                planningUnit: JSON.parse(planningUnitIdProp),
+                                                // planningUnitId: planningUnitIdProp
+                                            })
+                                            this.formSubmit(JSON.parse(planningUnitIdProp), this.state.rangeValue);
+                                        }
+                                    }
+                                    else if (proList.length == 1) {
                                         planningUnitIdProp = proList[0].value;
+                                        if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
+                                            var planningUnit = [{ value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label }];
+                                            this.setState({
+                                                planningUnit: planningUnit,
+                                                // planningUnitId: planningUnitIdProp
+                                            })
+                                            this.formSubmit(planningUnit, this.state.rangeValue);
+                                        }
                                     }
-                                    if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
-                                        var planningUnit = { value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label };
-                                        this.setState({
-                                            planningUnit: planningUnit,
-                                            planningUnitId: planningUnitIdProp
-                                        })
-                                        this.formSubmit(planningUnit, this.state.rangeValue);
-                                    }
+
                                 }.bind(this);
                             }.bind(this)
                         }.bind(this)
@@ -835,13 +871,17 @@ export default class ShipmentDetails extends React.Component {
             } else {
                 this.setState({
                     loading: false,
-                    planningUnitList: []
+                    planningUnitList: [],
+                    planningUnitListForJexcel: [],
+                    planningUnitListForJexcelAll: [],
+                    puData: []
                 })
             }
         }
     }
 
     formSubmit(value, rangeValue) {
+        console.log("Value@@@@@@@@@", value)
         var cont = false;
         if (this.state.shipmentChangedFlag == 1) {
             var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
@@ -858,11 +898,12 @@ export default class ShipmentDetails extends React.Component {
             let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
             this.setState({ loading: true, shipmentChangedFlag: 0 })
             var programId = document.getElementById('programId').value;
-            this.setState({ programId: programId, planningUnitId: value != "" && value != undefined ? value.value : 0, planningUnit: value });
-            var planningUnitId = value != "" && value != undefined ? value.value : 0;
+            this.setState({ programId: programId, planningUnit: value });
+            // var planningUnitId = value != "" && value != undefined ? value.value : 0;
+            var puList = value;
             var programId = document.getElementById("programId").value;
-            if (planningUnitId != 0) {
-                localStorage.setItem("sesPlanningUnitId", planningUnitId);
+            if (puList.length > 0) {
+                localStorage.setItem("sesPlanningUnitIdMulti", JSON.stringify(value));
                 document.getElementById("shipmentsDetailsTableDiv").style.display = "block";
                 if (document.getElementById("addRowButtonId") != null) {
                     if ((this.state.shipmentTypeIds).includes(1)) {
@@ -899,49 +940,69 @@ export default class ShipmentDetails extends React.Component {
                     }.bind(this);
                     programRequest.onsuccess = function (event) {
                         var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
-                        var planningUnitDataFilter = planningUnitDataList.filter(c => c.planningUnitId == planningUnitId);
-                        var programJson = {};
-                        if (planningUnitDataFilter.length > 0) {
-                            var planningUnitData = planningUnitDataFilter[0]
-                            var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
-                            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                            programJson = JSON.parse(programData);
-                        } else {
-                            programJson = {
-                                consumptionList: [],
-                                inventoryList: [],
-                                shipmentList: [],
-                                batchInfoList: [],
-                                supplyPlan: []
-                            }
-                        }
-
+                        var puData = [];
+                        var shipmentListForSelectedPlanningUnits = [];
+                        var shipmentListForSelectedPlanningUnitsUnfiltered = [];
+                        console.log("puList@@@@@@@@", puList)
                         var generalProgramDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
                         var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
                         var generalProgramJson = JSON.parse(generalProgramData);
+                        var planningUnitListForJexcel = this.state.planningUnitListForJexcelAll;
+                        console.log("planningUnitListForJexcel@@@@@@@@", planningUnitListForJexcel)
+                        var planningUnitListForJexcelUpdated = [];
+                        for (var pu = 0; pu < puList.length; pu++) {
+                            planningUnitListForJexcelUpdated.push(planningUnitListForJexcel.filter(c => c.id == puList[pu].value)[0]);
+                            console.log("puList[pu].value@@@@@@@@@Mohit", puList[pu].value)
+                            var planningUnitDataFilter = planningUnitDataList.filter(c => c.planningUnitId == puList[pu].value);
+                            console.log("planningUnitDataFilter[pu].value@@@@@@@@@Mohit", planningUnitDataFilter)
+                            var programJson = {};
+                            if (planningUnitDataFilter.length > 0) {
+                                var planningUnitData = planningUnitDataFilter[0]
+                                var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                                programJson = JSON.parse(programData);
+                            } else {
+                                programJson = {
+                                    consumptionList: [],
+                                    inventoryList: [],
+                                    shipmentList: [],
+                                    batchInfoList: [],
+                                    supplyPlan: []
+                                }
+                            }
 
-                        var programPlanningUnit = ((this.state.planningUnitListAll).filter(p => p.planningUnit.id == planningUnitId))[0];
-                        var shipmentListUnFiltered = programJson.shipmentList;
-                        this.setState({
-                            shipmentListUnFiltered: shipmentListUnFiltered
-                        })
-                        var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == (value != "" && value != undefined ? value.value : 0) && c.active.toString() == "true");
-                        if (this.state.shipmentTypeIds.length == 1 && (this.state.shipmentTypeIds).includes(1)) {
-                            shipmentList = shipmentList.filter(c => c.erpFlag.toString() == "false");
-                        } else if (this.state.shipmentTypeIds.length == 1 && (this.state.shipmentTypeIds).includes(2)) {
-                            shipmentList = shipmentList.filter(c => c.erpFlag.toString() == "true");
+
+                            var programPlanningUnit = ((this.state.planningUnitListAll).filter(p => p.planningUnit.id == puList[pu].value))[0];
+                            var shipmentListUnFiltered = programJson.shipmentList;
+                            shipmentListForSelectedPlanningUnitsUnfiltered = shipmentListForSelectedPlanningUnitsUnfiltered.concat(shipmentListUnFiltered);
+                            var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == puList[pu].value && c.active.toString() == "true");
+                            if (this.state.shipmentTypeIds.length == 1 && (this.state.shipmentTypeIds).includes(1)) {
+                                shipmentList = shipmentList.filter(c => c.erpFlag.toString() == "false");
+                            } else if (this.state.shipmentTypeIds.length == 1 && (this.state.shipmentTypeIds).includes(2)) {
+                                shipmentList = shipmentList.filter(c => c.erpFlag.toString() == "true");
+                            }
+                            shipmentList = shipmentList.filter(c => c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? moment(c.receivedDate).format("YYYY-MM-DD") >= moment(startDate).format("YYYY-MM-DD") && moment(c.receivedDate).format("YYYY-MM-DD") <= moment(stopDate).format("YYYY-MM-DD") : moment(c.expectedDeliveryDate).format("YYYY-MM-DD") >= moment(startDate).format("YYYY-MM-DD") && moment(c.expectedDeliveryDate).format("YYYY-MM-DD") <= moment(stopDate).format("YYYY-MM-DD"))
+                            shipmentListForSelectedPlanningUnits = shipmentListForSelectedPlanningUnits.concat(shipmentList);
+                            console.log("ShipmentList@@@@@@@@@@@@@@", shipmentList)
+                            console.log("ShipmentList@@@@@@@@@@@@@@", shipmentList)
+                            puData.push({
+                                id: puList[pu].value,
+                                shelfLife: programPlanningUnit.shelfLife,
+                                catalogPrice: programPlanningUnit.catalogPrice,
+                                programJson: programJson,
+                                shipmentListUnFiltered: shipmentListUnFiltered,
+                                shipmentList: shipmentList,
+                                showShipments: 1,
+                                programPlanningUnitForPrice: programPlanningUnit,
+                            })
                         }
-                        shipmentList = shipmentList.filter(c => c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? moment(c.receivedDate).format("YYYY-MM-DD") >= moment(startDate).format("YYYY-MM-DD") && moment(c.receivedDate).format("YYYY-MM-DD") <= moment(stopDate).format("YYYY-MM-DD") : moment(c.expectedDeliveryDate).format("YYYY-MM-DD") >= moment(startDate).format("YYYY-MM-DD") && moment(c.expectedDeliveryDate).format("YYYY-MM-DD") <= moment(stopDate).format("YYYY-MM-DD"))
-                        console.log("ShipmentList@@@@@@@@@@@@@@", shipmentList)
+                        console.log("planningUnitListForJexcelUpdated", planningUnitListForJexcelUpdated)
                         this.setState({
-                            shelfLife: programPlanningUnit.shelfLife,
-                            catalogPrice: programPlanningUnit.catalogPrice,
-                            programJson: programJson,
                             generalProgramJson: generalProgramJson,
-                            shipmentListUnFiltered: shipmentListUnFiltered,
-                            shipmentList: shipmentList,
-                            showShipments: 1,
-                            programPlanningUnitForPrice: programPlanningUnit
+                            puData: puData,
+                            shipmentListForSelectedPlanningUnits: shipmentListForSelectedPlanningUnits,
+                            shipmentListForSelectedPlanningUnitsUnfiltered: shipmentListForSelectedPlanningUnitsUnfiltered,
+                            planningUnitListForJexcel: planningUnitListForJexcelUpdated
                         })
                         this.refs.shipmentChild.showShipmentData();
                     }.bind(this)
@@ -1175,17 +1236,21 @@ export default class ShipmentDetails extends React.Component {
                                                         />
                                                     </div>
                                                 </FormGroup>
-                                                <FormGroup className="col-md-3 ">
+                                                <FormGroup className="col-md-3">
                                                     <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.qatProduct')}</Label>
+                                                    <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                                                     <div className="controls ">
-                                                        <Select
+                                                        {/* <InputGroup className="box"> */}
+                                                        <MultiSelect
                                                             name="planningUnit"
                                                             id="planningUnit"
-                                                            bsSize="sm"
-                                                            options={this.state.planningUnitList}
+                                                            options={this.state.planningUnitList.length > 0 ? this.state.planningUnitList : []}
                                                             value={this.state.planningUnit}
                                                             onChange={(e) => { this.formSubmit(e, this.state.rangeValue); }}
+                                                            // onChange={(e) => { this.handlePlanningUnitChange(e) }}
+                                                            labelledBy={i18n.t('static.common.select')}
                                                         />
+
                                                     </div>
                                                 </FormGroup>
                                                 <FormGroup className="col-md-3 ">
