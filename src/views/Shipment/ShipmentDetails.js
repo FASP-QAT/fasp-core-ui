@@ -360,6 +360,20 @@ export default class ShipmentDetails extends React.Component {
             // error: 'Invalid value',
         });
 
+        let planningUnitVar = [];
+        let planningUnitList = this.state.planningUnitListForJexcel;
+        for (let i = 0; i < planningUnitList.length; i++) {
+            planningUnitVar.push(planningUnitList[i].name);
+        }
+
+        worksheet.dataValidations.add('C2:C100', {
+            type: 'list',
+            allowBlank: false,
+            formulae: [`"${planningUnitVar.join(",")}"`],
+            showErrorMessage: true,
+            // errorStyle: 'error',
+            // error: 'Invalid value',
+        });
 
         let shipmentStatusVar = [];
         let shipmentStatusList = this.state.shipmentStatusList.filter(c => c.active.toString() == "true");
@@ -419,12 +433,12 @@ export default class ShipmentDetails extends React.Component {
                 fgColor: { argb: 'cccccc' },
                 bgColor: { argb: '96C8FB' }
             }
-            worksheet.getCell('C' + (+i + 2)).fill = {
-                type: 'pattern',
-                pattern: 'solid',
-                fgColor: { argb: 'cccccc' },
-                bgColor: { argb: '96C8FB' }
-            }
+            // worksheet.getCell('C' + (+i + 2)).fill = {
+            //     type: 'pattern',
+            //     pattern: 'solid',
+            //     fgColor: { argb: 'cccccc' },
+            //     bgColor: { argb: '96C8FB' }
+            // }
             worksheet.getCell('J' + (+i + 2)).fill = {
                 type: 'pattern',
                 pattern: 'solid',
@@ -449,6 +463,9 @@ export default class ShipmentDetails extends React.Component {
 
         worksheet.protect();
         worksheet.getColumn('A').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+        worksheet.getColumn('C').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
             cell.protection = { locked: false };
         });
         worksheet.getColumn('D').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
@@ -1187,7 +1204,7 @@ export default class ShipmentDetails extends React.Component {
                                 <div className="card-header-action">
                                     <a className="card-header-action">
                                         {this.state.programId != 0 && <a href="javascript:void();" onClick={this.toggleReplan}><i className="fa fa-calendar"></i></a>}&nbsp;&nbsp;
-                                        {this.state.programId != 0 && this.state.planningUnitId != 0 &&
+                                        {this.state.programId != 0 && this.state.planningUnit.length > 0 &&
                                             <a href='javascript:;' onClick={this.exportCSV} ><span style={{ cursor: 'pointer' }}><small className="supplyplanformulas">{i18n.t('static.dataentry.downloadTemplate')}</small></span></a>
                                         }
                                         {/* <a href={`${API_URL}/file/shipmentDataEntryTemplate`}><span style={{ cursor: 'pointer' }}><small className="supplyplanformulas">{i18n.t('static.dataentry.downloadTemplate')}</small></span></a> */}
