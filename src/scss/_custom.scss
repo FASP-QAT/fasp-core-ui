@@ -4882,7 +4882,7 @@ h6 {
 .ContactTemplate .ContactPhone {
   overflow: hidden;
   // top: 26px;
-  top: 34px!important;
+  top: 34px !important;
   left: 56px;
   height: 16px;
   bottom: 2px;
@@ -8774,6 +8774,10 @@ legend.scheduler-border {
   background-color: #86cd99 !important;
 }
 
+.jexcel>tbody>tr>td.readonly.notLowestError {
+  color: #000000 !important;
+}
+
 .jexcel>tbody>tr>td.readonly.commitServer {
   background-color: #e5edf5 !important;
 }
@@ -8846,6 +8850,25 @@ legend.scheduler-border {
 
 .jexcel>tbody>tr>td.historyBold {
   font-weight: bold;
+}
+
+.jss>tbody>tr>td.readonly.notSelectedForecast {
+  background-color: transparent !important;
+}
+
+.jexcelRedCell {
+  color: #BA0C2F !important;
+}
+
+.formula-img-mr-showGuidance1 {
+  border: 1px solid #fff;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.CleanUpSize {
+  width: 16px;
+  height: 16px;
 }
 
 .ProblemListTableBorder .jexcel>tbody>tr>td {
@@ -8981,7 +9004,7 @@ legend.scheduler-border {
   color: #212721 !important;
 }
 
-.jss > tbody > tr > td.historyBold {
+.jss>tbody>tr>td.historyBold {
   font-weight: bold;
   ;
 }
@@ -9014,61 +9037,63 @@ legend.scheduler-border {
   color: #BA0C2F !important;
 }
 
-.jexcel > tbody > tr > td.readonly.commitShipmentAlreadyLinkedToOtherPro {
+.jexcel>tbody>tr>td.readonly.commitShipmentAlreadyLinkedToOtherPro {
   background-color: yellow !important;
-  color: #BA0C2F!important;
-  font-weight: bold!important;
+  color: #BA0C2F !important;
+  font-weight: bold !important;
 }
 
-.jexcel > tbody > tr > td.commitShipmentAlreadyLinkedToOtherPro {
+.jexcel>tbody>tr>td.commitShipmentAlreadyLinkedToOtherPro {
   background-color: yellow !important;
-  color: red!important;
-  font-weight: bold!important;
+  color: red !important;
+  font-weight: bold !important;
 }
 
-.jexcel > tbody > tr > td.readonly.commitConflict {
-  background-color: yellow !important;
-}
-
-.jexcel > tbody > tr > td.commitConflict {
+.jexcel>tbody>tr>td.readonly.commitConflict {
   background-color: yellow !important;
 }
 
-.jexcel > tbody > tr > td.readonly.commitLocal {
+.jexcel>tbody>tr>td.commitConflict {
+  background-color: yellow !important;
+}
+
+.jexcel>tbody>tr>td.readonly.commitLocal {
   background-color: #86cd99 !important;
 }
 
-.jexcel > tbody > tr > td.commitLocal {
+.jexcel>tbody>tr>td.commitLocal {
   background-color: #86cd99 !important;
 }
 
-.jexcel > tbody > tr > td.readonly.commitServer {
+.jexcel>tbody>tr>td.readonly.commitServer {
   background-color: #e5edf5 !important;
 }
 
-.jexcel > tbody > tr > td.commitServer {
+.jexcel>tbody>tr>td.commitServer {
   background-color: #e5edf5 !important;
 }
 
-.jexcel > tbody > tr > td.readonly.commitNoChange {
+.jexcel>tbody>tr>td.readonly.commitNoChange {
   background-color: transparent !important;
 }
 
-.jexcel > tbody > tr > td.commitNoChange {
+.jexcel>tbody>tr>td.commitNoChange {
   background-color: transparent !important;
 }
 
-.rightClickColors .jcontextmenu > div:nth-of-type(2){
+.rightClickColors .jcontextmenu>div:nth-of-type(2) {
   background-color: #86cd99;
 }
 
-.rightClickColors .jcontextmenu > div:nth-of-type(3){
+.rightClickColors .jcontextmenu>div:nth-of-type(3) {
   background-color: #e5edf5;
 }
-.ERPLinkTable .jexcel{
-  width: unset!important;
+
+.ERPLinkTable .jexcel {
+  width: unset !important;
 }
-.NodeTitletext{
+
+.NodeTitletext {
   font-size: 12px;
   font-weight: bold;
   width: 138px;
@@ -9079,7 +9104,8 @@ legend.scheduler-border {
   float: left;
   white-space: normal;
 }
-.TemplateTitleBgblueSingle{
+
+.TemplateTitleBgblueSingle {
   background: #002f6c !important;
   border: none !important;
   border-radius: 0px !important;
@@ -9088,13 +9114,14 @@ legend.scheduler-border {
   left: 0px !important;
   right: 0px !important;
 }
-.TemplateTitleBgSingle{
+
+.TemplateTitleBgSingle {
   background: #a7c6ed !important;
   border: none !important;
   border-radius: 0px !important;
   padding: 0px 0px 1px 0px !important;
   top: 0px !important;
   left: 0px !important;
-  right: 0px !important; 
+  right: 0px !important;
 
 }

@@ -14,7 +14,7 @@ import { calculateSupplyPlan } from "./SupplyPlanCalculations";
 import AuthenticationService from "../Common/AuthenticationService";
 
 
-export default class ShipmentsInSupplyPlanComponent extends React.Component {
+export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Component {
 
     constructor(props) {
         super(props);
@@ -175,10 +175,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
     }
 
     showShipmentData() {
-        var planningUnitId = document.getElementById("planningUnitId").value;
-        var shipmentListUnFiltered = this.props.items.shipmentListUnFiltered;
-        var shipmentList = this.props.items.shipmentList;
-        var programJson = this.props.items.programJson;
+        // var programJson = this.props.items.programJson;
         var generalProgramJson = this.props.items.generalProgramJson;
         this.setState({
             actualProgramId: generalProgramJson.programId
@@ -214,13 +211,14 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 var rcpuResult = [];
                 rcpuResult = rcpuRequest.result;
                 for (var k = 0; k < rcpuResult.length; k++) {
-                    if (rcpuResult[k].realmCountry.id == generalProgramJson.realmCountry.realmCountryId && rcpuResult[k].planningUnit.id == document.getElementById("planningUnitId").value && rcpuResult[k].realmCountryPlanningUnitId != 0) {
+                    if (rcpuResult[k].realmCountry.id == generalProgramJson.realmCountry.realmCountryId && rcpuResult[k].realmCountryPlanningUnitId != 0) {
                         var rcpuJson = {
                             name: getLabelText(rcpuResult[k].label, this.props.items.lang),
                             id: rcpuResult[k].realmCountryPlanningUnitId,
                             multiplier: rcpuResult[k].multiplier,
                             active: rcpuResult[k].active,
-                            label: rcpuResult[k].label
+                            label: rcpuResult[k].label,
+                            planningUnitId: rcpuResult[k].planningUnit.id
                         }
                         realmCountryPlanningUnitList.push(rcpuJson);
                     }
@@ -476,6 +474,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                 filterOption = true;
                                             }
                                             var erpType = "hidden";
+                                            var shipmentList = this.props.items.shipmentListForSelectedPlanningUnits;
                                             shipmentList = shipmentList.sort(function (a, b) { return ((new Date(a.receivedDate != "" && a.receivedDate != null && a.receivedDate != undefined && a.receivedDate != "Invalid date" ? a.receivedDate : a.expectedDeliveryDate) - new Date(b.receivedDate != "" && b.receivedDate != null && b.receivedDate != undefined && b.receivedDate != "Invalid date" ? b.receivedDate : b.expectedDeliveryDate))) });
                                             var yForBatch = -1;
                                             if (shipmentList.length == 0) {
@@ -486,6 +485,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             }
                                             console.log("ShipmentListMohit@@@@@", shipmentList)
                                             for (var i = 0; i < shipmentList.length; i++) {
+                                                var shipmentListUnFiltered = this.props.items.puData.filter(c => c.id == shipmentList[i].planningUnit.id)[0].shipmentListUnFiltered;
                                                 var index;
                                                 if (shipmentList[i].shipmentId != 0) {
                                                     index = shipmentListUnFiltered.findIndex(c => c.shipmentId == shipmentList[i].shipmentId);
@@ -595,7 +595,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                 data[0] = true;
                                                 data[1] = false;
                                                 data[2] = 0;
-                                                data[3] = document.getElementById("planningUnitId").value;
+                                                data[3] = "";
                                                 data[4] = "";
                                                 data[5] = "";
                                                 data[6] = "";
@@ -611,7 +611,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                 data[16] = "";
                                                 data[17] = "";
                                                 data[18] = USD_CURRENCY_ID;
-                                                data[19] = this.props.items.catalogPrice;
+                                                data[19] = "";
                                                 data[20] = `=ROUND(T${parseInt(0) + 1}*M${parseInt(0) + 1},2)`;
                                                 data[21] = "";
                                                 data[22] = `=ROUND(ROUND(M${parseInt(0) + 1}*T${parseInt(0) + 1},2)+V${parseInt(0) + 1},2)`;
@@ -639,7 +639,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                     { type: 'checkbox', title: i18n.t('static.common.active'), width: 80, readOnly: !shipmentEditable },
                                                     { type: this.props.shipmentPage == 'shipmentDataEntry' && (this.props.items.shipmentTypeIds).includes(2) ? 'checkbox' : 'hidden', readOnly: true, title: i18n.t('static.supplyPlan.erpFlag'), width: 80 },
                                                     { type: 'text', title: i18n.t('static.report.id'), width: 80, readOnly: true },
-                                                    { type: 'hidden', title: i18n.t('static.supplyPlan.qatProduct'), width: 150 },
+                                                    { type: 'dropdown', title: i18n.t('static.supplyPlan.qatProduct'), width: 150, source: this.props.items.planningUnitListForJexcel },
                                                     { type: 'dropdown', title: i18n.t('static.shipmentDataEntry.shipmentStatus'), source: shipmentStatusList, filter: this.filterShipmentStatus, width: 100 },
                                                     { type: 'calendar', title: i18n.t('static.common.receivedate'), options: { format: JEXCEL_DATE_FORMAT, validRange: [moment(MIN_DATE_RESTRICTION_IN_DATA_ENTRY).startOf('month').format("YYYY-MM-DD"), moment(Date.now()).add(MAX_DATE_RESTRICTION_IN_DATA_ENTRY, 'years').endOf('month').format("YYYY-MM-DD")] }, width: 150 },
                                                     { type: 'dropdown', title: i18n.t("static.supplyPlan.shipmentMode"), source: [{ id: 1, name: i18n.t('static.supplyPlan.sea') }, { id: 2, name: i18n.t('static.supplyPlan.air') }], width: 100 },
@@ -854,7 +854,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                         }
                                                         // Add shipment batch info
                                                         var expectedDeliveryDate = moment(rowData[5]).add(1, 'months').format("YYYY-MM-DD");
-                                                        var expiryDate = moment(expectedDeliveryDate).add(this.props.items.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
                                                         if (rowData[5] != "" && rowData[5] != null && rowData[5] != undefined && rowData[5] != "Invalid date" && obj.getValue(`M${parseInt(y) + 1}`, true).toString().replaceAll("\,", "") > 0) {
                                                             items.push({
                                                                 title: i18n.t('static.supplyPlan.addOrListBatchInfo'),
@@ -880,7 +879,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                     }.bind(this);
                                                                     openRequest.onsuccess = function (e) {
                                                                         db1 = e.target.result;
-                                                                        var programJson = this.props.items.programJson;
                                                                         var generalProgramJson = this.props.items.generalProgramJson;
                                                                         var papuTransaction = db1.transaction(['procurementAgent'], 'readwrite');
                                                                         var papuOs = papuTransaction.objectStore('procurementAgent');
@@ -1273,12 +1271,13 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
     addRowInJexcel() {
         var obj = this.state.shipmentsEl;
         var json = obj.getJson(null, false);
-        var realmCountryPlanningUnitList = this.state.realmCountryPlanningUnitList;
+        var planningUnit = this.props.items.planningUnit;
+        var realmCountryPlanningUnitList = this.state.realmCountryPlanningUnitList.filter(c => planningUnit.length == 1 ? c.planningUnitId == planningUnit[0].value : 1 == 1);
         var data = [];
         data[0] = true;
         data[1] = false;
         data[2] = 0;
-        data[3] = document.getElementById("planningUnitId").value;
+        data[3] = planningUnit.length == 1 ? planningUnit[0].value : "";
         data[4] = "";
         data[5] = "";
         data[6] = "";
@@ -1294,7 +1293,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         data[16] = "";
         data[17] = "";
         data[18] = USD_CURRENCY_ID;
-        data[19] = this.props.items.catalogPrice;
+        data[19] = "";
         data[20] = `=ROUND(T${parseInt(json.length) + 1}*M${parseInt(json.length) + 1},2)`;
         data[21] = "";
         data[22] = `=ROUND(ROUND(M${parseInt(json.length) + 1}*T${parseInt(json.length) + 1},2)+V${parseInt(json.length) + 1},2)`;
@@ -1317,7 +1316,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         obj.insertRow(data);
         obj.setValueFromCoords(2, json.length, 0, true);
         obj.setValueFromCoords(12, json.length, 0, true);
-        obj.setValueFromCoords(19, json.length, this.props.items.catalogPrice, true);
         obj.setValueFromCoords(1, json.length, false, true);
         obj.setValueFromCoords(29, json.length, 0, true);
         obj.setValueFromCoords(31, json.length, 0, true);
@@ -1352,7 +1350,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         var shipmentInstance = this.state.shipmentsEl;
         var shipmentRowData = shipmentInstance.getRowData(rowData[4]);
         var expectedDeliveryDate = moment(shipmentRowData[4]).format("YYYY-MM-DD");
-        var expiryDate = moment(expectedDeliveryDate).add(this.props.items.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
+        var puData = this.props.items.puData.filter(c => c.id == shipmentRowData[3])[0];
+        var expiryDate = moment(expectedDeliveryDate).add(puData.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
         data[0] = "";
         data[1] = expiryDate;
         data[2] = "";
@@ -1399,7 +1398,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
     }.bind(this)
 
     filterRealmCountryPlanningUnit = function (instance, cell, c, r, source) {
-        return this.state.realmCountryPlanningUnitList.filter(c => c.name != "" && c.active.toString() == "true").sort(function (a, b) {
+        var planningUnitId = (this.state.shipmentsEl.getJson(null, false)[r])[3];
+        return this.state.realmCountryPlanningUnitList.filter(c => c.name != "" && c.active.toString() == "true" && c.planningUnitId == planningUnitId).sort(function (a, b) {
             a = a.name.toLowerCase();
             b = b.name.toLowerCase();
             return a < b ? -1 : a > b ? 1 : 0;
@@ -1420,6 +1420,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
 
         var tr = asterisk.firstChild;
+        tr.children[4].classList.add('AsteriskTheadtrTd');
         tr.children[5].classList.add('AsteriskTheadtrTd');
         tr.children[6].classList.add('AsteriskTheadtrTd');
         tr.children[7].classList.add('AsteriskTheadtrTd');
@@ -1465,6 +1466,13 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     // shipmentInstance.setStyle(col, "background-color", "#D3D3D3");
                     var cell = shipmentInstance.getCell(col);
                     cell.classList.add('shipmentEntryDoNotInclude');
+                    if (rowData[27] == -1 || rowData[27] === "" || rowData[27] == null || rowData[27] == undefined) {
+
+                    } else {
+                        var col = ("D").concat(parseInt(i) + 1);
+                        var cell = shipmentInstance.getCell(col)
+                        cell.classList.add('readonly');
+                    }
                     // var cell = shipmentInstance.getCell(`M${parseInt(i) + 1}`)
                     // cell.classList.add('shipmentEntryDoNotInclude');
                     // var cell = shipmentInstance.getCell(`B${parseInt(i) + 1}`)
@@ -1477,6 +1485,13 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     cell.classList.remove('shipmentEntryDoNotInclude');
                     var cell = shipmentInstance.getCell(`W${parseInt(i) + 1}`)
                     cell.classList.remove('shipmentEntryDoNotInclude');
+                    if (rowData[27] == -1 || rowData[27] === "" || rowData[27] == null || rowData[27] == undefined) {
+
+                    } else {
+                        var col = ("D").concat(parseInt(i) + 1);
+                        var cell = shipmentInstance.getCell(col)
+                        cell.classList.add('readonly');
+                    }
                     // cell.classList.add('readonly');
                     // var cell = shipmentInstance.getCell(`M${parseInt(i) + 1}`)
                     // cell.classList.remove('shipmentEntryDoNotInclude');
@@ -1492,6 +1507,13 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     // shipmentInstance.setStyle(col, "color", "red");
                     var cell = shipmentInstance.getCell(col);
                     cell.classList.add('shipmentEntryEmergency');
+                    if (rowData[27] == -1 || rowData[27] === "" || rowData[27] == null || rowData[27] == undefined) {
+
+                    } else {
+                        var col = ("D").concat(parseInt(i) + 1);
+                        var cell = shipmentInstance.getCell(col)
+                        cell.classList.add('readonly');
+                    }
                     // var cell = shipmentInstance.getCell(`M${parseInt(i) + 1}`)
                     // cell.classList.add('shipmentEntryEmergency');
                     // var cell = shipmentInstance.getCell(`B${parseInt(i) + 1}`)
@@ -1500,6 +1522,13 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     shipmentInstance.setStyle(col, "color", "#000");
                     var cell = shipmentInstance.getCell(col);
                     cell.classList.remove('shipmentEntryEmergency');
+                    if (rowData[27] == -1 || rowData[27] === "" || rowData[27] == null || rowData[27] == undefined) {
+
+                    } else {
+                        var col = ("D").concat(parseInt(i) + 1);
+                        var cell = shipmentInstance.getCell(col)
+                        cell.classList.add('readonly');
+                    }
                     // var cell = shipmentInstance.getCell(`M${parseInt(i) + 1}`)
                     // cell.classList.remove('shipmentEntryEmergency');
                     // var cell = shipmentInstance.getCell(`B${parseInt(i) + 1}`)
@@ -1543,6 +1572,13 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     // shipmentInstance.setStyle(col, "background-color", "#D3D3D3");
                     var cell = shipmentInstance.getCell(col);
                     cell.classList.add('shipmentEntryDoNotInclude');
+                    if (rowData[27] == -1 || rowData[27] === "" || rowData[27] == null || rowData[27] == undefined) {
+
+                    } else {
+                        var col = ("D").concat(parseInt(i) + 1);
+                        var cell = shipmentInstance.getCell(col)
+                        cell.classList.add('readonly');
+                    }
                     // var cell = shipmentInstance.getCell(`M${parseInt(i) + 1}`)
                     // cell.classList.add('shipmentEntryDoNotInclude');
                     // var cell = shipmentInstance.getCell(`B${parseInt(i) + 1}`)
@@ -1555,6 +1591,13 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     cell.classList.remove('shipmentEntryDoNotInclude');
                     var cell = shipmentInstance.getCell(`W${parseInt(i) + 1}`)
                     cell.classList.remove('shipmentEntryDoNotInclude');
+                    if (rowData[27] == -1 || rowData[27] === "" || rowData[27] == null || rowData[27] == undefined) {
+
+                    } else {
+                        var col = ("D").concat(parseInt(i) + 1);
+                        var cell = shipmentInstance.getCell(col)
+                        cell.classList.add('readonly');
+                    }
                     // cell.classList.add('readonly');
                     // var cell = shipmentInstance.getCell(`M${parseInt(i) + 1}`)
                     // cell.classList.remove('shipmentEntryDoNotInclude');
@@ -1570,6 +1613,13 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     // shipmentInstance.setStyle(col, "color", "red");
                     var cell = shipmentInstance.getCell(col);
                     cell.classList.add('shipmentEntryEmergency');
+                    if (rowData[27] == -1 || rowData[27] === "" || rowData[27] == null || rowData[27] == undefined) {
+
+                    } else {
+                        var col = ("D").concat(parseInt(i) + 1);
+                        var cell = shipmentInstance.getCell(col)
+                        cell.classList.add('readonly');
+                    }
                     // var cell = shipmentInstance.getCell(`M${parseInt(i) + 1}`)
                     // cell.classList.add('shipmentEntryEmergency');
                     // var cell = shipmentInstance.getCell(`B${parseInt(i) + 1}`)
@@ -1578,6 +1628,13 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     shipmentInstance.setStyle(col, "color", "#000");
                     var cell = shipmentInstance.getCell(col);
                     cell.classList.remove('shipmentEntryEmergency');
+                    if (rowData[27] == -1 || rowData[27] === "" || rowData[27] == null || rowData[27] == undefined) {
+
+                    } else {
+                        var col = ("D").concat(parseInt(i) + 1);
+                        var cell = shipmentInstance.getCell(col)
+                        cell.classList.add('readonly');
+                    }
                     // var cell = shipmentInstance.getCell(`M${parseInt(i) + 1}`)
                     // cell.classList.remove('shipmentEntryEmergency');
                     // var cell = shipmentInstance.getCell(`B${parseInt(i) + 1}`)
@@ -1630,8 +1687,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         }
         var rowData = obj.getRowData(y)
         var expectedDeliveryDate = moment(rowData[5]).format("YYYY-MM-DD");
-        var expiryDate = moment(expectedDeliveryDate).add(this.props.items.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
-        var batchInfoListAll = this.props.items.programJson.batchInfoList;
+        var puData = this.props.items.puData.filter(c => c.id == rowData[3])[0]
+        var expiryDate = moment(expectedDeliveryDate).add(puData.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
+        var batchInfoListAll = puData.programJson.batchInfoList;
         this.setState({
             batchInfoListAll: batchInfoListAll
         })
@@ -1820,7 +1878,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         var expectedArrivedDate = "";
         var expectedDeliveryDate = rowData[5];
         var shipmentMode = rowData[6];
-        var programJson = this.props.items.programJson;
         var generalProgramJson = this.props.items.generalProgramJson;
         if (expectedDeliveryDate != "") {
             if (procurementAgent != "") {
@@ -1957,12 +2014,12 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         var elInstance = instance;
         var rowData = elInstance.getRowData(y);
         var planningUnitId = rowData[3];
-        if (planningUnitId == "" || planningUnitId == undefined || planningUnitId == null) {
-            elInstance.setValueFromCoords(3, y, document.getElementById("planningUnitId").value, true);
-        }
+        // if (planningUnitId == "" || planningUnitId == undefined || planningUnitId == null) {
+        //     elInstance.setValueFromCoords(3, y, document.getElementById("planningUnitId").value, true);
+        // }
         this.props.updateState("shipmentError", "");
         this.props.updateState("noFundsBudgetError", "");
-        if ((x == 5 || x == 7 || x == 6 || x == 8) && rowData[26] == "") {
+        if ((x == 5 || x == 7 || x == 6 || x == 8 || x == 3) && rowData[26] == "" && planningUnitId != "") {
             this.calculateEmergencyOrder(y);
         }
         if (x == 30) {
@@ -2014,7 +2071,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 var batchDetails = rowData[28];
                 for (var b = 0; b < batchDetails.length; b++) {
                     var bd = batchDetails[b];
-                    var shipmentListUnFiltered = this.props.items.shipmentListUnFiltered;
+                    var puData = this.props.items.puData.filter(c => c.id == rowData[3])[0];
+                    var shipmentListUnFiltered = puData.shipmentListUnFiltered;
                     var minCreatedDate = moment(rowData[5]).format("YYYY-MM-DD");
                     shipmentListUnFiltered.filter(c => (c.shipmentId != 0 ? c.shipmentId != rowData[27] : c.index != rowData[27]) && c.active.toString() == "true" && c.accountFlag.toString() == "true" && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS)
                         .map(c => {
@@ -2033,10 +2091,11 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                 }
                             })
                         })
-                    if (bd.batch.autoGenerated.toString() == "true") {
-                        var expDate = moment(minCreatedDate).add(this.props.items.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
+                    if (bd.batch.autoGenerated.toString() == "true" && rowData[3] != "") {
+                        var puData = this.props.items.puData.filter(c => c.id == rowData[3])[0];
+                        var expDate = moment(minCreatedDate).add(puData.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
                         batchDetails[b].batch.expiryDate = expDate;
-                        var batchInfoList = this.props.items.programJson.batchInfoList.filter(c => c.batchNo == batchDetails[b].batch.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(expDate).startOf('month').format("YYYY-MM"));
+                        var batchInfoList = puData.programJson.batchInfoList.filter(c => c.batchNo == batchDetails[b].batch.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(expDate).startOf('month').format("YYYY-MM"));
                         var batchId = 0;
                         if (batchInfoList.length > 0) {
                             batchId = batchInfoList[0].batchId;
@@ -2184,14 +2243,15 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 // }
                 var pricePerUnit = elInstance.getValue(`T${parseInt(y) + 1}`, true).toString().replaceAll("\,", "");
                 if (rowData[27] == -1 || rowData[27] === "" || rowData[27] == null || rowData[27] == undefined) {
-                    var programPriceList = this.props.items.programPlanningUnitForPrice.programPlanningUnitProcurementAgentPrices.filter(c => c.program.id == this.state.actualProgramId && c.procurementAgent.id == rowData[7] && c.planningUnit.id == planningUnitId && c.active);
+                    var puData = this.props.items.puData.filter(c => c.id == rowData[3])[0];
+                    var programPriceList = puData.programPlanningUnitForPrice.programPlanningUnitProcurementAgentPrices.filter(c => c.program.id == this.state.actualProgramId && c.procurementAgent.id == rowData[7] && c.planningUnit.id == planningUnitId && c.active);
                     if (programPriceList.length > 0) {
                         pricePerUnit = Number(programPriceList[0].price);
                     } else {
                         if (procurementAgentPlanningUnit.length > 0) {
                             pricePerUnit = Number(procurementAgentPlanningUnit[0].catalogPrice);
                         } else {
-                            pricePerUnit = this.props.items.catalogPrice
+                            pricePerUnit = puData.catalogPrice
                         }
                     }
                     if (rowData[18] != "") {
@@ -2264,6 +2324,49 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             var valid = checkValidtion("text", "X", y, rowData[23], elInstance);
             if (valid == false) {
                 elInstance.setValueFromCoords(34, y, 1, true);
+            }
+        }
+
+        if (x == 3) {
+            var valid = checkValidtion("text", "D", y, rowData[3], elInstance);
+            elInstance.setValueFromCoords(11, y, "", true);
+            if (valid == false) {
+                elInstance.setValueFromCoords(34, y, 1, true);
+            } else {
+                var realmCountryPlanningUnitList = this.state.realmCountryPlanningUnitList.filter(c => c.planningUnitId == value && c.active);
+                console.log("realmCountryPlanningUnitList@@@@@@@", realmCountryPlanningUnitList)
+                if (realmCountryPlanningUnitList.length == 1) {
+                    elInstance.setValueFromCoords(11, y, realmCountryPlanningUnitList[0].id, true);
+                    elInstance.setValueFromCoords(13, y, realmCountryPlanningUnitList[0].multiplier, true);
+                }
+                var pricePerUnit = elInstance.getValue(`T${parseInt(y) + 1}`, true).toString().replaceAll("\,", "");
+                console.log("rowData[27]@@@@Mohit", rowData[27])
+                if (rowData[27] == -1 || rowData[27] === "" || rowData[27] == null || rowData[27] == undefined) {
+                    var puData = this.props.items.puData.filter(c => c.id == value)[0];
+                    var procurementAgentPlanningUnit = this.state.procurementAgentPlanningUnitListAll.filter(c => c.procurementAgent.id == rowData[7] && c.planningUnit.id == value && c.active);
+                    console.log("puData[27]@@@@Mohit", puData)
+                    var programPriceList = puData.programPlanningUnitForPrice.programPlanningUnitProcurementAgentPrices.filter(c => c.program.id == this.state.actualProgramId && c.procurementAgent.id == rowData[7] && c.planningUnit.id == value && c.active);
+                    console.log("program PU price[27]@@@@Mohit", puData.programPlanningUnitForPrice)
+                    console.log("program procurem[27]@@@@Mohit", puData.programPlanningUnitForPrice.programPlanningUnitProcurementAgentPrices)
+
+                    if (programPriceList.length > 0) {
+                        pricePerUnit = Number(programPriceList[0].price);
+                    } else {
+                        if (procurementAgentPlanningUnit.length > 0) {
+                            pricePerUnit = Number(procurementAgentPlanningUnit[0].catalogPrice);
+                        } else {
+                            pricePerUnit = puData.catalogPrice
+                        }
+                    }
+
+                    if (rowData[18] != "") {
+                        var conversionRateToUsd = Number((this.state.currencyListAll.filter(c => c.currencyId == rowData[18])[0]).conversionRateToUsd);
+                        pricePerUnit = Number(pricePerUnit / conversionRateToUsd).toFixed(2);
+                        elInstance.setValueFromCoords(19, y, pricePerUnit, true);
+                    } else {
+                        elInstance.setValueFromCoords(19, y, pricePerUnit, true);
+                    }
+                }
             }
         }
 
@@ -2390,6 +2493,13 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     var cell = elInstance.getCell(col);
                     cell.classList.add('shipmentEntryActive');
                     cell.classList.remove('shipmentEntryDoNotInclude');
+                    if (rowData[27] == -1 || rowData[27] === "" || rowData[27] == null || rowData[27] == undefined) {
+
+                    } else {
+                        var col = ("D").concat(parseInt(y) + 1);
+                        var cell = elInstance.getCell(col)
+                        cell.classList.add('readonly');
+                    }
                     // var cell = elInstance.getCell(`M${parseInt(i) + 1}`)
                     // cell.classList.add('shipmentEntryEmergency');
                     // var cell = elInstance.getCell(`B${parseInt(i) + 1}`)
@@ -2400,6 +2510,13 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         // elInstance.setStyle(col, "background-color", "#D3D3D3");
                         var cell = elInstance.getCell(col);
                         cell.classList.add('shipmentEntryDoNotInclude');
+                        if (rowData[27] == -1 || rowData[27] === "" || rowData[27] == null || rowData[27] == undefined) {
+
+                        } else {
+                            var col = ("D").concat(parseInt(y) + 1);
+                            var cell = elInstance.getCell(col)
+                            cell.classList.add('readonly');
+                        }
                         // var cell = elInstance.getCell(`M${parseInt(i) + 1}`)
                         // cell.classList.add('shipmentEntryDoNotInclude');
                         // var cell = elInstance.getCell(`B${parseInt(i) + 1}`)
@@ -2410,6 +2527,13 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         elInstance.setStyle(col, "background-color", "transparent");
                         var cell = elInstance.getCell(col);
                         cell.classList.remove('shipmentEntryDoNotInclude');
+                        if (rowData[27] == -1 || rowData[27] === "" || rowData[27] == null || rowData[27] == undefined) {
+
+                        } else {
+                            var col = ("D").concat(parseInt(y) + 1);
+                            var cell = elInstance.getCell(col)
+                            cell.classList.add('readonly');
+                        }
                         // cell.classList.add('readonly');
                         // var cell = elInstance.getCell(`M${parseInt(i) + 1}`)
                         // cell.classList.remove('shipmentEntryDoNotInclude');
@@ -2425,6 +2549,13 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         // elInstance.setStyle(col, "color", "red");
                         var cell = elInstance.getCell(col);
                         cell.classList.add('shipmentEntryEmergency');
+                        if (rowData[27] == -1 || rowData[27] === "" || rowData[27] == null || rowData[27] == undefined) {
+
+                        } else {
+                            var col = ("D").concat(parseInt(y) + 1);
+                            var cell = elInstance.getCell(col)
+                            cell.classList.add('readonly');
+                        }
                         // var cell = elInstance.getCell(`M${parseInt(i) + 1}`)
                         // cell.classList.add('shipmentEntryEmergency');
                         // var cell = elInstance.getCell(`B${parseInt(i) + 1}`)
@@ -2433,6 +2564,13 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         elInstance.setStyle(col, "color", "#000");
                         var cell = elInstance.getCell(col);
                         cell.classList.remove('shipmentEntryEmergency');
+                        if (rowData[27] == -1 || rowData[27] === "" || rowData[27] == null || rowData[27] == undefined) {
+
+                        } else {
+                            var col = ("D").concat(parseInt(y) + 1);
+                            var cell = elInstance.getCell(col)
+                            cell.classList.add('readonly');
+                        }
                         // var cell = elInstance.getCell(`M${parseInt(i) + 1}`)
                         // cell.classList.remove('shipmentEntryEmergency');
                         // var cell = elInstance.getCell(`B${parseInt(i) + 1}`)
@@ -2717,7 +2855,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     batchNo = map.get("0");
                 } else {
                     var programId = (document.getElementById("programId").value).split("_")[0];
-                    var planningUnitId = document.getElementById("planningUnitId").value;
+                    var planningUnitId = rowData[3];
                     programId = paddingZero(programId, 0, 6);
                     planningUnitId = paddingZero(planningUnitId, 0, 8);
                     batchNo = (BATCH_PREFIX).concat(programId).concat(planningUnitId).concat(moment(Date.now()).format("YYMMDD")).concat(generateRandomAplhaNumericCode(3));
@@ -2728,7 +2866,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 if (batchInfoList.length > 0) {
                     batchId = batchInfoList[0].batchId;
                 }
-                var shipmentListUnFiltered = this.props.items.shipmentListUnFiltered;
+                var puData = this.props.items.puData.filter(c => c.id == rowData[3])[0]
+                var shipmentListUnFiltered = puData.shipmentListUnFiltered;
                 var minCreatedDate = moment(rowData[5]).format("YYYY-MM-DD");
                 shipmentListUnFiltered.filter(c => (c.shipmentId != 0 ? c.shipmentId != rowData[27] : c.index != rowData[27]) && c.active.toString() == "true" && c.accountFlag.toString() == "true" && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS)
                     .map(c => {
@@ -2825,7 +2964,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             // }.bind(this);
             // openRequest.onsuccess = function (e) {
             //     db1 = e.target.result;
-            var programJson = this.props.items.programJson;
             var generalProgramJson = this.props.items.generalProgramJson;
             //     var papuTransaction = db1.transaction(['procurementAgent'], 'readwrite');
             //     var papuOs = papuTransaction.objectStore('procurementAgent');
@@ -2932,7 +3070,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     }.bind(this);
                     openRequest.onsuccess = function (e) {
                         db1 = e.target.result;
-                        var programJson = this.props.items.programJson;
                         var generalProgramJson = this.props.items.generalProgramJson;
                         var papuTransaction = db1.transaction(['procurementAgent'], 'readwrite');
                         var papuOs = papuTransaction.objectStore('procurementAgent');
@@ -3216,7 +3353,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             checkOtherValidation = true;
         }
         var negativeBudget = 0;
-        var shipmentListAfterUpdate = this.props.items.shipmentListUnFiltered;
+        var shipmentListAfterUpdate = this.props.items.shipmentListForSelectedPlanningUnitsUnfiltered;
         for (var y = 0; y < json.length; y++) {
             var map = new Map(Object.entries(json[y]));
             if (map.get("27") != -1) {
@@ -3248,7 +3385,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     freightCost: Number(freightCost.toString().replaceAll("\,", "")).toFixed(2),
                     planningUnit: {
                         id: map.get("3"),
-                        label: (this.props.items.planningUnitListAll.filter(c => c.planningUnit.id == map.get("3"))[0]).planningUnit.label
+                        label: map.get("3") != "" ? (this.props.items.planningUnitListAll.filter(c => c.planningUnit.id == map.get("3"))[0]).planningUnit.label : {}
                     },
                     productCost: productCost.toString().replaceAll("\,", ""),
                     shipmentId: 0,
@@ -3291,7 +3428,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     if (map.get("17") != "" && map.get("17") != undefined && map.get("17") != "undefined" && map.get("18") != "" && map.get("4") != CANCELLED_SHIPMENT_STATUS && map.get("33").toString() != "false" && map.get("0").toString() != "false") {
                         var budget = this.state.budgetListAll.filter(c => c.id == map.get("17"))[0]
                         var totalBudget = budget.budgetAmt * budget.currency.conversionRateToUsd;
-                        var shipmentList = shipmentListAfterUpdate.filter(c => c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.active.toString() == "true" && c.accountFlag.toString() == "true" && c.budget.id == map.get("17"));
+                        var shipmentList = shipmentListAfterUpdate.filter(c => c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.active.toString() == "true" && c.accountFlag.toString() == "true" && c.budget.id == map.get("17") && c.planningUnit.id == map.get("3"));
                         var usedBudgetTotalAmount = 0;
                         for (var s = 0; s < shipmentList.length; s++) {
                             if (shipmentList[s].currency != "" && shipmentList[s].currency != undefined) {
@@ -3381,6 +3518,12 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 }
 
                 var validation = checkValidtion("text", "X", y, rowData[23], elInstance);
+                if (validation == false) {
+                    valid = false;
+                    elInstance.setValueFromCoords(34, y, 1, true);
+                }
+
+                var validation = checkValidtion("text", "D", y, rowData[3], elInstance);
                 if (validation == false) {
                     valid = false;
                     elInstance.setValueFromCoords(34, y, 1, true);
@@ -3520,444 +3663,454 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     try {
                         var programDataJson = programRequest.result.programData;
                         var planningUnitDataList = programDataJson.planningUnitDataList;
-                        var planningUnitId = document.getElementById("planningUnitId").value
-                        var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == planningUnitId);
-                        var programJson = {}
-                        if (planningUnitDataIndex != -1) {
-                            var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == planningUnitId))[0];
-                            var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
-                            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                            programJson = JSON.parse(programData);
-                        } else {
-                            programJson = {
-                                consumptionList: [],
-                                inventoryList: [],
-                                shipmentList: [],
-                                batchInfoList: [],
-                                supplyPlan: []
-                            }
-                        }
+                        var selectedPlanningUnits = this.props.items.planningUnit;
                         var generalProgramDataBytes = CryptoJS.AES.decrypt(programDataJson.generalData, SECRET_KEY);
                         var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
                         var generalProgramJson = JSON.parse(generalProgramData);
-                        var shipmentDataList = (programJson.shipmentList);
                         var actionList = generalProgramJson.actionList;
                         if (actionList == undefined) {
                             actionList = []
                         }
-                        var batchInfoList = (programJson.batchInfoList);
                         var minDate = "";
-                        var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
-                        var curUser = AuthenticationService.getLoggedInUserId();
-                        var username = AuthenticationService.getLoggedInUsername();
-                        for (var j = 0; j < json.length; j++) {
-                            var map = new Map(Object.entries(json[j]));
-                            if (map.get("32") == 1) {
-                                if (minDate == "") {
-                                    minDate = moment(map.get("5")).format("YYYY-MM-DD");
-                                } else if (minDate != "" && moment(map.get("5")).format("YYYY-MM") < moment(minDate).format("YYYY-MM")) {
-                                    minDate = moment(map.get("5")).format("YYYY-MM-DD");
-                                }
-                                if (minDate != "" && map.get("38") != "" && moment(map.get("38")).format("YYYY-MM") < moment(minDate).format("YYYY-MM")) {
-                                    minDate = moment(map.get("38")).format("YYYY-MM-DD");
-                                }
-                            }
-                            var selectedShipmentStatus = map.get("4");
-                            var shipmentStatusId = selectedShipmentStatus;
-                            var shipmentQty = elInstance.getValue(`M${parseInt(j) + 1}`, true).toString().replaceAll("\,", "");
-                            var shipmentPUQty = elInstance.getValue(`O${parseInt(j) + 1}`, true).toString().replaceAll("\,", "");
-                            var productCost = elInstance.getValue(`U${parseInt(j) + 1}`, true).toString().replaceAll("\,", "");
-                            var rate = elInstance.getValue(`T${parseInt(j) + 1}`, true).toString().replaceAll("\,", "");
-                            var freightCost = elInstance.getValue(`V${parseInt(j) + 1}`, true).toString().replaceAll("\,", "");
-                            var shipmentMode = "Sea";
-                            if (map.get("6") == 2) {
-                                shipmentMode = "Air";
-                            }
-                            var shipmentDatesJson = map.get("30");
-                            var plannedDate = shipmentDatesJson.plannedDate != "" && shipmentDatesJson.plannedDate != "Invalid date" ? shipmentDatesJson.plannedDate : null;
-                            var submittedDate = shipmentDatesJson.submittedDate != "" && shipmentDatesJson.submittedDate != "Invalid date" ? shipmentDatesJson.submittedDate : null;
-                            var approvedDate = shipmentDatesJson.approvedDate != "" && shipmentDatesJson.approvedDate != "Invalid date" ? shipmentDatesJson.approvedDate : null;
-                            var shippedDate = shipmentDatesJson.shippedDate != "" && shipmentDatesJson.shippedDate != "Invalid date" ? shipmentDatesJson.shippedDate : null;
-                            var arrivedDate = shipmentDatesJson.arrivedDate != "" && shipmentDatesJson.arrivedDate != "Invalid date" ? shipmentDatesJson.arrivedDate : null;
-                            var receivedDate = shipmentDatesJson.receivedDate != "" && shipmentDatesJson.receivedDate != "Invalid date" ? shipmentDatesJson.receivedDate : null;
-                            var expectedDeliveryDate = shipmentDatesJson.expectedDeliveryDate != "" && shipmentDatesJson.expectedDeliveryDate != "Invalid date" ? shipmentDatesJson.expectedDeliveryDate : null;
-                            if (shipmentStatusId != DELIVERED_SHIPMENT_STATUS) {
-                                receivedDate = null;
-                            }
-                            if (shipmentStatusId != ARRIVED_SHIPMENT_STATUS && shipmentStatusId != DELIVERED_SHIPMENT_STATUS) {
-                                arrivedDate = null;
-                            }
-                            if (shipmentStatusId != SHIPPED_SHIPMENT_STATUS && shipmentStatusId != ARRIVED_SHIPMENT_STATUS && shipmentStatusId != DELIVERED_SHIPMENT_STATUS) {
-                                shippedDate = null;
-                            }
-                            if (shipmentStatusId != APPROVED_SHIPMENT_STATUS && shipmentStatusId != SHIPPED_SHIPMENT_STATUS && shipmentStatusId != ARRIVED_SHIPMENT_STATUS && shipmentStatusId != DELIVERED_SHIPMENT_STATUS) {
-                                approvedDate = null;
-                            }
-                            if (shipmentStatusId != SUBMITTED_SHIPMENT_STATUS && shipmentStatusId != APPROVED_SHIPMENT_STATUS && shipmentStatusId != SHIPPED_SHIPMENT_STATUS && shipmentStatusId != ARRIVED_SHIPMENT_STATUS && shipmentStatusId != DELIVERED_SHIPMENT_STATUS) {
-                                submittedDate = null;
-                            }
-
-                            var expiryDate = moment(receivedDate != "" && receivedDate != null && receivedDate != "Invalid date" ? receivedDate : expectedDeliveryDate).add(this.props.items.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
-                            if (map.get("27") != -1) {
-                                shipmentDataList[parseInt(map.get("27"))].plannedDate = plannedDate;
-                                shipmentDataList[parseInt(map.get("27"))].submittedDate = submittedDate;
-                                shipmentDataList[parseInt(map.get("27"))].approvedDate = approvedDate;
-                                shipmentDataList[parseInt(map.get("27"))].shippedDate = shippedDate;
-                                shipmentDataList[parseInt(map.get("27"))].arrivedDate = arrivedDate;
-                                shipmentDataList[parseInt(map.get("27"))].receivedDate = receivedDate;
-                                shipmentDataList[parseInt(map.get("27"))].expectedDeliveryDate = moment(shipmentDatesJson.expectedDeliveryDate).format("YYYY-MM-DD");
-
-                                shipmentDataList[parseInt(map.get("27"))].shipmentStatus.id = shipmentStatusId;
-                                shipmentDataList[parseInt(map.get("27"))].shipmentStatus.label = (this.state.shipmentStatusList).filter(c => c.id == shipmentStatusId)[0].label;
-                                shipmentDataList[parseInt(map.get("27"))].dataSource.id = map.get("23");
-                                shipmentDataList[parseInt(map.get("27"))].dataSource.label = (this.state.dataSourceList).filter(c => c.id == map.get("23"))[0].label;
-                                shipmentDataList[parseInt(map.get("27"))].procurementAgent.id = map.get("7");
-
-                                var pa = this.state.procurementAgentList.filter(c => c.id == map.get("7"))[0];
-                                shipmentDataList[parseInt(map.get("27"))].procurementAgent.code = pa.name;
-                                shipmentDataList[parseInt(map.get("27"))].procurementAgent.label = pa.label;
-
-                                var rcpu = this.state.realmCountryPlanningUnitList.filter(c => c.id == map.get("11"))[0];
-                                shipmentDataList[parseInt(map.get("27"))].realmCountryPlanningUnit.id = rcpu.id;
-                                shipmentDataList[parseInt(map.get("27"))].realmCountryPlanningUnit.label = rcpu.label;
-                                shipmentDataList[parseInt(map.get("27"))].realmCountryPlanningUnit.multiplier = rcpu.multiplier;
-
-                                var fs = this.state.fundingSourceList.filter(c => c.id == map.get("16"))[0];
-                                shipmentDataList[parseInt(map.get("27"))].fundingSource.id = map.get("16");
-                                shipmentDataList[parseInt(map.get("27"))].fundingSource.code = fs.name;
-                                shipmentDataList[parseInt(map.get("27"))].fundingSource.label = fs.label;
-
-                                if (map.get("17") != undefined && map.get("17") != "undefined" && map.get("17") != "") {
-                                    var b = this.state.budgetList.filter(c => c.id == map.get("17"))[0];
-                                    shipmentDataList[parseInt(map.get("27"))].budget.id = map.get("17");
-                                    shipmentDataList[parseInt(map.get("27"))].budget.code = b.name;
-                                    shipmentDataList[parseInt(map.get("27"))].budget.label = b.label;
-                                } else {
-                                    shipmentDataList[parseInt(map.get("27"))].budget.id = "";
-                                    shipmentDataList[parseInt(map.get("27"))].budget.code = "";
-                                    shipmentDataList[parseInt(map.get("27"))].budget.label = {};
-                                }
-
-                                shipmentDataList[parseInt(map.get("27"))].shipmentRcpuQty = shipmentQty.toString().replaceAll("\,", "");
-                                shipmentDataList[parseInt(map.get("27"))].shipmentQty = shipmentPUQty.toString().replaceAll("\,", "");
-                                shipmentDataList[parseInt(map.get("27"))].rate = rate.toString().replaceAll("\,", "");
-                                shipmentDataList[parseInt(map.get("27"))].shipmentMode = shipmentMode;
-                                shipmentDataList[parseInt(map.get("27"))].productCost = productCost.toString().replaceAll("\,", "");
-                                shipmentDataList[parseInt(map.get("27"))].freightCost = Number(freightCost.toString().replaceAll("\,", "")).toFixed(2);
-                                shipmentDataList[parseInt(map.get("27"))].notes = map.get("24").toString().trim();
-                                shipmentDataList[parseInt(map.get("27"))].accountFlag = map.get("0");
-                                shipmentDataList[parseInt(map.get("27"))].localProcurement = map.get("8");
-                                shipmentDataList[parseInt(map.get("27"))].active = map.get("33");
-
-                                shipmentDataList[parseInt(map.get("27"))].orderNo = map.get("9").toString().trim();
-
-                                shipmentDataList[parseInt(map.get("27"))].emergencyOrder = map.get("15");
-                                var c = (this.state.currencyListAll.filter(c => c.currencyId == map.get("18"))[0])
-                                shipmentDataList[parseInt(map.get("27"))].currency = c;
-                                if (map.get("32") == 1) {
-                                    if (shipmentDataList[parseInt(map.get("27"))].lastModifiedBy != null) {
-                                        shipmentDataList[parseInt(map.get("27"))].lastModifiedBy.userId = curUser;
-                                        shipmentDataList[parseInt(map.get("27"))].lastModifiedBy.username = username;
-                                    } else {
-                                        shipmentDataList[parseInt(map.get("27"))].lastModifiedBy = { userId: curUser, username: username };
-                                    }
-                                    shipmentDataList[parseInt(map.get("27"))].lastModifiedDate = curDate;
-                                }
-
-                                if (map.get("28") != "" && map.get("28").length != 0) {
-                                    var totalShipmentQty = (map.get("29"));
-                                    var adjustedOrderQty = elInstance.getValue(`M${parseInt(j) + 1}`, true).toString().replaceAll("\,", "");
-                                    var eBatchInfoList = map.get("28")
-                                    var remainingBatchQty = Number(adjustedOrderQty) - Number(totalShipmentQty);
-                                    if (totalShipmentQty < adjustedOrderQty) {
-                                        var indexBatchNo = eBatchInfoList.findIndex(c => c.batch.autoGenerated.toString() == "true");
-                                        if (indexBatchNo != -1) {
-                                            eBatchInfoList[indexBatchNo].shipmentQty = Number(eBatchInfoList[indexBatchNo].shipmentQty) + Number(remainingBatchQty);
-                                        } else {
-                                            var programId = (document.getElementById("programId").value).split("_")[0];
-                                            var planningUnitId = map.get("3");
-                                            programId = paddingZero(programId, 0, 6);
-                                            planningUnitId = paddingZero(planningUnitId, 0, 8);
-                                            var batchNo = (BATCH_PREFIX).concat(programId).concat(planningUnitId).concat(moment(Date.now()).format("YYMMDD")).concat(generateRandomAplhaNumericCode(3));
-                                            var json1 = {
-                                                shipmentTransBatchInfoId: 0,
-                                                batch: {
-                                                    batchNo: batchNo,
-                                                    expiryDate: expiryDate,
-                                                    batchId: 0,
-                                                    autoGenerated: true,
-                                                    createdDate: moment(map.get("5")).format("YYYY-MM-DD")
-                                                },
-                                                shipmentQty: remainingBatchQty,
-                                            }
-                                            eBatchInfoList.push(json1);
-                                        }
-                                    }
-                                    shipmentDataList[parseInt(map.get("27"))].batchInfoList = eBatchInfoList;
-                                    map.set("28", eBatchInfoList);
-                                }
-
-
-                                // if (shipmentStatusId == DELIVERED_SHIPMENT_STATUS) {
-                                var shipmentBatchInfoList = map.get("28");
-                                var expectedDeliveryDate = moment(map.get("5")).format("YYYY-MM-DD");
-                                var createdDate = expectedDeliveryDate;
-                                // if (shipmentDatesJson.receivedDate != "" && shipmentDatesJson.receivedDate != null && shipmentDatesJson.receivedDate != undefined && shipmentDatesJson.receivedDate != "Invalid date") {
-                                //     createdDate = moment(shipmentDatesJson.receivedDate).format("YYYY-MM-DD");
-                                // }
-                                if (shipmentBatchInfoList == "" && shipmentBatchInfoList.length == 0) {
-                                    // If user is not entering anything system will create its own batch
-                                    var programId = (document.getElementById("programId").value).split("_")[0];
-                                    var planningUnitId = map.get("3");
-                                    var batchNo = (BATCH_PREFIX).concat(paddingZero(programId, 0, 6)).concat(paddingZero(planningUnitId, 0, 8)).concat(moment(Date.now()).format("YYMMDD")).concat(generateRandomAplhaNumericCode(3));
-                                    // if (shipmentDatesJson.receivedDate != "" && shipmentDatesJson.receivedDate != null && shipmentDatesJson.receivedDate != undefined && shipmentDatesJson.receivedDate != "Invalid date") {
-                                    //     expiryDate = moment(shipmentDatesJson.receivedDate).add(this.props.items.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
-                                    // }
-                                    var batchInfoJson = {
-                                        shipmentTransBatchInfoId: 0,
-                                        batch: {
-                                            batchNo: batchNo,
-                                            expiryDate: expiryDate,
-                                            batchId: 0,
-                                            autoGenerated: true,
-                                            createdDate: createdDate
-                                        },
-                                        shipmentQty: shipmentQty.toString().replaceAll("\,", "")
-                                    }
-                                    var batchArr = [];
-                                    batchArr.push(batchInfoJson);
-                                    shipmentDataList[parseInt(map.get("27"))].batchInfoList = batchArr;
-
-                                    // Enter details in batch info list
-                                    var batchDetails = {
-                                        batchId: 0,
-                                        batchNo: batchNo,
-                                        planningUnitId: parseInt(map.get("3")),
-                                        expiryDate: expiryDate,
-                                        createdDate: createdDate,
-                                        autoGenerated: true
-                                    }
-                                    batchInfoList.push(batchDetails);
-                                }
-                                for (var bi = 0; bi < shipmentBatchInfoList.length; bi++) {
-                                    // Push shipment batch details in program json batch info list
-                                    var index = -1;
-                                    if (shipmentBatchInfoList[bi].batch.batchId != 0) {
-                                        index = batchInfoList.findIndex(c => c.batchId == shipmentBatchInfoList[bi].batch.batchId);
-                                    } else {
-                                        index = batchInfoList.findIndex(c => c.batchNo == shipmentBatchInfoList[bi].batch.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(shipmentBatchInfoList[bi].batch.expiryDate).format("YYYY-MM") && c.planningUnitId == document.getElementById("planningUnitId").value);
-                                    }
-                                    if (index == -1) {
-                                        var batchDetails = {
-                                            batchId: shipmentBatchInfoList[bi].batch.batchId,
-                                            batchNo: shipmentBatchInfoList[bi].batch.batchNo,
-                                            planningUnitId: parseInt(map.get("3")),
-                                            expiryDate: shipmentBatchInfoList[bi].batch.expiryDate,
-                                            createdDate: shipmentBatchInfoList[bi].batch.createdDate,
-                                            autoGenerated: shipmentBatchInfoList[bi].batch.autoGenerated
-                                        }
-                                        batchInfoList.push(batchDetails);
-                                    } else {
-                                        batchInfoList[index].expiryDate = shipmentBatchInfoList[bi].batch.expiryDate;
-                                        batchInfoList[index].createdDate = shipmentBatchInfoList[bi].batch.createdDate;
-                                        batchInfoList[index].autoGenerated = shipmentBatchInfoList[bi].batch.autoGenerated;
-                                    }
-                                }
-                                programJson.batchInfoList = batchInfoList;
-                                // }
+                        for (var pu = 0; pu < selectedPlanningUnits.length; pu++) {
+                            var planningUnitId = selectedPlanningUnits[pu].value
+                            var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == planningUnitId);
+                            var programJson = {}
+                            if (planningUnitDataIndex != -1) {
+                                var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == planningUnitId))[0];
+                                var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                                programJson = JSON.parse(programData);
                             } else {
-                                var pa = this.state.procurementAgentList.filter(c => c.id == map.get("7"))[0];
-                                var b = this.state.budgetList.filter(c => c.id == map.get("17"))[0];
-                                var c = (this.state.currencyListAll.filter(c => c.currencyId == map.get("18"))[0]);
-                                var fs = this.state.fundingSourceList.filter(c => c.id == map.get("16"))[0];
-                                var rcpu = this.state.realmCountryPlanningUnitList.filter(c => c.id == map.get("11"))[0];
-                                var shipmentJson = {
-                                    accountFlag: map.get("0"),
-                                    active: map.get("33"),
-                                    dataSource: {
-                                        id: map.get("23"),
-                                        label: (this.state.dataSourceList).filter(c => c.id == map.get("23"))[0].label
-                                    },
-                                    realmCountryPlanningUnit: {
-                                        id: map.get("11"),
-                                        label: rcpu.label,
-                                        multiplier: rcpu.multiplier
-                                    },
-                                    erpFlag: false,
-                                    localProcurement: map.get("8"),
-                                    freightCost: Number(freightCost.toString().replaceAll("\,", "")).toFixed(2),
-                                    notes: map.get("24").toString().trim(),
-                                    planningUnit: {
-                                        id: map.get("3"),
-                                        label: (this.props.items.planningUnitListAll.filter(c => c.planningUnit.id == map.get("3"))[0]).planningUnit.label
-                                    },
-
-                                    procurementAgent: {
-                                        id: map.get("7"),
-                                        code: pa.name,
-                                        label: pa.label
-                                    },
-                                    productCost: productCost.toString().replaceAll("\,", ""),
-                                    shipmentRcpuQty: shipmentQty.toString().replaceAll("\,", ""),
-                                    shipmentQty: shipmentPUQty.toString().replaceAll("\,", ""),
-                                    rate: rate.toString().replaceAll("\,", ""),
-                                    shipmentId: 0,
-                                    shipmentMode: shipmentMode,
-                                    shipmentStatus: {
-                                        id: map.get("4"),
-                                        label: (this.state.shipmentStatusList).filter(c => c.id == map.get("4"))[0].label
-                                    },
-                                    suggestedQty: map.get("31"),
-                                    budget: {
-                                        id: map.get("17") == "undefined" || map.get("17") == undefined || map.get("17") == "" ? '' : map.get("17"),
-                                        code: map.get("17") == "undefined" || map.get("17") == undefined || map.get("17") == "" ? '' : b.name,
-                                        label: map.get("17") == "undefined" || map.get("17") == undefined || map.get("17") == "" ? {} : b.label,
-                                    },
-                                    emergencyOrder: map.get("15"),
-                                    currency: c,
-                                    fundingSource: {
-                                        id: map.get("16"),
-                                        code: fs.name,
-                                        label: fs.label
-                                    },
-                                    plannedDate: plannedDate,
-                                    submittedDate: submittedDate,
-                                    approvedDate: approvedDate,
-                                    shippedDate: shippedDate,
-                                    arrivedDate: arrivedDate,
-                                    expectedDeliveryDate: expectedDeliveryDate,
-                                    receivedDate: receivedDate,
-                                    index: shipmentDataList.length,
-                                    tempShipmentId: map.get("3").toString().concat(shipmentDataList.length),
+                                programJson = {
+                                    consumptionList: [],
+                                    inventoryList: [],
+                                    shipmentList: [],
                                     batchInfoList: [],
-                                    orderNo: map.get("9").toString().trim(),
-                                    createdBy: {
-                                        userId: curUser,
-                                        username: username
-                                    },
-                                    createdDate: curDate,
-                                    lastModifiedBy: {
-                                        userId: curUser,
-                                        username: username
-                                    },
-                                    lastModifiedDate: curDate,
-                                    parentLinkedShipmentId: null,
-                                    tempParentLinkedShipmentId: null
+                                    supplyPlan: []
                                 }
-                                if (map.get("28") != "" && map.get("28").length != 0) {
-                                    var totalShipmentQty = (map.get("29"));
-                                    var adjustedOrderQty = elInstance.getValue(`M${parseInt(j) + 1}`, true).toString().replaceAll("\,", "");
-                                    var eBatchInfoList = map.get("28")
-                                    var remainingBatchQty = Number(adjustedOrderQty) - Number(totalShipmentQty);
-                                    if (totalShipmentQty < adjustedOrderQty) {
-                                        var indexBatchNo = eBatchInfoList.findIndex(c => c.batch.autoGenerated.toString() == "true");
-                                        if (indexBatchNo != -1) {
-                                            eBatchInfoList[indexBatchNo].shipmentQty = eBatchInfoList[indexBatchNo].shipmentQty + remainingBatchQty;
+                            }
+
+                            var shipmentDataList = (programJson.shipmentList);
+
+                            var batchInfoList = (programJson.batchInfoList);
+                            var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+                            var curUser = AuthenticationService.getLoggedInUserId();
+                            var username = AuthenticationService.getLoggedInUsername();
+                            for (var j = 0; j < json.length; j++) {
+                                if (json[j][3] == planningUnitId) {
+                                    var map = new Map(Object.entries(json[j]));
+
+                                    if (map.get("32") == 1) {
+                                        if (minDate == "") {
+                                            minDate = moment(map.get("5")).format("YYYY-MM-DD");
+                                        } else if (minDate != "" && moment(map.get("5")).format("YYYY-MM") < moment(minDate).format("YYYY-MM")) {
+                                            minDate = moment(map.get("5")).format("YYYY-MM-DD");
+                                        }
+                                        if (minDate != "" && map.get("38") != "" && moment(map.get("38")).format("YYYY-MM") < moment(minDate).format("YYYY-MM")) {
+                                            minDate = moment(map.get("38")).format("YYYY-MM-DD");
+                                        }
+                                    }
+                                    var selectedShipmentStatus = map.get("4");
+                                    var shipmentStatusId = selectedShipmentStatus;
+                                    var shipmentQty = elInstance.getValue(`M${parseInt(j) + 1}`, true).toString().replaceAll("\,", "");
+                                    var shipmentPUQty = elInstance.getValue(`O${parseInt(j) + 1}`, true).toString().replaceAll("\,", "");
+                                    var productCost = elInstance.getValue(`U${parseInt(j) + 1}`, true).toString().replaceAll("\,", "");
+                                    var rate = elInstance.getValue(`T${parseInt(j) + 1}`, true).toString().replaceAll("\,", "");
+                                    var freightCost = elInstance.getValue(`V${parseInt(j) + 1}`, true).toString().replaceAll("\,", "");
+                                    var shipmentMode = "Sea";
+                                    if (map.get("6") == 2) {
+                                        shipmentMode = "Air";
+                                    }
+                                    var shipmentDatesJson = map.get("30");
+                                    var plannedDate = shipmentDatesJson.plannedDate != "" && shipmentDatesJson.plannedDate != "Invalid date" ? shipmentDatesJson.plannedDate : null;
+                                    var submittedDate = shipmentDatesJson.submittedDate != "" && shipmentDatesJson.submittedDate != "Invalid date" ? shipmentDatesJson.submittedDate : null;
+                                    var approvedDate = shipmentDatesJson.approvedDate != "" && shipmentDatesJson.approvedDate != "Invalid date" ? shipmentDatesJson.approvedDate : null;
+                                    var shippedDate = shipmentDatesJson.shippedDate != "" && shipmentDatesJson.shippedDate != "Invalid date" ? shipmentDatesJson.shippedDate : null;
+                                    var arrivedDate = shipmentDatesJson.arrivedDate != "" && shipmentDatesJson.arrivedDate != "Invalid date" ? shipmentDatesJson.arrivedDate : null;
+                                    var receivedDate = shipmentDatesJson.receivedDate != "" && shipmentDatesJson.receivedDate != "Invalid date" ? shipmentDatesJson.receivedDate : null;
+                                    var expectedDeliveryDate = shipmentDatesJson.expectedDeliveryDate != "" && shipmentDatesJson.expectedDeliveryDate != "Invalid date" ? shipmentDatesJson.expectedDeliveryDate : null;
+                                    if (shipmentStatusId != DELIVERED_SHIPMENT_STATUS) {
+                                        receivedDate = null;
+                                    }
+                                    if (shipmentStatusId != ARRIVED_SHIPMENT_STATUS && shipmentStatusId != DELIVERED_SHIPMENT_STATUS) {
+                                        arrivedDate = null;
+                                    }
+                                    if (shipmentStatusId != SHIPPED_SHIPMENT_STATUS && shipmentStatusId != ARRIVED_SHIPMENT_STATUS && shipmentStatusId != DELIVERED_SHIPMENT_STATUS) {
+                                        shippedDate = null;
+                                    }
+                                    if (shipmentStatusId != APPROVED_SHIPMENT_STATUS && shipmentStatusId != SHIPPED_SHIPMENT_STATUS && shipmentStatusId != ARRIVED_SHIPMENT_STATUS && shipmentStatusId != DELIVERED_SHIPMENT_STATUS) {
+                                        approvedDate = null;
+                                    }
+                                    if (shipmentStatusId != SUBMITTED_SHIPMENT_STATUS && shipmentStatusId != APPROVED_SHIPMENT_STATUS && shipmentStatusId != SHIPPED_SHIPMENT_STATUS && shipmentStatusId != ARRIVED_SHIPMENT_STATUS && shipmentStatusId != DELIVERED_SHIPMENT_STATUS) {
+                                        submittedDate = null;
+                                    }
+                                    var puData = this.props.items.puData.filter(c => c.id == map.get("3"))[0];
+                                    var expiryDate = moment(receivedDate != "" && receivedDate != null && receivedDate != "Invalid date" ? receivedDate : expectedDeliveryDate).add(puData.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
+                                    if (map.get("27") != -1) {
+                                        shipmentDataList[parseInt(map.get("27"))].plannedDate = plannedDate;
+                                        shipmentDataList[parseInt(map.get("27"))].submittedDate = submittedDate;
+                                        shipmentDataList[parseInt(map.get("27"))].approvedDate = approvedDate;
+                                        shipmentDataList[parseInt(map.get("27"))].shippedDate = shippedDate;
+                                        shipmentDataList[parseInt(map.get("27"))].arrivedDate = arrivedDate;
+                                        shipmentDataList[parseInt(map.get("27"))].receivedDate = receivedDate;
+                                        shipmentDataList[parseInt(map.get("27"))].expectedDeliveryDate = moment(shipmentDatesJson.expectedDeliveryDate).format("YYYY-MM-DD");
+
+                                        shipmentDataList[parseInt(map.get("27"))].shipmentStatus.id = shipmentStatusId;
+                                        shipmentDataList[parseInt(map.get("27"))].shipmentStatus.label = (this.state.shipmentStatusList).filter(c => c.id == shipmentStatusId)[0].label;
+                                        shipmentDataList[parseInt(map.get("27"))].dataSource.id = map.get("23");
+                                        shipmentDataList[parseInt(map.get("27"))].dataSource.label = (this.state.dataSourceList).filter(c => c.id == map.get("23"))[0].label;
+                                        shipmentDataList[parseInt(map.get("27"))].procurementAgent.id = map.get("7");
+
+                                        var pa = this.state.procurementAgentList.filter(c => c.id == map.get("7"))[0];
+                                        shipmentDataList[parseInt(map.get("27"))].procurementAgent.code = pa.name;
+                                        shipmentDataList[parseInt(map.get("27"))].procurementAgent.label = pa.label;
+
+                                        var rcpu = this.state.realmCountryPlanningUnitList.filter(c => c.id == map.get("11"))[0];
+                                        shipmentDataList[parseInt(map.get("27"))].realmCountryPlanningUnit.id = rcpu.id;
+                                        shipmentDataList[parseInt(map.get("27"))].realmCountryPlanningUnit.label = rcpu.label;
+                                        shipmentDataList[parseInt(map.get("27"))].realmCountryPlanningUnit.multiplier = rcpu.multiplier;
+
+                                        var fs = this.state.fundingSourceList.filter(c => c.id == map.get("16"))[0];
+                                        shipmentDataList[parseInt(map.get("27"))].fundingSource.id = map.get("16");
+                                        shipmentDataList[parseInt(map.get("27"))].fundingSource.code = fs.name;
+                                        shipmentDataList[parseInt(map.get("27"))].fundingSource.label = fs.label;
+
+                                        if (map.get("17") != undefined && map.get("17") != "undefined" && map.get("17") != "") {
+                                            var b = this.state.budgetList.filter(c => c.id == map.get("17"))[0];
+                                            shipmentDataList[parseInt(map.get("27"))].budget.id = map.get("17");
+                                            shipmentDataList[parseInt(map.get("27"))].budget.code = b.name;
+                                            shipmentDataList[parseInt(map.get("27"))].budget.label = b.label;
                                         } else {
+                                            shipmentDataList[parseInt(map.get("27"))].budget.id = "";
+                                            shipmentDataList[parseInt(map.get("27"))].budget.code = "";
+                                            shipmentDataList[parseInt(map.get("27"))].budget.label = {};
+                                        }
+
+                                        shipmentDataList[parseInt(map.get("27"))].shipmentRcpuQty = shipmentQty.toString().replaceAll("\,", "");
+                                        shipmentDataList[parseInt(map.get("27"))].shipmentQty = shipmentPUQty.toString().replaceAll("\,", "");
+                                        shipmentDataList[parseInt(map.get("27"))].rate = rate.toString().replaceAll("\,", "");
+                                        shipmentDataList[parseInt(map.get("27"))].shipmentMode = shipmentMode;
+                                        shipmentDataList[parseInt(map.get("27"))].productCost = productCost.toString().replaceAll("\,", "");
+                                        shipmentDataList[parseInt(map.get("27"))].freightCost = Number(freightCost.toString().replaceAll("\,", "")).toFixed(2);
+                                        shipmentDataList[parseInt(map.get("27"))].notes = map.get("24").toString().trim();
+                                        shipmentDataList[parseInt(map.get("27"))].accountFlag = map.get("0");
+                                        shipmentDataList[parseInt(map.get("27"))].localProcurement = map.get("8");
+                                        shipmentDataList[parseInt(map.get("27"))].active = map.get("33");
+
+                                        shipmentDataList[parseInt(map.get("27"))].orderNo = map.get("9").toString().trim();
+
+                                        shipmentDataList[parseInt(map.get("27"))].emergencyOrder = map.get("15");
+                                        var c = (this.state.currencyListAll.filter(c => c.currencyId == map.get("18"))[0])
+                                        shipmentDataList[parseInt(map.get("27"))].currency = c;
+                                        if (map.get("32") == 1) {
+                                            if (shipmentDataList[parseInt(map.get("27"))].lastModifiedBy != null) {
+                                                shipmentDataList[parseInt(map.get("27"))].lastModifiedBy.userId = curUser;
+                                                shipmentDataList[parseInt(map.get("27"))].lastModifiedBy.username = username;
+                                            } else {
+                                                shipmentDataList[parseInt(map.get("27"))].lastModifiedBy = { userId: curUser, username: username };
+                                            }
+                                            shipmentDataList[parseInt(map.get("27"))].lastModifiedDate = curDate;
+                                        }
+
+                                        if (map.get("28") != "" && map.get("28").length != 0) {
+                                            var totalShipmentQty = (map.get("29"));
+                                            var adjustedOrderQty = elInstance.getValue(`M${parseInt(j) + 1}`, true).toString().replaceAll("\,", "");
+                                            var eBatchInfoList = map.get("28")
+                                            var remainingBatchQty = Number(adjustedOrderQty) - Number(totalShipmentQty);
+                                            if (totalShipmentQty < adjustedOrderQty) {
+                                                var indexBatchNo = eBatchInfoList.findIndex(c => c.batch.autoGenerated.toString() == "true");
+                                                if (indexBatchNo != -1) {
+                                                    eBatchInfoList[indexBatchNo].shipmentQty = Number(eBatchInfoList[indexBatchNo].shipmentQty) + Number(remainingBatchQty);
+                                                } else {
+                                                    var programId = (document.getElementById("programId").value).split("_")[0];
+                                                    var planningUnitId = map.get("3");
+                                                    programId = paddingZero(programId, 0, 6);
+                                                    planningUnitId = paddingZero(planningUnitId, 0, 8);
+                                                    var batchNo = (BATCH_PREFIX).concat(programId).concat(planningUnitId).concat(moment(Date.now()).format("YYMMDD")).concat(generateRandomAplhaNumericCode(3));
+                                                    var json1 = {
+                                                        shipmentTransBatchInfoId: 0,
+                                                        batch: {
+                                                            batchNo: batchNo,
+                                                            expiryDate: expiryDate,
+                                                            batchId: 0,
+                                                            autoGenerated: true,
+                                                            createdDate: moment(map.get("5")).format("YYYY-MM-DD")
+                                                        },
+                                                        shipmentQty: remainingBatchQty,
+                                                    }
+                                                    eBatchInfoList.push(json1);
+                                                }
+                                            }
+                                            shipmentDataList[parseInt(map.get("27"))].batchInfoList = eBatchInfoList;
+                                            map.set("28", eBatchInfoList);
+                                        }
+
+
+                                        // if (shipmentStatusId == DELIVERED_SHIPMENT_STATUS) {
+                                        var shipmentBatchInfoList = map.get("28");
+                                        var expectedDeliveryDate = moment(map.get("5")).format("YYYY-MM-DD");
+                                        var createdDate = expectedDeliveryDate;
+                                        // if (shipmentDatesJson.receivedDate != "" && shipmentDatesJson.receivedDate != null && shipmentDatesJson.receivedDate != undefined && shipmentDatesJson.receivedDate != "Invalid date") {
+                                        //     createdDate = moment(shipmentDatesJson.receivedDate).format("YYYY-MM-DD");
+                                        // }
+                                        if (shipmentBatchInfoList == "" && shipmentBatchInfoList.length == 0) {
+                                            // If user is not entering anything system will create its own batch
                                             var programId = (document.getElementById("programId").value).split("_")[0];
                                             var planningUnitId = map.get("3");
-                                            programId = paddingZero(programId, 0, 6);
-                                            planningUnitId = paddingZero(planningUnitId, 0, 8);
-                                            var batchNo = (BATCH_PREFIX).concat(programId).concat(planningUnitId).concat(moment(Date.now()).format("YYMMDD")).concat(generateRandomAplhaNumericCode(3));
-                                            var json1 = {
+                                            var batchNo = (BATCH_PREFIX).concat(paddingZero(programId, 0, 6)).concat(paddingZero(planningUnitId, 0, 8)).concat(moment(Date.now()).format("YYMMDD")).concat(generateRandomAplhaNumericCode(3));
+                                            // if (shipmentDatesJson.receivedDate != "" && shipmentDatesJson.receivedDate != null && shipmentDatesJson.receivedDate != undefined && shipmentDatesJson.receivedDate != "Invalid date") {
+                                            //     expiryDate = moment(shipmentDatesJson.receivedDate).add(this.props.items.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
+                                            // }
+                                            var batchInfoJson = {
                                                 shipmentTransBatchInfoId: 0,
                                                 batch: {
                                                     batchNo: batchNo,
                                                     expiryDate: expiryDate,
                                                     batchId: 0,
                                                     autoGenerated: true,
-                                                    createdDate: moment(map.get("5")).format("YYYY-MM-DD")
+                                                    createdDate: createdDate
                                                 },
-                                                shipmentQty: remainingBatchQty,
+                                                shipmentQty: shipmentQty.toString().replaceAll("\,", "")
                                             }
-                                            eBatchInfoList.push(json1);
+                                            var batchArr = [];
+                                            batchArr.push(batchInfoJson);
+                                            shipmentDataList[parseInt(map.get("27"))].batchInfoList = batchArr;
+
+                                            // Enter details in batch info list
+                                            var batchDetails = {
+                                                batchId: 0,
+                                                batchNo: batchNo,
+                                                planningUnitId: parseInt(map.get("3")),
+                                                expiryDate: expiryDate,
+                                                createdDate: createdDate,
+                                                autoGenerated: true
+                                            }
+                                            batchInfoList.push(batchDetails);
                                         }
-                                    }
-                                    map.set("28", eBatchInfoList);
-                                    shipmentJson.batchInfoList = map.get("28");
-                                }
-
-                                // if (shipmentStatusId == DELIVERED_SHIPMENT_STATUS) {
-                                var shipmentBatchInfoList = map.get("28");
-                                var expectedDeliveryDate = moment(map.get("5")).format("YYYY-MM-DD");
-                                var createdDate = expectedDeliveryDate;
-                                // if (shipmentDatesJson.receivedDate != "" && shipmentDatesJson.receivedDate != null && shipmentDatesJson.receivedDate != undefined && shipmentDatesJson.receivedDate != "Invalid date") {
-                                //     createdDate = moment(shipmentDatesJson.receivedDate).format("YYYY-MM-DD");
-                                // }
-                                if (shipmentBatchInfoList == "" && shipmentBatchInfoList.length == 0) {
-                                    var programId = (document.getElementById("programId").value).split("_")[0];
-                                    var planningUnitId = map.get("3");
-                                    var batchNo = (BATCH_PREFIX).concat(paddingZero(programId, 0, 6)).concat(paddingZero(planningUnitId, 0, 8)).concat(moment(Date.now()).format("YYMMDD")).concat(generateRandomAplhaNumericCode(3));
-                                    var expiryDate = moment(receivedDate != "" && receivedDate != null && receivedDate != "Invalid date" ? receivedDate : expectedDeliveryDate).add(this.props.items.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
-                                    // if (shipmentDatesJson.receivedDate != "" && shipmentDatesJson.receivedDate != null && shipmentDatesJson.receivedDate != undefined && shipmentDatesJson.receivedDate != "Invalid date") {
-                                    //     expiryDate = moment(shipmentDatesJson.receivedDate).add(this.props.items.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
-                                    // }
-                                    var batchInfoJson = {
-                                        shipmentTransBatchInfoId: 0,
-                                        batch: {
-                                            batchNo: batchNo,
-                                            expiryDate: expiryDate,
-                                            batchId: 0,
-                                            autoGenerated: true,
-                                            createdDate: createdDate
-                                        },
-                                        shipmentQty: shipmentQty.toString().replaceAll("\,", "")
-                                    }
-                                    var batchArr = [];
-                                    batchArr.push(batchInfoJson);
-                                    shipmentJson.batchInfoList = batchArr;
-
-
-                                    var batchDetails = {
-                                        batchId: 0,
-                                        batchNo: batchNo,
-                                        planningUnitId: map.get("3"),
-                                        expiryDate: expiryDate,
-                                        createdDate: createdDate,
-                                        autoGenerated: true
-                                    }
-                                    batchInfoList.push(batchDetails);
-                                }
-                                for (var bi = 0; bi < shipmentBatchInfoList.length; bi++) {
-                                    var index = -1;
-                                    if (shipmentBatchInfoList[bi].batch.batchId != 0) {
-                                        index = batchInfoList.findIndex(c => c.batchId == shipmentBatchInfoList[bi].batch.batchId);
-                                    } else {
-                                        index = batchInfoList.findIndex(c => c.batchNo == shipmentBatchInfoList[bi].batch.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(shipmentBatchInfoList[bi].batch.expiryDate).format("YYYY-MM") && c.planningUnitId == document.getElementById("planningUnitId").value);
-                                    }
-                                    if (index == -1) {
-                                        var batchDetails = {
-                                            batchId: shipmentBatchInfoList[bi].batch.batchId,
-                                            batchNo: shipmentBatchInfoList[bi].batch.batchNo,
-                                            planningUnitId: map.get("3"),
-                                            expiryDate: shipmentBatchInfoList[bi].batch.expiryDate,
-                                            createdDate: shipmentBatchInfoList[bi].batch.createdDate,
-                                            autoGenerated: shipmentBatchInfoList[bi].batch.autoGenerated
+                                        for (var bi = 0; bi < shipmentBatchInfoList.length; bi++) {
+                                            // Push shipment batch details in program json batch info list
+                                            var index = -1;
+                                            if (shipmentBatchInfoList[bi].batch.batchId != 0) {
+                                                index = batchInfoList.findIndex(c => c.batchId == shipmentBatchInfoList[bi].batch.batchId);
+                                            } else {
+                                                index = batchInfoList.findIndex(c => c.batchNo == shipmentBatchInfoList[bi].batch.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(shipmentBatchInfoList[bi].batch.expiryDate).format("YYYY-MM") && c.planningUnitId == planningUnitId);
+                                            }
+                                            if (index == -1) {
+                                                var batchDetails = {
+                                                    batchId: shipmentBatchInfoList[bi].batch.batchId,
+                                                    batchNo: shipmentBatchInfoList[bi].batch.batchNo,
+                                                    planningUnitId: parseInt(map.get("3")),
+                                                    expiryDate: shipmentBatchInfoList[bi].batch.expiryDate,
+                                                    createdDate: shipmentBatchInfoList[bi].batch.createdDate,
+                                                    autoGenerated: shipmentBatchInfoList[bi].batch.autoGenerated
+                                                }
+                                                batchInfoList.push(batchDetails);
+                                            } else {
+                                                batchInfoList[index].expiryDate = shipmentBatchInfoList[bi].batch.expiryDate;
+                                                batchInfoList[index].createdDate = shipmentBatchInfoList[bi].batch.createdDate;
+                                                batchInfoList[index].autoGenerated = shipmentBatchInfoList[bi].batch.autoGenerated;
+                                            }
                                         }
-                                        batchInfoList.push(batchDetails);
+                                        programJson.batchInfoList = batchInfoList;
+                                        // }
                                     } else {
-                                        batchInfoList[index].expiryDate = shipmentBatchInfoList[bi].batch.expiryDate;
-                                        batchInfoList[index].createdDate = shipmentBatchInfoList[bi].batch.createdDate;
-                                        batchInfoList[index].autoGenerated = shipmentBatchInfoList[bi].batch.autoGenerated;
+                                        var pa = this.state.procurementAgentList.filter(c => c.id == map.get("7"))[0];
+                                        var b = this.state.budgetList.filter(c => c.id == map.get("17"))[0];
+                                        var c = (this.state.currencyListAll.filter(c => c.currencyId == map.get("18"))[0]);
+                                        var fs = this.state.fundingSourceList.filter(c => c.id == map.get("16"))[0];
+                                        var rcpu = this.state.realmCountryPlanningUnitList.filter(c => c.id == map.get("11"))[0];
+                                        var shipmentJson = {
+                                            accountFlag: map.get("0"),
+                                            active: map.get("33"),
+                                            dataSource: {
+                                                id: map.get("23"),
+                                                label: (this.state.dataSourceList).filter(c => c.id == map.get("23"))[0].label
+                                            },
+                                            realmCountryPlanningUnit: {
+                                                id: map.get("11"),
+                                                label: rcpu.label,
+                                                multiplier: rcpu.multiplier
+                                            },
+                                            erpFlag: false,
+                                            localProcurement: map.get("8"),
+                                            freightCost: Number(freightCost.toString().replaceAll("\,", "")).toFixed(2),
+                                            notes: map.get("24").toString().trim(),
+                                            planningUnit: {
+                                                id: map.get("3"),
+                                                label: (this.props.items.planningUnitListAll.filter(c => c.planningUnit.id == map.get("3"))[0]).planningUnit.label
+                                            },
+
+                                            procurementAgent: {
+                                                id: map.get("7"),
+                                                code: pa.name,
+                                                label: pa.label
+                                            },
+                                            productCost: productCost.toString().replaceAll("\,", ""),
+                                            shipmentRcpuQty: shipmentQty.toString().replaceAll("\,", ""),
+                                            shipmentQty: shipmentPUQty.toString().replaceAll("\,", ""),
+                                            rate: rate.toString().replaceAll("\,", ""),
+                                            shipmentId: 0,
+                                            shipmentMode: shipmentMode,
+                                            shipmentStatus: {
+                                                id: map.get("4"),
+                                                label: (this.state.shipmentStatusList).filter(c => c.id == map.get("4"))[0].label
+                                            },
+                                            suggestedQty: map.get("31"),
+                                            budget: {
+                                                id: map.get("17") == "undefined" || map.get("17") == undefined || map.get("17") == "" ? '' : map.get("17"),
+                                                code: map.get("17") == "undefined" || map.get("17") == undefined || map.get("17") == "" ? '' : b.name,
+                                                label: map.get("17") == "undefined" || map.get("17") == undefined || map.get("17") == "" ? {} : b.label,
+                                            },
+                                            emergencyOrder: map.get("15"),
+                                            currency: c,
+                                            fundingSource: {
+                                                id: map.get("16"),
+                                                code: fs.name,
+                                                label: fs.label
+                                            },
+                                            plannedDate: plannedDate,
+                                            submittedDate: submittedDate,
+                                            approvedDate: approvedDate,
+                                            shippedDate: shippedDate,
+                                            arrivedDate: arrivedDate,
+                                            expectedDeliveryDate: expectedDeliveryDate,
+                                            receivedDate: receivedDate,
+                                            index: shipmentDataList.length,
+                                            tempShipmentId: map.get("3").toString().concat(shipmentDataList.length),
+                                            batchInfoList: [],
+                                            orderNo: map.get("9").toString().trim(),
+                                            createdBy: {
+                                                userId: curUser,
+                                                username: username
+                                            },
+                                            createdDate: curDate,
+                                            lastModifiedBy: {
+                                                userId: curUser,
+                                                username: username
+                                            },
+                                            lastModifiedDate: curDate,
+                                            parentLinkedShipmentId: null,
+                                            tempParentLinkedShipmentId: null
+                                        }
+                                        if (map.get("28") != "" && map.get("28").length != 0) {
+                                            var totalShipmentQty = (map.get("29"));
+                                            var adjustedOrderQty = elInstance.getValue(`M${parseInt(j) + 1}`, true).toString().replaceAll("\,", "");
+                                            var eBatchInfoList = map.get("28")
+                                            var remainingBatchQty = Number(adjustedOrderQty) - Number(totalShipmentQty);
+                                            if (totalShipmentQty < adjustedOrderQty) {
+                                                var indexBatchNo = eBatchInfoList.findIndex(c => c.batch.autoGenerated.toString() == "true");
+                                                if (indexBatchNo != -1) {
+                                                    eBatchInfoList[indexBatchNo].shipmentQty = eBatchInfoList[indexBatchNo].shipmentQty + remainingBatchQty;
+                                                } else {
+                                                    var programId = (document.getElementById("programId").value).split("_")[0];
+                                                    var planningUnitId = map.get("3");
+                                                    programId = paddingZero(programId, 0, 6);
+                                                    planningUnitId = paddingZero(planningUnitId, 0, 8);
+                                                    var batchNo = (BATCH_PREFIX).concat(programId).concat(planningUnitId).concat(moment(Date.now()).format("YYMMDD")).concat(generateRandomAplhaNumericCode(3));
+                                                    var json1 = {
+                                                        shipmentTransBatchInfoId: 0,
+                                                        batch: {
+                                                            batchNo: batchNo,
+                                                            expiryDate: expiryDate,
+                                                            batchId: 0,
+                                                            autoGenerated: true,
+                                                            createdDate: moment(map.get("5")).format("YYYY-MM-DD")
+                                                        },
+                                                        shipmentQty: remainingBatchQty,
+                                                    }
+                                                    eBatchInfoList.push(json1);
+                                                }
+                                            }
+                                            map.set("28", eBatchInfoList);
+                                            shipmentJson.batchInfoList = map.get("28");
+                                        }
+
+                                        // if (shipmentStatusId == DELIVERED_SHIPMENT_STATUS) {
+                                        var shipmentBatchInfoList = map.get("28");
+                                        var expectedDeliveryDate = moment(map.get("5")).format("YYYY-MM-DD");
+                                        var createdDate = expectedDeliveryDate;
+                                        // if (shipmentDatesJson.receivedDate != "" && shipmentDatesJson.receivedDate != null && shipmentDatesJson.receivedDate != undefined && shipmentDatesJson.receivedDate != "Invalid date") {
+                                        //     createdDate = moment(shipmentDatesJson.receivedDate).format("YYYY-MM-DD");
+                                        // }
+                                        if (shipmentBatchInfoList == "" && shipmentBatchInfoList.length == 0) {
+                                            var programId = (document.getElementById("programId").value).split("_")[0];
+                                            var planningUnitId = map.get("3");
+                                            var batchNo = (BATCH_PREFIX).concat(paddingZero(programId, 0, 6)).concat(paddingZero(planningUnitId, 0, 8)).concat(moment(Date.now()).format("YYMMDD")).concat(generateRandomAplhaNumericCode(3));
+                                            var puData = this.props.items.puData.filter(c => c.id == planningUnitId)[0];
+                                            var expiryDate = moment(receivedDate != "" && receivedDate != null && receivedDate != "Invalid date" ? receivedDate : expectedDeliveryDate).add(puData.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
+                                            // if (shipmentDatesJson.receivedDate != "" && shipmentDatesJson.receivedDate != null && shipmentDatesJson.receivedDate != undefined && shipmentDatesJson.receivedDate != "Invalid date") {
+                                            //     expiryDate = moment(shipmentDatesJson.receivedDate).add(this.props.items.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
+                                            // }
+                                            var batchInfoJson = {
+                                                shipmentTransBatchInfoId: 0,
+                                                batch: {
+                                                    batchNo: batchNo,
+                                                    expiryDate: expiryDate,
+                                                    batchId: 0,
+                                                    autoGenerated: true,
+                                                    createdDate: createdDate
+                                                },
+                                                shipmentQty: shipmentQty.toString().replaceAll("\,", "")
+                                            }
+                                            var batchArr = [];
+                                            batchArr.push(batchInfoJson);
+                                            shipmentJson.batchInfoList = batchArr;
+
+
+                                            var batchDetails = {
+                                                batchId: 0,
+                                                batchNo: batchNo,
+                                                planningUnitId: map.get("3"),
+                                                expiryDate: expiryDate,
+                                                createdDate: createdDate,
+                                                autoGenerated: true
+                                            }
+                                            batchInfoList.push(batchDetails);
+                                        }
+                                        for (var bi = 0; bi < shipmentBatchInfoList.length; bi++) {
+                                            var index = -1;
+                                            if (shipmentBatchInfoList[bi].batch.batchId != 0) {
+                                                index = batchInfoList.findIndex(c => c.batchId == shipmentBatchInfoList[bi].batch.batchId);
+                                            } else {
+                                                index = batchInfoList.findIndex(c => c.batchNo == shipmentBatchInfoList[bi].batch.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(shipmentBatchInfoList[bi].batch.expiryDate).format("YYYY-MM") && c.planningUnitId == planningUnitId);
+                                            }
+                                            if (index == -1) {
+                                                var batchDetails = {
+                                                    batchId: shipmentBatchInfoList[bi].batch.batchId,
+                                                    batchNo: shipmentBatchInfoList[bi].batch.batchNo,
+                                                    planningUnitId: map.get("3"),
+                                                    expiryDate: shipmentBatchInfoList[bi].batch.expiryDate,
+                                                    createdDate: shipmentBatchInfoList[bi].batch.createdDate,
+                                                    autoGenerated: shipmentBatchInfoList[bi].batch.autoGenerated
+                                                }
+                                                batchInfoList.push(batchDetails);
+                                            } else {
+                                                batchInfoList[index].expiryDate = shipmentBatchInfoList[bi].batch.expiryDate;
+                                                batchInfoList[index].createdDate = shipmentBatchInfoList[bi].batch.createdDate;
+                                                batchInfoList[index].autoGenerated = shipmentBatchInfoList[bi].batch.autoGenerated;
+                                            }
+                                        }
+                                        programJson.batchInfoList = batchInfoList;
+                                        // }
+                                        shipmentDataList.push(shipmentJson);
                                     }
                                 }
-                                programJson.batchInfoList = batchInfoList;
-                                // }
-                                shipmentDataList.push(shipmentJson);
+                            }
+                            actionList.push({
+                                planningUnitId: planningUnitId,
+                                type: SHIPMENT_MODIFIED,
+                                date: moment(minDate).startOf('month').format("YYYY-MM-DD")
+                            })
+                            programJson.shipmentList = shipmentDataList;
+                            if (planningUnitDataIndex != -1) {
+                                planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                            } else {
+                                planningUnitDataList.push({ planningUnitId: planningUnitId, planningUnitData: (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString() });
                             }
                         }
-                        actionList.push({
-                            planningUnitId: planningUnitId,
-                            type: SHIPMENT_MODIFIED,
-                            date: moment(minDate).startOf('month').format("YYYY-MM-DD")
-                        })
-                        programJson.shipmentList = shipmentDataList;
                         generalProgramJson.actionList = actionList;
-                        if (planningUnitDataIndex != -1) {
-                            planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
-                        } else {
-                            planningUnitDataList.push({ planningUnitId: planningUnitId, planningUnitData: (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString() });
-                        }
+
                         programDataJson.planningUnitDataList = planningUnitDataList;
                         programDataJson.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
                         programRequest.result.programData = programDataJson;
@@ -3970,14 +4123,14 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         }.bind(this);
                         putRequest.onsuccess = function (event) {
                             var programId = (document.getElementById("programId").value)
-                            var planningUnitId = (document.getElementById("planningUnitId").value)
+                            var puListForRebuild = [...new Set(this.props.items.planningUnit.map(ele => (ele.value)))]
                             var objectStore = "";
                             if (this.props.shipmentPage == "whatIf") {
                                 objectStore = 'whatIfProgramData';
                             } else {
                                 objectStore = 'programData';
                             }
-                            calculateSupplyPlan(programId, planningUnitId, objectStore, "shipment", this.props, [], moment(minDate).startOf('month').format("YYYY-MM-DD"));
+                            calculateSupplyPlan(programId, 0, objectStore, "shipment", this.props, puListForRebuild, moment(minDate).startOf('month').format("YYYY-MM-DD"));
                         }.bind(this)
                     } catch (err) {
                         this.props.updateState("shipmentError", i18n.t('static.program.errortext'));
@@ -4194,13 +4347,13 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     data: json1,
                     columnDrag: true,
                     columns: [
-                        { type: 'numeric', title: i18n.t('static.procurementAgentPlanningUnit.moq'), mask: '#,##.00', decimal: '.', width: 120,readOnly:true },
-                        { type: 'numeric', title: i18n.t('static.procurementAgentPlanningUnit.unitPerPalletEuro1'), mask: '#,##.00', decimal: '.', width: 120,readOnly:true },
-                        { type: 'numeric', title: i18n.t('static.procurementAgentPlanningUnit.unitPerPalletEuro2'), mask: '#,##.00', decimal: '.', width: 120,readOnly:true },
-                        { type: 'numeric', title: i18n.t('static.procurementUnit.unitsPerContainer'), mask: '#,##.00', decimal: '.', width: 120,readOnly:true },
-                        { type: 'numeric', title: i18n.t('static.supplyPlan.noOfPalletsEuro1'), mask: '#,##.00', decimal: '.', width: 120,readOnly:true },
-                        { type: 'numeric', title: i18n.t('static.supplyPlan.noOfPalletsEuro2'), mask: '#,##.00', decimal: '.', width: 120,readOnly:true },
-                        { type: 'numeric', title: i18n.t('static.supplyPlan.noOfContainers'), mask: '#,##.00', decimal: '.', width: 120,readOnly:true },
+                        { type: 'numeric', title: i18n.t('static.procurementAgentPlanningUnit.moq'), mask: '#,##.00', decimal: '.', width: 120 },
+                        { type: 'numeric', title: i18n.t('static.procurementAgentPlanningUnit.unitPerPalletEuro1'), mask: '#,##.00', decimal: '.', width: 120 },
+                        { type: 'numeric', title: i18n.t('static.procurementAgentPlanningUnit.unitPerPalletEuro2'), mask: '#,##.00', decimal: '.', width: 120 },
+                        { type: 'numeric', title: i18n.t('static.procurementUnit.unitsPerContainer'), mask: '#,##.00', decimal: '.', width: 120 },
+                        { type: 'numeric', title: i18n.t('static.supplyPlan.noOfPalletsEuro1'), mask: '#,##.00', decimal: '.', width: 120 },
+                        { type: 'numeric', title: i18n.t('static.supplyPlan.noOfPalletsEuro2'), mask: '#,##.00', decimal: '.', width: 120 },
+                        { type: 'numeric', title: i18n.t('static.supplyPlan.noOfContainers'), mask: '#,##.00', decimal: '.', width: 120 },
                         { type: 'hidden' },
                         { type: 'hidden' },
                         { type: 'hidden' },
@@ -4218,7 +4371,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     allowInsertRow: false,
                     allowManualInsertRow: false,
                     allowExport: false,
-                    editable: true,
+                    editable: false,
                     // text: {
                     //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
                     //     show: '',

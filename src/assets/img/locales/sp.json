@@ -1392,6 +1392,7 @@
     "static.common.pr": "PR",
     "static.message.login.invalidCredentials": "Usuario o contraseña incorrecta",
     "static.common.backTo": "De regreso",
+    "static.programLoadedAndmasterDataSync.success": "Programa cargado y datos maestros sincronizados con éxito",
     "static.dataEntryAndAdjustments.HistoricalActual": "pantalla. El consumo real histórico puede ser cantidades vendidas, cantidades entregadas al usuario o cantidades emitidas por las instalaciones de almacenamiento. En esta pantalla, los usuarios pueden ajustar los datos de consumo históricos que se ingresaron manualmente en esta pantalla o que se importaron de un programa de plan de suministro de QAT (si desea importar, vaya primero a la",
     "static.message.inventorySaved": "Datos de inventario guardados",
     "static.month.dec": "Dic",
@@ -2784,7 +2785,6 @@
     "static.organisation.organisationheader": "Organización",
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Max = 7",
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18)",
-    "static.loadDeleteProgram.loadDeleteProgram": "Cargar/Borrar programa",
     "static.editStatus.validCriticality": "Seleccione Criticidad",
     "static.shipment.shipmentProcurementAgentType": "Tipo de agente de compras de envío",
     "static.shipment.groupByProcurementAgentType": "Agrupar por tipo de agente de compras"

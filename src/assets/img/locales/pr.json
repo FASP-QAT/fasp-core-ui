@@ -81,15 +81,9 @@
     "static.common.duplicateTemplate": "Modelo duplicado",
     "static.supplyPlanFormula.amcEx3": "Mês atual = maio de 2020",
     "static.supplyPlanFormula.amcEx2": "Meses no futuro = 3 (com base na unidade de planeamento do programa)",
-<<<<<<< HEAD
     "static.supplyPlanFormula.amcEx5": "Consumo Ajustado em março de 2020 = 6.890",
     "static.tooltip.planningProgramSetting": "O programa deve ser carregado primeiro, pois as configurações da unidade de planejamento são específicas da versão",
     "static.supplyPlanFormula.amcEx4": "Consumo em fevereiro de 2020 = 5.000",
-=======
-    "static.supplyPlanFormula.amcEx5": "Consumo em março de 2020 = 6,890",
-    "static.tooltip.planningProgramSetting": "O programa deve ser carregado primeiro, pois as configurações da unidade de planeamento são específicas da versão",
-    "static.supplyPlanFormula.amcEx4": "Consumo em fevereiro de 2020 = 5,000",
->>>>>>> QAT-914
     "static.tooltip.LinearRegression": "A regressão linear modela a relação entre duas variáveis ​​ajustando uma equação linear aos dados observados. Intervalo de confiança: entre 0% e 100% (exclusivo) ex. O intervalo de confiança de 90% indica que 90% dos possíveis pontos futuros estão dentro desse raio da previsão representada pela linha de regressão.",
     "static.supplyPlanFormula.amcEx7": "Consumo ajustado em maio de 2020 = 7.087",
     "static.supplyPlanFormula.amcEx6": "Consumo Ajustado em abril de 2020 = 6.907",
@@ -144,12 +138,8 @@
     "static.extrapolation.TripleExponentialTextTwo": "As previsões que usam suavização exponencial tripla têm três parâmetros. A suavização exponencial usa dados mais antigos com pesos exponencialmente decrescentes ao longo do tempo.",
     "static.add.addTechnicalArea": "Adicionar área técnica",
     "static.dataEntryAndAdjustments.StockRate": "(1 - Taxa de Esgotamento)",
-<<<<<<< HEAD
     "static.commit.erpLineNo": "Linha ERP Nº",
     "static.tooltip.ModelingCalculator": "Use a calculadora de modelagem para interpolar para um destino ou se precisar de ajuda para descobrir a mudança mensal.",
-=======
-    "static.tooltip.ModelingCalculator": "Use a calculadora de modelagem para interpolar para um alvo ou se precisar de ajuda para calcular a mudança mensal.",
->>>>>>> QAT-914
     "static.ticket.filesuploadnote": "Se você deseja fazer upload ou envio de vários arquivos, compacte-os em um arquivo zip.",
     "static.month.jul": "jul.",
     "static.report.arrived": "Chegado",
@@ -507,15 +497,9 @@
     "static.planningUnitSetting.10digitWholeNumber": "Insira um número inteiro de 10 dígitos",
     "static.dashboard.countryheader": "Países",
     "static.forecastValidation.noMissingSelectedForecastFound": "Nenhuma previsão selecionada ausente encontrada",
-<<<<<<< HEAD
     "static.importFromQATSupplyPlan.multiplier": "Multiplicadora",
     "static.common.display?": "Exibição?",
     "static.loadProgram.loadWithoutLatestShipments": "Carregar sem envios mais recentes",
-=======
-    "static.importFromQATSupplyPlan.multiplier": "Multiplicador",
-    "static.common.display?": "Exibir?",
-    "static.CompareSelect.TipsGraphAndTabular": "Dicas sobre como usar os dados gráficos e tabulares",
->>>>>>> QAT-914
     "static.tree.#OfFU/month/": "# Of FU / mês /",
     "static.ManageTree.NodeAction": "Ações do nó",
     "static.report.approver": "Aprovador",
@@ -849,12 +833,7 @@
     "static.dataEntryAndAdjustments.Mathematically": "Matematicamente",
     "static.supplyPlan.shelfLife": "Validade",
     "static.extrapolation.SecondStep": "A segunda etapa é considerar se os valores de previsão devem refletir de perto os padrões históricos em seus dados e, portanto, se você usará as métricas de erro para informar sua seleção.",
-<<<<<<< HEAD
     "static.scenarioPlanning.newlyAddedShipment": "Remessa recém-adicionada",
-=======
-    "static.commitTree.noPUorFUMapping": "Você não pode consolidar a árvore de previsão com nós PU/nós FU que não tenham unidade de planeamento/unidade de previsão mapeada para ela",
-    "static.scenarioPlanning.newlyAddedShipment": "Remessa Replanejada",
->>>>>>> QAT-914
     "static.ManageTree.AdvancedFunctionality": "Funcionalidade avançada",
     "static.ManageTree.ManageTheTree": "Gerenciar a árvore de previsão",
     "static.jexcel.consumptionQuantity": "Com a quantidade de consumo",
@@ -1059,12 +1038,8 @@
     "static.organisationType.organisationTypeValue": "Selecione o tipo de organização",
     "static.forecastReport.unitPrice": "Preço unitário",
     "static.common.onlinepasswordtext": "Você deve estar online para atualizar a sua senha",
-<<<<<<< HEAD
     "static.tooltip.UsageType": "O produto de uso contínuo será usado por um período indeterminado O produto de uso discreto será usado por um período finito conforme definido pelo usuário",
     "static.commit.erpNo": "ERP Não",
-=======
-    "static.tooltip.UsageType": "O produto de uso contínuo será usado por um período indeterminado. O produto de uso discreto será usado por um período finito conforme definido pelo usuário.",
->>>>>>> QAT-914
     "static.quantimed.quantimedImportCosumptionPeriod": "Selecione o período de consumo para o qual deseja importar dados",
     "static.procurementAgentPlanningUnit.weightText": "Insira o peso",
     "static.ModelingTransfer.calculatesMarMonth": "A QAT calcula que essa mudança seja de 55,41 em Mar-22",
@@ -1089,12 +1064,8 @@
     "static.supplyPlan.orderBasedOn": "Embalagem baseada em",
     "static.supplyPlan.dateustBeLessThanCurDate": "A data deve ser antes da data actual",
     "static.budget.program": "Programa",
-<<<<<<< HEAD
     "static.mt.knShipmentNo": "N.º de Remessa KN",
     "static.tree.calculatedChangeForMonthTree": "Alteração calculada para o",
-=======
-    "static.tree.calculatedChangeForMonthTree": "Alteração calculada para",
->>>>>>> QAT-914
     "static.commitVersion.changedInLatestVersion": "Alterado na versão do servidor",
     "static.report.selectMonth": "Selecione o mês",
     "static.product.productcategorytext": "Selecione a categoria da unidade de planeamento",
@@ -1133,13 +1104,8 @@
     "static.mt.orderNoAlreadyTagged": "Nº de embarque ERP e  Nº da linha principal, marcados.",
     "static.commitVersion.resolvedConflictsSuccess": "Conflitos resolvidos com sucesso.",
     "static.common.product": "Unidade de planeamento",
-<<<<<<< HEAD
     "static.manualTagging.RONO": "Nº do pedido ERP",
     "static.ModelingTransfer.StaticEachMonth": "uma porcentagem estática a cada mês (por exemplo, se o mês inicial for 30% e a alteração for +1% a cada mês, o próximo mês for 31%, o próximo for 32% e assim por diante)",
-=======
-    "static.manualTagging.RONO": "Pedido ERP nº",
-    "static.ModelingTransfer.StaticEachMonth": "uma porcentagem estática a cada mês (por exemplo, se o mês inicial for 30% e a alteração for +1% a cada mês, o próximo mês vai ser 31%, o seguinte vai ser 32% e assim por diante)",
->>>>>>> QAT-914
     "static.dashboard.listprogram": "Mostrar programa",
     "static.commit.duplicateErp": "ERP duplicado",
     "static.NodeData.FieldIndicate": "campo para indicar. Por exemplo, se o usuário final usa um produto diariamente, mas só pega ou compra o produto a cada 2 meses, insira 2 no campo \"Intervalo de consumo\" para contabilizar um padrão de consumo multi mês. Observe que isso está disponível apenas para nós contínuos, pois o produto é considerado “consumido” no início do período de uso.",
@@ -1425,6 +1391,7 @@
     "static.common.pr": "PR",
     "static.message.login.invalidCredentials": "Login ou senha incorreta",
     "static.common.backTo": "De volta a",
+    "static.programLoadedAndmasterDataSync.success": "Programa carregado e dados mestre sincronizados com sucesso",
     "static.dataEntryAndAdjustments.HistoricalActual": "tela. O consumo real histórico pode ser quantidades vendidas, quantidades dispensadas ao usuário ou quantidades emitidas por instalações de armazenamento. Nesta tela, os usuários podem ajustar os dados históricos de consumo que foram inseridos manualmente nesta tela ou que foram importados de um programa de plano de abastecimento QAT (se desejar importar, prossiga primeiro para o",
     "static.message.inventorySaved": "Dados de stock salvos",
     "static.month.dec": "dez.",
@@ -1869,12 +1836,8 @@
     "static.label.labelFail": "Ocorreu um erro",
     "static.ForecastSummary.FullSupplyPlan": "Este não é um plano de fornecimento completo, mas uma análise de excedente/lacuna de aquisição de alto nível. Recomendamos importar sua previsão para o módulo de planejamento de fornecimento para planejamento de fornecimento granular.",
     "static.supplyPlan.qatProduct": "Unidade de planeamento QAT",
-<<<<<<< HEAD
     "static.ManageTree.ForecastTreeBuilt": "A árvore de previsão é construída de cima para baixo, usando diferentes tipos de “nós”. Consulte os tipos de nó e ações de nó abaixo. Cada árvore de previsão deve incluir um ou mais nós de unidade de planejamento, que formam a saída de previsão, para que essa árvore fique disponível na tela \"Comparar e selecionar\". Cada Nó de Unidade de Planejamento deve derivar de um Nó de Unidade de Previsão.",
     "static.commit.server": "Servidor",
-=======
-    "static.ManageTree.ForecastTreeBuilt": "A árvore de previsão é construída de cima para baixo, usando diferentes tipos de “nós”. Consulte os tipos de nó e ações de nó abaixo. Cada árvore de previsão deve incluir um ou mais nós de unidade de planeamento, que formam a saída de previsão, para que essa árvore fique disponível na tela \"Compare e selecione\". Cada Nó de Unidade de Planeamento deve derivar de um Nó de Unidade de Previsão.",
->>>>>>> QAT-914
     "static.organisation.organisation": "Organização",
     "static.common.disabled": "Desativado",
     "static.problemContext.transDetails": "Histórico de Notas",
@@ -2245,15 +2208,9 @@
     "static.supplyPlan.monthsOfStock": "Meses de stock ",
     "static.supplyPlanFormula.suggestedOrderQty": "Quantidade de pedido sugerida",
     "static.Tooltip.levelModelingValdation": "Eles são baseados nos vários níveis da Árvore de Previsão, incluindo um nível automatizado que consolida FUs ou PUs, caso eles se estendam por vários níveis. Os usuários podem optar por atualizar manualmente o nome de cada nível na tela Árvore de previsão, se desejarem, e isso será atualizado neste menu suspenso.",
-<<<<<<< HEAD
     "static.module.supplyPlanningMod": "PLANEJAMENTO DE FORNECIMENTO",
     "static.supplyPlanFormula.endingBalance1": "Estoque Projetado = Saldo inicial + Ajuste + Remessas em contas - Consumo Ajustado - Estoque vencido",
     "static.forecastValidation.noMonthsHaveLessData": "Nenhuma unidade de planejamento tem menos de 24 meses de dados de consumo",
-=======
-    "static.module.supplyPlanningMod": "PLANEAMENTO DO SUPRIMENTO",
-    "static.supplyPlanFormula.endingBalance1": "Stock projetado = Balanço inicial + ajustes + embarques na conta - consumos - stock expirado",
-    "static.forecastValidation.noMonthsHaveLessData": "Nenhuma unidade de planeamento tem menos de 24 meses de dados de consumo",
->>>>>>> QAT-914
     "static.currency.currency": "Moeda (inglês)",
     "static.message.invaliddate": "Data inválida",
     "static.report.planningUOM": "Unidade de medida da unidade de planeamento",
@@ -2284,12 +2241,8 @@
     "static.mt.selectShipment": "Selecione a identificação do embarque",
     "static.supplyPlan.adjustedPallets": "Paletes ajustadas",
     "static.dashboard.role": "Funções",
-<<<<<<< HEAD
     "static.supplyPlanFormula.noOfDaysInMonth": "Nº de dias no mês",
     "static.tooltip.errors": "RMSE: Erro quadrático médio; MAPE: Erro Percentual Absoluto Médio; MSE: Erro Quadrado Médio; WAPE: Erro de porcentagem absoluta ponderada. Consulte \"Mostrar orientação\" para obter mais informações.",
-=======
-    "static.tooltip.errors": "RMSE: Desvio quadrático médio; MAPE: Erro Percentual Absoluto Médio; MSE: Erro Quadrado Médio; WAPE: erro de porcentagem absoluta ponderada. Consulte Mostrar guia para obter mais informações.",
->>>>>>> QAT-914
     "static.planningunit.capacity": "Volume (m ^ 3)",
     "static.supplyPlan.noteBelowGraph": "Clique em um item de legenda para ocultar o elemento. Observe que ocultar embarques / consumo apenas os remove do gráfico e não afecta os dados subjacentes ou os cálculos de stock.",
     "static.mt.roNoAndRoLineNo": "Ordem #",
@@ -2324,13 +2277,8 @@
     "static.login.passwordtext": "Insira a sua senha",
     "static.commitVersion.linkedShipments": "Remessa vinculada",
     "static.common.jul": "jul.",
-<<<<<<< HEAD
     "static.tree.minDataRequiredToExtrapolate": "Os valores mínimos necessários para os vários recursos estão abaixo:\n* SET, Holt-Winters: pelo menos 24 meses de dados históricos\n* ARIMA: com sazonalidade: pelo menos 13 meses de dados históricos necessários. Sem sazonalidade : pelo menos 12 meses de histórico dados necessários.\n* Média móvel, semi-médias e regressão linear: pelo menos três meses de dados históricos",
     "static.importIntoQATSupplyPlan.forecastFinalVersion": "Versão da previsão (somente versões finais)",
-=======
-    "static.tree.minDataRequiredToExtrapolate": "Os valores mínimos necessários para os vários recursos estão abaixo:\n* TES, Holt-Winters: pelo menos 24 meses de dados históricos\n* ARIMA: QAT não pode calcular a previsão ARIMA com base no consumo real selecionado. Geralmente, o ARIMA deve ser capaz de calcular com 14 meses de dados.\n* Média móvel, semi-médias e regressão linear: pelo menos 3 meses de dados históricos\n",
-    "static.importIntoQATSupplyPlan.forecastFinalVersion": "Versão de previsão (somente versões finais)",
->>>>>>> e3cd2354dac52596680a4a67a88453ef1d599c4a
     "static.message.invalidStringLength": "As notas da versão não devem exceder 1000 caracteres",
     "static.problemList.problemStatus": "Aberto / endereçado",
     "static.dashboard.extrapolation": "Extrapolação",
@@ -2402,12 +2350,8 @@
     "static.commitVersion.resolveConflicts": "Resolver conflitos",
     "static.common.note": "Notas",
     "static.supplyPlan.consumption": "Consumo",
-<<<<<<< HEAD
     "static.manualTagging.changeCode": "Alterar código",
     "static.Tooltip.ProcurementsNeeded": "Se houver uma lacuna de aquisição, a QAT calculará o valor (em dólares) necessário para cobrir essa lacuna usando o preço unitário.",
-=======
-    "static.Tooltip.ProcurementsNeeded": "Se houver um gap de aquisição, a QAT calculará o valor (em dólares) necessário para cobrir esse gap usando o preço unitário.",
->>>>>>> QAT-914
     "static.common.selecttemplate": "Selecione o modelo",
     "static.versionSettings.forecastProgramMustBeLoaded": "Um programa de previsão deve ser carregado para atualizar as configurações da versão. Todas as versões anteriores de cada programa de previsão estarão em formato somente leitura; apenas a versão local está disponível para atualização e edição.",
     "static.tree.Add/EditTreeData": "Adicionar / Editar Dados da Árvore de previsão",
@@ -2840,7 +2784,6 @@
     "static.organisation.organisationheader": "Organização",
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Máx = 7",
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Máx = Menor entre (7,18)",
-    "static.loadDeleteProgram.loadDeleteProgram": "Carregar/Excluir Programa",
     "static.editStatus.validCriticality": "Selecione Criticidade",
     "static.shipment.shipmentProcurementAgentType": "Tipo de Agente de Aquisição de Remessa",
     "static.shipment.groupByProcurementAgentType": "Agrupar por tipo de agente de aquisição"

@@ -193,6 +193,9 @@ export function getDatabase() {
         if(!db1.objectStoreNames.contains('extrapolationMethod')){
             storeOS = db1.createObjectStore('extrapolationMethod', { keyPath: 'id', autoIncrement: true});
         }
+        if(!db1.objectStoreNames.contains('datasetDataServer')){
+            storeOS = db1.createObjectStore('datasetDataServer', { keyPath: 'id'});
+        }
         console.log("indexed db completed----------------------")
         
     };
