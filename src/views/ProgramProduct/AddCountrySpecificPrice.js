@@ -648,7 +648,7 @@ class CountrySpecificPrices extends Component {
                     if (response.status == "200") {
                         console.log(response);
                         let programId = this.props.match.params.programId;
-                        this.props.history.push(`/programProduct/addProgramProduct/${programId}/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
+                        this.props.history.push(`/programProduct/addProgramProduct/${programId}/` + 'green/' + 'Procurement Agent Prices added successfully')
                     } else {
                         this.setState({
                             message: response.data.messageCode
