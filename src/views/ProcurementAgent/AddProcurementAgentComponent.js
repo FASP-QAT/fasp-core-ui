@@ -793,7 +793,7 @@ class AddProcurementAgentComponent extends Component {
                                                     <FormFeedback className="red">{errors.realmId}</FormFeedback>
                                                 </FormGroup>
                                                 <FormGroup className="Selectcontrol-bdrNone">
-                                                    <Label htmlFor="programId">{i18n.t('static.dataSource.program')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Label htmlFor="programId">{i18n.t('static.dataSource.program')}</Label>
                                                     <Select
                                                         className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
                                                             { 'is-valid': !errors.programId && this.state.procurementAgent.programList.length != 0 },
@@ -810,7 +810,7 @@ class AddProcurementAgentComponent extends Component {
                                                         id="programId"
                                                         multi
                                                         required
-                                                        min={1}
+                                                        // min={1}
                                                         options={this.state.programList}
                                                         value={this.state.programId}
                                                     />
