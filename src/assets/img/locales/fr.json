@@ -545,6 +545,7 @@
     "static.forecastReport.xAxisAggregateByYear": "Agrégation de l'abscisse par année",
     "static.ForecastSummary.ForecastSummary": "Résumé des prévisions",
     "static.supplyPlanFormula.amcNote": "* Considérez uniquement les valeurs non nulles. Le mois en cours est également inclus dans les mois à venir pour le CMM",
+    "static.loadDeleteProgram.loadDeleteProgram": "Charger/Supprimer le programme",
     "static.equivalancyUnit.DisplayTheirForecast": "pourraient choisir d'afficher leurs prévisions dans l'UE  \"Traitements pour QATitis\" et d'afficher leurs prévisions comme 5 000 \"Traitements pour QATitis\" par mois à la place.",
     "static.report.lastmodifieddate": "Date de la dernière modification",
     "static.report.selectProgram": "Sélectionnez le programme et la version",
@@ -833,15 +834,9 @@
     "static.report.shippedToArrivedAirLeadTime": "Délai de livraison «expédié à arrivé» par voie aérienne (en mois)",
     "static.dataEntryAndAdjustments.Mathematically": "Mathématiquement",
     "static.supplyPlan.shelfLife": "Durée de vie",
-<<<<<<< HEAD
     "static.commitTree.noPUorFUMapping": "Vous ne pouvez pas valider l`arborescence avec des nœuds PU/FU qui ont une unité de planification/unité de prévision mappée dessus",
     "static.extrapolation.SecondStep": "La deuxième étape consiste à déterminer si les valeurs de prévision sont censées refléter fidèlement les modèles historiques de vos données et si vous utiliserez les mesures derreur pour éclairer votre sélection.",
     "static.scenarioPlanning.newlyAddedShipment": "Envoi nouvellement ajouté",
-=======
-    "static.extrapolation.SecondStep": "La deuxième étape consiste à déterminer si les valeurs de prévision sont censées refléter fidèlement les modèles historiques de vos données et si vous utiliserez les mesures d'erreur pour éclairer votre sélection.",
-    "static.commitTree.noPUorFUMapping": "Vous ne pouvez pas valider l'arbre de prévision avec des nœuds UP/UPr qui n'ont pas un UP/UPr mappée dessus",
-    "static.scenarioPlanning.newlyAddedShipment": "Expédition replanifiée",
->>>>>>> QAT-914
     "static.ManageTree.AdvancedFunctionality": "Fonctionnalité avancée",
     "static.ManageTree.ManageTheTree": "Gérer l'arbre de prévision",
     "static.jexcel.consumptionQuantity": "avec quantité de consommation",
@@ -1399,6 +1394,7 @@
     "static.common.pr": "PR",
     "static.message.login.invalidCredentials": "Identifiant ou mot de passe incorrect",
     "static.common.backTo": "Retour à",
+    "static.programLoadedAndmasterDataSync.success": "Programme chargé et données de base synchronisées avec succès",
     "static.dataEntryAndAdjustments.HistoricalActual": "écran. La consommation réelle historique peut être des quantités vendues, des quantités distribuées à l'utilisateur ou des quantités émises par les installations de stockage. Sur cet écran, les utilisateurs peuvent ajuster les données historiques de consommation qui ont été saisies manuellement sur cet écran ou qui ont été importées d'un programme de plan dapprovisionnement QAT (si vous souhaitez importer, veuillez dabord passer à la",
     "static.message.inventorySaved": "Données d`inventaire enregistrées",
     "static.month.dec": "Dec",
@@ -2791,7 +2787,6 @@
     "static.organisation.organisationheader": "Organisation",
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Max = 7",
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18)",
-    "static.loadDeleteProgram.loadDeleteProgram": "Charger/Supprimer le programme",
     "static.editStatus.validCriticality": "Veuillez sélectionner Criticité",
     "static.shipment.shipmentProcurementAgentType": "Type d`agent d`approvisionnement d`expédition",
     "static.shipment.groupByProcurementAgentType": "Regrouper par type d`agent d`approvisionnement"
