@@ -98,6 +98,18 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         this.setState({
             programId: event.target.value,
             versionId: '',
+            versions: [],
+            planningUnits: [],
+            forecastingUnits: [],
+            matricsList: [],
+            regions: [],
+            regionValues: [],
+            regionLabels: [],
+            viewById: 1,
+            planningUnitId: "",
+            forecastingUnitId: "",
+            equivalencyUnitId: "",
+            dataList:[],
             show: false
         }, () => {
             localStorage.setItem("sesVersionIdReport", '');
@@ -685,7 +697,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
 
     handleRangeDissmis(value) {
         this.setState({ rangeValue: value }, () => {
-            // this.fetchData();
+            this.fetchData();
         })
     }
 
@@ -1945,12 +1957,14 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                 var cell1 = value
                                 cell1 += ' %';
                                 return cell1;
-                            }
+                            },
+                            max:100
                         },
                         gridLines: {
                             drawBorder: true, lineWidth: 0
                         },
                         position: 'right',
+                        
                     }
                 ],
                 xAxes: [{
