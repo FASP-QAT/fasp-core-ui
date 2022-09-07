@@ -1483,7 +1483,7 @@ export default class BranchTemplate extends Component {
 
         treeTemplate.flatList = items;
         console.log("after---*", treeTemplate)
-        // calculateModelingData(treeTemplate, this, '', (nodeId != 0 ? nodeId : this.state.currentItemConfig.context.id), 0, type, -1, true);
+        calculateModelingData(treeTemplate, this, '', (nodeId != 0 ? nodeId : this.state.currentItemConfig.context.id), 0, type, -1, true);
     }
 
     updateState(parameterName, value) {
@@ -5398,13 +5398,17 @@ export default class BranchTemplate extends Component {
                             (items[i].payload.nodeDataMap[0])[0].displayCalculatedDataValue = (items[i].payload.nodeDataMap[0])[0].dataValue.toString();
                             (items[i].payload.nodeDataMap[0])[0].displayDataValue = (items[i].payload.nodeDataMap[0])[0].dataValue.toString();
                         } else {
+                            if (items[i].level == 0) {
+                                (items[i].payload.nodeDataMap[0])[0].calculatedDataValue = 0;
+                                (items[i].payload.nodeDataMap[0])[0].displayCalculatedDataValue = 0;
+                            } else {
+                                var findNodeIndex = items.findIndex(n => n.id == items[i].parent);
+                                var parentValue = (items[findNodeIndex].payload.nodeDataMap[0])[0].calculatedDataValue;
+                                console.log("api parent value---", parentValue);
 
-                            var findNodeIndex = items.findIndex(n => n.id == items[i].parent);
-                            var parentValue = (items[findNodeIndex].payload.nodeDataMap[0])[0].calculatedDataValue;
-                            console.log("api parent value---", parentValue);
-
-                            (items[i].payload.nodeDataMap[0])[0].calculatedDataValue = (parentValue * (items[i].payload.nodeDataMap[0])[0].dataValue) / 100;
-                            (items[i].payload.nodeDataMap[0])[0].displayCalculatedDataValue = ((parentValue * (items[i].payload.nodeDataMap[0])[0].dataValue) / 100).toString();
+                                (items[i].payload.nodeDataMap[0])[0].calculatedDataValue = (parentValue * (items[i].payload.nodeDataMap[0])[0].dataValue) / 100;
+                                (items[i].payload.nodeDataMap[0])[0].displayCalculatedDataValue = ((parentValue * (items[i].payload.nodeDataMap[0])[0].dataValue) / 100).toString();
+                            }
                             (items[i].payload.nodeDataMap[0])[0].displayDataValue = (items[i].payload.nodeDataMap[0])[0].dataValue.toString();
                             if (this.state.hideFUPUNode) {
                                 if (items[i].payload.nodeType.id == 4 || items[i].payload.nodeType.id == 5) {
@@ -9433,6 +9437,7 @@ export default class BranchTemplate extends Component {
                                         console.log("flatList---", flatList);
                                         var templateObj = {
                                             treeTemplateId: template.treeTemplateId,
+                                            branch: true,
                                             notes: template.notes,
                                             active: template.active,
                                             monthsInPast: template.monthsInPast,
@@ -9466,12 +9471,14 @@ export default class BranchTemplate extends Component {
                                                                 if (items[i].payload.nodeType.id == 1 || items[i].payload.nodeType.id == 2) {
                                                                     (items[i].payload.nodeDataMap[0])[0].calculatedDataValue = (items[i].payload.nodeDataMap[0])[0].dataValue;
                                                                 } else {
-
-                                                                    var findNodeIndex = items.findIndex(n => n.id == items[i].parent);
-                                                                    var parentValue = (items[findNodeIndex].payload.nodeDataMap[0])[0].calculatedDataValue;
-                                                                    console.log("api parent value---", parentValue);
-
-                                                                    (items[i].payload.nodeDataMap[0])[0].calculatedDataValue = (parentValue * (items[i].payload.nodeDataMap[0])[0].dataValue) / 100;
+                                                                    if (items[i].level == 0) {
+                                                                        (items[i].payload.nodeDataMap[0])[0].calculatedDataValue = 0;
+                                                                    } else {
+                                                                        var findNodeIndex = items.findIndex(n => n.id == items[i].parent);
+                                                                        var parentValue = (items[findNodeIndex].payload.nodeDataMap[0])[0].calculatedDataValue;
+                                                                        console.log("api parent value---", parentValue);
+                                                                        (items[i].payload.nodeDataMap[0])[0].calculatedDataValue = (parentValue * (items[i].payload.nodeDataMap[0])[0].dataValue) / 100;
+                                                                    }
                                                                     if (this.state.hideFUPUNode) {
                                                                         if (items[i].payload.nodeType.id == 4 || items[i].payload.nodeType.id == 5) {
                                                                             items[i].isVisible = false;
@@ -9562,12 +9569,15 @@ export default class BranchTemplate extends Component {
                                                             if (items[i].payload.nodeType.id == 1 || items[i].payload.nodeType.id == 2) {
                                                                 (items[i].payload.nodeDataMap[0])[0].calculatedDataValue = (items[i].payload.nodeDataMap[0])[0].dataValue;
                                                             } else {
+                                                                if (items[i].level == 0) {
+                                                                    (items[i].payload.nodeDataMap[0])[0].calculatedDataValue = 0;
+                                                                } else {
+                                                                    var findNodeIndex = items.findIndex(n => n.id == items[i].parent);
+                                                                    var parentValue = (items[findNodeIndex].payload.nodeDataMap[0])[0].calculatedDataValue;
+                                                                    console.log("api parent value---", parentValue);
 
-                                                                var findNodeIndex = items.findIndex(n => n.id == items[i].parent);
-                                                                var parentValue = (items[findNodeIndex].payload.nodeDataMap[0])[0].calculatedDataValue;
-                                                                console.log("api parent value---", parentValue);
-
-                                                                (items[i].payload.nodeDataMap[0])[0].calculatedDataValue = (parentValue * (items[i].payload.nodeDataMap[0])[0].dataValue) / 100;
+                                                                    (items[i].payload.nodeDataMap[0])[0].calculatedDataValue = (parentValue * (items[i].payload.nodeDataMap[0])[0].dataValue) / 100;
+                                                                }
                                                             }
                                                             console.log("load---", items[i])
                                                             // arr.push(items[i]);
