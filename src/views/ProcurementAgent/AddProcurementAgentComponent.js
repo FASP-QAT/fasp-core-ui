@@ -700,7 +700,13 @@ class AddProcurementAgentComponent extends Component {
                                         loading: true
                                     })
                                     console.log("on submit---", this.state.procurementAgent)
-                                    ProcurementAgentService.addProcurementAgent(this.state.procurementAgent)
+                                    var pAgent = this.state.procurementAgent;
+                                    for (var i = 0; i < pAgent.programList.length; i++) {
+                                        if (pAgent.programList[i].id == 0) {
+                                            pAgent.programList = []
+                                        }
+                                    }
+                                    ProcurementAgentService.addProcurementAgent(pAgent)
                                         .then(response => {
                                             if (response.status == 200) {
                                                 this.props.history.push(`/procurementAgent/listProcurementAgent/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
