@@ -1591,7 +1591,25 @@ export default class ListTreeComponent extends Component {
                             pathname: `/dataSet/buildTree/tree/${treeId}/${programId}`,
                         });
                     } else {
-                        this.downloadClicked(treeId);
+                        var db1;
+                        getDatabase();
+                        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                        openRequest.onerror = function (event) {
+                            this.setState({
+                                message: i18n.t('static.program.errortext'),
+                                color: 'red'
+                            })
+                            this.hideFirstComponent()
+                        }.bind(this);
+                        openRequest.onsuccess = function (e) {
+                            db1 = e.target.result;
+                            var programDataTransaction1 = db1.transaction(['datasetDataServer'], 'readwrite');
+                            var programDataOs1 = programDataTransaction1.objectStore('datasetDataServer');
+                            var ddatasetDataServerRequest = programDataOs1.clear();
+                            ddatasetDataServerRequest.onsuccess = function (event) {
+                                this.downloadClicked(treeId);
+                            }.bind(this)
+                        }.bind(this)
                     }
 
                 }
