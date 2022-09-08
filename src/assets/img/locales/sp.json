@@ -2787,5 +2787,6 @@
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18)",
     "static.editStatus.validCriticality": "Seleccione Criticidad",
     "static.shipment.shipmentProcurementAgentType": "Tipo de agente de compras de envío",
-    "static.shipment.groupByProcurementAgentType": "Agrupar por tipo de agente de compras"
+    "static.shipment.groupByProcurementAgentType": "Agrupar por tipo de agente de compras",
+    "static.programProcurementAgentPrice.success": "Los precios del agente de compras se agregaron con éxito"
 }
