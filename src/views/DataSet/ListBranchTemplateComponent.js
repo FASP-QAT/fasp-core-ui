@@ -15,7 +15,7 @@ import moment from 'moment';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css';
-const entityname = 'Tree Template';
+const entityname = i18n.t('static.dataset.BranchTreeTemplate');
 const validationSchema = function (values) {
     return Yup.object().shape({
         treeTemplateName: Yup.string()

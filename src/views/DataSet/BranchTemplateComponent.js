@@ -1327,7 +1327,7 @@ export default class BranchTemplate extends Component {
             .fillColor('#002f6c')
             .fontSize(20)
             .font('Helvetica')
-            .text('Tree Template PDF', doc.page.width / 2, 20);
+            .text('Branch Template PDF', doc.page.width / 2, 20);
 
         doc
             .fillColor('#002f6c')
@@ -1381,7 +1381,7 @@ export default class BranchTemplate extends Component {
         if (typeof stream !== 'undefined') {
             stream.on('finish', function () {
                 var string = stream.toBlob('application/pdf');
-                window.saveAs(string, i18n.t('static.dataset.TreeTemplate') + '.pdf');
+                window.saveAs(string, i18n.t('static.dataset.BranchTreeTemplate') + '.pdf');
             });
         } else {
             alert('Error: Failed to create file stream.');
@@ -8887,7 +8887,7 @@ export default class BranchTemplate extends Component {
         });
 
         Packer.toBlob(doc).then(blob => {
-            saveAs(blob, i18n.t('static.dataset.TreeTemplate') + "-" + "TreeValidation" + ".docx");
+            saveAs(blob, i18n.t('static.dataset.BranchTreeTemplate') + "-" + "TreeValidation" + ".docx");
         });
     }
 

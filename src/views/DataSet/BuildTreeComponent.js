@@ -11357,7 +11357,7 @@ export default class BuildTree extends Component {
             <Modal isOpen={this.state.isBranchTemplateModalOpen}
                 className={'modal-lg ' + this.props.className}>
                 <ModalHeader>
-                    <strong>{i18n.t('static.template.BranchTemplate')}</strong>
+                    <strong>{i18n.t('static.dataset.BranchTreeTemplate')}</strong>
                     <Button size="md" onClick={() => { this.setState({ isBranchTemplateModalOpen: false }) }} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
                 </ModalHeader>
                 <ModalBody className='pb-lg-0'>
@@ -11396,7 +11396,7 @@ export default class BuildTree extends Component {
                                             <div>
                                                 <div className='row'>
                                                     <FormGroup className="col-md-6">
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.template.template')}<span className="red Reqasterisk">*</span></Label>
+                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.dataset.BranchTreeTemplate')}<span className="red Reqasterisk">*</span></Label>
                                                         <div className="controls">
 
                                                             <Input
@@ -11410,7 +11410,7 @@ export default class BuildTree extends Component {
                                                                 onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                                 value={this.state.branchTemplateId}
                                                             >
-                                                                <option value="">{i18n.t('static.template.selectTemplate')}</option>
+                                                                <option value="">{i18n.t('static.dataset.selectBranchTreeTemplate')}</option>
                                                                 {this.state.branchTemplateList.length > 0
                                                                     && this.state.branchTemplateList.map((item, i) => {
                                                                         return (
