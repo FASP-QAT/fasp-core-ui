@@ -893,10 +893,10 @@ export default class AddInventory extends Component {
                                 <li><span className=" readonlylegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.common.readonlyData')} </span></li>
                             </ul>
                         </div>
-                        <div style={{ display: this.state.loading ? "none" : "block" }}>
+                        <div >
                             <InventoryInSupplyPlanComponent ref="inventoryChild" items={this.state} toggleLarge={this.toggleLarge} updateState={this.updateState} formSubmit={this.formSubmit} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} inventoryPage="inventoryDataEntry" useLocalData={1} />
-                            <div className="table-responsive inventoryDataEntryTable" id="adjustmentsTableDiv">
-                                <div id="adjustmentsTable" />
+                            <div className="inventoryDataEntryTable" id="adjustmentsTableDiv">
+                                <div id="adjustmentsTable" style={{ display: this.state.loading ? "none" : "block" }}/>
                             </div>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>
@@ -930,7 +930,7 @@ export default class AddInventory extends Component {
                     </ModalHeader>
                     <ModalBody>
                         <h6 className="red" id="div3">{this.state.inventoryBatchInfoDuplicateError || this.state.inventoryBatchInfoNoStockError || this.state.inventoryBatchError}</h6>
-                        <div className="table-responsive">
+                        <div className="">
                             <div id="inventoryBatchInfoTable" className="AddListbatchtrHeight"></div>
                         </div>
                         <br /><span>{i18n.t("static.dataEntry.missingBatchNote")}</span>

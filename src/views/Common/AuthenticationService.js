@@ -465,6 +465,7 @@ class AuthenticationService {
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != '') {
             let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
             // console.log("decryptedCurUser---", decryptedCurUser);
+            try{
             let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
             // console.log("decryptedUser---", decryptedUser);
             let businessFunctionList = decryptedUser.businessFunctionList;
@@ -476,6 +477,10 @@ class AuthenticationService {
             }
             // console.log("bfuntion---", bfunction);
             return bfunction;
+        }catch(err){
+            localStorage.setItem('curUser','')
+            return [];
+        }
         } else {
             return [];
         }
@@ -726,6 +731,23 @@ class AuthenticationService {
                     case "/procurementAgent/listProcurementAgent":
                     case "/procurementAgent/listProcurementAgent/:message":
                     case "/procurementAgent/listProcurementAgent/:color/:message":
+                        if (bfunction.includes("ROLE_BF_LIST_PROCUREMENT_AGENT")) {
+                            return true;
+                        }
+                        break;
+                    case "/procurementAgentType/addProcurementAgentType":
+                        if (bfunction.includes("ROLE_BF_ADD_PROCUREMENT_AGENT")) {
+                            return true;
+                        }
+                        break;
+                    case "/procurementAgentType/editProcurementAgentType/:procurementAgentTypeId":
+                        if (bfunction.includes("ROLE_BF_EDIT_PROCUREMENT_AGENT")) {
+                            return true;
+                        }
+                        break;
+                    case "/procurementAgentType/listProcurementAgentType":
+                    case "/procurementAgentType/listProcurementAgentType/:message":
+                    case "/procurementAgentType/listProcurementAgentType/:color/:message":
                         if (bfunction.includes("ROLE_BF_LIST_PROCUREMENT_AGENT")) {
                             return true;
                         }
@@ -1327,7 +1349,7 @@ class AuthenticationService {
                         }
                         break;
                     case "/extrapolation/extrapolateData":
-                        if (bfunction.includes("ROLE_BF_EXTRAPOLATION")) {
+                        if (bfunction.includes("ROLE_BF_EXTRAPOLATION") || bfunction.includes("ROLE_BF_VIEW_EXTRAPOLATION")) {
                             return true;
                         }
                         break;
@@ -1341,7 +1363,7 @@ class AuthenticationService {
                         break;
                     case "/report/compareAndSelectScenario":
                     case "/report/compareAndSelectScenario/:programId/:planningUnitId/:regionId":
-                        if (bfunction.includes("ROLE_BF_COMPARE_AND_SELECT")) {
+                        if (bfunction.includes("ROLE_BF_COMPARE_AND_SELECT") || bfunction.includes("ROLE_BF_VIEW_COMPARE_AND_SELECT")) {
                             return true;
                         }
                         break;
@@ -1368,7 +1390,7 @@ class AuthenticationService {
                     case "/dataentry/consumptionDataEntryAndAdjustment":
                     case "/dataentry/consumptionDataEntryAndAdjustment/:color/:message":
                     case "/dataentry/consumptionDataEntryAndAdjustment/:planningUnitId":
-                        if (bfunction.includes("ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT")) {
+                        if (bfunction.includes("ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT") || bfunction.includes("ROLE_BF_VIEW_CONSUMPTION_DATA_ENTRY_ADJUSTMENT")) {
                             return true;
                         }
                         break;
@@ -1405,7 +1427,7 @@ class AuthenticationService {
                         break;
 
                     case "/dataset/createTreeTemplate/:templateId":
-                        if (bfunction.includes("ROLE_BF_EDIT_TREE_TEMPLATE")) {
+                        if (bfunction.includes("ROLE_BF_EDIT_TREE_TEMPLATE") || bfunction.includes("ROLE_BF_ADD_TREE_TEMPLATE") || bfunction.includes("ROLE_BF_VIEW_TREE_TEMPLATES")) {
                             return true;
                         }
                         break;
@@ -1458,7 +1480,7 @@ class AuthenticationService {
 
                     case "/forecastReport/forecastSummary":
                     case "/forecastReport/forecastSummary/:programId/:versionId":
-                        if (bfunction.includes("ROLE_BF_LIST_FORECAST_SUMMARY")) {
+                        if (bfunction.includes("ROLE_BF_LIST_FORECAST_SUMMARY") || bfunction.includes("ROLE_BF_VIEW_FORECAST_SUMMARY")) {
                             return true;
                         }
                         break;
@@ -1598,6 +1620,7 @@ class AuthenticationService {
         localStorage.setItem('sesDatasetCompareVersionId', "");
         localStorage.setItem('sesDatasetPlanningUnitId', "");
         localStorage.setItem('sesDataentryDateRange', "");
+        localStorage.setItem('sesDataentryStartDateRange', "");
         localStorage.setItem('sesDatasetRegionId', "");
         localStorage.setItem('sesPlanningUnitId', "");
         // localStorage.setItem('sesLocalVersionChange', false);
@@ -1614,9 +1637,14 @@ class AuthenticationService {
         localStorage.setItem('sesBudFs', "");
         localStorage.setItem('sesBudStatus', "");
         localStorage.setItem('sesForecastProgramIds', "");
-        var currentDate = moment(Date.now()).utcOffset('-0500')
+        var currentDate = moment(Date.now()).utcOffset('-0500');
+        console.log("&&&&&&&&&&&&&&&&&Current Date in authetication service",currentDate);
         var curDate = moment(currentDate).startOf('month').subtract(MONTHS_IN_PAST_FOR_SUPPLY_PLAN, 'months').format("YYYY-MM-DD");
+        console.log("&&&&&&&&&&&&&&&&&Current Date after subtraction in authetication service",curDate);
         localStorage.setItem('sesStartDate', JSON.stringify({ year: parseInt(moment(curDate).format("YYYY")), month: parseInt(moment(curDate).format("M")) }))
+        localStorage.setItem('sesStartDate', JSON.stringify({ year: parseInt(moment(curDate).format("YYYY")), month: parseInt(moment(curDate).format("M")) }))
+ 
+        console.log("&&&&&&&&&&&&&&&&&Current Date json. stringfy",JSON.stringify({ year: parseInt(moment(curDate).format("YYYY")), month: parseInt(moment(curDate).format("M")) }));
     }
 
     getIconAndStaticLabel(val) {

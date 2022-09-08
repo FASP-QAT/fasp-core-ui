@@ -18,7 +18,7 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import ProgramService from '../../api/ProgramService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import { jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunctionOnlyHideRow, inValid, inValidWithColor, jExcelLoadedFunction, } from '../../CommonComponent/JExcelCommonFunctions.js'
+import { jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunctionOnlyHideRow, inValid, inValidWithColor, jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRowOld, jExcelLoadedFunctionOld, } from '../../CommonComponent/JExcelCommonFunctions.js'
 import moment from "moment";
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
@@ -282,7 +282,7 @@ export default class syncPage extends Component {
   }
 
   loadedResolveConflicts = function (instance) {
-    jExcelLoadedFunctionOnlyHideRow(instance);
+    jExcelLoadedFunctionOnlyHideRowOld(instance);
     var elInstance = instance.jexcel;
     var jsonData = elInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R']
@@ -461,7 +461,7 @@ export default class syncPage extends Component {
   }
 
   loadedResolveConflictsInventory = function (instance) {
-    jExcelLoadedFunctionOnlyHideRow(instance);
+    jExcelLoadedFunctionOnlyHideRowOld(instance);
     var elInstance = instance.jexcel;
     var jsonData = elInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S']
@@ -769,7 +769,7 @@ export default class syncPage extends Component {
   }
 
   loadedResolveConflictsShipment = function (instance) {
-    jExcelLoadedFunctionOnlyHideRow(instance);
+    jExcelLoadedFunctionOnlyHideRowOld(instance);
     var elInstance = instance.jexcel;
     var jsonData = elInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF']
@@ -888,7 +888,7 @@ export default class syncPage extends Component {
 
 
   loadedResolveConflictsProblem = function (instance) {
-    jExcelLoadedFunctionOnlyHideRow(instance);
+    jExcelLoadedFunctionOnlyHideRowOld(instance);
     var elInstance = instance.jexcel;
     var jsonData = elInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T']
@@ -2473,7 +2473,7 @@ export default class syncPage extends Component {
   }
 
   loadedFunctionForMerge = function (instance) {
-    jExcelLoadedFunction(instance, 0);
+    jExcelLoadedFunctionOld(instance, 0);
     var elInstance = instance.jexcel;
     var jsonData = elInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R']
@@ -2580,7 +2580,7 @@ export default class syncPage extends Component {
 
 
   loadedFunctionForMergeInventory = function (instance) {
-    jExcelLoadedFunction(instance, 1);
+    jExcelLoadedFunctionOld(instance, 1);
     var elInstance = instance.jexcel;
     var jsonData = elInstance.getJson();
 
@@ -2689,7 +2689,7 @@ export default class syncPage extends Component {
   }
 
   loadedFunctionForMergeShipment = function (instance) {
-    jExcelLoadedFunction(instance, 2);
+    jExcelLoadedFunctionOld(instance, 2);
     var elInstance = instance.jexcel;
     var jsonData = elInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF']
@@ -2806,7 +2806,7 @@ export default class syncPage extends Component {
   }
 
   loadedFunctionForMergeProblemList = function (instance) {
-    jExcelLoadedFunction(instance, 3);
+    jExcelLoadedFunctionOld(instance, 3);
     var elInstance = instance.jexcel;
     var jsonData = elInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T']

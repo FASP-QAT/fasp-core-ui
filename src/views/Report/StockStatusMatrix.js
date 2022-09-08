@@ -28,7 +28,7 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
 import { DatePicker } from 'antd';
 import 'antd/dist/antd.css';
-import { MultiSelect } from "react-multi-select-component";
+import {MultiSelect} from "react-multi-select-component";
 import SupplyPlanFormulas from "../SupplyPlan/SupplyPlanFormulas";
 import { isSiteOnline } from "../../CommonComponent/JavascriptCommonFunctions";
 import TracerCategoryService from '../../api/TracerCategoryService';
@@ -1603,7 +1603,7 @@ export default class StockStatusMatrix extends React.Component {
       && versions.map((item, i) => {
         return (
           <option key={i} value={item.versionId}>
-            {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)}
+            {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)} ({(moment(item.createdDate).format(`MMM DD YYYY`))})
           </option>
         )
       }, this);

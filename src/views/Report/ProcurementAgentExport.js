@@ -30,9 +30,9 @@ import ReportService from '../../api/ReportService';
 import ProcurementAgentService from "../../api/ProcurementAgentService";
 import { Online, Offline } from "react-detect-offline";
 import FundingSourceService from '../../api/FundingSourceService';
-import {MultiSelect} from 'react-multi-select-component';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import { MultiSelect } from 'react-multi-select-component';
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
@@ -76,6 +76,7 @@ class ProcurementAgentExport extends Component {
             loading: true,
             programId: '',
             versionId: ''
+
         }
         this.formatLabel = this.formatLabel.bind(this);
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
@@ -228,6 +229,7 @@ class ProcurementAgentExport extends Component {
                         }),
                         programId: localStorage.getItem("sesProgramIdReport")
                     }, () => {
+                        this.getProcurementAgent()
                         this.filterVersion();
                     })
                 } else {
@@ -249,13 +251,23 @@ class ProcurementAgentExport extends Component {
     }
 
     getProcurementAgent = () => {
+        let programId = document.getElementById("programId").value;
+
         if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors();
             ProcurementAgentService.getProcurementAgentListAll()
                 .then(response => {
                     // console.log(JSON.stringify(response.data))
                     var listArray = response.data;
-                    listArray.sort((a, b) => {
+                    var listArrays = [];
+                    for (var i = 0; i < listArray.length; i++) {
+                        for (var j = 0; j < listArray[i].programList.length; j++) {
+                            if (listArray[i].programList[j].id == programId) {
+                                listArrays.push(listArray[i]);
+                            }
+                        }
+                    }
+                    listArrays.sort((a, b) => {
                         var itemLabelA = a.procurementAgentCode.toUpperCase(); // ignore upper and lowercase
                         var itemLabelB = b.procurementAgentCode.toUpperCase(); // ignore upper and lowercase                   
                         return itemLabelA > itemLabelB ? 1 : -1;
@@ -342,7 +354,7 @@ class ProcurementAgentExport extends Component {
         const lan = 'en';
         const { procurementAgents } = this.state
         var proList = procurementAgents;
-
+        let programId = document.getElementById("programId").value;
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -384,14 +396,40 @@ class ProcurementAgentExport extends Component {
                     }
 
                 }
+                var listArray = proList;
+                var listArrays = [];
+                for (var i = 0; i < listArray.length; i++) {
+                    for (var j = 0; j < listArray[i].programList.length; j++) {
+                        if (listArray[i].programList[j].id == programId) {
+                            listArrays.push(listArray[i]);
+                        }
+                    }
+                }
+                console.log("listArrays", listArrays, "==programId", programId)
                 var lang = this.state.lang;
                 this.setState({
-                    procurementAgents: proList.sort(function (a, b) {
+                    procurementAgents: listArrays.sort(function (a, b) {
                         a = a.procurementAgentCode.toLowerCase();
                         b = b.procurementAgentCode.toLowerCase();
                         return a < b ? -1 : a > b ? 1 : 0;
                     })
                 })
+                let viewby = document.getElementById("viewById").value;
+                if (viewby == 1) {
+                    console.log("viewby", this.state.procurementAgents)
+
+                    if (listArrays.length > 0) {
+                        document.getElementById("procurementAgentDiv").style.display = "block";
+                        // document.getElementById("fundingSourceDiv").style.display = "block";
+                    } else {
+                        console.log("viewby", viewby)
+                        this.setState({
+                            viewby: 2,
+                        })
+                        document.getElementById("procurementAgentDiv").style.display = "none";
+                        document.getElementById("fundingSourceDiv").style.display = "block";
+                    }
+                }
 
             }.bind(this);
 
@@ -524,7 +562,8 @@ class ProcurementAgentExport extends Component {
             if (versionId == 0) {
                 this.setState({ message: i18n.t('static.program.validversion'), data: [] }, () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
-                    this.el.destroy();
+                    // this.el.destroy();
+                    jexcel.destroy(document.getElementById("tableDiv"), true);
                 })
             } else {
                 localStorage.setItem("sesVersionIdReport", versionId);
@@ -958,7 +997,8 @@ class ProcurementAgentExport extends Component {
         // }
         // console.log("shipmentCostArray---->", shipmentCostArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("tableDiv"), true);
         var json = [];
         var data = shipmentCostArray;
 
@@ -981,7 +1021,7 @@ class ProcurementAgentExport extends Component {
 
                 title: i18n.t('static.procurementagent.procurementagent'),
                 type: 'text',
-                readOnly: true
+                // readOnly: true
             }
 
             obj2 = {
@@ -994,7 +1034,7 @@ class ProcurementAgentExport extends Component {
 
                 title: i18n.t('static.report.procurementagentcode'),
                 type: 'text',
-                readOnly: true
+                // readOnly: true
             }
 
         } else if (viewby == 2) {
@@ -1011,7 +1051,7 @@ class ProcurementAgentExport extends Component {
 
                 title: i18n.t('static.budget.fundingsource'),
                 type: 'text',
-                readOnly: true
+                // readOnly: true
             }
 
             obj2 = {
@@ -1024,7 +1064,7 @@ class ProcurementAgentExport extends Component {
 
                 title: i18n.t('static.fundingsource.fundingsourceCode'),
                 type: 'text',
-                readOnly: true
+                // readOnly: true
             }
         } else {
             obj1 = {
@@ -1050,44 +1090,45 @@ class ProcurementAgentExport extends Component {
                 {
                     title: i18n.t('static.report.planningUnit'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.report.qty'),
                     type: 'numeric', mask: '#,##.00', decimal: '.',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.report.productCost'),
                     type: 'numeric', mask: '#,##.00', decimal: '.',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.report.freightPer'),
                     type: 'numeric', mask: '#,##.00', decimal: '.',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.report.freightCost'),
                     type: 'numeric', mask: '#,##.00', decimal: '.',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.report.totalCost'),
                     type: 'numeric', mask: '#,##.00', decimal: '.',
-                    readOnly: true
+                    // readOnly: true
                 },
             ],
-            text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
+            editable: false,
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
@@ -1368,7 +1409,8 @@ class ProcurementAgentExport extends Component {
                                     // this.consolidatedProgramList();
                                     this.consolidatedProcurementAgentList();
                                     this.el = jexcel(document.getElementById("tableDiv"), '');
-                                    this.el.destroy();
+                                    // this.el.destroy();
+                                    jexcel.destroy(document.getElementById("tableDiv"), true);
                                 })
                                 if (error.message === "Network Error") {
                                     this.setState({
@@ -1442,25 +1484,29 @@ class ProcurementAgentExport extends Component {
             } else if (programId == 0) {
                 this.setState({ message: i18n.t('static.report.selectProgram'), data: [] }, () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
-                    this.el.destroy();
+                    // this.el.destroy();
+                    jexcel.destroy(document.getElementById("tableDiv"), true);
                 })
 
             } else if (versionId == 0) {
                 this.setState({ message: i18n.t('static.program.validversion'), data: [] }, () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
-                    this.el.destroy();
+                    // this.el.destroy();
+                    jexcel.destroy(document.getElementById("tableDiv"), true);
                 })
 
             } else if (this.state.planningUnitValues.length == 0) {
                 this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: [] }, () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
-                    this.el.destroy();
+                    // this.el.destroy();
+                    jexcel.destroy(document.getElementById("tableDiv"), true);
                 })
 
             } else if (this.state.procurementAgentValues.length == 0) {
                 this.setState({ message: i18n.t('static.procurementAgent.selectProcurementAgent'), data: [] }, () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
-                    this.el.destroy();
+                    // this.el.destroy();
+                    jexcel.destroy(document.getElementById("tableDiv"), true);
                 })
             }
         } else if (viewby == 2) {
@@ -1692,7 +1738,8 @@ class ProcurementAgentExport extends Component {
                                     // this.consolidatedProgramList();
                                     this.consolidatedFundingSourceList();
                                     this.el = jexcel(document.getElementById("tableDiv"), '');
-                                    this.el.destroy();
+                                    // this.el.destroy();
+                                    jexcel.destroy(document.getElementById("tableDiv"), true);
 
                                 })
                                 if (error.message === "Network Error") {
@@ -1768,25 +1815,29 @@ class ProcurementAgentExport extends Component {
             } else if (programId == 0) {
                 this.setState({ message: i18n.t('static.report.selectProgram'), data: [] }, () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
-                    this.el.destroy();
+                    // this.el.destroy();
+                    jexcel.destroy(document.getElementById("tableDiv"), true);
                 })
 
             } else if (versionId == 0) {
                 this.setState({ message: i18n.t('static.program.validversion'), data: [] }, () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
-                    this.el.destroy();
+                    // this.el.destroy();
+                    jexcel.destroy(document.getElementById("tableDiv"), true);
                 })
 
             } else if (this.state.planningUnitValues.length == 0) {
                 this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: [] }, () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
-                    this.el.destroy();
+                    // this.el.destroy();
+                    jexcel.destroy(document.getElementById("tableDiv"), true);
                 })
 
             } else if (this.state.fundingSourceValues.length == 0) {
                 this.setState({ message: i18n.t('static.fundingSource.selectFundingSource'), data: [] }, () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
-                    this.el.destroy();
+                    // this.el.destroy();
+                    jexcel.destroy(document.getElementById("tableDiv"), true);
                 })
             }
         } else {
@@ -1997,7 +2048,8 @@ class ProcurementAgentExport extends Component {
                                     // this.consolidatedProgramList();
                                     this.consolidatedProcurementAgentList();
                                     this.el = jexcel(document.getElementById("tableDiv"), '');
-                                    this.el.destroy();
+                                    // this.el.destroy();
+                                    jexcel.destroy(document.getElementById("tableDiv"), true);
                                 })
                                 if (error.message === "Network Error") {
                                     this.setState({
@@ -2071,19 +2123,22 @@ class ProcurementAgentExport extends Component {
             } else if (programId == 0) {
                 this.setState({ message: i18n.t('static.report.selectProgram'), data: [] }, () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
-                    this.el.destroy();
+                    // this.el.destroy();
+                    jexcel.destroy(document.getElementById("tableDiv"), true);
                 })
 
             } else if (versionId == 0) {
                 this.setState({ message: i18n.t('static.program.validversion'), data: [] }, () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
-                    this.el.destroy();
+                    // this.el.destroy();
+                    jexcel.destroy(document.getElementById("tableDiv"), true);
                 })
 
             } else if (this.state.planningUnitValues.length == 0) {
                 this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: [] }, () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
-                    this.el.destroy();
+                    // this.el.destroy();
+                    jexcel.destroy(document.getElementById("tableDiv"), true);
                 })
 
             }
@@ -2104,7 +2159,8 @@ class ProcurementAgentExport extends Component {
             }, () => {
                 this.fetchData();
                 this.el = jexcel(document.getElementById("tableDiv"), '');
-                this.el.destroy();
+                // this.el.destroy();
+                jexcel.destroy(document.getElementById("tableDiv"), true);
                 // this.consolidatedProgramList();
                 // this.consolidatedProcurementAgentList();
             })
@@ -2118,7 +2174,8 @@ class ProcurementAgentExport extends Component {
             }, () => {
                 this.fetchData();
                 this.el = jexcel(document.getElementById("tableDiv"), '');
-                this.el.destroy();
+                // this.el.destroy();
+                jexcel.destroy(document.getElementById("tableDiv"), true);
                 // this.consolidatedProgramList();
                 // this.consolidatedProcurementAgentList();
             })
@@ -2134,7 +2191,8 @@ class ProcurementAgentExport extends Component {
                 // this.consolidatedProcurementAgentList();
                 this.fetchData();
                 this.el = jexcel(document.getElementById("tableDiv"), '');
-                this.el.destroy();
+                // this.el.destroy();
+                jexcel.destroy(document.getElementById("tableDiv"), true);
             })
 
 
@@ -2143,10 +2201,9 @@ class ProcurementAgentExport extends Component {
     }
 
     componentDidMount() {
-        this.getProcurementAgent();
         this.getFundingSource();
         this.getPrograms();
-        document.getElementById("fundingSourceDiv").style.display = "none";
+        document.getElementById("procurementAgentDiv").style.display = "none";
         let viewby = document.getElementById("viewById").value;
         this.setState({
             viewby: viewby
@@ -2160,6 +2217,7 @@ class ProcurementAgentExport extends Component {
             versionId: ''
         }, () => {
             localStorage.setItem("sesVersionIdReport", '');
+            this.getProcurementAgent();
             this.filterVersion();
         })
 
@@ -2350,6 +2408,11 @@ class ProcurementAgentExport extends Component {
     }
 
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
 
         const { SearchBar, ClearSearchButton } = Search;
         const customTotal = (from, to, size) => (
@@ -2369,7 +2432,7 @@ class ProcurementAgentExport extends Component {
             && versions.map((item, i) => {
                 return (
                     <option key={i} value={item.versionId}>
-                        {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)}
+                        {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)} ({(moment(item.createdDate).format(`MMM DD YYYY`))})
                     </option>
                 )
             }, this);
@@ -2699,10 +2762,11 @@ class ProcurementAgentExport extends Component {
                                                 id="viewById"
                                                 bsSize="sm"
                                                 onChange={this.toggleView}
+                                                value={this.state.viewby}
                                             >
                                                 {/* <option value="-1">{i18n.t('static.common.select')}</option> */}
-                                                <option value="1">{i18n.t('static.procurementagent.procurementagent')}</option>
                                                 <option value="2">{i18n.t('static.dashboard.fundingsource')}</option>
+                                                <option style={procurementAgents.length > 0 ? { display: "block" } : { display: "none" }} value="1">{i18n.t('static.procurementagent.procurementagent')}</option>
                                                 <option value="3">{i18n.t('static.planningunit.planningunit')}</option>
                                             </Input>
 
@@ -2755,8 +2819,8 @@ class ProcurementAgentExport extends Component {
 
                             </div>
                         </div>
-                        <div className="ReportSearchMarginTop" style={{ display: this.state.loading ? "none" : "block" }}>
-                            <div id="tableDiv" className="jexcelremoveReadonlybackground consumptionDataEntryTable">
+                        <div className="ReportSearchMarginTop">
+                            <div id="tableDiv" className="jexcelremoveReadonlybackground consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
                             </div>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>

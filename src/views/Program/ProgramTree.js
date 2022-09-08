@@ -28,6 +28,7 @@ import RealmService from '../../api/RealmService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import moment from "moment";
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions.js';
+import cleanUp from '../../assets/img/cleanUp.png';
 // import GetLatestProgramVersion from '../../CommonComponent/GetLatestProgramVersion'
 
 const entityname = i18n.t('static.dashboard.downloadprogram')
@@ -601,6 +602,72 @@ class Program extends Component {
 
     loading = () => <div className="animated fadeIn pt-1 text-center">{i18n.t('static.common.loading')}</div>
 
+    deleteLocalVersion(programId, versionId, changed) {
+        console.log(">>>", changed);
+        confirmAlert({
+            title: i18n.t('static.program.confirm'),
+            message: changed == 1 ? "Changes are not saved still do you want to delete this version." : "Delete this version",
+            buttons: [
+                {
+                    label: i18n.t('static.program.yes'),
+                    onClick: () => {
+                        this.setState({
+                            loading: true
+                        })
+                        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                        var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                        var id = programId + "_v" + versionId + "_uId_" + userId;
+                        var db1;
+                        getDatabase();
+                        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                        openRequest.onerror = function (event) {
+                        }.bind(this);
+                        openRequest.onsuccess = function (e) {
+                            db1 = e.target.result;
+                            var transaction = db1.transaction(['programData'], 'readwrite');
+                            var programTransaction = transaction.objectStore('programData');
+                            var deleteRequest = programTransaction.delete(id);
+                            deleteRequest.onsuccess = function (event) {
+                                var transaction1 = db1.transaction(['downloadedProgramData'], 'readwrite');
+                                var programTransaction1 = transaction1.objectStore('downloadedProgramData');
+                                var deleteRequest1 = programTransaction1.delete(id);
+                                deleteRequest1.onsuccess = function (event) {
+                                    var transaction2 = db1.transaction(['programQPLDetails'], 'readwrite');
+                                    var programTransaction2 = transaction2.objectStore('programQPLDetails');
+                                    var deleteRequest2 = programTransaction2.delete(id);
+                                    deleteRequest2.onsuccess = function (event) {
+                                        this.setState({
+                                            loading: false,
+                                            message: "Program delete succesfully.",
+                                            color: 'green'
+                                        }, () => {
+                                            this.hideFirstComponent()
+                                        })
+                                        this.getPrograms();
+                                        this.getLocalPrograms();
+
+                                    }.bind(this)
+                                }.bind(this)
+                            }.bind(this)
+                        }.bind(this)
+                    }
+                }, {
+                    label: i18n.t('static.program.no'),
+                    onClick: () => {
+                        this.setState({
+                            message: i18n.t('static.actionCancelled'), loading: false, color: "red"
+                        })
+                        this.setState({ loading: false, color: "red" }, () => {
+                            this.hideFirstComponent()
+                        })
+                        this.props.history.push(`/program/downloadProgram`)
+                    }
+                }
+            ]
+        })
+
+    }
+
     render() {
         console.log("++++", this.state.prgList);
         const { realmList } = this.state;
@@ -631,6 +698,8 @@ class Program extends Component {
                                     <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.loadProgram.oldVersion')}</span></li>
                                     <li><span className="greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.loadProgram.latestVersion')} </span></li>
                                     <li><span className=" blacklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.loadProgram.notDownloaded')} </span></li>
+                                    <li><span><img width="18" title="Clean up" src={cleanUp} className="CleanUpIcon"></img></span> <span className="legendDeleteCleanupText">Keep latest  version and delete older versions.</span></li>
+                                    <li><span className=""><i title="Delete" className="fa fa-trash DeleteIcon"></i></span> <span className="legendDeleteCleanupText">Delete the version</span></li>
                                 </ul>
                                 <Col md="3 pl-0" id="realmDiv">
                                     <FormGroup>
@@ -698,13 +767,15 @@ class Program extends Component {
                                                                                                 <input type="checkbox" name="programCheckBox" value={item2.program.id} id={"checkbox_".concat(item.realmCountry.id).concat(item2.program.id).concat(".0")} />
                                                                                                 {console.log("D------------>this.state.programList", this.state.programList, "Condition------->", this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == Math.max.apply(Math, item2.versionList.map(function (o) { return o.versionId; }))).length)}
                                                                                                 {/* <label className={this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == Math.max.apply(Math, item2.versionList.map(function (o) { return o.versionId; }))).length > 0 ? "greenColor" : this.state.programList.filter(c => c.programId == item2.program.id).length > 0 ? "redColor" : ""} htmlFor={"checkbox_".concat(item.realmCountry.id).concat(item2.program.id).concat(".0")}>{getLabelText(item2.program.label, this.state.lang)}<i className="ml-1 fa fa-eye"></i></label> */}
-                                                                                                <label className={this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == Math.max.apply(Math, item2.versionList.map(function (o) { return o.versionId; }))).length > 0 ? "greenColor" : this.state.programList.filter(c => c.programId == item2.program.id).length > 0 ? "redColor" : ""} htmlFor={"checkbox_".concat(item.realmCountry.id).concat(item2.program.id).concat(".0")}>{getLabelText(item2.program.label, this.state.lang) + ' - (' + item2.program.code +')'}<i className="ml-1 fa fa-eye"></i></label>
+                                                                                                {/* <label className={this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == Math.max.apply(Math, item2.versionList.map(function (o) { return o.versionId; }))).length > 0 ? "greenColor" : this.state.programList.filter(c => c.programId == item2.program.id).length > 0 ? "redColor" : ""} htmlFor={"checkbox_".concat(item.realmCountry.id).concat(item2.program.id).concat(".0")}>{getLabelText(item2.program.label, this.state.lang) + ' - (' + item2.program.code +')'}<i className="ml-1 fa fa-eye"></i></label> */}
+                                                                                                <label className={this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == Math.max.apply(Math, item2.versionList.map(function (o) { return o.versionId; }))).length > 0 ? "greenColor" : this.state.programList.filter(c => c.programId == item2.program.id).length > 0 ? "redColor" : ""} htmlFor={"checkbox_".concat(item.realmCountry.id).concat(item2.program.id).concat(".0")}>{getLabelText(item2.program.label, this.state.lang) + ' - (' + item2.program.code + ')'}</label>
                                                                                             </div>
                                                                                         </span>
                                                                                     </span>
                                                                                     {/* {console.log("Item1------------>", item1), console.log("Item1------------>", item.realmCountry.id, "---------", "fpm".concat(item.realmCountry.id).concat(item1.id))} */}
                                                                                     <input type="checkbox" defaultChecked id={"fpm".concat(item.realmCountry.id).concat(item2.program.id)} />
-                                                                                    <label className="arrow_label" htmlFor={"fpm".concat(item.realmCountry.id).concat(item2.program.id)}></label>
+                                                                                    <label className="arrow_label" htmlFor={"fpm".concat(item.realmCountry.id).concat(item2.program.id)}></label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                                                    {this.state.programList.filter(c => c.programId == item2.program.id).length > 1 ? <img onClick={() => this.deleteCleanUpIcon(item2.program.id)} src={cleanUp} className="DeleteIcontree CleanUpSize ml-1" width="16" title="Clean Up"/> : ""}
                                                                                     <ul>
                                                                                         {
                                                                                             this.state.prgList.filter(c => c.program.id == item2.program.id).map(item3 => (
@@ -714,7 +785,9 @@ class Program extends Component {
                                                                                                             <span className="">
                                                                                                                 <div className="checkbox m-0">
                                                                                                                     <input type="checkbox" data-program-id={item2.program.id} value={item4.versionId} className="versionCheckBox" name={"versionCheckBox".concat(item2.program.id)} id={"kf-v".concat(item.realmCountry.id).concat(item2.program.id).concat(item4.versionId)} />
-                                                                                                                    <label htmlFor={"kf-v".concat(item.realmCountry.id).concat(item2.program.id).concat(item4.versionId)}>{i18n.t('static.program.version').concat(" ")}<b>{(item4.versionId)}</b>{(" ").concat(i18n.t('static.program.savedOn')).concat(" ")}<b>{(moment(item4.createdDate).format(DATE_FORMAT_CAP))}</b>{(" ").concat(i18n.t("static.program.savedBy")).concat(" ")}<b>{(item4.createdBy.username)}</b>{(" ").concat(i18n.t("static.program.as")).concat(" ")}<b>{getLabelText(item4.versionType.label)}</b></label>
+                                                                                                                    <label className={this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == item4.versionId && Math.max.apply(Math, item2.versionList.map(function (o) { return o.versionId; })) == item4.versionId).length > 0 ? "greenColor" : this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == item4.versionId).length > 0 ? "redColor" : ""}
+                                                                                                                        htmlFor={"kf-v".concat(item.realmCountry.id).concat(item2.program.id).concat(item4.versionId)}>{i18n.t('static.program.version').concat(" ")}<b>{(item4.versionId)}</b>{(" ").concat(i18n.t('static.program.savedOn')).concat(" ")}<b>{(moment(item4.createdDate).format(DATE_FORMAT_CAP))}</b>{(" ").concat(i18n.t("static.program.savedBy")).concat(" ")}<b>{(item4.createdBy.username)}</b>{(" ").concat(i18n.t("static.program.as")).concat(" ")}<b>{getLabelText(item4.versionType.label)}</b></label>
+                                                                                                                    {this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == item4.versionId).length > 0 && <i title="Delete" onClick={() => this.deleteLocalVersion(item2.program.id, parseInt(item4.versionId), this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == item4.versionId)[0].changed)} className="ml-1 fa fa-trash DeleteIcontree"></i>}
                                                                                                                 </div>
                                                                                                             </span>
                                                                                                         </span>
@@ -781,6 +854,160 @@ class Program extends Component {
     cancelClicked() {
         let id = AuthenticationService.displayDashboardBasedOnRole();
         this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
+    }
+
+
+    deleteProgramById(id, i, length) {
+        console.log("deleteC---------->4 ", id);
+        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+        var userId = userBytes.toString(CryptoJS.enc.Utf8);
+        // var id = programId + "_v" + versionId + "_uId_" + userId;
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onerror = function (event) {
+        }.bind(this);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['programData'], 'readwrite');
+            var programTransaction = transaction.objectStore('programData');
+            var deleteRequest = programTransaction.delete(id);
+            deleteRequest.onsuccess = function (event) {
+                var transaction1 = db1.transaction(['downloadedProgramData'], 'readwrite');
+                var programTransaction1 = transaction1.objectStore('downloadedProgramData');
+                var deleteRequest1 = programTransaction1.delete(id);
+                deleteRequest1.onsuccess = function (event) {
+                    var transaction2 = db1.transaction(['programQPLDetails'], 'readwrite');
+                    var programTransaction2 = transaction2.objectStore('programQPLDetails');
+                    var deleteRequest2 = programTransaction2.delete(id);
+                    deleteRequest2.onsuccess = function (event) {
+
+                        if (i == length - 1) {
+                            this.setState({
+                                loading: false,
+                                message: "Program delete succesfully.",
+                                color: 'green'
+                            }, () => {
+                                this.hideFirstComponent()
+                            })
+                            this.getPrograms();
+                            this.getLocalPrograms();
+                        }
+
+                    }.bind(this)
+                }.bind(this)
+            }.bind(this)
+        }.bind(this)
+
+
+
+
+
+
+
+
+
+
+
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onerror = function (event) {
+        }.bind(this);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['datasetData'], 'readwrite');
+            var programTransaction = transaction.objectStore('datasetData');
+            var deleteRequest = programTransaction.delete(id);
+            deleteRequest.onsuccess = function (event) {
+                var transaction1 = db1.transaction(['downloadedDatasetData'], 'readwrite');
+                var programTransaction1 = transaction1.objectStore('downloadedDatasetData');
+                var deleteRequest1 = programTransaction1.delete(id);
+                deleteRequest1.onsuccess = function (event) {
+                    var transaction2 = db1.transaction(['datasetDetails'], 'readwrite');
+                    var programTransaction2 = transaction2.objectStore('datasetDetails');
+                    var deleteRequest2 = programTransaction2.delete(id);
+                    deleteRequest2.onsuccess = function (event) {
+                        // alert("Delete successfully");
+                        if (i == length - 1) {
+                            this.setState({
+                                loading: false,
+                                message: "Dataset delete succesfully.",
+                                color: 'green'
+                            }, () => {
+                                this.hideFirstComponent()
+                            })
+                            this.getPrograms();
+                            this.getLocalPrograms();
+                        }
+
+
+                    }.bind(this)
+                }.bind(this)
+            }.bind(this)
+        }.bind(this)
+    }
+
+    deleteCleanUpIcon(programId) {
+
+        console.log("deleteC---------->1 ", this.state.prgList.filter(c => c.program.id == programId));
+        console.log("deleteC---------->2 ", this.state.programList.filter(c => c.programId == programId));
+
+        let versionListForSelectedProgram = this.state.prgList.filter(c => c.program.id == programId)[0].versionList;
+
+        let versionListRemoveMaxVersionId = versionListForSelectedProgram.filter(c => c.versionId != Math.max.apply(Math, versionListForSelectedProgram.map(a => a.versionId)));
+
+        console.log("deleteC---------->3 ", versionListRemoveMaxVersionId);
+
+        confirmAlert({
+            title: i18n.t('static.program.confirmsubmit'),
+            // message: changed == 1 ? "Changes are not saved still do you want to delete this version." : "Delete this version",
+            message: "Do you want to clean up this program?",
+            buttons: [
+                {
+                    label: i18n.t('static.program.yes'),
+                    onClick: () => {
+                        this.setState({
+                            loading: true
+                        })
+                        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                        var userId = userBytes.toString(CryptoJS.enc.Utf8);
+
+
+
+                        for (var i = 0; i < versionListRemoveMaxVersionId.length; i++) {
+                            //------------------------------------------------
+                            var id = programId + "_v" + (versionListRemoveMaxVersionId[i].versionId).toString().replace(/^0+/, '') + "_uId_" + userId;
+                            this.deleteProgramById(id, i, versionListRemoveMaxVersionId.length);
+                            //--------------------------
+                        }
+
+                        // this.setState({
+                        //     loading: false,
+                        //     message: "Dataset delete succesfully.",
+                        //     color: 'green'
+                        // }, () => {
+                        //     this.hideFirstComponent()
+                        // })
+                        // this.getPrograms();
+                        // this.getLocalPrograms();
+
+
+                    }
+                }, {
+                    label: i18n.t('static.program.no'),
+                    onClick: () => {
+                        this.setState({
+                            message: i18n.t('static.actionCancelled'), loading: false, color: "#BA0C2F"
+                        })
+                        this.setState({ loading: false, color: "#BA0C2F" }, () => {
+                            this.hideFirstComponent()
+                        })
+                        this.props.history.push(`/dataSet/loadDeleteDataSet`)
+                    }
+                }
+            ]
+        })
     }
 
     downloadClicked() {
@@ -976,7 +1203,7 @@ class Program extends Component {
                                 }
                                 if (isExists > 0) {
                                     confirmAlert({
-                                        title: i18n.t('static.program.confirmsubmit'),
+                                        title: i18n.t('static.program.confirm'),
                                         message: i18n.t('static.program.programwithsameversion'),
                                         buttons: [
                                             {

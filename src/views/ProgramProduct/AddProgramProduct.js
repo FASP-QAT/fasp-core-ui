@@ -1,22 +1,22 @@
+import jexcel from 'jspreadsheet';
 import React, { Component } from "react";
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
-import "../../../node_modules/jsuites/dist/jsuites.css";
 import {
-    Card, CardBody, CardHeader, InputGroup,
-    Label, Input, FormGroup,
-    CardFooter, Button, Table, Badge, Col, Row, Form, FormFeedback
-
+    Button, Card, CardBody, CardFooter, Col, FormGroup, Input, InputGroup,
+    Label
 } from 'reactstrap';
-import getLabelText from '../../CommonComponent/getLabelText';
-import ProgramService from "../../api/ProgramService";
-import AuthenticationService from '../Common/AuthenticationService.js';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 import PlanningUnitService from "../../api/PlanningUnitService";
-import i18n from '../../i18n';
 import ProductCategoryServcie from '../../api/PoroductCategoryService.js';
+import ProgramService from "../../api/ProgramService";
+import getLabelText from '../../CommonComponent/getLabelText';
 import { jExcelLoadedFunction } from "../../CommonComponent/JExcelCommonFunctions";
-import { JEXCEL_INTEGER_REGEX, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_DECIMAL_CATELOG_PRICE, DECIMAL_NO_REGEX, JEXCEL_PAGINATION_OPTION, MONTHS_IN_PAST_FOR_AMC, MONTHS_IN_FUTURE_FOR_AMC, JEXCEL_PRO_KEY } from "../../Constants";
+import { JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_INTEGER_REGEX, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, MONTHS_IN_FUTURE_FOR_AMC, MONTHS_IN_PAST_FOR_AMC } from "../../Constants";
+import i18n from '../../i18n';
+import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { Prompt } from 'react-router';
+
 const entityname = i18n.t('static.dashboard.programPlanningUnit');
 
 
@@ -49,6 +49,7 @@ class AddprogramPlanningUnit extends Component {
             batchNoRequired: false,
             localProcurementLeadTime: '',
             isValidData: true,
+            isChanged: false,
             loading: true,
             productCategoryList: [],
             programs: [],
@@ -78,7 +79,9 @@ class AddprogramPlanningUnit extends Component {
 
     dropdownFilter = function (instance, cell, c, r, source) {
         var mylist = [];
-        var value = (instance.jexcel.getJson(null, false)[r])[c - 1];
+        // var value = (instance.jexcel.getJson(null, false)[r])[c - 1];
+        var value = (this.state.mapPlanningUnitEl.getJson(null, false)[r])[c - 1];
+
         // AuthenticationService.setupAxiosInterceptors();
         // PlanningUnitService.getActivePlanningUnitList()
         //     .then(response => {
@@ -345,7 +348,8 @@ class AddprogramPlanningUnit extends Component {
 
 
                                                         this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
-                                                        this.el.destroy();
+                                                        // this.el.destroy();
+                                                        jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
                                                         var json = [];
                                                         var data = productDataArr;
                                                         var options = {
@@ -369,7 +373,7 @@ class AddprogramPlanningUnit extends Component {
                                                                     type: 'numeric',
                                                                     textEditor: true,
                                                                     // decimal:'.',
-                                                                    mask: '#,##.00',
+                                                                    mask: '#,##',
                                                                     disabledMaskOnEdition: true
 
                                                                 },
@@ -378,7 +382,7 @@ class AddprogramPlanningUnit extends Component {
                                                                     type: 'numeric',
                                                                     textEditor: true,
                                                                     // decimal:'.',
-                                                                    mask: '#,##.00',
+                                                                    mask: '#,##',
                                                                     disabledMaskOnEdition: true
                                                                 },
                                                                 {
@@ -386,7 +390,7 @@ class AddprogramPlanningUnit extends Component {
                                                                     type: 'numeric',
                                                                     textEditor: true,
                                                                     // decimal:'.',
-                                                                    mask: '#,##.00',
+                                                                    mask: '#,##',
                                                                     disabledMaskOnEdition: true
                                                                 },
                                                                 {
@@ -394,7 +398,7 @@ class AddprogramPlanningUnit extends Component {
                                                                     type: 'numeric',
                                                                     textEditor: true,
                                                                     // decimal:'.',
-                                                                    mask: '#,##.00',
+                                                                    mask: '#,##',
                                                                     disabledMaskOnEdition: true
                                                                 },
                                                                 {
@@ -410,7 +414,7 @@ class AddprogramPlanningUnit extends Component {
                                                                     type: 'numeric',
                                                                     textEditor: true,
                                                                     // decimal:'.',
-                                                                    mask: '#,##.00',
+                                                                    mask: '#,##',
                                                                     disabledMaskOnEdition: true
                                                                 },
                                                                 {
@@ -442,7 +446,7 @@ class AddprogramPlanningUnit extends Component {
 
                                                             ],
                                                             updateTable: function (el, cell, x, y, source, value, id) {
-                                                                var elInstance = el.jexcel;
+                                                                var elInstance = el;
                                                                 var rowData = elInstance.getRowData(y);
                                                                 // var productCategoryId = rowData[0];
                                                                 var programPlanningUnitId = rowData[9];
@@ -465,16 +469,16 @@ class AddprogramPlanningUnit extends Component {
                                                                 }
                                                             },
                                                             onsearch: function (el) {
-                                                                el.jexcel.updateTable();
+                                                                // el.jexcel.updateTable();
                                                             },
                                                             onfilter: function (el) {
-                                                                el.jexcel.updateTable();
+                                                                // el.jexcel.updateTable();
                                                             },
                                                             pagination: localStorage.getItem("sesRecordCount"),
                                                             filters: true,
                                                             search: true,
                                                             columnSorting: true,
-                                                            tableOverflow: true,
+                                                            // tableOverflow: true,
                                                             wordWrap: true,
                                                             paginationOptions: JEXCEL_PAGINATION_OPTION,
                                                             position: 'top',
@@ -488,12 +492,12 @@ class AddprogramPlanningUnit extends Component {
                                                             parseFormulas: true,
                                                             onpaste: this.onPaste,
                                                             oneditionend: this.oneditionend,
-                                                            text: {
-                                                                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                                                                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                                                                show: '',
-                                                                entries: '',
-                                                            },
+                                                            // text: {
+                                                            //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                                                            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                                                            //     show: '',
+                                                            //     entries: '',
+                                                            // },
                                                             onload: this.loaded,
                                                             license: JEXCEL_PRO_KEY,
                                                             contextMenu: function (obj, x, y, e) {
@@ -879,7 +883,9 @@ class AddprogramPlanningUnit extends Component {
                 loading: false
             });
             this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
-            this.el.destroy();
+            // this.el.destroy();
+            jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
+
         }
 
 
@@ -908,7 +914,7 @@ class AddprogramPlanningUnit extends Component {
     }
 
     oneditionend = function (instance, cell, x, y, value) {
-        var elInstance = instance.jexcel;
+        var elInstance = instance;
         var rowData = elInstance.getRowData(y);
 
         if (x == 2 && !isNaN(rowData[2]) && rowData[2].toString().indexOf('.') != -1) {
@@ -934,13 +940,13 @@ class AddprogramPlanningUnit extends Component {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
-                var index = (instance.jexcel).getValue(`J${parseInt(data[i].y) + 1}`, true);
-                if (index == "" || index == null || index == undefined) {
-                    (instance.jexcel).setValueFromCoords(8, data[i].y, 0, true);
-                    (instance.jexcel).setValueFromCoords(9, data[i].y, 0, true);
-                    (instance.jexcel).setValueFromCoords(10, data[i].y, 1, true);
-                    (instance.jexcel).setValueFromCoords(11, data[i].y, 1, true);
-                    (instance.jexcel).setValueFromCoords(12, data[i].y, this.state.programId, true);
+                var index = (instance).getValue(`J${parseInt(data[i].y) + 1}`, true);
+                if (index === "" || index == null || index == undefined) {
+                    (instance).setValueFromCoords(8, data[i].y, 0, true);
+                    (instance).setValueFromCoords(9, data[i].y, 0, true);
+                    (instance).setValueFromCoords(10, data[i].y, 1, true);
+                    (instance).setValueFromCoords(11, data[i].y, 1, true);
+                    (instance).setValueFromCoords(12, data[i].y, this.state.programId, true);
                     z = data[i].y;
                 }
             }
@@ -1194,8 +1200,10 @@ class AddprogramPlanningUnit extends Component {
                 this.el.setValueFromCoords(11, y, 1, true);
                 valid = true;
             }
-            var columnName = jexcel.getColumnNameFromId([parseInt(x) + 1, y]);
-            instance.jexcel.setValue(columnName, '');
+            console.log("test11111", jexcel);
+
+            // var columnName = jexcel.getColumnNameFromId([parseInt(x) + 1, y]);
+            // instance.worksheets[0].setValue(columnName, '');
         }
 
         //Planning Unit
@@ -1441,7 +1449,7 @@ class AddprogramPlanningUnit extends Component {
         if (x != 11) {
             this.el.setValueFromCoords(11, y, 1, true);
         }
-        this.setState({ isValidData: valid });
+        this.setState({ isValidData: valid, isChanged: true });
     }
 
 
@@ -1495,7 +1503,7 @@ class AddprogramPlanningUnit extends Component {
                 .then(response => {
                     if (response.status == "200") {
                         this.setState({
-                            message: i18n.t('static.message.planningUnitUpdate'), loading: false, color: 'green'
+                            message: i18n.t('static.message.planningUnitUpdate'), loading: false, color: 'green', isChanged: false
                         },
                             () => {
                                 this.hideSecondComponent();
@@ -1569,7 +1577,8 @@ class AddprogramPlanningUnit extends Component {
 
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
-        var asterisk = document.getElementsByClassName("resizable")[0];
+        // var asterisk = document.getElementsByClassName("resizable")[0];
+        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
         tr.children[1].classList.add('AsteriskTheadtrTd');
         tr.children[2].classList.add('AsteriskTheadtrTd');
@@ -1583,6 +1592,11 @@ class AddprogramPlanningUnit extends Component {
     }
 
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
         const { programs } = this.state;
         let programList = programs.length > 0
             && programs.map((item, i) => {
@@ -1595,6 +1609,10 @@ class AddprogramPlanningUnit extends Component {
             }, this);
         return (
             <div className="animated fadeIn">
+                <Prompt
+                    when={this.state.isChanged == true}
+                    message={i18n.t("static.dataentry.confirmmsg")}
+                />
                 <AuthenticationServiceComponent history={this.props.history} />
                 {/* <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5> */}
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
@@ -1641,7 +1659,7 @@ class AddprogramPlanningUnit extends Component {
                             </div> */}
                             <div >
                                 <h4 className="red">{this.props.message}</h4>
-                                <div className="table-responsive consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
+                                <div className="consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
                                     <div id="mapPlanningUnit" className="RowheightForaddprogaddRow">
                                     </div>
                                 </div>
@@ -1664,7 +1682,7 @@ class AddprogramPlanningUnit extends Component {
                             <FormGroup>
                                 {this.state.isValidData && this.state.programId != 0 && <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>}
                                 &nbsp;
-                                {this.state.isValidData && this.state.programId != 0 && <Button type="submit" size="md" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
+                                {this.state.isChanged && this.state.isValidData && this.state.programId != 0 && <Button type="submit" size="md" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
                                 &nbsp;
                                 {this.state.isValidData && this.state.programId != 0 && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.addRowInJexcel}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>}
                                 &nbsp;

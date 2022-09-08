@@ -58,9 +58,9 @@ import "jspdf-autotable";
 import ReportService from '../../api/ReportService';
 import ProgramService from '../../api/ProgramService';
 import TracerCategoryService from '../../api/TracerCategoryService';
-import {MultiSelect} from "react-multi-select-component";
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import { MultiSelect } from "react-multi-select-component";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { contrast, isSiteOnline } from "../../CommonComponent/JavascriptCommonFunctions";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
@@ -669,7 +669,8 @@ class ForecastMetrics extends Component {
     // }
     // console.log("consumptionArray---->", consumptionArray);
     this.el = jexcel(document.getElementById("tableDiv"), '');
-    this.el.destroy();
+    // this.el.destroy();
+    jexcel.destroy(document.getElementById("tableDiv"), true);
     var json = [];
     var data = consumptionArray;
 
@@ -690,11 +691,11 @@ class ForecastMetrics extends Component {
         {
           title: i18n.t('static.report.error'),
           type: 'numeric',
-          mask: '#,##%',
+          mask: '#,##.00%', decimal: '.'
         },
         {
           title: i18n.t('static.report.noofmonth'),
-          type: 'numeric', mask: '#,##.00', decimal: '.',
+          type: 'numeric', mask: '#,##'
         },
         {
           title: i18n.t('static.report.error'),
@@ -702,11 +703,11 @@ class ForecastMetrics extends Component {
         },
       ],
       editable: false,
-      text: {
-        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-        show: '',
-        entries: '',
-      },
+      // text: {
+      //   showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+      //   show: '',
+      //   entries: '',
+      // },
 
       // updateTable: function (el, cell, x, y, source, value, id) {
       //   if (y != null) {
@@ -731,16 +732,16 @@ class ForecastMetrics extends Component {
       //   }
       // }.bind(this),
       onsearch: function (el) {
-        el.jexcel.updateTable();
+        // el.jexcel.updateTable();
       },
       onfilter: function (el) {
-        el.jexcel.updateTable();
+        // el.jexcel.updateTable();
       },
       onload: this.loaded,
       pagination: localStorage.getItem("sesRecordCount"),
       search: true,
       columnSorting: true,
-      tableOverflow: true,
+      // tableOverflow: true,
       wordWrap: true,
       allowInsertColumn: false,
       allowManualInsertColumn: false,
@@ -770,7 +771,7 @@ class ForecastMetrics extends Component {
     jExcelLoadedFunction(instance);
     console.log("INSIDE UPDATE TABLE");
 
-    var elInstance = instance.jexcel;
+    var elInstance = instance.worksheets[0];
     var json = elInstance.getJson();
 
     var colArr = ['A', 'B', 'C', 'D', 'E']
@@ -785,8 +786,10 @@ class ForecastMetrics extends Component {
         for (var i = 0; i < colArr.length; i++) {
           elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
           //  elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', '#f48282');
-          let textColor = '#BA0C2F'//contrast('#f48282');
-          elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'color', textColor);
+          // let textColor = '#BA0C2F'//contrast('#f48282');
+          // elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'color', textColor);
+          var cell = elInstance.getCell((colArr[i]).concat(parseInt(j) + 1))
+          cell.classList.add('jexcelRedCell');
         }
       } else {
         for (var i = 0; i < colArr.length; i++) {
@@ -829,7 +832,8 @@ class ForecastMetrics extends Component {
               consumptions: [], loading: false
             }, () => {
               this.el = jexcel(document.getElementById("tableDiv"), '');
-              this.el.destroy();
+              // this.el.destroy();
+              jexcel.destroy(document.getElementById("tableDiv"), true);
             });
             if (error.message === "Network Error") {
               this.setState({
@@ -910,7 +914,8 @@ class ForecastMetrics extends Component {
         tracerCategoryLabels: [],
       }, () => {
         this.el = jexcel(document.getElementById("tableDiv"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("tableDiv"), true);
       });
 
     } else if (this.state.programValues.length == 0) {
@@ -926,7 +931,8 @@ class ForecastMetrics extends Component {
 
       }, () => {
         this.el = jexcel(document.getElementById("tableDiv"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("tableDiv"), true);
       });
 
     } else if (this.state.tracerCategoryValues.length == 0) {
@@ -938,13 +944,15 @@ class ForecastMetrics extends Component {
         planningUnitLabels: [],
       }, () => {
         this.el = jexcel(document.getElementById("tableDiv"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("tableDiv"), true);
       });
 
     } else if (this.state.planningUnitValues.length == 0) {
       this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), consumptions: [] }, () => {
         this.el = jexcel(document.getElementById("tableDiv"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("tableDiv"), true);
       });
 
     }
@@ -1390,6 +1398,11 @@ class ForecastMetrics extends Component {
     return color;
   }
   render() {
+    jexcel.setDictionary({
+      Show: " ",
+      entries: " ",
+    });
+
     const { planningUnits } = this.state;
     let planningUnitList = [];
     planningUnitList = planningUnits.length > 0
@@ -1591,7 +1604,7 @@ class ForecastMetrics extends Component {
                       </div>
                     </FormGroup>
 
-                    <FormGroup className="col-md-3">
+                    <FormGroup className="col-md-3" style={{ zIndex: '2' }}>
                       <Label htmlFor="countrysId">{i18n.t('static.program.realmcountry')}</Label>
                       <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
 
@@ -1636,7 +1649,7 @@ class ForecastMetrics extends Component {
 
                     </FormGroup>
 
-                    <FormGroup className="col-md-3">
+                    <FormGroup className="col-md-3" style={{ zIndex: '1' }}>
                       <Label htmlFor="appendedInputButton">{i18n.t('static.tracercategory.tracercategory')}</Label>
                       <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                       <div className="controls">
@@ -1659,7 +1672,7 @@ class ForecastMetrics extends Component {
                     </FormGroup>
 
 
-                    <FormGroup className="col-sm-3" id="hideDiv">
+                    <FormGroup className="col-sm-3" id="hideDiv" style={{ zIndex: '1' }}>
                       <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
                       <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                       <div className="controls">
@@ -1678,7 +1691,7 @@ class ForecastMetrics extends Component {
                       </div>
                     </FormGroup>
 
-                    <FormGroup className="col-md-3">
+                    <FormGroup className="col-md-3" style={{ zIndex: '1' }}>
                       <Label htmlFor="appendedInputButton">{i18n.t('static.report.includeapproved')}</Label>
                       <div className="controls ">
                         <InputGroup>
@@ -1742,8 +1755,8 @@ class ForecastMetrics extends Component {
                 </div>
               </Col> */}
 
-            <div className="ReportSearchMarginTop" style={{ display: this.state.loading ? "none" : "block" }}>
-              <div id="tableDiv" className="jexcelremoveReadonlybackground consumptionDataEntryTable">
+            <div className="ReportSearchMarginTop">
+              <div id="tableDiv" className="jexcelremoveReadonlybackground consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
               </div>
             </div>
             <div style={{ display: this.state.loading ? "block" : "none" }}>

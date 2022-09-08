@@ -58,12 +58,12 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 import ReportService from '../../api/ReportService';
 import ProgramService from '../../api/ProgramService';
-import {MultiSelect} from 'react-multi-select-component';
+import { MultiSelect } from 'react-multi-select-component';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 import { filter } from 'jszip';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { red } from '@material-ui/core/colors';
 
@@ -825,7 +825,9 @@ class ShipmentSummery extends Component {
         }
 
         this.el = jexcel(document.getElementById("shipmentDetailsListTableDiv"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("shipmentDetailsListTableDiv"), true);
+
         var json = [];
         var data = shipmentDetailsListArray;
         var options = {
@@ -852,12 +854,12 @@ class ShipmentSummery extends Component {
                 {
                     title: i18n.t('static.report.erpOrder'),
                     type: 'checkbox',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.report.localprocurement'),
                     type: 'checkbox',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.report.orderNo'),
@@ -935,16 +937,16 @@ class ShipmentSummery extends Component {
             editable: false,
             license: JEXCEL_PRO_KEY,
             filters: true,
-            text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
@@ -968,7 +970,7 @@ class ShipmentSummery extends Component {
     }
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
-        var elInstance = instance.jexcel;
+        var elInstance = instance.worksheets[0];
         var json = elInstance.getJson();
         for (var j = 0; j < json.length; j++) {
             var colArr = ['A', 'B', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P']
@@ -983,26 +985,29 @@ class ShipmentSummery extends Component {
         }
     }
 
-    selected = function (instance, cell, x, y, value) {
-        if ((x == 0 && value != 0) || (y == 0)) {
-            // console.log("HEADER SELECTION--------------------------");
-        } else {
-            // if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROBLEM')) {
-            let versionId = document.getElementById("versionId").value;
-            let programId = document.getElementById("programId").value;
-            let userId = AuthenticationService.getLoggedInUserId();
+    selected = function (instance, cell, x, y, value, e) {
+        if (e.buttons == 1) {
 
-            if (versionId.includes('Local')) {
-                var planningUnitId = this.el.getValueFromCoords(16, x);
-                var rangeValue = this.state.rangeValue;
-                var programIdd = programId + '_v' + versionId.split(' ')[0] + '_uId_' + userId;
-                console.log("proId***", programIdd);
-                console.log("p***", planningUnitId);
-                console.log("rangeVlaue***", this.state.rangeValue);
-                localStorage.setItem('sesRangeValue', JSON.stringify(rangeValue));
-                window.open(window.location.origin + `/#/shipment/shipmentDetails/${programIdd}/${versionId}/${planningUnitId}`);
+            if ((x == 0 && value != 0) || (y == 0)) {
+                // console.log("HEADER SELECTION--------------------------");
+            } else {
+                // if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROBLEM')) {
+                let versionId = document.getElementById("versionId").value;
+                let programId = document.getElementById("programId").value;
+                let userId = AuthenticationService.getLoggedInUserId();
+
+                if (versionId.includes('Local')) {
+                    var planningUnitId = this.el.getValueFromCoords(16, x);
+                    var rangeValue = this.state.rangeValue;
+                    var programIdd = programId + '_v' + versionId.split(' ')[0] + '_uId_' + userId;
+                    console.log("proId***", programIdd);
+                    console.log("p***", planningUnitId);
+                    console.log("rangeVlaue***", this.state.rangeValue);
+                    localStorage.setItem('sesRangeValue', JSON.stringify(rangeValue));
+                    window.open(window.location.origin + `/#/shipment/shipmentDetails/${programIdd}/${versionId}/${planningUnitId}`);
+                }
+                // }
             }
-            // }
         }
     }
     getPrograms = () => {
@@ -1951,19 +1956,22 @@ class ShipmentSummery extends Component {
             this.setState(
                 { message: i18n.t('static.common.selectProgram'), data: [], shipmentDetailsList: [], shipmentDetailsFundingSourceList: [], shipmentDetailsMonthList: [] }, () => {
                     this.el = jexcel(document.getElementById("shipmentDetailsListTableDiv"), '');
-                    this.el.destroy();
+                    // this.el.destroy();
+                    jexcel.destroy(document.getElementById("shipmentDetailsListTableDiv"), true);
                 });
 
         } else if (versionId == 0) {
             this.setState({ message: i18n.t('static.program.validversion'), data: [], shipmentDetailsList: [], shipmentDetailsFundingSourceList: [], shipmentDetailsMonthList: [] }, () => {
                 this.el = jexcel(document.getElementById("shipmentDetailsListTableDiv"), '');
-                this.el.destroy();
+                // this.el.destroy();
+                jexcel.destroy(document.getElementById("shipmentDetailsListTableDiv"), true);
             });
 
         } else if (this.state.planningUnitValues.length == 0) {
             this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: [], shipmentDetailsList: [], shipmentDetailsFundingSourceList: [], shipmentDetailsMonthList: [] }, () => {
                 this.el = jexcel(document.getElementById("shipmentDetailsListTableDiv"), '');
-                this.el.destroy();
+                // this.el.destroy();
+                jexcel.destroy(document.getElementById("shipmentDetailsListTableDiv"), true);
 
             });
         }
@@ -2024,6 +2032,11 @@ class ShipmentSummery extends Component {
     }
 
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
         const { programs } = this.state
 
         const { versions } = this.state;
@@ -2031,7 +2044,7 @@ class ShipmentSummery extends Component {
             && versions.map((item, i) => {
                 return (
                     <option key={i} value={item.versionId}>
-                        {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)}
+                        {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)} ({(moment(item.createdDate).format(`MMM DD YYYY`))})
                     </option>
                 )
             }, this);
@@ -2590,7 +2603,9 @@ class ShipmentSummery extends Component {
                                                     {this.state.shipmentDetailsList.length > 0 && <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyOrder')}</span></li>}
                                                 </ul>
                                             </FormGroup>
-                                            <div className="ShipmentSummeryReportMarginTop consumptionDataEntryTable" id="mytable2">
+                                            <div className="consumptionDataEntryTable ShipmentSummeryReportMarginTop" id="mytable2">
+                                                {/* this.props.items is undefined that's why removed this style - Sonal */}
+                                                {/* <div id="shipmentDetailsListTableDiv" style={{ display: this.props.items.loading ? "none" : "block" }} className={document.getElementById("versionId") != null && document.getElementById("versionId").value.includes('Local') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} > */}
                                                 <div id="shipmentDetailsListTableDiv" className={document.getElementById("versionId") != null && document.getElementById("versionId").value.includes('Local') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} >
                                                 </div>
                                             </div>

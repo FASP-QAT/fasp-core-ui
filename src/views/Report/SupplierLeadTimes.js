@@ -28,9 +28,9 @@ import BootstrapTable from 'react-bootstrap-table-next';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator';
-import {MultiSelect} from 'react-multi-select-component';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import { MultiSelect } from 'react-multi-select-component';
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
@@ -121,7 +121,8 @@ class SupplierLeadTimes extends Component {
         // }
         // console.log("outPutArray---->", outPutArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("tableDiv"), true);
         var json = [];
         var data = outPutArray;
 
@@ -135,18 +136,18 @@ class SupplierLeadTimes extends Component {
                 {
                     title: i18n.t('static.planningunit.planningunit'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
 
                 {
                     title: i18n.t('static.report.procurementAgentName'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.report.plannedToSubmitLeadTime'),
                     type: 'numeric', mask: '#,##.00', decimal: '.',
-                    readOnly: true
+                    // readOnly: true
                 },
                 // {
                 //     title: 'Draft To Submitted Lead Time',
@@ -156,42 +157,42 @@ class SupplierLeadTimes extends Component {
                 {
                     title: i18n.t('static.procurementagent.procurementagentapprovetosubmittime'),
                     type: 'numeric', mask: '#,##.00', decimal: '.',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.procurementAgentProcurementUnit.approvedToShippedLeadTime'),
                     type: 'numeric', mask: '#,##.00', decimal: '.',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.report.shippedToArrivedSeaLeadTime'),
                     type: 'numeric', mask: '#,##.00', decimal: '.',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.report.shippedToArrivedAirLeadTime'),
                     type: 'numeric', mask: '#,##.00', decimal: '.',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.shipment.arrivedToreceivedLeadTime'),
                     type: 'numeric', mask: '#,##.00', decimal: '.',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.report.totalSeaLeadTime'),
                     type: 'numeric', mask: '#,##.00', decimal: '.',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.report.totalAirLeadTime'),
                     type: 'numeric', mask: '#,##.00', decimal: '.',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.report.localProcurementAgentLeadTime'),
                     type: 'numeric', mask: '#,##.00', decimal: '.',
-                    readOnly: true
+                    // readOnly: true
                 },
             ],
             nestedHeaders: [
@@ -210,16 +211,17 @@ class SupplierLeadTimes extends Component {
                 ],
 
             ],
-            text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
+            editable: false,
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
@@ -719,6 +721,7 @@ class SupplierLeadTimes extends Component {
                         programId: localStorage.getItem("sesProgramIdReport")
                     }, () => {
                         this.getPlanningUnit();
+                        this.getProcurementAgent();
                     })
                 } else {
                     this.setState({
@@ -828,8 +831,8 @@ class SupplierLeadTimes extends Component {
             this.setState({
                 planningUnits: [],
                 planningUnitValues: [],
-                // procurementAgents: [],
-                // procurementAgenttValues:[]
+                procurementAgents: [],
+                procurementAgenttValues: []
 
             }, () => {
                 // if (versionId.includes('Local')) {
@@ -968,21 +971,32 @@ class SupplierLeadTimes extends Component {
             },
                 () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
-                    this.el.destroy();
+                    // this.el.destroy();
+                    jexcel.destroy(document.getElementById("tableDiv"), true);
                 })
         }
     }
 
     getProcurementAgent = () => {
+        let programId = document.getElementById("programId").value;
+
         if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors();
             ProcurementAgentService.getProcurementAgentListAll()
                 .then(response => {
                     // console.log(JSON.stringify(response.data))
                     var procurementAgent = response.data
+                    var listArrays = [];
+                    for (var i = 0; i < procurementAgent.length; i++) {
+                        for (var j = 0; j < procurementAgent[i].programList.length; j++) {
+                            if (procurementAgent[i].programList[j].id == programId) {
+                                listArrays.push(procurementAgent[i]);
+                            }
+                        }
+                    }
                     //  procurementAgent.push({ procurementAgentCode: 'No Procurement Agent', procurementAgentId: 0 })
                     this.setState({
-                        procurementAgents: procurementAgent, loading: false
+                        procurementAgents: listArrays, loading: false
                     }, () => { this.consolidatedProcurementAgentList() })
                 }).catch(
                     error => {
@@ -1063,6 +1077,7 @@ class SupplierLeadTimes extends Component {
         const lan = 'en';
         const { procurementAgents } = this.state
         var proList = procurementAgents;
+        let programId = document.getElementById("programId").value;
 
         var db1;
         getDatabase();
@@ -1097,9 +1112,17 @@ class SupplierLeadTimes extends Component {
                     }
 
                 }
-
+                var listArray = proList;
+                var listArrays = [];
+                for (var i = 0; i < listArray.length; i++) {
+                    for (var j = 0; j < listArray[i].programList.length; j++) {
+                        if (listArray[i].programList[j].id == programId) {
+                            listArrays.push(listArray[i]);
+                        }
+                    }
+                }
                 this.setState({
-                    procurementAgents: proList.sort(function (a, b) {
+                    procurementAgents: listArrays.sort(function (a, b) {
                         a = a.procurementAgentCode.toLowerCase();
                         b = b.procurementAgentCode.toLowerCase();
                         return a < b ? -1 : a > b ? 1 : 0;
@@ -1118,7 +1141,9 @@ class SupplierLeadTimes extends Component {
         let programId = document.getElementById("programId").value;
         // let plannedShipments = document.getElementById("shipmentStatusId").value;
         let planningUnitIds = this.state.planningUnitValues.length == this.state.planningUnits.length ? [] : this.state.planningUnitValues.map(ele => (ele.value).toString());
-        let procurementAgentIds = this.state.procurementAgenttValues.length == this.state.procurementAgents.length ? [] : this.state.procurementAgenttValues.map(ele => (ele.value).toString());
+        // let procurementAgentIds = this.state.procurementAgenttValues.length == this.state.procurementAgents.length ? [] : this.state.procurementAgenttValues.map(ele => (ele.value).toString());
+        let procurementAgentIds = this.state.procurementAgenttValues.map(ele => (ele.value).toString());
+
         // let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         // let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
 
@@ -1150,7 +1175,8 @@ class SupplierLeadTimes extends Component {
                             },
                                 () => {
                                     this.el = jexcel(document.getElementById("tableDiv"), '');
-                                    this.el.destroy();
+                                    // this.el.destroy();
+                                    jexcel.destroy(document.getElementById("tableDiv"), true);
                                 })
                             if (error.message === "Network Error") {
                                 this.setState({
@@ -1501,29 +1527,41 @@ class SupplierLeadTimes extends Component {
             this.setState({ message: i18n.t('static.common.selectProgram'), outPutList: [] },
                 () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
-                    this.el.destroy();
+                    // this.el.destroy();
+                    jexcel.destroy(document.getElementById("tableDiv"), true);
 
                 })
         } else if (this.state.planningUnitValues.length == 0) {
             this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), outPutList: [] },
                 () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
-                    this.el.destroy();
+                    // this.el.destroy();
+                    jexcel.destroy(document.getElementById("tableDiv"), true);
                 })
         }
         else {
-            this.setState({ message: i18n.t('static.procurementAgent.selectProcurementAgent'), outPutList: [] },
-                () => {
-                    this.el = jexcel(document.getElementById("tableDiv"), '');
-                    this.el.destroy();
-                })
+            if (this.state.procurementAgents.length == 0) {
+                this.setState({ message: i18n.t('static.procurementAgent.procurementAgentNotMappedWithProgram'), outPutList: [] },
+                    () => {
+                        this.el = jexcel(document.getElementById("tableDiv"), '');
+                        // this.el.destroy();
+                        jexcel.destroy(document.getElementById("tableDiv"), true);
+                    })
+            } else {
+                this.setState({ message: i18n.t('static.procurementAgent.selectProcurementAgent'), outPutList: [] },
+                    () => {
+                        this.el = jexcel(document.getElementById("tableDiv"), '');
+                        // this.el.destroy();
+                        jexcel.destroy(document.getElementById("tableDiv"), true);
+                    })
+            }
 
         }
     }
     componentDidMount() {
         // AuthenticationService.setupAxiosInterceptors();
         this.getPrograms();
-        this.getProcurementAgent();
+        // this.getProcurementAgent();
     }
 
     setprogramId(event) {
@@ -1531,6 +1569,7 @@ class SupplierLeadTimes extends Component {
             programId: event.target.value
         }, () => {
             this.getPlanningUnit();
+            this.getProcurementAgent();
         })
 
     }
@@ -1544,6 +1583,11 @@ class SupplierLeadTimes extends Component {
     }
     loading = () => <div className="animated fadeIn pt-1 text-center">{i18n.t('static.common.loading')}</div>
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
         const { SearchBar, ClearSearchButton } = Search;
         const customTotal = (from, to, size) => (
             <span className="react-bootstrap-table-pagination-total">
@@ -1820,7 +1864,7 @@ class SupplierLeadTimes extends Component {
 
                                     </div>
                                 </FormGroup>
-                                <FormGroup className="col-md-3">
+                                {procurementAgentList.length > 0 && <FormGroup className="col-md-3">
                                     {/* <Label htmlFor="appendedInputButton">{i18n.t('static.report.procurementAgentName')}</Label> */}
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.report.procurementAgentName')} </Label>
 
@@ -1835,12 +1879,12 @@ class SupplierLeadTimes extends Component {
                                             disabled={this.state.loading}
                                         />
                                     </div>
-                                </FormGroup>
+                                </FormGroup>}
                             </div>
                         </div>
                         {/* </Form> */}
-                        <div className="ReportSearchMarginTop SupplierLeadTable" style={{ display: this.state.loading ? "none" : "block" }}>
-                            <div id="tableDiv" className="jexcelremoveReadonlybackground consumptionDataEntryTable">
+                        <div className="ReportSearchMarginTop SupplierLeadTable">
+                            <div id="tableDiv" className="jexcelremoveReadonlybackground consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
                             </div>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>

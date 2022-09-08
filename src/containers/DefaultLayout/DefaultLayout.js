@@ -64,6 +64,11 @@ const EditFundingSource = React.lazy(() => import('../../views/FundingSource/Edi
 const AddProcurementAgent = React.lazy(() => import('../../views/ProcurementAgent/AddProcurementAgentComponent'));
 const ListProcurementAgent = React.lazy(() => import('../../views/ProcurementAgent/ListProcurementAgentComponent'));
 const EditProcurementAgent = React.lazy(() => import('../../views/ProcurementAgent/EditProcurementAgentComponent'));
+
+const AddProcurementAgentType = React.lazy(() => import('../../views/ProcurementAgentType/AddProcurementAgentTypeComponent'));
+const ListProcurementAgentType = React.lazy(() => import('../..//views/ProcurementAgentType/ListProcurementAgentTypeComponent'));
+const EditProcurementAgentType = React.lazy(() => import('../../views/ProcurementAgentType/EditProcurementAgentTypeComponent'));
+
 const AddTracerCategory = React.lazy(() => import('../../views/TracerCategory/AddTracerCategoryComponent'));
 const ListTracerCategory = React.lazy(() => import('../../views/TracerCategory/ListTracerCategoryComponent'));
 const EditTracerCategory = React.lazy(() => import('../../views/TracerCategory/EditTracerCategoryComponent'));
@@ -451,6 +456,12 @@ const routes = [
   { path: '/procurementAgent/listProcurementAgent/:color/:message', name: 'static.breadcrum.list', entityname: 'static.dashboard.procurementagent', component: ListProcurementAgent },
   { path: '/procurementAgent/editProcurementAgent/:procurementAgentId', name: 'static.breadcrum.edit', entityname: 'static.dashboard.procurementagentheader', component: EditProcurementAgent },
 
+  { path: '/procurementAgentType/addProcurementAgentType', name: 'static.breadcrum.add', entityname: 'static.dashboard.procurementagenttypeheader', component: AddProcurementAgentType },
+  { path: '/procurementAgentType/listProcurementAgentType', exact: true, name: 'static.breadcrum.list', entityname: 'static.dashboard.procurementagenttype', component: ListProcurementAgentType },
+  // { path: '/procurementAgent/listProcurementAgent/:message', component: ListProcurementAgent },
+  { path: '/procurementAgentType/listProcurementAgentType/:color/:message', name: 'static.breadcrum.list', entityname: 'static.dashboard.procurementagenttype', component: ListProcurementAgentType },
+  { path: '/procurementAgentType/editProcurementAgentType/:procurementAgentTypeId', name: 'static.breadcrum.edit', entityname: 'static.dashboard.procurementagenttypeheader', component: EditProcurementAgentType },
+
   { path: '/tracerCategory/addTracerCategory', name: 'static.breadcrum.add', entityname: 'static.tracerCategoryHead.tracerCategory', component: AddTracerCategory },
   { path: '/tracerCategory/listTracerCategory', exact: true, name: 'static.breadcrum.list', entityname: 'static.tracerCategoryHead.tracerCategory', component: ListTracerCategory },
   // { path: '/tracerCategory/listTracerCategory/:message', component: ListTracerCategory },
@@ -500,7 +511,7 @@ const routes = [
 
   // { path: '/dashboard/:message', component: Dashboard },
   { path: '/dashboard/:color/:message', component: Dashboard },
-  { path: '/program/downloadProgram', name: 'static.dashboard.downloadprogram', component: ProgramTree },
+  { path: '/program/downloadProgram', name: 'static.loadDeleteProgram.loadDeleteProgram', component: ProgramTree },
   { path: '/program/syncPage', name: "static.dashboard.commitVersion", component: syncPage },
   { path: '/program/downloadProgram/:message', component: ProgramTree },
   { path: '/program/exportProgram', name: 'static.dashboard.exportprogram', component: ExportProgram },
@@ -725,7 +736,7 @@ const routes = [
   { path: '/dataset/listDataSet', exact: true, name: 'static.breadcrum.list', entityname: 'static.dataset.manageProgramInfo', component: DataSetList },
   // { path: '/dataset/listDataSet/:message', component: ListDataSource },
   { path: '/dataset/listDataSet/:color/:message', name: 'static.breadcrum.list', entityname: 'static.dataset.manageProgramInfo', component: DataSetList },
-  { path: '/dataset/editDataSet/:dataSetId', name: 'static.breadcrum.edit', entityname: 'static.dataset.manageProgramInfo', component: EditDataSet },
+  { path: '/dataset/editDataSet/:dataSetId', name: i18n.t('static.dataset.manageProgramInfo'), component: EditDataSet },
 
   { path: '/importFromQATSupplyPlan/listImportFromQATSupplyPlan/:color/:message', name: i18n.t('static.importFromQATSupplyPlan.importFromQATSupplyPlan'), component: ImportFromQATSupplyPlan },
   { path: '/importFromQATSupplyPlan/listImportFromQATSupplyPlan', exact: true, name: i18n.t('static.importFromQATSupplyPlan.importFromQATSupplyPlan'), component: ImportFromQATSupplyPlan },
@@ -903,6 +914,11 @@ class DefaultLayout extends Component {
     e.preventDefault();
     // AuthenticationService.setupAxiosInterceptors();
     this.props.history.push(`/changePassword`);
+  }
+
+  goToMasterDataSync(e){
+    e.preventDefault();
+    this.props.history.push({ pathname: `/syncProgram`, state: { "isFullSync": true } })
   }
   signOut(e) {
     e.preventDefault();
@@ -1563,6 +1579,18 @@ class DefaultLayout extends Component {
                             }
                           },
                           {
+                            name: i18n.t('static.dashboard.procurementagentType'),
+                            url: '/procurementAgentType/listProcurementAgentType',
+                            icon: 'fa fa-user-circle-o',
+                            // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_PROCUREMENT_AGENT') && this.state.activeTab == 2 ? false : true) }
+                            attributes: {
+                              hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_PROCUREMENT_AGENT') && this.state.activeTab == 2 ? false : true),
+                              onClick: e => {
+                                this.refreshPage();
+                              }
+                            }
+                          },
+                          {
                             name: i18n.t('static.dashboard.procurementagent'),
                             url: '/procurementAgent/listProcurementAgent',
                             icon: 'fa fa-user-circle-o',
@@ -1771,12 +1799,12 @@ class DefaultLayout extends Component {
                               }
                             }
                           },
-                          // {
-                          //   name: i18n.t('static.common.loadDeleteDataSet'),
-                          //   url: '/dataset/loadDeleteDataSet',
-                          //   icon: 'fa fa-download',
-                          //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
-                          // },
+                          {
+                            name: i18n.t('static.loadDeleteProgram.loadDeleteProgram'),
+                            url: '/dataset/loadDeleteDataSet',
+                            icon: 'fa fa-download',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LOAD_DELETE_DATASET') && this.state.activeTab == 1 ? false : true) }
+                          },
                           {
                             name: 'Import Program',
                             url: '/dataset/importDataset',
@@ -1799,17 +1827,17 @@ class DefaultLayout extends Component {
                               }
                             }
                           },
-                          {
-                            name: i18n.t('static.common.loadDeleteDataSet'),
-                            url: '/dataset/loadDeleteDataSet',
-                            icon: 'cui-cloud-download FontBoldIcon',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_LOAD_DELETE_DATASET') && this.state.activeTab == 1 ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
+                          // {
+                          //   name: i18n.t('static.common.loadDeleteDataSet'),
+                          //   url: '/dataset/loadDeleteDataSet',
+                          //   icon: 'cui-cloud-download FontBoldIcon',
+                          //   attributes: {
+                          //     hidden: (this.state.businessFunctions.includes('ROLE_BF_LOAD_DELETE_DATASET') && this.state.activeTab == 1 ? false : true),
+                          //     onClick: e => {
+                          //       this.refreshPage();
+                          //     }
+                          //   }
+                          // },
                           {
                             name: i18n.t('static.commitProgram.commitProgram'),
                             url: '/dataset/commitTree',
@@ -1862,7 +1890,7 @@ class DefaultLayout extends Component {
                         // hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true)
                         // },
                         attributes: {
-                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_LIST_IMPORT_FROM_QAT_SUPPLY_PLAN')) || (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT')) || (this.state.businessFunctions.includes('ROLE_BF_EXTRAPOLATION'))) && this.state.activeTab == 1) ? false : true)
+                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_LIST_IMPORT_FROM_QAT_SUPPLY_PLAN')) || (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_CONSUMPTION_DATA_ENTRY_ADJUSTMENT')) || (this.state.businessFunctions.includes('ROLE_BF_EXTRAPOLATION')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_EXTRAPOLATION'))) && this.state.activeTab == 1) ? false : true)
                         },
                         children: [
                           {
@@ -1887,7 +1915,7 @@ class DefaultLayout extends Component {
                             url: '/dataentry/consumptionDataEntryAndAdjustment',
                             icon: 'fa fa-pencil',
                             attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT') && this.state.activeTab == 1 ? false : true),
+                              hidden: ((((this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_CONSUMPTION_DATA_ENTRY_ADJUSTMENT'))) && this.state.activeTab == 1) ? false : true),
                               onClick: e => {
                                 this.refreshPage();
                               }
@@ -1899,7 +1927,7 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-line-chart',
                             // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
                             attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_EXTRAPOLATION') && this.state.activeTab == 1 ? false : true),
+                              hidden: ((((this.state.businessFunctions.includes('ROLE_BF_EXTRAPOLATION')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_EXTRAPOLATION'))) && this.state.activeTab == 1) ? false : true),
                               onClick: e => {
                                 this.refreshPage();
                               }
@@ -1992,7 +2020,7 @@ class DefaultLayout extends Component {
                         // hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true)
                         // },
                         attributes: {
-                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_COMPARE_AND_SELECT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_MONTHLY_FORECAST')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECAST_SUMMARY')) || (this.state.businessFunctions.includes('ROLE_BF_COMPARE_VERSION')) || (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_FORECAST_ERROR'))) && this.state.activeTab == 1) ? false : true)
+                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_COMPARE_AND_SELECT')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_COMPARE_AND_SELECT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_MONTHLY_FORECAST')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECAST_SUMMARY')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_FORECAST_SUMMARY')) || (this.state.businessFunctions.includes('ROLE_BF_COMPARE_VERSION')) || (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_FORECAST_ERROR'))) && this.state.activeTab == 1) ? false : true)
                         },
                         children: [
                           // {
@@ -2007,7 +2035,7 @@ class DefaultLayout extends Component {
                             url: '/report/compareAndSelectScenario',
                             icon: 'fa fa-check-square-o',
                             attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_COMPARE_AND_SELECT') && this.state.activeTab == 1 ? false : true),
+                              hidden: ((((this.state.businessFunctions.includes('ROLE_BF_COMPARE_AND_SELECT')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_COMPARE_AND_SELECT'))) && this.state.activeTab == 1) ? false : true),
                               onClick: e => {
                                 this.refreshPage();
                               }
@@ -2031,7 +2059,7 @@ class DefaultLayout extends Component {
                             url: '/forecastReport/forecastSummary',
                             icon: 'fa fa-table',
                             attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECAST_SUMMARY') && this.state.activeTab == 1 ? false : true),
+                              hidden: ((((this.state.businessFunctions.includes('ROLE_BF_LIST_FORECAST_SUMMARY')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_FORECAST_SUMMARY'))) && this.state.activeTab == 1) ? false : true),
                               onClick: e => {
                                 this.refreshPage();
                               }
@@ -2049,12 +2077,12 @@ class DefaultLayout extends Component {
                               }
                             }
                           },
-                          {
-                            name: 'Consumption Forecast Error',
-                            url: '/forecastReport/consumptionForecastError',
-                            icon: 'fa fa-signal',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_FORECAST_ERROR') && this.state.activeTab == 1 ? false : true) }
-                          },
+                          // {
+                          //   name: 'Consumption Forecast Error',
+                          //   url: '/forecastReport/consumptionForecastError',
+                          //   icon: 'fa fa-signal',
+                          //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_FORECAST_ERROR') && this.state.activeTab == 1 ? false : true) }
+                          // },
                         ]
                       },
                       // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
@@ -2175,7 +2203,7 @@ class DefaultLayout extends Component {
                             }
                           },
                           {
-                            name: i18n.t('static.dashboard.downloadprogram'),
+                            name: i18n.t('static.loadDeleteProgram.loadDeleteProgram'),
                             url: '/program/downloadProgram',
                             icon: 'cui-cloud-download FontBoldIcon',
                             attributes: {
@@ -2185,18 +2213,18 @@ class DefaultLayout extends Component {
                               }
                             }
                           },
-                          {
-                            name: i18n.t('static.program.deleteLocalProgram'),
-                            url: '/program/deleteLocalProgram',
-                            icon: 'fa fa-trash',
-                            attributes: {
-                              hidden: ((this.state.businessFunctions.includes('ROLE_BF_DELETE_LOCAL_PROGRAM') && this.state.activeTab == 2) ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                            // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DOWNLOAD_PROGARM') ? false : true) }
-                          },
+                          // {
+                          //   name: i18n.t('static.program.deleteLocalProgram'),
+                          //   url: '/program/deleteLocalProgram',
+                          //   icon: 'fa fa-trash',
+                          //   attributes: {
+                          //     hidden: ((this.state.businessFunctions.includes('ROLE_BF_DELETE_LOCAL_PROGRAM') && this.state.activeTab == 2) ? false : true),
+                          //     onClick: e => {
+                          //       this.refreshPage();
+                          //     }
+                          //   }
+                          //   // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DOWNLOAD_PROGARM') ? false : true) }
+                          // },
                           {
                             name: i18n.t('static.dashboard.programimport'),
                             // url: '/pipeline/pipelineProgramImport',
@@ -2860,7 +2888,7 @@ class DefaultLayout extends Component {
                                 }
                               },
                               // {
-                              //   name: i18n.t('static.report.forecasterrorovertime'),
+                              //   name: 'Forecast Error (Monthly) (New)',
                               //   url: '/report/consumptionForecastErrorSupplyPlan',
                               //   icon: 'fa fa-line-chart',
                               //   attributes: {
@@ -3405,7 +3433,7 @@ class DefaultLayout extends Component {
                         // hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true)
                         // },
                         attributes: {
-                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT')) || (this.state.businessFunctions.includes('ROLE_BF_EXTRAPOLATION'))) && this.state.activeTab == 1) ? false : true)
+                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT')) || (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT')) || (this.state.businessFunctions.includes('ROLE_BF_EXTRAPOLATION')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_EXTRAPOLATION'))) && this.state.activeTab == 1) ? false : true)
                         },
                         children: [
                           // {
@@ -3424,7 +3452,7 @@ class DefaultLayout extends Component {
                             url: '/dataentry/consumptionDataEntryAndAdjustment',
                             icon: 'fa fa-pencil',
                             attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT') && this.state.activeTab == 1 ? false : true),
+                              hidden: ((((this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_CONSUMPTION_DATA_ENTRY_ADJUSTMENT'))) && this.state.activeTab == 1) ? false : true),
                               onClick: e => {
                                 this.refreshPage();
                               }
@@ -3436,7 +3464,7 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-line-chart',
                             // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
                             attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_EXTRAPOLATION') && this.state.activeTab == 1 ? false : true),
+                              hidden: ((((this.state.businessFunctions.includes('ROLE_BF_EXTRAPOLATION')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_EXTRAPOLATION'))) && this.state.activeTab == 1) ? false : true),
                               onClick: e => {
                                 this.refreshPage();
                               }
@@ -3501,7 +3529,7 @@ class DefaultLayout extends Component {
                         // hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true)
                         // },
                         attributes: {
-                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_COMPARE_AND_SELECT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_MONTHLY_FORECAST')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECAST_SUMMARY')) || (this.state.businessFunctions.includes('ROLE_BF_COMPARE_VERSION')) || (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_FORECAST_ERROR'))) && this.state.activeTab == 1) ? false : true)
+                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_COMPARE_AND_SELECT')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_COMPARE_AND_SELECT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_MONTHLY_FORECAST')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECAST_SUMMARY')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_FORECAST_SUMMARY')) || (this.state.businessFunctions.includes('ROLE_BF_COMPARE_VERSION')) || (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_FORECAST_ERROR'))) && this.state.activeTab == 1) ? false : true)
                         },
                         children: [
                           // {
@@ -3524,7 +3552,7 @@ class DefaultLayout extends Component {
                             url: '/report/compareAndSelectScenario',
                             icon: 'fa fa-check-square-o',
                             attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_COMPARE_AND_SELECT') && this.state.activeTab == 1 ? false : true),
+                              hidden: ((((this.state.businessFunctions.includes('ROLE_BF_COMPARE_AND_SELECT')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_COMPARE_AND_SELECT'))) && this.state.activeTab == 1) ? false : true),
                               onClick: e => {
                                 this.refreshPage();
                               }
@@ -3549,7 +3577,7 @@ class DefaultLayout extends Component {
                             url: '/forecastReport/forecastSummary',
                             icon: 'fa fa-pie-chart',
                             attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECAST_SUMMARY') && this.state.activeTab == 1 ? false : true),
+                              hidden: ((((this.state.businessFunctions.includes('ROLE_BF_LIST_FORECAST_SUMMARY')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_FORECAST_SUMMARY'))) && this.state.activeTab == 1) ? false : true),
                               onClick: e => {
                                 this.refreshPage();
                               }
@@ -3567,17 +3595,17 @@ class DefaultLayout extends Component {
                               }
                             }
                           },
-                          {
-                            name: 'Consumption Forecast Error',
-                            url: '/forecastReport/consumptionForecastError',
-                            icon: 'fa fa-signal',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_FORECAST_ERROR') && this.state.activeTab == 1 ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
+                          // {
+                          //   name: 'Consumption Forecast Error',
+                          //   url: '/forecastReport/consumptionForecastError',
+                          //   icon: 'fa fa-signal',
+                          //   attributes: {
+                          //     hidden: (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_FORECAST_ERROR') && this.state.activeTab == 1 ? false : true),
+                          //     onClick: e => {
+                          //       this.refreshPage();
+                          //     }
+                          //   }
+                          // },
                           // {
                           //   name: i18n.t('static.dashboard.Versioncomarition'),
                           //   url: '/report/compareVersion',
@@ -3927,7 +3955,7 @@ class DefaultLayout extends Component {
                                 }
                               },
                               // {
-                              //   name: i18n.t('static.report.forecasterrorovertime'),
+                              //   name: 'Forecast Error (Monthly) (New)',
                               //   url: '/report/consumptionForecastErrorSupplyPlan',
                               //   icon: 'fa fa-line-chart',
                               //   attributes: {
@@ -4207,7 +4235,7 @@ class DefaultLayout extends Component {
         </div>
         <AppFooter>
           <Suspense fallback={this.loading()}>
-            <DefaultFooter />
+            <DefaultFooter syncProgram={e => this.goToMasterDataSync(e)}/>
           </Suspense>
         </AppFooter>
       </div>

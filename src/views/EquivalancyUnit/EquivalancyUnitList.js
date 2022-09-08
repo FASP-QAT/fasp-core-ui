@@ -8,8 +8,8 @@ import {
 import { FastField, Formik } from 'formik';
 import * as Yup from 'yup'
 import i18n from '../../i18n'
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js';
 import getLabelText from '../../CommonComponent/getLabelText';
@@ -108,7 +108,8 @@ class EquivalancyUnit extends Component {
     loaded1 = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance, 1);
         jExcelLoadedFunctionOnlyHideRow(instance);
-        var asterisk = document.getElementsByClassName("resizable")[0];
+        // var asterisk = document.getElementsByClassName("resizable")[0];
+        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
         // tr.children[1].classList.add('AsteriskTheadtrTd');
         tr.children[2].classList.add('AsteriskTheadtrTd');
@@ -129,11 +130,11 @@ class EquivalancyUnit extends Component {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
-                var index = (instance.jexcel).getValue(`G${parseInt(data[i].y) + 1}`, true);
-                if (index == "" || index == null || index == undefined) {
-                    (instance.jexcel).setValueFromCoords(0, data[i].y, 0, true);
-                    (instance.jexcel).setValueFromCoords(8, data[i].y, 1, true);
-                    (instance.jexcel).setValueFromCoords(9, data[i].y, 1, true);
+                var index = (instance).getValue(`G${parseInt(data[i].y) + 1}`, true);
+                if (index === "" || index == null || index == undefined) {
+                    (instance).setValueFromCoords(0, data[i].y, 0, true);
+                    (instance).setValueFromCoords(8, data[i].y, 1, true);
+                    (instance).setValueFromCoords(9, data[i].y, 1, true);
                     z = data[i].y;
                 }
             }
@@ -252,7 +253,9 @@ class EquivalancyUnit extends Component {
         //     this.state.eqUnitTableEl.destroy();
         // }
         if (this.state.table2Instance != "" && this.state.table2Instance != undefined) {
-            this.state.table2Instance.destroy();
+            // this.state.table2Instance.destroy();
+            jexcel.destroy(document.getElementById("eqUnitInfoTable"), true);
+
         }
         var json = [];
         var data = papuDataArr;
@@ -266,7 +269,7 @@ class EquivalancyUnit extends Component {
                 {
                     title: 'equivalancyUnitId',
                     type: 'hidden',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.program.healtharea'),
@@ -285,7 +288,7 @@ class EquivalancyUnit extends Component {
                 {
                     title: i18n.t('static.healtharea.realm'),
                     type: 'hidden',
-                    readOnly: true
+                    // readOnly: true
                     // textEditor: true,
                 },
                 {
@@ -322,7 +325,7 @@ class EquivalancyUnit extends Component {
             ],
             updateTable: function (el, cell, x, y, source, value, id) {
                 if (y != null) {
-                    var elInstance = el.jexcel;
+                    var elInstance = el;
                     //left align
                     elInstance.setStyle(`B${parseInt(y) + 1}`, 'text-align', 'left');
 
@@ -350,7 +353,7 @@ class EquivalancyUnit extends Component {
             search: true,
             // pagination: false,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
@@ -363,12 +366,12 @@ class EquivalancyUnit extends Component {
             parseFormulas: true,
             // onpaste: this.onPaste1,
             oneditionend: this.oneditionend1,
-            text: {
-                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
             onload: this.loaded1,
             license: JEXCEL_PRO_KEY,
             editable: true,
@@ -582,11 +585,13 @@ class EquivalancyUnit extends Component {
         // }
 
         if (this.state.table1Instance != "" && this.state.table1Instance != undefined) {
-            this.state.table1Instance.destroy();
+            // this.state.table1Instance.destroy();
+            jexcel.destroy(document.getElementById("paputableDiv"), true);
         }
 
         if (this.state.table2Instance != "" && this.state.table2Instance != undefined) {
-            this.state.table2Instance.destroy();
+            // this.state.table2Instance.destroy();
+            jexcel.destroy(document.getElementById("eqUnitInfoTable"), true);
         }
         var json = [];
         var data = papuDataArr;
@@ -600,7 +605,7 @@ class EquivalancyUnit extends Component {
                 {
                     title: 'equivalancyUnitMappingId',
                     type: 'hidden',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.equivalancyUnit.equivalancyUnitName'),
@@ -699,7 +704,7 @@ class EquivalancyUnit extends Component {
             ],
             updateTable: function (el, cell, x, y, source, value, id) {
                 if (y != null) {
-                    var elInstance = el.jexcel;
+                    var elInstance = el;
                     var rowData = elInstance.getRowData(y);
 
                     //left align
@@ -906,7 +911,7 @@ class EquivalancyUnit extends Component {
             filters: true,
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
@@ -920,12 +925,12 @@ class EquivalancyUnit extends Component {
             parseFormulas: true,
             // onpaste: this.onPaste,
             oneditionend: this.oneditionend,
-            text: {
-                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
             onload: this.loaded,
             editable: true,
             // editable: (( AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_MODELING_TYPE') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_MODELING_TYPE') ) ? true : false),
@@ -981,7 +986,9 @@ class EquivalancyUnit extends Component {
 
     filterForecastingUnitBasedOnTracerCategory = function (instance, cell, c, r, source) {
         var mylist = [];
-        var value = (instance.jexcel.getJson(null, false)[r])[3];
+        // var value = (instance.jexcel.getJson(null, false)[r])[3];
+        var value = (this.state.table1Instance.getJson(null, false)[r])[3];
+
         if (value > 0) {
             mylist = this.state.forecastingUnitList.filter(c => c.tracerCategoryId == value && c.active.toString() == "true");
         }
@@ -1003,7 +1010,9 @@ class EquivalancyUnit extends Component {
 
 
     filterTechnicalAreaList = function (instance, cell, c, r, source) {
-        var selectedEquivalencyUnitId = (instance.jexcel.getJson(null, false)[r])[1];
+        // var selectedEquivalencyUnitId = (instance.jexcel.getJson(null, false)[r])[1];
+        var selectedEquivalencyUnitId = (this.state.table1Instance.getJson(null, false)[r])[1];
+
         let selectedEqObj = this.state.equivalancyUnitList.filter(c => c.id == selectedEquivalencyUnitId)[0];
         // console.log("selectedEqObj-------->", selectedEqObj);
         let mylist = [];
@@ -1021,7 +1030,9 @@ class EquivalancyUnit extends Component {
         // let mylist = this.state.tracerCategoryList.filter(c => c.healthArea.id == selectedHealthAreaId);
         // return mylist;
 
-        var selectedHealthAreaId = (instance.jexcel.getJson(null, false)[r])[2].toString().split(';');
+        // var selectedHealthAreaId = (instance.worksheets[0].getJson(null, false)[r])[2].toString().split(';');
+        var selectedHealthAreaId = (this.state.table1Instance.getJson(null, false)[r])[2].toString().split(';');
+
         let mylist = [];
         // console.log("mylist-------->0", (instance.jexcel.getJson(null, false)[r])[2]);
         // console.log("mylist-------->1", selectedHealthAreaId);
@@ -1882,14 +1893,14 @@ class EquivalancyUnit extends Component {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
-                var index = (instance.jexcel).getValue(`G${parseInt(data[i].y) + 1}`, true);
-                if (index == "" || index == null || index == undefined) {
-                    (instance.jexcel).setValueFromCoords(0, data[i].y, 0, true);
-                    (instance.jexcel).setValueFromCoords(8, data[i].y, true, true);
-                    (instance.jexcel).setValueFromCoords(11, data[i].y, 1, true);
-                    (instance.jexcel).setValueFromCoords(12, data[i].y, 0, true);
-                    (instance.jexcel).setValueFromCoords(13, data[i].y, 0, true);
-                    (instance.jexcel).setValueFromCoords(14, data[i].y, 1, true);
+                var index = (instance).getValue(`G${parseInt(data[i].y) + 1}`, true);
+                if (index === "" || index == null || index == undefined) {
+                    (instance).setValueFromCoords(0, data[i].y, 0, true);
+                    (instance).setValueFromCoords(8, data[i].y, true, true);
+                    (instance).setValueFromCoords(11, data[i].y, 1, true);
+                    (instance).setValueFromCoords(12, data[i].y, 0, true);
+                    (instance).setValueFromCoords(13, data[i].y, 0, true);
+                    (instance).setValueFromCoords(14, data[i].y, 1, true);
                     z = data[i].y;
                 }
             }
@@ -2208,7 +2219,8 @@ class EquivalancyUnit extends Component {
 
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
-        var asterisk = document.getElementsByClassName("resizable")[0];
+        // var asterisk = document.getElementsByClassName("resizable")[0];
+        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
         // tr.children[1].classList.add('AsteriskTheadtrTd');
         tr.children[2].classList.add('AsteriskTheadtrTd');
@@ -2797,6 +2809,11 @@ class EquivalancyUnit extends Component {
 
     render() {
 
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
         const { tracerCategoryList1 } = this.state;
         let tracerCategoryTempList = tracerCategoryList1.length > 0
             && tracerCategoryList1.map((item, i) => {
@@ -2932,123 +2949,120 @@ class EquivalancyUnit extends Component {
                     </CardFooter>
 
                     <Modal isOpen={this.state.showGuidance}
-className={'modal-lg ' + this.props.className} >
-<ModalHeader toggle={() => this.toggleShowGuidance()} className="ModalHead modal-info-Headher">
-    <strong className="TextWhite">Show Guidance</strong>
-</ModalHeader>
-<div>
-    <ModalBody>
-       <div>
-           <h3 className='ShowGuidanceHeading'>Equivalency Unit</h3>
-       </div>
-        <p>
-            <p style={{fontSize:'13px'}}><span className="UnderLineText">Purpose :</span> Enable users manage Equivalency Units. Equivalency Units (EUs) allow users to aggregate data across products that are different, but related. 
-            <ul>
-                <li><b>Regional View:</b>  Use this view to see your forecast across planning units and regions. Directly update the forecast method for every region-planning unit combination and add notes in the table, if desired. Forecast selections can also be updated in the '<a href='/#/report/compareAndSelectScenario' target="_blank" style={{textDecoration:'underline'}}>Compare and Select Forecast</a>' screen.</li>
-                <li><b>National View:</b> Use this view to see your forecast at a <span style={{textDecoration:'underline'}}>national level</span> and evaluate your <span style={{textDecoration:'underline'}}>procurement surplus or gaps</span>. </li>
-            </ul>
-            </p>
-        </p>
-        <p style={{fontSize:'13px'}}>
-            <p style={{fontSize:'13px'}}><span className="UnderLineText">Using this screen:</span><br></br>
-            <b>Mapping equivalency units to forecasting units</b><br></br>
-            Use the main screen to manage mappings between equivalency units and forecasting units. Realm-level mappings are available to all users and are indicated by "All". However, program admins can create program-specific mappings (by adding a row and tagging it to a specific EU). If there are any conflicts, program-specific mappings will take precedence and be used instead of realm-level mappings.
-            </p>
-        </p>
-        <p>
-        For example, a user is forecasting medicines to treat QATitis, a condition where people cannot stop using QAT. The user may forecast by different treatments (different forecasting units) but want to see how they are aggregated together. 
-        <table className="table table-bordered ">
-                                <thead>
-                                <tr>
-                                    <th>Equivalency Unit</th>
-                                    <th>Forecasting Unit</th>
-                                    <th>Conversion to EU</th>
-                                    <th style={{width:'150px'}}>Average Treatment required to cure QATitis</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr>
-                                    <td>1 Treatment for QATitis </td>
-                                    <td>1 tablet of FASPicillin</td>
-                                    <td>14</td>
-                                    <td>1 tablet a day for 2 weeks</td>
-                                </tr>
-                                <tr>
-                                    <td>1 Treatment for QATitis </td>
-                                    <td>5mL tube of FASPasone (cream)</td>
-                                    <td>1</td>
-                                    <td>0.5mL/day applied on the forehead over 10 days (1 tube total)</td>
-                                </tr>
-                                <tr>
-                                    <td>1 Treatment for QATitis </td>
-                                    <td>2mL vial of FASPicaine (injection)</td>
-                                    <td>0.5</td>
-                                    <td>One injection of 1mL (Two people can share one vial)</td>
-                                </tr>
-                                <tr>
-                                    <td>1 Treatment for QATitis </td>
-                                    <td>1 bar of white chocolate</td>
-                                    <td>2</td>
-                                    <td rowspan="3">2 bars of chocolate. The type of chocolate does not matter, as all chocolate contains the natural form of FASPicillin.  </td>
-                                </tr>
-                                <tr>
-                                    <td>1 Treatment for QATitis  </td>
-                                    <td>1 bar of dark chocolate</td>
-                                    <td>2</td>
-                                    
-                                </tr>
-                                <tr>
-                                    <td>1 Treatment for QATitis </td>
-                                    <td>1 bar of milk chocolate</td>
-                                    <td>2</td>
-                                    
-                                </tr>
-                                </tbody>
-                                </table>
-        </p>
-        <p style={{fontSize:'13px'}}>
-        <b>Creating and managing equivalency units  </b><br></br>
-        If you don't see an equivalency unit that you would like to map or you would like to edit an existing equivalency unit, click on the "Manage Equivalency Unit" button in top right of the screen. 
-         </p>
-        <p>
-        <b>Where are equivalency units used?</b>
-        <ul>
-            <li>In the '<a href="/#/report/compareAndSelectScenario" target="_blank" style={{textDecoration:'underline'}}>Compare and Select</a>' screen, the user can display their forecasts in EUs. Using the example above, a user that forecasts 10,000 bars of dark chocolate per month, could elect to display their forecast in the EU of “Treatments for QATitis” and display their forecast as 5,000 “Treatments for QATitis” per month instead. </li>
-            <li>In the '<a href="/#/forecastReport/forecastOutput" target="_blank" style={{textDecoration:'underline'}}>Monthly Forecast</a>' screen, the user can display their selected forecasts by individual planning units, or aggregate across planning units if they are connected by EUs. For example, if a user forecasted 10,000 bars of dark chocolate, and 10,000 bars of white chocolate and 14,000 per month, QAT would display 7,000 "Treatments for QATitis".</li>
-        </ul>
-        </p>
-        <p>
-        <table className="table table-bordered ">
-                                <thead>
-                                <tr>
-                                    <th>Forecast</th>
-                                    <th>Equivalent in "Treatments for QATitis"</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr>
-                                    <td>10,000 bars of dark chocolate </td>
-                                    <td style={{textAlign:'center'}}>5,000</td>
-                                </tr>
-                                <tr>
-                                    <td>10,000 bars of white chocolate </td>
-                                    <td style={{textAlign:'center'}}>5,000</td>
-                                </tr>
-                                <tr>
-                                    <td>14,000 tablets of FASPicillin </td>
-                                    <td style={{textAlign:'center'}}>1,000</td>
-                                </tr>
-                                <tr>
-                                    <td style={{textAlign:'right',borderLeft:'1px solid #fff',borderBottom:'1px solid #fff'}}><b>Total</b></td>
-                                    <td style={{textAlign:'center'}}><b>7,000</b></td>
-                                </tr>
-                                </tbody>
-                                </table>
-        </p>
+                        className={'modal-lg ' + this.props.className} >
+                        <ModalHeader toggle={() => this.toggleShowGuidance()} className="ModalHead modal-info-Headher">
+                            <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
+                        </ModalHeader>
+                        <div>
+                            <ModalBody>
+                                <div>
+                                    <h3 className='ShowGuidanceHeading'>{i18n.t('static.equivalancyUnit.equivalancyUnits')}</h3>
+                                </div>
+                                <p>
+                                    <p style={{ fontSize: '13px' }}><span className="UnderLineText">{i18n.t('static.listTree.purpose')} :</span> {i18n.t('static.equivalancyUnit.EnableUser')}
+                                    </p>
+                                </p>
+                                <p style={{ fontSize: '13px' }}>
+                                    <p style={{ fontSize: '13px' }}><span className="UnderLineText">{i18n.t('static.listTree.useThisScreen')}:</span><br></br>
+                                        <b>{i18n.t('static.equivalancyUnit.MappingEquivalency')}</b><br></br>
+                                        {i18n.t('static.equivalancyUnit.ManageMappings')} {i18n.t('static.equivalancyUnit.ProgramAdmins')}
+                                    </p>
+                                </p>
+                                <p>
+                                    {i18n.t('static.equivalancyUnit.ForecastingMedicines')}
+                                    <table className="table table-bordered ">
+                                        <thead>
+                                            <tr>
+                                                <th>Equivalency Unit</th>
+                                                <th>Forecasting Unit</th>
+                                                <th>Conversion to EU</th>
+                                                <th style={{ width: '150px' }}>Average Treatment required to cure QATitis</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>1 Treatment for QATitis </td>
+                                                <td>1 tablet of FASPicillin</td>
+                                                <td>14</td>
+                                                <td>1 tablet a day for 2 weeks</td>
+                                            </tr>
+                                            <tr>
+                                                <td>1 Treatment for QATitis </td>
+                                                <td>5mL tube of FASPasone (cream)</td>
+                                                <td>1</td>
+                                                <td>0.5mL/day applied on the forehead over 10 days (1 tube total)</td>
+                                            </tr>
+                                            <tr>
+                                                <td>1 Treatment for QATitis </td>
+                                                <td>2mL vial of FASPicaine (injection)</td>
+                                                <td>0.5</td>
+                                                <td>One injection of 1mL (Two people can share one vial)</td>
+                                            </tr>
+                                            <tr>
+                                                <td>1 Treatment for QATitis </td>
+                                                <td>1 bar of white chocolate</td>
+                                                <td>2</td>
+                                                <td rowspan="3">2 bars of chocolate. The type of chocolate does not matter, as all chocolate contains the natural form of FASPicillin.  </td>
+                                            </tr>
+                                            <tr>
+                                                <td>1 Treatment for QATitis  </td>
+                                                <td>1 bar of dark chocolate</td>
+                                                <td>2</td>
 
-    </ModalBody>
-</div>
-</Modal>
+                                            </tr>
+                                            <tr>
+                                                <td>1 Treatment for QATitis </td>
+                                                <td>1 bar of milk chocolate</td>
+                                                <td>2</td>
+
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </p>
+                                <p style={{ fontSize: '13px' }}>
+                                    <b>{i18n.t('static.equivalancyUnit.CreatingManaging')}  </b><br></br>
+                                    {i18n.t('static.equivalancyUnit.ExistingEquivalency')}
+                                </p>
+                                <p>
+                                    <b>{i18n.t('static.equivalancyUnit.EquivalencyUsed')}</b>
+                                    <ul>
+                                        <li>{i18n.t('static.equivalancyUnit.InThe')} Forecasting Module '<a href="/#/report/compareAndSelectScenario" target="_blank" style={{ textDecoration: 'underline' }}>{i18n.t('static.dashboard.compareAndSelect')}</a>' {i18n.t('static.equivalancyUnit.ForecastsInEUs')} {i18n.t('static.equivalancyUnit.DisplayTheirForecast')} </li>
+                                        <li>{i18n.t('static.equivalancyUnit.InThe')} Forecasting Module '<a href="/#/forecastReport/forecastOutput" target="_blank" style={{ textDecoration: 'underline' }}>{i18n.t('static.dashboard.monthlyForecast')}</a>' {i18n.t('static.equivalancyUnit.SelectedForecasts')} {i18n.t('static.equivalancyUnit.UserForecasted')}</li>
+                                        <li>In the Supply Planning Module '<a href="/#/report/consumptionForecastErrorSupplyPlan" target="_blank" style={{ textDecoration: 'underline' }}>Forecast Error (Monthly)</a> Report'  screen, users can also view the actual and forecasted consumption in Equivalency Units. </li>
+                                    </ul>
+                                </p>
+                                <p>
+                                    <table className="table table-bordered ">
+                                        <thead>
+                                            <tr>
+                                                <th>Forecast</th>
+                                                <th>Equivalent in "Treatments for QATitis"</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>10,000 bars of dark chocolate </td>
+                                                <td style={{ textAlign: 'center' }}>5,000</td>
+                                            </tr>
+                                            <tr>
+                                                <td>10,000 bars of white chocolate </td>
+                                                <td style={{ textAlign: 'center' }}>5,000</td>
+                                            </tr>
+                                            <tr>
+                                                <td>14,000 tablets of FASPicillin </td>
+                                                <td style={{ textAlign: 'center' }}>1,000</td>
+                                            </tr>
+                                            <tr>
+                                                <td style={{ textAlign: 'right', borderLeft: '1px solid #fff', borderBottom: '1px solid #fff' }}><b>Total</b></td>
+                                                <td style={{ textAlign: 'center' }}><b>7,000</b></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </p>
+
+                            </ModalBody>
+                        </div>
+                    </Modal>
 
                     <Modal isOpen={this.state.isModalOpen}
                         className={'modal-lg ' + this.props.className, "modalWidth"}>
@@ -3087,4 +3101,3 @@ className={'modal-lg ' + this.props.className} >
 }
 
 export default EquivalancyUnit
-

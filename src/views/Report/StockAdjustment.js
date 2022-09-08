@@ -28,11 +28,12 @@ import "jspdf-autotable";
 import { LOGO } from '../../CommonComponent/Logo.js';
 import ReportService from '../../api/ReportService';
 import { MultiSelect } from 'react-multi-select-component';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
+import { faLeaf } from '@fortawesome/free-solid-svg-icons';
 
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -67,6 +68,7 @@ class StockAdjustmentComponent extends Component {
             loading: true,
             programId: '',
             versionId: ''
+
         }
         this.formatLabel = this.formatLabel.bind(this);
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
@@ -378,7 +380,8 @@ class StockAdjustmentComponent extends Component {
             if (versionId == 0) {
                 this.setState({ message: i18n.t('static.program.validversion'), data: [] }, () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
-                    this.el.destroy();
+                    // this.el.destroy();
+                    jexcel.destroy(document.getElementById("tableDiv"), true);
                 });
             } else {
                 localStorage.setItem("sesVersionIdReport", versionId);
@@ -711,7 +714,8 @@ class StockAdjustmentComponent extends Component {
         // }
         // console.log("stockAdjustmentArray---->", stockAdjustmentArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("tableDiv"), true);
         var json = [];
         var data = stockAdjustmentArray;
 
@@ -724,50 +728,51 @@ class StockAdjustmentComponent extends Component {
                 {
                     title: i18n.t('static.datasource.datasource'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.report.planningUnit'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.inventoryDate.inventoryReport'),
                     type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' },
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.report.stockAdjustment'),
                     type: 'numeric', mask: '[-]#,##',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.report.lastmodifiedby'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.report.lastmodifieddate'),
                     type: 'calendar',
                     options: { format: JEXCEL_DATE_FORMAT_SM },
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.program.notes'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
             ],
-            text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
+            editable: false,
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
@@ -951,7 +956,8 @@ class StockAdjustmentComponent extends Component {
                                 loading: false
                             }, () => {
                                 this.el = jexcel(document.getElementById("tableDiv"), '');
-                                this.el.destroy();
+                                // this.el.destroy();
+                                jexcel.destroy(document.getElementById("tableDiv"), true);
                             });
                             if (error.message === "Network Error") {
                                 this.setState({
@@ -1024,19 +1030,22 @@ class StockAdjustmentComponent extends Component {
         } else if (programId == 0) {
             this.setState({ message: i18n.t('static.common.selectProgram'), data: [] }, () => {
                 this.el = jexcel(document.getElementById("tableDiv"), '');
-                this.el.destroy();
+                // this.el.destroy();
+                jexcel.destroy(document.getElementById("tableDiv"), true);
             });
 
         } else if (versionId == 0) {
             this.setState({ message: i18n.t('static.program.validversion'), data: [] }, () => {
                 this.el = jexcel(document.getElementById("tableDiv"), '');
-                this.el.destroy();
+                // this.el.destroy();
+                jexcel.destroy(document.getElementById("tableDiv"), true);
             });
 
         } else {
             this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: [] }, () => {
                 this.el = jexcel(document.getElementById("tableDiv"), '');
-                this.el.destroy();
+                // this.el.destroy();
+                jexcel.destroy(document.getElementById("tableDiv"), true);
             });
 
         }
@@ -1095,6 +1104,11 @@ class StockAdjustmentComponent extends Component {
     }
 
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
 
         const { SearchBar, ClearSearchButton } = Search;
         const customTotal = (from, to, size) => (
@@ -1109,7 +1123,7 @@ class StockAdjustmentComponent extends Component {
             && versions.map((item, i) => {
                 return (
                     <option key={i} value={item.versionId}>
-                        {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)}
+                        {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)} ({(moment(item.createdDate).format(`MMM DD YYYY`))})
                     </option>
                 )
             }, this);
@@ -1351,8 +1365,9 @@ class StockAdjustmentComponent extends Component {
                             </div>
                         </div>
 
-
+                        <div className='ProgramListSearchAlignment'>
                         <div id="tableDiv" className="jexcelremoveReadonlybackground consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
+                        </div>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>
                             <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >

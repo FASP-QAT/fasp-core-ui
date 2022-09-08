@@ -517,8 +517,8 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import moment from 'moment';
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
@@ -652,7 +652,7 @@ export default class DataSourceListComponent extends Component {
             data[2] = getLabelText(dataSourceList[j].dataSourceType.label, this.state.lang)
             data[3] = getLabelText(dataSourceList[j].label, this.state.lang)
             // data[4] = getLabelText(dataSourceList[j].program.label, this.state.lang)
-            data[4] = dataSourceList[j].program!=null?dataSourceList[j].program.code:null;
+            data[4] = dataSourceList[j].program != null ? dataSourceList[j].program.code : null;
             data[5] = dataSourceList[j].lastModifiedBy.username;
             data[6] = (dataSourceList[j].lastModifiedDate ? moment(dataSourceList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
             data[7] = dataSourceList[j].active;
@@ -665,7 +665,8 @@ export default class DataSourceListComponent extends Component {
         // }
         // console.log("dataSourceArray---->", dataSourceArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("tableDiv"), true);
         var json = [];
         var data = dataSourceArray;
 
@@ -678,43 +679,43 @@ export default class DataSourceListComponent extends Component {
                 {
                     title: 'dataSourceId',
                     type: 'hidden',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.realm.realm'),
                     type: (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN') ? 'text' : 'hidden'),
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.datasourcetype.datasourcetype'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.datasource.datasource'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.dataSource.program'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.common.lastModifiedBy'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.common.lastModifiedDate'),
                     type: 'calendar',
                     options: { format: JEXCEL_DATE_FORMAT_SM },
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     type: 'dropdown',
                     title: i18n.t('static.common.status'),
-                    readOnly: true,
+                    // readOnly: true,
                     source: [
                         { id: true, name: i18n.t('static.common.active') },
                         { id: false, name: i18n.t('static.common.disabled') }
@@ -722,17 +723,18 @@ export default class DataSourceListComponent extends Component {
                 },
 
             ],
-            text: {
-                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
+            editable: false,
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
@@ -1003,18 +1005,21 @@ export default class DataSourceListComponent extends Component {
         }
     }
 
-    selected = function (instance, cell, x, y, value) {
-        console.log("selected x--->", x);
-        console.log("selected y--->", y);
-        console.log("selected value--->", value);
-        if ((x == 0 && value != 0) || (y == 0)) {
-            // console.log("HEADER SELECTION--------------------------");
-        } else {
-            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DATA_SOURCE')) {
-                this.props.history.push({
-                    pathname: `/dataSource/editDataSource/${this.el.getValueFromCoords(0, x)}`,
-                    // state: { currency: currency }
-                });
+    selected = function (instance, cell, x, y, value, e) {
+        if (e.buttons == 1) {
+
+            console.log("selected x--->", x);
+            console.log("selected y--->", y);
+            console.log("selected value--->", value);
+            if ((x == 0 && value != 0) || (y == 0)) {
+                // console.log("HEADER SELECTION--------------------------");
+            } else {
+                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DATA_SOURCE')) {
+                    this.props.history.push({
+                        pathname: `/dataSource/editDataSource/${this.el.getValueFromCoords(0, x)}`,
+                        // state: { currency: currency }
+                    });
+                }
             }
         }
     }.bind(this);
@@ -1033,6 +1038,11 @@ export default class DataSourceListComponent extends Component {
     }
 
     render() {
+
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
 
         const { realms } = this.state;
         let realmList = realms.length > 0
@@ -1151,8 +1161,8 @@ export default class DataSourceListComponent extends Component {
                             </div>
                         </Col>
                         <div className='consumptionDataEntryTable'>
-                        <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DATA_SOURCE') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
-                        </div>
+                            <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DATA_SOURCE') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
+                            </div>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>
                             <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >

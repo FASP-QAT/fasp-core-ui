@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n';
@@ -85,7 +85,6 @@ export default class StepOneImportMapPlanningUnits extends Component {
         this.changed = this.changed.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
-        this.oneditionend = this.oneditionend.bind(this);
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
         this.handleRangeChange = this.handleRangeChange.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
@@ -176,25 +175,27 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
     changed = function (instance, cell, x, y, value) {
         this.props.removeMessageText && this.props.removeMessageText();
+        var selectedPlanningUnitObj = "";
+        let ForecastPlanningUnitId = this.el.getValueFromCoords(7, y);
         if (x == 7) {
-            let ForecastPlanningUnitId = this.el.getValueFromCoords(7, y);
             if (ForecastPlanningUnitId != -1 && ForecastPlanningUnitId != null && ForecastPlanningUnitId != '') {
-                var selectedPlanningUnitObj = this.state.planningUnitList.filter(c => c.id == ForecastPlanningUnitId)[0];
+                selectedPlanningUnitObj = this.state.planningUnitList.filter(c => c.id == ForecastPlanningUnitId)[0];
                 let multiplier = "";
-                if (selectedPlanningUnitObj.forecastingUnit.id == this.el.getValueFromCoords(12, y)) {
-                    multiplier = (this.el.getValueFromCoords(3, y) / selectedPlanningUnitObj.multiplier).toFixed(6)
+                if (selectedPlanningUnitObj.forecastingUnit.id == this.el.getValueFromCoords(11, y)) {
+                    multiplier = (this.el.getValueFromCoords(3, y) / selectedPlanningUnitObj.multiplier)
                 }
                 this.el.setValueFromCoords(6, y, ForecastPlanningUnitId, true);
                 this.el.setValueFromCoords(8, y, selectedPlanningUnitObj.multiplier, true);
                 this.el.setValueFromCoords(9, y, multiplier, true);
                 this.el.setValueFromCoords(10, y, 0, true);
-                this.el.setValueFromCoords(11, y, selectedPlanningUnitObj.forecastingUnit.tracerCategory.id, true);
             } else {
                 this.el.setValueFromCoords(6, y, '', true);
                 this.el.setValueFromCoords(8, y, '', true);
                 this.el.setValueFromCoords(9, y, '', true);
                 this.el.setValueFromCoords(10, y, 0, true);
             }
+
+            let tracerCategoryId = this.el.getValueFromCoords(5, y);
 
             var budgetRegx = /^\S+(?: \S+)*$/;
             var col = ("H").concat(parseInt(y) + 1);
@@ -207,6 +208,10 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.spacetext'));
+                } else if (ForecastPlanningUnitId != -1 && ForecastPlanningUnitId != null && ForecastPlanningUnitId != '' && tracerCategoryId != selectedPlanningUnitObj.forecastingUnit.tracerCategory.id) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.common.tracerCategoryInvalidSelection'));
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
@@ -221,7 +226,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             var col = ("J").concat(parseInt(y) + 1);
             value = this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             // var reg = DECIMAL_NO_REGEX;
-            var reg = /^\d{1,6}(\.\d{1,6})?$/;
+            var reg = JEXCEL_DECIMAL_CATELOG_PRICE
             if (ForecastPlanningUnitId != -1) {
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
@@ -257,20 +262,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
         }
     }
 
-    oneditionend = function (instance, cell, x, y, value) {
-        var elInstance = instance.jexcel;
-        var rowData = elInstance.getRowData(y);
-
-    }
-
     loaded = function (instance, cell, x, y, value) {
-        // jExcelLoadedFunctionWithoutPagination(instance);
         jExcelLoadedFunction(instance);
-        var asterisk = document.getElementsByClassName("resizable")[0];
-        var tr = asterisk.firstChild;
-        // tr.children[1].classList.add('AsteriskTheadtrTd');
-        // tr.children[2].classList.add('AsteriskTheadtrTd');
-        // tr.children[3].classList.add('AsteriskTheadtrTd');
     }
 
     componentDidMount() {
@@ -555,7 +548,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 message: i18n.t('static.importFromQATSupplyPlan.selectSupplyPlanProgram'),
             })
             this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
-            this.el.destroy();
+            // this.el.destroy();
+            jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
             document.getElementById("stepOneBtn").disabled = true;
         } else if (versionId == 0) {
             this.setState({
@@ -564,7 +558,9 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 message: i18n.t('static.importFromQATSupplyPlan.pleaseSelectSupplyPlanVersion'),
             })
             this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
-            this.el.destroy();
+            // this.el.destroy();
+            jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
+
             document.getElementById("stepOneBtn").disabled = true;
         } else if (forecastProgramId == 0) {
             this.setState({
@@ -573,7 +569,9 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 message: i18n.t('static.importFromQATSupplyPlan.pleaseSelectForecastProgram'),
             })
             this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
-            this.el.destroy();
+            // this.el.destroy();
+            jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
+
             document.getElementById("stepOneBtn").disabled = true;
         } else {
             this.setState({
@@ -582,7 +580,9 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 message: ''
             })
             this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
-            this.el.destroy();
+            // this.el.destroy();
+            jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
+
             document.getElementById("stepOneBtn").disabled = true;
         }
 
@@ -706,7 +706,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 data[2] = getLabelText(papuList[j].label, this.state.lang) + ' | ' + papuList[j].id
                 data[3] = papuList[j].multiplier
                 data[4] = papuList[j].forecastingUnit.id
-                data[5] = planningUnitObj != undefined ? planningUnitObj.forecastingUnit.tracerCategory.id : ""
+                data[5] = papuList[j].forecastingUnit.tracerCategory.id
 
                 // let selectedForecastProgram = this.state.datasetList.filter(c => c.programId == document.getElementById("forecastProgramId").value && c.versionId == this.state.forecastProgramVersionId)[0];
                 // let filteredForecastingUnit = selectedForecastProgram.filteredForecastingUnit;
@@ -723,7 +723,6 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     data[8] = papuList[j].multiplier
                     data[9] = 1
                     data[10] = 1
-                    data[11] = planningUnitObj != undefined ? planningUnitObj.forecastingUnit.tracerCategory.id : ""
 
                     forecastPlanignUnitListForNotDuplicate.push({
                         supplyPlanPlanningUnitId: papuList[j].id,
@@ -735,9 +734,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     data[8] = ''
                     data[9] = ''
                     data[10] = ''
-                    data[11] = ''
                 }
-                data[12] = planningUnitObj != undefined ? planningUnitObj.forecastingUnit.id : ""
+                data[11] = planningUnitObj != undefined ? planningUnitObj.forecastingUnit.id : ""
 
                 papuDataArr[count] = data;
                 count++;
@@ -745,13 +743,19 @@ export default class StepOneImportMapPlanningUnits extends Component {
         }
 
         this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
+
 
         this.el = jexcel(document.getElementById("mapRegion"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("mapRegion"), true);
+
 
         this.el = jexcel(document.getElementById("mapImport"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("mapImport"), true);
+
 
         var json = [];
 
@@ -777,7 +781,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 {
                     title: 'Supply Plan Planning Unit Id',
                     type: 'hidden',
-                    readOnly: true//1 B
+                    // readOnly: true//1 B
                 },
                 {
                     title: i18n.t('static.importFromQATSupplyPlan.supplyPlanPlanningUnit'),
@@ -787,22 +791,22 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 {
                     title: 'multiplier',
                     type: 'hidden',
-                    readOnly: true//3 D
+                    // readOnly: true//3 D
                 },
                 {
                     title: 'forecastingUnitId',
                     type: 'hidden',
-                    readOnly: true//4 E
+                    // readOnly: true//4 E
                 },
                 {
                     title: 'tracerCategoryId',
                     type: 'hidden',
-                    readOnly: true//5 F
+                    // readOnly: true//5 F
                 },
                 {
                     title: 'Forecast Planning Unit Id',
                     type: 'hidden',
-                    readOnly: true//6 G
+                    // readOnly: true//6 G
                 },
                 {
                     title: i18n.t('static.importFromQATSupplyPlan.forecastPlanningUnit'),
@@ -813,7 +817,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 {
                     title: 'ForecastMultiplier',
                     type: 'hidden',
-                    readOnly: true//8 I
+                    // readOnly: true//8 I
                 },
                 {
                     title: i18n.t('static.importFromQATSupplyPlan.conversionFactor'),
@@ -825,32 +829,26 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 {
                     title: 'Match',
                     type: 'hidden',
-                    readOnly: true//10 K
-                },
-                {
-                    title: 'Match tracer category',
-                    type: 'hidden',
-                    readOnly: true//11 L
+                    // readOnly: true//10 K
                 },
                 {
                     title: 'Supply plan Forcast unit id',
                     type: 'hidden',
-                    readOnly: true//12 M
+                    // readOnly: true//11 L
                 }
 
 
             ],
             updateTable: function (el, cell, x, y, source, value, id) {
                 if (y != null) {
-                    var elInstance = el.jexcel;
+                    var elInstance = el;
                     //left align
                     elInstance.setStyle(`C${parseInt(y) + 1}`, 'text-align', 'left');
                     var rowData = elInstance.getRowData(y);
 
 
                     var match = rowData[10];
-                    // console.log("addRowId------>", addRowId);
-                    if (match == 1) {// grade out
+                    if (match == 1 || rowData[1] == rowData[7]) {// grade out
                         var cell1 = elInstance.getCell(`J${parseInt(y) + 1}`)
                         cell1.classList.add('readonly');
                     } else {
@@ -884,7 +882,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             filters: true,
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
@@ -892,17 +890,14 @@ export default class StepOneImportMapPlanningUnits extends Component {
             allowManualInsertColumn: false,
             // allowDeleteRow: true,
             onchange: this.changed,
-            // oneditionend: this.onedit,
             copyCompatibility: true,
             allowManualInsertRow: false,
             parseFormulas: true,
-            // onpaste: this.onPaste,
-            // oneditionend: this.oneditionend,
-            text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
             onload: this.loaded,
             editable: true,
             license: JEXCEL_PRO_KEY,
@@ -1048,28 +1043,26 @@ export default class StepOneImportMapPlanningUnits extends Component {
         for (var y = 0; y < json.length; y++) {
             var value = this.el.getValueFromCoords(7, y);
             var tracerCategoryId = this.el.getValueFromCoords(5, y);
-            var selectedPUTracerCategoryId = this.el.getValueFromCoords(11, y);
             if (value != -1) {
-
+                var selectedPlanningUnitObj = this.state.planningUnitList.filter(c => c.id == value)[0];
                 //ForecastPlanningUnit
                 var budgetRegx = /^\S+(?: \S+)*$/;
                 var col = ("H").concat(parseInt(y) + 1);
-                var value = this.el.getValueFromCoords(7, y);
                 // console.log("value-----", value);
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
-                } else if (tracerCategoryId != selectedPUTracerCategoryId) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.common.tracerCategoryInvalidSelection'));
-                    valid = false;
                 } else if (!(budgetRegx.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.spacetext'));
+                    valid = false;
+                } else if (tracerCategoryId != selectedPlanningUnitObj.forecastingUnit.tracerCategory.id) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.common.tracerCategoryInvalidSelection'));
                     valid = false;
                 } else {
                     for (var i = (json.length - 1); i >= 0; i--) {
@@ -1092,7 +1085,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 //multiplier
                 var col = ("J").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(9, y);
-                var reg = /^\d{1,6}(\.\d{1,6})?$/;
+                var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
@@ -1102,12 +1095,14 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     if (!(reg.test(value))) {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t('static.usagePeriod.conversionFactorTestString'));
+                        this.el.setComments(col, i18n.t('static.planningUnitSetting.max10Digit4AfterDecimal'));
+                        valid = false;
                     } else {
                         if (isNaN(Number.parseInt(value)) || value <= 0) {
                             this.el.setStyle(col, "background-color", "transparent");
                             this.el.setStyle(col, "background-color", "yellow");
                             this.el.setComments(col, i18n.t('static.program.validvaluetext'));
+                            valid = false;
                         } else {
                             this.el.setStyle(col, "background-color", "transparent");
                             this.el.setComments(col, "");
@@ -1161,6 +1156,11 @@ export default class StepOneImportMapPlanningUnits extends Component {
     }
 
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
         const { rangeValue } = this.state
 
         const { programs } = this.state;
@@ -1181,7 +1181,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 return (
                     <option key={i} value={item.versionId}>
                         {/* {item.versionId} */}
-                        {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)}
+                        {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)} ({(moment(item.createdDate).format(`MMM DD YYYY`))})
                     </option>
                 )
             }, this);
@@ -1293,7 +1293,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
                 </div>
 
-                <div className="table-responsive consumptionDataEntryTable" style={{ display: this.props.items.loading ? "none" : "block" }} >
+                <div className="consumptionDataEntryTable" style={{ display: this.props.items.loading ? "none" : "block" }} >
 
                     <div id="mapPlanningUnit">
                     </div>

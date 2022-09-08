@@ -938,10 +938,10 @@ export default class ConsumptionDetails extends React.Component {
                             </ul>
                         </div>
 
-                        <div className="consumptionSearchMarginTop" style={{ display: this.state.loading ? "none" : "block" }}>
+                        <div className="consumptionSearchMarginTop" >
                             <ConsumptionInSupplyPlanComponent ref="consumptionChild" items={this.state} toggleLarge={this.toggleLarge} updateState={this.updateState} formSubmit={this.formSubmit} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} consumptionPage="consumptionDataEntry" useLocalData={1} />
-                            <div className="table-responsive consumptionDataEntryTable" id="consumptionTableDiv">
-                                <div id="consumptionTable" />
+                            <div className="consumptionDataEntryTable" id="consumptionTableDiv">
+                                <div id="consumptionTable" style={{ display: this.state.loading ? "none" : "block" }}/>
                             </div>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>
@@ -975,7 +975,7 @@ export default class ConsumptionDetails extends React.Component {
                     </ModalHeader>
                     <ModalBody>
                         <h6 className="red" id="div3">{this.state.consumptionBatchInfoDuplicateError || this.state.consumptionBatchInfoNoStockError || this.state.consumptionBatchError}</h6>
-                        <div className="table-responsive">
+                        <div className="">
                             <div id="consumptionBatchInfoTable" className="AddListbatchtrHeight"></div>
                         </div>
                         <br /><span>{i18n.t("static.dataEntry.missingBatchNote")}</span>

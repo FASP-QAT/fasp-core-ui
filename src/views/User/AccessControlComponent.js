@@ -1164,8 +1164,8 @@ import i18n from '../../i18n'
 import getLabelText from '../../CommonComponent/getLabelText';
 
 import CryptoJS from 'crypto-js';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import moment from "moment";
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
@@ -1281,9 +1281,10 @@ class AccessControlComponent extends Component {
 
         if (selProgram.length > 0) {
             for (var i = 0; i < selProgram.length; i++) {
+                var name = selProgram[i].programCode + " (" + (selProgram[i].programTypeId == 1 ? "SP" : selProgram[i].programTypeId == 2 ? "FC" : "") + ")";
                 var paJson = {
                     // name: getLabelText(selProgram[i].label, this.state.lang),
-                    name: selProgram[i].programCode,
+                    name: name,
                     id: parseInt(selProgram[i].programId),
                     active: selProgram[i].active
                 }
@@ -1384,7 +1385,9 @@ class AccessControlComponent extends Component {
             papuDataArr[0] = data;
         }
         this.el = jexcel(document.getElementById("paputableDiv"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("paputableDiv"), true);
+
         var json = [];
         var data = papuDataArr;
 
@@ -1429,11 +1432,12 @@ class AccessControlComponent extends Component {
                 },
 
             ],
+            editable: true,
             pagination: localStorage.getItem("sesRecordCount"),
             filters: true,
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
@@ -1445,12 +1449,12 @@ class AccessControlComponent extends Component {
             copyCompatibility: true,
             parseFormulas: true,
             onpaste: this.onPaste,
-            text: {
-                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
             onload: this.loaded,
             license: JEXCEL_PRO_KEY,
             contextMenu: function (obj, x, y, e) {
@@ -1624,7 +1628,7 @@ class AccessControlComponent extends Component {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
-                (instance.jexcel).setValueFromCoords(0, data[i].y, this.state.user.username, true);
+                (instance).setValueFromCoords(0, data[i].y, this.state.user.username, true);
                 z = data[i].y;
             }
         }
@@ -1780,7 +1784,7 @@ class AccessControlComponent extends Component {
                                                         DatasetService.getDatasetList()
                                                             .then(response1 => {
                                                                 if (response1.status == "200") {
-                                                                    
+
                                                                     var listArray = [...response.data, ...response1.data]
                                                                     listArray.sort((a, b) => {
                                                                         var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -2219,7 +2223,9 @@ class AccessControlComponent extends Component {
 
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
-        var asterisk = document.getElementsByClassName("resizable")[0];
+        // var asterisk = document.getElementsByClassName("resizable")[0];
+        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
+
         var tr = asterisk.firstChild;
         // tr.children[1].classList.add('AsteriskTheadtrTd');
         tr.children[2].classList.add('AsteriskTheadtrTd');
@@ -2229,6 +2235,11 @@ class AccessControlComponent extends Component {
     }
 
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
         return (
 
             <div className="animated fadeIn">

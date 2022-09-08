@@ -495,8 +495,8 @@ import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'reac
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js';
 import moment from 'moment';
@@ -678,7 +678,7 @@ class ListProcurementAgentComponent extends Component {
 
     buildJExcel() {
         let procurementAgentList = this.state.selProcurementAgent;
-        // console.log("procurementAgentList---->", procurementAgentList);
+        console.log("procurementAgentList---->", procurementAgentList);
         let procurementAgentArray = [];
         let count = 0;
 
@@ -686,15 +686,16 @@ class ListProcurementAgentComponent extends Component {
             data = [];
             data[0] = procurementAgentList[j].procurementAgentId
             data[1] = getLabelText(procurementAgentList[j].realm.label, this.state.lang)
-            data[2] = getLabelText(procurementAgentList[j].label, this.state.lang)
-            data[3] = procurementAgentList[j].procurementAgentCode;
-            data[4] = procurementAgentList[j].colorHtmlCode;
-            data[5] = procurementAgentList[j].submittedToApprovedLeadTime;
-            data[6] = procurementAgentList[j].approvedToShippedLeadTime;
-            data[7] = (procurementAgentList[j].localProcurementAgent ? i18n.t('static.program.yes') : i18n.t('static.program.no'))
-            data[8] = procurementAgentList[j].lastModifiedBy.username;
-            data[9] = (procurementAgentList[j].lastModifiedDate ? moment(procurementAgentList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
-            data[10] = procurementAgentList[j].active;
+            data[2] = procurementAgentList[j].procurementAgentType.code;
+            data[3] = getLabelText(procurementAgentList[j].label, this.state.lang)
+            data[4] = procurementAgentList[j].procurementAgentCode;
+            data[5] = procurementAgentList[j].colorHtmlCode;
+            data[6] = procurementAgentList[j].submittedToApprovedLeadTime;
+            data[7] = procurementAgentList[j].approvedToShippedLeadTime;
+            data[8] = (procurementAgentList[j].localProcurementAgent ? i18n.t('static.program.yes') : i18n.t('static.program.no'))
+            data[9] = procurementAgentList[j].lastModifiedBy.username;
+            data[10] = (procurementAgentList[j].lastModifiedDate ? moment(procurementAgentList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
+            data[11] = procurementAgentList[j].active;
 
 
             procurementAgentArray[count] = data;
@@ -706,7 +707,8 @@ class ListProcurementAgentComponent extends Component {
         // }
         // console.log("procurementAgentArray---->", procurementAgentArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("tableDiv"), true);
         var json = [];
         var data = procurementAgentArray;
 
@@ -723,32 +725,37 @@ class ListProcurementAgentComponent extends Component {
                 {
                     title: i18n.t('static.realm.realm'),
                     type: (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN') ? 'text' : 'hidden'),
-                    readOnly: true
+                    // readOnly: true
+                },
+                {
+                    title: i18n.t('static.procurementagenttype.procurementagenttypecode'),
+                    type: 'text',
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.procurementagent.procurementagentname'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.procurementagent.procurementagentcode'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.procurementagent.procurementAgentColorCode'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.procurementagent.procurementagentsubmittoapprovetimeLabel'),
                     type: 'numeric', mask: '#,##.00', decimal: '.',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.procurementagent.procurementagentapprovetoshippedtimeLabel'),
                     type: 'numeric', mask: '#,##.00', decimal: '.',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.procurementAgent.localProcurementAgent'),
@@ -757,18 +764,18 @@ class ListProcurementAgentComponent extends Component {
                 {
                     title: i18n.t('static.common.lastModifiedBy'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.common.lastModifiedDate'),
                     type: 'calendar',
                     options: { format: JEXCEL_DATE_FORMAT_SM },
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     type: 'dropdown',
                     title: i18n.t('static.common.status'),
-                    readOnly: true,
+                    // readOnly: true,
                     source: [
                         { id: true, name: i18n.t('static.common.active') },
                         { id: false, name: i18n.t('static.common.disabled') }
@@ -776,17 +783,18 @@ class ListProcurementAgentComponent extends Component {
                 },
 
             ],
-            text: {
-                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
+            editable: true,
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
@@ -847,16 +855,18 @@ class ListProcurementAgentComponent extends Component {
         })
     }
 
-    selected = function (instance, cell, x, y, value) {
+    selected = function (instance, cell, x, y, value, e) {
+        if (e.buttons == 1) {
 
-        if ((x == 0 && value != 0) || (y == 0)) {
-            // console.log("HEADER SELECTION--------------------------");
-        } else {
-            // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
-            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROCUREMENT_AGENT')) {
-                this.props.history.push({
-                    pathname: `/procurementAgent/editProcurementAgent/${this.el.getValueFromCoords(0, x)}`,
-                });
+            if ((x == 0 && value != 0) || (y == 0)) {
+                // console.log("HEADER SELECTION--------------------------");
+            } else {
+                // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
+                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROCUREMENT_AGENT')) {
+                    this.props.history.push({
+                        pathname: `/procurementAgent/editProcurementAgent/${this.el.getValueFromCoords(0, x)}`,
+                    });
+                }
             }
         }
     }.bind(this);
@@ -997,6 +1007,10 @@ class ListProcurementAgentComponent extends Component {
     }
 
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
 
         const { SearchBar, ClearSearchButton } = Search;
         const customTotal = (from, to, size) => (
@@ -1167,8 +1181,8 @@ class ListProcurementAgentComponent extends Component {
                             </Col>
                         }
                         <div className='consumptionDataEntryTable'>
-                        {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROCUREMENT_AGENT') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
-                        </div>
+                            {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROCUREMENT_AGENT') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
+                            </div>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>
                             <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >

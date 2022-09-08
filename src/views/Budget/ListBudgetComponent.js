@@ -508,8 +508,8 @@ import moment from 'moment';
 import ProgramService from "../../api/ProgramService";
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_SM } from '../../Constants.js';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
@@ -765,7 +765,8 @@ class ListBudgetComponent extends Component {
     // }
     // console.log("budgetArray---->", budgetArray);
     this.el = jexcel(document.getElementById("tableDiv"), '');
-    this.el.destroy();
+    // this.el.destroy();
+    jexcel.destroy(document.getElementById("tableDiv"), true);
     var json = [];
     var data = budgetArray;
 
@@ -871,11 +872,11 @@ class ListBudgetComponent extends Component {
       editable: false,
       license: JEXCEL_PRO_KEY,
       filters: true,
-      text: {
-        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-        show: '',
-        entries: '',
-      },
+      // text: {
+      //   showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+      //   show: '',
+      //   entries: '',
+      // },
 
       updateTable: function (el, cell, x, y, source, value, id) {
         // console.log("INSIDE UPDATE TABLE");
@@ -906,7 +907,7 @@ class ListBudgetComponent extends Component {
       pagination: localStorage.getItem("sesRecordCount"),
       search: true,
       columnSorting: true,
-      tableOverflow: true,
+      // tableOverflow: true,
       wordWrap: true,
       allowInsertColumn: false,
       allowManualInsertColumn: false,
@@ -930,17 +931,18 @@ class ListBudgetComponent extends Component {
     })
   }
 
-  selected = function (instance, cell, x, y, value) {
-
-    if ((x == 0 && value != 0) || (y == 0)) {
-      // console.log("HEADER SELECTION--------------------------");
-    } else {
-      // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
-      if (this.state.selBudget.length != 0) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_BUDGET')) {
-          this.props.history.push({
-            pathname: `/budget/editBudget/${this.el.getValueFromCoords(0, x)}`,
-          });
+  selected = function (instance, cell, x, y, value, e) {
+    if (e.buttons == 1) {
+      if ((x == 0 && value != 0) || (y == 0)) {
+        // console.log("HEADER SELECTION--------------------------");
+      } else {
+        // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
+        if (this.state.selBudget.length != 0) {
+          if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_BUDGET')) {
+            this.props.history.push({
+              pathname: `/budget/editBudget/${this.el.getValueFromCoords(0, x)}`,
+            });
+          }
         }
       }
     }
@@ -949,7 +951,7 @@ class ListBudgetComponent extends Component {
   loaded = function (instance, cell, x, y, value) {
     jExcelLoadedFunction(instance);
     console.log("INSIDE UPDATE TABLE");
-    var elInstance = instance.jexcel;
+    var elInstance = instance.worksheets[0];
     var json = elInstance.getJson();
 
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N']
@@ -1203,6 +1205,10 @@ class ListBudgetComponent extends Component {
 
 
   render() {
+    jexcel.setDictionary({
+      Show: " ",
+      entries: " ",
+    });
 
     const { SearchBar, ClearSearchButton } = Search;
     const { fundingSourceList } = this.state;
@@ -1470,8 +1476,8 @@ class ListBudgetComponent extends Component {
 
             {/* <div id="loader" className="center"></div> */}
             <div className='consumptionDataEntryTable'>
-            <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_BUDGET') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
-            </div>
+              <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_BUDGET') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
+              </div>
             </div>
             <div style={{ display: this.state.loading ? "block" : "none" }}>
               <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >

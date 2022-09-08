@@ -14,8 +14,8 @@ import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 
 import i18n from '../../i18n'
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import getLabelText from '../../CommonComponent/getLabelText';
@@ -115,7 +115,8 @@ class usageTemplate extends Component {
             usagePeriodListLong: [],
             usagePeriodDisplayList: [],
             dimensionList: [],
-            isChanged1: false
+            isChanged1: false,
+            dataEl: ''
         }
         // this.setTextAndValue = this.setTextAndValue.bind(this);
         // this.disableRow = this.disableRow.bind(this);
@@ -132,7 +133,7 @@ class usageTemplate extends Component {
         // this.updateRow = this.updateRow.bind(this);
         this.changed = this.changed.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
-        this.onPaste = this.onPaste.bind(this);
+        // this.onPaste = this.onPaste.bind(this);
         this.oneditionend = this.oneditionend.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
         this.onchangepage = this.onchangepage.bind(this);
@@ -828,10 +829,14 @@ class usageTemplate extends Component {
                 data[15] = (papuList[j].usageType.id == 1 ? (papuList[j].oneTimeUsage == false ? `=ROUND(${v13}/${usagePeriodConversion}*${s1},2)` : `=ROUND(${n1},2)`) : '')
 
                 let unitName = (this.state.dimensionList.filter(c => c.id == papuList[j].unit.id)[0]).name;
-                let string = "Every " + (papuList[j].noOfPatients).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") + " " + unitName + "(s) - requires " + papuList[j].noOfForecastingUnits + " " + papuList[j].forecastingUnit.unit.label.label_en;
+                let string = "Every " + (papuList[j].noOfPatients).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") + " " + unitName + "(s) - requires " + papuList[j].noOfForecastingUnits + " " + papuList[j].forecastingUnit.unit.label.label_en + "(s)";
 
                 if (!papuList[j].oneTimeUsage) { //one time usage false
-                    string += " " + (papuList[j].usageFrequencyCount == null ? '' : papuList[j].usageFrequencyCount) + " time(s) per " + (papuList[j].usageFrequencyUsagePeriod != null ? papuList[j].usageFrequencyUsagePeriod.label.label_en : '');
+                    if (papuList[j].usageType.id == 2) {
+                        string += " " + (papuList[j].usageFrequencyCount == null ? '' : " Every " + papuList[j].usageFrequencyCount) + " " + (papuList[j].usageFrequencyUsagePeriod != null ? papuList[j].usageFrequencyUsagePeriod.label.label_en : '');
+                    } else {
+                        string += " " + (papuList[j].usageFrequencyCount == null ? '' : papuList[j].usageFrequencyCount) + " time(s) per " + (papuList[j].usageFrequencyUsagePeriod != null ? papuList[j].usageFrequencyUsagePeriod.label.label_en : '');
+                    }
 
                     if (papuList[j].usageType.id == 2) {
                         string += " indefinitely";
@@ -846,6 +851,8 @@ class usageTemplate extends Component {
                 data[18] = 0;
                 data[19] = (papuList[j].program == null ? -1 : papuList[j].program.id)
                 data[20] = papuList[j].notes
+                data[21] = papuList[j].active
+                data[22] = papuList[j].createdBy.userId
 
                 papuDataArr[count] = data;
                 count++;
@@ -880,18 +887,22 @@ class usageTemplate extends Component {
             data[18] = 1;
             data[19] = 0;
             data[20] = "";
+            data[21] = 0;
+            data[22] = papuList[j].createdBy.userId
+
             papuDataArr[0] = data;
         }
 
         this.el = jexcel(document.getElementById("paputableDiv"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("paputableDiv"), true);
         var json = [];
         var data = papuDataArr;
-
+        console.log("data-->", data)
         var options = {
             data: data,
             columnDrag: true,
-            freezeColumns: 2,
+            // freezeColumns: 2,
             // colWidths: [100, 100, 100, 100, 150, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 120],
             columns: [
 
@@ -904,19 +915,19 @@ class usageTemplate extends Component {
                     title: i18n.t('static.forecastProgram.forecastProgram'),
                     type: 'autocomplete',
                     source: this.state.typeList,
-                    width: '130',
+                    width: '90',
                     filter: this.filterDataset //1 B
                 },
                 {
                     title: i18n.t('static.usageTemplate.usageName'),
                     type: 'text',
-                    width: '150',
+                    width: '90',
                     textEditor: true,//2 C
                 },
                 {
                     title: i18n.t('static.tracercategory.tracercategory'),
                     type: 'autocomplete',
-                    width: '150',
+                    width: '130',
                     source: this.state.tracerCategoryList, //3 D
                     filter: this.filterTracerCategoryByProgramId
 
@@ -924,20 +935,20 @@ class usageTemplate extends Component {
                 {
                     title: i18n.t('static.product.unit1'),
                     type: 'autocomplete',
-                    width: '150',
+                    width: '130',
                     source: this.state.forecastingUnitList,
                     filter: this.filterForecastingUnitBasedOnTracerCategory //4 E
                 },
                 {
                     title: i18n.t('static.usageTemplate.lagInMonth'),
                     type: 'numeric',
-                    width: '150',
+                    width: '100',
                     textEditor: true, //5 F
                 },
                 {
                     title: i18n.t('static.supplyPlan.type'),
                     type: 'dropdown',
-                    width: '100',
+                    width: '95',
                     source: [
                         { id: 1, name: i18n.t('static.usageTemplate.discrete') },
                         { id: 2, name: i18n.t('static.usageTemplate.continuous') }
@@ -956,7 +967,8 @@ class usageTemplate extends Component {
                     title: i18n.t('static.usageTemplate.personsUnit'),
                     type: 'autocomplete',
                     width: '130',
-                    source: this.state.dimensionList, //8 I
+                    source: this.state.dimensionList,
+                    readOnly: (this.state.roleArray.includes('ROLE_REALM_ADMIN') || this.state.roleArray.includes('ROLE_DATASET_ADMIN')) ? false : true //8 I
                 },
                 {
                     title: i18n.t('static.usageTemplate.fuPerPersonPerTime'),
@@ -1035,9 +1047,21 @@ class usageTemplate extends Component {
                     type: 'hidden',
                     // width: 400 //20 U
                 },
-
+                {
+                    title: i18n.t('static.checkbox.active'),
+                    type: 'checkbox',
+                    width: '130',
+                    readOnly: false
+                    // readOnly: true //21 V
+                },
+                {
+                    title: 'createdBy',
+                    type: 'hidden',
+                    // width: 400 //22 W
+                },
 
             ],
+            onload: this.loaded,
             // nestedHeaders: [
             //     [
             //         {
@@ -1050,6 +1074,268 @@ class usageTemplate extends Component {
             //         }
             //     ],
             // ],
+            onsearch: function (el) {
+                var elInstance = el;
+                var json = elInstance.getJson();
+                let roleArray = this.state.roleArray;
+                var jsonLength;
+                jsonLength = json.length;
+                console.log("JsonLength", jsonLength)
+
+                for (var j = 0; j < jsonLength; j++) {
+                    try {
+                        var rowData = elInstance.getRowData(j);
+
+                        //left align
+                        elInstance.setStyle(`B${parseInt(j) + 1}`, 'text-align', 'left');
+                        var rowData = elInstance.getRowData(j);
+
+                        var typeId = rowData[6];
+                        var oneTimeUsage = rowData[10];
+
+                        console.log("roleArray--------->1", j);
+                        console.log("roleArray--------->2", elInstance);
+                        if (typeId == 2) {
+                            var cell1 = elInstance.getCell(("H").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("K").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                        } else {
+                            var cell1 = elInstance.getCell(("H").concat(parseInt(j) + 1))
+                            cell1.classList.remove('readonly');
+                            var cell1 = elInstance.getCell(("K").concat(parseInt(j) + 1))
+                            cell1.classList.remove('readonly');
+                        }
+
+                        if (oneTimeUsage) {
+                            var cell1 = elInstance.getCell(("L").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("M").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                        } else {
+                            var cell1 = elInstance.getCell(("L").concat(parseInt(j) + 1))
+                            cell1.classList.remove('readonly');
+                            var cell1 = elInstance.getCell(("M").concat(parseInt(j) + 1))
+                            cell1.classList.remove('readonly');
+                        }
+
+                        if (typeId == 1 && oneTimeUsage == false) {
+                            // elInstance.setValueFromCoords(19, y, 'for', true);
+                            var cell1 = elInstance.getCell(("N").concat(parseInt(j) + 1))
+                            cell1.classList.remove('readonly');
+                            var cell1 = elInstance.getCell(("O").concat(parseInt(j) + 1))
+                            cell1.classList.remove('readonly');
+                        } else {
+                            var cell1 = elInstance.getCell(("N").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("O").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                        }
+
+
+                        var typeId = rowData[19];
+                        var userId = rowData[22];
+                        var curUser = AuthenticationService.getLoggedInUserId();
+                        // if ((roleArray.includes('ROLE_REALM_ADMIN') && typeId != -1 && typeId != 0) || (roleArray.includes('ROLE_DATASET_ADMIN') && typeId == -1 && typeId != 0)) {
+                        if ((roleArray.includes('ROLE_DATASET_ADMIN') && ((typeId == -1 && typeId != 0) || curUser != userId))) {
+                            var cell1 = elInstance.getCell(("B").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("C").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("D").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("E").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("F").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("G").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("H").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("J").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("K").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("L").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("M").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("N").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("O").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("U").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+
+                        }
+
+                        if (!roleArray.includes('ROLE_REALM_ADMIN') && !roleArray.includes('ROLE_DATASET_ADMIN')) {
+                            var cell1 = elInstance.getCell(("B").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("C").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("D").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("E").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("F").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("G").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("H").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("J").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("K").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("L").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("M").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("N").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("O").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("U").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                        }
+                    } catch (err) {
+
+                    }
+
+                }
+            }.bind(this),
+            onfilter: function (el, terms, rowNumbers) {
+                var elInstance = el;
+                var json = elInstance.getJson();
+                let roleArray = this.state.roleArray;
+                var jsonLength;
+                jsonLength = json.length;
+                console.log("JsonLength", jsonLength)
+
+                for (var j = 0; j < jsonLength; j++) {
+                    try {
+                        var rowData = elInstance.getRowData(j);
+
+                        //left align
+                        elInstance.setStyle(`B${parseInt(j) + 1}`, 'text-align', 'left');
+                        var rowData = elInstance.getRowData(j);
+
+                        var typeId = rowData[6];
+                        var oneTimeUsage = rowData[10];
+
+                        // console.log("roleArray--------->1", j);
+                        // console.log("roleArray--------->2", elInstance);
+                        if (typeId == 2) {
+                            var cell1 = elInstance.getCell(("H").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("K").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                        } else {
+                            var cell1 = elInstance.getCell(("H").concat(parseInt(j) + 1))
+                            cell1.classList.remove('readonly');
+                            var cell1 = elInstance.getCell(("K").concat(parseInt(j) + 1))
+                            cell1.classList.remove('readonly');
+                        }
+
+                        if (oneTimeUsage) {
+                            var cell1 = elInstance.getCell(("L").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("M").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                        } else {
+                            var cell1 = elInstance.getCell(("L").concat(parseInt(j) + 1))
+                            cell1.classList.remove('readonly');
+                            var cell1 = elInstance.getCell(("M").concat(parseInt(j) + 1))
+                            cell1.classList.remove('readonly');
+                        }
+
+                        if (typeId == 1 && oneTimeUsage == false) {
+                            // elInstance.setValueFromCoords(19, y, 'for', true);
+                            var cell1 = elInstance.getCell(("N").concat(parseInt(j) + 1))
+                            cell1.classList.remove('readonly');
+                            var cell1 = elInstance.getCell(("O").concat(parseInt(j) + 1))
+                            cell1.classList.remove('readonly');
+                        } else {
+                            var cell1 = elInstance.getCell(("N").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("O").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                        }
+
+
+                        var typeId = rowData[19];
+                        var userId = rowData[22];
+                        var curUser = AuthenticationService.getLoggedInUserId();
+                        // if ((roleArray.includes('ROLE_REALM_ADMIN') && typeId != -1 && typeId != 0) || (roleArray.includes('ROLE_DATASET_ADMIN') && typeId == -1 && typeId != 0)) {
+                        if ((roleArray.includes('ROLE_DATASET_ADMIN') && ((typeId == -1 && typeId != 0) || curUser != userId))) {
+                            var cell1 = elInstance.getCell(("B").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("C").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("D").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("E").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("F").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("G").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("H").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("J").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("K").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("L").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("M").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("N").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("O").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("U").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+
+                        }
+
+                        if (!roleArray.includes('ROLE_REALM_ADMIN') && !roleArray.includes('ROLE_DATASET_ADMIN')) {
+                            var cell1 = elInstance.getCell(("B").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("C").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("D").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("E").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("F").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("G").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("H").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("J").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("K").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("L").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("M").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("N").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("O").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("U").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                        }
+                    } catch (err) {
+
+                    }
+
+                }
+            }.bind(this),
             updateTable: function (el, cell, x, y, source, value, id) {
                 if (y != null) {
                     // var elInstance = el.jexcel;
@@ -1172,9 +1458,9 @@ class usageTemplate extends Component {
             pagination: localStorage.getItem("sesRecordCount"),
             filters: true,
             search: true,
-            freezeColumns: 3,
+            // freezeColumns: 3,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
@@ -1187,16 +1473,278 @@ class usageTemplate extends Component {
             allowManualInsertRow: false,
             parseFormulas: true,
             // onpaste: this.onPaste,
+            onsearch: function (el) {
+                var elInstance = el.jexcel;
+                var json = elInstance.getJson();
+                let roleArray = this.state.roleArray;
+                var jsonLength;
+                jsonLength = json.length;
+                console.log("JsonLength", jsonLength)
+
+                for (var j = 0; j < jsonLength; j++) {
+                    try {
+                        var rowData = elInstance.getRowData(j);
+
+                        //left align
+                        elInstance.setStyle(`B${parseInt(j) + 1}`, 'text-align', 'left');
+                        var rowData = elInstance.getRowData(j);
+
+                        var typeId = rowData[6];
+                        var oneTimeUsage = rowData[10];
+
+                        console.log("roleArray--------->1", j);
+                        console.log("roleArray--------->2", elInstance);
+                        if (typeId == 2) {
+                            var cell1 = elInstance.getCell(("H").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("K").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                        } else {
+                            var cell1 = elInstance.getCell(("H").concat(parseInt(j) + 1))
+                            cell1.classList.remove('readonly');
+                            var cell1 = elInstance.getCell(("K").concat(parseInt(j) + 1))
+                            cell1.classList.remove('readonly');
+                        }
+
+                        if (oneTimeUsage) {
+                            var cell1 = elInstance.getCell(("L").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("M").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                        } else {
+                            var cell1 = elInstance.getCell(("L").concat(parseInt(j) + 1))
+                            cell1.classList.remove('readonly');
+                            var cell1 = elInstance.getCell(("M").concat(parseInt(j) + 1))
+                            cell1.classList.remove('readonly');
+                        }
+
+                        if (typeId == 1 && oneTimeUsage == false) {
+                            // elInstance.setValueFromCoords(19, y, 'for', true);
+                            var cell1 = elInstance.getCell(("N").concat(parseInt(j) + 1))
+                            cell1.classList.remove('readonly');
+                            var cell1 = elInstance.getCell(("O").concat(parseInt(j) + 1))
+                            cell1.classList.remove('readonly');
+                        } else {
+                            var cell1 = elInstance.getCell(("N").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("O").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                        }
+
+
+                        var typeId = rowData[19];
+                        var userId = rowData[22];
+                        var curUser = AuthenticationService.getLoggedInUserId();
+                        // if ((roleArray.includes('ROLE_REALM_ADMIN') && typeId != -1 && typeId != 0) || (roleArray.includes('ROLE_DATASET_ADMIN') && typeId == -1 && typeId != 0)) {
+                        if ((roleArray.includes('ROLE_DATASET_ADMIN') && ((typeId == -1 && typeId != 0) || curUser != userId))) {
+                            var cell1 = elInstance.getCell(("B").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("C").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("D").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("E").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("F").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("G").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("H").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("J").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("K").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("L").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("M").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("N").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("O").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("U").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+
+                        }
+
+                        if (!roleArray.includes('ROLE_REALM_ADMIN') && !roleArray.includes('ROLE_DATASET_ADMIN')) {
+                            var cell1 = elInstance.getCell(("B").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("C").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("D").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("E").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("F").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("G").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("H").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("J").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("K").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("L").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("M").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("N").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("O").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("U").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                        }
+                    } catch (err) {
+
+                    }
+
+                }
+            }.bind(this),
+            onfilter: function (el) {
+                var elInstance = el.jexcel;
+                var json = elInstance.getJson();
+                let roleArray = this.state.roleArray;
+                var jsonLength;
+                jsonLength = json.length;
+                console.log("JsonLength", jsonLength)
+
+                for (var j = 0; j < jsonLength; j++) {
+                    try {
+                        var rowData = elInstance.getRowData(j);
+
+                        //left align
+                        elInstance.setStyle(`B${parseInt(j) + 1}`, 'text-align', 'left');
+                        var rowData = elInstance.getRowData(j);
+
+                        var typeId = rowData[6];
+                        var oneTimeUsage = rowData[10];
+
+                        console.log("roleArray--------->1", j);
+                        console.log("roleArray--------->2", elInstance);
+                        if (typeId == 2) {
+                            var cell1 = elInstance.getCell(("H").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("K").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                        } else {
+                            var cell1 = elInstance.getCell(("H").concat(parseInt(j) + 1))
+                            cell1.classList.remove('readonly');
+                            var cell1 = elInstance.getCell(("K").concat(parseInt(j) + 1))
+                            cell1.classList.remove('readonly');
+                        }
+
+                        if (oneTimeUsage) {
+                            var cell1 = elInstance.getCell(("L").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("M").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                        } else {
+                            var cell1 = elInstance.getCell(("L").concat(parseInt(j) + 1))
+                            cell1.classList.remove('readonly');
+                            var cell1 = elInstance.getCell(("M").concat(parseInt(j) + 1))
+                            cell1.classList.remove('readonly');
+                        }
+
+                        if (typeId == 1 && oneTimeUsage == false) {
+                            // elInstance.setValueFromCoords(19, y, 'for', true);
+                            var cell1 = elInstance.getCell(("N").concat(parseInt(j) + 1))
+                            cell1.classList.remove('readonly');
+                            var cell1 = elInstance.getCell(("O").concat(parseInt(j) + 1))
+                            cell1.classList.remove('readonly');
+                        } else {
+                            var cell1 = elInstance.getCell(("N").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("O").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                        }
+
+
+                        var typeId = rowData[19];
+                        var userId = rowData[22];
+                        var curUser = AuthenticationService.getLoggedInUserId();
+                        // if ((roleArray.includes('ROLE_REALM_ADMIN') && typeId != -1 && typeId != 0) || (roleArray.includes('ROLE_DATASET_ADMIN') && typeId == -1 && typeId != 0)) {
+                        if ((roleArray.includes('ROLE_DATASET_ADMIN') && ((typeId == -1 && typeId != 0) || curUser != userId))) {
+                            var cell1 = elInstance.getCell(("B").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("C").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("D").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("E").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("F").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("G").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("H").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("J").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("K").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("L").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("M").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("N").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("O").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("U").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+
+                        }
+
+                        if (!roleArray.includes('ROLE_REALM_ADMIN') && !roleArray.includes('ROLE_DATASET_ADMIN')) {
+                            var cell1 = elInstance.getCell(("B").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("C").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("D").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("E").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("F").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("G").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("H").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("J").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("K").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("L").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("M").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("N").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("O").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(("U").concat(parseInt(j) + 1))
+                            cell1.classList.add('readonly');
+                        }
+                    } catch (err) {
+
+                    }
+
+                }
+
+            }.bind(this),
             oneditionend: this.oneditionend,
-            text: {
-                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
-            onload: this.loaded,
+            // text: {
+            //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
             onchangepage: this.onchangepage,
-            editable: true,
+            editable: (this.state.roleArray.includes('ROLE_REALM_ADMIN') || this.state.roleArray.includes('ROLE_DATASET_ADMIN')) ? true : false,
             license: JEXCEL_PRO_KEY,
             contextMenu: function (obj, x, y, e) {
                 var items = [];
@@ -1282,9 +1830,11 @@ class usageTemplate extends Component {
                 return items;
             }.bind(this)
         };
-
+        var dataEL = "";
         this.el = jexcel(document.getElementById("paputableDiv"), options);
+        dataEL = this.el
         this.setState({
+            dataEl: dataEL,
             loading: false
         })
     }
@@ -1924,7 +2474,9 @@ class usageTemplate extends Component {
     filterTracerCategoryByProgramId = function (instance, cell, c, r, source) {
         var mylist = this.state.tracerCategoryList;
         var programList = this.state.typeList;
-        var value = (instance.jexcel.getJson(null, false)[r])[1];
+        // var value = (instance.jexcel.getJson(null, false)[r])[1];
+        var value = (this.state.dataEl.getJson(null, false)[r])[1];
+
         value = Number(value);
         if (value != -1 && value != 0) {
             let programObj = this.state.typeList.filter(c => c.id == parseInt(value))[0];
@@ -1944,7 +2496,9 @@ class usageTemplate extends Component {
 
     filterForecastingUnitBasedOnTracerCategory = function (instance, cell, c, r, source) {
         var mylist = [];
-        var value = (instance.jexcel.getJson(null, false)[r])[3];
+        // var value = (instance.jexcel.getJson(null, false)[r])[3];
+        var value = (this.state.dataEl.getJson(null, false)[r])[3];
+
         if (value > 0) {
             mylist = this.state.forecastingUnitList.filter(c => c.tracerCategoryId == value && c.active.toString() == "true");
         }
@@ -1980,7 +2534,9 @@ class usageTemplate extends Component {
         if (mylist[0].id == -1) {
             mylist.splice(0, 1);
         }
-        var value = (instance.jexcel.getJson(null, false)[r])[12];
+        // var value = (instance.jexcel.getJson(null, false)[r])[12];
+        var value = (this.state.dataEl.getJson(null, false)[r])[12];
+
         let tempUsagePeriodList = [];
         if (value > 0) {
             let selectedPickerConvertTOMonth = mylist.filter(c => c.id == value)[0].convertToMonth;
@@ -2136,7 +2692,7 @@ class usageTemplate extends Component {
     }
 
     oneditionend = function (instance, cell, x, y, value) {
-        var elInstance = instance.jexcel;
+        var elInstance = instance;
         var rowData = elInstance.getRowData(y);
 
         // if (x == 2 && !isNaN(rowData[2]) && rowData[2].toString().indexOf('.') != -1) {
@@ -2215,27 +2771,12 @@ class usageTemplate extends Component {
         data[18] = 1;
         data[19] = 0;
         data[20] = "";
+        data[21] = true;
 
         this.el.insertRow(
             data, 0, 1
         );
     };
-
-    onPaste(instance, data) {
-        var z = -1;
-        for (var i = 0; i < data.length; i++) {
-            if (z != data[i].y) {
-                var index = (instance.jexcel).getValue(`G${parseInt(data[i].y) + 1}`, true);
-                if (index == "" || index == null || index == undefined) {
-                    (instance.jexcel).setValueFromCoords(0, data[i].y, 0, true);
-                    (instance.jexcel).setValueFromCoords(2, data[i].y, true, true);
-                    (instance.jexcel).setValueFromCoords(5, data[i].y, 1, true);
-                    (instance.jexcel).setValueFromCoords(6, data[i].y, 1, true);
-                    z = data[i].y;
-                }
-            }
-        }
-    }
 
     formSubmit = function () {
 
@@ -2269,7 +2810,7 @@ class usageTemplate extends Component {
                         usageFrequencyCount: this.el.getValue(`L${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                         repeatUsagePeriod: { usagePeriodId: (parseInt(map1.get("14")) == -1 ? null : parseInt(map1.get("14"))) },
                         repeatCount: this.el.getValue(`N${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                        active: true,
+                        active: map1.get("21"),
                         notes: map1.get("20")
                         // capacityCbm: map1.get("2").replace(",", ""),
                         // capacityCbm: map1.get("2").replace(/,/g, ""),
@@ -2363,19 +2904,19 @@ class usageTemplate extends Component {
     }
 
     onchangepage(el, pageNo, oldPageNo) {
-        var elInstance = el.jexcel;
+        var elInstance = el;
         var json = elInstance.getJson(null, false);
 
         var colArr = ['A', 'B'];
 
-        var jsonLength = (pageNo + 1) * (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+        var jsonLength = (pageNo + 1) * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
         if (jsonLength == undefined) {
             jsonLength = 15
         }
         if (json.length < jsonLength) {
             jsonLength = json.length;
         }
-        var start = pageNo * (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+        var start = pageNo * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
 
         for (var y = start; y < jsonLength; y++) {
             var rowData = elInstance.getRowData(y);
@@ -2428,8 +2969,12 @@ class usageTemplate extends Component {
 
             var typeId = rowData[19];
             let roleArray = this.state.roleArray;
+            var userId = rowData[22];
+
             // if ((roleArray.includes('ROLE_REALM_ADMIN') && typeId != -1 && typeId != 0) || (roleArray.includes('ROLE_DATASET_ADMIN') && typeId == -1 && typeId != 0)) {
-            if ((roleArray.includes('ROLE_DATASET_ADMIN') && typeId == -1 && typeId != 0)) {
+            if ((roleArray.includes('ROLE_DATASET_ADMIN') && ((typeId == -1 && typeId != 0) || userId != ""))) {
+                console.log("roleArrayinsideIf--------->onchangepage", roleArray, "---", userId);
+
                 var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
                 cell1.classList.add('readonly');
                 var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
@@ -2499,8 +3044,11 @@ class usageTemplate extends Component {
 
 
     loaded = function (instance, cell, x, y, value) {
-        jExcelLoadedFunction(instance);
-        var asterisk = document.getElementsByClassName("resizable")[0];
+        jExcelLoadedFunction(instance, 0);
+
+        console.log("instance===>", instance.worksheets[0])
+        // var asterisk = document.getElementsByClassName("resizable")[0];
+        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
         // tr.children[1].classList.add('AsteriskTheadtrTd');
         // tr.children[2].classList.add('AsteriskTheadtrTd');
@@ -2518,7 +3066,7 @@ class usageTemplate extends Component {
         tr.children[2].classList.add('InfoTrAsteriskTheadtrTd');
         tr.children[3].classList.add('InfoTrAsteriskTheadtrTd');
         tr.children[6].classList.add('InfoTrAsteriskTheadtrTd');
-        // tr.children[7].classList.add('InfoTrAsteriskTheadtrTd');
+        tr.children[7].classList.add('InfoTrAsteriskTheadtrTd');
         tr.children[8].classList.add('InfoTr');
         tr.children[9].classList.add('InfoTr');
         tr.children[10].classList.add('InfoTr');
@@ -2528,7 +3076,7 @@ class usageTemplate extends Component {
         tr.children[14].classList.add('InfoTr');
         tr.children[15].classList.add('InfoTr');
         tr.children[16].classList.add('InfoTr');
-        // tr.children[17].classList.add('InfoTr');
+        tr.children[17].classList.add('InfoTr');
         // tr.children[18].classList.add('InfoTr');
         // tr.children[19].classList.add('InfoTr');
         // tr.children[20].classList.add('InfoTr');
@@ -2537,33 +3085,29 @@ class usageTemplate extends Component {
         // tr.children[23].classList.add('InfoTr');
         // tr.children[24].classList.add('InfoTr');
 
-        // tr.children[2].title = i18n.t('static.tooltip.ForecastProgram');
-        // tr.children[3].title = i18n.t('static.tooltip.UsageName');
-        // tr.children[6].title = i18n.t('static.tooltip.LagInMonth');
-        // // tr.children[7].title = i18n.t('static.tooltip.UsageType');
-        // tr.children[8].title = i18n.t('static.tooltip.Persons');
-        // tr.children[9].title = i18n.t('static.tooltip.PersonsUnit');
-        // // tr.children[12].title = i18n.t('static.tooltip.FUPersonTime');
-        // tr.children[11].title = i18n.t('static.tooltip.OneTimeUsage');
-        // // tr.children[16].title = i18n.t('static.tooltip.OfTimeFreqwency');
-        // // tr.children[18].title = i18n.t('static.tooltip.Freqwency');
-        // tr.children[14].title = i18n.t('static.tooltip.UsagePeriod');
-        // // tr.children[22].title = i18n.t('static.tooltip.PeriodUnit');
-        // tr.children[16].title = i18n.t('static.tooltip.OfFuRequired');
-        // tr.children[24].title = i18n.t('static.tooltip.UsageInWords');
+        tr.children[2].title = i18n.t('static.tooltip.ForecastProgram');
+        tr.children[3].title = i18n.t('static.tooltip.UsageName');
+        tr.children[6].title = i18n.t('static.tooltip.LagInMonth');
+        tr.children[7].title = i18n.t('static.tooltip.UsageType');
+        tr.children[8].title = i18n.t('static.tooltip.Persons');
+        tr.children[9].title = i18n.t('static.tooltip.PersonsUnit');
+        tr.children[10].title = i18n.t('static.tooltip.FUPersonTime');
+        tr.children[11].title = i18n.t('static.tooltip.OneTimeUsage');
+        tr.children[12].title = i18n.t('static.tooltip.OfTimeFreqwency');
+        tr.children[13].title = i18n.t('static.tooltip.Freqwency');
+        tr.children[14].title = i18n.t('static.tooltip.UsagePeriod');
+        tr.children[15].title = i18n.t('static.tooltip.PeriodUnit');
+        tr.children[16].title = i18n.t('static.tooltip.OfFuRequired');
+        tr.children[17].title = i18n.t('static.tooltip.UsageInWords');
 
-
-
-
-
-        var elInstance = instance.jexcel;
+        var elInstance = instance.worksheets[0];
         var json = elInstance.getJson();
         let roleArray = this.state.roleArray;
 
         var jsonLength;
 
-        if ((document.getElementsByClassName("jexcel_pagination_dropdown")[0] != undefined)) {
-            jsonLength = 1 * (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+        if ((document.getElementsByClassName("jss_pagination_dropdown")[0] != undefined)) {
+            jsonLength = 1 * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
         }
 
         if (jsonLength == undefined) {
@@ -2624,9 +3168,12 @@ class usageTemplate extends Component {
 
 
             var typeId = rowData[19];
-
+            var userId = rowData[22];
+            var curUser = AuthenticationService.getLoggedInUserId();
             // if ((roleArray.includes('ROLE_REALM_ADMIN') && typeId != -1 && typeId != 0) || (roleArray.includes('ROLE_DATASET_ADMIN') && typeId == -1 && typeId != 0)) {
-            if ((roleArray.includes('ROLE_DATASET_ADMIN') && typeId == -1 && typeId != 0)) {
+            if ((roleArray.includes('ROLE_DATASET_ADMIN') && ((typeId == -1 && typeId != 0) || curUser != userId))) {
+                // console.log("roleArrayinsideIf--------->2", elInstance);
+
                 var cell1 = elInstance.getCell(("B").concat(parseInt(j) + 1))
                 cell1.classList.add('readonly');
                 var cell1 = elInstance.getCell(("C").concat(parseInt(j) + 1))
@@ -2946,23 +3493,26 @@ class usageTemplate extends Component {
             }
 
 
-            let string = 'Every ' + (this.el.getValue(`H${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`H${parseInt(y) + 1}`, true)) + ' ' + (unitName == '' ? '____' : unitName) + '(s) - requires ' + (this.el.getValue(`J${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`J${parseInt(y) + 1}`, true)) + " " + (unitName1 == '' ? '____' : unitName1);
+            let string = 'Every ' + (this.el.getValue(`H${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`H${parseInt(y) + 1}`, true)) + ' ' + (unitName == '' ? '____' : unitName) + '(s) - requires ' + (this.el.getValue(`J${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`J${parseInt(y) + 1}`, true)) + " " + (unitName1 == '' ? '____' : unitName1 + "(s)");
 
             let q1 = '';
+            // if (this.el.getValueFromCoords(10, y) == false) {
+            //     q1 = 'time(s) per';
+            // } else {
+            //     q1 = '';
+            // }
+            console.log("Test-1--", string)
             if (this.el.getValueFromCoords(10, y) == false) {
-                q1 = 'time(s) per';
-            } else {
-                q1 = '';
-            }
-
-            if (this.el.getValueFromCoords(6, y) == 2) {//contonuous
-                q1 = 'time(s) per';
-            } else {
-                q1 = '';
-                if (!this.el.getValueFromCoords(10, y)) {
-                    q1 = 'time(s) per';
+                if (this.el.getValueFromCoords(6, y) == 1) {
+                    q1 = '';
+                    if (!this.el.getValueFromCoords(10, y)) {
+                        q1 = 'time(s) per';
+                    }
                 }
+            } else {
+                q1 = '';
             }
+            console.log("Test-2--", string)
 
             let t1 = ''
             if (this.el.getValueFromCoords(6, y) == 1 && !this.el.getValueFromCoords(10, y)) {
@@ -2978,13 +3528,19 @@ class usageTemplate extends Component {
             // let string = 'Every ' + this.el.getValue(`I${parseInt(y) + 1}`, true) + ' patient - requires ' + this.el.getValue(`L${parseInt(y) + 1}`, true) + " " + this.el.getValue(`M${parseInt(y) + 1}`, true);
 
             if (!this.el.getValueFromCoords(10, y)) {//one time usage false
-                string += " " + (this.el.getValue(`L${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`L${parseInt(y) + 1}`, true)) + " " + (q1 == '' ? '____' : q1) + " " + (this.el.getValue(`M${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`M${parseInt(y) + 1}`, true));
+                if (this.el.getValueFromCoords(6, y) == 2) {
+                    string += " Every " + (this.el.getValue(`L${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`L${parseInt(y) + 1}`, true)) + " " + (this.el.getValue(`M${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`M${parseInt(y) + 1}`, true));
+                } else {
+                    string += " " + (this.el.getValue(`L${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`L${parseInt(y) + 1}`, true)) + " " + (q1 == '' ? '____' : q1) + " " + (this.el.getValue(`M${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`M${parseInt(y) + 1}`, true));
+                }
+                console.log("Test-3--", string)
                 if (this.el.getValueFromCoords(6, y) == 2) {
                     string += " " + (this.el.getValue(`O${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`O${parseInt(y) + 1}`, true));
                 } else {
                     string += " " + (t1 == '' ? '____' : t1) + " " + (this.el.getValue(`N${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`N${parseInt(y) + 1}`, true)) + " " + (this.el.getValue(`O${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`O${parseInt(y) + 1}`, true));
                 }
             }
+            console.log("Test-4--", string)
 
 
             this.el.setValueFromCoords(16, y, string, true);
@@ -2995,7 +3551,9 @@ class usageTemplate extends Component {
         // if (x != 24) {
         //     this.el.setValueFromCoords(24, y, 1, true);
         // }
-        if (x == 10 || x == 11 || x == 12) {
+        console.log("LOG---------->2", x);
+
+        if (x == 10 || x == 11 || x == 12 || x == 21) {
             this.el.setValueFromCoords(17, y, 1, true);
         }
 
@@ -4506,6 +5064,11 @@ class usageTemplate extends Component {
 
 
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
 
         const { usagePeriodListLong } = this.state;
         let usageList = usagePeriodListLong.length > 0
@@ -4542,8 +5105,8 @@ class usageTemplate extends Component {
                             {/* <h5>{i18n.t("static.placeholder.usageTemplate")}</h5> */}
                             <h5>{i18n.t('static.usageTemplate.usageTemplateText')}</h5>
                             <span className=""><h5><i class="fa fa-calculator" aria-hidden="true"></i>  {i18n.t('static.usageTemplate.calculatorReminderText')}</h5></span>
-                            <div className="UsageTemplateTable">
-                                <div id="paputableDiv" className="table-responsive consumptionDataEntryTable usageTemplateDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
+                            <div className="UsageTemplateTable leftAlignTable1">
+                                <div id="paputableDiv" className="consumptionDataEntryTable usageTemplateDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
                                 </div>
                             </div>
                             <div style={{ display: this.state.loading ? "block" : "none" }}>
@@ -4864,4 +5427,3 @@ class usageTemplate extends Component {
 }
 
 export default usageTemplate
-

@@ -12,13 +12,13 @@ import ProgramService from '../../api/ProgramService.js';
 import ProductService from '../../api/ProductService';
 import ManualTaggingService from '../../api/ManualTaggingService.js';
 import PlanningUnitService from '../../api/PlanningUnitService.js';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions.js';
-import {MultiSelect} from 'react-multi-select-component';
+import { MultiSelect } from 'react-multi-select-component';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 
@@ -74,7 +74,7 @@ export default class ShipmentLinkingNotifications extends Component {
         console.log("row length---", row.shipmentList.length);
         if (row.shipmentList.length > 1 || (row.shipmentList.length == 1 && row.shipmentList[0].batchNo != null)) {
             var batchDetails = row.shipmentList.filter(c => (c.fileName === row.maxFilename));
-        
+
             batchDetails.sort(function (a, b) {
                 var dateA = new Date(a.expiryDate).getTime();
                 var dateB = new Date(b.expiryDate).getTime();
@@ -353,7 +353,7 @@ export default class ShipmentLinkingNotifications extends Component {
     }.bind(this);
 
     oneditionend = function (instance, cell, x, y, value) {
-        var elInstance = instance.jexcel;
+        var elInstance = instance;
         var rowData = elInstance.getRowData(y);
 
         if (x == 10 && !isNaN(rowData[10]) && rowData[10].toString().indexOf('.') != -1) {
@@ -366,11 +366,11 @@ export default class ShipmentLinkingNotifications extends Component {
 
     onPaste(instance, data) {
         if (data.length == 1 && Object.keys(data[0])[2] == "value") {
-            (instance.jexcel).setValueFromCoords(10, data[0].y, parseFloat(data[0].value), true);
+            (instance).setValueFromCoords(10, data[0].y, parseFloat(data[0].value), true);
         }
         else {
             for (var i = 0; i < data.length; i++) {
-                (instance.jexcel).setValueFromCoords(13, data[i].y, 1, true);
+                (instance).setValueFromCoords(13, data[i].y, 1, true);
             }
         }
     }
@@ -498,7 +498,9 @@ export default class ShipmentLinkingNotifications extends Component {
                 this.setState({
                     outputList: []
                 }, () => {
-                    this.state.languageEl.destroy();
+                    // this.state.languageEl.destroy();
+                    jexcel.destroy(document.getElementById("tableDiv"), true);
+
                 })
             }
             // else if (programId == -1) {
@@ -770,7 +772,9 @@ export default class ShipmentLinkingNotifications extends Component {
         }
 
         this.el = jexcel(document.getElementById("tableDiv"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("tableDiv"), true);
+
         var json = [];
         var data = manualTaggingArray;
 
@@ -878,16 +882,16 @@ export default class ShipmentLinkingNotifications extends Component {
                 },
             ],
             editable: true,
-            text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
@@ -895,7 +899,7 @@ export default class ShipmentLinkingNotifications extends Component {
             // onselection: this.selected,
             onchange: this.changed,
             updateTable: function (el, cell, x, y, source, value, id) {
-                var elInstance = el.jexcel;
+                var elInstance = el;
                 if (y != null) {
                     var rowData = elInstance.getRowData(y);
                     if (rowData[0] && parseInt(rowData[13]) != 1) {
@@ -935,10 +939,10 @@ export default class ShipmentLinkingNotifications extends Component {
                 }
             }.bind(this),
             onsearch: function (el) {
-                el.jexcel.updateTable();
+                // el.jexcel.updateTable();
             },
             onfilter: function (el) {
-                el.jexcel.updateTable();
+                // el.jexcel.updateTable();
             },
             oneditionend: this.oneditionend,
             copyCompatibility: true,
@@ -1073,7 +1077,9 @@ export default class ShipmentLinkingNotifications extends Component {
         }
 
         this.el = jexcel(document.getElementById("tableDiv1"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("tableDiv1"), true);
+
         var json = [];
         var data = notificationSummaryArray;
 
@@ -1086,14 +1092,14 @@ export default class ShipmentLinkingNotifications extends Component {
                 {
                     title: i18n.t('static.program.programName'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
 
                 {
                     title: i18n.t('static.mt.notificationCount'),
                     type: 'numeric',
                     mask: '#,##.00', decimal: '.',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: "programId",
@@ -1101,16 +1107,16 @@ export default class ShipmentLinkingNotifications extends Component {
                 }
             ],
             editable: false,
-            text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
             onload: this.loaded1,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
@@ -1382,7 +1388,9 @@ export default class ShipmentLinkingNotifications extends Component {
                 outputList: [],
                 planningUnits: []
             }, () => {
-                this.state.languageEl.destroy();
+                // this.state.languageEl.destroy();
+                jexcel.destroy(document.getElementById("tableDiv"), true);
+
             })
         }
         // this.filterData();
@@ -1434,6 +1442,11 @@ export default class ShipmentLinkingNotifications extends Component {
 
 
     render() {
+
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
 
         const { SearchBar, ClearSearchButton } = Search;
         const customTotal = (from, to, size) => (
@@ -1657,7 +1670,7 @@ export default class ShipmentLinkingNotifications extends Component {
                                                     <SearchBar {...props.searchProps} />
                                                     <ClearSearchButton {...props.searchProps} />
                                                 </div> */}
-                                                            <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                                            <BootstrapTable striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
                                                                 // pagination={paginationFactory(options)}
                                                                 rowEvents={{
                                                                 }}

@@ -1,7 +1,6 @@
 
 
 import CryptoJS from 'crypto-js';
-import jexcel from 'jexcel-pro';
 import moment from "moment";
 import React, { Component } from 'react';
 import Picker from 'react-month-picker';
@@ -15,7 +14,8 @@ import {
     CardFooter,
     Table, FormGroup, Input, InputGroup, InputGroupAddon, Label, Form, Modal, ModalHeader, ModalFooter, ModalBody, Popover, PopoverBody, PopoverHeader, Button
 } from 'reactstrap';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import PlanningUnitService from '../../api/PlanningUnitService';
 import ProgramService from '../../api/ProgramService';
@@ -78,7 +78,6 @@ export default class StepOneImportMapPlanningUnits extends Component {
         this.changed = this.changed.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
-        this.oneditionend = this.oneditionend.bind(this);
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
         this.handleRangeChange = this.handleRangeChange.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
@@ -388,16 +387,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
         }
     }
 
-    oneditionend = function (instance, cell, x, y, value) {
-        var elInstance = instance.jexcel;
-        var rowData = elInstance.getRowData(y);
-
-    }
-
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
-        var asterisk = document.getElementsByClassName("resizable")[0];
-        var tr = asterisk.firstChild;
     }
 
     componentDidMount() {
@@ -596,16 +587,17 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 this.props.updateStepOneData("stopDate", stopDate);
 
 
-                document.getElementById("stepOneBtn").disabled = false;
+                // document.getElementById("stepOneBtn").disabled = false;
                 PlanningUnitService.getPlanningUnitListByProgramVersionIdForSelectedForecastMap(forecastProgramId, versionId)
                     .then(response => {
                         if (response.status == 200) {
+                            var planningUnitList = response.data.filter(c => c.active)
                             this.setState({
-                                programPlanningUnitList: response.data,
-                                selSource: response.data,
+                                programPlanningUnitList: planningUnitList,
+                                selSource: planningUnitList,
                                 message: ''
                             }, () => {
-                                if (response.data.length == 0) {
+                                if (planningUnitList.length == 0) {
                                     document.getElementById("stepOneBtn").disabled = true;
                                 }
                                 this.buildJexcel();
@@ -672,7 +664,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 message: i18n.t('static.importFromQATSupplyPlan.pleaseSelectForecastProgram'),
             })
             this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
-            this.el.destroy();
+            // this.el.destroy();
+            jexcel.destroy(document.getElementById("mapPlanningUnit"),true);
             document.getElementById("stepOneBtn").disabled = true;
         } else if (versionId == 0) {
             this.setState({
@@ -681,7 +674,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 message: i18n.t('static.importIntoQATSupplyPlan.pleaseSelectForecastProgramVersion'),
             })
             this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
-            this.el.destroy();
+            // this.el.destroy();
+            jexcel.destroy(document.getElementById("mapPlanningUnit"),true);
             document.getElementById("stepOneBtn").disabled = true;
         } else if (programId == 0) {
             this.setState({
@@ -690,7 +684,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 message: i18n.t('static.importFromQATSupplyPlan.selectSupplyPlanProgram'),
             })
             this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
-            this.el.destroy();
+            // this.el.destroy();
+            jexcel.destroy(document.getElementById("mapPlanningUnit"),true);
             document.getElementById("stepOneBtn").disabled = true;
         } else {
             this.setState({
@@ -699,7 +694,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 message: ''
             })
             this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
-            this.el.destroy();
+            jexcel.destroy(document.getElementById("mapPlanningUnit"),true);
+            // this.el.destroy();
             document.getElementById("stepOneBtn").disabled = true;
         }
 
@@ -712,6 +708,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
         var data = [];
         var papuDataArr = [];
         var count = 0;
+        var myVar = "";
+
         if (papuList.length != 0) {
             for (var j = 0; j < papuList.length; j++) {
 
@@ -743,13 +741,19 @@ export default class StepOneImportMapPlanningUnits extends Component {
         }
 
         this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("mapPlanningUnit"),true);
+
 
         this.el = jexcel(document.getElementById("mapRegion"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("mapRegion"),true);
+
 
         this.el = jexcel(document.getElementById("mapImport"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("mapImport"),true);
+
 
         var json = [];
         var papuList11 = this.state.selSource1;
@@ -802,23 +806,23 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 {
                     title: 'Forcast planning unit id',
                     type: 'hidden',
-                    readOnly: true//6 G
+                    // readOnly: true//6 G
                 },
                 {
                     title: 'Selected Forecast Map',
                     type: 'hidden',
-                    readOnly: true//7 H
+                    // readOnly: true//7 H
                 },
                 {
                     title: 'No Forecast Selected',
                     type: 'hidden',
-                    readOnly: true//8 I
+                    // readOnly: true//8 I
                 }
 
             ],
             updateTable: function (el, cell, x, y, source, value, id) {
                 if (y != null) {
-                    var elInstance = el.jexcel;
+                    var elInstance = el;
                     //left align
                     elInstance.setStyle(`C${parseInt(y) + 1}`, 'text-align', 'left');
                     var rowData = elInstance.getRowData(y);
@@ -883,7 +887,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             filters: true,
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
@@ -891,17 +895,14 @@ export default class StepOneImportMapPlanningUnits extends Component {
             allowManualInsertColumn: false,
             // allowDeleteRow: true,
             onchange: this.changed,
-            // oneditionend: this.onedit,
             copyCompatibility: true,
             allowManualInsertRow: false,
             parseFormulas: true,
-            // onpaste: this.onPaste,
-            // oneditionend: this.oneditionend,
-            text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
             onload: this.loaded,
             editable: true,
             license: JEXCEL_PRO_KEY,
@@ -911,17 +912,22 @@ export default class StepOneImportMapPlanningUnits extends Component {
             }.bind(this)
         };
 
-        this.el = jexcel(document.getElementById("mapPlanningUnit"), options);
+        myVar = jexcel(document.getElementById("mapPlanningUnit"), options);
+        this.el=myVar
         this.setState({
             loading: false,
+            mapPlanningUnitEl: myVar
             // forecastPlanignUnitListForNotDuplicate: forecastPlanignUnitListForNotDuplicate
         })
         this.props.updateStepOneData("loading", false);
+        document.getElementById("stepOneBtn").disabled = false;
     }
 
     filterPlanningUnitBasedOnTracerCategory = function (instance, cell, c, r, source) {
         var mylist = [];
-        var value = (instance.jexcel.getJson(null, false)[r])[5];
+        // var value = (instance.jexcel.getJson(null, false)[r])[5];
+        var value = (this.state.mapPlanningUnitEl.getJson(null, false)[r])[5];
+
         console.log("value--------->100", value);
 
         var mylist = this.state.planningUnitListJexcel;
@@ -971,6 +977,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     versions: (forecastProgram[0].versionList.filter(function (x, i, a) {
                         let forecastStartDate = x.forecastStartDate;
                         let forecastStopDate = x.forecastStopDate;
+                        console.log("forecastStartDate", forecastStartDate)
                         if (!(formattedDate > forecastStartDate && formattedDate < forecastStopDate)) {
                             isForecastOver = true;
                         }
@@ -1084,11 +1091,13 @@ export default class StepOneImportMapPlanningUnits extends Component {
         }
         if (isForecastAlreadyStarted) {
 
-            defaultForecastStartYear = new Date().getFullYear();
-            defaultForecastStartMonth = new Date().getMonth() + 1;
+            defaultForecastStartYear = forecastStartDate.getFullYear();
+            defaultForecastStartMonth = forecastStartDate.getMonth() + 1;
 
-            updatedForecastStartYear = formattedDate.getFullYear();
-            updatedForecastStartMonth = formattedDate.getMonth() + 1;
+            // updatedForecastStartYear = formattedDate.getFullYear();
+            // updatedForecastStartMonth = formattedDate.getMonth() + 1;
+            updatedForecastStartYear = forecastStartDate.getFullYear();
+            updatedForecastStartMonth = forecastStartDate.getMonth() + 1;
             // console.log("defaultForecastStartYear-1->", defaultForecastStartYear);
             // console.log("defaultForecastStartMonth-1->", defaultForecastStartMonth);
 
@@ -1257,6 +1266,11 @@ export default class StepOneImportMapPlanningUnits extends Component {
     }
 
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
         const { rangeValue } = this.state
 
         const { programListFilter } = this.state;
@@ -1315,138 +1329,138 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     <Modal isOpen={this.state.showGuidance}
                         className={'modal-xl ' + this.props.className} >
                         <ModalHeader toggle={() => this.toggleShowGuidance()} className="ModalHead modal-info-Headher">
-                            <strong className="TextWhite">Show Guidance</strong>
+                            <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
                         </ModalHeader>
                         <div>
                             <ModalBody>
                                 <div>
-                                    <h3 className='ShowGuidanceHeading'>QAT Forecast Import</h3>
+                                    <h3 className='ShowGuidanceHeading'>{i18n.t('static.importIntoQATSupplyPlan.importIntoQATSupplyPlan')}</h3>
                                 </div>
                                 <p>
-                                    <p style={{ fontSize: '13px' }}><span className="UnderLineText">Purpose :</span> Enable users to import QAT-created forecasts into supply plan programs. Forecasts are only available for importing if 1) they are committed as a final version and 2) there is a forecast selected for each planning unit.</p>
+                                    <p style={{ fontSize: '13px' }}><span className="UnderLineText">{i18n.t('static.listTree.purpose')} :</span> {i18n.t('static.QATForecastImport.EnableUsers')}</p>
                                 </p>
                                 <p>
-                                    <p style={{ fontSize: '13px' }}><span className="UnderLineText">Using this screen :</span></p>
-                                    <p><b>(Step 1)</b>
+                                    <p style={{ fontSize: '13px' }}><span className="UnderLineText">{i18n.t('static.listTree.useThisScreen')} :</span></p>
+                                    <p><b>{i18n.t('static.QATForecastImport.StepOne')}</b>
                                         <ul>
-                                            <li>Select which forecast program to import from (only final forecasts are available)</li>
-                                            <li>Select which supply plan program to import to. </li>
-                                            <li>Select the date range of forecast data to import, which are restricted as follows:
+                                            <li>{i18n.t('static.QATForecastImport.ForecastProgram')}</li>
+                                            <li>{i18n.t('static.QATForecastImport.ProgramToImport')} </li>
+                                            <li>{i18n.t('static.QATForecastImport.DateRange')}:
                                                 <ul>
-                                                    <li>Must be within the forecast period</li>
-                                                    <li>The oldest forecasted consumption you can import is 6 months before the current month. </li>
-                                                    <li>If the entire forecast period is more than 6 months in the past, the forecast cannot be imported, and the version will not appear in the program dropdown </li>
+                                                    <li>{i18n.t('static.QATForecastImport.ForecastPeriod')}</li>
+                                                    <li>{i18n.t('static.QATForecastImport.OldestForecasted')} </li>
+                                                    <li>{i18n.t('static.QATForecastImport.EntireForecast')} </li>
                                                 </ul>
                                             </li>
-                                            <li>In the table that appears, select and map planning units.
+                                            <li>{i18n.t('static.QATForecastImport.TableAppears')}
                                                 <ul>
-                                                    <li>For every Forecasting Planning Unit, QAT requires a corresponding Supply Plan Planning Unit and conversion factor. QAT automatically maps exact planning unit matches, but users can override both the planning unit mapping and conversion factor. </li>
-                                                    <li>Not all forecast planning units need to be imported, however, all forecast planning units must have a selection in the mapping table. For example, in the below table, even though 2 products are not being imported, you would still need to select 'Do not import'.</li>
+                                                    <li>{i18n.t('static.QATForecastImport.EveryForecasting')} </li>
+                                                    <li>{i18n.t('static.QATForecastImport.AllForecast')}</li>
                                                     <br></br>
-                                                    <img className="img-fluid" src={ShowGuidanceScreenshot1} style={{width:'971px'}} />
+                                                    <img className="img-fluid" src={ShowGuidanceScreenshot1} style={{ width: '971px' }} />
                                                 </ul>
 
 
                                             </li>
                                         </ul>
                                     </p>
-                                    <p><b>(Step 2) </b>
-                                        For each Forecast region, input how much (%) of that region's forecast you will import and which region the forecasted consumption will be imported into. Below are some use cases:
+                                    <p><b>{i18n.t('static.QATForecastImport.StepTwo')} </b>
+                                        {i18n.t('static.QATForecastImport.ForecastRegion')}:
                                         <ul>
-                                            <li>National forecast to national supply plan
+                                            <li>{i18n.t('static.QATForecastImport.NationalForecast')}
                                                 <table className="table table-bordered ">
                                                     <thead>
                                                         <tr>
-                                                            <th>Forecast Region (s)</th>
-                                                            <th>% of Forecast</th>
-                                                            <th>Supply Plan Region</th>
+                                                            <th>{i18n.t('static.QATForecastImport.ForecastRegion')}</th>
+                                                            <th>% {i18n.t('static.QATForecastImport.OfForecast')}</th>
+                                                            <th>{i18n.t('static.QATForecastImport.SPRegion')}</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
                                                         <tr>
-                                                            <td>National</td>
+                                                            <td>{i18n.t('static.QATForecastImport.National')}</td>
                                                             <td>100</td>
-                                                            <td>National</td>
+                                                            <td>{i18n.t('static.QATForecastImport.National')}</td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
                                             </li>
                                         </ul>
                                         <ul>
-                                            <li>Multi-region forecast to multi-region supply plan
+                                            <li>{i18n.t('static.QATForecastImport.MultiRegion')}
                                                 <table className="table table-bordered ">
                                                     <thead>
                                                         <tr>
-                                                            <th>Forecast Region (s)</th>
-                                                            <th>% of Forecast</th>
-                                                            <th>Supply Plan Region</th>
+                                                            <th>{i18n.t('static.QATForecastImport.ForecastRegion')}</th>
+                                                            <th>% {i18n.t('static.QATForecastImport.OfForecast')}</th>
+                                                            <th>{i18n.t('static.QATForecastImport.SPRegion')}</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
                                                         <tr>
-                                                            <td>North</td>
+                                                            <td>{i18n.t('static.QATForecastImport.North')}</td>
                                                             <td>100</td>
-                                                            <td>North</td>
+                                                            <td>{i18n.t('static.QATForecastImport.North')}</td>
                                                         </tr>
                                                         <tr>
-                                                            <td>East</td>
+                                                            <td>{i18n.t('static.QATForecastImport.East')}</td>
                                                             <td>100</td>
-                                                            <td>East</td>
+                                                            <td>{i18n.t('static.QATForecastImport.East')}</td>
                                                         </tr>
                                                         <tr>
-                                                            <td>South</td>
+                                                            <td>{i18n.t('static.QATForecastImport.South')}</td>
                                                             <td>100</td>
-                                                            <td>South</td>
+                                                            <td>{i18n.t('static.QATForecastImport.South')}</td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
                                             </li>
                                         </ul>
                                         <ul>
-                                            <li>Multi-region forecast to national supply plan –
+                                            <li>{i18n.t('static.QATForecastImport.MultiRegionSP')} -
                                                 <table className="table table-bordered ">
                                                     <thead>
                                                         <tr>
-                                                            <th>Forecast Region (s)</th>
-                                                            <th>% of Forecast</th>
-                                                            <th>Supply Plan Region</th>
+                                                            <th>{i18n.t('static.QATForecastImport.ForecastRegion')}</th>
+                                                            <th>% {i18n.t('static.QATForecastImport.OfForecast')}</th>
+                                                            <th>{i18n.t('static.QATForecastImport.SPRegion')}</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
                                                         <tr>
-                                                            <td>North</td>
+                                                            <td>{i18n.t('static.QATForecastImport.North')}</td>
                                                             <td>100</td>
-                                                            <td>National</td>
+                                                            <td>{i18n.t('static.QATForecastImport.National')}</td>
                                                         </tr>
                                                         <tr>
-                                                            <td>East</td>
+                                                            <td>{i18n.t('static.QATForecastImport.East')}</td>
                                                             <td>100</td>
-                                                            <td>National</td>
+                                                            <td>{i18n.t('static.QATForecastImport.National')}</td>
                                                         </tr>
                                                         <tr>
-                                                            <td>South</td>
+                                                            <td>{i18n.t('static.QATForecastImport.South')}</td>
                                                             <td>100</td>
-                                                            <td>National</td>
+                                                            <td>{i18n.t('static.QATForecastImport.National')}</td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
                                             </li>
                                         </ul>
                                         <ul>
-                                            <li>National forecast to multi-region supply plan - note that the import process needs to be repeated for each supply plan region.
+                                            <li>{i18n.t('static.QATForecastImport.ForecastToMultiRegion')}
                                                 <table className="table table-bordered ">
                                                     <thead>
                                                         <tr>
-                                                            <th>Forecast Region (s)</th>
-                                                            <th>% of Forecast</th>
-                                                            <th>Supply Plan Region</th>
+                                                            <th>{i18n.t('static.QATForecastImport.ForecastRegion')}</th>
+                                                            <th>% {i18n.t('static.QATForecastImport.OfForecast')}</th>
+                                                            <th>{i18n.t('static.QATForecastImport.SPRegion')}</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
                                                         <tr>
-                                                            <td>National</td>
+                                                            <td>{i18n.t('static.QATForecastImport.National')}</td>
                                                             <td>20</td>
-                                                            <td>North</td>
+                                                            <td>{i18n.t('static.QATForecastImport.North')}</td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
@@ -1454,16 +1468,16 @@ export default class StepOneImportMapPlanningUnits extends Component {
                                                 <table className="table table-bordered ">
                                                     <thead>
                                                         <tr>
-                                                            <th>Forecast Region (s)</th>
-                                                            <th>% of Forecast</th>
-                                                            <th>Supply Plan Region</th>
+                                                            <th>{i18n.t('static.QATForecastImport.ForecastRegion')}</th>
+                                                            <th>% {i18n.t('static.QATForecastImport.OfForecast')}</th>
+                                                            <th>{i18n.t('static.QATForecastImport.SPRegion')}</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
                                                         <tr>
-                                                            <td>National</td>
+                                                            <td>{i18n.t('static.QATForecastImport.National')}</td>
                                                             <td>45</td>
-                                                            <td>South</td>
+                                                            <td>{i18n.t('static.QATForecastImport.South')}</td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
@@ -1471,40 +1485,40 @@ export default class StepOneImportMapPlanningUnits extends Component {
                                                 <table className="table table-bordered ">
                                                     <thead>
                                                         <tr>
-                                                            <th>Forecast Region (s)</th>
-                                                            <th>% of Forecast</th>
-                                                            <th>Supply Plan Region</th>
+                                                            <th>{i18n.t('static.QATForecastImport.ForecastRegion')}</th>
+                                                            <th>% {i18n.t('static.QATForecastImport.OfForecast')}</th>
+                                                            <th>{i18n.t('static.QATForecastImport.SPRegion')}</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
                                                         <tr>
-                                                            <td>National</td>
+                                                            <td>{i18n.t('static.QATForecastImport.National')}</td>
                                                             <td>35</td>
-                                                            <td>East</td>
+                                                            <td>{i18n.t('static.QATForecastImport.East')}</td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
                                             </li>
                                         </ul>
                                     </p>
-                                    <p><b>(Step 3) </b><br></br>
-                                        QAT will list each forecast record to be imported (one row for each planning unit, region and month combination).
+                                    <p><b>{i18n.t('static.QATForecastImport.StepThree')} </b><br></br>
+                                        {i18n.t('static.QATForecastImport.ListForecast')}
                                         <ul>
-                                            <li>QAT calculates the Forecasted Consumption to be imported as follows: </li>
+                                            <li>{i18n.t('static.QATForecastImport.ImportedFollows')}: </li>
                                             <img className="formula-img-mr img-fluid mb-lg-0" src={ForecastedConsumptionimported} style={{ border: '1px solid #fff', marginLeft: '-20px' }} />
                                             <p>
-                                                For the following example:
+                                                {i18n.t('static.QATForecastImport.FollowingExample')}:
                                                 <ul>
-                                                    <li>A national forecast that will be split into two regions of 50% each</li>
-                                                    <li>The Forecast Planning Unit is in packs of 3, and the Supply Plan Planning Unit is in packs of 1 (Conversion factor = 3)</li>
-                                                    <li>The national forecast for Month X was 100 (packs of 3)</li>
-                                                    <li>Forecast of 100 * 50% * 3 = 150  (packs of 1) will be imported into each region for month X</li>
+                                                    <li>{i18n.t('static.QATForecastImport.SplitInto')}</li>
+                                                    <li>{i18n.t('static.QATForecastImport.ForecastPlanning')}</li>
+                                                    <li>{i18n.t('static.QATForecastImport.ForecastForMonth')}</li>
+                                                    <li>Forecast of 100 * 50% * 3 = 150  {i18n.t('static.QATForecastImport.ImportedIntoEach')}</li>
                                                 </ul>
                                             </p>
-                                            <li>If there is an existing forecasted consumption in the supply plan, the 'Current Forecasted Consumption' cell will be highlighted yellow. </li>
-                                            <li>Use the "Import?" column to de-select any forecasts that you do NOT want to import into the supply plan. If checked, the Converted Forecasted Consumption will override the Supply Plan forecast. If unchecked, the current Supply Plan forecast will remain.</li>
+                                            <li>{i18n.t('static.QATForecastImport.ExistingForecasted')} </li>
+                                            <li>{i18n.t('static.QATForecastImport.ImportColumn')}</li>
                                             <br></br>
-                                            <img className="img-fluid" src={ShowGuidanceScreenshot2} style={{width:'971px'}}/>
+                                            <img className="img-fluid" src={ShowGuidanceScreenshot2} style={{ width: '971px' }} />
                                         </ul>
 
                                     </p>
@@ -1578,7 +1592,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                             </div>
                         </FormGroup>
                         <FormGroup className="col-md-4">
-                            <Label htmlFor="appendedInputButton">{i18n.t('static.importFromQATSupplyPlan.Range')}<span className="stock-box-icon fa fa-sort-desc"></span> <i>(Forecast: {this.state.forecastPeriod})</i></Label>
+                            <Label htmlFor="appendedInputButton">Range to Import Forecast Consumption<span className="stock-box-icon fa fa-sort-desc"></span> <i>(Forecast: {this.state.forecastPeriod})</i></Label>
                             <div className="controls  Regioncalender">
 
                                 <Picker
@@ -1600,9 +1614,9 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
                 </div>
 
-                <div className="table-responsive consumptionDataEntryTable" style={{ display: this.props.items.loading ? "none" : "block" }} >
+                <div className="consumptionDataEntryTable" style={{ display: this.props.items.loading ? "none" : "block" }} >
 
-                    <div id="mapPlanningUnit" style={{ marginTop: '-10px' }}>
+                    <div id="mapPlanningUnit" style={{ display: this.props.items.loading ? "none" : "block" }}>
                     </div>
                 </div>
                 <div style={{ display: this.props.items.loading ? "block" : "none" }}>

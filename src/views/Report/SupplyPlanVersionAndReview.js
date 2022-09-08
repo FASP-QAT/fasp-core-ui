@@ -19,9 +19,9 @@ import paginationFactory from 'react-bootstrap-table2-paginator'
 import BootstrapTable from 'react-bootstrap-table-next';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { SECRET_KEY, DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH } from '../../Constants.js';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import { SECRET_KEY, DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, SPV_REPORT_DATEPICKER_START_MONTH } from '../../Constants.js';
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import {
@@ -74,9 +74,9 @@ class SupplyPlanVersionAndReview extends Component {
     constructor(props) {
         super(props);
         var dt = new Date();
-        dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
+        dt.setMonth(dt.getMonth() - SPV_REPORT_DATEPICKER_START_MONTH);
         var dt1 = new Date();
-        dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
+        dt1.setMonth(dt1.getMonth());
         this.state = {
             loading: true,
             matricsList: [],
@@ -143,7 +143,7 @@ class SupplyPlanVersionAndReview extends Component {
     buildJexcel() {
 
         let matricsList = this.state.matricsList;
-        console.log("matricsList---->", matricsList);
+        // console.log("matricsList---->", matricsList);
         let matricsArray = [];
         let count = 0;
         for (var j = 0; j < matricsList.length; j++) {
@@ -170,68 +170,69 @@ class SupplyPlanVersionAndReview extends Component {
         // }
         // console.log("matricsArray---->", matricsArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("tableDiv"), true);
         var json = [];
         var data = matricsArray;
 
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [100, 70, 100, 100, 120, 100, 100, 120, 100],
+            colWidths: [100, 70, 100, 100, 120, 100, 100, 120, 180],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
                     title: i18n.t('static.program.program'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.report.version'),
                     type: 'numeric', mask: '#,##.00', decimal: '.',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.report.versiontype'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
 
                 {
                     title: i18n.t('static.report.veruploaddate'),
                     type: 'calendar',
                     options: { format: JEXCEL_DATE_FORMAT_SM },
-                    readOnly: true
+                    // readOnly: true
                 }, {
                     title: i18n.t('static.report.veruploaduser'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 }, {
                     title: i18n.t('static.report.issupplyplanapprove'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 }, {
                     title: i18n.t('static.report.reviewer'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 }, {
                     title: i18n.t('static.report.approvedRevieweddate'),
                     options: { isTime: 1, format: "DD-Mon-YY HH24:MI" },
-                    readOnly: true,
+                    // readOnly: true,
                     type: 'calendar'
                 }, {
                     title: i18n.t('static.report.comment'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: 'versionTypeId',
                     type: 'hidden',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: 'versionStatusId',
                     type: 'hidden',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: 'programId',
@@ -239,16 +240,17 @@ class SupplyPlanVersionAndReview extends Component {
 
                 }
             ],
-            text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
+            editable: false,
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
@@ -294,7 +296,7 @@ class SupplyPlanVersionAndReview extends Component {
                 // let versionTypeId =this.el.getValueFromCoords(2, x);
 
                 console.log("instance----->", instance.jexcel, "----------->", x);
-                var elInstance = instance.jexcel;
+                var elInstance = instance;
                 var rowData = elInstance.getRowData(x);
                 console.log("rowData==>", rowData);
                 let programId = rowData[11];
@@ -568,7 +570,7 @@ class SupplyPlanVersionAndReview extends Component {
             this.setState({
                 versionTypeList: listArray, loading: false
             }, () => {
-                document.getElementById("versionTypeId").value = 2;
+                // document.getElementById("versionTypeId").value = 2;
             })
         }).catch(
             error => {
@@ -714,6 +716,11 @@ class SupplyPlanVersionAndReview extends Component {
                     if (versionStatusId == 1) {
                         result = result.filter(c => c.versionType.id != 1);
                     }
+                    result.sort((a, b) => {
+                        var itemLabelA = a.lastModifiedDate;
+                        var itemLabelB = b.lastModifiedDate
+                        return itemLabelA < itemLabelB ? 1 : -1;
+                    });
                     this.setState({
                         matricsList: result,
                         message: ''
@@ -725,7 +732,8 @@ class SupplyPlanVersionAndReview extends Component {
                         },
                             () => {
                                 this.el = jexcel(document.getElementById("tableDiv"), '');
-                                this.el.destroy();
+                                // this.el.destroy();
+                                jexcel.destroy(document.getElementById("tableDiv"), true);
                             })
                         if (error.message === "Network Error") {
                             this.setState({
@@ -797,14 +805,16 @@ class SupplyPlanVersionAndReview extends Component {
             this.setState({ matricsList: [], message: i18n.t('static.program.validcountrytext') },
                 () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
-                    this.el.destroy();
+                    // this.el.destroy();
+                    jexcel.destroy(document.getElementById("tableDiv"), true);
                 })
         }
         else {
             this.setState({ matricsList: [], message: i18n.t('static.common.selectProgram') },
                 () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
-                    this.el.destroy();
+                    // this.el.destroy();
+                    jexcel.destroy(document.getElementById("tableDiv"), true);
                 })
         }
 
@@ -970,6 +980,11 @@ class SupplyPlanVersionAndReview extends Component {
 
 
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
         const { programLst } = this.state;
         let programList = programLst.length > 0
             && programLst.map((item, i) => {
@@ -1002,7 +1017,7 @@ class SupplyPlanVersionAndReview extends Component {
         let statusList = statuses.length > 0
             && statuses.map((item, i) => {
                 return (
-                    <option key={i} value={item.id} selected={item.id == 1 ? 'selected' : ''}>
+                    <option key={i} value={item.id}>
                         {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
@@ -1269,7 +1284,7 @@ class SupplyPlanVersionAndReview extends Component {
                                                     >  <option value="-1">{i18n.t('static.common.all')}</option>
                                                         {versionTypes}</Input>
                                                 </InputGroup>    </div></FormGroup>
-                                        <FormGroup className="col-md-3">
+                                        <FormGroup className="col-md-3" style={{ zIndex: '1' }}>
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.common.status')}</Label>
                                             <div className="controls">
                                                 <InputGroup>

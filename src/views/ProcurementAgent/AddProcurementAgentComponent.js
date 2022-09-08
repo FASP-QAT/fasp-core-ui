@@ -3,6 +3,9 @@ import { Row, Col, Card, CardHeader, CardFooter, Button, CardBody, Form, FormFee
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
+import ProgramService from "../../api/ProgramService";
+import Select from 'react-select';
+import classNames from 'classnames';
 
 import RealmService from "../../api/RealmService";
 import ProcurementAgentService from "../../api/ProcurementAgentService";
@@ -22,6 +25,8 @@ let initialValues = {
     procurementAgentName: "",
     submittedToApprovedLeadTime: "",
     approvedToShippedLeadTime: "",
+    procurementAgentTypeId: [],
+    programId: []
     // colorHtmlCode: "",
 
 }
@@ -33,6 +38,10 @@ const validationSchema = function (values) {
         // procurementAgentCode: Yup.string()
         //     .matches(/^\S*$/, i18n.t('static.validNoSpace.string'))
         //     .required(i18n.t('static.procurementagent.codetext')),
+        // programId: Yup.string()
+        //     .required(i18n.t('static.procurementagent.programtext')),
+        procurementAgentTypeId: Yup.string()
+            .required(i18n.t('static.procurementagent.procurementagenttypetext')),
         procurementAgentCode: Yup.string()
             // .matches(ALPHABET_NUMBER_REGEX, i18n.t('static.message.alphabetnumerallowed'))
             // .matches(/^[a-zA-Z0-9_'\/-]*$/, i18n.t('static.common.alphabetNumericCharOnly'))
@@ -103,6 +112,9 @@ class AddProcurementAgentComponent extends Component {
                 a: '1',
             },
             realms: [],
+            procurementAgentTypes: [],
+            programId: '',
+            programList: [],
             procurementAgent: {
                 realm: {
                     id: ''
@@ -116,6 +128,10 @@ class AddProcurementAgentComponent extends Component {
                 approvedToShippedLeadTime: '',
                 localProcurementAgent: false,
                 colorHtmlCode: '#F17013',
+                procurementAgentType: {
+                    id: ''
+                },
+                programList: [],
             },
             message: '',
             lang: localStorage.getItem('lang'),
@@ -127,6 +143,9 @@ class AddProcurementAgentComponent extends Component {
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.getDisplayName = this.getDisplayName.bind(this);
+        this.programChange = this.programChange.bind(this);
+        this.getProgramByRealmId = this.getProgramByRealmId.bind(this);
+
     }
     handleClick = () => {
         this.setState({ displayColorPicker: !this.state.displayColorPicker })
@@ -286,6 +305,12 @@ class AddProcurementAgentComponent extends Component {
         if (event.target.name == "realmId") {
             procurementAgent.realm.id = event.target.value;
         }
+        if (event.target.name == "procurementAgentTypeId") {
+            procurementAgent.procurementAgentType.id = event.target.value;
+        }
+        if (event.target.name == "programId") {
+            procurementAgent.programList.id = event.target.value;
+        }
         if (event.target.name == "colorHtmlCode") {
             procurementAgent.colorHtmlCode = event.target.value.toUpperCase();
         }
@@ -313,6 +338,38 @@ class AddProcurementAgentComponent extends Component {
             () => { });
     };
 
+    programChange(programId) {
+        var selectedArray = [];
+        for (var p = 0; p < programId.length; p++) {
+            selectedArray.push(programId[p].value);
+        }
+        if (selectedArray.includes("-1")) {
+            this.setState({ programId: [] });
+            var list = this.state.programList.filter(c => c.value != -1)
+            this.setState({ programId: list });
+            var programId = list;
+        } else {
+            this.setState({ programId: programId });
+            var programId = programId;
+        }
+
+        let { procurementAgent } = this.state;
+        // this.setState({ roleId });
+        var programIdArray = [];
+        for (var i = 0; i < programId.length; i++) {
+            programIdArray[i] = {
+                id: programId[i].value
+            }
+        }
+
+        procurementAgent.programList = programIdArray;
+
+        this.setState({
+            procurementAgent,
+        },
+            () => { });
+    }
+
     touchAll(setTouched, errors) {
         setTouched({
             realmId: true,
@@ -320,6 +377,8 @@ class AddProcurementAgentComponent extends Component {
             procurementAgentName: true,
             submittedToApprovedLeadTime: true,
             approvedToShippedLeadTime: true,
+            procurementAgentTypeId: true,
+            programId: true
             // colorHtmlCode: true,
         }
         )
@@ -337,6 +396,83 @@ class AddProcurementAgentComponent extends Component {
                 form[i].focus()
                 break
             }
+        }
+    }
+
+    getProgramByRealmId(e) {
+        // AuthenticationService.setupAxiosInterceptors();
+        if (e != 0) {
+            ProgramService.getProgramList(e)
+                .then(response => {
+                    if (response.status == 200) {
+                        var programList = [{ value: "-1", label: i18n.t("static.common.all") }];
+                        for (var i = 0; i < response.data.length; i++) {
+                            programList[i + 1] = { value: response.data[i].programId, label: getLabelText(response.data[i].label, this.state.lang) }
+                        }
+                        var listArray = programList;
+                        listArray.sort((a, b) => {
+                            var itemLabelA = a.label.toUpperCase(); // ignore upper and lowercase
+                            var itemLabelB = b.label.toUpperCase(); // ignore upper and lowercase                   
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        });
+                        console.log("listArray", listArray)
+                        this.setState({
+                            programList: listArray,
+                            loading: false
+                        })
+                    } else {
+                        this.setState({
+                            message: response.data.messageCode, loading: false
+                        },
+                            () => {
+                                this.hideSecondComponent();
+                            })
+                    }
+                })
+                .catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
+                                    break;
+                            }
+                        }
+                    }
+                );
+        } else {
+            this.setState({
+                programList: {}, loading: false
+            })
         }
     }
 
@@ -417,9 +553,71 @@ class AddProcurementAgentComponent extends Component {
                 procurementAgent
             },
                 () => {
-
+                    console.log("listArray", realmId)
+                    this.getProgramByRealmId(realmId)
                 })
         }
+
+        ProcurementAgentService.getProcurementAgentTypeListAll()
+            .then(response => {
+                if (response.status == 200) {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
+                    this.setState({
+                        procurementAgentTypes: listArray.filter(c => c.active == true && realmId == c.realm.id), loading: false,
+                    })
+                } else {
+                    this.setState({
+                        message: response.data.messageCode, loading: false
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
+                }
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
     }
 
     render() {
@@ -462,6 +660,15 @@ class AddProcurementAgentComponent extends Component {
                     </option>
                 )
             }, this);
+        const { procurementAgentTypes } = this.state;
+        let procurementAgentTypeList = procurementAgentTypes.length > 0
+            && procurementAgentTypes.map((item, i) => {
+                return (
+                    <option key={i} value={item.procurementAgentTypeId}>
+                        {item.procurementAgentTypeCode}
+                    </option>
+                )
+            }, this);
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
@@ -484,6 +691,8 @@ class AddProcurementAgentComponent extends Component {
                                         submittedToApprovedLeadTime: this.state.procurementAgent.submittedToApprovedLeadTime,
                                         approvedToShippedLeadTime: this.state.procurementAgent.approvedToShippedLeadTime,
                                         colorHtmlCode: this.state.procurementAgent.colorHtmlCode,
+                                        procurementAgentTypeId: this.state.procurementAgent.procurementAgentType.id,
+                                        programId: this.state.procurementAgent.programList.id
                                     }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -555,84 +764,132 @@ class AddProcurementAgentComponent extends Component {
                                         isSubmitting,
                                         isValid,
                                         setTouched,
-                                        handleReset
+                                        handleReset,
+                                        setFieldTouched,
+                                        setFieldValue
                                     }) => (
-                                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='procurementAgentForm' autocomplete="off">
-                                                <CardBody className="pb-0" style={{ display: this.state.loading ? "none" : "block" }}>
-                                                    <FormGroup>
-                                                        <Label htmlFor="realmId">{i18n.t('static.realm.realmName')}<span className="red Reqasterisk">*</span></Label>
-                                                        {/* <InputGroupAddon addonType="prepend"> */}
-                                                        {/* <InputGroupText><i className="fa fa-pencil"></i></InputGroupText> */}
-                                                        <Input
-                                                            type="select"
-                                                            bsSize="sm"
-                                                            name="realmId"
-                                                            id="realmId"
-                                                            valid={!errors.realmId && this.state.procurementAgent.realm.id != ''}
-                                                            invalid={touched.realmId && !!errors.realmId}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.procurementAgent.realm.id}
-                                                            required
-                                                        >
-                                                            <option value="">{i18n.t('static.common.select')}</option>
-                                                            {realmList}
-                                                        </Input>
-                                                        {/* </InputGroupAddon> */}
-                                                        <FormFeedback className="red">{errors.realmId}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label for="procurementAgentName">{i18n.t('static.procurementagent.procurementagentname')}<span className="red Reqasterisk">*</span></Label>
-                                                        {/* <InputGroupAddon addonType="prepend"> */}
-                                                        {/* <InputGroupText><i className="fa fa-pencil-square-o"></i></InputGroupText> */}
-                                                        <Input type="text"
-                                                            bsSize="sm"
-                                                            name="procurementAgentName"
-                                                            id="procurementAgentName"
-                                                            valid={!errors.procurementAgentName && this.state.procurementAgent.label.label_en != ''}
-                                                            invalid={touched.procurementAgentName && !!errors.procurementAgentName}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            // onBlur={handleBlur}
-                                                            onBlur={(e) => { handleBlur(e); this.getDisplayName() }}
-                                                            maxLength={255}
-                                                            required
-                                                            value={this.Capitalize(this.state.procurementAgent.label.label_en)}
-                                                        />
-                                                        {/* </InputGroupAddon> */}
-                                                        <FormFeedback className="red">{errors.procurementAgentName}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label for="procurementAgentCode">{i18n.t('static.procurementagent.procurementagentcode')}<span className="red Reqasterisk">*</span></Label>
-                                                        {/* <InputGroupAddon addonType="prepend"> */}
-                                                        {/* <InputGroupText><i className="fa fa-pencil-square-o"></i></InputGroupText> */}
-                                                        <Input type="text"
-                                                            bsSize="sm"
-                                                            name="procurementAgentCode"
-                                                            id="procurementAgentCode"
-                                                            valid={!errors.procurementAgentCode && this.state.procurementAgent.procurementAgentCode != ''}
-                                                            invalid={touched.procurementAgentCode && !!errors.procurementAgentCode}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            required
-                                                            maxLength={10}
-                                                            // value={this.Capitalize(this.state.procurementAgent.procurementAgentCode)}
-                                                            value={this.state.procurementAgent.procurementAgentCode}
-                                                        />
-                                                        {/* </InputGroupAddon> */}
-                                                        <FormFeedback className="red">{errors.procurementAgentCode}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label for="colorHtmlCode">{i18n.t('static.procurementagent.procurementAgentColorCode')}</Label>
-                                                        <div bsSize="sm">
-                                                            <div style={styles.swatch} onClick={this.handleClick}>
-                                                                <div style={styles.color} />
-                                                            </div>
+                                        <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='procurementAgentForm' autocomplete="off">
+                                            <CardBody className="pb-0" style={{ display: this.state.loading ? "none" : "block" }}>
+                                                <FormGroup>
+                                                    <Label htmlFor="realmId">{i18n.t('static.realm.realmName')}<span className="red Reqasterisk">*</span></Label>
+                                                    {/* <InputGroupAddon addonType="prepend"> */}
+                                                    {/* <InputGroupText><i className="fa fa-pencil"></i></InputGroupText> */}
+                                                    <Input
+                                                        type="select"
+                                                        bsSize="sm"
+                                                        name="realmId"
+                                                        id="realmId"
+                                                        valid={!errors.realmId && this.state.procurementAgent.realm.id != ''}
+                                                        invalid={touched.realmId && !!errors.realmId}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.procurementAgent.realm.id}
+                                                        required
+                                                    >
+                                                        <option value="">{i18n.t('static.common.select')}</option>
+                                                        {realmList}
+                                                    </Input>
+                                                    {/* </InputGroupAddon> */}
+                                                    <FormFeedback className="red">{errors.realmId}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup className="Selectcontrol-bdrNone">
+                                                    <Label htmlFor="programId">{i18n.t('static.dataSource.program')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Select
+                                                        className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                            { 'is-valid': !errors.programId && this.state.procurementAgent.programList.length != 0 },
+                                                            { 'is-invalid': (touched.programId && !!errors.programId) }
+                                                        )}
+                                                        bsSize="sm"
+                                                        onChange={(e) => {
+                                                            handleChange(e);
+                                                            setFieldValue("programId", e);
+                                                            this.programChange(e);
+                                                        }}
+                                                        onBlur={() => setFieldTouched("programId", true)}
+                                                        name="programId"
+                                                        id="programId"
+                                                        multi
+                                                        required
+                                                        min={1}
+                                                        options={this.state.programList}
+                                                        value={this.state.programId}
+                                                    />
+                                                    <FormFeedback className="red">{errors.programId}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label htmlFor="procurementAgentTypeId">{i18n.t('static.dashboard.procurementagenttype')}<span className="red Reqasterisk">*</span></Label>
+                                                    {/* <InputGroupAddon addonType="prepend"> */}
+                                                    {/* <InputGroupText><i className="fa fa-pencil"></i></InputGroupText> */}
+                                                    <Input
+                                                        type="select"
+                                                        bsSize="sm"
+                                                        name="procurementAgentTypeId"
+                                                        id="procurementAgentTypeId"
+                                                        valid={!errors.procurementAgentTypeId && this.state.procurementAgent.procurementAgentType.id != ''}
+                                                        invalid={touched.procurementAgentTypeId && !!errors.procurementAgentTypeId}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.procurementAgent.procurementAgentType.id}
+                                                        required
+                                                    >
+                                                        <option value="">{i18n.t('static.common.select')}</option>
+                                                        {procurementAgentTypeList}
+                                                    </Input>
+                                                    {/* </InputGroupAddon> */}
+                                                    <FormFeedback className="red">{errors.procurementAgentTypeId}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label for="procurementAgentName">{i18n.t('static.procurementagent.procurementagentname')}<span className="red Reqasterisk">*</span></Label>
+                                                    {/* <InputGroupAddon addonType="prepend"> */}
+                                                    {/* <InputGroupText><i className="fa fa-pencil-square-o"></i></InputGroupText> */}
+                                                    <Input type="text"
+                                                        bsSize="sm"
+                                                        name="procurementAgentName"
+                                                        id="procurementAgentName"
+                                                        valid={!errors.procurementAgentName && this.state.procurementAgent.label.label_en != ''}
+                                                        invalid={touched.procurementAgentName && !!errors.procurementAgentName}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        // onBlur={handleBlur}
+                                                        onBlur={(e) => { handleBlur(e); this.getDisplayName() }}
+                                                        maxLength={255}
+                                                        required
+                                                        value={this.Capitalize(this.state.procurementAgent.label.label_en)}
+                                                    />
+                                                    {/* </InputGroupAddon> */}
+                                                    <FormFeedback className="red">{errors.procurementAgentName}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label for="procurementAgentCode">{i18n.t('static.procurementagent.procurementagentcode')}<span className="red Reqasterisk">*</span></Label>
+                                                    {/* <InputGroupAddon addonType="prepend"> */}
+                                                    {/* <InputGroupText><i className="fa fa-pencil-square-o"></i></InputGroupText> */}
+                                                    <Input type="text"
+                                                        bsSize="sm"
+                                                        name="procurementAgentCode"
+                                                        id="procurementAgentCode"
+                                                        valid={!errors.procurementAgentCode && this.state.procurementAgent.procurementAgentCode != ''}
+                                                        invalid={touched.procurementAgentCode && !!errors.procurementAgentCode}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        onBlur={handleBlur}
+                                                        required
+                                                        maxLength={10}
+                                                        // value={this.Capitalize(this.state.procurementAgent.procurementAgentCode)}
+                                                        value={this.state.procurementAgent.procurementAgentCode}
+                                                    />
+                                                    {/* </InputGroupAddon> */}
+                                                    <FormFeedback className="red">{errors.procurementAgentCode}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label for="colorHtmlCode">{i18n.t('static.procurementagent.procurementAgentColorCode')}</Label>
+                                                    <div bsSize="sm">
+                                                        <div style={styles.swatch} onClick={this.handleClick}>
+                                                            <div style={styles.color} />
                                                         </div>
-                                                        {this.state.displayColorPicker ? <div style={styles.popover}>
-                                                            <div style={styles.cover} onClick={this.handleClose} />
-                                                            <SketchPicker color={this.state.color} onChange={this.handleChangeColor} />
-                                                        </div> : null}
-                                                        {/* <Input type="text"
+                                                    </div>
+                                                    {this.state.displayColorPicker ? <div style={styles.popover}>
+                                                        <div style={styles.cover} onClick={this.handleClose} />
+                                                        <SketchPicker color={this.state.color} onChange={this.handleChangeColor} />
+                                                    </div> : null}
+                                                    {/* <Input type="text"
                                                             bsSize="sm"
                                                             name="colorHtmlCode"
                                                             id="colorHtmlCode"
@@ -644,49 +901,49 @@ class AddProcurementAgentComponent extends Component {
                                                             maxLength={6}
                                                             value={this.state.procurementAgent.colorHtmlCode}
                                                         /> */}
-                                                        {/* <FormFeedback className="red">{errors.colorHtmlCode}</FormFeedback> */}
+                                                    {/* <FormFeedback className="red">{errors.colorHtmlCode}</FormFeedback> */}
 
-                                                    </FormGroup>
+                                                </FormGroup>
 
-                                                    <FormGroup>
-                                                        <Label for="submittedToApprovedLeadTime">{i18n.t('static.procurementagent.procurementagentsubmittoapprovetimeLabel')}<span className="red Reqasterisk">*</span></Label>
-                                                        {/* <InputGroupAddon addonType="prepend"> */}
-                                                        {/* <InputGroupText><i className="fa fa-clock-o"></i></InputGroupText> */}
-                                                        <Input type="number"
-                                                            bsSize="sm"
-                                                            name="submittedToApprovedLeadTime"
-                                                            id="submittedToApprovedLeadTime"
-                                                            valid={!errors.submittedToApprovedLeadTime && this.state.procurementAgent.submittedToApprovedLeadTime != ''}
-                                                            invalid={touched.submittedToApprovedLeadTime && !!errors.submittedToApprovedLeadTime}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            required
-                                                            value={this.state.procurementAgent.submittedToApprovedLeadTime}
-                                                            min="0"
-                                                        />
-                                                        {/* </InputGroupAddon> */}
-                                                        <FormFeedback className="red">{errors.submittedToApprovedLeadTime}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label for="approvedToShippedLeadTime">{i18n.t('static.procurementagent.procurementagentapprovetoshippedtimeLabel')}<span className="red Reqasterisk">*</span></Label>
-                                                        {/* <InputGroupAddon addonType="prepend"> */}
-                                                        {/* <InputGroupText><i className="fa fa-clock-o"></i></InputGroupText> */}
-                                                        <Input type="number"
-                                                            bsSize="sm"
-                                                            name="approvedToShippedLeadTime"
-                                                            id="approvedToShippedLeadTime"
-                                                            valid={!errors.approvedToShippedLeadTime && this.state.procurementAgent.approvedToShippedLeadTime != ''}
-                                                            invalid={touched.approvedToShippedLeadTime && !!errors.approvedToShippedLeadTime}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            required
-                                                            value={this.state.procurementAgent.approvedToShippedLeadTime}
-                                                            min="1"
-                                                        />
-                                                        {/* </InputGroupAddon> */}
-                                                        <FormFeedback className="red">{errors.approvedToShippedLeadTime}</FormFeedback>
-                                                    </FormGroup>
-                                                    {/* <FormGroup>
+                                                <FormGroup>
+                                                    <Label for="submittedToApprovedLeadTime">{i18n.t('static.procurementagent.procurementagentsubmittoapprovetimeLabel')}<span className="red Reqasterisk">*</span></Label>
+                                                    {/* <InputGroupAddon addonType="prepend"> */}
+                                                    {/* <InputGroupText><i className="fa fa-clock-o"></i></InputGroupText> */}
+                                                    <Input type="number"
+                                                        bsSize="sm"
+                                                        name="submittedToApprovedLeadTime"
+                                                        id="submittedToApprovedLeadTime"
+                                                        valid={!errors.submittedToApprovedLeadTime && this.state.procurementAgent.submittedToApprovedLeadTime != ''}
+                                                        invalid={touched.submittedToApprovedLeadTime && !!errors.submittedToApprovedLeadTime}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        onBlur={handleBlur}
+                                                        required
+                                                        value={this.state.procurementAgent.submittedToApprovedLeadTime}
+                                                        min="0"
+                                                    />
+                                                    {/* </InputGroupAddon> */}
+                                                    <FormFeedback className="red">{errors.submittedToApprovedLeadTime}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label for="approvedToShippedLeadTime">{i18n.t('static.procurementagent.procurementagentapprovetoshippedtimeLabel')}<span className="red Reqasterisk">*</span></Label>
+                                                    {/* <InputGroupAddon addonType="prepend"> */}
+                                                    {/* <InputGroupText><i className="fa fa-clock-o"></i></InputGroupText> */}
+                                                    <Input type="number"
+                                                        bsSize="sm"
+                                                        name="approvedToShippedLeadTime"
+                                                        id="approvedToShippedLeadTime"
+                                                        valid={!errors.approvedToShippedLeadTime && this.state.procurementAgent.approvedToShippedLeadTime != ''}
+                                                        invalid={touched.approvedToShippedLeadTime && !!errors.approvedToShippedLeadTime}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        onBlur={handleBlur}
+                                                        required
+                                                        value={this.state.procurementAgent.approvedToShippedLeadTime}
+                                                        min="1"
+                                                    />
+                                                    {/* </InputGroupAddon> */}
+                                                    <FormFeedback className="red">{errors.approvedToShippedLeadTime}</FormFeedback>
+                                                </FormGroup>
+                                                {/* <FormGroup>
                                                         <Label className="P-absltRadio">{i18n.t('static.procurementAgent.localProcurementAgent')}  </Label>
                                                         <FormGroup check inline className="procurementAgentradiomargin">
                                                             <Input
@@ -721,31 +978,31 @@ class AddProcurementAgentComponent extends Component {
                                                             </Label>
                                                         </FormGroup>
                                                     </FormGroup> */}
-                                                </CardBody>
-                                                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                                                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                                                        <div class="align-items-center">
-                                                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+                                            </CardBody>
+                                            <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                                    <div class="align-items-center">
+                                                        <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-                                                            <div class="spinner-border blue ml-4" role="status">
+                                                        <div class="spinner-border blue ml-4" role="status">
 
-                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <CardFooter>
-                                                    <FormGroup>
-                                                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                                        {/* <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button> */}
-                                                        <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                            </div>
+                                            <CardFooter>
+                                                <FormGroup>
+                                                    <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                    <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                    {/* <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button> */}
+                                                    <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
 
-                                                        &nbsp;
-                                                    </FormGroup>
-                                                </CardFooter>
-                                            </Form>
+                                                    &nbsp;
+                                                </FormGroup>
+                                            </CardFooter>
+                                        </Form>
 
-                                        )} />
+                                    )} />
 
                         </Card>
                     </Col>

@@ -1064,10 +1064,10 @@ export default class ShipmentDetails extends React.Component {
                             </ul>
                         </div>
 
-                        <div className="shipmentconsumptionSearchMarginTop" style={{ display: this.state.loading ? "none" : "block" }}>
+                        <div className="shipmentconsumptionSearchMarginTop" >
                             <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state} updateState={this.updateState} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} hideFourthComponent={this.hideFourthComponent} hideFifthComponent={this.hideFifthComponent} shipmentPage="shipmentDataEntry" useLocalData={1} openBatchPopUp={this.openBatchPopUp} />
-                            <div className="table-responsive shipmentDataEntryTable" id="shipmentsDetailsTableDiv">
-                                <div id="shipmentsDetailsTable" className="jexcelremoveReadonlybackground" />
+                            <div className="shipmentDataEntryTable" id="shipmentsDetailsTableDiv">
+                                <div id="shipmentsDetailsTable" className="jexcelremoveReadonlybackground" style={{ display: this.state.loading ? "none" : "block" }}/>
                             </div>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>
@@ -1100,19 +1100,19 @@ export default class ShipmentDetails extends React.Component {
                     </ModalHeader>
                     <ModalBody>
                         <h6 className="red" id="div3">{this.state.qtyCalculatorValidationError}</h6>
-                        <div className="table-responsive RemoveStriped">
+                        <div className="RemoveStriped">
                             <div id="qtyCalculatorTable"></div>
                         </div>
 
-                        <div className="table-responsive RemoveStriped">
-                            <div id="qtyCalculatorTable1"></div>
+                        <div className="RemoveStriped">
+                            <div id="qtyCalculatorTable1" className="jexcelremoveReadonlybackground"></div>
                         </div>
                         <h6 className="red" id="div4">{this.state.shipmentDatesError}</h6>
-                        <div className="table-responsive">
+                        <div className="">
                             <div id="shipmentDatesTable"></div>
                         </div>
                         <h6 className="red" id="div5">{this.state.shipmentBatchInfoDuplicateError || this.state.shipmentValidationBatchError}</h6>
-                        <div className="table-responsive">
+                        <div className="">
                             <div id="shipmentBatchInfoTable" className="AddListbatchtrHeight"></div>
                         </div>
 
