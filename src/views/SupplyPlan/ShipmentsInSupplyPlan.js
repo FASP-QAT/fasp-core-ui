@@ -78,10 +78,12 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
                 var index = (instance).getValue(`AB${parseInt(data[i].y) + 1}`, true);
-                (instance).setValueFromCoords(3, data[i].y, document.getElementById("planningUnitId").value, true);
+                // (instance).setValueFromCoords(3, data[i].y, document.getElementById("planningUnitId").value, true);
                 (instance).setValueFromCoords(25, data[i].y, moment(Date.now()).format("YYYY-MM-DD"), true);
                 (instance).setValueFromCoords(20, data[i].y, `=ROUND(T${parseInt(data[i].y) + 1}*M${parseInt(data[i].y) + 1},2)`, true);
+                (instance).setValueFromCoords(14, data[i].y, `=ROUND(M${parseInt(data[i].y) + 1}*N${parseInt(data[i].y) + 1},0)`, true);
                 (instance).setValueFromCoords(22, data[i].y, `=ROUND(ROUND(M${parseInt(data[i].y) + 1}*T${parseInt(data[i].y) + 1},2)+V${parseInt(data[i].y) + 1},2)`, true);
+                (instance).setValueFromCoords(2, false, false, true);
                 if (index === "" || index == null || index == undefined) {
                     (instance).setValueFromCoords(1, data[i].y, false, true);
                     (instance).setValueFromCoords(26, data[i].y, "", true);
@@ -101,21 +103,23 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             }
             if (data[i].x == 19 && data[i].value == "") {
                 var rowData = (instance).getRowData(data[i].y);
+                if(rowData[3]!=""){
                 var pricePerUnit = "";
-                var planningUnitId = document.getElementById("planningUnitId").value;
+                var planningUnitId = rowData[3];
                 var procurementAgentPlanningUnit = this.state.procurementAgentPlanningUnitListAll.filter(c => c.procurementAgent.id == rowData[7] && c.planningUnit.id == planningUnitId && c.active);
                 // if (procurementAgentPlanningUnit.length > 0 && ((procurementAgentPlanningUnit[0].unitsPerPalletEuro1 != 0 && procurementAgentPlanningUnit[0].unitsPerPalletEuro1 != null) || (procurementAgentPlanningUnit[0].moq != 0 && procurementAgentPlanningUnit[0].moq != null) || (procurementAgentPlanningUnit[0].unitsPerPalletEuro2 != 0 && procurementAgentPlanningUnit[0].unitsPerPalletEuro2 != null) || (procurementAgentPlanningUnit[0].unitsPerContainer != 0 && procurementAgentPlanningUnit[0].unitsPerContainer != null))) {
                 //     elInstance.setValueFromCoords(9, y, "", true);
                 // }
                 // if (rowData[27] == -1 || rowData[27] == "" || rowData[27] == null || rowData[27] == undefined) {
-                var programPriceList = this.props.items.programPlanningUnitForPrice.programPlanningUnitProcurementAgentPrices.filter(c => c.program.id == this.state.actualProgramId && c.procurementAgent.id == rowData[7] && c.planningUnit.id == planningUnitId && c.active);
+                var puData=this.props.items.puData.filter(c=>c.id==planningUnitId)[0];
+                var programPriceList = puData.programPlanningUnitForPrice.programPlanningUnitProcurementAgentPrices.filter(c => c.program.id == this.state.actualProgramId && c.procurementAgent.id == rowData[7] && c.planningUnit.id == planningUnitId && c.active);
                 if (programPriceList.length > 0) {
                     pricePerUnit = Number(programPriceList[0].price);
                 } else {
                     if (procurementAgentPlanningUnit.length > 0) {
                         pricePerUnit = Number(procurementAgentPlanningUnit[0].catalogPrice);
                     } else {
-                        pricePerUnit = this.props.items.catalogPrice
+                        pricePerUnit = puData.catalogPrice
                     }
                 }
                 if (rowData[18] != "") {
@@ -124,6 +128,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 }
                 // }
                 (instance).setValueFromCoords(19, data[i].y, pricePerUnit, true);
+            }
             }
             if (data[i].x == 21 && data[i].value != "") {
                 (instance).setValueFromCoords(21, data[i].y, data[i].value, true);

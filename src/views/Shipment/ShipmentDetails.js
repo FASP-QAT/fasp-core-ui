@@ -159,29 +159,33 @@ export default class ShipmentDetails extends React.Component {
         //Add Header Row
 
         worksheet.columns = [
-            { header: i18n.t('static.common.active'), key: 'string', width: 25 },
-            { header: i18n.t('static.report.id'), key: 'name', width: 25 },
-            { header: i18n.t('static.dataEntry.planningUnitId'), key: 'name', width: 25 },
-            { header: i18n.t('static.shipmentDataEntry.shipmentStatus'), key: 'name', width: 25 },
-            { header: i18n.t('static.common.receivedate'), key: 'string', width: 25, style: { numFmt: 'YYYY-MM-DD' } },
-            { header: i18n.t('static.supplyPlan.shipmentMode'), key: 'name', width: 40 },
-            { header: i18n.t('static.procurementagent.procurementagent'), key: 'name', width: 40 },
-            { header: i18n.t('static.shipmentDataEntry.localProcurement'), key: 'name', width: 32 },
-            { header: i18n.t('static.shipmentDataentry.procurementAgentOrderNo'), key: 'name', width: 32 },
-            { header: i18n.t('static.shipmentDataentry.procurementAgentPrimeLineNo'), key: 'name', width: 12 },
-            { header: i18n.t('static.supplyPlan.adjustesOrderQty'), key: 'name', width: 12 },
-            { header: i18n.t('static.supplyPlan.emergencyOrder'), key: 'name', width: 25 },
-            { header: i18n.t('static.subfundingsource.fundingsource'), key: 'string', width: 25 },
+            { header: i18n.t('static.common.active'), key: 'string', width: 25 },//A
+            { header: i18n.t('static.supplyPlan.erpFlag'), key: 'string', width: 25 },//A
+            { header: i18n.t('static.report.id'), key: 'name', width: 25 },//B
+            { header: i18n.t('static.dataEntry.planningUnitId'), key: 'name', width: 25 },//C
+            { header: i18n.t('static.shipmentDataEntry.shipmentStatus'), key: 'name', width: 25 },//D
+            { header: i18n.t('static.common.receivedate'), key: 'string', width: 25, style: { numFmt: 'YYYY-MM-DD' } },//E
+            { header: i18n.t('static.supplyPlan.shipmentMode'), key: 'name', width: 40 },//F
+            { header: i18n.t('static.procurementagent.procurementagent'), key: 'name', width: 40 },//G
+            { header: i18n.t('static.shipmentDataEntry.localProcurement'), key: 'name', width: 32 },//H
+            { header: i18n.t('static.shipmentDataentry.procurementAgentOrderNo'), key: 'name', width: 32 },//I
+            { header: i18n.t('static.shipmentDataentry.procurementAgentPrimeLineNo'), key: 'name', width: 12 },//J
+            { header: i18n.t('static.supplyPlan.alternatePlanningUnit'), key: 'name', width: 32 },//K
+            { header: i18n.t('static.shipment.shipmentQtyARU'), key: 'name', width: 12 },//L
+            { header: i18n.t('static.unit.multiplierFromARUTOPU'), key: 'name', width: 12 },//M
+            { header: i18n.t('static.supplyPlan.quantityPU'), key: 'name', width: 12 },//N
+            { header: i18n.t('static.supplyPlan.emergencyOrder'), key: 'name', width: 25 },//O
+            { header: i18n.t('static.subfundingsource.fundingsource'), key: 'string', width: 25 },//P
 
-            { header: i18n.t('static.dashboard.budget'), key: 'string', width: 25 },
-            { header: i18n.t('static.dashboard.currency'), key: 'string', width: 25 },
-            { header: i18n.t('static.supplyPlan.pricePerPlanningUnit'), key: 'string', width: 25 },
-            { header: i18n.t('static.shipment.productcost'), key: 'string', width: 25 },
-            { header: i18n.t('static.shipment.freightcost'), key: 'string', width: 25 },
-            { header: i18n.t('static.shipment.totalCost'), key: 'string', width: 25 },
+            { header: i18n.t('static.dashboard.budget'), key: 'string', width: 25 },//Q
+            { header: i18n.t('static.dashboard.currency'), key: 'string', width: 25 },//R
+            { header: i18n.t('static.supplyPlan.pricePerPlanningUnit'), key: 'string', width: 25 },//S
+            { header: i18n.t('static.shipment.productcost'), key: 'string', width: 25 },//T
+            { header: i18n.t('static.shipment.freightcost'), key: 'string', width: 25 },//U
+            { header: i18n.t('static.shipment.totalCost'), key: 'string', width: 25 },//V
 
-            { header: i18n.t('static.datasource.datasource'), key: 'string', width: 25 },
-            { header: i18n.t('static.program.notes'), key: 'string', width: 25 },
+            { header: i18n.t('static.datasource.datasource'), key: 'string', width: 25 },//W
+            { header: i18n.t('static.program.notes'), key: 'string', width: 25 },//X
 
 
         ];
@@ -224,11 +228,11 @@ export default class ShipmentDetails extends React.Component {
         // });
 
         for (let i = 0; i < 100; i++) {
-            worksheet.getCell('E' + (+i + 2)).note = i18n.t('static.dataEntry.dateValidation');
+            worksheet.getCell('F' + (+i + 2)).note = i18n.t('static.dataEntry.dateValidation');
         }
 
         let shipmentModeDropdown = [i18n.t('static.supplyPlan.sea'), i18n.t('static.supplyPlan.air')];
-        worksheet.dataValidations.add('F2:F100', {
+        worksheet.dataValidations.add('G2:G100', {
             type: 'list',
             allowBlank: false,
             formulae: [`"${shipmentModeDropdown.join(",")}"`],
@@ -239,7 +243,7 @@ export default class ShipmentDetails extends React.Component {
 
         // let isLocalProcurementAgentDropdown = [i18n.t('static.dataEntry.True'), i18n.t('static.dataEntry.False')];
         let isLocalProcurementAgentDropdown = ["True", "False"];
-        worksheet.dataValidations.add('H2:H100', {
+        worksheet.dataValidations.add('I2:I100', {
             type: 'list',
             allowBlank: false,
             formulae: [`"${isLocalProcurementAgentDropdown.join(",")}"`],
@@ -250,7 +254,7 @@ export default class ShipmentDetails extends React.Component {
 
         // let emergencyShipmentDropdown = [i18n.t('static.dataEntry.True'), i18n.t('static.dataEntry.False')];
         let emergencyShipmentDropdown = ["True", "False"];
-        worksheet.dataValidations.add('L2:L100', {
+        worksheet.dataValidations.add('P2:P100', {
             type: 'list',
             allowBlank: false,
             formulae: [`"${emergencyShipmentDropdown.join(",")}"`],
@@ -270,7 +274,7 @@ export default class ShipmentDetails extends React.Component {
             dataSourceVar.push(datasourceList[i].name);
         }
 
-        worksheet.dataValidations.add('T2:T100', {
+        worksheet.dataValidations.add('X2:X100', {
             type: 'list',
             allowBlank: false,
             formulae: [`"${dataSourceVar.join(",")}"`],
@@ -291,7 +295,7 @@ export default class ShipmentDetails extends React.Component {
             currencyVar.push(currencyList[i].name);
         }
 
-        worksheet.dataValidations.add('O2:O100', {
+        worksheet.dataValidations.add('S2:S100', {
             type: 'list',
             allowBlank: false,
             formulae: [`"${currencyVar.join(",")}"`],
@@ -311,7 +315,7 @@ export default class ShipmentDetails extends React.Component {
             fundingSourceVar.push(fundingSourceList[i].name);
         }
 
-        worksheet.dataValidations.add('M2:M100', {
+        worksheet.dataValidations.add('Q2:Q100', {
             type: 'list',
             allowBlank: false,
             formulae: [`"${fundingSourceVar.join(",")}"`],
@@ -331,7 +335,7 @@ export default class ShipmentDetails extends React.Component {
             procurementAgentVar.push(procurementAgentList[i].name);
         }
 
-        worksheet.dataValidations.add('G2:G100', {
+        worksheet.dataValidations.add('H2:H100', {
             type: 'list',
             allowBlank: false,
             formulae: [`"${procurementAgentVar.join(",")}"`],
@@ -351,7 +355,7 @@ export default class ShipmentDetails extends React.Component {
             budgetVar.push(budgetList[i].name);
         }
 
-        worksheet.dataValidations.add('N2:N100', {
+        worksheet.dataValidations.add('R2:R100', {
             type: 'list',
             allowBlank: false,
             formulae: [`"${budgetVar.join(",")}"`],
@@ -360,20 +364,20 @@ export default class ShipmentDetails extends React.Component {
             // error: 'Invalid value',
         });
 
-        let planningUnitVar = [];
-        let planningUnitList = this.state.planningUnitListForJexcel;
-        for (let i = 0; i < planningUnitList.length; i++) {
-            planningUnitVar.push(planningUnitList[i].name);
-        }
+        // let planningUnitVar = [];
+        // let planningUnitList = this.state.planningUnitListForJexcel;
+        // for (let i = 0; i < planningUnitList.length; i++) {
+        //     planningUnitVar.push(planningUnitList[i].name);
+        // }
 
-        worksheet.dataValidations.add('C2:C100', {
-            type: 'list',
-            allowBlank: false,
-            formulae: [`"${planningUnitVar.join(",")}"`],
-            showErrorMessage: true,
-            // errorStyle: 'error',
-            // error: 'Invalid value',
-        });
+        // worksheet.dataValidations.add('C2:C100', {
+        //     type: 'list',
+        //     allowBlank: false,
+        //     formulae: [`"${planningUnitVar.join(",")}"`],
+        //     showErrorMessage: true,
+        //     // errorStyle: 'error',
+        //     // error: 'Invalid value',
+        // });
 
         let shipmentStatusVar = [];
         let shipmentStatusList = this.state.shipmentStatusList.filter(c => c.active.toString() == "true");
@@ -381,7 +385,7 @@ export default class ShipmentDetails extends React.Component {
             shipmentStatusVar.push(shipmentStatusList[i].name);
         }
 
-        worksheet.dataValidations.add('D2:D100', {
+        worksheet.dataValidations.add('E2:E100', {
             type: 'list',
             allowBlank: false,
             formulae: [`"${shipmentStatusVar.join(",")}"`],
@@ -394,7 +398,7 @@ export default class ShipmentDetails extends React.Component {
 
         //Validations
 
-        worksheet.dataValidations.add('K2:K100', {
+        worksheet.dataValidations.add('M2:M100', {
             type: 'whole',
             operator: 'greaterThan',
             showErrorMessage: true,
@@ -404,7 +408,7 @@ export default class ShipmentDetails extends React.Component {
             // error: 'Invalid Value'
         });
 
-        worksheet.dataValidations.add('P2:P100', {
+        worksheet.dataValidations.add('T2:T100', {
             type: 'whole',
             operator: 'greaterThan',
             showErrorMessage: true,
@@ -414,7 +418,7 @@ export default class ShipmentDetails extends React.Component {
             // error: 'Invalid Value'
         });
 
-        worksheet.dataValidations.add('R2:R100', {
+        worksheet.dataValidations.add('V2:V100', {
             type: 'whole',
             operator: 'greaterThan',
             showErrorMessage: true,
@@ -433,25 +437,49 @@ export default class ShipmentDetails extends React.Component {
                 fgColor: { argb: 'cccccc' },
                 bgColor: { argb: '96C8FB' }
             }
+            worksheet.getCell('C' + (+i + 2)).fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'cccccc' },
+                bgColor: { argb: '96C8FB' }
+            }
             // worksheet.getCell('C' + (+i + 2)).fill = {
             //     type: 'pattern',
             //     pattern: 'solid',
             //     fgColor: { argb: 'cccccc' },
             //     bgColor: { argb: '96C8FB' }
             // }
-            worksheet.getCell('J' + (+i + 2)).fill = {
+            worksheet.getCell('K' + (+i + 2)).fill = {
                 type: 'pattern',
                 pattern: 'solid',
                 fgColor: { argb: 'cccccc' },
                 bgColor: { argb: '96C8FB' }
             }
-            worksheet.getCell('Q' + (+i + 2)).fill = {
+            worksheet.getCell('O' + (+i + 2)).fill = {
                 type: 'pattern',
                 pattern: 'solid',
                 fgColor: { argb: 'cccccc' },
                 bgColor: { argb: '96C8FB' }
             }
-            worksheet.getCell('S' + (+i + 2)).fill = {
+            worksheet.getCell('W' + (+i + 2)).fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'cccccc' },
+                bgColor: { argb: '96C8FB' }
+            }
+            worksheet.getCell('N' + (+i + 2)).fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'cccccc' },
+                bgColor: { argb: '96C8FB' }
+            }
+            worksheet.getCell('O' + (+i + 2)).fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'cccccc' },
+                bgColor: { argb: '96C8FB' }
+            }
+            worksheet.getCell('U' + (+i + 2)).fill = {
                 type: 'pattern',
                 pattern: 'solid',
                 fgColor: { argb: 'cccccc' },
@@ -463,9 +491,6 @@ export default class ShipmentDetails extends React.Component {
 
         worksheet.protect();
         worksheet.getColumn('A').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
-            cell.protection = { locked: false };
-        });
-        worksheet.getColumn('C').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
             cell.protection = { locked: false };
         });
         worksheet.getColumn('D').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
@@ -486,26 +511,20 @@ export default class ShipmentDetails extends React.Component {
         worksheet.getColumn('I').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
             cell.protection = { locked: false };
         });
-        worksheet.getColumn('K').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+        worksheet.getColumn('J').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
             cell.protection = { locked: false };
         });
         worksheet.getColumn('L').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
             cell.protection = { locked: false };
         });
-
         worksheet.getColumn('M').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
             cell.protection = { locked: false };
         });
-
-        worksheet.getColumn('N').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
-            cell.protection = { locked: false };
-        });
-
-        worksheet.getColumn('O').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
-            cell.protection = { locked: false };
-        });
-
         worksheet.getColumn('P').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+
+        worksheet.getColumn('Q').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
             cell.protection = { locked: false };
         });
 
@@ -513,11 +532,23 @@ export default class ShipmentDetails extends React.Component {
             cell.protection = { locked: false };
         });
 
+        worksheet.getColumn('S').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+
         worksheet.getColumn('T').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
             cell.protection = { locked: false };
         });
 
-        worksheet.getColumn('U').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+        worksheet.getColumn('V').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+
+        worksheet.getColumn('X').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+
+        worksheet.getColumn('Y').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
             cell.protection = { locked: false };
         });
 
