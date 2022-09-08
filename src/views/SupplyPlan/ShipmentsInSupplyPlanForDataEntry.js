@@ -81,7 +81,9 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                 // (instance).setValueFromCoords(3, data[i].y, document.getElementById("planningUnitId").value, true);
                 (instance).setValueFromCoords(25, data[i].y, moment(Date.now()).format("YYYY-MM-DD"), true);
                 (instance).setValueFromCoords(20, data[i].y, `=ROUND(T${parseInt(data[i].y) + 1}*M${parseInt(data[i].y) + 1},2)`, true);
+                (instance).setValueFromCoords(14, data[i].y, `=ROUND(M${parseInt(data[i].y) + 1}*N${parseInt(data[i].y) + 1},0)`, true);
                 (instance).setValueFromCoords(22, data[i].y, `=ROUND(ROUND(M${parseInt(data[i].y) + 1}*T${parseInt(data[i].y) + 1},2)+V${parseInt(data[i].y) + 1},2)`, true);
+                (instance).setValueFromCoords(2, false, false, true);
                 if (index === "" || index == null || index == undefined) {
                     (instance).setValueFromCoords(1, data[i].y, false, true);
                     (instance).setValueFromCoords(26, data[i].y, "", true);
