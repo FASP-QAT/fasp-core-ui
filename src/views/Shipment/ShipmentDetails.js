@@ -879,8 +879,9 @@ export default class ShipmentDetails extends React.Component {
                                     var planningUnitIdProp = '';
                                     if (this.props.match.params.planningUnitId != '' && this.props.match.params.planningUnitId != undefined) {
                                         planningUnitIdProp = this.props.match.params.planningUnitId;
-                                        if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
-                                            var planningUnit = [{ value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label }];
+                                        var proListFiltered=proList.filter(c => c.value == planningUnitIdProp);
+                                        if (planningUnitIdProp != '' && planningUnitIdProp != undefined && proListFiltered.length>0) {
+                                            var planningUnit = [{ value: planningUnitIdProp, label: proListFiltered[0].label }];
                                             this.setState({
                                                 planningUnit: planningUnit,
                                                 // planningUnitId: planningUnitIdProp
@@ -891,12 +892,19 @@ export default class ShipmentDetails extends React.Component {
                                     else if (localStorage.getItem("sesPlanningUnitIdMulti") != '' && localStorage.getItem("sesPlanningUnitIdMulti") != undefined) {
                                         planningUnitIdProp = localStorage.getItem("sesPlanningUnitIdMulti");
                                         if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
+                                            var planningUnitIdSession=JSON.parse(planningUnitIdProp);
+                                            var updatePlanningUnitList=[];
+                                            for(var pu=0;pu<planningUnitIdSession.length;pu++){
+                                                if(proList.filter(c=>c.value==planningUnitIdSession[pu].value).length>0){
+                                                    updatePlanningUnitList.push(planningUnitIdSession[pu]);
+                                                }
+                                            }
                                             // var planningUnit = [{ value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label }];
                                             this.setState({
-                                                planningUnit: JSON.parse(planningUnitIdProp),
+                                                planningUnit: updatePlanningUnitList,
                                                 // planningUnitId: planningUnitIdProp
                                             })
-                                            this.formSubmit(JSON.parse(planningUnitIdProp), this.state.rangeValue);
+                                            this.formSubmit(updatePlanningUnitList, this.state.rangeValue);
                                         }
                                     }
                                     else if (proList.length == 1) {
