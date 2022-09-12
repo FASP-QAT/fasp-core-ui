@@ -778,7 +778,7 @@ class AddUserComponent extends Component {
 
         var mylist = [];
         // var value = (instance.jexcel.getJson(null, false)[r])[1];
-        var value = (this.state.addUserEL.getJson(null, false)[r])[0];
+        var value = (this.state.addUserEL.getJson(null, false)[r])[1];
         var proList = [];
         if (value != -1) {
             proList = this.state.programListForFilter.filter(c => c.id == -1 || c.realmCountryId == value);
@@ -913,7 +913,7 @@ class AddUserComponent extends Component {
             data[4] = -1;
             papuDataArr[0] = data;
         }
-        this.el = jexcel(document.getElementById("paputableDiv"), '');
+        // this.el = jexcel(document.getElementById("paputableDiv"), '');
         // this.el.destroy();
         jexcel.destroy(document.getElementById("paputableDiv"), true);
 
@@ -1811,9 +1811,9 @@ class AddUserComponent extends Component {
                                                 <FormGroup>
                                                     <h5><Label htmlFor="select">{'Access control'}</Label></h5>
                                                 </FormGroup>
-
-                                                <div id="paputableDiv" style={{ display: this.state.loading1 ? "none" : "block" }}>
-
+                                                <div className="" style={{ display: this.state.loading1 ? "none" : "block" }} >
+                                                    <div id="paputableDiv" className="RowheightForjexceladdRow consumptionDataEntryTable">
+                                                    </div>
                                                 </div>
                                                 <div style={{ display: this.state.loading1 ? "block" : "none" }}>
                                                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
