@@ -1717,7 +1717,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 {
                     title: i18n.t('static.supplyPlan.batchId'),
                     type: 'text',
-                    autoCasting:false,
+                    autoCasting:false
                 },
                 {
                     title: i18n.t('static.supplyPlan.expiryDate'),
