@@ -1775,6 +1775,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                 {
                     title: i18n.t('static.supplyPlan.batchId'),
                     type: 'text',
+                    autoCasting:false
                 },
                 {
                     title: i18n.t('static.supplyPlan.expiryDate'),
