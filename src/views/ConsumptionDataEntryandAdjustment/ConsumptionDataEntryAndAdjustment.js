@@ -480,7 +480,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     if (this.state.selectedConsumptionUnitId > 0) {
       this.setState({ loading: true })
       var datasetJson = this.state.datasetJson;
-      console.log("datasetJson--", datasetJson)
+      console.log("datasetJson**********", datasetJson)
       // Need to filter
       var regionList = this.state.regionList;
       var count = 0;
@@ -512,9 +512,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           }
           var forecastMinDate = moment(datasetJson.currentVersion.forecastStartDate).format("YYYY-MM-DD");
           var forecastMaxDate = moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM-DD");
-          const monthsDiff = moment(new Date(forecastMaxDate)).diff(new Date(forecastMinDate), 'months', true);
-
-          const noOfMonthsForProjection = monthsDiff - inputDataMovingAvg.length;
+          const monthsDiff = moment(new Date(moment(maxDate).format("YYYY-MM-DD")>moment(forecastMaxDate).format("YYYY-MM-DD")?moment(maxDate).format("YYYY-MM-DD"):moment(forecastMaxDate).format("YYYY-MM-DD"))).diff(new Date(moment(minDate).format("YYYY-MM-DD")<moment(forecastMinDate).format("YYYY-MM-DD")?moment(minDate).format("YYYY-MM-DD"):moment(forecastMinDate).format("YYYY-MM-DD")), 'months', true);
+          const noOfMonthsForProjection = (monthsDiff+1) - inputDataMovingAvg.length;
 
           if (inputDataMovingAvg.filter(c => c.actual != null).length >= 3) {
             count++;
@@ -1484,7 +1483,8 @@ console.log("TES",this.state.jsonDataMovingAvg.length
               loading: false,
               message: i18n.t('static.compareAndSelect.dataSaved'),
               messageColor: "green",
-              consumptionChanged: false
+              consumptionChanged: false,
+              datasetJson:datasetJson
             }, () => {
               this.getDatasetData();
               this.hideFirstComponent();
