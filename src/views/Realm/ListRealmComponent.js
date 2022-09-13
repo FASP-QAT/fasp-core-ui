@@ -481,19 +481,21 @@ export default class ReactListComponent extends Component {
                                 var items = [];
                                 if (y != null) {
                                     if (obj.options.allowInsertRow == true) {
-                                        items.push({
-                                            title: i18n.t('static.realm.mapRealmCountry'),
-                                            onclick: function () {
-                                                // console.log("onclick------>", this.el.getValueFromCoords(0, y));
-                                                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_REALM_COUNTRY')) {
+                                        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_REALM_COUNTRY')) {
+                                            items.push({
+                                                title: i18n.t('static.realm.mapRealmCountry'),
+                                                onclick: function () {
+                                                    // console.log("onclick------>", this.el.getValueFromCoords(0, y));
+
                                                     this.props.history.push({
                                                         pathname: `/realmCountry/RealmCountry/${this.el.getValueFromCoords(0, y)}`,
                                                         // state: { realm: row }
                                                     })
-                                                }
 
-                                            }.bind(this)
-                                        });
+
+                                                }.bind(this)
+                                            });
+                                        }
                                     }
                                 }
 
