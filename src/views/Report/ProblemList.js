@@ -1830,142 +1830,136 @@ export default class ConsumptionDetails extends React.Component {
                             {this.state.showProblemDashboard == 1 && <ProblemListDashboard problemListUnFilttered={this.state.problemReportListUnFiltered} problemCategoryList={this.state.problemCategoryList} problemStatusList={this.state.problemStatusList} />}
 
                             {/* <div className="ProgramListSearch"> */}
-<<<<<<< HEAD
-        <div className='ProblemListTableBorder'>
-            <div id="tableDiv" className='consumptionDataEntryTable' style={{ display: this.state.loading ? "none" : "block" }}>
-            </div>
-=======
-                            <div className='ProgramListSearchAlignment'>
-                <div id="tableDiv" className='consumptionDataEntryTable' style={{ display: this.state.loading ? "none" : "block" }}>
-                </div>
->>>>>>> QAT-914
-            </div>
-            {/* </div> */}
-        </div>
+                            <div className='ProblemListTableBorder'>
+                                <div id="tableDiv" className='consumptionDataEntryTable' style={{ display: this.state.loading ? "none" : "block" }}>
+                                </div>
+                            </div>
+                            {/* </div> */}
+                        </div>
                     </CardBody >
-            <CardFooter>
-                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => this.cancelClicked(id)}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                {this.state.showUpdateButton && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={this.updateChangedProblems}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>}
-            </CardFooter>
+                    <CardFooter>
+                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => this.cancelClicked(id)}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                        {this.state.showUpdateButton && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={this.updateChangedProblems}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>}
+                    </CardFooter>
                 </Card >
-            <div style={{ display: this.state.loading ? "block" : "none" }}>
-                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                    <div class="align-items-center">
-                        <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-                        <div class="spinner-border blue ml-4" role="status">
+                            <div class="spinner-border blue ml-4" role="status">
 
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        {/* Problem Transaction details modal */ }
-        <Modal isOpen={this.state.problemTransDetailsModal}
-            className={'modal-md modalWidthExpiredStock'}>
-            <ModalHeader toggle={() => this.toggleLarge()} className="modalHeaderSupplyPlan">
-                <strong>{i18n.t('static.report.problemTransDetails')}</strong>
-            </ModalHeader>
-            <div>
-                <ModalBody>
-                    <ToolkitProvider
-                        keyField="problemActionIndex"
-                        data={this.state.problemTransList}
-                        columns={columnsTrans}
-                        search={{ searchFormatted: true }}
-                        hover
-                        filter={filterFactory()}
-                    >
-                        {
-                            props => (
-                                <div className="col-md-12 bg-white pb-1 mb-2">
-                                    {/* <ul class="navbar-nav"><li class="nav-item pl-0"><a aria-current="page" class="nav-link active" ><b>{i18n.t('static.report.problemTransDetails')}</b></a></li></ul> */}
-                                    <div className="row">
-                                        <FormGroup className="col-md-6 ">
-                                            <Label for="problemType">{i18n.t('static.report.problemType')}</Label>
-                                            <Input type="text"
-                                                name="problemType"
-                                                id="problemType"
-                                                bsSize="sm"
-                                                readOnly
-                                                value={this.state.problemType}
-                                            />
-                                        </FormGroup>
-                                        <FormGroup className="col-md-6 ">
-                                            <Label for="createdDate">{i18n.t('static.report.createdDate')}</Label>
-                                            <Input type="text"
-                                                name="createdDate"
-                                                id="createdDate"
-                                                bsSize="sm"
-                                                readOnly
-                                                value={moment(this.state.problemCreatedDate).format(DATE_FORMAT_CAP)}
-                                                className="form-control-sm form-control date-color"
-                                            />
-                                        </FormGroup>
-                                    </div>
-                                    <div className="TableCust">
-                                        <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
+                {/* Problem Transaction details modal */}
+                <Modal isOpen={this.state.problemTransDetailsModal}
+                    className={'modal-md modalWidthExpiredStock'}>
+                    <ModalHeader toggle={() => this.toggleLarge()} className="modalHeaderSupplyPlan">
+                        <strong>{i18n.t('static.report.problemTransDetails')}</strong>
+                    </ModalHeader>
+                    <div>
+                        <ModalBody>
+                            <ToolkitProvider
+                                keyField="problemActionIndex"
+                                data={this.state.problemTransList}
+                                columns={columnsTrans}
+                                search={{ searchFormatted: true }}
+                                hover
+                                filter={filterFactory()}
+                            >
+                                {
+                                    props => (
+                                        <div className="col-md-12 bg-white pb-1 mb-2">
+                                            {/* <ul class="navbar-nav"><li class="nav-item pl-0"><a aria-current="page" class="nav-link active" ><b>{i18n.t('static.report.problemTransDetails')}</b></a></li></ul> */}
+                                            <div className="row">
+                                                <FormGroup className="col-md-6 ">
+                                                    <Label for="problemType">{i18n.t('static.report.problemType')}</Label>
+                                                    <Input type="text"
+                                                        name="problemType"
+                                                        id="problemType"
+                                                        bsSize="sm"
+                                                        readOnly
+                                                        value={this.state.problemType}
+                                                    />
+                                                </FormGroup>
+                                                <FormGroup className="col-md-6 ">
+                                                    <Label for="createdDate">{i18n.t('static.report.createdDate')}</Label>
+                                                    <Input type="text"
+                                                        name="createdDate"
+                                                        id="createdDate"
+                                                        bsSize="sm"
+                                                        readOnly
+                                                        value={moment(this.state.problemCreatedDate).format(DATE_FORMAT_CAP)}
+                                                        className="form-control-sm form-control date-color"
+                                                    />
+                                                </FormGroup>
+                                            </div>
+                                            <div className="TableCust">
+                                                <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
 
-                                            <SearchBar {...props.searchProps} />
-                                            <ClearSearchButton {...props.searchProps} />
+                                                    <SearchBar {...props.searchProps} />
+                                                    <ClearSearchButton {...props.searchProps} />
+                                                </div>
+                                                <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                                    pagination={paginationFactory(optionsTrans)}
+                                                    // rowEvents={{
+                                                    //     onClick: (e, row, rowIndex) => {
+                                                    //         this.editProblem(row);
+                                                    //     }
+                                                    // }}
+                                                    {...props.baseProps}
+                                                />
+
+
+                                            </div>
                                         </div>
-                                        <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
-                                            pagination={paginationFactory(optionsTrans)}
-                                            // rowEvents={{
-                                            //     onClick: (e, row, rowIndex) => {
-                                            //         this.editProblem(row);
-                                            //     }
-                                            // }}
-                                            {...props.baseProps}
-                                        />
-
-
-                                    </div>
-                                </div>
-                            )
-                        }
-                    </ToolkitProvider>
-                </ModalBody>
-                <ModalFooter>
-                    <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.toggleLarge()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                </ModalFooter>
-            </div>
-        </Modal>
-        {/* Problem Transaction details modal */ }
-
-        {/* Problem details  modal */ }
-        <Modal isOpen={this.state.problemDetailsModal}
-            className={'modal-md modalWidthExpiredStock'}>
-            <ModalHeader toggle={() => this.toggleProblemDetails()} className="modalHeaderSupplyPlan">
-                <strong>{i18n.t('static.report.problemDescription')}</strong>
-            </ModalHeader>
-            <div>
-                <ModalBody>
-                    {this.state.problemDetailsModal && <div className="row">
-                        <FormGroup className="col-md-6 ">
-                            <Label for="program">{i18n.t('static.program.program')}</Label>
-                            <Input type="text"
-                                readOnly
-                                value={this.state.problemDetail.program.code}
-                            />
-
-                        </FormGroup>
-                        <FormGroup className="col-md-6 ">
-                            <Label for="planningunit">{i18n.t('static.planningunit.planningunit')}</Label>
-                            <Input type="text"
-                                bsSize="sm"
-                                readOnly
-                                value={getLabelText(this.state.problemDetail.planningUnit.label, this.state.lang)}
-                            />
-                        </FormGroup>
+                                    )
+                                }
+                            </ToolkitProvider>
+                        </ModalBody>
+                        <ModalFooter>
+                            <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.toggleLarge()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                        </ModalFooter>
                     </div>
-                    }
-                </ModalBody>
-                <ModalFooter>
-                    <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.toggleProblemDetails()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                </ModalFooter>
-            </div>
-        </Modal>
-        {/* Problem  details modal */ }
+                </Modal>
+                {/* Problem Transaction details modal */}
+
+                {/* Problem details  modal */}
+                <Modal isOpen={this.state.problemDetailsModal}
+                    className={'modal-md modalWidthExpiredStock'}>
+                    <ModalHeader toggle={() => this.toggleProblemDetails()} className="modalHeaderSupplyPlan">
+                        <strong>{i18n.t('static.report.problemDescription')}</strong>
+                    </ModalHeader>
+                    <div>
+                        <ModalBody>
+                            {this.state.problemDetailsModal && <div className="row">
+                                <FormGroup className="col-md-6 ">
+                                    <Label for="program">{i18n.t('static.program.program')}</Label>
+                                    <Input type="text"
+                                        readOnly
+                                        value={this.state.problemDetail.program.code}
+                                    />
+
+                                </FormGroup>
+                                <FormGroup className="col-md-6 ">
+                                    <Label for="planningunit">{i18n.t('static.planningunit.planningunit')}</Label>
+                                    <Input type="text"
+                                        bsSize="sm"
+                                        readOnly
+                                        value={getLabelText(this.state.problemDetail.planningUnit.label, this.state.lang)}
+                                    />
+                                </FormGroup>
+                            </div>
+                            }
+                        </ModalBody>
+                        <ModalFooter>
+                            <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.toggleProblemDetails()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                        </ModalFooter>
+                    </div>
+                </Modal>
+                {/* Problem  details modal */}
             </div >
         );
     }
