@@ -4088,6 +4088,13 @@ h6 {
   width: 200px;
 }
 
+.consumptionDataEntryTable .jexcel_content {
+  // max-height: calc(100vh - 262px)!important;
+  max-height: calc(100vh - 300px) !important;
+  // overflow: scroll !important;
+  overflow-x: auto;
+}
+
 .ProgramListSearch {
   margin-top: -4%;
 }
@@ -7603,6 +7610,12 @@ legend.scheduler-border {
   cursor: pointer !important;
 }
 
+.Firstcolum1 {
+  width: 120px;
+  left: 0;
+  z-index: 3;
+}
+
 .jss_pagination_dropdown {
   color: #fff !important;
   background-color: #20a8d8 !important;
@@ -8170,4 +8183,36 @@ legend.scheduler-border {
 .EditStatusTable .jss>thead>tr>td {
   border-top: 1px solid #212721 !important;
   border-left: 1px solid #212721 !important;
+}
+
+.SupplierLeadTable .jexcel>thead {
+  position: sticky;
+  top: 0;
+}
+
+.ARUMarginTop {
+  margin-top: -22px;
+}
+
+.Theadtablesticky {
+  position: sticky;
+  top: 0;
+}
+
+.fixTableHead1 {
+  // overflow-y: auto;
+  max-height: calc(100vh - 100px) !important;
+  overflow-x: auto;
+  border-top: 1px solid #c8ced3;
+}
+
+.fixTableHeadSupplyPlan {
+  max-height: calc(100vh - 300px) !important;
+  overflow: scroll;
+}
+
+.loadProgramHeight {
+  max-height: calc(100vh - 100px) !important;
+  overflow-x: hidden;
+  overflow-y: scroll;
 }

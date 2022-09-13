@@ -558,7 +558,7 @@ export default class QunatimedImportStepFive extends Component {
                 <Row style={{ display: this.state.loading ? "none" : "block" }}>
 
 
-                    <CardBody className="table-responsive pt-md-1 pb-md-1">
+                    <CardBody className="pt-md-1 pb-md-1">
 
                         <Col xs="12" sm="12">
                             <h6>
@@ -567,8 +567,9 @@ export default class QunatimedImportStepFive extends Component {
                         </Col>
 
                         <Col xs="12" sm="12">
-
+                            <div className='consumptionDataEntryTable'>
                             <div id="recordsDiv" >
+                            </div>
                             </div>
 
                         </Col>

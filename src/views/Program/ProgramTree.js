@@ -694,6 +694,7 @@ class Program extends Component {
                                 <strong>{i18n.t('static.program.download')}</strong>
                             </CardHeader> */}
                             <CardBody className="pb-lg-2 pt-lg-2">
+                                <div>
                                 <ul className="legendcommitversion pl-0" style={{ display: 'inline-flex' }}>
                                     <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.loadProgram.oldVersion')}</span></li>
                                     <li><span className="greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.loadProgram.latestVersion')} </span></li>
@@ -701,6 +702,7 @@ class Program extends Component {
                                     <li><span><img width="18" title="Clean up" src={cleanUp} className="CleanUpIcon"></img></span> <span className="legendDeleteCleanupText">Keep latest  version and delete older versions.</span></li>
                                     <li><span className=""><i title="Delete" className="fa fa-trash DeleteIcon"></i></span> <span className="legendDeleteCleanupText">Delete the version</span></li>
                                 </ul>
+                                </div>
                                 <Col md="3 pl-0" id="realmDiv">
                                     <FormGroup>
                                         <Label htmlFor="select">{i18n.t('static.program.realm')}</Label>
@@ -729,7 +731,7 @@ class Program extends Component {
                         <Card>
                             <CardBody> */}
                                 <div style={{ display: this.state.loading ? "none" : "block" }}>
-                                    <div className="table-responsive" id="treeDiv" style={{ display: "none" }}>
+                                    <div className="table-responsive loadProgramHeight" id="treeDiv" style={{ display: "none"}}>
                                         <ul className="tree">
                                             <li>
                                                 <input type="checkbox" id="c1" />
