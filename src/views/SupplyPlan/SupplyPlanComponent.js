@@ -1513,7 +1513,7 @@ export default class SupplyPlanComponent extends React.Component {
 
                                         <tr className="totalShipments">
                                             <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                            <td align="left" className="sticky-col first-col clone">&emsp;&emsp;{i18n.t('static.supplyPlan.suggestedShipments')}</td>
+                                            <td align="left" className="sticky-col first-col clone">&emsp;&emsp;{i18n.t('static.supplyPlan.suggestedShipments')}&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:void();" onClick={this.toggleReplan}><i className="fa fa-lg fa-calendar"></i></a></td>
                                             {
                                                 this.state.suggestedShipmentsTotalData.map(item1 => {
                                                     if (item1.suggestedOrderQty.toString() != "") {
@@ -4415,7 +4415,7 @@ export default class SupplyPlanComponent extends React.Component {
                         {/* <strong>{i18n.t('static.dashboard.supplyPlan')}</strong> */}
                         <div className="card-header-actions">
                             <a className="card-header-action">
-                                {this.state.programId != 0 && <a href="javascript:void();" onClick={this.toggleReplan}><i className="fa fa-calendar"></i></a>}&nbsp;&nbsp;
+                                {/* {this.state.programId != 0 && <a href="javascript:void();" onClick={this.toggleReplan}><i className="fa fa-calendar"></i></a>}&nbsp;&nbsp; */}
                                 <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggle() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span>
                                 {/* <Link to='/supplyPlanFormulas' target="_blank"><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></Link> */}
                             </a>
