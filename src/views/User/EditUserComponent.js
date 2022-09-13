@@ -725,17 +725,11 @@ class EditUserComponent extends Component {
         // var value = (instance.jexcel.getJson(null, false)[r])[1];
         var value = (this.state.addUserEL.getJson(null, false)[r])[1];
 
-        console.log("mylist--------->3.2", value);
-
-        // const { selProgram } = this.state;
-
         var proList = [];
         if (value != -1) {
-            console.log("mylist--------->3.11");
             proList = this.state.programListForFilter.filter(c => c.id == -1 || c.realmCountryId == value);
 
         } else {
-            console.log("mylist--------->3.22");
             proList = this.state.programListForFilter;
         }
         return proList;
@@ -1850,9 +1844,9 @@ class EditUserComponent extends Component {
                                                 <FormGroup>
                                                     <h5><Label htmlFor="select">{'Access control'}</Label></h5>
                                                 </FormGroup>
-
-                                                <div id="paputableDiv" style={{ display: this.state.loading1 ? "none" : "block" }}>
-
+                                                <div className="" style={{ display: this.state.loading1 ? "none" : "block" }} >
+                                                    <div id="paputableDiv" className="RowheightForjexceladdRow consumptionDataEntryTable">
+                                                    </div>
                                                 </div>
                                                 <div style={{ display: this.state.loading1 ? "block" : "none" }}>
                                                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
