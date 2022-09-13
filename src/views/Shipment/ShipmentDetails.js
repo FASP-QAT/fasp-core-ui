@@ -1256,12 +1256,12 @@ export default class ShipmentDetails extends React.Component {
                     </ModalHeader>
                     <ModalBody>
                         <h6 className="red" id="div3">{this.state.qtyCalculatorValidationError}</h6>
-                        <div className="table-responsive RemoveStriped">
+                        <div className="RemoveStriped">
                             <div id="qtyCalculatorTable"></div>
                         </div>
 
-                        <div className="table-responsive RemoveStriped">
-                            <div id="qtyCalculatorTable1"></div>
+                        <div className="RemoveStriped">
+                            <div id="qtyCalculatorTable1" className="jexcelremoveReadonlybackground"></div>
                         </div>
                         <h6 className="red" id="div4">{this.state.shipmentDatesError}</h6>
                         <div className="">

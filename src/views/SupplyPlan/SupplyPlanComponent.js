@@ -1447,9 +1447,9 @@ export default class SupplyPlanComponent extends React.Component {
                             <span className="supplyplan-rarrow" onClick={this.rightClicked}> {i18n.t('static.supplyPlan.scrollToRight')} <i className="cui-arrow-right icons" ></i> </span>
                         </div>
                         {/* </Row> */}
-                        <div className="table-scroll">
-                            <div className="table-wrap table-responsive">
-                                <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" options={this.options}>
+                        <div className="table-scroll mt-2">
+                            <div className="table-wrap table-responsive fixTableHeadSupplyPlan">
+                                <Table className="table-bordered text-center overflowhide main-table "  size="sm" options={this.options}>
                                     <thead>
                                         <tr>
                                             <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th>
@@ -2212,7 +2212,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 </div>
 
                                 <div className=" RemoveStriped">
-                                    <div id="qtyCalculatorTable1"></div>
+                                    <div id="qtyCalculatorTable1" className="jexcelremoveReadonlybackground"></div>
                                 </div>
 
                                 <div id="showSaveQtyButtonDiv" style={{ display: 'none' }}>
@@ -4536,7 +4536,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 </FormGroup>
                                 {(this.state.programQPLDetails.filter(c => c.id == this.state.programId)).length > 0 && (this.state.programQPLDetails.filter(c => c.id == this.state.programId))[0].readonly == 1 && <h5 style={{ color: 'red' }}>{i18n.t('static.dataentry.readonly')}</h5>}
                                 <Row>
-                                    <Col xs="12" md="12" className="mb-4  mt-3">
+                                    <Col xs="12" md="12" className="mb-4  mt-3 loadProgramHeight">
                                         <Nav tabs>
                                             <NavItem>
                                                 <NavLink

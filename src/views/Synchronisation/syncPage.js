@@ -18,7 +18,11 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import ProgramService from '../../api/ProgramService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
+<<<<<<< HEAD
 import { jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunctionOnlyHideRow, inValid, inValidWithColor, jExcelLoadedFunction, jExcelLoadedFunctionOld, jExcelLoadedFunctionOnlyHideRowOld, } from '../../CommonComponent/JExcelCommonFunctions.js'
+=======
+import { jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunctionOnlyHideRow, inValid, inValidWithColor, jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRowOld, jExcelLoadedFunctionOld, } from '../../CommonComponent/JExcelCommonFunctions.js'
+>>>>>>> devMod2
 import moment from "moment";
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
@@ -1914,6 +1918,7 @@ export default class syncPage extends Component {
                                       programId: programJson.programId,
                                       roAndRoPrimeLineNoList: listOfRoAndRoPrimeLineNo
                                     }
+<<<<<<< HEAD
                                     ProgramService.checkIfLinkingExistsWithOtherProgram(json)
                                       .then(responseLinking => {
                                         if (responseLinking.status == 200) {
@@ -2096,6 +2101,61 @@ export default class syncPage extends Component {
                                               //   })
                                               // }
                                               return items;
+=======
+
+                                    var options = {
+                                      data: mergedConsumptionJexcel,
+                                      columnDrag: true,
+                                      columns: [
+                                        { title: i18n.t('static.commit.consumptionId'), type: 'hidden', width: 100 },
+                                        { title: i18n.t('static.planningunit.planningunit'), type: 'dropdown', source: planningUnitList, width: 200 },
+                                        { title: i18n.t('static.pipeline.consumptionDate'), type: 'text', width: 95 },
+                                        { title: i18n.t('static.region.region'), type: 'dropdown', source: regionList, width: 100 },
+                                        { title: i18n.t('static.inventory.dataSource'), type: 'dropdown', source: dataSourceList, width: 100 },
+                                        { title: i18n.t('static.supplyPlan.alternatePlanningUnit'), type: 'dropdown', source: realmCountryPlanningUnitList, width: 150 },
+                                        { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: 'numeric', mask: '#,##', width: 80 },
+                                        { title: i18n.t('static.unit.multiplier'), type: 'numeric', mask: '#,##.000000', decimal: '.', width: 90 },
+                                        { title: i18n.t('static.supplyPlan.quantityQATProduct'), type: 'numeric', mask: '#,##', width: 80 },
+                                        { title: i18n.t('static.consumption.daysofstockout'), type: 'numeric', mask: '#,##', width: 80 },
+                                        { title: i18n.t('static.program.notes'), type: 'text', width: 200 },
+                                        { type: 'dropdown', title: i18n.t('static.consumption.consumptionType'), source: [{ id: 1, name: i18n.t('static.consumption.actual') }, { id: 2, name: i18n.t('static.consumption.forcast') }], width: 100 },
+                                        { title: i18n.t('static.inventory.active'), type: 'checkbox', width: 70 },
+                                        { type: 'hidden', title: i18n.t('static.supplyPlan.batchInfo'), width: 0 },
+                                        { type: 'text', title: i18n.t('static.supplyPlan.batchInfo'), width: 85 },
+                                        { type: 'hidden', title: 'Old data' },
+                                        { type: 'hidden', title: 'latest data' },
+                                        { type: 'hidden', title: 'downloaded data' },
+                                        { type: 'hidden', title: 'result of compare' },
+                                      ],
+                                      pagination: localStorage.getItem("sesRecordCount"),
+                                      paginationOptions: JEXCEL_PAGINATION_OPTION,
+                                      search: true,
+                                      columnSorting: true,
+                                      tableOverflow: true,
+                                      wordWrap: true,
+                                      allowInsertColumn: false,
+                                      allowManualInsertColumn: false,
+                                      allowDeleteRow: false,
+                                      editable: false,
+                                      onload: this.loadedFunctionForMerge,
+                                      text: {
+                                        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                                        show: '',
+                                        entries: '',
+                                      },
+                                      filters: true,
+                                      license: JEXCEL_PRO_KEY,
+                                      contextMenu: function (obj, x, y, e) {
+                                        var items = [];
+                                        //Resolve conflicts
+                                        var rowData = obj.getRowData(y)
+                                        if (rowData[18].toString() == 1) {
+                                          items.push({
+                                            title: "Resolve conflicts",
+                                            onclick: function () {
+                                              this.setState({ loading: true })
+                                              this.toggleLarge(rowData[15], rowData[16], y, 'consumption');
+>>>>>>> devMod2
                                             }.bind(this)
                                           };
 
@@ -2112,6 +2172,7 @@ export default class syncPage extends Component {
                                             fundingSourceList: fundingSourceList,
                                             procurementAgentList: procurementAgentList
                                           })
+<<<<<<< HEAD
                                           console.log("+++Consumption jexcel completed", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
 
                                           // Inventory part
@@ -2282,6 +2343,192 @@ export default class syncPage extends Component {
                                               //   })
                                               // }
                                               return items;
+=======
+                                        } else {
+                                          return false;
+                                        }
+
+                                        // if (rowData[0].toString() > 0) {
+                                        //   items.push({
+                                        //     title: "Show version history",
+                                        //     onclick: function () {
+                                        //       this.toggleVersionHistory(rowData[13]);
+                                        //     }.bind(this)
+                                        //   })
+                                        // }
+                                        return items;
+                                      }.bind(this)
+                                    };
+
+                                    var mergedConsumptionJexcel = jexcel(document.getElementById("mergedVersionConsumption"), options);
+                                    this.el = mergedConsumptionJexcel;
+                                    this.setState({
+                                      mergedConsumptionJexcel: mergedConsumptionJexcel,
+                                      dataSourceList: dataSourceList,
+                                      realmCountryPlanningUnitList: realmCountryPlanningUnitList,
+                                      planningUnitList: planningUnitList,
+                                      regionList: regionList,
+                                      shipmentStatusList: shipmentStatusList,
+                                      budgetList: budgetList,
+                                      fundingSourceList: fundingSourceList,
+                                      procurementAgentList: procurementAgentList
+                                    })
+                                    console.log("+++Consumption jexcel completed", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
+
+                                    // Inventory part
+                                    var latestProgramDataInventory = latestProgramData.inventoryList;
+                                    var oldProgramDataInventory = oldProgramData.inventoryList;
+                                    var downloadedProgramDataInventory = downloadedProgramData.inventoryList;
+
+                                    var modifiedInventoryIds = []
+                                    latestProgramDataInventory.filter(c => c.versionId > oldProgramData.currentVersion.versionId).map(item => { modifiedInventoryIds.push(item.inventoryId) });
+                                    oldProgramDataInventory.filter(c => moment(c.lastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(oldProgramData.currentVersion.createdDate).format("YYYY-MM-DD HH:mm:ss")).map(item => modifiedInventoryIds.push(item.inventoryId));
+
+                                    var latestModifiedInventoryData = latestProgramDataInventory.filter(c => modifiedInventoryIds.includes(c.inventoryId));
+                                    var oldModifiedInventoryData = oldProgramDataInventory.filter(c => c.inventoryId == 0 || modifiedInventoryIds.includes(c.inventoryId));
+
+                                    var mergedInventoryData = [];
+                                    var existingInventoryId = [];
+                                    for (var c = 0; c < oldModifiedInventoryData.length; c++) {
+                                      if (oldModifiedInventoryData[c].inventoryId != 0) {
+                                        mergedInventoryData.push(oldModifiedInventoryData[c]);
+                                        existingInventoryId.push(oldModifiedInventoryData[c].inventoryId);
+                                      } else {
+                                        // If 0 check whether that exists in latest version or not
+                                        var index = 0;
+                                        if (oldModifiedInventoryData[c].actualQty != null && oldModifiedInventoryData[c].actualQty != "" && oldModifiedInventoryData[c].actualQty != undefined) {
+                                          index = latestProgramDataInventory.findIndex(f =>
+                                            f.planningUnit.id == oldModifiedInventoryData[c].planningUnit.id &&
+                                            moment(f.inventoryDate).format("YYYY-MM") == moment(oldModifiedInventoryData[c].inventoryDate).format("YYYY-MM") &&
+                                            f.region != null && f.region.id != 0 && oldModifiedInventoryData[c].region != null && oldModifiedInventoryData[c].region.id != 0 && f.region.id == oldModifiedInventoryData[c].region.id &&
+                                            (f.actualQty != null && f.actualQty.toString() != "" && f.actualQty != undefined) == (oldModifiedInventoryData[c].actualQty != null && oldModifiedInventoryData[c].actualQty != "" && oldModifiedInventoryData[c].actualQty != undefined) &&
+                                            f.realmCountryPlanningUnit.id == oldModifiedInventoryData[c].realmCountryPlanningUnit.id &&
+                                            !existingInventoryId.includes(f.inventoryId)
+                                          );
+                                        } else {
+                                          index = -1;
+                                        }
+                                        if (index == -1) { // Does not exists
+                                          mergedInventoryData.push(oldModifiedInventoryData[c]);
+                                        } else { // Exists
+                                          oldModifiedInventoryData[c].inventoryId = latestProgramDataInventory[index].inventoryId;
+                                          var index1 = oldProgramDataInventory.findIndex(f =>
+                                            f.planningUnit.id == oldModifiedInventoryData[c].planningUnit.id &&
+                                            moment(f.inventoryDate).format("YYYY-MM") == moment(oldModifiedInventoryData[c].inventoryDate).format("YYYY-MM") &&
+                                            f.region != null && f.region.id != 0 && oldModifiedInventoryData[c].region != null && oldModifiedInventoryData[c].region.id != 0 && f.region.id == oldModifiedInventoryData[c].region.id &&
+                                            (f.actualQty != null && f.actualQty.toString() != "" && f.actualQty != undefined) == (oldModifiedInventoryData[c].actualQty != null && oldModifiedInventoryData[c].actualQty != "" && oldModifiedInventoryData[c].actualQty != undefined) &&
+                                            f.realmCountryPlanningUnit.id == oldModifiedInventoryData[c].realmCountryPlanningUnit.id &&
+                                            !existingInventoryId.includes(f.inventoryId)
+                                          );
+                                          oldProgramDataInventory[index1].inventoryId = latestProgramDataInventory[index].inventoryId;
+                                          oldProgramDataInventory[index1].versionId = latestProgramDataInventory[index].versionId;
+                                          existingInventoryId.push(latestProgramDataInventory[index].inventoryId);
+                                          mergedInventoryData.push(oldModifiedInventoryData[c]);
+                                        }
+
+                                      }
+                                    }
+                                    // Getting other entries of latest inventory data
+                                    var latestOtherInventoryEntries = latestModifiedInventoryData.filter(c => !(existingInventoryId.includes(c.inventoryId)));
+                                    mergedInventoryData = mergedInventoryData.concat(latestOtherInventoryEntries);
+                                    var data = [];
+                                    var mergedInventoryJexcel = [];
+                                    for (var cd = 0; cd < mergedInventoryData.length; cd++) {
+                                      if (mergedInventoryData[cd].region != null && mergedInventoryData[cd].region.id != 0) {
+                                        data = [];
+                                        data[0] = mergedInventoryData[cd].inventoryId;
+                                        data[1] = mergedInventoryData[cd].planningUnit.id;
+                                        data[2] = moment(mergedInventoryData[cd].inventoryDate).format(DATE_FORMAT_CAP_WITHOUT_DATE);
+                                        data[3] = mergedInventoryData[cd].region.id;
+                                        data[4] = mergedInventoryData[cd].dataSource.id;
+                                        data[5] = mergedInventoryData[cd].realmCountryPlanningUnit.id;
+                                        data[6] = mergedInventoryData[cd].adjustmentQty != "" && mergedInventoryData[cd].adjustmentQty != null && mergedInventoryData[cd].adjustmentQty != undefined ? 2 : 1;
+                                        data[7] = Math.round(mergedInventoryData[cd].adjustmentQty);
+                                        data[8] = Math.round(mergedInventoryData[cd].actualQty);
+                                        data[9] = mergedInventoryData[cd].multiplier;
+                                        data[10] = Math.round(Math.round(mergedInventoryData[cd].adjustmentQty) * mergedInventoryData[cd].multiplier);
+                                        data[11] = Math.round(Math.round(mergedInventoryData[cd].actualQty) * mergedInventoryData[cd].multiplier);
+                                        data[12] = mergedInventoryData[cd].notes;
+                                        data[13] = mergedInventoryData[cd].active;
+                                        data[14] = JSON.stringify(mergedInventoryData[cd].batchInfoList != "" ? ((mergedInventoryData[cd].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty1": parseInt(a.adjustmentQty), "qty2": parseInt(a.actualQty) } })).sort(function (a, b) { return a.qty1 - b.qty1; }) : "");
+                                        data[15] = "";
+                                        var oldDataList = oldProgramDataInventory.filter(c => c.inventoryId == mergedInventoryData[cd].inventoryId && c.region != null && c.region.id != 0);
+                                        var oldData = ""
+                                        if (oldDataList.length > 0) {
+                                          oldData = [oldDataList[0].inventoryId, oldDataList[0].planningUnit.id, moment(oldDataList[0].inventoryDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), oldDataList[0].region.id, oldDataList[0].dataSource.id, oldDataList[0].realmCountryPlanningUnit.id, oldDataList[0].adjustmentQty != "" && oldDataList[0].adjustmentQty != null && oldDataList[0].adjustmentQty != undefined ? 2 : 1, Math.round(oldDataList[0].adjustmentQty), Math.round(oldDataList[0].actualQty), oldDataList[0].multiplier, Math.round(Math.round(oldDataList[0].adjustmentQty) * oldDataList[0].multiplier), Math.round(Math.round(oldDataList[0].actualQty) * oldDataList[0].multiplier), oldDataList[0].notes, oldDataList[0].active, JSON.stringify(oldDataList[0].batchInfoList != "" ? ((oldDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty1": parseInt(a.adjustmentQty), "qty2": parseInt(a.actualQty) } })).sort(function (a, b) { return a.qty1 - b.qty1; }) : ""), "", "", "", "", 4];
+                                        }
+                                        data[16] = oldData;//Old data
+                                        var latestDataList = latestProgramDataInventory.filter(c => c.inventoryId == mergedInventoryData[cd].inventoryId && c.region != null && c.region.id != 0);
+                                        var latestData = ""
+                                        if (latestDataList.length > 0) {
+                                          latestData = [latestDataList[0].inventoryId, latestDataList[0].planningUnit.id, moment(latestDataList[0].inventoryDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), latestDataList[0].region.id, latestDataList[0].dataSource.id, latestDataList[0].realmCountryPlanningUnit.id, latestDataList[0].adjustmentQty != "" && latestDataList[0].adjustmentQty != null && latestDataList[0].adjustmentQty != undefined ? 2 : 1, Math.round(latestDataList[0].adjustmentQty), Math.round(latestDataList[0].actualQty), latestDataList[0].multiplier, Math.round(Math.round(latestDataList[0].adjustmentQty) * latestDataList[0].multiplier), Math.round(Math.round(latestDataList[0].actualQty) * latestDataList[0].multiplier), latestDataList[0].notes, latestDataList[0].active, JSON.stringify(latestDataList[0].batchInfoList != "" ? ((latestDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty1": parseInt(a.adjustmentQty), "qty2": parseInt(a.actualQty) } })).sort(function (a, b) { return a.qty1 - b.qty1; }) : ""), "", "", "", "", 4];
+                                        }
+                                        data[17] = latestData;//Latest data
+                                        var downloadedDataList = downloadedProgramDataInventory.filter(c => c.inventoryId == mergedInventoryData[cd].inventoryId && c.region != null && c.region.id != 0);
+                                        var downloadedData = "";
+                                        if (downloadedDataList.length > 0) {
+                                          downloadedData = [downloadedDataList[0].inventoryId, downloadedDataList[0].planningUnit.id, moment(downloadedDataList[0].inventoryDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), downloadedDataList[0].region.id, downloadedDataList[0].dataSource.id, downloadedDataList[0].realmCountryPlanningUnit.id, downloadedDataList[0].adjustmentQty != "" && downloadedDataList[0].adjustmentQty != null && downloadedDataList[0].adjustmentQty != undefined ? 2 : 1, Math.round(downloadedDataList[0].adjustmentQty), Math.round(downloadedDataList[0].actualQty), downloadedDataList[0].multiplier, Math.round(Math.round(downloadedDataList[0].adjustmentQty) * downloadedDataList[0].multiplier), Math.round(Math.round(downloadedDataList[0].actualQty) * downloadedDataList[0].multiplier), downloadedDataList[0].notes, downloadedDataList[0].active, JSON.stringify(downloadedDataList[0].batchInfoList != "" ? ((downloadedDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty1": parseInt(a.adjustmentQty), "qty2": parseInt(a.actualQty) } })).sort(function (a, b) { return a.qty1 - b.qty1; }) : ""), "", "", "", "", 4];
+                                        }
+                                        data[18] = downloadedData;//Downloaded data
+                                        data[19] = 4;
+                                        mergedInventoryJexcel.push(data);
+                                      }
+                                    }
+
+                                    var options = {
+                                      data: mergedInventoryJexcel,
+                                      columnDrag: true,
+                                      columns: [
+                                        { title: i18n.t('static.commit.inventoryId'), type: 'hidden', width: 100 },
+                                        { title: i18n.t('static.planningunit.planningunit'), type: 'dropdown', source: planningUnitList, width: 200 },
+                                        { title: i18n.t('static.inventory.inventoryDate'), type: 'text', width: 85 },
+                                        { title: i18n.t('static.region.region'), type: 'dropdown', source: regionList, width: 100 },
+                                        { title: i18n.t('static.inventory.dataSource'), type: 'dropdown', source: dataSourceList, width: 100 },
+                                        { title: i18n.t('static.supplyPlan.alternatePlanningUnit'), type: 'dropdown', source: realmCountryPlanningUnitList, width: 150 },
+                                        { title: i18n.t('static.supplyPlan.inventoryType'), type: 'dropdown', source: [{ id: 1, name: i18n.t('static.inventory.inventory') }, { id: 2, name: i18n.t('static.inventoryType.adjustment') }], width: 100 },
+                                        { title: i18n.t('static.inventory.adjustmentQunatity'), type: 'numeric', mask: '[-]#,##', width: 120 },
+                                        { title: i18n.t('static.inventory.inventoryQunatity'), type: 'numeric', mask: '#,##', width: 120 },
+                                        { title: i18n.t('static.unit.multiplier'), type: 'numeric', mask: '#,##.000000', decimal: '.', width: 90, },
+                                        { title: i18n.t('static.inventory.adjustmentQunatityPU'), type: 'numeric', mask: '[-]#,##', width: 120, },
+                                        { title: i18n.t('static.inventory.inventoryQunatityPU'), type: 'numeric', mask: '#,##', width: 120, },
+                                        { title: i18n.t('static.program.notes'), type: 'text', width: 200 },
+                                        { title: i18n.t('static.inventory.active'), type: 'checkbox', width: 70 },
+                                        { type: 'hidden', title: i18n.t('static.supplyPlan.batchInfo'), width: 0 },
+                                        { type: 'text', title: i18n.t('static.supplyPlan.batchInfo'), width: 90 },
+                                        { type: 'hidden', title: 'Old data' },
+                                        { type: 'hidden', title: 'latest data' },
+                                        { type: 'hidden', title: 'downloaded data' },
+                                        { type: 'hidden', title: 'result of compare' },
+                                      ],
+                                      pagination: localStorage.getItem("sesRecordCount"),
+                                      paginationOptions: JEXCEL_PAGINATION_OPTION,
+                                      search: true,
+                                      columnSorting: true,
+                                      tableOverflow: true,
+                                      wordWrap: true,
+                                      allowInsertColumn: false,
+                                      allowManualInsertColumn: false,
+                                      allowDeleteRow: false,
+                                      editable: false,
+                                      onload: this.loadedFunctionForMergeInventory,
+                                      text: {
+                                        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                                        show: '',
+                                        entries: '',
+                                      },
+                                      filters: true,
+                                      license: JEXCEL_PRO_KEY,
+                                      contextMenu: function (obj, x, y, e) {
+                                        var items = [];
+                                        //Resolve conflicts
+                                        var rowData = obj.getRowData(y)
+                                        if (rowData[19].toString() == 1) {
+                                          items.push({
+                                            title: "Resolve conflicts",
+                                            onclick: function () {
+                                              this.setState({ loading: true })
+                                              this.toggleLargeInventory(rowData[16], rowData[17], y, 'inventory');
+>>>>>>> devMod2
                                             }.bind(this)
                                           };
 
@@ -2482,6 +2729,7 @@ export default class syncPage extends Component {
                                             mergedShipmentJexcel: mergedShipmentJexcel,
                                           })
 
+<<<<<<< HEAD
                                           // Shipment Linked part
                                           var latestProgramDataShipmentLinked = latestProgramData.shipmentLinkingList != null ? latestProgramData.shipmentLinkingList : [];
                                           var oldProgramDataShipmentLinked = oldProgramData.shipmentLinkingList != null ? oldProgramData.shipmentLinkingList.filter(c => c.shipmentLinkingId > 0 || (c.shipmentLinkingId == 0 && c.active == true)) : [];
@@ -2837,6 +3085,75 @@ export default class syncPage extends Component {
                                               // }
                                               console.log("items@@@@@@@@@@@@@@@@@@@@@", items);
                                               return items;
+=======
+                                    var options = {
+                                      data: mergedShipmentJexcel,
+                                      columnDrag: true,
+                                      columns: [
+                                        { title: i18n.t('static.commit.shipmentId'), type: 'hidden', width: 100 },
+                                        { title: i18n.t('static.planningunit.planningunit'), type: 'dropdown', source: planningUnitList, width: 200 },
+                                        { type: 'dropdown', title: i18n.t('static.supplyPlan.shipmentStatus'), source: shipmentStatusList, width: 100 },
+                                        { type: 'text', title: i18n.t('static.supplyPlan.expectedDeliveryDate'), width: 100, },
+                                        { type: 'dropdown', title: i18n.t('static.procurementagent.procurementagent'), source: procurementAgentList, width: 120 },
+                                        { type: 'dropdown', title: i18n.t('static.subfundingsource.fundingsource'), source: fundingSourceList, width: 120 },
+                                        { type: 'dropdown', title: i18n.t('static.dashboard.budget'), source: budgetList, width: 120 },
+                                        { type: 'text', title: i18n.t('static.supplyPlan.orderNoAndPrimeLineNo'), width: 150 },
+                                        { type: 'dropdown', title: i18n.t('static.datasource.datasource'), source: dataSourceList, width: 150 },
+                                        { type: 'dropdown', title: i18n.t("static.supplyPlan.shipmentMode"), source: [{ id: 1, name: i18n.t('static.supplyPlan.sea') }, { id: 2, name: i18n.t('static.supplyPlan.air') }], width: 100 },
+                                        { type: 'numeric', title: i18n.t("static.shipment.suggestedQty"), width: 100, mask: '#,##' },
+                                        { type: 'numeric', title: i18n.t("static.supplyPlan.adjustesOrderQty"), width: 100, mask: '#,##' },
+                                        { type: 'dropdown', title: i18n.t('static.dashboard.currency'), source: currencyList, width: 120 },
+                                        { type: 'numeric', title: i18n.t('static.supplyPlan.pricePerPlanningUnit'), width: 80, mask: '#,##.00', decimal: '.' },
+                                        { type: 'numeric', title: i18n.t('static.shipment.productcost'), width: 80, mask: '#,##.00', decimal: '.' },
+                                        { type: 'numeric', title: i18n.t('static.shipment.freightcost'), width: 80, mask: '#,##.00', decimal: '.' },
+                                        { type: 'text', title: i18n.t('static.supplyPlan.plannedDate'), width: 100, },
+                                        { type: 'text', title: i18n.t('static.supplyPlan.submittedDate'), width: 100, },
+                                        { type: 'text', title: i18n.t('static.supplyPlan.approvedDate'), width: 100, },
+                                        { type: 'text', title: i18n.t('static.supplyPlan.shippedDate'), width: 100, },
+                                        { type: 'text', title: i18n.t('static.supplyPlan.arrivedDate'), width: 100, },
+                                        { type: 'text', title: i18n.t('static.shipment.receiveddate'), width: 100, },
+                                        { type: 'text', title: i18n.t('static.program.notes'), width: 200 },
+                                        { type: 'checkbox', title: i18n.t('static.supplyPlan.erpFlag'), width: 80 },
+                                        { type: 'checkbox', title: i18n.t('static.supplyPlan.emergencyOrder'), width: 80 },
+                                        { type: 'checkbox', title: i18n.t('static.common.accountFlag'), width: 80 },
+                                        { type: 'checkbox', title: i18n.t('static.common.active'), width: 80 },
+                                        { type: 'checkbox', title: i18n.t('static.report.localprocurement'), width: 80 },
+                                        { type: 'hidden', title: i18n.t('static.supplyPlan.batchInfo'), width: 0 },
+                                        { type: 'text', title: i18n.t('static.supplyPlan.batchInfo'), width: 90 },
+                                        { type: 'hidden', title: 'Old data' },
+                                        { type: 'hidden', title: 'latest data' },
+                                        { type: 'hidden', title: 'downloaded data' },
+                                        { type: 'hidden', title: 'result of compare' },
+                                      ],
+                                      pagination: localStorage.getItem("sesRecordCount"),
+                                      paginationOptions: JEXCEL_PAGINATION_OPTION,
+                                      search: true,
+                                      columnSorting: true,
+                                      tableOverflow: true,
+                                      wordWrap: true,
+                                      allowInsertColumn: false,
+                                      allowManualInsertColumn: false,
+                                      allowDeleteRow: false,
+                                      editable: false,
+                                      onload: this.loadedFunctionForMergeShipment,
+                                      filters: true,
+                                      license: JEXCEL_PRO_KEY,
+                                      text: {
+                                        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                                        show: '',
+                                        entries: '',
+                                      },
+                                      contextMenu: function (obj, x, y, e) {
+                                        var items = [];
+                                        //Resolve conflicts
+                                        var rowData = obj.getRowData(y)
+                                        if (rowData[33].toString() == 1) {
+                                          items.push({
+                                            title: "Resolve conflicts",
+                                            onclick: function () {
+                                              this.setState({ loading: true })
+                                              this.toggleLargeShipment(rowData[30], rowData[31], y, 'shipment');
+>>>>>>> devMod2
                                             }.bind(this)
                                           };
 
@@ -3442,7 +3759,11 @@ export default class syncPage extends Component {
   }
 
   loadedFunctionForMergeProblemList = function (instance) {
+<<<<<<< HEAD
     jExcelLoadedFunctionOld(instance, 4);
+=======
+    jExcelLoadedFunctionOld(instance, 3);
+>>>>>>> devMod2
     var elInstance = instance.jexcel;
     var jsonData = elInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T']

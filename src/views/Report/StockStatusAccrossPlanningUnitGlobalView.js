@@ -1352,14 +1352,16 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
                   </div>
                   <div className="row" style={{ display: this.state.loading ? "none" : "block" }}>
                     <div className="col-md-12">
-                      <div className="table-responsive ">
+                    <div className=''>
+                      <div className="fixTableHead1">
 
-                        {this.state.data.length > 0 && <Table responsive className="table-striped  table-fixed  table-bordered text-center mt-2">
+                        {this.state.data.length > 0 && 
+                        <Table className="table-striped  table-fixed  table-bordered text-center">
 
 
                           <thead>
                             <tr>
-                              <th className="text-center" style={{ width: '27%' }}>{i18n.t('static.planningunit.planningunit')}</th>
+                              <th className="text-center Firstcolum1" style={{ width: '27%' }}>{i18n.t('static.planningunit.planningunit')}</th>
                               {
                                 this.state.programLst.map(ele => { return (<th className="text-center" style={{ width: ((100 - 27) / this.state.programLst.length) + '%' }}>{ele}</th>) })}
                             </tr>
@@ -1369,7 +1371,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
                             {
                               this.state.planningUnits.map(
                                 ele => {
-                                  return <tr><td>{getLabelText(ele.label, this.state.lang)}</td>{
+                                  return <tr><td className='sticky-col first-col clone Firstcolum'>{getLabelText(ele.label, this.state.lang)}</td>{
                                     this.state.programLst.map(ele1 => {
                                       return (this.state.data.filter(c => c.planningUnit.id == ele.id)).map(
                                         item => {
@@ -1387,6 +1389,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
                           </tbody>
                         </Table>}
 
+                      </div>
                       </div>
 
 

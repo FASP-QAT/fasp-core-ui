@@ -65,10 +65,18 @@ export default class ExportProgram extends Component {
             message: '',
             selectProgramMessage: '',
             loading: true,
+            encryptCheck: true,
         }
         this.formSubmit = this.formSubmit.bind(this)
         this.cancelClicked = this.cancelClicked.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
+    }
+    
+    setEncryptCheck(e) {
+        var encryptCheck = e.target.checked;
+        this.setState({
+            encryptCheck: encryptCheck,
+        })
     }
 
     componentDidMount() {
@@ -147,7 +155,7 @@ export default class ExportProgram extends Component {
                 getRequest.onsuccess = function (event) {
                     var myResult = [];
                     myResult = getRequest.result;
-                    console.log("MyResult+++",myResult);
+                    console.log("MyResult+++", myResult);
                     var dTransaction = db1.transaction(['downloadedProgramData'], 'readwrite');
                     var dProgram = dTransaction.objectStore('downloadedProgramData');
                     var dGetRequest = dProgram.getAll();
@@ -237,6 +245,16 @@ export default class ExportProgram extends Component {
                                                                         budgetRequest.onsuccess = function (event) {
                                                                             var budgetList = [];
                                                                             budgetList = budgetRequest.result;
+
+                                                                            var isUnEncrepted = false;
+                                                                            var checkboxValue = document.getElementById('isExportData').checked;
+                                                                            if (checkboxValue) {
+                                                                                isUnEncrepted = true;
+                                                                            } else {
+                                                                                isUnEncrepted = false;
+                                                                            }
+
+
                                                                             for (var i = 0; i < myResult.length; i++) {
                                                                                 for (var j = 0; j < programId.length; j++) {
                                                                                     if (myResult[i].id == programId[j].value) {
@@ -259,16 +277,108 @@ export default class ExportProgram extends Component {
                                                                                         myResult[i].addressedCount = programQPLResultFiltered.addressedCount;
                                                                                         myResult[i].readonly = programQPLResultFiltered.readonly;
 
-                                                                                        var txt = JSON.stringify(myResult[i]);
-                                                                                        var dArray = dMyResult.filter(c => c.id == programId[j].value)[0];
-                                                                                        var txt1 = JSON.stringify(dArray)
-                                                                                        // var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
-                                                                                        // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                                                                                        var labelName = (programId[j].label).replaceAll("/", "-")
-                                                                                        // zip.file(labelName + "_" + parseInt(j + 1) + ".txt", programData);
-                                                                                        console.log("Txt ", txt);
-                                                                                        console.log("Txt 1", txt1);
-                                                                                        zip.file(labelName + "_" + parseInt(j + 1) + ".txt", txt + "@~-~@" + txt1);
+
+                                                                                        if (isUnEncrepted) {//encrept data
+
+                                                                                            var txt = JSON.stringify(myResult[i]);
+                                                                                            var dArray = dMyResult.filter(c => c.id == programId[j].value)[0];
+                                                                                            var txt1 = JSON.stringify(dArray)
+                                                                                            // var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                                                                                            // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                                                                                            var labelName = (programId[j].label).replaceAll("/", "-")
+                                                                                            // zip.file(labelName + "_" + parseInt(j + 1) + ".txt", programData);
+                                                                                            console.log("Txt ", txt);
+                                                                                            console.log("Txt 1", txt1);
+                                                                                            zip.file(labelName + "_" + parseInt(j + 1) + ".txt", txt + "@~-~@" + txt1);
+
+                                                                                        } else {
+
+                                                                                            console.log("myResult------------->1", myResult[i]);
+
+                                                                                            var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+                                                                                            var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+                                                                                            var programNameLabel1 = JSON.parse(programNameLabel);
+                                                                                            console.log("myResult------------->2", programNameLabel1);
+
+                                                                                            // var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                                                                                            // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                                                                                            // var programJson1 = JSON.parse(programData);
+
+                                                                                            // var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == planningUnitId))[0];
+                                                                                            // var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                                                                                            // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                                                                                            // programJson1 = JSON.parse(programData);
+
+                                                                                            var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
+                                                                                            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                                                                                            var programJson1 = JSON.parse(programData);
+                                                                                            console.log("myResult------------->3", programJson1);
+
+                                                                                            var planningUnitDataList = myResult[i].programData.planningUnitDataList;
+
+                                                                                            console.log("myResult------------->4", planningUnitDataList);
+
+
+
+                                                                                            for (var h = 0; h < planningUnitDataList.length; h++) {
+                                                                                                var programDataForPlanningUnitBytes = CryptoJS.AES.decrypt(planningUnitDataList[h].planningUnitData, SECRET_KEY);
+                                                                                                var programDataForPlanningUnit = programDataForPlanningUnitBytes.toString(CryptoJS.enc.Utf8);
+                                                                                                var programJsonForPlanningUnit = JSON.parse(programDataForPlanningUnit);
+
+                                                                                                planningUnitDataList[h].planningUnitData = programJsonForPlanningUnit;
+                                                                                            }
+                                                                                            console.log("myResult------------->5", planningUnitDataList);
+
+
+                                                                                            myResult[i].programName = programNameLabel1;
+                                                                                            myResult[i].programData = { generalData: programJson1, planningUnitDataList: planningUnitDataList };
+
+                                                                                            var txt = JSON.stringify(myResult[i]);
+
+
+                                                                                            var dArray = dMyResult.filter(c => c.id == programId[j].value)[0];
+
+                                                                                            var bytes1 = CryptoJS.AES.decrypt(dArray.programName, SECRET_KEY);
+                                                                                            var programNameLabel11 = bytes1.toString(CryptoJS.enc.Utf8);
+                                                                                            var programNameLabel111 = JSON.parse(programNameLabel11);
+
+                                                                                            // var programDataBytes1 = CryptoJS.AES.decrypt(dArray.programData, SECRET_KEY);
+                                                                                            // var programData1 = programDataBytes1.toString(CryptoJS.enc.Utf8);
+                                                                                            // var programJson111 = JSON.parse(programData1);
+
+                                                                                            var programDataBytes1 = CryptoJS.AES.decrypt(dArray.programData.generalData, SECRET_KEY);
+                                                                                            var programData1 = programDataBytes1.toString(CryptoJS.enc.Utf8);
+                                                                                            var programJson111 = JSON.parse(programData1);
+
+                                                                                            var planningUnitDataList1 = dArray.programData.planningUnitDataList;
+
+                                                                                            for (var h = 0; h < planningUnitDataList1.length; h++) {
+                                                                                                var programDataForPlanningUnitBytes = CryptoJS.AES.decrypt(planningUnitDataList1[h].planningUnitData, SECRET_KEY);
+                                                                                                var programDataForPlanningUnit = programDataForPlanningUnitBytes.toString(CryptoJS.enc.Utf8);
+                                                                                                var programJsonForPlanningUnit = JSON.parse(programDataForPlanningUnit);
+
+                                                                                                planningUnitDataList1[h].planningUnitData = programJsonForPlanningUnit;
+                                                                                            }
+
+
+
+                                                                                            dArray.programName = programNameLabel111;
+                                                                                            // dArray.programData = programJson111;
+                                                                                            dArray.programData = { generalData: programJson111, planningUnitDataList: planningUnitDataList1 };
+
+
+                                                                                            var txt1 = JSON.stringify(dArray)
+                                                                                            // var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                                                                                            // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                                                                                            var labelName = (programId[j].label).replaceAll("/", "-")
+                                                                                            // zip.file(labelName + "_" + parseInt(j + 1) + ".txt", programData);
+                                                                                            console.log("Txt ", txt);
+                                                                                            console.log("Txt 1", txt1);
+                                                                                            zip.file(labelName + "_" + parseInt(j + 1) + ".txt", txt + "@~-~@" + txt1);
+
+                                                                                        }
+
+
                                                                                     }
                                                                                 }
                                                                                 if (i == myResult.length - 1) {
@@ -382,6 +492,26 @@ export default class ExportProgram extends Component {
                                             <span className="red">{this.state.selectProgramMessage}</span>
                                         </FormGroup>
                                     </CardBody>
+                                    <FormGroup className="col-md-3" id="hideCalculationDiv">
+                                        <div className="controls pl-lg-4 pt-lg-0">
+                                            <Input
+                                                className="form-check-input"
+                                                type="checkbox"
+                                                id="isExportData"
+                                                name="isExportData"
+                                                style={{ marginTop: '3' }}
+                                                checked={this.state.encryptCheck}
+                                                onClick={(e) => { this.setEncryptCheck(e); }}
+                                            // checked={true}
+                                            // onClick={(e) => { this.hideCalculation(e); }}
+                                            />
+                                            <Label
+                                                className="form-check-label"
+                                                check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                {'Do you want to encrypt data?'}
+                                            </Label>
+                                        </div>
+                                    </FormGroup>
                                     <div style={{ display: this.state.loading ? "none" : "block" }}></div>
                                     <div style={{ display: this.state.loading ? "block" : "none" }}>
                                         <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >

@@ -34,7 +34,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         this.onPasteForBatchInfo = this.onPasteForBatchInfo.bind(this);
         this.oneditionend = this.oneditionend.bind(this);
         this.batchDetailsClicked = this.batchDetailsClicked.bind(this);
-        this.formulaChanged=this.formulaChanged.bind(this)
+        this.formulaChanged = this.formulaChanged.bind(this)
         this.state = {
             consumptionEl: "",
             consumptionBatchInfoTableEl: ""
@@ -334,7 +334,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                             { type: 'hidden', width: 0 }
                         ],
                         pagination: paginationOption,
-                        onformulachain:this.formulaChanged,
+                        onformulachain: this.formulaChanged,
                         paginationOptions: paginationArray,
                         search: searchOption,
                         columnSorting: true,
@@ -867,10 +867,10 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         });
     }.bind(this);
 
-    formulaChanged  = function (instance, executions) {
-        var executions=executions;
-        for(var e=0;e<executions.length;e++){
-            this.consumptionChanged(instance,executions[e].cell,executions[e].x,executions[e].y,executions[e].v)
+    formulaChanged = function (instance, executions) {
+        var executions = executions;
+        for (var e = 0; e < executions.length; e++) {
+            this.consumptionChanged(instance, executions[e].cell, executions[e].x, executions[e].y, executions[e].v)
         }
     }
 
@@ -1216,6 +1216,11 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                     valid = false;
                 }
 
+                validation = checkValidtion("text", "A", y, elInstance.getValueFromCoords(0, y, true), elInstance);
+                if (validation == false) {
+                    valid = false;
+                }
+
                 validation = checkValidtion("number", "C", y, elInstance.getValue(`C${parseInt(y) + 1}`, true).toString().replaceAll(",", ""), elInstance, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, 1, 0);
                 if (validation == false) {
                     valid = false;
@@ -1426,6 +1431,11 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                             valid = false;
                             elInstance.setValueFromCoords(14, y, 1, true);
                         }
+                        validation = checkValidtion("text", "B", y, elInstance.getValueFromCoords(1, y, true), elInstance);
+                        if (validation == false) {
+                            valid = false;
+                            elInstance.setValueFromCoords(14, y, 1, true);
+                        }
 
                         validation = checkValidtion("text", "D", y, rowData[3], elInstance);
                         if (validation == false) {
@@ -1435,6 +1445,19 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
 
 
                         validation = checkValidtion("text", "E", y, rowData[4], elInstance);
+                        if (validation == false) {
+                            valid = false;
+                            elInstance.setValueFromCoords(14, y, 1, true);
+                        }
+
+                        validation = checkValidtion("text", "D", y, elInstance.getValueFromCoords(3, y, true), elInstance);
+                        if (validation == false) {
+                            valid = false;
+                            elInstance.setValueFromCoords(14, y, 1, true);
+                        }
+
+
+                        validation = checkValidtion("text", "E", y, elInstance.getValueFromCoords(4, y, true), elInstance);
                         if (validation == false) {
                             valid = false;
                             elInstance.setValueFromCoords(14, y, 1, true);

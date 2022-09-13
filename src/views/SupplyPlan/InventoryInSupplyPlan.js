@@ -34,7 +34,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         this.onPasteForBatchInfo = this.onPasteForBatchInfo.bind(this);
         this.oneditionend = this.oneditionend.bind(this);
         this.batchDetailsClicked = this.batchDetailsClicked.bind(this);
-        this.formulaChanged=this.formulaChanged.bind(this)
+        this.formulaChanged = this.formulaChanged.bind(this)
         this.state = {
             inventoryEl: "",
             inventoryBatchInfoTableEl: ""
@@ -375,7 +375,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         // },
                         onload: this.loadedInventory,
                         editable: inventoryEditable,
-                        onformulachain:this.formulaChanged,
+                        onformulachain: this.formulaChanged,
                         onchange: this.inventoryChanged,
                         updateTable: function (el, cell, x, y, source, value, id) {
 
@@ -873,10 +873,10 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         }
     }
 
-    formulaChanged  = function (instance, executions) {
-        var executions=executions;
-        for(var e=0;e<executions.length;e++){
-            this.inventoryChanged(instance,executions[e].cell,executions[e].x,executions[e].y,executions[e].v)
+    formulaChanged = function (instance, executions) {
+        var executions = executions;
+        for (var e = 0; e < executions.length; e++) {
+            this.inventoryChanged(instance, executions[e].cell, executions[e].x, executions[e].y, executions[e].v)
         }
     }
 
@@ -1037,24 +1037,24 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             }
         }
 
-        // if (x == 10) {
-        //     if (rowData[4] == 2) {
-        //         var valid = checkValidtion("text", "K", y, rowData[10], elInstance);
-        //         if (valid == true) {
-        //             if (rowData[10].length > 600) {
-        //                 inValid("K", y, i18n.t('static.dataentry.notesMaxLength'), elInstance);
-        //             } else {
-        //                 positiveValidation("K", y, elInstance);
-        //             }
-        //         }
-        //     } else {
-        //         if (rowData[10].length > 600) {
-        //             inValid("K", y, i18n.t('static.dataentry.notesMaxLength'), elInstance);
-        //         } else {
-        //             positiveValidation("K", y, elInstance);
-        //         }
-        //     }
-        // }
+        if (x == 10) {
+            if (rowData[4] == 2) {
+                var valid = checkValidtion("text", "K", y, rowData[10], elInstance);
+                if (valid == true) {
+                    if (rowData[10].length > 600) {
+                        inValid("K", y, i18n.t('static.dataentry.notesMaxLength'), elInstance);
+                    } else {
+                        positiveValidation("K", y, elInstance);
+                    }
+                }
+            } else {
+                if (rowData[10].length > 600) {
+                    inValid("K", y, i18n.t('static.dataentry.notesMaxLength'), elInstance);
+                } else {
+                    positiveValidation("K", y, elInstance);
+                }
+            }
+        }
 
         // this.showOnlyErrors();
     }
@@ -1244,6 +1244,11 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     valid = false;
                 }
 
+                var validation = checkValidtion("text", "A", y, elInstance.getValueFromCoords(0, y, true), elInstance);
+                if (validation == false) {
+                    valid = false;
+                }
+
                 if (rowData[2] == 2) {
                     validation = checkValidtion("number", "D", y, elInstance.getValue(`D${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim(), elInstance, JEXCEL_NEGATIVE_INTEGER_NO_REGEX_FOR_DATA_ENTRY, 0, 0);
                     if (validation == false) {
@@ -1399,7 +1404,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     this.props.toggleLarge("submit");
                 }
                 // elInstance.destroy();
-                jexcel.destroy(document.getElementById("tableDiv"), true);
+                jexcel.destroy(document.getElementById("inventoryBatchInfoTable"), true);
             }
             this.props.updateState("loading", false);
 
@@ -1593,6 +1598,25 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
 
 
                     var validation = checkValidtion("text", "D", y, rowData[3], elInstance);
+                    if (validation == false) {
+                        valid = false;
+                        elInstance.setValueFromCoords(16, y, 1, true);
+                    }
+
+                    var validation = checkValidtion("text", "B", y, elInstance.getValueFromCoords(1, y, true), elInstance);
+                    if (validation == false) {
+                        valid = false;
+                        elInstance.setValueFromCoords(16, y, 1, true);
+                    }
+
+                    var validation = checkValidtion("text", "C", y, elInstance.getValueFromCoords(2, y, true), elInstance);
+                    if (validation == false) {
+                        valid = false;
+                        elInstance.setValueFromCoords(16, y, 1, true);
+                    }
+
+
+                    var validation = checkValidtion("text", "D", y, elInstance.getValueFromCoords(3, y, true), elInstance);
                     if (validation == false) {
                         valid = false;
                         elInstance.setValueFromCoords(16, y, 1, true);

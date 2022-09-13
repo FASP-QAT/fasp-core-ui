@@ -779,19 +779,11 @@ class AddUserComponent extends Component {
         var mylist = [];
         // var value = (instance.jexcel.getJson(null, false)[r])[1];
         var value = (this.state.addUserEL.getJson(null, false)[r])[1];
-
-        console.log("mylist--------->3.2", value);
-
-        // const { selProgram } = this.state;
-
-
         var proList = [];
         if (value != -1) {
-            console.log("mylist--------->3.11");
             proList = this.state.programListForFilter.filter(c => c.id == -1 || c.realmCountryId == value);
 
-        } else {//All
-            console.log("mylist--------->3.22");
+        } else {
             proList = this.state.programListForFilter;
         }
         return proList;
@@ -810,9 +802,10 @@ class AddUserComponent extends Component {
 
         if (selProgram.length > 0) {
             for (var i = 0; i < selProgram.length; i++) {
+                var name = selProgram[i].programCode + " (" + (selProgram[i].programTypeId == 1 ? "SP" : selProgram[i].programTypeId == 2 ? "FC" : "") + ")";
                 var paJson = {
                     // name: getLabelText(selProgram[i].label, this.state.lang),
-                    name: selProgram[i].programCode,
+                    name: name,
                     id: parseInt(selProgram[i].programId),
                     active: selProgram[i].active,
                     realmCountryId: selProgram[i].realmCountry.realmCountryId,
@@ -920,7 +913,7 @@ class AddUserComponent extends Component {
             data[4] = -1;
             papuDataArr[0] = data;
         }
-        this.el = jexcel(document.getElementById("paputableDiv"), '');
+        // this.el = jexcel(document.getElementById("paputableDiv"), '');
         // this.el.destroy();
         jexcel.destroy(document.getElementById("paputableDiv"), true);
 
@@ -969,12 +962,12 @@ class AddUserComponent extends Component {
                 },
 
             ],
-            editable: true,
             pagination: localStorage.getItem("sesRecordCount"),
             filters: true,
             search: true,
             columnSorting: true,
             // tableOverflow: true,
+            editable: true,
             wordWrap: true,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
@@ -1145,8 +1138,9 @@ class AddUserComponent extends Component {
         };
 
         this.el = jexcel(document.getElementById("paputableDiv"), options);
+        var varEL = this.el
         this.setState({
-            addUserEL: jexcel(document.getElementById("paputableDiv"), options),
+            addUserEL: varEL,
             loading: false,
             loading1: false
         })
@@ -1817,9 +1811,9 @@ class AddUserComponent extends Component {
                                                 <FormGroup>
                                                     <h5><Label htmlFor="select">{'Access control'}</Label></h5>
                                                 </FormGroup>
-
-                                                <div id="paputableDiv" style={{ display: this.state.loading1 ? "none" : "block" }}>
-
+                                                <div className="" style={{ display: this.state.loading1 ? "none" : "block" }} >
+                                                    <div id="paputableDiv" className="RowheightForjexceladdRow consumptionDataEntryTable">
+                                                    </div>
                                                 </div>
                                                 <div style={{ display: this.state.loading1 ? "block" : "none" }}>
                                                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
