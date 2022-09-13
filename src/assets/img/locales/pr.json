@@ -575,6 +575,7 @@
     "static.report.annualshipmentcost": "Visão Geral dos Custos de Embarque",
     "static.report.submitted": "Requisitado",
     "static.supplyPlan.supplyPlanForV": "Plano de suprimento do servidor - V",
+    "static.editStatus.validCriticality": "Selecione Criticidade",
     "static.technicalArea.technicalAreaDisplayName": "Nome de exibição da área técnica",
     "static.unkownError": "Ocorreu um erro desconhecido",
     "static.versionSettings.versionSettings": "Configuração das versões",
@@ -1063,6 +1064,7 @@
     "static.supplyPlan.orderBasedOn": "Embalagem baseada em",
     "static.supplyPlan.dateustBeLessThanCurDate": "A data deve ser antes da data actual",
     "static.budget.program": "Programa",
+    "static.programProcurementAgentPrice.success": "Preços do Agente de Compras adicionados com sucesso",
     "static.tree.calculatedChangeForMonthTree": "Alteração calculada para",
     "static.commitVersion.changedInLatestVersion": "Alterado na versão do servidor",
     "static.report.selectMonth": "Selecione o mês",
@@ -1244,6 +1246,7 @@
     "static.common.roleinvalidtext": "Você não pode seleccionar outras funções em combinação com a função de administrador do aplicativo",
     "static.commitTree.compare&Select": "Compare e selecione",
     "static.checkbox.active": "Ativo?",
+    "static.editStatus.problemDescText": "Insira a descrição do problema",
     "static.tree.calculatedChange": "Mudança calculada (+/-%)",
     "static.procurementUnit.labeling": "Rótulo",
     "static.tree.nodeValue": "Valor do Nó",
@@ -1548,6 +1551,7 @@
     "static.subfundingsource.subfundingsourceaddttext": "Adicionar fonte de sub-financiamento",
     "static.masterDataSync.masterDataSync": "Sincronização de dados mestres",
     "static.CompareSelect.AssumingReliable": "Assumindo dados confiáveis de consumo real, esta comparação ajuda os usuários a determinar se suas Árvores de Previsões são realistas.",
+    "static.editStatus.problemSuggestionText": "Digite a sugestão de problema",
     "static.dashboard.funderExport": "Relatório dos Orçamentos",
     "static.procurementUnit.weightQty": "Quantidade de Peso",
     "static.realm.monthInPastForAmcText": "Insira # meses no passado usados ​​para calcular o CMM",
@@ -2761,9 +2765,5 @@
     "static.supplyPlanFormula.maxMonthOfStockEx2": "Máx = Menor entre ([Maior entre (4,3) +3], 18)",
     "static.organisation.organisationheader": "Organização",
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Máx = 7",
-    "static.supplyPlanFormula.maxMonthOfStockEx4": "Máx = Menor entre (7,18)",
-    "static.programProcurementAgentPrice.success": "Preços do Agente de Compras adicionados com sucesso",
-    "static.editStatus.problemDescText": "Insira a descrição do problema",
-    "static.editStatus.problemSuggestionText": "Digite a sugestão de problema",
-    "static.editStatus.validCriticality": "Selecione Criticidade"
+    "static.supplyPlanFormula.maxMonthOfStockEx4": "Máx = Menor entre (7,18)"
 }

@@ -575,6 +575,7 @@
     "static.report.annualshipmentcost": "Shipment Cost Overview",
     "static.report.submitted": "Submitted",
     "static.supplyPlan.supplyPlanForV": "Server Supply Plan - V",
+    "static.editStatus.validCriticality": "Please select Criticality",
     "static.technicalArea.technicalAreaDisplayName": "Technical Area Display Name",
     "static.unkownError": "Unknown error occurred",
     "static.versionSettings.versionSettings": "Version Settings",
@@ -1063,6 +1064,7 @@
     "static.supplyPlan.orderBasedOn": "Packaging Based On",
     "static.supplyPlan.dateustBeLessThanCurDate": "Date must be earlier than current date",
     "static.budget.program": "Program",
+    "static.programProcurementAgentPrice.success": "Procurement Agent Prices added successfully",
     "static.tree.calculatedChangeForMonthTree": "Calculated change for",
     "static.commitVersion.changedInLatestVersion": " Changed in server version",
     "static.report.selectMonth": "Select month",
@@ -1244,6 +1246,7 @@
     "static.common.roleinvalidtext": " You can`t select other roles in combination with application level admin role",
     "static.commitTree.compare&Select": "Compare & Select",
     "static.checkbox.active": "Active?",
+    "static.editStatus.problemDescText": "Enter Problem Description",
     "static.tree.calculatedChange": "Calculated Change (+/- %)",
     "static.procurementUnit.labeling": "Labeling",
     "static.tree.nodeValue": "Node Value",
@@ -1548,6 +1551,7 @@
     "static.subfundingsource.subfundingsourceaddttext": "Add sub-funding Source",
     "static.masterDataSync.masterDataSync": "Master Data Sync",
     "static.CompareSelect.AssumingReliable": "screen.Assuming reliable actual consumption data, this comparison helps users determine if their Tree Forecasts are realistic.",
+    "static.editStatus.problemSuggestionText": "Enter Problem Suggestion",
     "static.dashboard.funderExport": "Budget Report",
     "static.procurementUnit.weightQty": "Weight Quantity",
     "static.realm.monthInPastForAmcText": "Enter # of months in the past used for calculating AMC",
@@ -2761,9 +2765,5 @@
     "static.supplyPlanFormula.maxMonthOfStockEx2": "Max = MIN ([ MAX(4,3)+3 ] ,18 )",
     "static.organisation.organisationheader": "Organization",
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Max = 7",
-    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )",
-    "static.programProcurementAgentPrice.success": "Procurement Agent Prices added successfully",
-    "static.editStatus.problemDescText": "Enter Problem Description",
-    "static.editStatus.problemSuggestionText": "Enter Problem Suggestion",
-    "static.editStatus.validCriticality": "Please select Criticality"
+    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )"
 }
