@@ -2762,5 +2762,8 @@
     "static.organisation.organisationheader": "Organization",
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Max = 7",
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )",
-    "static.programProcurementAgentPrice.success": "Procurement Agent Prices added successfully"
+    "static.programProcurementAgentPrice.success": "Procurement Agent Prices added successfully",
+    "static.editStatus.problemDescText": "Enter Problem Description",
+    "static.editStatus.problemSuggestionText": "Enter Problem Suggestion",
+    "static.editStatus.validCriticality": "Please select Criticality"
 }
