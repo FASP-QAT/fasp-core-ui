@@ -1150,9 +1150,34 @@ export default class ListTreeComponent extends Component {
         }.bind(this)
 
     }
-
     consolidatedDataSetList = (programId, versionId) => {
+        if (versionId != 0 && !versionId.toString().includes("(Local)")) {
+            confirmAlert({
+                message: i18n.t('static.treeList.confirmAlert'),
+                buttons: [
+                    {
+                        label: i18n.t('static.report.ok'),
+                        onClick: () => {
+                            this.loadConsolidatedDataSetList(programId, versionId)
+                        }
+                    },
+                    {
+                        label: i18n.t('static.common.cancel'),
+                        onClick: () => {
+                            jexcel.destroy(document.getElementById("tableDiv"), true);
+                        }
+                    }
+                ]
+            });
+        } else {
+            this.loadConsolidatedDataSetList(programId, versionId)
+        }
+    }
+
+
+    loadConsolidatedDataSetList = (programId, versionId) => {
         if (programId != 0 && versionId != 0) {
+            console.log("parseInt(versionId)", parseInt(versionId))
             var selectedProgram = [];
             var json = {
                 programId: programId,
@@ -1185,7 +1210,7 @@ export default class ListTreeComponent extends Component {
 
                 })
         } else {
-            this.el = jexcel(document.getElementById("tableDiv"), '');
+            // this.el = jexcel(document.getElementById("tableDiv"), '');
             // this.el.destroy();
             jexcel.destroy(document.getElementById("tableDiv"), true);
         }
@@ -1855,7 +1880,7 @@ export default class ListTreeComponent extends Component {
                         </div>
 
                     </div>
-                    <CardBody className="pb-lg-0 pt-lg-0">
+                    <CardBody className="pb-lg-5 pt-lg-0">
                         <Col md="6 pl-0">
                             <div className="d-md-flex Selectdiv2">
                                 <FormGroup className="tab-ml-0 mt-md-2 mb-md-0 ">
@@ -1916,7 +1941,6 @@ export default class ListTreeComponent extends Component {
                                 </FormGroup>
                             </div>
                         </Col>
-                        {/* <div id="loader" className="center"></div> */}
                         <div className="listtreetable consumptionDataEntryTable">
                             <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DIMENSION') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
                             </div>
