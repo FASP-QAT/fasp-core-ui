@@ -30,6 +30,11 @@ import {
 import ProgramService from '../../api/ProgramService';
 import ReportService from '../../api/ReportService';
 import moment from "moment";
+import { Formik } from 'formik';
+import * as Yup from 'yup';
+import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
+import CryptoJS from 'crypto-js'
+
 const entityname = ""
 const options = {
     title: {
@@ -92,9 +97,7 @@ class SupplyPlanVersionAndReview extends Component {
             rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() + 1 },
-            programId: -1
-
-
+            programId: -1,
 
         };
 
@@ -114,6 +117,7 @@ class SupplyPlanVersionAndReview extends Component {
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.setProgramId = this.setProgramId.bind(this);
+
     }
 
     setProgramId(event) {
@@ -138,7 +142,6 @@ class SupplyPlanVersionAndReview extends Component {
     componentWillUnmount() {
         clearTimeout(this.timeout);
     }
-
 
     buildJexcel() {
 
@@ -188,7 +191,7 @@ class SupplyPlanVersionAndReview extends Component {
                 },
                 {
                     title: i18n.t('static.report.version'),
-                    type: 'numeric', mask: '#,##.00', decimal: '.',
+                    type: 'numeric', mask: '#,##',
                     // readOnly: true
                 },
                 {
@@ -1022,6 +1025,14 @@ class SupplyPlanVersionAndReview extends Component {
                     </option>
                 )
             }, this);
+
+        // const { programList } = this.state;
+        // let programs = programList.length > 0
+        //     && programList.map((item, i) => {
+        //         return (
+        //             <option key={i} value={item.id}>{item.name}</option>
+        //         )
+        //     }, this);
 
 
         const bar = {
