@@ -1354,7 +1354,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
         var rowData = obj.getRowData(0);
         var shipmentInstance = this.state.shipmentsEl;
         var shipmentRowData = shipmentInstance.getRowData(rowData[4]);
-        var expectedDeliveryDate = moment(shipmentRowData[4]).format("YYYY-MM-DD");
+        var expectedDeliveryDate = moment(shipmentRowData[5]).format("YYYY-MM-DD");
         var puData = this.props.items.puData.filter(c => c.id == shipmentRowData[3])[0];
         var expiryDate = moment(expectedDeliveryDate).add(puData.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
         data[0] = "";
@@ -1775,6 +1775,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                 {
                     title: i18n.t('static.supplyPlan.batchId'),
                     type: 'text',
+                    autoCasting:false
                 },
                 {
                     title: i18n.t('static.supplyPlan.expiryDate'),

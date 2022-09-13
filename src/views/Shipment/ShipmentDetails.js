@@ -140,6 +140,7 @@ export default class ShipmentDetails extends React.Component {
         this.handleRangeChange = this.handleRangeChange.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
         this.pickRange = React.createRef();
+        this.pickAMonthSingle = React.createRef();
         this.openBatchPopUp = this.openBatchPopUp.bind(this);
         this.exportCSV = this.exportCSV.bind(this);
         this.toggleReplan = this.toggleReplan.bind(this);
@@ -1451,7 +1452,7 @@ export default class ShipmentDetails extends React.Component {
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.mtexpectedDeliveryDate')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                                                 <div className="controls edit">
                                                     <Picker
-                                                        ref="pickAMonthSingle"
+                                                        ref={this.pickAMonthSingle}
                                                         years={{ min: this.state.minDateSingle, max: this.state.maxDateSingle }}
                                                         value={this.state.singleValue}
                                                         lang={pickerLang.months}
@@ -1589,7 +1590,7 @@ export default class ShipmentDetails extends React.Component {
     }
 
     handleClickMonthBoxSingle = (e) => {
-        this.refs.pickAMonthSingle.show()
+        this.pickAMonthSingle.current.show()
     }
     handleAMonthChangeSingle = (value, text) => {
         //

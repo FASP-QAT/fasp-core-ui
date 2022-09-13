@@ -1356,7 +1356,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         var rowData = obj.getRowData(0);
         var shipmentInstance = this.state.shipmentsEl;
         var shipmentRowData = shipmentInstance.getRowData(rowData[4]);
-        var expectedDeliveryDate = moment(shipmentRowData[4]).format("YYYY-MM-DD");
+        var expectedDeliveryDate = moment(shipmentRowData[5]).format("YYYY-MM-DD");
         var expiryDate = moment(expectedDeliveryDate).add(this.props.items.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
         data[0] = "";
         data[1] = expiryDate;
@@ -1717,6 +1717,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 {
                     title: i18n.t('static.supplyPlan.batchId'),
                     type: 'text',
+                    autoCasting:false
                 },
                 {
                     title: i18n.t('static.supplyPlan.expiryDate'),
