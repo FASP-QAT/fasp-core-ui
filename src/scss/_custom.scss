@@ -5593,6 +5593,21 @@ label.arrow_label:before {
   overflow: scroll !important;
 }
 
+.consumptionDataEntryTable .jss_content {
+  max-height: calc(100vh - 262px) !important;
+  overflow: scroll !important;
+}
+
+.inventoryDataEntryTable .jss_content {
+  max-height: calc(100vh - 230px) !important;
+  overflow: scroll !important;
+}
+
+.shipmentDataEntryTable .jss_content {
+  max-height: calc(100vh - 213px) !important;
+  overflow: scroll !important;
+}
+
 .jexcel>tbody>tr>td.readonly>input[type="checkbox"],
 .jexcel>tbody>tr>td.readonly>input[type="radio"] {
   pointer-events: none;
