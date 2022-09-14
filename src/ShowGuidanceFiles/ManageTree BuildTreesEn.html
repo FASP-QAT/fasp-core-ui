@@ -17,9 +17,19 @@
   border-collapse: collapse!important;
   width: 100%;
 }*/
-.table1, th, td {
+.table1 td {
   border: 1px solid #c8ced3!important;
-  border-collapse: collapse!important;
+  padding: 6px;
+  font-size: 13px;
+}
+.table1 th {
+  border: 1px solid #c8ced3!important;
+  padding: 6px;
+  font-size: 13px;
+}
+.table1 {
+  /* width: 100%; */
+  border-collapse: collapse;
 }
 a {
     color: #205493;
@@ -46,15 +56,15 @@ a {
 												<span style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold;">Using this screen :</span>
 												<br>
 												<span style="font-weight: bold;">Manage the Tree:</span> Click on the gear icon <i class="fa fa-cog" aria-hidden="true"></i> to show and edit or hide the forecast method, tree name, and region.</p>
-												<p><span style="font-weight: bold; font-size: 14px;">Building the Tree:</span>The forecast tree is built from the top down, using different types of
+												<p><span style="font-weight: bold; font-size: 13px;">Building the Tree:</span>The forecast tree is built from the top down, using different types of
 													 "nodes". See the Node Types and Node Actions below. Each forecast tree must 
 													 include one or more Planning Unit Nodes, which form the forecast output, 
 													 for that tree to be available in the "<a href="/#/report/compareAndSelectScenario" target="_blank">Compare and Select</a>" screen. Each Planning Unit 
 													 Node must stem from a Forecasting Unit Node.  </p>
 
 												<p>
-													<p style="font-size: 14px; font-weight: bold;"><span class="">Node Actions :</span></p>
-													 <ul class="pl-lg-4">
+													<p style="font-size: 13px; font-weight: bold;"><span class="">Node Actions :</span></p>
+													 <ul class="pl-lg-4" style="font-size: 13px;">
 														<li><i class="fa fa-trash-o" aria-hidden="true" style="color: rgb(0, 47, 108);"></i> Delete: Deletes the selected node </li>
 														<li><i class="fa fa-clone" aria-hidden="true" style="color: rgb(0, 47, 108);"></i> Duplicate: Duplicates the selected node under the same parent </li>
 														<li><i class="fa fa-plus-square-o" aria-hidden="true" style="color: rgb(0, 47, 108);"></i> Add: Adds a child to the selected node.</li>
@@ -62,11 +72,11 @@ a {
 												</p>
 
 												<p>
-													<p style="font-size: 14px; font-weight: bold;">
+													<p style="font-size: 13px; font-weight: bold;">
 														<span class="">Node Type  :</span>
 													</p>
-													<div class="pl-lg-4 pr-lg-4">
-														<table class="table1">
+													<div class="pl-lg-4 pr-lg-4 table1">
+														<table  style="border-collapse: collapse;">
 															<thead>
 																<tr>
 																	<th style="width: 130px;">Node Type</th>
@@ -105,6 +115,57 @@ a {
 																	<td>Defined as a percentage of the parent and planning unit parameters</td>
 																	<td>-</td>
 																	<td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i class="fa fa-link"></i></td>
+																</tr>
+															</tbody>
+														</table>
+													</div>
+												</p>
+												<p style="font-size: 13px;">
+													<span style="font-size: 13px; font-weight: bold;">Changes Over Time</span>
+													<br>Tree structure :
+													<ul style="font-size: 13px;">
+														<li>
+															<b><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i> Modeling:</b> 
+															Allows user to specify the exact rate of change
+														</li>
+														<li><b><i class="fa fa-link"></i> Transfer:</b> Allows users to link two nodes together - so the decrease from the 
+															source node is linked to the increase of the destination node. Useful for transitions.
+														</li>
+														<li><b><i class="fa fa-line-chart"></i> Extrapolation:</b> Allows users to use historical data to extrapolate 
+															future change
+														</li>
+													</ul>
+												</p>
+
+												<p style="font-size: 13px;">
+													<span style="font-size: 13px; font-weight: bold;">Using Scenarios :</span>
+													<br>Scenarios are used to model different values for the same tree. To add, edit or 
+													delete a scenario, use the <i class="fa fa-cog" aria-hidden="true"></i> icon next to the 
+													scenario dropdown. Use the scenario dropdown to select which scenario to view and edit.
+													<div class="pl-lg-4 pr-lg-4 pt-lg-4 table1">
+														<table style="border-collapse: collapse;">
+															<thead>
+																<tr>
+																	<th style="width: 130px;">Fixed for All Scenarios</th>
+																	<th style="width: 230px;">Unique to each Scenario</th>
+																</tr>
+															</thead>
+															<tbody>
+																<tr>
+																	<td>Tree structure</td>
+																	<td>Node value</td>
+																</tr>
+																<tr>
+																	<td>Node Title</td>
+																	<td>Month</td>
+																</tr>
+																<tr>
+																	<td>Node Type</td>
+																	<td>Notes</td>
+																</tr>
+																<tr>
+																	<td></td>
+																	<td>Modeling/Transfer/Extrapolation</td>
 																</tr>
 															</tbody>
 														</table>
