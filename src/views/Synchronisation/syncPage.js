@@ -2551,21 +2551,21 @@ export default class syncPage extends Component {
                                                 arr1.push(item.shipmentId)
                                               })
                                             }
-                                            var oldShipmentDetails = oldProgramData.shipmentList.filter(c=>oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length - 1].childShipmentId>0?c.shipmentId==oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length - 1].childShipmentId :c.tempShipmentId==oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length - 1].tempChildShipmentId);
-                                            var latestShipmentDetails = latestProgramData.shipmentList.filter(c=>latestProgramDataShipmentLinkedFiltered[latestProgramDataShipmentLinkedFiltered.length - 1].childShipmentId>0?c.shipmentId==latestProgramDataShipmentLinkedFiltered[latestProgramDataShipmentLinkedFiltered.length - 1].childShipmentId :c.tempShipmentId==latestProgramDataShipmentLinkedFiltered[latestProgramDataShipmentLinkedFiltered.length - 1].tempChildShipmentId);
+                                            var oldShipmentDetails = oldProgramData.shipmentList.filter(c => oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length - 1].childShipmentId > 0 ? c.shipmentId == oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length - 1].childShipmentId : c.tempShipmentId == oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length - 1].tempChildShipmentId);
+                                            var latestShipmentDetails = latestProgramData.shipmentList.filter(c => latestProgramDataShipmentLinkedFiltered[latestProgramDataShipmentLinkedFiltered.length - 1].childShipmentId > 0 ? c.shipmentId == latestProgramDataShipmentLinkedFiltered[latestProgramDataShipmentLinkedFiltered.length - 1].childShipmentId : c.tempShipmentId == latestProgramDataShipmentLinkedFiltered[latestProgramDataShipmentLinkedFiltered.length - 1].tempChildShipmentId);
                                             data[0] = uniqueRoNoAndRoPrimeLineNo[cd].split("|")[0] + " - " + uniqueRoNoAndRoPrimeLineNo[cd].split("|")[1];
                                             data[1] = uniqueRoNoAndRoPrimeLineNo[cd].split("|")[1];
                                             data[2] = oldProgramDataShipmentLinkedFiltered.length > 0 ? getLabelText(oldProgramData.label, this.state.lang) : "";
-                                            data[3] = oldShipmentDetails.length>0?getLabelText(oldShipmentDetails[0].planningUnit.label,this.state.lang):""
-                                            data[4] = oldShipmentDetails.length>0?getLabelText(oldShipmentDetails[0].realmCountryPlanningUnit.label,this.state.lang):""
+                                            data[3] = oldShipmentDetails.length > 0 ? getLabelText(oldShipmentDetails[0].planningUnit.label, this.state.lang) : ""
+                                            data[4] = oldShipmentDetails.length > 0 ? getLabelText(oldShipmentDetails[0].realmCountryPlanningUnit.label, this.state.lang) : ""
                                             data[5] = oldProgramDataShipmentLinkedFiltered.length > 0 ? arr1 : "";
                                             data[6] = oldShipmentDetails.length > 0 ? oldShipmentDetails[0].realmCountryPlanningUnit.multiplier : "";
                                             data[7] = oldProgramDataShipmentLinkedFiltered.length > 0 ? oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length - 1].active == 1 || oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length - 1].active == true ? true : false : false;
                                             data[8] = listFromAPIFiltered.length > 0 ? getLabelText(listFromAPIFiltered[0].program.label, this.state.lang) : latestProgramDataShipmentLinkedFiltered.length > 0 ? getLabelText(latestProgramData.label, this.state.lang) : "";
-                                            data[9] = oldShipmentDetails.length>0?getLabelText(oldShipmentDetails[0].planningUnit.label,this.state.lang):""
-                                            data[10] = oldShipmentDetails.length>0?getLabelText(oldShipmentDetails[0].realmCountryPlanningUnit.label,this.state.lang):""
+                                            data[9] = oldShipmentDetails.length > 0 ? getLabelText(oldShipmentDetails[0].planningUnit.label, this.state.lang) : ""
+                                            data[10] = oldShipmentDetails.length > 0 ? getLabelText(oldShipmentDetails[0].realmCountryPlanningUnit.label, this.state.lang) : ""
                                             data[11] = listFromAPIFiltered.length > 0 ? listFromAPIFiltered[listFromAPIFiltered.length - 1].shipmentId : latestProgramDataShipmentLinkedFiltered.length > 0 ? arr : "";
-                                            data[12] = listFromAPIFiltered.length > 0 ? listFromAPIFiltered[listFromAPIFiltered.length - 1].realmCountryPlanningUnit.multiplier :latestShipmentDetails.length > 0 ? latestShipmentDetails[0].realmCountryPlanningUnit.multiplier : "" ;
+                                            data[12] = listFromAPIFiltered.length > 0 ? listFromAPIFiltered[listFromAPIFiltered.length - 1].realmCountryPlanningUnit.multiplier : latestShipmentDetails.length > 0 ? latestShipmentDetails[0].realmCountryPlanningUnit.multiplier : "";
                                             data[13] = listFromAPIFiltered.length > 0 ? listFromAPIFiltered[listFromAPIFiltered.length - 1].conversionFactor : latestProgramDataShipmentLinkedFiltered.length > 0 ? latestProgramDataShipmentLinkedFiltered[latestProgramDataShipmentLinkedFiltered.length - 1].active == 1 || latestProgramDataShipmentLinkedFiltered[latestProgramDataShipmentLinkedFiltered.length - 1].active == true ? true : false : false;
                                             data[14] = oldProgramDataShipmentLinkedFiltered.length > 0 ? oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length - 1].shipmentLinkingId : "";
                                             data[15] = latestProgramDataShipmentLinkedFiltered.length > 0 ? latestProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length - 1].shipmentLinkingId : "";
@@ -3215,7 +3215,7 @@ export default class syncPage extends Component {
     console.log("In resolve conflicts@@@@@@@@@@@@")
     var elInstance = instance;
     var jsonData = elInstance.getJson();
-    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S','T','U','V','W','X','Y','Z']
+    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
     elInstance.options.editable = true;
     for (var c = 0; c < jsonData.length; c++) {
       if (jsonData[c][2] !== "" && jsonData[c][8] !== "" && jsonData[c][2] !== jsonData[c][8]) {

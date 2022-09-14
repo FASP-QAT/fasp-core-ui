@@ -1254,7 +1254,7 @@
     "static.procurementUnit.labeling": "Étiquetage",
     "static.tree.nodeValue": "Valeur du nœud",
     "static.masterDataSync.success": "Données de base synchronisées avec succès",
-    "static.programLoadedAndmasterDataSync.success":"Programme chargé et synchronisation des données de base réussie",
+    "static.programLoadedAndmasterDataSync.success": "Programme chargé et synchronisation des données de base réussie",
     "static.dataValidation.treeNotes": "Notes sur l'arbre de prévision",
     "static.compareAndSelect.forecastError": "Erreur de Prévision (%)",
     "static.pipeline.productToPlanningUnit": "Produit PipeLine à lunité de planification",
@@ -2787,8 +2787,9 @@
     "static.organisation.organisationheader": "Organisation",
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Max = 7",
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18)",
-    "static.editStatus.validCriticality": "Veuillez sélectionner Criticité",
     "static.shipment.shipmentProcurementAgentType": "Type d`agent d`approvisionnement d`expédition",
     "static.shipment.groupByProcurementAgentType": "Regrouper par type d`agent d`approvisionnement",
-    "static.programProcurementAgentPrice.success": "Les prix de l`agent d`approvisionnement ont été ajoutés avec succès"
+    "static.treeList.confirmAlert": "La version du serveur prendra un certain temps à se charger. Êtes-vous sûr de vouloir charger la version du serveur ?",
+    "static.programProcurementAgentPrice.success": "Les prix de l`agent d`approvisionnement ont été ajoutés avec succès",
+    "static.editStatus.validCriticality": "Veuillez sélectionner Criticité"
 }

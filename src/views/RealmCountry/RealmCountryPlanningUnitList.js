@@ -739,7 +739,7 @@ export default class RealmCountryPlanningUnitList extends Component {
 
         this.el = jexcel(document.getElementById("tableDiv"), '');
         // this.el.destroy();
-        jexcel.destroy(document.getElementById("tableDiv"),true);
+        jexcel.destroy(document.getElementById("tableDiv"), true);
         var json = [];
         var data = papuDataArr;
         var options = {
@@ -1247,7 +1247,7 @@ export default class RealmCountryPlanningUnitList extends Component {
             }, () => {
                 this.el = jexcel(document.getElementById("tableDiv"), '');
                 // this.el.destroy();
-                jexcel.destroy(document.getElementById("tableDiv"),true);
+                jexcel.destroy(document.getElementById("tableDiv"), true);
             })
 
         }
@@ -1483,8 +1483,8 @@ export default class RealmCountryPlanningUnitList extends Component {
                         </Form>
 
                         <div className='consumptionDataEntryTable ARUMarginTop'>
-                        <div id="tableDiv" style={{ display: this.state.loading ? "none" : "block" }}>
-                        </div>
+                            <div id="tableDiv" style={{ display: this.state.loading ? "none" : "block" }}>
+                            </div>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>
                             <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >

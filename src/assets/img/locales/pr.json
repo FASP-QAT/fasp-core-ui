@@ -1251,7 +1251,7 @@
     "static.procurementUnit.labeling": "Rótulo",
     "static.tree.nodeValue": "Valor do Nó",
     "static.masterDataSync.success": "Dados mestre sincronizados com sucesso",
-    "static.programLoadedAndmasterDataSync.success":"Programa carregado e sincronização de dados mestre com sucesso",
+    "static.programLoadedAndmasterDataSync.success": "Programa carregado e sincronização de dados mestre com sucesso",
     "static.dataValidation.treeNotes": "Notas de Árvore de previsão",
     "static.compareAndSelect.forecastError": "Erro de previsão (%)",
     "static.pipeline.productToPlanningUnit": "Produto PipeLine para Unidade de Planeamento ",
@@ -2784,8 +2784,9 @@
     "static.organisation.organisationheader": "Organização",
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Máx = 7",
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Máx = Menor entre (7,18)",
-    "static.editStatus.validCriticality": "Selecione Criticidade",
     "static.shipment.shipmentProcurementAgentType": "Tipo de Agente de Aquisição de Remessa",
     "static.shipment.groupByProcurementAgentType": "Agrupar por tipo de agente de aquisição",
-    "static.programProcurementAgentPrice.success": "Preços do Agente de Compras adicionados com sucesso"
+    "static.treeList.confirmAlert": "A versão do servidor levará algum tempo para carregar. Tem certeza de que deseja carregar a versão do servidor?",
+    "static.programProcurementAgentPrice.success": "Preços do Agente de Compras adicionados com sucesso",
+    "static.editStatus.validCriticality": "Selecione Criticidade"
 }
