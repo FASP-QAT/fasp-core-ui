@@ -245,20 +245,9 @@ class ProgramService {
         return axios.get(`${API_URL}/api/user/programId/${programId}`, {}
         );
     }
-<<<<<<< HEAD
 
     checkIfLinkingExistsWithOtherProgram(json) {
         return axios.post(`${API_URL}/api/erpLinking/otherProgramCheck`, json, {}
-=======
-<<<<<<< HEAD
-    getProgramManagerListByProgramId(programId) {
-        return axios.get(`${API_URL}/api/user/programId/${programId}`, {}
-=======
-
-    checkIfLinkingExistsWithOtherProgram(json) {
-        return axios.post(`${API_URL}/api/erpLinking/otherProgramCheck`, json, {}
->>>>>>> devMod2
->>>>>>> QAT-1785
         );
     }
 
