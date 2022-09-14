@@ -1474,9 +1474,9 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                     if (rowData[27] == -1 || rowData[27] === "" || rowData[27] == null || rowData[27] == undefined) {
 
                     } else {
-                        var col = ("D").concat(parseInt(i) + 1);
-                        var cell = shipmentInstance.getCell(col)
-                        cell.classList.add('readonly');
+                        var col1 = ("D").concat(parseInt(i) + 1);
+                        var cell1 = shipmentInstance.getCell(col1)
+                        cell1.classList.add('readonly');
                     }
                     // var cell = shipmentInstance.getCell(`M${parseInt(i) + 1}`)
                     // cell.classList.add('shipmentEntryDoNotInclude');
@@ -1493,9 +1493,9 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                     if (rowData[27] == -1 || rowData[27] === "" || rowData[27] == null || rowData[27] == undefined) {
 
                     } else {
-                        var col = ("D").concat(parseInt(i) + 1);
-                        var cell = shipmentInstance.getCell(col)
-                        cell.classList.add('readonly');
+                        var col2 = ("D").concat(parseInt(i) + 1);
+                        var cell2 = shipmentInstance.getCell(col2)
+                        cell2.classList.add('readonly');
                     }
                     // cell.classList.add('readonly');
                     // var cell = shipmentInstance.getCell(`M${parseInt(i) + 1}`)
@@ -1515,9 +1515,9 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                     if (rowData[27] == -1 || rowData[27] === "" || rowData[27] == null || rowData[27] == undefined) {
 
                     } else {
-                        var col = ("D").concat(parseInt(i) + 1);
-                        var cell = shipmentInstance.getCell(col)
-                        cell.classList.add('readonly');
+                        var col3 = ("D").concat(parseInt(i) + 1);
+                        var cell3 = shipmentInstance.getCell(col3)
+                        cell3.classList.add('readonly');
                     }
                     // var cell = shipmentInstance.getCell(`M${parseInt(i) + 1}`)
                     // cell.classList.add('shipmentEntryEmergency');
@@ -1530,9 +1530,9 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                     if (rowData[27] == -1 || rowData[27] === "" || rowData[27] == null || rowData[27] == undefined) {
 
                     } else {
-                        var col = ("D").concat(parseInt(i) + 1);
-                        var cell = shipmentInstance.getCell(col)
-                        cell.classList.add('readonly');
+                        var col4 = ("D").concat(parseInt(i) + 1);
+                        var cell4 = shipmentInstance.getCell(col4)
+                        cell4.classList.add('readonly');
                     }
                     // var cell = shipmentInstance.getCell(`M${parseInt(i) + 1}`)
                     // cell.classList.remove('shipmentEntryEmergency');
@@ -1580,9 +1580,9 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                     if (rowData[27] == -1 || rowData[27] === "" || rowData[27] == null || rowData[27] == undefined) {
 
                     } else {
-                        var col = ("D").concat(parseInt(i) + 1);
-                        var cell = shipmentInstance.getCell(col)
-                        cell.classList.add('readonly');
+                        var col5 = ("D").concat(parseInt(i) + 1);
+                        var cell5 = shipmentInstance.getCell(col5)
+                        cell5.classList.add('readonly');
                     }
                     // var cell = shipmentInstance.getCell(`M${parseInt(i) + 1}`)
                     // cell.classList.add('shipmentEntryDoNotInclude');
@@ -1599,9 +1599,9 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                     if (rowData[27] == -1 || rowData[27] === "" || rowData[27] == null || rowData[27] == undefined) {
 
                     } else {
-                        var col = ("D").concat(parseInt(i) + 1);
-                        var cell = shipmentInstance.getCell(col)
-                        cell.classList.add('readonly');
+                        var col6 = ("D").concat(parseInt(i) + 1);
+                        var cell6 = shipmentInstance.getCell(col6)
+                        cell6.classList.add('readonly');
                     }
                     // cell.classList.add('readonly');
                     // var cell = shipmentInstance.getCell(`M${parseInt(i) + 1}`)
@@ -1621,9 +1621,9 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                     if (rowData[27] == -1 || rowData[27] === "" || rowData[27] == null || rowData[27] == undefined) {
 
                     } else {
-                        var col = ("D").concat(parseInt(i) + 1);
-                        var cell = shipmentInstance.getCell(col)
-                        cell.classList.add('readonly');
+                        var col7 = ("D").concat(parseInt(i) + 1);
+                        var cell7 = shipmentInstance.getCell(col7)
+                        cell7.classList.add('readonly');
                     }
                     // var cell = shipmentInstance.getCell(`M${parseInt(i) + 1}`)
                     // cell.classList.add('shipmentEntryEmergency');
@@ -1636,9 +1636,9 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                     if (rowData[27] == -1 || rowData[27] === "" || rowData[27] == null || rowData[27] == undefined) {
 
                     } else {
-                        var col = ("D").concat(parseInt(i) + 1);
-                        var cell = shipmentInstance.getCell(col)
-                        cell.classList.add('readonly');
+                        var col8 = ("D").concat(parseInt(i) + 1);
+                        var cell8 = shipmentInstance.getCell(col8)
+                        cell8.classList.add('readonly');
                     }
                     // var cell = shipmentInstance.getCell(`M${parseInt(i) + 1}`)
                     // cell.classList.remove('shipmentEntryEmergency');
