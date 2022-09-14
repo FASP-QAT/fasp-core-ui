@@ -1513,7 +1513,7 @@ export default class SupplyPlanComponent extends React.Component {
 
                                         <tr className="totalShipments">
                                             <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                            <td align="left" className="sticky-col first-col clone">&emsp;&emsp;{i18n.t('static.supplyPlan.suggestedShipments')}&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:void();" onClick={this.toggleReplan}><i className="fa fa-lg fa-calendar"></i></a></td>
+                                            <td align="left" className="sticky-col first-col clone">&emsp;&emsp;{i18n.t('static.supplyPlan.suggestedShipments')}&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:void();" onClick={this.toggleReplan} title={i18n.t("static.supplyPlan.planMultiplePusByDate")}><i className="fa fa-lg fa-calendar"></i></a></td>
                                             {
                                                 this.state.suggestedShipmentsTotalData.map(item1 => {
                                                     if (item1.suggestedOrderQty.toString() != "") {
