@@ -2408,10 +2408,10 @@ class ShipmentGlobalView extends Component {
 
                                                 {/* table1 */}
                                                 {this.state.table1Body.length > 0 &&
-                                                    <div className="table-responsive ">
-                                                        <Table id="mytable1" responsive className="table-striped  table-fixed table-bordered text-center mt-2">
+                                                    <div className="table-responsive fixTableHead1 mt-lg-3">
+                                                        <Table id="mytable1" className="table-striped  table-fixed table-bordered text-center">
 
-                                                            <thead>
+                                                            <thead className='Theadtablesticky'>
                                                                 <tr>
                                                                     {
                                                                         this.state.table1Headers.map((item, idx) =>
@@ -2448,10 +2448,10 @@ class ShipmentGlobalView extends Component {
                                                 {/* table2 */}
 
                                                 {this.state.shipmentList.length > 0 &&
-                                                    <div className="table-responsive ">
-                                                        <Table id="mytable2" responsive className="table-striped  table-fixed table-bordered text-center mt-2">
+                                                    <div className="table-responsive fixTableHead1 mt-lg-4">
+                                                        <Table id="mytable2"  className="table-striped  table-fixed table-bordered text-center">
 
-                                                            <thead>
+                                                            <thead className='Theadtablesticky'>
                                                                 <tr>
                                                                     <th className="text-center" style={{ width: '350px' }}> {i18n.t('static.dashboard.months')} </th>
                                                                     <th className="text-center " style={{ width: '350px' }}> {i18n.t('static.program.realmcountry')} </th>
