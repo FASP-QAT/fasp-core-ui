@@ -2761,5 +2761,6 @@
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18)",
     "static.editStatus.problemDescText": "Entrez la description du problème",
     "static.editStatus.problemSuggestionText": "Entrez la suggestion de problème",
-    "static.editStatus.validCriticality": "Veuillez sélectionner Criticité"
+    "static.editStatus.validCriticality": "Veuillez sélectionner Criticité",
+    "static.label.someSpecialCaseNotAllowed": "Saisissez des données valides. Certains caractères spéciaux ne sont pas autorisés, par exemple (' \" :)"
 }
