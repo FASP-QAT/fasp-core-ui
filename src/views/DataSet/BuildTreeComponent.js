@@ -60,6 +60,15 @@ import ModelingTransferScreenshot3 from '../../assets/img/ModelingTransferScreen
 import ModelingTransferScreenshot4 from '../../assets/img/ModelingTransferScreenshot4.jpg';
 import ModelingTransferScreenshot5 from '../../assets/img/ModelingTransferScreenshot5.jpg';
 import ModelingTransferScreenshot6 from '../../assets/img/ModelingTransferScreenshot6.jpg';
+import showguidanceBuildTreeEn from '../../../src/ShowGuidanceFiles/ManageTreeBuildTreesEn.html'
+import showguidanceBuildTreeFr from '../../../src/ShowGuidanceFiles/ManageTreeBuildTreesFr.html'
+import showguidanceBuildTreeSp from '../../../src/ShowGuidanceFiles/ManageTreeBuildTreesSp.html'
+import showguidanceBuildTreePr from '../../../src/ShowGuidanceFiles/ManageTreeBuildTreesPr.html'
+import showguidanceAddEditNodeDataEn from '../../../src/ShowGuidanceFiles/AddEditNodeDataEn.html'
+import showguidanceAddEditNodeDataFr from '../../../src/ShowGuidanceFiles/AddEditNodeDataFr.html'
+import showguidanceAddEditNodeDataSp from '../../../src/ShowGuidanceFiles/AddEditNodeDataSp.html'
+import showguidanceAddEditNodeDataPr from '../../../src/ShowGuidanceFiles/AddEditNodeDataPr.html'
+
 
 // const ref = React.createRef();
 const entityname = 'Tree';
@@ -11216,7 +11225,17 @@ export default class BuildTree extends Component {
                     <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
                 </ModalHeader>
                 <div>
-                    <ModalBody>
+
+                <ModalBody className="ModalBodyPadding">
+                        <div dangerouslySetInnerHTML={ {__html:localStorage.getItem('lang') == 'en' ?
+                showguidanceAddEditNodeDataEn :
+                localStorage.getItem('lang') == 'fr' ?
+                showguidanceAddEditNodeDataFr :
+                  localStorage.getItem('lang') == 'sp' ?
+                  showguidanceAddEditNodeDataSp :
+                  showguidanceAddEditNodeDataPr
+              } } />
+                    {/* <ModalBody>
                         <div>
                             <h3 className='ShowGuidanceHeading'>{i18n.t('static.NodeData.AddEditNode')}</h3>
                         </div>
@@ -11336,7 +11355,7 @@ export default class BuildTree extends Component {
                                 <li><b> {i18n.t('static.NodeData.MultiMonth')}</b> {i18n.t('static.NodeData.ProductActually')} <b>{i18n.t('static.NodeData.PlanningUnitNode')}</b>, {i18n.t('static.NodeData.Usethe')} <b>{i18n.t('static.NodeData.ConsumptionInterval')}</b> {i18n.t('static.NodeData.FieldIndicate')}</li>
                                 <li><b>{i18n.t('static.NodeData.RepeatingForecasting')}</b> {i18n.t('static.NodeData.multipleForecasting')} <a href='/#/usageTemplate/listUsageTemplate' target="_blank" style={{ textDecoration: 'underline' }}>{i18n.t('static.usageTemplate.usageTemplate')} </a>{i18n.t('static.NodeData.CommonUsages')} </li>
                             </ul>
-                        </p>
+                        </p> */}
 
                     </ModalBody>
                 </div>
@@ -11347,8 +11366,16 @@ export default class BuildTree extends Component {
                     <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
                 </ModalHeader>
                 <div>
-                    <ModalBody>
-                        <div>
+                    <ModalBody className="ModalBodyPadding">
+                        <div dangerouslySetInnerHTML={ {__html:localStorage.getItem('lang') == 'en' ?
+                showguidanceBuildTreeEn :
+                localStorage.getItem('lang') == 'fr' ?
+                showguidanceBuildTreeFr :
+                  localStorage.getItem('lang') == 'sp' ?
+                  showguidanceBuildTreeSp :
+                  showguidanceBuildTreePr
+              } } />
+                        {/* <div>
                             <h3 className='ShowGuidanceHeading'>{i18n.t('static.ManageTree.BuildTree')}</h3>
                         </div>
                         <p>
@@ -11463,7 +11490,7 @@ export default class BuildTree extends Component {
                                     </tbody>
                                 </table>
                             </div>
-                        </p>
+                        </p> */}
 
                     </ModalBody>
                 </div>
