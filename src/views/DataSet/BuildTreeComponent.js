@@ -8521,7 +8521,8 @@ export default class BuildTree extends Component {
                                                                 readOnly={true}
                                                                 onChange={(e) => { this.dataChange(e) }}
                                                                 // value={this.state.addNodeFlag != "true" ? addCommas(this.state.parentScenario.calculatedDataValue) : addCommas(this.state.parentValue)}
-                                                                value={addCommas(this.state.parentValue.toString())}
+                                                                value={addCommas(this.state.parentValue.toString()) +"-"+ this.state.nodeUnitList.filter(c=> c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label.label_en
+                                                                 }
                                                             ></Input>
                                                             {/* <Input
                                                                 type="select"
