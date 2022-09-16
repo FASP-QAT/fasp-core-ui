@@ -68,6 +68,10 @@ import showguidanceAddEditNodeDataEn from '../../../src/ShowGuidanceFiles/AddEdi
 import showguidanceAddEditNodeDataFr from '../../../src/ShowGuidanceFiles/AddEditNodeDataFr.html'
 import showguidanceAddEditNodeDataSp from '../../../src/ShowGuidanceFiles/AddEditNodeDataSp.html'
 import showguidanceAddEditNodeDataPr from '../../../src/ShowGuidanceFiles/AddEditNodeDataPr.html'
+import showguidanceModelingTransferEn from '../../../src/ShowGuidanceFiles/BuildTreeModelingTransferEn.html'
+import showguidanceModelingTransferFr from '../../../src/ShowGuidanceFiles/BuildTreeModelingTransferFr.html'
+import showguidanceModelingTransferSp from '../../../src/ShowGuidanceFiles/BuildTreeModelingTransferSp.html'
+import showguidanceModelingTransferPr from '../../../src/ShowGuidanceFiles/BuildTreeModelingTransferPr.html'
 
 
 // const ref = React.createRef();
@@ -11101,8 +11105,16 @@ export default class BuildTree extends Component {
                     <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
                 </ModalHeader>
                 <div>
-                    <ModalBody>
-                        <div>
+                <ModalBody className="ModalBodyPadding">
+                        <div dangerouslySetInnerHTML={ {__html:localStorage.getItem('lang') == 'en' ?
+                showguidanceModelingTransferEn :
+                localStorage.getItem('lang') == 'fr' ?
+                showguidanceModelingTransferFr :
+                  localStorage.getItem('lang') == 'sp' ?
+                  showguidanceModelingTransferSp :
+                  showguidanceModelingTransferPr
+              } } />
+                        {/* <div>
                             <h3 className='ShowGuidanceHeading'>{i18n.t('static.ModelingTransfer.ModelingTransfer')} </h3>
                         </div>
                         <p>
@@ -11164,20 +11176,12 @@ export default class BuildTree extends Component {
                         <p><span style={{ fontSize: '14px' }} className="UnderLineText">{i18n.t('static.ModelingTransfer.RulesTransfer')}:</span>
                             <ul>
 
-                                {/* <li>Transfers must occur between nodes be on the same level</li>
-                                <li>Users can only transfer to nodes that are of the same type (i.e. a forecasting unit may transfer node data to another forecasting unit, but not a planning unit as they are not the same node type).</li>
-                                <li>The order of operations for calculating a transfer occurs from the left to the right in the forecast tree. A transfer cannot be made from right to left, thus a user should be careful when designing their tree and determining where each node should be placed. </li>
-                                <li>Transfers are always negative from the source node and positive to the destination node.</li> */}
                                 <li>{i18n.t('static.ModelingTransfer.NumberNode')}</li>
                                 <li>Percentage nodes can only transfer to other percentage nodes and must belong to the same parent. </li>
                                 <li>The order of operations for calculating a transfer occurs from the left to the right in the forecast tree. A transfer cannot be made from right to left, thus a user should be careful when designing their tree and determining where each node should be placed. </li>
                                 <li>Transfers are always negative from the source node and positive to the destination node. </li>
                                 <li>Extrapolation is not allowed on a node that also has a transfer, whether that be to/from another node. </li>
-                                {/* <li>{i18n.t('static.ModelingTransfer.PercentageFUPU')}</li> */}
-                                {/* <li>{i18n.t('static.ModelingTransfer.DataTransferred')}</li> */}
-                                {/* <li>{i18n.t('static.ModelingTransfer.OrderOfOperations')}</li>
-                                <li>{i18n.t('static.ModelingTransfer.TransferDestination')}</li>
-                                <li>{i18n.t('static.ModelingTransfer.ExtrapolationNotAllowed')}</li> */}
+                                
                             </ul>
                         </p>
                         <p><span style={{ fontSize: '14px' }} className="UnderLineText">{i18n.t('static.ModelingTransfer.Examples')} :</span>
@@ -11214,7 +11218,7 @@ export default class BuildTree extends Component {
                                     <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0" src={ModelingTransferScreenshot6} style={{ border: '1px solid #fff' }} /></span>
                                 </li>
                             </ul>
-                        </p>
+                        </p> */}
 
                     </ModalBody>
                 </div>
