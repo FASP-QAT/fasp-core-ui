@@ -8524,29 +8524,6 @@ export default class BuildTree extends Component {
                                                                 value={addCommas(this.state.parentValue.toString()) +"-"+ this.state.nodeUnitList.filter(c=> c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label.label_en
                                                                  }
                                                             ></Input>
-                                                            {/* <Input
-                                                                type="select"
-                                                                id="nodeUnitId"
-                                                                name="nodeUnitId"
-                                                                bsSize="sm"
-                                                                valid={!errors.nodeUnitId && this.state.currentItemConfig.context.payload.nodeUnit.id != ''}
-                                                                invalid={touched.nodeUnitId && !!errors.nodeUnitId}
-                                                                onBlur={handleBlur}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                required
-                                                                disabled={this.state.currentItemConfig.context.payload.nodeType.id > 3 ? true : false}
-                                                                value={this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.parentItem.payload.nodeUnit.id : this.state.currentItemConfig.context.payload.nodeUnit.id}
-                                                            >
-                                                                <option value="">{i18n.t('static.common.select')}</option>
-                                                                {this.state.nodeUnitList.length > 0
-                                                                    && this.state.nodeUnitList.map((item, i) => {
-                                                                        return (
-                                                                            <option key={i} value={item.unitId}>
-                                                                                {getLabelText(item.label, this.state.lang)}
-                                                                            </option>
-                                                                        )
-                                                                    }, this)}
-                                                            </Input> */}
                                                         </FormGroup>
 
                                                         <FormGroup className="col-md-4">
