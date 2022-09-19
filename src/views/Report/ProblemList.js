@@ -710,7 +710,7 @@ export default class ConsumptionDetails extends React.Component {
                 },
                 {
                     title: i18n.t('static.common.action'),
-                    type: 'text',
+                    type: 'hidden',
                 },
                 {
                     title: 'planningUnitId',
