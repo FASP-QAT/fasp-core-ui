@@ -88,286 +88,285 @@ let initialValuesNodeData = {
 const validationSchemaNodeData = function (values) {
     return Yup.object().shape({
         nodeTypeId: Yup.string()
-            .required(i18n.t('static.validation.fieldRequired')),
-        nodeTitle: Yup.string()
-            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
-            .required(i18n.t('static.validation.fieldRequired')),
-        nodeUnitId: Yup.string()
-            .test('nodeUnitId', i18n.t('static.validation.fieldRequired'),
-                function (value) {
-                    // console.log("@@@",(parseInt(document.getElementById("nodeTypeId").value) == 3 || parseInt(document.getElementById("nodeTypeId").value) == 2) && document.getElementById("nodeUnitId").value == "");
-                    if ((parseInt(document.getElementById("nodeTypeId").value) == 3 || parseInt(document.getElementById("nodeTypeId").value) == 2) && document.getElementById("nodeUnitId").value == "") {
-                        console.log("Pass 1");
-                        return false;
-                    } else {
-                        console.log("Fail 1");
-                        return true;
-                    }
-                }),
-        monthNo: Yup.string()
-            .test('monthNo', i18n.t('static.validation.fieldRequired'),
-                function (value) {
-                    // console.log("@@@",(parseInt(document.getElementById("nodeTypeId").value) == 3 || parseInt(document.getElementById("nodeTypeId").value) == 2) && document.getElementById("nodeUnitId").value == "");
-                    if (parseInt(document.getElementById("nodeTypeId").value) != 1 && document.getElementById("monthNo").value == "") {
-                        console.log("Pass 2");
-                        return false;
-                    } else {
-                        console.log("Fail 2");
-                        return true;
-                    }
-                }),
-        percentageOfParent: Yup.string()
-            .test('percentageOfParent', i18n.t('static.tree.decimalValidation10&2'),
-                function (value) {
-                    var testNumber = document.getElementById("percentageOfParent").value != "" ? (/^\d{0,3}(\.\d{1,4})?$/).test(document.getElementById("percentageOfParent").value) : false;
-                    // console.log(">>>>*", parseInt(document.getElementById("nodeTypeId").value) == 3 || parseInt(document.getElementById("nodeTypeId").value) == 4) && (document.getElementById("percentageOfParent").value == "" || testNumber == false);
-                    if ((parseInt(document.getElementById("nodeTypeId").value) == 3 || parseInt(document.getElementById("nodeTypeId").value) == 4 || parseInt(document.getElementById("nodeTypeId").value) == 5) && (document.getElementById("percentageOfParent").value == "" || testNumber == false)) {
-                        console.log("Pass 3");
-                        return false;
-                    } else {
-                        console.log("Fail 3");
-                        return true;
-                    }
-                }),
-        nodeValue: Yup.string()
-            .test('nodeValue', 'Please enter a valid number having less then 10 digits.',
-                function (value) {
-                    // console.log("*****", document.getElementById("nodeValue").value);
-                    var testNumber = (/^(?!$)\d{0,10}(?:\.\d{1,4})?$/).test((document.getElementById("nodeValue").value).replaceAll(",", ""));
-                    // console.log("*****", testNumber);
-                    if ((parseInt(document.getElementById("nodeTypeId").value) == 3 || parseInt(document.getElementById("nodeTypeId").value) == 2) && (document.getElementById("nodeValue").value == "" || testNumber == false)) {
-                        console.log("Pass 4");
-                        return false;
-                    } else {
-                        console.log("Fail 4");
-                        return true;
-                    }
-                }),
-        // tracerCategoryId: Yup.string()
-        //     .test('tracerCategoryId', i18n.t('static.validation.fieldRequired'),
+        //     .required(i18n.t('static.validation.fieldRequired')),
+        // nodeTitle: Yup.string()
+        //     .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
+        //     .required(i18n.t('static.validation.fieldRequired')),
+        // nodeUnitId: Yup.string()
+        //     .test('nodeUnitId', i18n.t('static.validation.fieldRequired'),
         //         function (value) {
-        //             if (parseInt(document.getElementById("nodeTypeId").value) == 4 && document.getElementById("tracerCategoryId").value == "") {
+        //             if ((parseInt(document.getElementById("nodeTypeId").value) == 3 || parseInt(document.getElementById("nodeTypeId").value) == 2) && document.getElementById("nodeUnitId").value == "") {
+        //                 console.log("Pass 1");
         //                 return false;
         //             } else {
+        //                 console.log("Fail 1");
         //                 return true;
         //             }
         //         }),
-        needFUValidation: Yup.boolean(),
-        forecastingUnitId: Yup.string()
-            .when("needFUValidation", {
-                is: val => {
-                    return document.getElementById("needFUValidation").value === "true";
+        // monthNo: Yup.string()
+        //     .test('monthNo', i18n.t('static.validation.fieldRequired'),
+        //         function (value) {
+        //             // console.log("@@@",(parseInt(document.getElementById("nodeTypeId").value) == 3 || parseInt(document.getElementById("nodeTypeId").value) == 2) && document.getElementById("nodeUnitId").value == "");
+        //             if (parseInt(document.getElementById("nodeTypeId").value) != 1 && document.getElementById("monthNo").value == "") {
+        //                 console.log("Pass 2");
+        //                 return false;
+        //             } else {
+        //                 console.log("Fail 2");
+        //                 return true;
+        //             }
+        //         }),
+        // percentageOfParent: Yup.string()
+        //     .test('percentageOfParent', i18n.t('static.tree.decimalValidation10&2'),
+        //         function (value) {
+        //             var testNumber = document.getElementById("percentageOfParent").value != "" ? (/^\d{0,3}(\.\d{1,4})?$/).test(document.getElementById("percentageOfParent").value) : false;
+        //             // console.log(">>>>*", parseInt(document.getElementById("nodeTypeId").value) == 3 || parseInt(document.getElementById("nodeTypeId").value) == 4) && (document.getElementById("percentageOfParent").value == "" || testNumber == false);
+        //             if ((parseInt(document.getElementById("nodeTypeId").value) == 3 || parseInt(document.getElementById("nodeTypeId").value) == 4 || parseInt(document.getElementById("nodeTypeId").value) == 5) && (document.getElementById("percentageOfParent").value == "" || testNumber == false)) {
+        //                 console.log("Pass 3");
+        //                 return false;
+        //             } else {
+        //                 console.log("Fail 3");
+        //                 return true;
+        //             }
+        //         }),
+        // nodeValue: Yup.string()
+        //     .test('nodeValue', 'Please enter a valid number having less then 10 digits.',
+        //         function (value) {
+        //             // console.log("*****", document.getElementById("nodeValue").value);
+        //             var testNumber = (/^(?!$)\d{0,10}(?:\.\d{1,4})?$/).test((document.getElementById("nodeValue").value).replaceAll(",", ""));
+        //             // console.log("*****", testNumber);
+        //             if ((parseInt(document.getElementById("nodeTypeId").value) == 3 || parseInt(document.getElementById("nodeTypeId").value) == 2) && (document.getElementById("nodeValue").value == "" || testNumber == false)) {
+        //                 console.log("Pass 4");
+        //                 return false;
+        //             } else {
+        //                 console.log("Fail 4");
+        //                 return true;
+        //             }
+        //         }),
+        // // tracerCategoryId: Yup.string()
+        // //     .test('tracerCategoryId', i18n.t('static.validation.fieldRequired'),
+        // //         function (value) {
+        // //             if (parseInt(document.getElementById("nodeTypeId").value) == 4 && document.getElementById("tracerCategoryId").value == "") {
+        // //                 return false;
+        // //             } else {
+        // //                 return true;
+        // //             }
+        // //         }),
+        // needFUValidation: Yup.boolean(),
+        // forecastingUnitId: Yup.string()
+        //     .when("needFUValidation", {
+        //         is: val => {
+        //             return document.getElementById("needFUValidation").value === "true";
 
-                },
-                then: Yup.string()
-                    .required('Please select forecasting unit')
-                    .typeError('Please select forecasting unit'),
-                otherwise: Yup.string().notRequired()
-            }),
-        planningUnitIdFUFlag: Yup.boolean(),
-        planningUnitIdFU: Yup.string()
-            .when("planningUnitIdFUFlag", {
-                is: val => {
-                    return parseInt(document.getElementById("nodeTypeId").value) == 4 && document.getElementById("planningUnitIdFUFlag").value === "true" && document.getElementById("planningUnitIdFU").value === "";
+        //         },
+        //         then: Yup.string()
+        //             .required('Please select forecasting unit')
+        //             .typeError('Please select forecasting unit'),
+        //         otherwise: Yup.string().notRequired()
+        //     }),
+        // planningUnitIdFUFlag: Yup.boolean(),
+        // planningUnitIdFU: Yup.string()
+        //     .when("planningUnitIdFUFlag", {
+        //         is: val => {
+        //             return parseInt(document.getElementById("nodeTypeId").value) == 4 && document.getElementById("planningUnitIdFUFlag").value === "true" && document.getElementById("planningUnitIdFU").value === "";
 
-                },
-                then: Yup.string()
-                    .required('Please select planning unit')
-                    .typeError('Please select planning unit'),
-                otherwise: Yup.string().notRequired()
-            }),
-        usageTypeIdFU: Yup.string()
-            .test('usageTypeIdFU', i18n.t('static.validation.fieldRequired'),
-                function (value) {
-                    if (parseInt(document.getElementById("nodeTypeId").value) == 4 && document.getElementById("usageTypeIdFU").value == "") {
-                        console.log("Pass 5");
-                        return false;
-                    } else {
-                        console.log("Fail 5");
-                        return true;
-                    }
-                }),
-        lagInMonths:
-            Yup.string().test('lagInMonths', 'Please enter a valid number having less then equal to 3 digit.',
-                function (value) {
-                    // console.log("*****", document.getElementById("nodeValue").value);
-                    var testNumber = (/^\d{0,3}?$/).test(document.getElementById("lagInMonths").value);
-                    // console.log("*****", testNumber);
-                    if ((parseInt(document.getElementById("nodeTypeId").value) == 4) && (document.getElementById("lagInMonths").value == "" || testNumber == false)) {
-                        console.log("Pass 6");
-                        return false;
-                    } else {
-                        console.log("Fail 6");
-                        return true;
-                    }
-                }),
+        //         },
+        //         then: Yup.string()
+        //             .required('Please select planning unit')
+        //             .typeError('Please select planning unit'),
+        //         otherwise: Yup.string().notRequired()
+        //     }),
+        // usageTypeIdFU: Yup.string()
+        //     .test('usageTypeIdFU', i18n.t('static.validation.fieldRequired'),
+        //         function (value) {
+        //             if (parseInt(document.getElementById("nodeTypeId").value) == 4 && document.getElementById("usageTypeIdFU").value == "") {
+        //                 console.log("Pass 5");
+        //                 return false;
+        //             } else {
+        //                 console.log("Fail 5");
+        //                 return true;
+        //             }
+        //         }),
+        // lagInMonths:
+        //     Yup.string().test('lagInMonths', 'Please enter a valid number having less then equal to 3 digit.',
+        //         function (value) {
+        //             // console.log("*****", document.getElementById("nodeValue").value);
+        //             var testNumber = (/^\d{0,3}?$/).test(document.getElementById("lagInMonths").value);
+        //             // console.log("*****", testNumber);
+        //             if ((parseInt(document.getElementById("nodeTypeId").value) == 4) && (document.getElementById("lagInMonths").value == "" || testNumber == false)) {
+        //                 console.log("Pass 6");
+        //                 return false;
+        //             } else {
+        //                 console.log("Fail 6");
+        //                 return true;
+        //             }
+        //         }),
 
-        noOfPersons:
-            Yup.string().test('noOfPersons', 'Please enter a valid 10 digit number.',
-                function (value) {
-                    // console.log("*****", document.getElementById("nodeValue").value);
-                    var testNumber = (/^\d{0,10}?$/).test((document.getElementById("noOfPersons").value).replaceAll(",", ""));
-                    // console.log("*****", testNumber);
-                    if ((parseInt(document.getElementById("nodeTypeId").value) == 4) && (document.getElementById("noOfPersons").value == "" || testNumber == false)) {
-                        console.log("Pass 7");
-                        return false;
-                    } else {
-                        console.log("Fail 7");
-                        return true;
-                    }
-                }),
+        // noOfPersons:
+        //     Yup.string().test('noOfPersons', 'Please enter a valid 10 digit number.',
+        //         function (value) {
+        //             // console.log("*****", document.getElementById("nodeValue").value);
+        //             var testNumber = (/^\d{0,10}?$/).test((document.getElementById("noOfPersons").value).replaceAll(",", ""));
+        //             // console.log("*****", testNumber);
+        //             if ((parseInt(document.getElementById("nodeTypeId").value) == 4) && (document.getElementById("noOfPersons").value == "" || testNumber == false)) {
+        //                 console.log("Pass 7");
+        //                 return false;
+        //             } else {
+        //                 console.log("Fail 7");
+        //                 return true;
+        //             }
+        //         }),
 
-        forecastingUnitPerPersonsFC:
-            Yup.string().test('forecastingUnitPerPersonsFC', i18n.t('static.tree.decimalValidation12&2'),
-                function (value) {
-                    // console.log("*****", document.getElementById("nodeValue").value);
-                    var testNumber = (/^\d{0,12}(\.\d{1,4})?$/).test((document.getElementById("forecastingUnitPerPersonsFC").value).replaceAll(",", ""));
-                    if ((parseInt(document.getElementById("nodeTypeId").value) == 4) && (document.getElementById("forecastingUnitPerPersonsFC").value == "" || testNumber == false)) {
-                        console.log("Pass 8");
-                        return false;
-                    } else {
-                        console.log("Fail 8");
-                        return true;
-                    }
-                }),
-        usageFrequencyCon: Yup.string()
-            .test('usageFrequencyCon', i18n.t('static.tree.decimalValidation12&2'),
-                function (value) {
-                    var testNumber = (/^\d{0,12}(\.\d{1,4})?$/).test((document.getElementById("usageFrequencyCon").value).replaceAll(",", ""))
-                    if (document.getElementById("usageTypeIdFU").value == 2 && (document.getElementById("usageFrequencyCon").value == "" || testNumber == false)) {
-                        console.log("Pass 9");
-                        return false;
-                    } else {
-                        console.log("Fail 9");
-                        return true;
-                    }
-                }),
-        usageFrequencyDis: Yup.string()
-            .test('usageFrequencyDis', i18n.t('static.tree.decimalValidation12&2'),
-                function (value) {
-                    var testNumber = (/^\d{0,12}(\.\d{1,4})?$/).test((document.getElementById("usageFrequencyDis").value).replaceAll(",", ""))
-                    if (document.getElementById("usageTypeIdFU").value == 1 && (document.getElementById("oneTimeUsage").value == 'false' || document.getElementById("oneTimeUsage").value == false) && (document.getElementById("usageFrequencyDis").value == "" || testNumber == false)) {
-                        console.log("Pass 10");
-                        return false;
-                    } else {
-                        console.log("Fail 10");
-                        return true;
-                    }
-                }),
-        usagePeriodIdCon: Yup.string()
-            .test('usagePeriodIdCon', 'This field is required.',
-                function (value) {
-                    if (document.getElementById("usageTypeIdFU").value == 2 && document.getElementById("usagePeriodIdCon").value == "") {
-                        console.log("Pass 11");
-                        return false;
-                    } else {
-                        console.log("Fail 11");
-                        return true;
-                    }
+        // forecastingUnitPerPersonsFC:
+        //     Yup.string().test('forecastingUnitPerPersonsFC', i18n.t('static.tree.decimalValidation12&2'),
+        //         function (value) {
+        //             // console.log("*****", document.getElementById("nodeValue").value);
+        //             var testNumber = (/^\d{0,12}(\.\d{1,4})?$/).test((document.getElementById("forecastingUnitPerPersonsFC").value).replaceAll(",", ""));
+        //             if ((parseInt(document.getElementById("nodeTypeId").value) == 4) && (document.getElementById("forecastingUnitPerPersonsFC").value == "" || testNumber == false)) {
+        //                 console.log("Pass 8");
+        //                 return false;
+        //             } else {
+        //                 console.log("Fail 8");
+        //                 return true;
+        //             }
+        //         }),
+        // usageFrequencyCon: Yup.string()
+        //     .test('usageFrequencyCon', i18n.t('static.tree.decimalValidation12&2'),
+        //         function (value) {
+        //             var testNumber = (/^\d{0,12}(\.\d{1,4})?$/).test((document.getElementById("usageFrequencyCon").value).replaceAll(",", ""))
+        //             if (document.getElementById("usageTypeIdFU").value == 2 && (document.getElementById("usageFrequencyCon").value == "" || testNumber == false)) {
+        //                 console.log("Pass 9");
+        //                 return false;
+        //             } else {
+        //                 console.log("Fail 9");
+        //                 return true;
+        //             }
+        //         }),
+        // usageFrequencyDis: Yup.string()
+        //     .test('usageFrequencyDis', i18n.t('static.tree.decimalValidation12&2'),
+        //         function (value) {
+        //             var testNumber = (/^\d{0,12}(\.\d{1,4})?$/).test((document.getElementById("usageFrequencyDis").value).replaceAll(",", ""))
+        //             if (document.getElementById("usageTypeIdFU").value == 1 && (document.getElementById("oneTimeUsage").value == 'false' || document.getElementById("oneTimeUsage").value == false) && (document.getElementById("usageFrequencyDis").value == "" || testNumber == false)) {
+        //                 console.log("Pass 10");
+        //                 return false;
+        //             } else {
+        //                 console.log("Fail 10");
+        //                 return true;
+        //             }
+        //         }),
+        // usagePeriodIdCon: Yup.string()
+        //     .test('usagePeriodIdCon', 'This field is required.',
+        //         function (value) {
+        //             if (document.getElementById("usageTypeIdFU").value == 2 && document.getElementById("usagePeriodIdCon").value == "") {
+        //                 console.log("Pass 11");
+        //                 return false;
+        //             } else {
+        //                 console.log("Fail 11");
+        //                 return true;
+        //             }
 
-                }),
-        usagePeriodIdDis: Yup.string()
-            .test('usagePeriodIdDis', 'This field is required.',
-                function (value) {
-                    if (document.getElementById("usageTypeIdFU").value == 1 && (document.getElementById("oneTimeUsage").value == 'false' || document.getElementById("oneTimeUsage").value == false) && document.getElementById("usagePeriodIdDis").value == "") {
-                        console.log("usagePeriodIdDis false");
-                        console.log("Pass 12");
-                        return false;
-                    } else {
-                        console.log("usagePeriodIdDis true");
-                        console.log("Fail 12");
-                        return true;
-                    }
+        //         }),
+        // usagePeriodIdDis: Yup.string()
+        //     .test('usagePeriodIdDis', 'This field is required.',
+        //         function (value) {
+        //             if (document.getElementById("usageTypeIdFU").value == 1 && (document.getElementById("oneTimeUsage").value == 'false' || document.getElementById("oneTimeUsage").value == false) && document.getElementById("usagePeriodIdDis").value == "") {
+        //                 console.log("usagePeriodIdDis false");
+        //                 console.log("Pass 12");
+        //                 return false;
+        //             } else {
+        //                 console.log("usagePeriodIdDis true");
+        //                 console.log("Fail 12");
+        //                 return true;
+        //             }
 
-                }),
-        oneTimeUsage: Yup.string()
-            .test('oneTimeUsage', i18n.t('static.validation.fieldRequired'),
-                function (value) {
-                    if (document.getElementById("usageTypeIdFU").value == 1 && document.getElementById("oneTimeUsage").value == "") {
-                        console.log("Pass 13");
-                        return false;
-                    } else {
-                        console.log("Fail 13");
-                        return true;
-                    }
-                }),
-        repeatCount: Yup.string().test('repeatCount', i18n.t('static.tree.decimalValidation12&2'),
-            function (value) {
-                var testNumber = (/^\d{0,12}(\.\d{1,4})?$/).test((document.getElementById("repeatCount").value).replaceAll(",", ""));
-                if (document.getElementById("usageTypeIdFU").value == 1 && (document.getElementById("oneTimeUsage").value === "false" || document.getElementById("oneTimeUsage").value === false) && (document.getElementById("repeatCount").value == "" || testNumber == false)) {
-                    console.log("Pass 14");
-                    return false;
-                } else {
-                    console.log("Fail 14");
-                    return true;
-                }
-            }),
-        repeatUsagePeriodId: Yup.string().test('repeatUsagePeriodId', 'This field is required.',
-            function (value) {
-                if (document.getElementById("usageTypeIdFU").value == 1 && (document.getElementById("oneTimeUsage").value == "false" || document.getElementById("oneTimeUsage").value == false) && (document.getElementById("repeatUsagePeriodId").value == "")) {
-                    console.log("Pass 15");
-                    return false;
-                } else {
-                    console.log("Fail 15");
-                    return true;
-                }
-            }),
-        planningUnitId: Yup.string()
-            .test('planningUnitId', i18n.t('static.validation.fieldRequired'),
-                function (value) {
-                    if (parseInt(document.getElementById("nodeTypeId").value) == 5 && document.getElementById("planningUnitId").value == "") {
-                        console.log("Pass 16");
-                        return false;
-                    } else {
-                        console.log("Fail 16");
-                        return true;
-                    }
-                }),
+        //         }),
+        // oneTimeUsage: Yup.string()
+        //     .test('oneTimeUsage', i18n.t('static.validation.fieldRequired'),
+        //         function (value) {
+        //             if (document.getElementById("usageTypeIdFU").value == 1 && document.getElementById("oneTimeUsage").value == "") {
+        //                 console.log("Pass 13");
+        //                 return false;
+        //             } else {
+        //                 console.log("Fail 13");
+        //                 return true;
+        //             }
+        //         }),
+        // repeatCount: Yup.string().test('repeatCount', i18n.t('static.tree.decimalValidation12&2'),
+        //     function (value) {
+        //         var testNumber = (/^\d{0,12}(\.\d{1,4})?$/).test((document.getElementById("repeatCount").value).replaceAll(",", ""));
+        //         if (document.getElementById("usageTypeIdFU").value == 1 && (document.getElementById("oneTimeUsage").value === "false" || document.getElementById("oneTimeUsage").value === false) && (document.getElementById("repeatCount").value == "" || testNumber == false)) {
+        //             console.log("Pass 14");
+        //             return false;
+        //         } else {
+        //             console.log("Fail 14");
+        //             return true;
+        //         }
+        //     }),
+        // repeatUsagePeriodId: Yup.string().test('repeatUsagePeriodId', 'This field is required.',
+        //     function (value) {
+        //         if (document.getElementById("usageTypeIdFU").value == 1 && (document.getElementById("oneTimeUsage").value == "false" || document.getElementById("oneTimeUsage").value == false) && (document.getElementById("repeatUsagePeriodId").value == "")) {
+        //             console.log("Pass 15");
+        //             return false;
+        //         } else {
+        //             console.log("Fail 15");
+        //             return true;
+        //         }
+        //     }),
+        // planningUnitId: Yup.string()
+        //     .test('planningUnitId', i18n.t('static.validation.fieldRequired'),
+        //         function (value) {
+        //             if (parseInt(document.getElementById("nodeTypeId").value) == 5 && document.getElementById("planningUnitId").value == "") {
+        //                 console.log("Pass 16");
+        //                 return false;
+        //             } else {
+        //                 console.log("Fail 16");
+        //                 return true;
+        //             }
+        //         }),
 
-        refillMonths: Yup.string()
-            .test('refillMonths', 'Please enter a valid number having less then 10 digits.',
-                function (value) {
-                    // console.log("*****", document.getElementById("nodeValue").value);
-                    var testNumber = (/^[1-9]\d*$/).test((document.getElementById("refillMonths").value).replaceAll(",", ""));
-                    // console.log("*****", testNumber);
-                    if ((document.getElementById("nodeTypeId").value == 5 && document.getElementById("usageTypeIdPU").value == 2) && (document.getElementById("refillMonths").value == "" || testNumber == false)) {
-                        console.log("Pass 17");
-                        return false;
-                    } else {
-                        console.log("Fail 17");
-                        return true;
-                    }
-                }),
-        sharePlanningUnit: Yup.string()
-            .test('sharePlanningUnit', i18n.t('static.validation.fieldRequired'),
-                function (value) {
-                    if (document.getElementById("nodeTypeId").value == 5 && document.getElementById("usageTypeIdPU").value == 1 && document.getElementById("sharePlanningUnit").value == "") {
-                        console.log("Pass 18");
-                        return false;
-                    } else {
-                        console.log("Fail 18");
-                        return true;
-                    }
-                }),
-        puPerVisit: Yup.string()
-            .test('puPerVisit', 'Please enter # of pu per visit.',
-                function (value) {
+        // refillMonths: Yup.string()
+        //     .test('refillMonths', 'Please enter a valid number having less then 10 digits.',
+        //         function (value) {
+        //             // console.log("*****", document.getElementById("nodeValue").value);
+        //             var testNumber = (/^[1-9]\d*$/).test((document.getElementById("refillMonths").value).replaceAll(",", ""));
+        //             // console.log("*****", testNumber);
+        //             if ((document.getElementById("nodeTypeId").value == 5 && document.getElementById("usageTypeIdPU").value == 2) && (document.getElementById("refillMonths").value == "" || testNumber == false)) {
+        //                 console.log("Pass 17");
+        //                 return false;
+        //             } else {
+        //                 console.log("Fail 17");
+        //                 return true;
+        //             }
+        //         }),
+        // sharePlanningUnit: Yup.string()
+        //     .test('sharePlanningUnit', i18n.t('static.validation.fieldRequired'),
+        //         function (value) {
+        //             if (document.getElementById("nodeTypeId").value == 5 && document.getElementById("usageTypeIdPU").value == 1 && document.getElementById("sharePlanningUnit").value == "") {
+        //                 console.log("Pass 18");
+        //                 return false;
+        //             } else {
+        //                 console.log("Fail 18");
+        //                 return true;
+        //             }
+        //         }),
+        // puPerVisit: Yup.string()
+        //     .test('puPerVisit', 'Please enter # of pu per visit.',
+        //         function (value) {
 
-                    var testNumber = (/^\d{0,12}(\.\d{1,4})?$/).test((document.getElementById("puPerVisit").value).replaceAll(",", ""));
-                    console.log("19 1---->", document.getElementById("nodeTypeId").value);
-                    console.log("19 2---->", document.getElementById("usageTypeIdPU").value);
-                    console.log("19 3---->", document.getElementById("sharePlanningUnit").value);
-                    console.log("19 4---->", document.getElementById("puPerVisit").value);
-                    console.log("19 5---->", testNumber);
-                    console.log("19 6---->", (document.getElementById("nodeTypeId").value == 5 && (document.getElementById("usageTypeIdPU").value == 2 || document.getElementById("sharePlanningUnit").value == false || document.getElementById("sharePlanningUnit").value == "false") && (document.getElementById("puPerVisit").value == "" || testNumber == false)));
-                    if (document.getElementById("nodeTypeId").value == 5 && (document.getElementById("usageTypeIdPU").value == 2 || document.getElementById("sharePlanningUnit").value == false || document.getElementById("sharePlanningUnit").value == "false") && (document.getElementById("puPerVisit").value == "" || testNumber == false)) {
-                        console.log("Pass 19");
-                        return false;
-                    } else {
-                        console.log("Fail 19");
-                        return true;
-                    }
-                }),
+        //             var testNumber = (/^\d{0,12}(\.\d{1,4})?$/).test((document.getElementById("puPerVisit").value).replaceAll(",", ""));
+        //             console.log("19 1---->", document.getElementById("nodeTypeId").value);
+        //             console.log("19 2---->", document.getElementById("usageTypeIdPU").value);
+        //             console.log("19 3---->", document.getElementById("sharePlanningUnit").value);
+        //             console.log("19 4---->", document.getElementById("puPerVisit").value);
+        //             console.log("19 5---->", testNumber);
+        //             console.log("19 6---->", (document.getElementById("nodeTypeId").value == 5 && (document.getElementById("usageTypeIdPU").value == 2 || document.getElementById("sharePlanningUnit").value == false || document.getElementById("sharePlanningUnit").value == "false") && (document.getElementById("puPerVisit").value == "" || testNumber == false)));
+        //             if (document.getElementById("nodeTypeId").value == 5 && (document.getElementById("usageTypeIdPU").value == 2 || document.getElementById("sharePlanningUnit").value == false || document.getElementById("sharePlanningUnit").value == "false") && (document.getElementById("puPerVisit").value == "" || testNumber == false)) {
+        //                 console.log("Pass 19");
+        //                 return false;
+        //             } else {
+        //                 console.log("Fail 19");
+        //                 return true;
+        //             }
+        //         }),
 
     })
 }
