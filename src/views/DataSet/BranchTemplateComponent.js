@@ -97,8 +97,10 @@ const validationSchemaNodeData = function (values) {
                 function (value) {
                     // console.log("@@@",(parseInt(document.getElementById("nodeTypeId").value) == 3 || parseInt(document.getElementById("nodeTypeId").value) == 2) && document.getElementById("nodeUnitId").value == "");
                     if ((parseInt(document.getElementById("nodeTypeId").value) == 3 || parseInt(document.getElementById("nodeTypeId").value) == 2) && document.getElementById("nodeUnitId").value == "") {
+                        console.log("Pass 1");
                         return false;
                     } else {
+                        console.log("Fail 1");
                         return true;
                     }
                 }),
@@ -107,8 +109,10 @@ const validationSchemaNodeData = function (values) {
                 function (value) {
                     // console.log("@@@",(parseInt(document.getElementById("nodeTypeId").value) == 3 || parseInt(document.getElementById("nodeTypeId").value) == 2) && document.getElementById("nodeUnitId").value == "");
                     if (parseInt(document.getElementById("nodeTypeId").value) != 1 && document.getElementById("monthNo").value == "") {
+                        console.log("Pass 2");
                         return false;
                     } else {
+                        console.log("Fail 2");
                         return true;
                     }
                 }),
@@ -118,8 +122,10 @@ const validationSchemaNodeData = function (values) {
                     var testNumber = document.getElementById("percentageOfParent").value != "" ? (/^\d{0,3}(\.\d{1,4})?$/).test(document.getElementById("percentageOfParent").value) : false;
                     // console.log(">>>>*", parseInt(document.getElementById("nodeTypeId").value) == 3 || parseInt(document.getElementById("nodeTypeId").value) == 4) && (document.getElementById("percentageOfParent").value == "" || testNumber == false);
                     if ((parseInt(document.getElementById("nodeTypeId").value) == 3 || parseInt(document.getElementById("nodeTypeId").value) == 4 || parseInt(document.getElementById("nodeTypeId").value) == 5) && (document.getElementById("percentageOfParent").value == "" || testNumber == false)) {
+                        console.log("Pass 3");
                         return false;
                     } else {
+                        console.log("Fail 3");
                         return true;
                     }
                 }),
@@ -130,8 +136,10 @@ const validationSchemaNodeData = function (values) {
                     var testNumber = (/^(?!$)\d{0,10}(?:\.\d{1,4})?$/).test((document.getElementById("nodeValue").value).replaceAll(",", ""));
                     // console.log("*****", testNumber);
                     if ((parseInt(document.getElementById("nodeTypeId").value) == 3 || parseInt(document.getElementById("nodeTypeId").value) == 2) && (document.getElementById("nodeValue").value == "" || testNumber == false)) {
+                        console.log("Pass 4");
                         return false;
                     } else {
+                        console.log("Fail 4");
                         return true;
                     }
                 }),
@@ -172,8 +180,10 @@ const validationSchemaNodeData = function (values) {
             .test('usageTypeIdFU', i18n.t('static.validation.fieldRequired'),
                 function (value) {
                     if (parseInt(document.getElementById("nodeTypeId").value) == 4 && document.getElementById("usageTypeIdFU").value == "") {
+                        console.log("Pass 5");
                         return false;
                     } else {
+                        console.log("Fail 5");
                         return true;
                     }
                 }),
@@ -184,8 +194,10 @@ const validationSchemaNodeData = function (values) {
                     var testNumber = (/^\d{0,3}?$/).test(document.getElementById("lagInMonths").value);
                     // console.log("*****", testNumber);
                     if ((parseInt(document.getElementById("nodeTypeId").value) == 4) && (document.getElementById("lagInMonths").value == "" || testNumber == false)) {
+                        console.log("Pass 6");
                         return false;
                     } else {
+                        console.log("Fail 6");
                         return true;
                     }
                 }),
@@ -197,8 +209,10 @@ const validationSchemaNodeData = function (values) {
                     var testNumber = (/^\d{0,10}?$/).test((document.getElementById("noOfPersons").value).replaceAll(",", ""));
                     // console.log("*****", testNumber);
                     if ((parseInt(document.getElementById("nodeTypeId").value) == 4) && (document.getElementById("noOfPersons").value == "" || testNumber == false)) {
+                        console.log("Pass 7");
                         return false;
                     } else {
+                        console.log("Fail 7");
                         return true;
                     }
                 }),
@@ -209,8 +223,10 @@ const validationSchemaNodeData = function (values) {
                     // console.log("*****", document.getElementById("nodeValue").value);
                     var testNumber = (/^\d{0,12}(\.\d{1,4})?$/).test((document.getElementById("forecastingUnitPerPersonsFC").value).replaceAll(",", ""));
                     if ((parseInt(document.getElementById("nodeTypeId").value) == 4) && (document.getElementById("forecastingUnitPerPersonsFC").value == "" || testNumber == false)) {
+                        console.log("Pass 8");
                         return false;
                     } else {
+                        console.log("Fail 8");
                         return true;
                     }
                 }),
@@ -219,8 +235,10 @@ const validationSchemaNodeData = function (values) {
                 function (value) {
                     var testNumber = (/^\d{0,12}(\.\d{1,4})?$/).test((document.getElementById("usageFrequencyCon").value).replaceAll(",", ""))
                     if (document.getElementById("usageTypeIdFU").value == 2 && (document.getElementById("usageFrequencyCon").value == "" || testNumber == false)) {
+                        console.log("Pass 9");
                         return false;
                     } else {
+                        console.log("Fail 9");
                         return true;
                     }
                 }),
@@ -229,8 +247,10 @@ const validationSchemaNodeData = function (values) {
                 function (value) {
                     var testNumber = (/^\d{0,12}(\.\d{1,4})?$/).test((document.getElementById("usageFrequencyDis").value).replaceAll(",", ""))
                     if (document.getElementById("usageTypeIdFU").value == 1 && (document.getElementById("oneTimeUsage").value == 'false' || document.getElementById("oneTimeUsage").value == false) && (document.getElementById("usageFrequencyDis").value == "" || testNumber == false)) {
+                        console.log("Pass 10");
                         return false;
                     } else {
+                        console.log("Fail 10");
                         return true;
                     }
                 }),
@@ -238,8 +258,10 @@ const validationSchemaNodeData = function (values) {
             .test('usagePeriodIdCon', 'This field is required.',
                 function (value) {
                     if (document.getElementById("usageTypeIdFU").value == 2 && document.getElementById("usagePeriodIdCon").value == "") {
+                        console.log("Pass 11");
                         return false;
                     } else {
+                        console.log("Fail 11");
                         return true;
                     }
 
@@ -249,9 +271,11 @@ const validationSchemaNodeData = function (values) {
                 function (value) {
                     if (document.getElementById("usageTypeIdFU").value == 1 && (document.getElementById("oneTimeUsage").value == 'false' || document.getElementById("oneTimeUsage").value == false) && document.getElementById("usagePeriodIdDis").value == "") {
                         console.log("usagePeriodIdDis false");
+                        console.log("Pass 12");
                         return false;
                     } else {
                         console.log("usagePeriodIdDis true");
+                        console.log("Fail 12");
                         return true;
                     }
 
@@ -260,8 +284,10 @@ const validationSchemaNodeData = function (values) {
             .test('oneTimeUsage', i18n.t('static.validation.fieldRequired'),
                 function (value) {
                     if (document.getElementById("usageTypeIdFU").value == 1 && document.getElementById("oneTimeUsage").value == "") {
+                        console.log("Pass 13");
                         return false;
                     } else {
+                        console.log("Fail 13");
                         return true;
                     }
                 }),
@@ -269,16 +295,20 @@ const validationSchemaNodeData = function (values) {
             function (value) {
                 var testNumber = (/^\d{0,12}(\.\d{1,4})?$/).test((document.getElementById("repeatCount").value).replaceAll(",", ""));
                 if (document.getElementById("usageTypeIdFU").value == 1 && (document.getElementById("oneTimeUsage").value === "false" || document.getElementById("oneTimeUsage").value === false) && (document.getElementById("repeatCount").value == "" || testNumber == false)) {
+                    console.log("Pass 14");
                     return false;
                 } else {
+                    console.log("Fail 14");
                     return true;
                 }
             }),
         repeatUsagePeriodId: Yup.string().test('repeatUsagePeriodId', 'This field is required.',
             function (value) {
                 if (document.getElementById("usageTypeIdFU").value == 1 && (document.getElementById("oneTimeUsage").value == "false" || document.getElementById("oneTimeUsage").value == false) && (document.getElementById("repeatUsagePeriodId").value == "")) {
+                    console.log("Pass 15");
                     return false;
                 } else {
+                    console.log("Fail 15");
                     return true;
                 }
             }),
@@ -286,8 +316,10 @@ const validationSchemaNodeData = function (values) {
             .test('planningUnitId', i18n.t('static.validation.fieldRequired'),
                 function (value) {
                     if (parseInt(document.getElementById("nodeTypeId").value) == 5 && document.getElementById("planningUnitId").value == "") {
+                        console.log("Pass 16");
                         return false;
                     } else {
+                        console.log("Fail 16");
                         return true;
                     }
                 }),
@@ -299,8 +331,10 @@ const validationSchemaNodeData = function (values) {
                     var testNumber = (/^[1-9]\d*$/).test((document.getElementById("refillMonths").value).replaceAll(",", ""));
                     // console.log("*****", testNumber);
                     if ((document.getElementById("nodeTypeId").value == 5 && document.getElementById("usageTypeIdPU").value == 2) && (document.getElementById("refillMonths").value == "" || testNumber == false)) {
+                        console.log("Pass 17");
                         return false;
                     } else {
+                        console.log("Fail 17");
                         return true;
                     }
                 }),
@@ -308,23 +342,29 @@ const validationSchemaNodeData = function (values) {
             .test('sharePlanningUnit', i18n.t('static.validation.fieldRequired'),
                 function (value) {
                     if (document.getElementById("nodeTypeId").value == 5 && document.getElementById("usageTypeIdPU").value == 1 && document.getElementById("sharePlanningUnit").value == "") {
+                        console.log("Pass 18");
                         return false;
                     } else {
+                        console.log("Fail 18");
                         return true;
                     }
                 }),
         puPerVisit: Yup.string()
             .test('puPerVisit', 'Please enter # of pu per visit.',
                 function (value) {
-                    // console.log("*****", document.getElementById("nodeValue").value);
-                    // var testNumber = document.getElementById("puPerVisit").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("puPerVisit").value) : false;
-                    // var testNumber = (/^[1-9]\d*$/).test((document.getElementById("puPerVisit").value).replaceAll(",", ""));
-                    // console.log("*****", testNumber);
-                    // var testNumber = (/^[1-9]\d*$/).test((document.getElementById("puPerVisit").value));
+
                     var testNumber = (/^\d{0,12}(\.\d{1,4})?$/).test((document.getElementById("puPerVisit").value).replaceAll(",", ""));
+                    console.log("19 1---->", document.getElementById("nodeTypeId").value);
+                    console.log("19 2---->", document.getElementById("usageTypeIdPU").value);
+                    console.log("19 3---->", document.getElementById("sharePlanningUnit").value);
+                    console.log("19 4---->", document.getElementById("puPerVisit").value);
+                    console.log("19 5---->", testNumber);
+                    console.log("19 6---->", (document.getElementById("nodeTypeId").value == 5 && (document.getElementById("usageTypeIdPU").value == 2 || document.getElementById("sharePlanningUnit").value == false || document.getElementById("sharePlanningUnit").value == "false") && (document.getElementById("puPerVisit").value == "" || testNumber == false)));
                     if (document.getElementById("nodeTypeId").value == 5 && (document.getElementById("usageTypeIdPU").value == 2 || document.getElementById("sharePlanningUnit").value == false || document.getElementById("sharePlanningUnit").value == "false") && (document.getElementById("puPerVisit").value == "" || testNumber == false)) {
+                        console.log("Pass 19");
                         return false;
                     } else {
+                        console.log("Fail 19");
                         return true;
                     }
                 }),
@@ -4315,7 +4355,7 @@ export default class BranchTemplate extends Component {
         console.log("obj------->>>>", this.state.currentItemConfig);
         if (this.state.currentItemConfig.context.parent != null) {
             id = this.state.currentItemConfig.parentItem.payload.nodeUnit.id;
-            console.log("node unit for test---",id);
+            console.log("node unit for test---", id);
             // } else {
             //     id = this.state.currentItemConfig.context.payload.nodeUnit.id;
 
@@ -4665,7 +4705,7 @@ export default class BranchTemplate extends Component {
             console.log("pu id>>>", (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.id);
             console.log("pu id>>>", this.state.planningUnitList);
             if (this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.planningUnit.id != null && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.planningUnit.id != "") {
-                var nodeUnitTxt = this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id)[0].label.label_en;
+                var nodeUnitTxt = this.state.currentItemConfig.parentItem.parent != null ? this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id)[0].label.label_en : this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.context.parent)[0].payload.nodeUnit.id)[0].label.label_en;
                 if (this.state.addNodeFlag) {
                     var planningUnitId = document.getElementById("planningUnitId");
                     var planningUnit = planningUnitId.options[planningUnitId.selectedIndex].text;
@@ -4891,6 +4931,7 @@ export default class BranchTemplate extends Component {
         }
     }
     touchAllNodeData(setTouched, errors) {
+
         setTouched({
             nodeTypeId: true,
             nodeTitle: true,
@@ -4905,6 +4946,7 @@ export default class BranchTemplate extends Component {
             // nodeValue: true
         }
         )
+        console.log("errors---", errors);
         this.validateFormNodeData(errors)
     }
     validateFormNodeData(errors) {
@@ -5528,21 +5570,58 @@ export default class BranchTemplate extends Component {
                                         dataValue: '0',
                                         calculatedDataValue: '0',
                                         fuNode: {
+                                            oneTimeUsage: "false",
+                                            lagInMonths: 0,
                                             forecastingUnit: {
                                                 tracerCategory: {
 
                                                 },
                                                 unit: {
 
+                                                },
+                                                label: {
+                                                    label_en: ""
                                                 }
                                             },
                                             usageType: {
 
                                             },
                                             usagePeriod: {
-
+                                                usagePeriodId: 1
+                                            },
+                                            repeatCount: '',
+                                            repeatUsagePeriod: {
+                                                usagePeriodId: 1
                                             }
                                         },
+                                        puNode: {
+                                            planningUnit: {
+                                                id: '',
+                                                unit: {
+                                                    id: ""
+                                                },
+                                                multiplier: ''
+                                            },
+                                            refillMonths: '',
+                                            sharePlanningUnit: "false"
+                                        },
+
+                                        // fuNode: {
+                                        //     forecastingUnit: {
+                                        //         tracerCategory: {
+
+                                        //         },
+                                        //         unit: {
+
+                                        //         }
+                                        //     },
+                                        //     usageType: {
+
+                                        //     },
+                                        //     usagePeriod: {
+
+                                        //     }
+                                        // },
                                         nodeDataModelingList: [],
                                         nodeDataOverrideList: [],
                                         nodeDataMomList: []
@@ -5622,20 +5701,40 @@ export default class BranchTemplate extends Component {
                                     dataValue: '0',
                                     calculatedDataValue: '0',
                                     fuNode: {
+                                        oneTimeUsage: "false",
+                                        lagInMonths: 0,
                                         forecastingUnit: {
                                             tracerCategory: {
 
                                             },
                                             unit: {
 
+                                            },
+                                            label: {
+                                                label_en: ""
                                             }
                                         },
                                         usageType: {
 
                                         },
                                         usagePeriod: {
-
+                                            usagePeriodId: 1
+                                        },
+                                        repeatCount: '',
+                                        repeatUsagePeriod: {
+                                            usagePeriodId: 1
                                         }
+                                    },
+                                    puNode: {
+                                        planningUnit: {
+                                            id: '',
+                                            unit: {
+                                                id: ""
+                                            },
+                                            multiplier: ''
+                                        },
+                                        refillMonths: '',
+                                        sharePlanningUnit: "false"
                                     }
                                 }]
                             ]
@@ -6198,7 +6297,7 @@ export default class BranchTemplate extends Component {
         var levelListFiltered = treeLevelList.findIndex(c => c.levelNo == parseInt(itemConfig.context.level + 1));
         if (levelListFiltered == -1) {
             var label = {}
-            var unitId = this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.parentItem.payload.nodeUnit.id : this.state.currentItemConfig.context.payload.nodeUnit.id;
+            var unitId = this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.parent != null ? this.state.currentItemConfig.parentItem.payload.nodeUnit.id : this.state.currentItemConfig.context.payload.nodeUnit.id;
             if (unitId != "") {
                 label = this.state.nodeUnitList.filter(c => c.unitId == unitId)[0].label;
             }
@@ -6220,6 +6319,8 @@ export default class BranchTemplate extends Component {
         treeTemplate.levelList = treeLevelList;
         newItem.level = parseInt(itemConfig.context.level + 1);
         newItem.payload.nodeId = nodeId;
+        console.log("this.state.tempPlanningUnitId---", this.state.tempPlanningUnitId);
+        console.log("this.state.planningUnitList---", this.state.planningUnitList);
         var pu = this.state.planningUnitList.filter(x => x.planningUnitId == this.state.tempPlanningUnitId)[0];
         newItem.payload.label = pu.label;
         newItem.payload.nodeType.id = 5;
@@ -6232,6 +6333,7 @@ export default class BranchTemplate extends Component {
         (newItem.payload.nodeDataMap[0])[0].displayDataValue = (newItem.payload.nodeDataMap[0])[0].dataValue;
         (newItem.payload.nodeDataMap[0])[0].displayCalculatedDataValue = (newItem.payload.nodeDataMap[0])[0].calculatedDataValue;
         // (newItem.payload.nodeDataMap[0])[0].month = moment((newItem.payload.nodeDataMap[0])[0].month).startOf('month').format("YYYY-MM-DD")
+        console.log("newItem.payload.nodeDataMap[0])[0]----", newItem.payload.nodeDataMap[0][0]);
         (newItem.payload.nodeDataMap[0])[0].puNode.planningUnit.id = this.state.tempPlanningUnitId;
         (newItem.payload.nodeDataMap[0])[0].puNode.planningUnit.label = pu.label;
         try {
@@ -6604,11 +6706,13 @@ export default class BranchTemplate extends Component {
 
                         console.log("hey 4")
                     }, 0);
-                    // });
-
-                    // this.getUsageText();
-                    // this.getConversionFactor((data.context.payload.nodeDataMap[0])[0].puNode.planningUnit.id);
-                    this.state.currentItemConfig.context.payload.nodeUnit.id = this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id;
+                    // console.log("this.state.currentItemConfig.parentItem.parent 1----", this.state.currentItemConfig.parentItem.parent);
+                    // console.log("this.state.currentItemConfig.parentItem.parent 2----", this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent));
+                    if (this.state.currentItemConfig.parentItem.parent == null) {
+                        this.state.currentItemConfig.context.payload.nodeUnit.id = this.state.items.filter(x => x.id == this.state.currentItemConfig.context.parent)[0].payload.nodeUnit.id;
+                    } else {
+                        this.state.currentItemConfig.context.payload.nodeUnit.id = this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id;
+                    }
                 }
                 if (data.context.payload.nodeType.id != 1) {
                     this.getSameLevelNodeList(data.context.level, data.context.id, data.context.payload.nodeType.id, data.context.parent);
@@ -6622,6 +6726,7 @@ export default class BranchTemplate extends Component {
 
     updateNodeInfoInJson(currentItemConfig) {
         console.log("update tree node called------------", currentItemConfig);
+        let isNodeChanged = currentItemConfig.context.newTemplateFlag;
         var nodeTypeId = currentItemConfig.context.payload.nodeType.id;
         var nodes = this.state.items;
         var findNodeIndex = nodes.findIndex(n => n.id == currentItemConfig.context.id);
@@ -6649,7 +6754,7 @@ export default class BranchTemplate extends Component {
             var levelListFiltered = treeLevelList.findIndex(c => c.levelNo == parseInt(currentItemConfig.context.level));
             console.log("levelListFiltered@@@@@@@@@@", levelListFiltered);
             if (levelListFiltered != -1) {
-                var unitId = currentItemConfig.context.payload.nodeType.id == 4 ? currentItemConfig.parentItem.payload.nodeUnit.id : currentItemConfig.context.payload.nodeUnit.id;
+                var unitId = currentItemConfig.context.payload.nodeType.id == 4 && currentItemConfig.context.parent != null ? currentItemConfig.parentItem.payload.nodeUnit.id : currentItemConfig.context.payload.nodeUnit.id;
                 var label = {}
                 if (unitId != "") {
                     label = this.state.nodeUnitList.filter(c => c.unitId == unitId)[0].label;
@@ -6669,7 +6774,11 @@ export default class BranchTemplate extends Component {
             treeTemplate
         }, () => {
             console.log("updated tree data+++", this.state);
-            this.calculateMOMData(0, 0);
+            if (currentItemConfig.context.payload.nodeType.id == 4 && (isNodeChanged == 0 || isNodeChanged == false)) {
+                this.createPUNode(JSON.parse(JSON.stringify(currentItemConfig)), currentItemConfig.context.id);
+            } else {
+                this.calculateMOMData(0, 0);
+            }
         });
     }
 
@@ -7712,7 +7821,8 @@ export default class BranchTemplate extends Component {
                                                 name="planningUnitIdFUFlag"
                                                 value={this.state.addNodeFlag}
                                             />
-                                            <FormGroup className="col-md-12" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.addNodeFlag == true ? 'block' : 'none' }}>
+                                            {/* --2--{this.state.addNodeFlag} */}
+                                            <FormGroup className="col-md-12" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 && (this.state.addNodeFlag == true || this.state.currentItemConfig.context.newTemplateFlag == 0) ? 'block' : 'none' }}>
                                                 <Label htmlFor="currencyId">{i18n.t('static.product.product')}<span class="red Reqasterisk">*</span></Label>
                                                 <div className="controls ">
                                                     {/* <InMultiputGroup> */}
@@ -9302,10 +9412,10 @@ export default class BranchTemplate extends Component {
                                             this.getNoOfMonthsInUsagePeriod();
                                             this.getPlanningUnitListByFUId((itemConfig.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id);
                                         }, 0);
-                                        if(itemConfig.parent == null){
-                                            this.state.currentItemConfig.context.payload.nodeUnit.id = itemConfig.payload.nodeUnit.id;    
-                                        }else{
-                                        this.state.currentItemConfig.context.payload.nodeUnit.id = this.state.items.filter(x => x.id == itemConfig.parent)[0].payload.nodeUnit.id;
+                                        if (itemConfig.parent == null) {
+                                            this.state.currentItemConfig.context.payload.nodeUnit.id = itemConfig.payload.nodeUnit.id;
+                                        } else {
+                                            this.state.currentItemConfig.context.payload.nodeUnit.id = this.state.items.filter(x => x.id == itemConfig.parent)[0].payload.nodeUnit.id;
                                         }
                                     } else {
 
