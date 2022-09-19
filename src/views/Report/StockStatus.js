@@ -1155,14 +1155,14 @@ class StockStatus extends Component {
                             }
                           })
                           var conList = consumptionList.filter(c => c.actualFlag == false && (c.consumptionDate >= dt && c.consumptionDate <= enddtStr))
-                          var totalforecastConsumption = null;
+                          var totalforecastConsumption = 0;
                           conList.map(elt => {
-                            totalforecastConsumption = (totalforecastConsumption == null) ? elt.consumptionQty : totalforecastConsumption + Number(elt.consumptionQty)
+                            totalforecastConsumption = (totalforecastConsumption == 0) ? elt.consumptionQty : totalforecastConsumption + Number(elt.consumptionQty)
                           })
                           var conListAct = consumptionList.filter(c => c.actualFlag == true && (c.consumptionDate >= dt && c.consumptionDate <= enddtStr))
-                          var totalActualConsumption = null;
+                          var totalActualConsumption = 0;
                           conListAct.map(elt => {
-                            totalActualConsumption = (totalActualConsumption == null) ? elt.consumptionQty : totalActualConsumption + Number(elt.consumptionQty)
+                            totalActualConsumption = (totalActualConsumption == 0) ? elt.consumptionQty : totalActualConsumption + Number(elt.consumptionQty)
                           })
                           console.log(conList)
                           console.log(totalforecastConsumption)
