@@ -2811,6 +2811,7 @@
     "static.supplyPlan.listOfNewShipmentsCreated": "List of new shipments created",
     "static.treeList.confirmAlert": "Server version will take some time to load. Are you sure you want to load the server version ?",
     "static.programProcurementAgentPrice.success": "Procurement Agent Prices added successfully",
+    "static.supplyPlan.planMultiplePusByDate": "Plan multiple PUs by date",
     "static.editStatus.validCriticality": "Please select Criticality",
-    "static.supplyPlan.planMultiplePusByDate":"Plan multiple PUs by date"
+    "static.label.someSpecialCaseNotAllowed": "Enter valid data. Some special characters are not allowed i.e.(' \" :)"
 }

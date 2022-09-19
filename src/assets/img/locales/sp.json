@@ -2789,5 +2789,6 @@
     "static.shipment.groupByProcurementAgentType": "Agrupar por tipo de agente de compras",
     "static.treeList.confirmAlert": "La versión del servidor tardará un tiempo en cargarse. ¿Está seguro de que desea cargar la versión del servidor?",
     "static.programProcurementAgentPrice.success": "Los precios del agente de compras se agregaron con éxito",
-    "static.editStatus.validCriticality": "Seleccione Criticidad"
+    "static.editStatus.validCriticality": "Seleccione Criticidad",
+    "static.label.someSpecialCaseNotAllowed": "Introduce datos válidos. Algunos caracteres especiales no están permitidos, por ejemplo (' \" :)"
 }

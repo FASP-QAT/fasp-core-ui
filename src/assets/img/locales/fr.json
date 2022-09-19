@@ -2791,5 +2791,6 @@
     "static.shipment.groupByProcurementAgentType": "Regrouper par type d`agent d`approvisionnement",
     "static.treeList.confirmAlert": "La version du serveur prendra un certain temps à se charger. Êtes-vous sûr de vouloir charger la version du serveur ?",
     "static.programProcurementAgentPrice.success": "Les prix de l`agent d`approvisionnement ont été ajoutés avec succès",
-    "static.editStatus.validCriticality": "Veuillez sélectionner Criticité"
+    "static.editStatus.validCriticality": "Veuillez sélectionner Criticité",
+    "static.label.someSpecialCaseNotAllowed": "Saisissez des données valides. Certains caractères spéciaux ne sont pas autorisés, par exemple (' \" :)"
 }
