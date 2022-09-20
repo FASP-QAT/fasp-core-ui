@@ -2765,5 +2765,6 @@
     "static.programProcurementAgentPrice.success": "Procurement Agent Prices added successfully",
     "static.editStatus.problemDescText": "Enter Problem Description",
     "static.editStatus.problemSuggestionText": "Enter Problem Suggestion",
-    "static.editStatus.validCriticality": "Please select Criticality"
+    "static.editStatus.validCriticality": "Please select Criticality",
+    "static.label.someSpecialCaseNotAllowed": "Enter valid data. Some special characters are not allowed i.e.(' \" :)"
 }

@@ -2765,5 +2765,6 @@
     "static.programProcurementAgentPrice.success": "Preços do Agente de Compras adicionados com sucesso",
     "static.editStatus.problemDescText": "Insira a descrição do problema",
     "static.editStatus.problemSuggestionText": "Digite a sugestão de problema",
-    "static.editStatus.validCriticality": "Selecione Criticidade"
+    "static.editStatus.validCriticality": "Selecione Criticidade",
+    "static.label.someSpecialCaseNotAllowed": "Insira dados válidos. Alguns caracteres especiais não são permitidos, por exemplo (' \" :)"
 }

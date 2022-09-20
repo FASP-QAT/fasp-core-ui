@@ -47,10 +47,12 @@ const entityname = i18n.t('static.report.problem');
 const validationSchemaForAddingProblem = function (values) {
     return Yup.object().shape({
         problemDescription: Yup.string()
+            .matches(/^[^'":]+$/, i18n.t("static.label.someSpecialCaseNotAllowed"))
             .required(i18n.t('static.editStatus.problemDescText')),
         modelPlanningUnitId: Yup.string()
             .required(i18n.t('static.procurementUnit.validPlanningUnitText')),
         suggession: Yup.string()
+            .matches(/^[^'":]+$/, i18n.t('static.label.someSpecialCaseNotAllowed'))
             .required(i18n.t('static.editStatus.problemSuggestionText')),
         modelCriticalityId: Yup.string()
             .required(i18n.t('static.editStatus.validCriticality'))

@@ -2765,5 +2765,6 @@
     "static.programProcurementAgentPrice.success": "Les prix de l`agent d`approvisionnement ont été ajoutés avec succès",
     "static.editStatus.problemDescText": "Entrez la description du problème",
     "static.editStatus.problemSuggestionText": "Entrez la suggestion de problème",
-    "static.editStatus.validCriticality": "Veuillez sélectionner Criticité"
+    "static.editStatus.validCriticality": "Veuillez sélectionner Criticité",
+    "static.label.someSpecialCaseNotAllowed": "Saisissez des données valides. Certains caractères spéciaux ne sont pas autorisés, par exemple (' \" :)"
 }
