@@ -1078,7 +1078,7 @@ class LoadDeleteDataSet extends Component {
         confirmAlert({
             title: i18n.t('static.program.confirmsubmit'),
             // message: changed == 1 ? "Changes are not saved still do you want to delete this version." : "Delete this version",
-            message: "Do you want to clean up this program?",
+            message: i18n.t('static.program.cleanUpConfirmation'),
             buttons: [
                 {
                     label: i18n.t('static.program.yes'),
