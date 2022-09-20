@@ -3946,6 +3946,7 @@ class EditSupplyPlanStatus extends Component {
             allowInsertColumn: false,
             allowManualInsertColumn: false,
             allowDeleteRow: false,
+            allowManualInsertRow: false,
             onchange: this.rowChanged,
             // onselection: this.selected,
             // oneditionend: this.onedit,
