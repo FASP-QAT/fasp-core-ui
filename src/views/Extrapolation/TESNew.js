@@ -59,15 +59,20 @@ export function calculateTES(inputData, alphaParam, betaParam, gammaParam, confi
             }
         }).catch(error => {
             console.log("Error@@@@@@", error)
-            if (!isTreeExtrapolation) {
-                // props.updateState("showData", false);
-                // props.updateState("dataEl", "");
-                props.updateState("loading", false);
-                props.updateState("noDataMessage", i18n.t('static.extrapolation.errorOccured'));
-                props.updateState("dataChanged", true);
-                // props.updateState("show", false);
-                // props.el = jexcel(document.getElementById("tableDiv"), '');
-                // props.el.destroy();
+            if (page == "DataEntry" || page == "ImportFromSupplyPlan") {
+                var tesData = { "data": [], "PlanningUnitId": props.state.selectedConsumptionUnitId, "regionId": regionId }
+                props.updateTESData(tesData);
+            } else {
+                if (!isTreeExtrapolation) {
+                    // props.updateState("showData", false);
+                    // props.updateState("dataEl", "");
+                    props.updateState("loading", false);
+                    props.updateState("noDataMessage", i18n.t('static.extrapolation.errorOccured'));
+                    props.updateState("dataChanged", true);
+                    // props.updateState("show", false);
+                    // props.el = jexcel(document.getElementById("tableDiv"), '');
+                    // props.el.destroy();
+                }
             }
         })
 
