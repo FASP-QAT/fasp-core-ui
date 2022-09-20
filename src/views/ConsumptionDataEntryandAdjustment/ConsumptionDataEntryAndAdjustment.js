@@ -480,7 +480,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     if (this.state.selectedConsumptionUnitId > 0) {
       this.setState({ loading: true })
       var datasetJson = this.state.datasetJson;
-      console.log("datasetJson--", datasetJson)
+      console.log("datasetJson**********", datasetJson)
       // Need to filter
       var regionList = this.state.regionList;
       var count = 0;
@@ -512,9 +512,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           }
           var forecastMinDate = moment(datasetJson.currentVersion.forecastStartDate).format("YYYY-MM-DD");
           var forecastMaxDate = moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM-DD");
-          const monthsDiff = moment(new Date(forecastMaxDate)).diff(new Date(forecastMinDate), 'months', true);
-
-          const noOfMonthsForProjection = monthsDiff - inputDataMovingAvg.length;
+          const monthsDiff = moment(new Date(moment(maxDate).format("YYYY-MM-DD")>moment(forecastMaxDate).format("YYYY-MM-DD")?moment(maxDate).format("YYYY-MM-DD"):moment(forecastMaxDate).format("YYYY-MM-DD"))).diff(new Date(moment(minDate).format("YYYY-MM-DD")<moment(forecastMinDate).format("YYYY-MM-DD")?moment(minDate).format("YYYY-MM-DD"):moment(forecastMinDate).format("YYYY-MM-DD")), 'months', true);
+          const noOfMonthsForProjection = (monthsDiff+1) - inputDataMovingAvg.length;
 
           if (inputDataMovingAvg.filter(c => c.actual != null).length >= 3) {
             count++;
@@ -559,13 +558,19 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       console.log("countRecivedMov", this.state.countRecived)
       console.log("countMov", this.state.count)
 
-
+console.log("outSide****",(this.state.jsonDataMovingAvg.length
+  + this.state.jsonDataSemiAverage.length
+  + this.state.jsonDataLinearRegression.length
+  + this.state.jsonDataTes.length
+  + this.state.jsonDataArima.length
+  == this.state.count))
       if (this.state.jsonDataMovingAvg.length
         + this.state.jsonDataSemiAverage.length
         + this.state.jsonDataLinearRegression.length
         + this.state.jsonDataTes.length
         + this.state.jsonDataArima.length
         == this.state.count) {
+          console.log("inside if")
         this.saveForecastConsumptionExtrapolation();
       }
     })
@@ -584,7 +589,12 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     }, () => {
       console.log("countRecivedSemi", this.state.countRecived)
       console.log("countSemi", this.state.count)
-
+console.log("Semi outside if", this.state.jsonDataMovingAvg.length
++ this.state.jsonDataSemiAverage.length
++ this.state.jsonDataLinearRegression.length
++ this.state.jsonDataTes.length
++ this.state.jsonDataArima.length
+== this.state.count)
       if (this.state.jsonDataMovingAvg.length
         + this.state.jsonDataSemiAverage.length
         + this.state.jsonDataLinearRegression.length
@@ -606,7 +616,12 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     }, () => {
       console.log("countRecivedL", this.state.countRecived)
       console.log("countL", this.state.count)
-
+console.log("linear outside***",this.state.jsonDataMovingAvg.length
++ this.state.jsonDataSemiAverage.length
++ this.state.jsonDataLinearRegression.length
++ this.state.jsonDataTes.length
++ this.state.jsonDataArima.length
+== this.state.count)
 
       if (this.state.jsonDataMovingAvg.length
         + this.state.jsonDataSemiAverage.length
@@ -629,7 +644,12 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     }, () => {
       console.log("countRecivedT", this.state.countRecived)
       console.log("countT", this.state.count)
-
+console.log("TES",this.state.jsonDataMovingAvg.length
++ this.state.jsonDataSemiAverage.length
++ this.state.jsonDataLinearRegression.length
++ this.state.jsonDataTes.length
++ this.state.jsonDataArima.length
+== this.state.count)
 
       if (this.state.jsonDataMovingAvg.length
         + this.state.jsonDataSemiAverage.length
@@ -652,6 +672,12 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     }, () => {
       console.log("countRecivedA", this.state.countRecived)
       console.log("countA", this.state.count)
+      console.log("Arima", this.state.jsonDataMovingAvg.length
+      + this.state.jsonDataSemiAverage.length
+      + this.state.jsonDataLinearRegression.length
+      + this.state.jsonDataTes.length
+      + this.state.jsonDataArima.length
+      == this.state.count)
       if (this.state.jsonDataMovingAvg.length
         + this.state.jsonDataSemiAverage.length
         + this.state.jsonDataLinearRegression.length
@@ -1457,7 +1483,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               loading: false,
               message: i18n.t('static.compareAndSelect.dataSaved'),
               messageColor: "green",
-              consumptionChanged: false
+              consumptionChanged: false,
+              datasetJson:datasetJson
             }, () => {
               this.getDatasetData();
               this.hideFirstComponent();
