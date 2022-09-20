@@ -971,9 +971,12 @@ class ListBudgetComponent extends Component {
       if (((moment(stopDate)).isBefore(moment(Date.now())) || ((budgetAmt - usedUsdAmt) <= 0))) {
         for (var i = 0; i < colArr.length; i++) {
           elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
-          elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', '#f48282');
-          let textColor = contrast('#f48282');
-          elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'color', textColor);
+          // elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', '#f48282');
+          // let textColor = contrast('#f48282');
+          // elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'color', textColor);
+
+          var cell = elInstance.getCell((colArr[i]).concat(parseInt(j) + 1))
+          cell.classList.add('jexcelRedCell');
         }
       } else {
         for (var i = 0; i < colArr.length; i++) {
