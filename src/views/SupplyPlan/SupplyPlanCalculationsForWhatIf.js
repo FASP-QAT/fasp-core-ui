@@ -11,64 +11,126 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
     props.updateState("scenarioId", '');
     var curDate = moment(startDate).format("YYYY-MM-DD");
     var startDate1 = moment(startDate).format("YYYY-MM-DD");
-    console.log("CurDate mohit",curDate)
-    console.log("Stop date mohit",stopDate)
-    console.log("compare mohit",moment(curDate).format("YYYY-MM") < moment(stopDate).format("YYYY-MM"))
+    console.log("CurDate mohit", curDate)
+    console.log("Stop date mohit", stopDate)
+    console.log("compare mohit", moment(curDate).format("YYYY-MM") < moment(stopDate).format("YYYY-MM"))
     for (var s = 1; moment(curDate).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM"); s++) {
         var supplyPlanData = programJson.supplyPlan;
-        console.log("In loop for curDate mohit",curDate)
+        console.log("In loop for curDate mohit", curDate)
         var jsonList = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM-DD") == moment(curDate).format("YYYY-MM-DD"));
-        var currentMonth = moment(Date.now()).utcOffset('-0500').startOf('month').format("YYYY-MM-DD");
-        var compare = (curDate >= currentMonth);
-        // var stockInHand = jsonList[0].closingBalance;
         var supplyPlanData = programJson.supplyPlan;
         var shipmentList = programJson.shipmentList;
-        var amc = Math.round(Number(jsonList[0].amc));
-        var spd1 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(curDate).format("YYYY-MM"));
-        var spd2 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(curDate).add(1, 'months').format("YYYY-MM"));
-        var spd3 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(curDate).add(2, 'months').format("YYYY-MM"));
-        var mosForMonth1 = spd1.length > 0 ? spd1[0].mos : 0;
-        var mosForMonth2 = spd2.length > 0 ? spd2[0].mos : 0;
-        var mosForMonth3 = spd3.length > 0 ? spd3[0].mos : 0;
+        if (props.state.planBasedOn == 1) {
+            var currentMonth = moment(Date.now()).utcOffset('-0500').startOf('month').format("YYYY-MM-DD");
+            var compare = (curDate >= currentMonth);
+            // var stockInHand = jsonList[0].closingBalance;
+            var amc = Math.round(Number(jsonList[0].amc));
+            var spd1 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(curDate).format("YYYY-MM"));
+            var spd2 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(curDate).add(1, 'months').format("YYYY-MM"));
+            var spd3 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(curDate).add(2, 'months').format("YYYY-MM"));
+            var mosForMonth1 = spd1.length > 0 ? spd1[0].mos : 0;
+            var mosForMonth2 = spd2.length > 0 ? spd2[0].mos : 0;
+            var mosForMonth3 = spd3.length > 0 ? spd3[0].mos : 0;
 
-        var suggestShipment = false;
-        var useMax = false;
-        if (compare) {
-            if (Number(amc) == 0) {
-                suggestShipment = false;
-            } else if (Number(mosForMonth1) != 0 && Number(mosForMonth1) < Number(props.state.minStockMoSQty) && (Number(mosForMonth2) > Number(props.state.minStockMoSQty) || Number(mosForMonth3) > Number(props.state.minStockMoSQty))) {
-                suggestShipment = false;
-            } else if (Number(mosForMonth1) != 0 && Number(mosForMonth1) < Number(props.state.minStockMoSQty) && Number(mosForMonth2) < Number(props.state.minStockMoSQty) && Number(mosForMonth3) < Number(props.state.minStockMoSQty)) {
-                suggestShipment = true;
-                useMax = true;
-            } else if (Number(mosForMonth1) == 0) {
-                suggestShipment = true;
-                if (Number(mosForMonth2) < Number(props.state.minStockMoSQty) && Number(mosForMonth3) < Number(props.state.minStockMoSQty)) {
+            var suggestShipment = false;
+            var useMax = false;
+            if (compare) {
+                if (Number(amc) == 0) {
+                    suggestShipment = false;
+                } else if (Number(mosForMonth1) != 0 && Number(mosForMonth1) < Number(props.state.minStockMoSQty) && (Number(mosForMonth2) > Number(props.state.minStockMoSQty) || Number(mosForMonth3) > Number(props.state.minStockMoSQty))) {
+                    suggestShipment = false;
+                } else if (Number(mosForMonth1) != 0 && Number(mosForMonth1) < Number(props.state.minStockMoSQty) && Number(mosForMonth2) < Number(props.state.minStockMoSQty) && Number(mosForMonth3) < Number(props.state.minStockMoSQty)) {
+                    suggestShipment = true;
                     useMax = true;
+                } else if (Number(mosForMonth1) == 0) {
+                    suggestShipment = true;
+                    if (Number(mosForMonth2) < Number(props.state.minStockMoSQty) && Number(mosForMonth3) < Number(props.state.minStockMoSQty)) {
+                        useMax = true;
+                    } else {
+                        useMax = false;
+                    }
+                }
+            } else {
+                suggestShipment = false;
+            }
+            var addLeadTimes = parseFloat(generalProgramJson.plannedToSubmittedLeadTime) + parseFloat(generalProgramJson.submittedToApprovedLeadTime) +
+                parseFloat(generalProgramJson.approvedToShippedLeadTime) + parseFloat(generalProgramJson.shippedToArrivedBySeaLeadTime) +
+                parseFloat(generalProgramJson.arrivedToDeliveredLeadTime);
+            var expectedDeliveryDate = moment(curDate).subtract(Number(addLeadTimes * 30), 'days').format("YYYY-MM-DD");
+            var isEmergencyOrder = false;
+            if (expectedDeliveryDate >= currentMonth) {
+                isEmergencyOrder = false;
+            } else {
+                isEmergencyOrder = true;
+            }
+            if (suggestShipment) {
+                var suggestedOrd = 0;
+                if (useMax) {
+                    suggestedOrd = Number((amc * Number(props.state.maxStockMoSQty)) - Number(jsonList[0].closingBalance) + Number(jsonList[0].unmetDemand));
                 } else {
-                    useMax = false;
+                    suggestedOrd = Number((amc * Number(props.state.minStockMoSQty)) - Number(jsonList[0].closingBalance) + Number(jsonList[0].unmetDemand));
                 }
             }
         } else {
-            suggestShipment = false;
-        }
-        var addLeadTimes = parseFloat(generalProgramJson.plannedToSubmittedLeadTime) + parseFloat(generalProgramJson.submittedToApprovedLeadTime) +
-            parseFloat(generalProgramJson.approvedToShippedLeadTime) + parseFloat(generalProgramJson.shippedToArrivedBySeaLeadTime) +
-            parseFloat(generalProgramJson.arrivedToDeliveredLeadTime);
-        var expectedDeliveryDate = moment(curDate).subtract(Number(addLeadTimes * 30), 'days').format("YYYY-MM-DD");
-        var isEmergencyOrder = false;
-        if (expectedDeliveryDate >= currentMonth) {
-            isEmergencyOrder = false;
-        } else {
-            isEmergencyOrder = true;
+            var currentMonth = moment(Date.now()).utcOffset('-0500').startOf('month').format("YYYY-MM-DD");
+            var compare = (curDate >= currentMonth);
+            // var stockInHand = jsonList[0].closingBalance;
+            var spd1 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(curDate).add(props.state.distributionLeadTime, 'months').format("YYYY-MM"));
+            var spd2 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(curDate).add(1 + props.state.distributionLeadTime, 'months').format("YYYY-MM"));
+            var spd3 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(curDate).add(2 + props.state.distributionLeadTime, 'months').format("YYYY-MM"));
+            var amc = spd1.length > 0 ? Math.round(Number(spd1[0].amc)) : 0;
+            var mosForMonth1 = spd1.length > 0 ? spd1[0].mos : 0;
+            var mosForMonth2 = spd2.length > 0 ? spd2[0].mos : 0;
+            var mosForMonth3 = spd3.length > 0 ? spd3[0].mos : 0;
+
+            var cbForMonth1 = spd1.length > 0 ? spd1[0].closingBalance : 0;
+            var cbForMonth2 = spd2.length > 0 ? spd2[0].closingBalance : 0;
+            var cbForMonth3 = spd3.length > 0 ? spd3[0].closingBalance : 0;
+
+            var maxStockForMonth1 = spd1.length > 0 ? spd1[0].maxStock : 0;
+            var minStockForMonth1 = spd1.length > 0 ? spd1[0].minStock : 0;
+
+            var suggestShipment = false;
+            var useMax = false;
+            if (compare) {
+                if (Number(amc) == 0) {
+                    suggestShipment = false;
+                } else if (Number(cbForMonth1) != 0 && Number(cbForMonth1) < Number(props.state.minQtyPpu) && (Number(cbForMonth2) > Number(props.state.minQtyPpu) || Number(cbForMonth3) > Number(props.state.minQtyPpu))) {
+                    suggestShipment = false;
+                } else if (Number(cbForMonth1) != 0 && Number(cbForMonth1) < Number(props.state.minQtyPpu) && Number(cbForMonth2) < Number(props.state.minQtyPpu) && Number(cbForMonth3) < Number(props.state.minQtyPpu)) {
+                    suggestShipment = true;
+                    useMax = true;
+                } else if (Number(cbForMonth1) == 0) {
+                    suggestShipment = true;
+                    if (Number(cbForMonth2) < Number(props.state.minQtyPpu) && Number(cbForMonth3) < Number(props.state.minQtyPpu)) {
+                        useMax = true;
+                    } else {
+                        useMax = false;
+                    }
+                }
+            } else {
+                suggestShipment = false;
+            }
+            var addLeadTimes = parseFloat(generalProgramJson.plannedToSubmittedLeadTime) + parseFloat(generalProgramJson.submittedToApprovedLeadTime) +
+                parseFloat(generalProgramJson.approvedToShippedLeadTime) + parseFloat(generalProgramJson.shippedToArrivedBySeaLeadTime) +
+                parseFloat(generalProgramJson.arrivedToDeliveredLeadTime);
+            var expectedDeliveryDate = moment(curDate).subtract(Number(addLeadTimes * 30), 'days').format("YYYY-MM-DD");
+            var isEmergencyOrder = false;
+            if (expectedDeliveryDate >= currentMonth) {
+                isEmergencyOrder = false;
+            } else {
+                isEmergencyOrder = true;
+            }
+            if (suggestShipment) {
+                var suggestedOrd = 0;
+                if (useMax) {
+                    suggestedOrd = Number((Number(maxStockForMonth1)) - Number(jsonList[0].closingBalance) + Number(jsonList[0].unmetDemand));
+                } else {
+                    suggestedOrd = Number((Number(minStockForMonth1)) - Number(jsonList[0].closingBalance) + Number(jsonList[0].unmetDemand));
+                }
+            }
         }
         if (suggestShipment) {
-            var suggestedOrd = 0;
-            if (useMax) {
-                suggestedOrd = Number((amc * Number(props.state.maxStockMoSQty)) - Number(jsonList[0].closingBalance) + Number(jsonList[0].unmetDemand));
-            } else {
-                suggestedOrd = Number((amc * Number(props.state.minStockMoSQty)) - Number(jsonList[0].closingBalance) + Number(jsonList[0].unmetDemand));
-            }
             if (suggestedOrd <= 0) {
             } else {
                 //Create a shipment 
@@ -217,7 +279,7 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                 if (supplyPlanData == undefined) {
                     supplyPlanData = []
                 }
-                var lastDataEntryDate = moment(stopDate).add(2, 'months').format("YYYY-MM-DD");
+                var lastDataEntryDate = moment(stopDate).add(2 + props.state.distributionLeadTime, 'months').format("YYYY-MM-DD");
                 supplyPlanData = supplyPlanData.filter(c => (c.planningUnitId != planningUnitId) || (c.planningUnitId == planningUnitId && (moment(c.transDate).format("YYYY-MM") < moment(curDate).format("YYYY-MM") || moment(c.transDate).format("YYYY-MM") > moment(lastDataEntryDate).format("YYYY-MM"))));
                 var createdDate = moment(curDate).startOf('month').format("YYYY-MM");
                 var firstDataEntryDate = moment(curDate).startOf('month').format("YYYY-MM");
@@ -226,7 +288,7 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                 for (var i = 0; createdDate < lastDataEntryDate; i++) {
                     // Adding months to created date and getting start date and end date
                     createdDate = moment(firstDataEntryDate).add(i, 'months').format("YYYY-MM-DD");
-                    console.log("Trans Date@@@@@@ mohit",createdDate);
+                    console.log("Trans Date@@@@@@ mohit", createdDate);
                     var startDate = moment(createdDate).startOf('month').format('YYYY-MM-DD');
                     var endDate = moment(createdDate).endOf('month').format('YYYY-MM-DD');
                     // Getting prev month date
@@ -1039,8 +1101,17 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                     }
                     var maxStockMoSQty = Number(minForMonths);
 
-                    var minStock = Number(amc) * Number(minStockMoSQty);
-                    var maxStock = Number(amc) * Number(maxStockMoSQty);
+                    var minStock = 0;
+                    var maxStock = 0;
+                    if (programPlanningUnitList.planBasedOn == 2) {
+                        minStock = programPlanningUnitList.minQty;
+                        maxStock = Math.round(Number(Number(programPlanningUnitList.minQty) + Number(programPlanningUnitList.reorderFrequencyInMonths) * Number(amc)));
+                        minStockMoSQty = Number(programPlanningUnitList.minQty) / Number(amc);
+                        maxStockMoSQty = Number(Number(Number(programPlanningUnitList.minQty) / Number(amc)) + Number(programPlanningUnitList.reorderFrequencyInMonths));
+                    } else {
+                        minStock = Number(amc) * Number(minStockMoSQty);
+                        maxStock = Number(amc) * Number(maxStockMoSQty);
+                    }
 
                     // Calculations of Closing balance
                     var closingBalance = 0;
