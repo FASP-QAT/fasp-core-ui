@@ -2814,5 +2814,14 @@
     "static.supplyPlan.planByDateNote": "Planned by date",
     "static.supplyPlan.listOfNewShipmentsCreated": "List of new shipments created",
     "static.treeList.confirmAlert": "Server version will take some time to load. Are you sure you want to load the server version ?",
-    "static.supplyPlan.planMultiplePusByDate": "Plan multiple PUs by date"
+    "static.supplyPlan.planMultiplePusByDate": "Plan multiple PUs by date",
+    "static.programPU.planBasedOn":"Plan Based On",
+    "static.product.minQuantity":"Min Quantity",
+    "static.product.distributionLeadTime":"Distribution Lead Time (months)",
+    "static.supplyPlan.minQty":"Min Qty",
+    "static.programPU.planBasedOnTooltip":"Choose `quantity` for products where months of stock (MOS) planning doesn’t make sense (ie products that are high expiry, low consumption)",
+    "static.stockStatus.plannedBy":"Planned By",
+    "static.report.minMosOrQty":"Min (months or qty)",
+    "static.report.maxMosOrQty":"Max (months or qty)",
+    "static.report.variable":"Variable"
 }
