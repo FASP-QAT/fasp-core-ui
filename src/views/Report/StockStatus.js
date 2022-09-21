@@ -1157,15 +1157,15 @@ class StockStatus extends Component {
                           var conList = consumptionList.filter(c => c.actualFlag == false && (c.consumptionDate >= dt && c.consumptionDate <= enddtStr))
                           var totalforecastConsumption = 0;
                           conList.map(elt => {
-                            totalforecastConsumption = (totalforecastConsumption == 0) ? elt.consumptionQty : totalforecastConsumption + Number(elt.consumptionQty)
+                            totalforecastConsumption = (totalforecastConsumption == 0) ? elt.consumptionQty : Number(totalforecastConsumption) + Number(elt.consumptionQty)
                           })
                           var conListAct = consumptionList.filter(c => c.actualFlag == true && (c.consumptionDate >= dt && c.consumptionDate <= enddtStr))
                           var totalActualConsumption = 0;
                           conListAct.map(elt => {
-                            totalActualConsumption = (totalActualConsumption == 0) ? elt.consumptionQty : totalActualConsumption + Number(elt.consumptionQty)
+                            totalActualConsumption = (totalActualConsumption == 0) ? elt.consumptionQty : Number(totalActualConsumption) + Number(elt.consumptionQty)
                           })
-                          console.log(conList)
-                          console.log(totalforecastConsumption)
+                          // console.log(conList)
+                          // console.log(totalforecastConsumption)
                           var json = {
                             dt: new Date(from, month - 1),
                             forecastedConsumptionQty: totalforecastConsumption,
@@ -1209,7 +1209,7 @@ class StockStatus extends Component {
                           }
                         }
                         data.push(json)
-                        console.log(json)
+                        // console.log(json)
                         if (month == this.state.rangeValue.to.month && from == to) {
                           this.setState({
                             stockStatusList: data,

@@ -579,6 +579,7 @@
     "static.report.annualshipmentcost": "Shipment Cost Overview",
     "static.report.submitted": "Submitted",
     "static.supplyPlan.supplyPlanForV": "Server Supply Plan - V",
+    "static.editStatus.validCriticality": "Please select Criticality",
     "static.technicalArea.technicalAreaDisplayName": "Technical Area Display Name",
     "static.unkownError": "Unknown error occurred",
     "static.versionSettings.versionSettings": "Version Settings",
@@ -1071,6 +1072,7 @@
     "static.supplyPlan.dateustBeLessThanCurDate": "Date must be earlier than current date",
     "static.budget.program": "Program",
     "static.mt.knShipmentNo": "KN Shipment No",
+    "static.programProcurementAgentPrice.success": "Procurement Agent Prices added successfully",
     "static.tree.calculatedChangeForMonthTree": "Calculated change for",
     "static.commitVersion.changedInLatestVersion": " Changed in server version",
     "static.report.selectMonth": "Select month",
@@ -1839,6 +1841,7 @@
     "static.ManageTree.NodeValue": "Node value",
     "static.supplyPlan.doNotConsideAsEmergencyOrder": "Not an emergency order",
     "static.dashboard.datasourcetype": "Data source types",
+    "static.label.someSpecialCaseNotAllowed": "Enter valid data. Some special characters are not allowed i.e.(' \" :)",
     "static.quantimed.quantimedImport": "Quantimed Import",
     "static.label.labelFail": "An error occurred",
     "static.ForecastSummary.FullSupplyPlan": "This is not a full supply plan, but a high-level procurement surplus/gap analysis. We recommend importing your forecast into the supply planning module for granular supply planning.",
@@ -1977,6 +1980,7 @@
     "static.dataentry.stockedOut": "Stockout Rate (days)",
     "static.manualTagging.search": "Search By RO/Order No.",
     "static.extrapolation.ClickExtrapolate": "Click Extrapolate. All selected forecasts will display in the main table and the graphs.",
+    "static.program.cleanUpConfirmation": "Do you want to clean up this program?",
     "static.tooltip.ComparetoConsumptionForecast": "For each Tree Forecast QAT will calculate the percentage above the highest or below the lowest Consumption Forecast The percentage will be highlighted in red text if it is outside of the threshold percentages set by the user in the Version Settings screen",
     "static.usageTemplate.lagInMonth": "Lag In Months",
     "static.tree.monthStartNoSeasonality": "Month Start (no seasonality)",
@@ -2810,8 +2814,5 @@
     "static.supplyPlan.planByDateNote": "Planned by date",
     "static.supplyPlan.listOfNewShipmentsCreated": "List of new shipments created",
     "static.treeList.confirmAlert": "Server version will take some time to load. Are you sure you want to load the server version ?",
-    "static.programProcurementAgentPrice.success": "Procurement Agent Prices added successfully",
-    "static.supplyPlan.planMultiplePusByDate": "Plan multiple PUs by date",
-    "static.editStatus.validCriticality": "Please select Criticality",
-    "static.label.someSpecialCaseNotAllowed": "Enter valid data. Some special characters are not allowed i.e.(' \" :)"
+    "static.supplyPlan.planMultiplePusByDate": "Plan multiple PUs by date"
 }
