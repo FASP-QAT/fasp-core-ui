@@ -723,8 +723,8 @@ export default class MapPlanningUnits extends Component {
                                             title: i18n.t('static.report.reorderFrequencyInMonths'),
                                             type: 'numeric',
                                             textEditor: true,
-                                            decimal: '.',
-                                            mask: '#,##.00',
+                                            // decimal: '.',
+                                            mask: '#,##',
                                             disabledMaskOnEdition: true
 
                                         },
@@ -732,8 +732,8 @@ export default class MapPlanningUnits extends Component {
                                             title: i18n.t('static.supplyPlan.minMonthsOfStock'),
                                             type: 'numeric',
                                             textEditor: true,
-                                            decimal: '.',
-                                            mask: '#,##.00',
+                                            // decimal: '.',
+                                            mask: '#,##',
                                             disabledMaskOnEdition: true
                                         },
                                         {
@@ -748,24 +748,24 @@ export default class MapPlanningUnits extends Component {
                                             title: i18n.t('static.program.monthfutureamc'),
                                             type: 'numeric',
                                             textEditor: true,
-                                            decimal: '.',
-                                            mask: '#,##.00',
+                                            // decimal: '.',
+                                            mask: '#,##',
                                             disabledMaskOnEdition: true
                                         },
                                         {
                                             title: i18n.t('static.program.monthpastamc'),
                                             type: 'numeric',
                                             textEditor: true,
-                                            decimal: '.',
-                                            mask: '#,##.00',
+                                            // decimal: '.',
+                                            mask: '#,##',
                                             disabledMaskOnEdition: true
                                         },
                                         {
                                             title: i18n.t('static.report.procurmentAgentLeadTimeReport'),
                                             type: 'numeric',
                                             textEditor: true,
-                                            decimal: '.',
-                                            mask: '#,##.00',
+                                            // decimal: '.',
+                                            mask: '#,##',
                                             disabledMaskOnEdition: true
                                         },
                                         {
@@ -780,8 +780,8 @@ export default class MapPlanningUnits extends Component {
                                             title: i18n.t('static.supplyPlan.shelfLife'),
                                             type: 'numeric',
                                             textEditor: true,
-                                            decimal: '.',
-                                            mask: '#,##.00',
+                                            // decimal: '.',
+                                            mask: '#,##',
                                             disabledMaskOnEdition: true
                                         },
                                         {

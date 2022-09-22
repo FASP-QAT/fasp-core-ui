@@ -10667,6 +10667,10 @@ legend.scheduler-border {
   width: unset !important;
 }
 
+.PUNodemarginTop{
+margin-top: -65px;
+}
+
 .formula-img-mr-showGuidance1 {
   border: 1px solid #fff;
   padding: 10px;
@@ -10960,6 +10964,7 @@ legend.scheduler-border {
   top: 0px !important;
   left: 0px !important;
   right: 0px !important;
+<<<<<<< HEAD
 }
 .PUNodemarginTop{
    margin-top: -65px;
@@ -11026,4 +11031,6 @@ legend.scheduler-border {
   background-color: #cfcdc9 !important;
   font-weight: bold!important;
   color: #000!important;
+=======
+>>>>>>> QAT-1803A
 }
