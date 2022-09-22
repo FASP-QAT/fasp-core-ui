@@ -343,11 +343,11 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                             { title: i18n.t('static.supplyPlan.quantityQATProduct'), type: actualColumnType, mask: '#,##', width: 120, readOnly: true },
                             { title: i18n.t('static.program.notes'), type: 'text', width: 400 },
                             { title: i18n.t('static.inventory.active'), type: 'checkbox', width: 100, readOnly: !inventoryEditable },
-                            { title: i18n.t('static.inventory.inventoryDate'), type: 'hidden', width: 0 },
-                            { type: 'hidden', title: i18n.t('static.supplyPlan.batchInfo'), width: 0 },
-                            { type: 'hidden', title: i18n.t('static.supplyPlan.index'), width: 50 },
-                            { type: 'hidden', title: i18n.t('static.supplyPlan.isChanged'), width: 0 },
-                            { type: 'hidden', width: 0 },
+                            { title: i18n.t('static.inventory.inventoryDate'), type: 'hidden', width: 0,readOnly:true },
+                            { type: 'hidden', title: i18n.t('static.supplyPlan.batchInfo'), width: 0,readOnly:true },
+                            { type: 'hidden', title: i18n.t('static.supplyPlan.index'), width: 50,readOnly:true },
+                            { type: 'hidden', title: i18n.t('static.supplyPlan.isChanged'), width: 0,readOnly:true },
+                            { type: 'hidden', width: 0,readOnly:true },
                         ],
                         pagination: paginationOption,
                         paginationOptions: paginationArray,
@@ -1385,7 +1385,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     // cell.classList.add('readonly');
                 }
                 // rowData[15] = batchInfoArray;
-                inventoryInstance.setValueFromCoords(13, rowNumber, batchInfoArray, "");
+                inventoryInstance.setValueFromCoords(13, rowNumber, batchInfoArray, true);
                 this.setState({
                     inventoryChangedFlag: 1,
                     inventoryBatchInfoChangedFlag: 0,
