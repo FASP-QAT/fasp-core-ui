@@ -7020,119 +7020,121 @@ export default class CreateTreeTemplate extends Component {
                                 setFieldTouched
                             }) => (
                                 <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='nodeDataForm' autocomplete="off">
-                                    <div className="row">
+                                    {(this.state.currentItemConfig.context.payload.nodeType.id != 5) &&
+                                        <>
+                                            <div className="row">
 
-                                        {this.state.level0 &&
-                                            <>
+                                                {this.state.level0 &&
+                                                    <>
+                                                        <div>
+                                                            <Popover placement="top" isOpen={this.state.popoverOpenParent} target="Popover2" trigger="hover" toggle={this.toggleParent}>
+                                                                <PopoverBody>{i18n.t('static.tooltip.Parent')}</PopoverBody>
+                                                            </Popover>
+                                                        </div>
+                                                        <FormGroup className="col-md-6">
+                                                            <Label htmlFor="currencyId">Parent <i class="fa fa-info-circle icons pl-lg-2" id="Popover2" onClick={this.toggleParent} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                            {/* <Label htmlFor="currencyId">Parent</Label> */}
+                                                            <Input type="text"
+                                                                name="parent"
+                                                                bsSize="sm"
+                                                                readOnly={true}
+                                                                value={this.state.currentItemConfig.context.level != 0
+                                                                    && this.state.addNodeFlag !== "true"
+                                                                    ? this.state.currentItemConfig.parentItem.payload.label.label_en
+                                                                    : this.state.currentItemConfig.parentItem.payload.label.label_en}
+                                                            ></Input>
+                                                        </FormGroup>
+                                                    </>}
                                                 <div>
-                                                    <Popover placement="top" isOpen={this.state.popoverOpenParent} target="Popover2" trigger="hover" toggle={this.toggleParent}>
-                                                        <PopoverBody>{i18n.t('static.tooltip.Parent')}</PopoverBody>
+                                                    <Popover placement="top" isOpen={this.state.popoverOpenNodeTitle} target="Popover3" trigger="hover" toggle={this.toggleNodeTitle}>
+                                                        <PopoverBody>{i18n.t('static.tooltip.NodeTitle')}</PopoverBody>
                                                     </Popover>
                                                 </div>
                                                 <FormGroup className="col-md-6">
-                                                    <Label htmlFor="currencyId">Parent <i class="fa fa-info-circle icons pl-lg-2" id="Popover2" onClick={this.toggleParent} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
-                                                    {/* <Label htmlFor="currencyId">Parent</Label> */}
+                                                    <Label htmlFor="currencyId">Node Title<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover3" onClick={this.toggleNodeTitle} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                     <Input type="text"
-                                                        name="parent"
+                                                        id="nodeTitle"
+                                                        name="nodeTitle"
                                                         bsSize="sm"
-                                                        readOnly={true}
-                                                        value={this.state.currentItemConfig.context.level != 0
-                                                            && this.state.addNodeFlag !== "true"
-                                                            ? this.state.currentItemConfig.parentItem.payload.label.label_en
-                                                            : this.state.currentItemConfig.parentItem.payload.label.label_en}
-                                                    ></Input>
+                                                        valid={!errors.nodeTitle && this.state.currentItemConfig.context.payload.label.label_en != ''}
+                                                        invalid={touched.nodeTitle && !!errors.nodeTitle}
+                                                        onBlur={handleBlur}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        value={this.state.currentItemConfig.context.payload.label.label_en}>
+                                                    </Input>
+                                                    <FormFeedback className="red">{errors.nodeTitle}</FormFeedback>
                                                 </FormGroup>
-                                            </>}
-                                        <div>
-                                            <Popover placement="top" isOpen={this.state.popoverOpenNodeTitle} target="Popover3" trigger="hover" toggle={this.toggleNodeTitle}>
-                                                <PopoverBody>{i18n.t('static.tooltip.NodeTitle')}</PopoverBody>
-                                            </Popover>
-                                        </div>
-                                        <FormGroup className="col-md-6">
-                                            <Label htmlFor="currencyId">Node Title<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover3" onClick={this.toggleNodeTitle} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
-                                            <Input type="text"
-                                                id="nodeTitle"
-                                                name="nodeTitle"
-                                                bsSize="sm"
-                                                valid={!errors.nodeTitle && this.state.currentItemConfig.context.payload.label.label_en != ''}
-                                                invalid={touched.nodeTitle && !!errors.nodeTitle}
-                                                onBlur={handleBlur}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                value={this.state.currentItemConfig.context.payload.label.label_en}>
-                                            </Input>
-                                            <FormFeedback className="red">{errors.nodeTitle}</FormFeedback>
-                                        </FormGroup>
-                                        <div>
-                                            <Popover placement="top" isOpen={this.state.popoverOpenNodeType} target="Popover4" trigger="hover" toggle={this.toggleNodeType}>
-                                                <PopoverBody>{i18n.t('static.tooltip.NodeType')}</PopoverBody>
-                                            </Popover>
-                                        </div>
-                                        <Input
-                                            type="hidden"
-                                            name="isValidError"
-                                            id="isValidError"
-                                            value={JSON.stringify(errors) != '{}'}
-                                        />
-                                        <FormGroup className="col-md-6">
-                                            <Label htmlFor="currencyId">Node Type<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover4" onClick={this.toggleNodeType} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
-                                            <Input
-                                                type="select"
-                                                id="nodeTypeId"
-                                                name="nodeTypeId"
-                                                bsSize="sm"
-                                                valid={!errors.nodeTypeId && this.state.currentItemConfig.context.payload.nodeType.id != ''}
-                                                invalid={touched.nodeTypeId && !!errors.nodeTypeId}
-                                                onBlur={handleBlur}
-                                                onChange={(e) => { handleChange(e); this.nodeTypeChange(e.target.value); this.dataChange(e) }}
-                                                required
-                                                value={this.state.currentItemConfig.context.payload.nodeType.id}
-                                            >
-                                                <option value="">{i18n.t('static.common.select')}</option>
-                                                {this.state.nodeTypeFollowUpList.length > 0
-                                                    && this.state.nodeTypeFollowUpList.map((item, i) => {
-                                                        return (
-                                                            <option key={i} value={item.id}>
-                                                                {getLabelText(item.label, this.state.lang)}
-                                                            </option>
-                                                        )
-                                                    }, this)}
-                                            </Input>
-                                            <FormFeedback className="red">{errors.nodeTypeId}</FormFeedback>
-                                        </FormGroup>
+                                                <div>
+                                                    <Popover placement="top" isOpen={this.state.popoverOpenNodeType} target="Popover4" trigger="hover" toggle={this.toggleNodeType}>
+                                                        <PopoverBody>{i18n.t('static.tooltip.NodeType')}</PopoverBody>
+                                                    </Popover>
+                                                </div>
+                                                <Input
+                                                    type="hidden"
+                                                    name="isValidError"
+                                                    id="isValidError"
+                                                    value={JSON.stringify(errors) != '{}'}
+                                                />
+                                                <FormGroup className="col-md-6">
+                                                    <Label htmlFor="currencyId">Node Type<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover4" onClick={this.toggleNodeType} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                    <Input
+                                                        type="select"
+                                                        id="nodeTypeId"
+                                                        name="nodeTypeId"
+                                                        bsSize="sm"
+                                                        valid={!errors.nodeTypeId && this.state.currentItemConfig.context.payload.nodeType.id != ''}
+                                                        invalid={touched.nodeTypeId && !!errors.nodeTypeId}
+                                                        onBlur={handleBlur}
+                                                        onChange={(e) => { handleChange(e); this.nodeTypeChange(e.target.value); this.dataChange(e) }}
+                                                        required
+                                                        value={this.state.currentItemConfig.context.payload.nodeType.id}
+                                                    >
+                                                        <option value="">{i18n.t('static.common.select')}</option>
+                                                        {this.state.nodeTypeFollowUpList.length > 0
+                                                            && this.state.nodeTypeFollowUpList.map((item, i) => {
+                                                                return (
+                                                                    <option key={i} value={item.id}>
+                                                                        {getLabelText(item.label, this.state.lang)}
+                                                                    </option>
+                                                                )
+                                                            }, this)}
+                                                    </Input>
+                                                    <FormFeedback className="red">{errors.nodeTypeId}</FormFeedback>
+                                                </FormGroup>
 
-                                        {/* {this.state.aggregationNode && */}
+                                                {/* {this.state.aggregationNode && */}
 
-                                        <FormGroup className="col-md-6" style={{ display: this.state.aggregationNode ? 'block' : 'none' }}>
-                                            <Label htmlFor="currencyId">Node Unit<span class="red Reqasterisk">*</span></Label>
-                                            <Input
-                                                type="select"
-                                                id="nodeUnitId"
-                                                name="nodeUnitId"
-                                                bsSize="sm"
-                                                valid={!errors.nodeUnitId && this.state.currentItemConfig.context.payload.nodeUnit.id != ''}
-                                                invalid={touched.nodeUnitId && !!errors.nodeUnitId}
-                                                onBlur={handleBlur}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                required
-                                                disabled={this.state.currentItemConfig.context.payload.nodeType.id > 3 ? true : false}
-                                                value={this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.parentItem.payload.nodeUnit.id : this.state.currentItemConfig.context.payload.nodeUnit.id}
-                                            >
-                                                <option value="">{i18n.t('static.common.select')}</option>
-                                                {this.state.nodeUnitList.length > 0
-                                                    && this.state.nodeUnitList.map((item, i) => {
-                                                        return (
-                                                            <option key={i} value={item.unitId}>
-                                                                {getLabelText(item.label, this.state.lang)}
-                                                            </option>
-                                                        )
-                                                    }, this)}
-                                            </Input>
-                                            <FormFeedback className="red">{errors.nodeUnitId}</FormFeedback>
-                                        </FormGroup>
-                                        {/* } */}
-                                        {/* {this.state.currentItemConfig.context.payload.nodeType.id != 1 && */}
+                                                <FormGroup className="col-md-6" style={{ display: this.state.aggregationNode ? 'block' : 'none' }}>
+                                                    <Label htmlFor="currencyId">Node Unit<span class="red Reqasterisk">*</span></Label>
+                                                    <Input
+                                                        type="select"
+                                                        id="nodeUnitId"
+                                                        name="nodeUnitId"
+                                                        bsSize="sm"
+                                                        valid={!errors.nodeUnitId && this.state.currentItemConfig.context.payload.nodeUnit.id != ''}
+                                                        invalid={touched.nodeUnitId && !!errors.nodeUnitId}
+                                                        onBlur={handleBlur}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        required
+                                                        disabled={this.state.currentItemConfig.context.payload.nodeType.id > 3 ? true : false}
+                                                        value={this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.parentItem.payload.nodeUnit.id : this.state.currentItemConfig.context.payload.nodeUnit.id}
+                                                    >
+                                                        <option value="">{i18n.t('static.common.select')}</option>
+                                                        {this.state.nodeUnitList.length > 0
+                                                            && this.state.nodeUnitList.map((item, i) => {
+                                                                return (
+                                                                    <option key={i} value={item.unitId}>
+                                                                        {getLabelText(item.label, this.state.lang)}
+                                                                    </option>
+                                                                )
+                                                            }, this)}
+                                                    </Input>
+                                                    <FormFeedback className="red">{errors.nodeUnitId}</FormFeedback>
+                                                </FormGroup>
+                                                {/* } */}
+                                                {/* {this.state.currentItemConfig.context.payload.nodeType.id != 1 && */}
 
-                                        {/* <FormGroup className="col-md-6" style={{ display: this.state.aggregationNode ? 'block' : 'none' }}>
+                                                {/* <FormGroup className="col-md-6" style={{ display: this.state.aggregationNode ? 'block' : 'none' }}>
                                             <Label htmlFor="currencyId">{i18n.t('static.common.month')}<span class="red Reqasterisk">*</span></Label>
                                             <div className="controls edit">
                                                 <Picker
@@ -7151,130 +7153,307 @@ export default class CreateTreeTemplate extends Component {
                                                 </Picker>
                                             </div>
                                         </FormGroup> */}
-                                        <FormGroup className="col-md-6" style={{ display: this.state.aggregationNode ? 'block' : 'none' }}>
-                                            <Label htmlFor="currencyId">{i18n.t('static.common.month')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input
-                                                type="select"
-                                                id="monthNo"
-                                                name="monthNo"
-                                                bsSize="sm"
-                                                valid={!errors.monthNo && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].monthNo != ''}
-                                                invalid={touched.monthNo && !!errors.monthNo}
-                                                onBlur={handleBlur}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                required
-                                                value={this.state.currentItemConfig.context.payload.nodeDataMap[0][0].monthNo}
-                                            >
-                                                <option value="">{i18n.t('static.common.select')}</option>
-                                                {this.state.monthList.length > 0
-                                                    && this.state.monthList.map((item, i) => {
-                                                        return (
-                                                            <option key={i} value={item.id}>
-                                                                {item.name}
-                                                            </option>
-                                                        )
-                                                    }, this)}
-                                            </Input>
-                                            <FormFeedback className="red">{errors.monthNo}</FormFeedback>
-                                        </FormGroup>
+                                                <FormGroup className="col-md-6" style={{ display: this.state.aggregationNode ? 'block' : 'none' }}>
+                                                    <Label htmlFor="currencyId">{i18n.t('static.common.month')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Input
+                                                        type="select"
+                                                        id="monthNo"
+                                                        name="monthNo"
+                                                        bsSize="sm"
+                                                        valid={!errors.monthNo && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].monthNo != ''}
+                                                        invalid={touched.monthNo && !!errors.monthNo}
+                                                        onBlur={handleBlur}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        required
+                                                        value={this.state.currentItemConfig.context.payload.nodeDataMap[0][0].monthNo}
+                                                    >
+                                                        <option value="">{i18n.t('static.common.select')}</option>
+                                                        {this.state.monthList.length > 0
+                                                            && this.state.monthList.map((item, i) => {
+                                                                return (
+                                                                    <option key={i} value={item.id}>
+                                                                        {item.name}
+                                                                    </option>
+                                                                )
+                                                            }, this)}
+                                                    </Input>
+                                                    <FormFeedback className="red">{errors.monthNo}</FormFeedback>
+                                                </FormGroup>
 
-                                        {/* // } */}
+                                                {/* // } */}
 
-                                        {/* {(this.state.numberNode && this.state.currentItemConfig.context.payload.nodeType.id != 1) && */}
-                                        {/* <> */}
-                                        <div>
-                                            <Popover placement="top" isOpen={this.state.popoverOpenPercentageOfParent} target="Popover5" trigger="hover" toggle={this.togglePercentageOfParent}>
-                                                <PopoverBody>{i18n.t('static.tooltip.PercentageOfParent')}</PopoverBody>
-                                            </Popover>
-                                        </div>
-                                        <FormGroup className="col-md-6" style={{ display: this.state.numberNode ? 'block' : 'none' }}>
-                                            <Label htmlFor="currencyId">Percentage of Parent<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover5" onClick={this.togglePercentageOfParent} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
-                                            <InputGroup>
-                                                <Input type="number"
-                                                    id="percentageOfParent"
-                                                    name="percentageOfParent"
-                                                    bsSize="sm"
-                                                    valid={!errors.percentageOfParent && (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue != ''}
-                                                    invalid={touched.percentageOfParent && !!errors.percentageOfParent}
-                                                    onBlur={handleBlur}
-                                                    onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                    step={.01}
-                                                    value={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue}></Input>
-                                                <InputGroupAddon addonType="append">
-                                                    <InputGroupText><i class="fa fa-percent icons" data-toggle="collapse" aria-expanded="false"></i></InputGroupText>
-                                                </InputGroupAddon>
-                                                <FormFeedback className="red">{errors.percentageOfParent}</FormFeedback>
-                                            </InputGroup>
-                                        </FormGroup>
-                                        <div>
-                                            <Popover placement="top" isOpen={this.state.popoverOpenParentValue} target="Popover6" trigger="hover" toggle={this.toggleParentValue}>
-                                                <PopoverBody>{i18n.t('static.tooltip.ParentValue')}</PopoverBody>
-                                            </Popover>
-                                        </div>
-                                        <FormGroup className="col-md-6" style={{ display: this.state.numberNode ? 'block' : 'none' }}>
-                                            <Label htmlFor="currencyId">{i18n.t('static.tree.parentValue')} {this.state.currentItemConfig.context.level != 0 && i18n.t('static.common.for')}{" Month "} {this.state.currentItemConfig.context.level != 0 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].monthNo} <i class="fa fa-info-circle icons pl-lg-2" id="Popover6" onClick={this.toggleParentValue} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
-                                            <Input type="text"
-                                                id="parentValue"
-                                                name="parentValue"
-                                                bsSize="sm"
-                                                readOnly={true}
-                                                onChange={(e) => { this.dataChange(e) }}
-                                                value={addCommas(this.state.parentValue).toString()}
-                                            ></Input>
-                                        </FormGroup>
-                                        {/* </> */}
-                                        {/* } */}
-                                        {/* {(this.state.aggregationNode && this.state.currentItemConfig.context.payload.nodeType.id != 1) && */}
-                                        <div>
-                                            <Popover placement="top" isOpen={this.state.popoverOpenNodeValue} target="Popover7" trigger="hover" toggle={this.toggleNodeValue}>
-                                                <PopoverBody>{this.state.numberNode ? i18n.t('static.tooltip.NodeValue') : i18n.t('static.tooltip.NumberNodeValue')}</PopoverBody>
-                                            </Popover>
-                                        </div>
-                                        <FormGroup className="col-md-6" style={{ display: this.state.aggregationNode ? 'block' : 'none' }}>
-                                            <Label htmlFor="currencyId">Node Value<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover7" onClick={this.toggleNodeValue} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
-                                            <Input type="text"
-                                                id="nodeValue"
-                                                name="nodeValue"
-                                                bsSize="sm"
-                                                valid={!errors.nodeValue && (this.state.currentItemConfig.context.payload.nodeType.id != 1 && this.state.currentItemConfig.context.payload.nodeType.id != 2) ? addCommas(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].calculatedDataValue) : addCommas(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].dataValue) != ''}
-                                                invalid={touched.nodeValue && !!errors.nodeValue}
-                                                onBlur={handleBlur}
-                                                readOnly={this.state.numberNode ? true : false}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                // step={.01}
-                                                // value={this.getNodeValue(this.state.currentItemConfig.context.payload.nodeType.id)}
-                                                value={(this.state.currentItemConfig.context.payload.nodeType.id != 1 && this.state.currentItemConfig.context.payload.nodeType.id != 2) ? (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue == 0 ? "0" : addCommas((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue) : addCommas((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue.toString())}
-                                            ></Input>
-                                            <FormFeedback className="red">{errors.nodeValue}</FormFeedback>
-                                        </FormGroup>
-                                        {/* // } */}
+                                                {/* {(this.state.numberNode && this.state.currentItemConfig.context.payload.nodeType.id != 1) && */}
+                                                {/* <> */}
+                                                <div>
+                                                    <Popover placement="top" isOpen={this.state.popoverOpenPercentageOfParent} target="Popover5" trigger="hover" toggle={this.togglePercentageOfParent}>
+                                                        <PopoverBody>{i18n.t('static.tooltip.PercentageOfParent')}</PopoverBody>
+                                                    </Popover>
+                                                </div>
+                                                <FormGroup className="col-md-6" style={{ display: this.state.numberNode ? 'block' : 'none' }}>
+                                                    <Label htmlFor="currencyId">Percentage of Parent<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover5" onClick={this.togglePercentageOfParent} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                    <InputGroup>
+                                                        <Input type="number"
+                                                            id="percentageOfParent"
+                                                            name="percentageOfParent"
+                                                            bsSize="sm"
+                                                            valid={!errors.percentageOfParent && (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue != ''}
+                                                            invalid={touched.percentageOfParent && !!errors.percentageOfParent}
+                                                            onBlur={handleBlur}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            step={.01}
+                                                            value={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue}></Input>
+                                                        <InputGroupAddon addonType="append">
+                                                            <InputGroupText><i class="fa fa-percent icons" data-toggle="collapse" aria-expanded="false"></i></InputGroupText>
+                                                        </InputGroupAddon>
+                                                        <FormFeedback className="red">{errors.percentageOfParent}</FormFeedback>
+                                                    </InputGroup>
+                                                </FormGroup>
+                                                <div>
+                                                    <Popover placement="top" isOpen={this.state.popoverOpenParentValue} target="Popover6" trigger="hover" toggle={this.toggleParentValue}>
+                                                        <PopoverBody>{i18n.t('static.tooltip.ParentValue')}</PopoverBody>
+                                                    </Popover>
+                                                </div>
+                                                <FormGroup className="col-md-6" style={{ display: this.state.numberNode ? 'block' : 'none' }}>
+                                                    <Label htmlFor="currencyId">{i18n.t('static.tree.parentValue')} {this.state.currentItemConfig.context.level != 0 && i18n.t('static.common.for')}{" Month "} {this.state.currentItemConfig.context.level != 0 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].monthNo} <i class="fa fa-info-circle icons pl-lg-2" id="Popover6" onClick={this.toggleParentValue} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                    <Input type="text"
+                                                        id="parentValue"
+                                                        name="parentValue"
+                                                        bsSize="sm"
+                                                        readOnly={true}
+                                                        onChange={(e) => { this.dataChange(e) }}
+                                                        value={addCommas(this.state.parentValue).toString()}
+                                                    ></Input>
+                                                </FormGroup>
+                                                {/* </> */}
+                                                {/* } */}
+                                                {/* {(this.state.aggregationNode && this.state.currentItemConfig.context.payload.nodeType.id != 1) && */}
+                                                <div>
+                                                    <Popover placement="top" isOpen={this.state.popoverOpenNodeValue} target="Popover7" trigger="hover" toggle={this.toggleNodeValue}>
+                                                        <PopoverBody>{this.state.numberNode ? i18n.t('static.tooltip.NodeValue') : i18n.t('static.tooltip.NumberNodeValue')}</PopoverBody>
+                                                    </Popover>
+                                                </div>
+                                                <FormGroup className="col-md-6" style={{ display: this.state.aggregationNode ? 'block' : 'none' }}>
+                                                    <Label htmlFor="currencyId">Node Value<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover7" onClick={this.toggleNodeValue} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                    <Input type="text"
+                                                        id="nodeValue"
+                                                        name="nodeValue"
+                                                        bsSize="sm"
+                                                        valid={!errors.nodeValue && (this.state.currentItemConfig.context.payload.nodeType.id != 1 && this.state.currentItemConfig.context.payload.nodeType.id != 2) ? addCommas(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].calculatedDataValue) : addCommas(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].dataValue) != ''}
+                                                        invalid={touched.nodeValue && !!errors.nodeValue}
+                                                        onBlur={handleBlur}
+                                                        readOnly={this.state.numberNode ? true : false}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        // step={.01}
+                                                        // value={this.getNodeValue(this.state.currentItemConfig.context.payload.nodeType.id)}
+                                                        value={(this.state.currentItemConfig.context.payload.nodeType.id != 1 && this.state.currentItemConfig.context.payload.nodeType.id != 2) ? (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue == 0 ? "0" : addCommas((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue) : addCommas((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue.toString())}
+                                                    ></Input>
+                                                    <FormFeedback className="red">{errors.nodeValue}</FormFeedback>
+                                                </FormGroup>
+                                                {/* // } */}
 
-                                        <FormGroup className="col-md-6">
-                                            <Label htmlFor="currencyId">{i18n.t('static.common.note')}</Label>
-                                            <Input type="textarea"
-                                                id="notes"
-                                                name="notes"
-                                                onChange={(e) => { this.dataChange(e) }}
-                                                // value={this.getNotes}
-                                                value={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].notes}
-                                            ></Input>
-                                        </FormGroup>
-                                    </div>
+                                                <FormGroup className="col-md-6">
+                                                    <Label htmlFor="currencyId">{i18n.t('static.common.note')}</Label>
+                                                    <Input type="textarea"
+                                                        id="notes"
+                                                        name="notes"
+                                                        onChange={(e) => { this.dataChange(e) }}
+                                                        // value={this.getNotes}
+                                                        value={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].notes}
+                                                    ></Input>
+                                                </FormGroup>
+                                            </div>
+                                        </>
+                                    }
                                     {/* Planning unit start */}
                                     <div>
                                         <div className="row">
                                             {(this.state.currentItemConfig.context.payload.nodeType.id == 5) &&
                                                 <>
+                                                    {this.state.level0 &&
+                                                        <>
+                                                            <div>
+                                                                <Popover placement="top" isOpen={this.state.popoverOpenParent} target="Popover2" trigger="hover" toggle={this.toggleParent}>
+                                                                    <PopoverBody>{i18n.t('static.tooltip.Parent')}</PopoverBody>
+                                                                </Popover>
+                                                            </div>
+                                                            <FormGroup className="col-md-4">
+                                                                <Label htmlFor="currencyId">Parent <i class="fa fa-info-circle icons pl-lg-2" id="Popover2" onClick={this.toggleParent} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                                {/* <Label htmlFor="currencyId">Parent</Label> */}
+                                                                <Input type="text"
+                                                                    name="parent"
+                                                                    bsSize="sm"
+                                                                    readOnly={true}
+                                                                    value={this.state.currentItemConfig.context.level != 0
+                                                                        && this.state.addNodeFlag !== "true"
+                                                                        ? this.state.currentItemConfig.parentItem.payload.label.label_en
+                                                                        : this.state.currentItemConfig.parentItem.payload.label.label_en}
+                                                                ></Input>
+                                                            </FormGroup>
+                                                        </>}
+                                                    <div>
+                                                        <Popover placement="top" isOpen={this.state.popoverOpenNodeTitle} target="Popover3" trigger="hover" toggle={this.toggleNodeTitle}>
+                                                            <PopoverBody>{i18n.t('static.tooltip.NodeTitle')}</PopoverBody>
+                                                        </Popover>
+                                                    </div>
+                                                    <FormGroup className="col-md-4">
+                                                        <Label htmlFor="currencyId">Node Title<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover3" onClick={this.toggleNodeTitle} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                        <Input type="text"
+                                                            id="nodeTitle"
+                                                            name="nodeTitle"
+                                                            bsSize="sm"
+                                                            valid={!errors.nodeTitle && this.state.currentItemConfig.context.payload.label.label_en != ''}
+                                                            invalid={touched.nodeTitle && !!errors.nodeTitle}
+                                                            onBlur={handleBlur}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            value={this.state.currentItemConfig.context.payload.label.label_en}>
+                                                        </Input>
+                                                        <FormFeedback className="red">{errors.nodeTitle}</FormFeedback>
+                                                    </FormGroup>
+                                                    <div>
+                                                        <Popover placement="top" isOpen={this.state.popoverOpenNodeType} target="Popover4" trigger="hover" toggle={this.toggleNodeType}>
+                                                            <PopoverBody>{i18n.t('static.tooltip.NodeType')}</PopoverBody>
+                                                        </Popover>
+                                                    </div>
+                                                    <Input
+                                                        type="hidden"
+                                                        name="isValidError"
+                                                        id="isValidError"
+                                                        value={JSON.stringify(errors) != '{}'}
+                                                    />
+                                                    <FormGroup className="col-md-4">
+                                                        <Label htmlFor="currencyId">Node Type<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover4" onClick={this.toggleNodeType} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                        <Input
+                                                            type="select"
+                                                            id="nodeTypeId"
+                                                            name="nodeTypeId"
+                                                            bsSize="sm"
+                                                            valid={!errors.nodeTypeId && this.state.currentItemConfig.context.payload.nodeType.id != ''}
+                                                            invalid={touched.nodeTypeId && !!errors.nodeTypeId}
+                                                            onBlur={handleBlur}
+                                                            onChange={(e) => { handleChange(e); this.nodeTypeChange(e.target.value); this.dataChange(e) }}
+                                                            required
+                                                            value={this.state.currentItemConfig.context.payload.nodeType.id}
+                                                        >
+                                                            <option value="">{i18n.t('static.common.select')}</option>
+                                                            {this.state.nodeTypeFollowUpList.length > 0
+                                                                && this.state.nodeTypeFollowUpList.map((item, i) => {
+                                                                    return (
+                                                                        <option key={i} value={item.id}>
+                                                                            {getLabelText(item.label, this.state.lang)}
+                                                                        </option>
+                                                                    )
+                                                                }, this)}
+                                                        </Input>
+                                                        <FormFeedback className="red">{errors.nodeTypeId}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup className="col-md-4" style={{ display: this.state.aggregationNode ? 'block' : 'none' }}>
+                                                        <Label htmlFor="currencyId">{i18n.t('static.common.month')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Input
+                                                            type="select"
+                                                            id="monthNo"
+                                                            name="monthNo"
+                                                            bsSize="sm"
+                                                            valid={!errors.monthNo && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].monthNo != ''}
+                                                            invalid={touched.monthNo && !!errors.monthNo}
+                                                            onBlur={handleBlur}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            required
+                                                            value={this.state.currentItemConfig.context.payload.nodeDataMap[0][0].monthNo}
+                                                        >
+                                                            <option value="">{i18n.t('static.common.select')}</option>
+                                                            {this.state.monthList.length > 0
+                                                                && this.state.monthList.map((item, i) => {
+                                                                    return (
+                                                                        <option key={i} value={item.id}>
+                                                                            {item.name}
+                                                                        </option>
+                                                                    )
+                                                                }, this)}
+                                                        </Input>
+                                                        <FormFeedback className="red">{errors.monthNo}</FormFeedback>
+                                                    </FormGroup>
+                                                    <div>
+                                                        <Popover placement="top" isOpen={this.state.popoverOpenParentValue} target="Popover6" trigger="hover" toggle={this.toggleParentValue}>
+                                                            <PopoverBody>{i18n.t('static.tooltip.ParentValue')}</PopoverBody>
+                                                        </Popover>
+                                                    </div>
+                                                    <FormGroup className="col-md-4" style={{ display: this.state.numberNode ? 'block' : 'none' }}>
+                                                        <Label htmlFor="currencyId">{i18n.t('static.tree.parentValue')} {this.state.currentItemConfig.context.level != 0 && i18n.t('static.common.for')}{" Month "} {this.state.currentItemConfig.context.level != 0 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].monthNo} <i class="fa fa-info-circle icons pl-lg-2" id="Popover6" onClick={this.toggleParentValue} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                        <Input type="text"
+                                                            id="parentValue"
+                                                            name="parentValue"
+                                                            bsSize="sm"
+                                                            readOnly={true}
+                                                            onChange={(e) => { this.dataChange(e) }}
+                                                            value={addCommas(this.state.parentValue).toString() + " " + this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label.label_en}
+                                                        ></Input>
+                                                    </FormGroup>
+                                                    <FormGroup className="col-md-4">
+                                                        <Label htmlFor="currencyId">{i18n.t('static.common.note')}</Label>
+                                                        <Input type="textarea"
+                                                            id="notes"
+                                                            name="notes"
+                                                            style={{ height: "100px" }}
+                                                            onChange={(e) => { this.dataChange(e) }}
+                                                            // value={this.getNotes}
+                                                            value={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].notes}
+                                                        ></Input>
+                                                    </FormGroup>
+                                                    <div>
+                                                        <Popover placement="top" isOpen={this.state.popoverOpenPercentageOfParent} target="Popover5" trigger="hover" toggle={this.togglePercentageOfParent}>
+                                                            <PopoverBody>{i18n.t('static.tooltip.PercentageOfParent')}</PopoverBody>
+                                                        </Popover>
+                                                    </div>
+                                                    <FormGroup className="col-md-4 PUNodemarginTop" style={{ display: this.state.numberNode ? 'block' : 'none' }}>
+                                                        <Label htmlFor="currencyId">Percentage of Parent<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover5" onClick={this.togglePercentageOfParent} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                        <InputGroup>
+                                                            <Input type="number"
+                                                                id="percentageOfParent"
+                                                                name="percentageOfParent"
+                                                                bsSize="sm"
+                                                                valid={!errors.percentageOfParent && (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue != ''}
+                                                                invalid={touched.percentageOfParent && !!errors.percentageOfParent}
+                                                                onBlur={handleBlur}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                step={.01}
+                                                                value={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue}></Input>
+                                                            <InputGroupAddon addonType="append">
+                                                                <InputGroupText><i class="fa fa-percent icons" data-toggle="collapse" aria-expanded="false"></i></InputGroupText>
+                                                            </InputGroupAddon>
+                                                            <FormFeedback className="red">{errors.percentageOfParent}</FormFeedback>
+                                                        </InputGroup>
+                                                    </FormGroup>
+                                                    <div>
+                                                        <Popover placement="top" isOpen={this.state.popoverOpenNodeValue} target="Popover7" trigger="hover" toggle={this.toggleNodeValue}>
+                                                            <PopoverBody>{this.state.numberNode ? i18n.t('static.tooltip.NodeValue') : i18n.t('static.tooltip.NumberNodeValue')}</PopoverBody>
+                                                        </Popover>
+                                                    </div>
+                                                    <FormGroup className="col-md-4 PUNodemarginTop" style={{ display: this.state.aggregationNode ? 'block' : 'none' }}>
+                                                        <Label htmlFor="currencyId">Node Value<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover7" onClick={this.toggleNodeValue} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                        <Input type="text"
+                                                            id="nodeValue"
+                                                            name="nodeValue"
+                                                            bsSize="sm"
+                                                            valid={!errors.nodeValue && (this.state.currentItemConfig.context.payload.nodeType.id != 1 && this.state.currentItemConfig.context.payload.nodeType.id != 2) ? addCommas(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].calculatedDataValue) : addCommas(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].dataValue) != ''}
+                                                            invalid={touched.nodeValue && !!errors.nodeValue}
+                                                            onBlur={handleBlur}
+                                                            readOnly={this.state.numberNode ? true : false}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            // step={.01}
+                                                            // value={this.getNodeValue(this.state.currentItemConfig.context.payload.nodeType.id)}
+                                                            value={(this.state.currentItemConfig.context.payload.nodeType.id != 1 && this.state.currentItemConfig.context.payload.nodeType.id != 2) ? (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue == 0 ? "0" : addCommas((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue) : addCommas((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue.toString())}
+                                                        ></Input>
+                                                        <FormFeedback className="red">{errors.nodeValue}</FormFeedback>
+                                                    </FormGroup>
                                                     <div>
                                                         <Popover placement="top" isOpen={this.state.popoverOpenTypeOfUsePU} target="Popover8" trigger="hover" toggle={this.toggleTypeOfUsePU}>
                                                             <PopoverBody>{i18n.t('static.tooltip.TypeOfUsePU')}</PopoverBody>
                                                         </Popover>
                                                     </div>
-                                                    <FormGroup className="col-md-2">
-                                                        <Label htmlFor="currencyId">{i18n.t('static.common.typeofuse')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover8" onClick={this.toggleTypeOfUsePU} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
-
+                                                    <FormGroup className="col-md-3">
                                                     </FormGroup>
-                                                    <FormGroup className="col-md-10">
+                                                    <FormGroup className="col-md-3">
+                                                        <Label htmlFor="currencyId">{i18n.t('static.common.typeofuse')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover8" onClick={this.toggleTypeOfUsePU} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                         <Input
                                                             type="select"
                                                             id="usageTypeIdPU"
@@ -7296,11 +7475,8 @@ export default class CreateTreeTemplate extends Component {
                                                                 }, this)}
                                                         </Input>
                                                     </FormGroup>
-                                                    <FormGroup className="col-md-2">
+                                                    <FormGroup className="col-md-5">
                                                         <Label htmlFor="currencyId">Forecasting unit</Label>
-
-                                                    </FormGroup>
-                                                    <FormGroup className="col-md-10">
                                                         <Input type="text"
                                                             id="forecastingUnitPU"
                                                             name="forecastingUnitPU"
@@ -7312,9 +7488,6 @@ export default class CreateTreeTemplate extends Component {
                                                     </FormGroup>
                                                     <FormGroup className="col-md-2">
                                                         <Label htmlFor="currencyId">{(this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 ? "# of FU / month / " : "# of FU / usage / "}{this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label.label_en}</Label>
-
-                                                    </FormGroup>
-                                                    <FormGroup className="col-md-5">
                                                         <Input type="text"
                                                             id="forecastingUnitPU"
                                                             name="forecastingUnitPU"
@@ -7325,7 +7498,7 @@ export default class CreateTreeTemplate extends Component {
 
                                                         </Input>
                                                     </FormGroup>
-                                                    <FormGroup className="col-md-5">
+                                                    <FormGroup className="col-md-2" style={{ marginTop: "25px" }}>
                                                         <Input type="select"
                                                             id="forecastingUnitUnitPU"
                                                             name="forecastingUnitUnitPU"
@@ -7344,34 +7517,8 @@ export default class CreateTreeTemplate extends Component {
                                                                     )
                                                                 }, this)}
                                                         </Input>
-                                                    </FormGroup></>}
-                                            <FormGroup className="col-md-2" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 5 ? 'block' : 'none' }}>
-                                                <Label htmlFor="currencyId">{i18n.t('static.product.product')}<span class="red Reqasterisk">*</span></Label>
-
-                                            </FormGroup>
-                                            <FormGroup className="col-md-10" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 5 ? 'block' : 'none' }}>
-                                                <Input type="select"
-                                                    id="planningUnitId"
-                                                    name="planningUnitId"
-                                                    bsSize="sm"
-                                                    valid={!errors.planningUnitId && this.state.currentItemConfig.context.payload.nodeType.id == 5 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.planningUnit.id != '' : !errors.planningUnitId}
-                                                    invalid={touched.planningUnitId && !!errors.planningUnitId}
-                                                    onBlur={handleBlur}
-                                                    onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                    value={this.state.currentItemConfig.context.payload.nodeType.id == 5 ? (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.id : ""}>
-
-                                                    <option value="">{i18n.t('static.common.select')}</option>
-                                                    {this.state.planningUnitList.length > 0
-                                                        && this.state.planningUnitList.map((item, i) => {
-                                                            return (
-                                                                <option key={i} value={item.planningUnitId}>
-                                                                    {getLabelText(item.label, this.state.lang) + " | " + item.planningUnitId}
-                                                                </option>
-                                                            )
-                                                        }, this)}
-                                                </Input>
-                                                <FormFeedback className="red">{errors.planningUnitId}</FormFeedback>
-                                            </FormGroup>
+                                                    </FormGroup></>
+                                            }
                                             {(this.state.currentItemConfig.context.payload.nodeType.id == 5) &&
                                                 <>
                                                     <div>
@@ -7379,10 +7526,9 @@ export default class CreateTreeTemplate extends Component {
                                                             <PopoverBody>{i18n.t('static.tooltip.Conversionfactor')}</PopoverBody>
                                                         </Popover>
                                                     </div>
-                                                    <FormGroup className="col-md-2">
+                                                    <FormGroup className="col-md-3">
                                                         <Label htmlFor="currencyId">Conversion Factor (FU:PU) <i class="fa fa-info-circle icons pl-lg-2" id="Popover9" onClick={this.toggleConversionFactorFUPU} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
-                                                    </FormGroup>
-                                                    <FormGroup className="col-md-10">
+
                                                         <Input type="text"
                                                             id="conversionFactor"
                                                             name="conversionFactor"
@@ -7392,15 +7538,37 @@ export default class CreateTreeTemplate extends Component {
 
                                                         </Input>
                                                     </FormGroup>
+                                                    <FormGroup className="col-md-5">
+                                                        <Label htmlFor="currencyId">{i18n.t('static.product.product')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Input type="select"
+                                                            id="planningUnitId"
+                                                            name="planningUnitId"
+                                                            bsSize="sm"
+                                                            valid={!errors.planningUnitId && this.state.currentItemConfig.context.payload.nodeType.id == 5 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.planningUnit.id != '' : !errors.planningUnitId}
+                                                            invalid={touched.planningUnitId && !!errors.planningUnitId}
+                                                            onBlur={handleBlur}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            value={this.state.currentItemConfig.context.payload.nodeType.id == 5 ? (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.id : ""}>
+
+                                                            <option value="">{i18n.t('static.common.select')}</option>
+                                                            {this.state.planningUnitList.length > 0
+                                                                && this.state.planningUnitList.map((item, i) => {
+                                                                    return (
+                                                                        <option key={i} value={item.planningUnitId}>
+                                                                            {getLabelText(item.label, this.state.lang) + " | " + item.planningUnitId}
+                                                                        </option>
+                                                                    )
+                                                                }, this)}
+                                                        </Input>
+                                                        <FormFeedback className="red">{errors.planningUnitId}</FormFeedback>
+                                                    </FormGroup>
                                                     <div>
                                                         <Popover placement="top" isOpen={this.state.popoverOpenNoOfPUUsage} target="Popover11" trigger="hover" toggle={this.toggleNoOfPUUsage}>
                                                             <PopoverBody>{i18n.t('static.tooltip.NoOfPUUsage')}</PopoverBody>
                                                         </Popover>
                                                     </div>
                                                     <FormGroup className="col-md-2">
-                                                        <Label htmlFor="currencyId">{(this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 ? "# of PU / month / " : "# of PU / usage / "}{this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label.label_en} <i class="fa fa-info-circle icons pl-lg-2" id="Popover11" onClick={this.toggleNoOfPUUsage} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
-                                                    </FormGroup>
-                                                    <FormGroup className="col-md-5">
+                                                    <Label htmlFor="currencyId">{(this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 ? "# of PU / month / " : "# of PU / usage / "}{this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label.label_en} <i class="fa fa-info-circle icons pl-lg-2" id="Popover11" onClick={this.toggleNoOfPUUsage} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                         <Input type="text"
                                                             id="noOfPUUsage"
                                                             name="noOfPUUsage"
@@ -7410,7 +7578,7 @@ export default class CreateTreeTemplate extends Component {
 
                                                         </Input>
                                                     </FormGroup>
-                                                    <FormGroup className="col-md-5">
+                                                    <FormGroup className="col-md-2"  style={{ marginTop: "25px" }}>
                                                         <Input type="select"
                                                             id="planningUnitUnitPU"
                                                             name="planningUnitUnitPU"
@@ -7430,6 +7598,7 @@ export default class CreateTreeTemplate extends Component {
                                                                 }, this)}
                                                         </Input>
                                                     </FormGroup>
+
                                                     {(this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 &&
                                                         <>
                                                             <div>
@@ -8890,10 +9059,15 @@ export default class CreateTreeTemplate extends Component {
             return connectDropTarget(connectDragSource(
                 // <div className="ContactTemplate " style={{ opacity, backgroundColor: Colors.White, borderColor: Colors.Black }}>
                 <div className="ContactTemplate boxContactTemplate" title={itemConfig.payload.nodeDataMap[0][0].notes}>
-                    <div className={itemConfig.payload.nodeType.id == 5 || itemConfig.payload.nodeType.id == 4 ? "ContactTitleBackground TemplateTitleBgblue" : "ContactTitleBackground TemplateTitleBg"}
+                     <div className={itemConfig.payload.nodeType.id == 5
+                        || itemConfig.payload.nodeType.id == 4 ? (itemConfig.payload.label.label_en.length<=20?"ContactTitleBackground TemplateTitleBgblueSingle":"ContactTitleBackground TemplateTitleBgblue") :
+                        (itemConfig.payload.label.label_en.length<=20?"ContactTitleBackground TemplateTitleBgSingle":"ContactTitleBackground TemplateTitleBg")}
                     >
+                    {/* <div className={itemConfig.payload.nodeType.id == 5 || itemConfig.payload.nodeType.id == 4 ? "ContactTitleBackground TemplateTitleBgblue" : "ContactTitleBackground TemplateTitleBg"}
+                    > */}
                         <div className={itemConfig.payload.nodeType.id == 5 || itemConfig.payload.nodeType.id == 4 ? "ContactTitle TitleColorWhite" : "ContactTitle TitleColor"}>
-                            <div title={itemConfig.payload.label.label_en} style={{ fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '137px', float: 'left', fontWeight: 'bold' }}>{itemConfig.payload.label.label_en}</div>
+                            {/* <div title={itemConfig.payload.label.label_en} style={{ fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '137px', float: 'left', fontWeight: 'bold' }}>{itemConfig.payload.label.label_en}</div> */}
+                            <div title={itemConfig.payload.label.label_en} className="NodeTitletext">{itemConfig.payload.label.label_en}</div>
                             <div style={{ float: 'right' }}>
                                 {this.getPayloadData(itemConfig, 4) == true && <i class="fa fa-long-arrow-up" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
                                 {this.getPayloadData(itemConfig, 6) == true && <i class="fa fa-long-arrow-down" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
@@ -9297,7 +9471,7 @@ export default class CreateTreeTemplate extends Component {
             // itemTitleFirstFontColor: Colors.White,
             templates: [{
                 name: "contactTemplate",
-                itemSize: { width: 200, height: 80 },
+                itemSize: { width: 200, height: 88 },
                 minimizedItemSize: { width: 2, height: 2 },
                 highlightPadding: { left: 1, top: 1, right: 1, bottom: 1 },
                 highlightBorderWidth: 1,
@@ -10012,4 +10186,3 @@ export default class CreateTreeTemplate extends Component {
         </div>
     }
 }
-
