@@ -144,6 +144,9 @@ class SupplyPlanVersionAndReview extends Component {
     }
 
     buildJexcel() {
+        // this.setState({
+        //     loading: true
+        // })
 
         let matricsList = this.state.matricsList;
         // console.log("matricsList---->", matricsList);
@@ -331,9 +334,9 @@ class SupplyPlanVersionAndReview extends Component {
         // clearTimeout(this.timeout);
         // AuthenticationService.setupAxiosInterceptors();
         this.getCountrylist();
-        this.getPrograms()
-        this.getVersionTypeList()
-        this.getStatusList()
+        // this.getPrograms()
+        // this.getVersionTypeList()
+        // this.getStatusList()
     }
     formatLabel(cell, row) {
         return getLabelText(cell, this.state.lang);
@@ -368,6 +371,9 @@ class SupplyPlanVersionAndReview extends Component {
     }
 
     getCountrylist() {
+        this.setState({
+            loading: true
+        });
         // AuthenticationService.setupAxiosInterceptors();
         let realmId = AuthenticationService.getRealmId();
         RealmCountryService.getRealmCountryForProgram(realmId)
@@ -379,9 +385,8 @@ class SupplyPlanVersionAndReview extends Component {
                     return itemLabelA > itemLabelB ? 1 : -1;
                 });
                 this.setState({
-                    // countries: response.data.map(ele => ele.realmCountry), loading: false
-                    countries: listArray, loading: false
-                })
+                    countries: listArray
+                }, () => { this.getPrograms() });
             }).catch(
                 error => {
                     this.setState({
@@ -484,8 +489,8 @@ class SupplyPlanVersionAndReview extends Component {
                     return itemLabelA > itemLabelB ? 1 : -1;
                 });
                 this.setState({
-                    programs: listArray, loading: false, programLst: listArray
-                })
+                    programs: listArray, programLst: listArray
+                }, () => { this.getVersionTypeList() });
             }).catch(
                 error => {
                     this.setState({
@@ -571,8 +576,9 @@ class SupplyPlanVersionAndReview extends Component {
                 return itemLabelA > itemLabelB ? 1 : -1;
             });
             this.setState({
-                versionTypeList: listArray, loading: false
+                versionTypeList: listArray
             }, () => {
+                this.getStatusList();
                 // document.getElementById("versionTypeId").value = 2;
             })
         }).catch(
@@ -627,7 +633,7 @@ class SupplyPlanVersionAndReview extends Component {
                 return itemLabelA > itemLabelB ? 1 : -1;
             });
             this.setState({
-                statuses: listArray, loading: false
+                statuses: listArray
             }, () => {
                 this.fetchData()
             })
@@ -710,7 +716,7 @@ class SupplyPlanVersionAndReview extends Component {
         let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
         console.log('endDate', endDate)
         if (programId != 0 && countryId != 0) {
-            this.setState({ loading: true })
+            // this.setState({ loading: true })
             // AuthenticationService.setupAxiosInterceptors();
             ReportService.getProgramVersionList(programId, countryId, versionStatusId, versionTypeId, startDate, endDate)
                 .then(response => {

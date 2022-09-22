@@ -274,6 +274,12 @@ export default class EditProgram extends Component {
             var programCode = response.data.programCode;
             var splitCode = programCode.split("-");
             var uniqueCode = splitCode[3];
+            // 0     1     2   3   4
+            // "MOZ-VMMC-MOH-[CDC-ICAP]"
+
+            if(splitCode.length>4){
+                uniqueCode = programCode.substring(programCode.indexOf(splitCode[3]),programCode.length);
+            }
             var realmCountryCode = splitCode[0];
             var healthAreaCode = splitCode[1];
             var organisationCode = splitCode[2];
