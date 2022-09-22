@@ -41,6 +41,7 @@ import CurrencyService from '../../api/CurrencyService';
 import BudgetService from '../../api/BudgetService';
 import ProcurementAgentService from '../../api/ProcurementAgentService';
 import CryptoJS from 'crypto-js'
+import { confirmAlert } from 'react-confirm-alert'; // Import
 
 const entityname = i18n.t('static.report.problem');
 
@@ -48,11 +49,13 @@ const validationSchemaForAddingProblem = function (values) {
     return Yup.object().shape({
         problemDescription: Yup.string()
             .matches(/^[^'":]+$/, i18n.t("static.label.someSpecialCaseNotAllowed"))
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.editStatus.problemDescText')),
         modelPlanningUnitId: Yup.string()
             .required(i18n.t('static.procurementUnit.validPlanningUnitText')),
         suggession: Yup.string()
             .matches(/^[^'":]+$/, i18n.t('static.label.someSpecialCaseNotAllowed'))
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.editStatus.problemSuggestionText')),
         modelCriticalityId: Yup.string()
             .required(i18n.t('static.editStatus.validCriticality'))
@@ -2551,6 +2554,25 @@ class EditSupplyPlanStatus extends Component {
 
     }
 
+    formatter = value => {
+        if (value != null && value !== '' && !isNaN(Number(value))) {
+            var cell1 = value
+            cell1 += '';
+            var x = cell1.split('.');
+            var x1 = x[0];
+            var x2 = x.length > 1 ? '.' + x[1] : '';
+            var rgx = /(\d+)(\d{3})/;
+            while (rgx.test(x1)) {
+                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+            }
+            return x1 + x2;
+        } else if (value != null && isNaN(Number(value))) {
+            return value;
+        } else {
+            return ''
+        }
+    }
+
     toggle(tabPane, tab) {
         const newArray = this.state.activeTab.slice()
         newArray[tabPane] = tab
@@ -4220,6 +4242,81 @@ class EditSupplyPlanStatus extends Component {
         });
     }
 
+    submitManualProblem(criticalityId, regionId, modelPlanningUnitId, problemDescription, suggession) {
+        var json = {
+            "realmProblem": {
+                "realmProblemId": criticalityId == 1 ? "25" : criticalityId == 2 ? "26" : "27",
+                "problemType": {
+                    "id": "2"
+                }
+            },
+            "program": {
+                "id": this.props.match.params.programId
+            },
+            "versionId": this.props.match.params.versionId,
+            "problemStatus": {
+                "id": "1"
+            },
+            "dt": moment(new Date()).format("YYYY-MM-DD"),
+            "region": {
+                "id": regionId
+            },
+            "planningUnit": {
+                "id": modelPlanningUnitId
+            },
+            "data5": '{"problemDescription":"' + problemDescription + '", "suggession":"' + suggession + '"}',
+            "notes": ""
+        }
+        ProgramService.createManualProblem(json)
+            .then(response => {
+                if (response.status == 200) {
+                    // this.props.history.push('/report/editStatus/' + this.props.match.params.programId + '/' + this.props.match.params.versionId + '/' + false + '/green/' + i18n.t('static.problem.addedSuccessfully'));
+                    this.setState({
+                        message: response.data.message,
+                        problemReportChanged: 0,
+
+                        // isModalOpen: !this.state.isModalOpen,
+                    })
+                    // window.location.reload(false);
+                    this.componentDidMount();
+                    this.toggle(0, '2');
+
+                } else {
+                    this.setState({
+                        message: response.data.message,
+                    })
+                }
+            })
+            .catch(
+                error => {
+
+                    console.log(error)
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 404:
+                                this.props.history.push(`/login/${error.response.data.messageCode}`)
+                                break;
+                            case 500:
+                            case 401:
+                            case 403:
+                            case 406:
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                break;
+                        }
+                    }
+                }
+            );
+    }
+
     modelOpenClose() {
         this.setState({
             isModalOpen: !this.state.isModalOpen
@@ -4977,82 +5074,55 @@ class EditSupplyPlanStatus extends Component {
                                         }}
                                         validate={validateForAddingProblem(validationSchemaForAddingProblem)}
                                         onSubmit={(values, { setSubmitting, setErrors }) => {
-                                            if (!this.state.isSubmitClicked) {
-                                                this.setState({ loading: true, isSubmitClicked: true }, () => {
-                                                    var criticalityId = (document.getElementById("modelCriticalityId").value)
-                                                    console.log("criticalityId", criticalityId)
-                                                    var json = {
-                                                        "realmProblem": {
-                                                            "realmProblemId": criticalityId == 1 ? "25" : criticalityId == 2 ? "26" : "27",
-                                                            "problemType": {
-                                                                "id": "2"
-                                                            }
-                                                        },
-                                                        "program": {
-                                                            "id": this.props.match.params.programId
-                                                        },
-                                                        "versionId": this.props.match.params.versionId,
-                                                        "problemStatus": {
-                                                            "id": "1"
-                                                        },
-                                                        "dt": moment(new Date()).format("YYYY-MM-DD"),
-                                                        "region": {
-                                                            "id": (document.getElementById("modelRegionId").value)
-                                                        },
-                                                        "planningUnit": {
-                                                            "id": (document.getElementById("modelPlanningUnitId").value)
-                                                        },
-                                                        "data5": '{"problemDescription":"' + (document.getElementById("problemDescription").value) + '", "suggession":"' + (document.getElementById("suggession").value) + '"}',
-                                                        "notes": ""
-                                                    }
-                                                    ProgramService.createManualProblem(json)
-                                                        .then(response => {
-                                                            if (response.status == 200) {
-                                                                // this.props.history.push('/report/editStatus/' + this.props.match.params.programId + '/' + this.props.match.params.versionId + '/' + false + '/green/' + i18n.t('static.problem.addedSuccessfully'));
-                                                                this.setState({
-                                                                    message: response.data.message,
-                                                                    isModalOpen: !this.state.isModalOpen,
-                                                                })
-                                                                // window.location.reload(false);
-                                                                this.componentDidMount();
-                                                                this.toggle(0, '2');
+                                            console.log("inside for prolem report changes if", this.state.problemReportChanged)
 
-                                                            } else {
-                                                                this.setState({
-                                                                    message: response.data.message,
+                                            // if (!this.state.isSubmitClicked) {
+                                            var criticalityId = (document.getElementById("modelCriticalityId").value)
+                                            var regionId = (document.getElementById("modelRegionId").value);
+                                            var modelPlanningUnitId = (document.getElementById("modelPlanningUnitId").value);
+                                            var problemDescription = (document.getElementById("problemDescription").value);
+                                            var suggession = (document.getElementById("suggession").value);
+
+                                            if (this.state.problemReportChanged) {
+                                                this.setState({
+                                                    isModalOpen: !this.state.isModalOpen,
+                                                })
+                                                confirmAlert({
+                                                    message: 'There is some review changes in table, if you wish to add Manual problem than you will lose all review changes. Are you sure you want to add this manual problem ?',
+                                                    buttons: [
+                                                        {
+                                                            label: i18n.t('static.program.yes'),
+                                                            onClick: () => {
+                                                                this.setState({ loading: true, isSubmitClicked: true }, () => {
+                                                                    console.log("criticalityId", criticalityId)
+                                                                    this.submitManualProblem(criticalityId, regionId, modelPlanningUnitId, problemDescription, suggession);
                                                                 })
                                                             }
-                                                        })
-                                                        .catch(
-                                                            error => {
-
-                                                                console.log(error)
-                                                                if (error.message === "Network Error") {
-                                                                    this.setState({ message: error.message });
-                                                                } else {
-                                                                    switch (error.response ? error.response.status : "") {
-                                                                        case 404:
-                                                                            this.props.history.push(`/login/${error.response.data.messageCode}`)
-                                                                            break;
-                                                                        case 500:
-                                                                        case 401:
-                                                                        case 403:
-                                                                        case 406:
-                                                                        case 412:
-                                                                            this.setState({
-                                                                                message: error.response.data.messageCode,
-                                                                                loading: false
-                                                                            });
-                                                                            break;
-                                                                        default:
-                                                                            this.setState({ message: 'static.unkownError' });
-                                                                            break;
-                                                                    }
-                                                                }
+                                                        },
+                                                        {
+                                                            label: i18n.t('static.program.no'),
+                                                            onClick: () => {
+                                                                this.setState({
+                                                                    // problemReportChanged: !this.state.problemReportChanged,
+                                                                    isSubmitClicked: true
+                                                                })
+                                                                // 
                                                             }
-                                                        );
+                                                        }
+                                                    ]
+                                                });
+                                            } else {
+                                                this.setState({ loading: true, isSubmitClicked: true, isModalOpen: !this.state.isModalOpen }, () => {
+                                                    this.submitManualProblem(criticalityId, regionId, modelPlanningUnitId, problemDescription, suggession);
+
                                                 })
                                             }
+                                            // this.setState({
+                                            //     problemReportChanged: !this.state.problemReportChanged,
+                                            //     // isSubmitClicked: true
+                                            // })
+                                            // this.toggle(0, '2');
+                                            // }
 
                                         }}
 
