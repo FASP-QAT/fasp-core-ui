@@ -648,7 +648,7 @@ export default function getSuggestion(row, lang) {
 
         return getLabelText(label, lang);
     }
-    if (row.realmProblem.problem.problemId == 23) {
+    if (row.realmProblem.problem.problemId == 23 || row.realmProblem.problem.problemId == 29) {
         var label = row.realmProblem.problem.actionLabel;
         // label.label_en = "Inventory doen't fall within min/max range";
         return getLabelText(label, lang);
