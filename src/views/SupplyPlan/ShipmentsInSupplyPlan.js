@@ -103,32 +103,32 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             }
             if (data[i].x == 19 && data[i].value == "") {
                 var rowData = (instance).getRowData(data[i].y);
-                if(rowData[3]!=""){
-                var pricePerUnit = "";
-                var planningUnitId = rowData[3];
-                var procurementAgentPlanningUnit = this.state.procurementAgentPlanningUnitListAll.filter(c => c.procurementAgent.id == rowData[7] && c.planningUnit.id == planningUnitId && c.active);
-                // if (procurementAgentPlanningUnit.length > 0 && ((procurementAgentPlanningUnit[0].unitsPerPalletEuro1 != 0 && procurementAgentPlanningUnit[0].unitsPerPalletEuro1 != null) || (procurementAgentPlanningUnit[0].moq != 0 && procurementAgentPlanningUnit[0].moq != null) || (procurementAgentPlanningUnit[0].unitsPerPalletEuro2 != 0 && procurementAgentPlanningUnit[0].unitsPerPalletEuro2 != null) || (procurementAgentPlanningUnit[0].unitsPerContainer != 0 && procurementAgentPlanningUnit[0].unitsPerContainer != null))) {
-                //     elInstance.setValueFromCoords(9, y, "", true);
-                // }
-                // if (rowData[27] == -1 || rowData[27] == "" || rowData[27] == null || rowData[27] == undefined) {
-                var puData=this.props.items.puData.filter(c=>c.id==planningUnitId)[0];
-                var programPriceList = puData.programPlanningUnitForPrice.programPlanningUnitProcurementAgentPrices.filter(c => c.program.id == this.state.actualProgramId && c.procurementAgent.id == rowData[7] && c.planningUnit.id == planningUnitId && c.active);
-                if (programPriceList.length > 0) {
-                    pricePerUnit = Number(programPriceList[0].price);
-                } else {
-                    if (procurementAgentPlanningUnit.length > 0) {
-                        pricePerUnit = Number(procurementAgentPlanningUnit[0].catalogPrice);
+                if (rowData[3] != "") {
+                    var pricePerUnit = "";
+                    var planningUnitId = rowData[3];
+                    var procurementAgentPlanningUnit = this.state.procurementAgentPlanningUnitListAll.filter(c => c.procurementAgent.id == rowData[7] && c.planningUnit.id == planningUnitId && c.active);
+                    // if (procurementAgentPlanningUnit.length > 0 && ((procurementAgentPlanningUnit[0].unitsPerPalletEuro1 != 0 && procurementAgentPlanningUnit[0].unitsPerPalletEuro1 != null) || (procurementAgentPlanningUnit[0].moq != 0 && procurementAgentPlanningUnit[0].moq != null) || (procurementAgentPlanningUnit[0].unitsPerPalletEuro2 != 0 && procurementAgentPlanningUnit[0].unitsPerPalletEuro2 != null) || (procurementAgentPlanningUnit[0].unitsPerContainer != 0 && procurementAgentPlanningUnit[0].unitsPerContainer != null))) {
+                    //     elInstance.setValueFromCoords(9, y, "", true);
+                    // }
+                    // if (rowData[27] == -1 || rowData[27] == "" || rowData[27] == null || rowData[27] == undefined) {
+                    var puData = this.props.items.puData.filter(c => c.id == planningUnitId)[0];
+                    var programPriceList = puData.programPlanningUnitForPrice.programPlanningUnitProcurementAgentPrices.filter(c => c.program.id == this.state.actualProgramId && c.procurementAgent.id == rowData[7] && c.planningUnit.id == planningUnitId && c.active);
+                    if (programPriceList.length > 0) {
+                        pricePerUnit = Number(programPriceList[0].price);
                     } else {
-                        pricePerUnit = puData.catalogPrice
+                        if (procurementAgentPlanningUnit.length > 0) {
+                            pricePerUnit = Number(procurementAgentPlanningUnit[0].catalogPrice);
+                        } else {
+                            pricePerUnit = puData.catalogPrice
+                        }
                     }
+                    if (rowData[18] != "") {
+                        var conversionRateToUsd = Number((this.state.currencyListAll.filter(c => c.currencyId == rowData[18])[0]).conversionRateToUsd);
+                        pricePerUnit = Number(pricePerUnit / conversionRateToUsd).toFixed(2);
+                    }
+                    // }
+                    (instance).setValueFromCoords(19, data[i].y, pricePerUnit, true);
                 }
-                if (rowData[18] != "") {
-                    var conversionRateToUsd = Number((this.state.currencyListAll.filter(c => c.currencyId == rowData[18])[0]).conversionRateToUsd);
-                    pricePerUnit = Number(pricePerUnit / conversionRateToUsd).toFixed(2);
-                }
-                // }
-                (instance).setValueFromCoords(19, data[i].y, pricePerUnit, true);
-            }
             }
             if (data[i].x == 21 && data[i].value != "") {
                 (instance).setValueFromCoords(21, data[i].y, data[i].value, true);
@@ -644,7 +644,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                     { type: 'checkbox', title: i18n.t('static.common.active'), width: 80, readOnly: !shipmentEditable },
                                                     { type: this.props.shipmentPage == 'shipmentDataEntry' && (this.props.items.shipmentTypeIds).includes(2) ? 'checkbox' : 'hidden', readOnly: true, title: i18n.t('static.supplyPlan.erpFlag'), width: 80 },
                                                     { type: 'text', title: i18n.t('static.report.id'), width: 80, readOnly: true },
-                                                    { type: 'hidden', title: i18n.t('static.supplyPlan.qatProduct'), width: 150 },
+                                                    { type: 'hidden', title: i18n.t('static.supplyPlan.qatProduct'), width: 150, readOnly: true },
                                                     { type: 'dropdown', title: i18n.t('static.shipmentDataEntry.shipmentStatus'), source: shipmentStatusList, filter: this.filterShipmentStatus, width: 100 },
                                                     { type: 'calendar', title: i18n.t('static.common.receivedate'), options: { format: JEXCEL_DATE_FORMAT, validRange: [moment(MIN_DATE_RESTRICTION_IN_DATA_ENTRY).startOf('month').format("YYYY-MM-DD"), moment(Date.now()).add(MAX_DATE_RESTRICTION_IN_DATA_ENTRY, 'years').endOf('month').format("YYYY-MM-DD")] }, width: 150 },
                                                     { type: 'dropdown', title: i18n.t("static.supplyPlan.shipmentMode"), source: [{ id: 1, name: i18n.t('static.supplyPlan.sea') }, { id: 2, name: i18n.t('static.supplyPlan.air') }], width: 100 },
@@ -667,20 +667,20 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                     // { type: 'hidden', readOnly: true, title: i18n.t('static.shipment.totalCost'), width: 130, mask: '#,##.00', textEditor: true, decimal: '.' },
                                                     { type: 'dropdown', title: i18n.t('static.datasource.datasource'), source: dataSourceList, filter: this.filterDataSourceList, width: 150 },
                                                     { type: 'text', title: i18n.t('static.program.notes'), width: 400 },
-                                                    { type: 'hidden', title: i18n.t('static.supplyPlan.createdDate'), width: 0 },
-                                                    { type: 'hidden', title: i18n.t('static.supplyPlan.lastshipmentStatus'), width: 0 },
-                                                    { type: 'hidden', title: i18n.t('static.supplyPlan.index'), width: 0 },
-                                                    { type: 'hidden', title: i18n.t('static.supplyPlan.batchInfo'), width: 200 },
-                                                    { type: 'hidden', title: i18n.t('static.supplyPlan.totalQtyBatchInfo'), width: 0 },
-                                                    { type: 'hidden', title: i18n.t('static.supplyPlan.shipmentDatesJson'), width: 0 },
-                                                    { type: 'hidden', title: "Suggested order Qty" },
-                                                    { type: 'hidden', title: "Is changed" },
-                                                    { title: i18n.t('static.inventory.active'), type: 'hidden', width: 0 },
-                                                    { type: 'hidden' },
-                                                    { type: 'hidden' },
-                                                    { type: 'hidden' },
-                                                    { type: 'hidden' },
-                                                    { type: 'hidden' }
+                                                    { type: 'hidden', title: i18n.t('static.supplyPlan.createdDate'), width: 0, readOnly: true },
+                                                    { type: 'hidden', title: i18n.t('static.supplyPlan.lastshipmentStatus'), width: 0, readOnly: true },
+                                                    { type: 'hidden', title: i18n.t('static.supplyPlan.index'), width: 0, readOnly: true },
+                                                    { type: 'hidden', title: i18n.t('static.supplyPlan.batchInfo'), width: 200, readOnly: true },
+                                                    { type: 'hidden', title: i18n.t('static.supplyPlan.totalQtyBatchInfo'), width: 0, readOnly: true },
+                                                    { type: 'hidden', title: i18n.t('static.supplyPlan.shipmentDatesJson'), width: 0, readOnly: true },
+                                                    { type: 'hidden', title: "Suggested order Qty", readOnly: true },
+                                                    { type: 'hidden', title: "Is changed", readOnly: true },
+                                                    { title: i18n.t('static.inventory.active'), type: 'hidden', width: 0, readOnly: true },
+                                                    { type: 'hidden', readOnly: true },
+                                                    { type: 'hidden', readOnly: true },
+                                                    { type: 'hidden', readOnly: true },
+                                                    { type: 'hidden', readOnly: true },
+                                                    { type: 'hidden', readOnly: true }
                                                 ],
                                                 editable: true,
                                                 pagination: paginationOption,
@@ -1068,6 +1068,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                                     {
                                                                                         title: i18n.t('static.supplyPlan.rowNumber'),
                                                                                         type: 'hidden',
+                                                                                        readOnly: true
                                                                                     },
                                                                                     {
                                                                                         title: i18n.t('static.supplyPlan.type'),
@@ -1717,7 +1718,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 {
                     title: i18n.t('static.supplyPlan.batchId'),
                     type: 'text',
-                    autoCasting:false
+                    autoCasting: false
                 },
                 {
                     title: i18n.t('static.supplyPlan.expiryDate'),
@@ -1738,19 +1739,22 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 {
                     title: i18n.t('static.supplyPlan.shipmentTransBatchInfoId'),
                     type: 'hidden',
+                    readOnly: true
                 },
                 {
                     title: i18n.t('static.supplyPlan.rowNumber'),
                     type: 'hidden',
+                    readOnly: true
                 },
                 {
                     title: i18n.t('static.supplyPlan.index'),
-                    type: 'hidden',
+                    type: 'hidden'
+                    , readOnly: true
                 },
                 { type: 'checkbox', title: i18n.t('static.report.autogenerated'), readOnly: true },
-                { type: 'hidden' },
-                { type: 'hidden' },
-                { type: 'hidden' }
+                { type: 'hidden', readOnly: true },
+                { type: 'hidden', readOnly: true },
+                { type: 'hidden', readOnly: true }
             ],
             editable: true,
             pagination: false,
@@ -4131,14 +4135,14 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     { type: roundingOptionType, title: i18n.t('static.supplyPlan.orderBasedOn'), source: orderBasedOn, width: 120 },
                     { type: roundingOptionType, title: i18n.t('static.supplyPlan.roundingOption'), source: [{ id: 1, name: i18n.t('static.supplyPlan.roundDown') }, { id: 2, name: i18n.t('static.supplyPlan.roundUp') }], width: 120 },
                     { title: i18n.t('static.supplyPlan.finalOrderQty'), type: 'numeric', textEditor: true, readOnly: true, mask: '#,##', width: 120 },
-                    { title: i18n.t('static.supplyPlan.rowNumber'), type: 'hidden', width: 0 },
-                    { type: 'hidden', readOnly: true, title: i18n.t('static.procurementAgentPlanningUnit.moq'), width: 0 },
-                    { type: 'hidden', title: i18n.t('static.procurementAgentPlanningUnit.unitPerPalletEuro1'), width: 0 },
-                    { type: 'hidden', title: i18n.t('static.procurementAgentPlanningUnit.unitPerPalletEuro2'), width: 0 },
-                    { type: 'hidden', title: i18n.t('static.procurementUnit.unitsPerContainer'), width: 0 },
-                    { type: 'hidden', title: i18n.t('static.procurementUnit.noOfPalletEuro1'), width: 0 },
-                    { type: 'hidden', title: i18n.t('static.procurementUnit.noOfPalletEuro2'), width: 0 },
-                    { type: 'hidden', title: i18n.t('static.procurementUnit.noOfContainers'), width: 0 },
+                    { title: i18n.t('static.supplyPlan.rowNumber'), type: 'hidden', width: 0, readOnly: true },
+                    { type: 'hidden', readOnly: true, title: i18n.t('static.procurementAgentPlanningUnit.moq'), width: 0, readOnly: true },
+                    { type: 'hidden', title: i18n.t('static.procurementAgentPlanningUnit.unitPerPalletEuro1'), width: 0, readOnly: true },
+                    { type: 'hidden', title: i18n.t('static.procurementAgentPlanningUnit.unitPerPalletEuro2'), width: 0, readOnly: true },
+                    { type: 'hidden', title: i18n.t('static.procurementUnit.unitsPerContainer'), width: 0, readOnly: true },
+                    { type: 'hidden', title: i18n.t('static.procurementUnit.noOfPalletEuro1'), width: 0, readOnly: true },
+                    { type: 'hidden', title: i18n.t('static.procurementUnit.noOfPalletEuro2'), width: 0, readOnly: true },
+                    { type: 'hidden', title: i18n.t('static.procurementUnit.noOfContainers'), width: 0, readOnly: true },
                 ],
                 pagination: false,
                 onformulachain: this.formulaChanged3,
@@ -4207,10 +4211,10 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         { type: 'numeric', title: i18n.t('static.supplyPlan.noOfPalletsEuro1'), mask: '#,##.00', decimal: '.', width: 120 },
                         { type: 'numeric', title: i18n.t('static.supplyPlan.noOfPalletsEuro2'), mask: '#,##.00', decimal: '.', width: 120 },
                         { type: 'numeric', title: i18n.t('static.supplyPlan.noOfContainers'), mask: '#,##.00', decimal: '.', width: 120 },
-                        { type: 'hidden' },
-                        { type: 'hidden' },
-                        { type: 'hidden' },
-                        { type: 'hidden' }
+                        { type: 'hidden', readOnly: true },
+                        { type: 'hidden', readOnly: true },
+                        { type: 'hidden', readOnly: true },
+                        { type: 'hidden', readOnly: true }
                     ],
                     pagination: false,
                     search: false,
