@@ -34,7 +34,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         this.onPasteForBatchInfo = this.onPasteForBatchInfo.bind(this);
         this.oneditionend = this.oneditionend.bind(this);
         this.batchDetailsClicked = this.batchDetailsClicked.bind(this);
-        this.formulaChanged=this.formulaChanged.bind(this)
+        this.formulaChanged = this.formulaChanged.bind(this)
         this.state = {
             inventoryEl: "",
             inventoryBatchInfoTableEl: ""
@@ -338,9 +338,9 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                             { title: i18n.t('static.supplyPlan.inventoryType'), type: 'dropdown', source: [{ id: 1, name: i18n.t('static.inventory.inventory') }, { id: 2, name: i18n.t('static.inventoryType.adjustment') }], readOnly: true, width: 100 },
                             { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: adjustmentColumnType, mask: '[-]#,##', textEditor: true, disabledMaskOnEdition: true, width: 120 },
                             { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: actualColumnType, mask: '#,##', textEditor: true, disabledMaskOnEdition: true, decimal: '.', width: 120 },
-                            { title: i18n.t('static.unit.multiplierFromARUTOPU'), type: 'numeric', mask: '#,##0.000000', decimal: '.', width: 90, readOnly: true },
-                            { title: i18n.t('static.supplyPlan.quantityQATProduct'), type: adjustmentColumnType, mask: '[-]#,##.00', decimal: '.', width: 120, readOnly: true },
-                            { title: i18n.t('static.supplyPlan.quantityQATProduct'), type: actualColumnType, mask: '#,##.00', decimal: '.', width: 120, readOnly: true },
+                            { title: i18n.t('static.unit.multiplierFromARUTOPU'), type: 'numeric', mask: '#,##0', width: 90, readOnly: true },
+                            { title: i18n.t('static.supplyPlan.quantityQATProduct'), type: adjustmentColumnType, mask: '[-]#,##', width: 120, readOnly: true },
+                            { title: i18n.t('static.supplyPlan.quantityQATProduct'), type: actualColumnType, mask: '#,##', width: 120, readOnly: true },
                             { title: i18n.t('static.program.notes'), type: 'text', width: 400 },
                             { title: i18n.t('static.inventory.active'), type: 'checkbox', width: 100, readOnly: !inventoryEditable },
                             { title: i18n.t('static.inventory.inventoryDate'), type: 'hidden', width: 0 },
@@ -375,7 +375,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         // },
                         onload: this.loadedInventory,
                         editable: inventoryEditable,
-                        onformulachain:this.formulaChanged,
+                        onformulachain: this.formulaChanged,
                         onchange: this.inventoryChanged,
                         updateTable: function (el, cell, x, y, source, value, id) {
 
@@ -873,10 +873,10 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         }
     }
 
-    formulaChanged  = function (instance, executions) {
-        var executions=executions;
-        for(var e=0;e<executions.length;e++){
-            this.inventoryChanged(instance,executions[e].cell,executions[e].x,executions[e].y,executions[e].v)
+    formulaChanged = function (instance, executions) {
+        var executions = executions;
+        for (var e = 0; e < executions.length; e++) {
+            this.inventoryChanged(instance, executions[e].cell, executions[e].x, executions[e].y, executions[e].v)
         }
     }
 
@@ -1037,24 +1037,24 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             }
         }
 
-        // if (x == 10) {
-        //     if (rowData[4] == 2) {
-        //         var valid = checkValidtion("text", "K", y, rowData[10], elInstance);
-        //         if (valid == true) {
-        //             if (rowData[10].length > 600) {
-        //                 inValid("K", y, i18n.t('static.dataentry.notesMaxLength'), elInstance);
-        //             } else {
-        //                 positiveValidation("K", y, elInstance);
-        //             }
-        //         }
-        //     } else {
-        //         if (rowData[10].length > 600) {
-        //             inValid("K", y, i18n.t('static.dataentry.notesMaxLength'), elInstance);
-        //         } else {
-        //             positiveValidation("K", y, elInstance);
-        //         }
-        //     }
-        // }
+        if (x == 10) {
+            if (rowData[4] == 2) {
+                var valid = checkValidtion("text", "K", y, rowData[10], elInstance);
+                if (valid == true) {
+                    if (rowData[10].length > 600) {
+                        inValid("K", y, i18n.t('static.dataentry.notesMaxLength'), elInstance);
+                    } else {
+                        positiveValidation("K", y, elInstance);
+                    }
+                }
+            } else {
+                if (rowData[10].length > 600) {
+                    inValid("K", y, i18n.t('static.dataentry.notesMaxLength'), elInstance);
+                } else {
+                    positiveValidation("K", y, elInstance);
+                }
+            }
+        }
 
         // this.showOnlyErrors();
     }
@@ -1240,6 +1240,11 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 var rowData = elInstance.getRowData(y);
 
                 var validation = checkValidtion("text", "A", y, rowData[0], elInstance);
+                if (validation == false) {
+                    valid = false;
+                }
+
+                var validation = checkValidtion("text", "A", y, elInstance.getValueFromCoords(0, y, true), elInstance);
                 if (validation == false) {
                     valid = false;
                 }
@@ -1593,6 +1598,25 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
 
 
                     var validation = checkValidtion("text", "D", y, rowData[3], elInstance);
+                    if (validation == false) {
+                        valid = false;
+                        elInstance.setValueFromCoords(16, y, 1, true);
+                    }
+
+                    var validation = checkValidtion("text", "B", y, elInstance.getValueFromCoords(1, y, true), elInstance);
+                    if (validation == false) {
+                        valid = false;
+                        elInstance.setValueFromCoords(16, y, 1, true);
+                    }
+
+                    var validation = checkValidtion("text", "C", y, elInstance.getValueFromCoords(2, y, true), elInstance);
+                    if (validation == false) {
+                        valid = false;
+                        elInstance.setValueFromCoords(16, y, 1, true);
+                    }
+
+
+                    var validation = checkValidtion("text", "D", y, elInstance.getValueFromCoords(3, y, true), elInstance);
                     if (validation == false) {
                         valid = false;
                         elInstance.setValueFromCoords(16, y, 1, true);

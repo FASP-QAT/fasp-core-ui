@@ -79,6 +79,8 @@ export default class DatabaseTranslations extends React.Component {
                         for (var l = 0; l < languageList.length; l++) {
                             colHeadersArray.push({ type: 'text', title: languageList[l].label.label_en })
                         }
+                        jexcel.destroy(document.getElementById("labelTranslationTable"), true);
+
                         var options = {
                             data: label,
                             colWidths: [80, 80, 80, 80, 80],
@@ -110,7 +112,10 @@ export default class DatabaseTranslations extends React.Component {
                             }.bind(this),
                             // tableHeight: '500px',
                         };
+                        console.log("optionsss===1", options)
                         this.el = jexcel(document.getElementById("labelTranslationTable"), options);
+                        console.log("optionsss===2", options)
+
                         this.setState({
                             loading: false
                         })
@@ -354,7 +359,7 @@ export default class DatabaseTranslations extends React.Component {
                             </CardHeader> */}
                             <CardBody className="table-responsive pt-md-1 pb-md-1">
                                 {/* <div id="loader" className="center"></div> */}
-                                <div id="labelTranslationTable" style={{ display: this.state.loading ? "none" : "block" }}></div>
+                                <div id="labelTranslationTable consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}></div>
                                 <Row style={{ display: this.state.loading ? "block" : "none" }}>
                                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                                         <div class="align-items-center">
@@ -407,9 +412,7 @@ export default class DatabaseTranslations extends React.Component {
     }.bind(this)
 
     editStart = function (instance, cell, x, y, value) {
-        var elInstance = instance.jexcel;
+        var elInstance = instance;
         elInstance.setValueFromCoords(2, y, 1, true);
     }.bind(this)
 }
-
-

@@ -30,6 +30,11 @@ import {
 import ProgramService from '../../api/ProgramService';
 import ReportService from '../../api/ReportService';
 import moment from "moment";
+import { Formik } from 'formik';
+import * as Yup from 'yup';
+import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
+import CryptoJS from 'crypto-js'
+
 const entityname = ""
 const options = {
     title: {
@@ -74,9 +79,9 @@ class SupplyPlanVersionAndReview extends Component {
     constructor(props) {
         super(props);
         var dt = new Date();
-        dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
+        dt.setMonth(dt.getMonth() - SPV_REPORT_DATEPICKER_START_MONTH);
         var dt1 = new Date();
-        dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
+        dt1.setMonth(dt1.getMonth());
         this.state = {
             loading: true,
             matricsList: [],
@@ -92,9 +97,7 @@ class SupplyPlanVersionAndReview extends Component {
             rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() + 1 },
-            programId: -1
-
-
+            programId: -1,
 
         };
 
@@ -114,6 +117,7 @@ class SupplyPlanVersionAndReview extends Component {
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.setProgramId = this.setProgramId.bind(this);
+
     }
 
     setProgramId(event) {
@@ -139,11 +143,10 @@ class SupplyPlanVersionAndReview extends Component {
         clearTimeout(this.timeout);
     }
 
-
     buildJexcel() {
 
         let matricsList = this.state.matricsList;
-        console.log("matricsList---->", matricsList);
+        // console.log("matricsList---->", matricsList);
         let matricsArray = [];
         let count = 0;
         for (var j = 0; j < matricsList.length; j++) {
@@ -178,7 +181,7 @@ class SupplyPlanVersionAndReview extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [100, 70, 100, 100, 120, 100, 100, 120, 100],
+            colWidths: [100, 70, 100, 100, 120, 100, 100, 120, 180],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
@@ -188,7 +191,7 @@ class SupplyPlanVersionAndReview extends Component {
                 },
                 {
                     title: i18n.t('static.report.version'),
-                    type: 'numeric', mask: '#,##.00', decimal: '.',
+                    type: 'numeric', mask: '#,##',
                     // readOnly: true
                 },
                 {
@@ -570,7 +573,7 @@ class SupplyPlanVersionAndReview extends Component {
             this.setState({
                 versionTypeList: listArray, loading: false
             }, () => {
-                document.getElementById("versionTypeId").value = 2;
+                // document.getElementById("versionTypeId").value = 2;
             })
         }).catch(
             error => {
@@ -716,6 +719,11 @@ class SupplyPlanVersionAndReview extends Component {
                     if (versionStatusId == 1) {
                         result = result.filter(c => c.versionType.id != 1);
                     }
+                    result.sort((a, b) => {
+                        var itemLabelA = a.lastModifiedDate;
+                        var itemLabelB = b.lastModifiedDate
+                        return itemLabelA < itemLabelB ? 1 : -1;
+                    });
                     this.setState({
                         matricsList: result,
                         message: ''
@@ -1012,11 +1020,19 @@ class SupplyPlanVersionAndReview extends Component {
         let statusList = statuses.length > 0
             && statuses.map((item, i) => {
                 return (
-                    <option key={i} value={item.id} selected={item.id == 1 ? 'selected' : ''}>
+                    <option key={i} value={item.id}>
                         {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
             }, this);
+
+        // const { programList } = this.state;
+        // let programs = programList.length > 0
+        //     && programList.map((item, i) => {
+        //         return (
+        //             <option key={i} value={item.id}>{item.name}</option>
+        //         )
+        //     }, this);
 
 
         const bar = {

@@ -2366,124 +2366,124 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
 
                                         {/* } */}
                                         {this.state.show && this.state.dataList.length > 0 &&
-                                            <div className="table-scroll">
-                                                <div className="table-wrap DataEntryTable table-responsive">
-                                                    <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" >
-                                                        <thead>
-                                                            <tr>
-                                                                <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th>
-                                                                <th className="dataentryTdWidth sticky-col first-col clone"></th>
-                                                                {this.state.monthArray.map((item, count) => {
-                                                                    return (<th>{moment(item.date).format(DATE_FORMAT_CAP_WITHOUT_DATE)}</th>)
-                                                                })}
-                                                                <th className="sticky-col first-col clone">Average</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            <tr className="hoverTd">
-                                                                <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                                                <td className="sticky-col first-col clone hoverTd" align="left"><b>Error*</b></td>
-                                                                {this.state.monthArray.map((item1, count) => {
-                                                                    var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
-                                                                    totalError += isNaN(data[0].errorPerc) ? '' : (data[0].errorPerc == null || data[0].errorPerc == 'Infinity') ? '' : data[0].errorPerc;
-                                                                    countError += 1;
-                                                                    return (<td><NumberFormat displayType={'text'} thousandSeparator={true} />{isNaN(data[0].errorPerc) ? '' : (data[0].errorPerc == null || data[0].errorPerc == 'Infinity') ? '' : this.PercentageFormatter(data[0].errorPerc)}</td>)
+                                            // <div className="table-scroll">
+                                            //     <div className="table-wrap DataEntryTable table-responsive">
+                                            <Table className="table-bordered text-center mt-2 overflowhide main-table responsive" bordered size="sm">
+                                                <thead>
+                                                    <tr>
+                                                        <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th>
+                                                        <th className="sticky-col first-col clone"></th>
+                                                        {this.state.monthArray.map((item, count) => {
+                                                            return (<th>{moment(item.date).format(DATE_FORMAT_CAP_WITHOUT_DATE)}</th>)
+                                                        })}
+                                                        <th className="sticky-col first-col clone">Average</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr className="hoverTd">
+                                                        <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                        <td className="sticky-col first-col clone hoverTd" align="left"><b>Error*</b></td>
+                                                        {this.state.monthArray.map((item1, count) => {
+                                                            var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
+                                                            totalError += isNaN(data[0].errorPerc) ? '' : (data[0].errorPerc == null || data[0].errorPerc == 'Infinity') ? '' : data[0].errorPerc;
+                                                            countError += 1;
+                                                            return (<td><NumberFormat displayType={'text'} thousandSeparator={true} />{isNaN(data[0].errorPerc) ? '' : (data[0].errorPerc == null || data[0].errorPerc == 'Infinity') ? '' : this.PercentageFormatter(data[0].errorPerc)}</td>)
 
-                                                                })}
-                                                                <td className="sticky-col first-col clone hoverTd" align="left">{this.PercentageFormatter(totalError / countError)}</td>
-                                                            </tr>
-                                                            <tr className="hoverTd">
-                                                                <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordion(0)}>
-                                                                    {this.state.consumptionUnitShowArr.includes(0) ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
-                                                                </td>
-                                                                <td className="sticky-col first-col clone hoverTd" align="left"><b>Forecast</b></td>
-                                                                {this.state.monthArray.map((item1, count) => {
-                                                                    var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
-                                                                    totalForcaste += Number(data[0].forecastQty);
-                                                                    countForcaste += 1;
-                                                                    return (<td><NumberFormat displayType={'text'} thousandSeparator={true} /> {(Number(data[0].forecastQty).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>)
+                                                        })}
+                                                        <td className="sticky-col first-col clone hoverTd" align="left">{this.PercentageFormatter(totalError / countError)}</td>
+                                                    </tr>
+                                                    <tr className="hoverTd">
+                                                        <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordion(0)}>
+                                                            {this.state.consumptionUnitShowArr.includes(0) ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
+                                                        </td>
+                                                        <td className="sticky-col first-col clone hoverTd" align="left"><b>Forecast</b></td>
+                                                        {this.state.monthArray.map((item1, count) => {
+                                                            var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
+                                                            totalForcaste += Number(data[0].forecastQty);
+                                                            countForcaste += 1;
+                                                            return (<td><NumberFormat displayType={'text'} thousandSeparator={true} /> {(Number(data[0].forecastQty).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>)
 
-                                                                })}
-                                                                <td className="sticky-col first-col clone hoverTd" align="left">{(Number(totalForcaste / countForcaste).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
-                                                            </tr>
-                                                            {this.state.regions.map(r => {
-                                                                var totalRegion = 0;
-                                                                var totalRegionCount = 0;
-                                                                return (<tr style={{ display: this.state.consumptionUnitShowArr.includes(0) ? "" : "none" }}>
-                                                                    <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                                                    <td className="sticky-col first-col clone text-left" style={{ textIndent: '30px' }}>{"   " + getLabelText(r.label, this.state.lang)}</td>
-                                                                    {this.state.monthArray.map((item1, count) => {
-                                                                        var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.regionData[0].region.id == r.regionId)
-                                                                        totalRegion += Number(data[0].forecastQty);
-                                                                        totalRegionCount += 1;
-                                                                        return (<td><NumberFormat displayType={'text'} thousandSeparator={true} />{(Number(data[0].forecastQty).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>)
-                                                                    })}
-                                                                    <td className="sticky-col first-col clone text-left">{(Number(totalRegion / totalRegionCount).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
-                                                                </tr>)
+                                                        })}
+                                                        <td className="sticky-col first-col clone hoverTd" align="left">{(Number(totalForcaste / countForcaste).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                    </tr>
+                                                    {this.state.regions.map(r => {
+                                                        var totalRegion = 0;
+                                                        var totalRegionCount = 0;
+                                                        return (<tr style={{ display: this.state.consumptionUnitShowArr.includes(0) ? "" : "none" }}>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                            <td className="sticky-col first-col clone text-left" style={{ textIndent: '30px' }}>{"   " + getLabelText(r.label, this.state.lang)}</td>
+                                                            {this.state.monthArray.map((item1, count) => {
+                                                                var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.regionData[0].region.id == r.regionId)
+                                                                totalRegion += Number(data[0].forecastQty);
+                                                                totalRegionCount += 1;
+                                                                return (<td><NumberFormat displayType={'text'} thousandSeparator={true} />{(Number(data[0].forecastQty).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>)
                                                             })}
-                                                            <tr className="hoverTd">
-                                                                <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordion(1)}>
-                                                                    {this.state.consumptionUnitShowArr.includes(1) ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
-                                                                </td>
-                                                                <td className="sticky-col first-col clone hoverTd" align="left"><b>Actual</b></td>
-                                                                {this.state.monthArray.map((item1, count) => {
-                                                                    var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
-                                                                    // actualQty/(noOfDays - dayOfStockOut) * noOfDays
-                                                                    totalActal += Number(this.state.consumptionAdjForStockOutId ? (data[0].actualQty / (item1.noOfDays - totalDaysOfStockOut) * item1.noOfDays) : data[0].actualQty);
-                                                                    countActal += 1;
-                                                                    return (<td><NumberFormat displayType={'text'} thousandSeparator={true} />{(Number(this.state.consumptionAdjForStockOutId ? (data[0].actualQty / (item1.noOfDays - totalDaysOfStockOut) * item1.noOfDays) : (data[0].actualQty)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>)
-                                                                })}
-                                                                <td className="sticky-col first-col clone hoverTd" align="left">{(Number(totalActal / countActal).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
-                                                            </tr>
-                                                            {this.state.regions.map(r => {
-                                                                var totalRegion = 0;
-                                                                var totalRegionCount = 0;
-                                                                return (<tr style={{ display: this.state.consumptionUnitShowArr.includes(1) ? "" : "none" }}>
-                                                                    <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                                                    <td className="sticky-col first-col clone text-left" style={{ textIndent: '30px' }}>{"   " + getLabelText(r.label, this.state.lang)}</td>
-                                                                    {this.state.monthArray.map((item1, count) => {
-                                                                        var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.regionData[0].region.id == r.regionId)
-                                                                        totalRegion += Number(this.state.consumptionAdjForStockOutId ? (data[0].actualQty / (item1.noOfDays - (data[0].daysOfStockOut != undefined ? data[0].daysOfStockOut : 0)) * item1.noOfDays) : data[0].actualQty);
-                                                                        totalRegionCount += 1;
-                                                                        totalDaysOfStockOut += data[0].daysOfStockOut;
-                                                                        return (<td><NumberFormat displayType={'text'} thousandSeparator={true} />{(Number(this.state.consumptionAdjForStockOutId ? (data[0].actualQty / (item1.noOfDays - (data[0].daysOfStockOut != undefined ? data[0].daysOfStockOut : 0)) * item1.noOfDays) : (data[0].actualQty)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>)
-                                                                    })}
-                                                                    <td className="sticky-col first-col clone text-left">{(Number(totalRegion / totalRegionCount).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
-                                                                </tr>)
+                                                            <td className="sticky-col first-col clone text-left">{(Number(totalRegion / totalRegionCount).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                        </tr>)
+                                                    })}
+                                                    <tr className="hoverTd">
+                                                        <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordion(1)}>
+                                                            {this.state.consumptionUnitShowArr.includes(1) ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
+                                                        </td>
+                                                        <td className="sticky-col first-col clone hoverTd" align="left"><b>Actual</b></td>
+                                                        {this.state.monthArray.map((item1, count) => {
+                                                            var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
+                                                            // actualQty/(noOfDays - dayOfStockOut) * noOfDays
+                                                            totalActal += Number(this.state.consumptionAdjForStockOutId ? (data[0].actualQty / (item1.noOfDays - totalDaysOfStockOut) * item1.noOfDays) : data[0].actualQty);
+                                                            countActal += 1;
+                                                            return (<td><NumberFormat displayType={'text'} thousandSeparator={true} />{(Number(this.state.consumptionAdjForStockOutId ? (data[0].actualQty / (item1.noOfDays - totalDaysOfStockOut) * item1.noOfDays) : (data[0].actualQty)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>)
+                                                        })}
+                                                        <td className="sticky-col first-col clone hoverTd" align="left">{(Number(totalActal / countActal).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                    </tr>
+                                                    {this.state.regions.map(r => {
+                                                        var totalRegion = 0;
+                                                        var totalRegionCount = 0;
+                                                        return (<tr style={{ display: this.state.consumptionUnitShowArr.includes(1) ? "" : "none" }}>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                            <td className="sticky-col first-col clone text-left" style={{ textIndent: '30px' }}>{"   " + getLabelText(r.label, this.state.lang)}</td>
+                                                            {this.state.monthArray.map((item1, count) => {
+                                                                var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.regionData[0].region.id == r.regionId)
+                                                                totalRegion += Number(this.state.consumptionAdjForStockOutId ? (data[0].actualQty / (item1.noOfDays - (data[0].daysOfStockOut != undefined ? data[0].daysOfStockOut : 0)) * item1.noOfDays) : data[0].actualQty);
+                                                                totalRegionCount += 1;
+                                                                totalDaysOfStockOut += data[0].daysOfStockOut;
+                                                                return (<td><NumberFormat displayType={'text'} thousandSeparator={true} />{(Number(this.state.consumptionAdjForStockOutId ? (data[0].actualQty / (item1.noOfDays - (data[0].daysOfStockOut != undefined ? data[0].daysOfStockOut : 0)) * item1.noOfDays) : (data[0].actualQty)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>)
                                                             })}
-                                                            <tr className="hoverTd">
-                                                                <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordion(2)}>
-                                                                    {this.state.consumptionUnitShowArr.includes(2) ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
-                                                                </td>
-                                                                <td className="sticky-col first-col clone hoverTd" align="left"><b>Difference</b></td>
-                                                                {this.state.monthArray.map((item1, count) => {
-                                                                    var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
-                                                                    return (<td style={{ color: (data[0].actualQty - data[0].forecastQty) < 0 ? 'red' : 'black' }}><NumberFormat displayType={'text'} thousandSeparator={true} />{(Number(data[0].actualQty - data[0].forecastQty).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>)
-                                                                })}
-                                                                <td className="sticky-col first-col clone hoverTd" align="left" style={{ color: ((totalActal / countActal) - (totalForcaste / countForcaste)) < 0 ? 'red' : 'black' }} >{(Number((totalActal / countActal) - (totalForcaste / countForcaste)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
-                                                            </tr>
-                                                            {this.state.regions.map(r => {
-                                                                var totalRegion = 0;
-                                                                var totalRegionCount = 0;
-                                                                return (<tr style={{ display: this.state.consumptionUnitShowArr.includes(2) ? "" : "none" }}>
-                                                                    <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                                                    <td className="sticky-col first-col clone text-left" style={{ textIndent: '30px' }}>{"   " + getLabelText(r.label, this.state.lang)}</td>
-                                                                    {this.state.monthArray.map((item1, count) => {
-                                                                        var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.regionData[0].region.id == r.regionId)
-                                                                        totalRegion += Number(data[0].actualQty - data[0].forecastQty);
-                                                                        totalRegionCount += 1;
-                                                                        return (<td style={{ color: (data[0].actualQty - data[0].forecastQty) < 0 ? 'red' : 'black' }}><NumberFormat displayType={'text'} thousandSeparator={true} />{(Number(data[0].actualQty - data[0].forecastQty).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>)
-                                                                    })}
-                                                                    <td className="sticky-col first-col clone text-left" style={{ color: (totalRegion / totalRegionCount) < 0 ? 'red' : 'black' }}>{(Number(totalRegion / totalRegionCount).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
-                                                                </tr>)
+                                                            <td className="sticky-col first-col clone text-left">{(Number(totalRegion / totalRegionCount).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                        </tr>)
+                                                    })}
+                                                    <tr className="hoverTd">
+                                                        <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordion(2)}>
+                                                            {this.state.consumptionUnitShowArr.includes(2) ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
+                                                        </td>
+                                                        <td className="sticky-col first-col clone hoverTd" align="left"><b>Difference</b></td>
+                                                        {this.state.monthArray.map((item1, count) => {
+                                                            var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
+                                                            return (<td style={{ color: (data[0].actualQty - data[0].forecastQty) < 0 ? 'red' : 'black' }}><NumberFormat displayType={'text'} thousandSeparator={true} />{(Number(data[0].actualQty - data[0].forecastQty).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>)
+                                                        })}
+                                                        <td className="sticky-col first-col clone hoverTd" align="left" style={{ color: ((totalActal / countActal) - (totalForcaste / countForcaste)) < 0 ? 'red' : 'black' }} >{(Number((totalActal / countActal) - (totalForcaste / countForcaste)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                    </tr>
+                                                    {this.state.regions.map(r => {
+                                                        var totalRegion = 0;
+                                                        var totalRegionCount = 0;
+                                                        return (<tr style={{ display: this.state.consumptionUnitShowArr.includes(2) ? "" : "none" }}>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                            <td className="sticky-col first-col clone text-left" style={{ textIndent: '30px' }}>{"   " + getLabelText(r.label, this.state.lang)}</td>
+                                                            {this.state.monthArray.map((item1, count) => {
+                                                                var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.regionData[0].region.id == r.regionId)
+                                                                totalRegion += Number(data[0].actualQty - data[0].forecastQty);
+                                                                totalRegionCount += 1;
+                                                                return (<td style={{ color: (data[0].actualQty - data[0].forecastQty) < 0 ? 'red' : 'black' }}><NumberFormat displayType={'text'} thousandSeparator={true} />{(Number(data[0].actualQty - data[0].forecastQty).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>)
                                                             })}
-                                                            {/* </>)
+                                                            <td className="sticky-col first-col clone text-left" style={{ color: (totalRegion / totalRegionCount) < 0 ? 'red' : 'black' }}>{(Number(totalRegion / totalRegionCount).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                        </tr>)
+                                                    })}
+                                                    {/* </>)
                                                         } 
                                                         )} */}
-                                                        </tbody>
-                                                    </Table>
-                                                </div>
-                                            </div>
+                                                </tbody>
+                                            </Table>
+                                            //     </div>
+                                            // </div>
                                         }
                                     </div>
                                     {/* </div> */}

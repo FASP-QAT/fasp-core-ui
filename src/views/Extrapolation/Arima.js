@@ -60,8 +60,12 @@ export function calculateArima(inputData, p, d, q, confidenceLevel, noOfProjecti
         }).catch(error => {
             console.log("ErrorArima@@@@@@", error)
             // if (!isTreeExtrapolation) {
-                console.log("ErrorArima@@@@@@", error.status)
-                console.log("ErrorArima@@@@@@1", error.response.status == 500)
+            console.log("ErrorArima@@@@@@", error.status)
+            console.log("ErrorArima@@@@@@1", error.response.status == 500)
+            if (page == "DataEntry" || page == "ImportFromSupplyPlan") {
+                var arimaData = { "data": [], "PlanningUnitId": props.state.selectedConsumptionUnitId, "regionId": regionId }
+                props.updateArimaData(arimaData);
+            } else {
                 props.updateState("loading", false);
                 props.updateState("dataChanged", true);
                 if (error.response.status == 500) {
@@ -69,11 +73,12 @@ export function calculateArima(inputData, p, d, q, confidenceLevel, noOfProjecti
                 } else {
                     props.updateState("noDataMessage", i18n.t('static.extrapolation.errorOccured'));
                 }
-                // props.updateState("showData", false);
-                // props.updateState("dataEl", "");
-                // props.updateState("show", false);
-                // props.el = jexcel(document.getElementById("tableDiv"), '');
-                // props.el.destroy();
+            }
+            // props.updateState("showData", false);
+            // props.updateState("dataEl", "");
+            // props.updateState("show", false);
+            // props.el = jexcel(document.getElementById("tableDiv"), '');
+            // props.el.destroy();
             // }
         })
 

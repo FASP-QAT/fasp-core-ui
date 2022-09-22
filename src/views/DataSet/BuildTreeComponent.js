@@ -10252,13 +10252,15 @@ export default class BuildTree extends Component {
 
                 <div className="ContactTemplate boxContactTemplate" title={itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined ? itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].notes : ''}>
                     <div className={itemConfig.payload.nodeType.id == 5
-                        || itemConfig.payload.nodeType.id == 4 ? "ContactTitleBackground TemplateTitleBgblue" :
-                        "ContactTitleBackground TemplateTitleBg"}
+                        || itemConfig.payload.nodeType.id == 4 ? (itemConfig.payload.label.label_en.length<=20?"ContactTitleBackground TemplateTitleBgblueSingle":"ContactTitleBackground TemplateTitleBgblue") :
+                        (itemConfig.payload.label.label_en.length<=20?"ContactTitleBackground TemplateTitleBgSingle":"ContactTitleBackground TemplateTitleBg")}
                     >
                         <div className={itemConfig.payload.nodeType.id == 5 ||
                             itemConfig.payload.nodeType.id == 4 ? "ContactTitle TitleColorWhite" :
                             "ContactTitle TitleColor"}>
-                            <div title={itemConfig.payload.label.label_en} style={{ fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '128px', float: 'left', fontWeight: 'bold', }}>
+                            {/* <div title={itemConfig.payload.label.label_en} style={{ fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '128px', float: 'left', fontWeight: 'bold', }}>
+                                {itemConfig.payload.label.label_en}</div> */}
+                                <div title={itemConfig.payload.label.label_en} className="NodeTitletext">
                                 {itemConfig.payload.label.label_en}</div>
                             <div style={{ float: 'right' }}>
                                 {(itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined && itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation == true) && <i class="fa fa-line-chart" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
@@ -10742,7 +10744,7 @@ export default class BuildTree extends Component {
             // itemTitleFirstFontColor: Colors.White,
             templates: [{
                 name: "contactTemplate",
-                itemSize: { width: 200, height: 80 },
+                itemSize: { width: 200, height: 88 },
                 minimizedItemSize: { width: 2, height: 2 },
                 highlightPadding: { left: 1, top: 1, right: 1, bottom: 1 },
                 highlightBorderWidth: 1,
@@ -11922,16 +11924,23 @@ export default class BuildTree extends Component {
                                     )))}
                         <b className="supplyplanformulas ScalingheadTitle">{this.state.currentItemConfig.context.payload.label.label_en}</b></div>}
                     <Button size="md" onClick={() => {
+                        if (this.state.isChanged == true || this.state.isTreeDataChanged == true || this.state.isScenarioChanged == true) {
+                            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+                            if (cf == true) {
+                                this.setState({
+                                    openAddNodeModal: false, cursorItem: 0, isChanged: false,
+                                    highlightItem: 0, activeTab1: new Array(3).fill('1')
+                                })
+                            } else {
 
-                        var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
-                        if (cf == true) {
+                            }
+                        }else {
                             this.setState({
                                 openAddNodeModal: false, cursorItem: 0, isChanged: false,
                                 highlightItem: 0, activeTab1: new Array(3).fill('1')
                             })
-                        } else {
-
                         }
+
                     }
 
                     }
