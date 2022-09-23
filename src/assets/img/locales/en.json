@@ -2822,5 +2822,21 @@
     "static.stockStatus.plannedBy":"Planned By",
     "static.report.minMosOrQty":"Min (months or qty)",
     "static.report.maxMosOrQty":"Max (months or qty)",
-    "static.report.variable":"Variable"
+    "static.report.variable":"Variable",
+    "static.supplyPlan.maxQty":"Max Quantity",
+    "static.supplyPlan.maxQtyFormula1":"Min Qty for current month = 7,000",
+    "static.supplyPlan.maxQtyFormula2":"Reorder Frequency = 3",
+    "static.supplyPlan.maxQtyFormula3":"Max Qty = Min Qty + Reorder Frequency * AMC",
+    "static.supplyPlan.maxQtyFormula4":"Max Qty = 7,000 + 3 * 6,392",
+    "static.supplyPlan.maxQtyFormula5":"Max Qty = 7,000 + 19,176",
+    "static.supplyPlan.maxQtyFormula6":"Max Qty = 26,176",
+    "static.supplyPlan.whenToSuggestQty1":"a. If Plan Based on is MOS",
+    "static.supplyPlan.whenToSuggestQty2":"b. If Plan Based on is Quantity",
+    "static.supplyPlan.whenToSuggestQty3":"Closing Balance for current month + X months (Distribution Lead Time) = 7,000",
+    "static.supplyPlan.whenToSuggestQty4":"Clsoing Balance for 1st month = 6,000",
+    "static.supplyPlan.whenToSuggestQty5":"Clsoing Balance for 2nd month = 6,500",
+    "static.supplyPlan.whenToSuggestQty6":"Min Quantity= 8,000",
+    "static.supplyPlan.whenToSuggestQty7":"Since Closing Balance for all the three months is less than Min Quantity , therefore",
+    "static.supplyPlan.suggestedMaxQty1":"Max Quantity for current month + X months (Distribution Lead Time) = 44,744",
+    "static.supplyPlan.suggestedMaxQty2":"Suggested Order Qty = (Max Qty - Ending balance + Unmet Demand)"
 }
