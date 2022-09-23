@@ -2838,5 +2838,9 @@
     "static.supplyPlan.whenToSuggestQty6":"Min Quantity= 8,000",
     "static.supplyPlan.whenToSuggestQty7":"Since Closing Balance for all the three months is less than Min Quantity , therefore",
     "static.supplyPlan.suggestedMaxQty1":"Max Quantity for current month + X months (Distribution Lead Time) = 44,744",
-    "static.supplyPlan.suggestedMaxQty2":"Suggested Order Qty = (Max Qty - Ending balance + Unmet Demand)"
+    "static.supplyPlan.suggestedMaxQty2":"Suggested Order Qty = (Max Qty - Ending balance + Unmet Demand)",
+    "static.login.confirmSessionChange":"In order to switch to online mode, you need to log in again.",
+    "static.login.goToLogin":"Go to Login",
+    "static.login.goOffline":"Go Offline",
+    "static.login.goOnline":"Go Online"
 }

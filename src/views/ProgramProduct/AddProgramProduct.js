@@ -1097,13 +1097,13 @@ class AddprogramPlanningUnit extends Component {
                 // var reg = /^[0-9\b]+$/;
                 var reg = JEXCEL_INTEGER_REGEX
                 // console.log("value-----", value);
-                if (json[y][2]==1 && value == "") {
+                if (json[y][2] == 1 && value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
                 } else {
-                    if ((isNaN(parseInt(value)) || !(reg.test(value))) && value!="") {
+                    if ((isNaN(parseInt(value)) || !(reg.test(value))) && value != "") {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
                         this.el.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -1120,13 +1120,13 @@ class AddprogramPlanningUnit extends Component {
                 // var reg = /^[0-9\b]+$/;
                 var reg = JEXCEL_INTEGER_REGEX
                 // console.log("value-----", value);
-                if (json[y][2]==2 && value == "") {
+                if (json[y][2] == 2 && value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
                 } else {
-                    if ((isNaN(parseInt(value)) || !(reg.test(value))) && value!="") {
+                    if ((isNaN(parseInt(value)) || !(reg.test(value))) && value != "") {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
                         this.el.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -1142,13 +1142,13 @@ class AddprogramPlanningUnit extends Component {
                 // var reg = /^[0-9\b]+$/;
                 var reg = JEXCEL_INTEGER_REGEX
                 // console.log("value-----", value);
-                if (json[y][2]==2 && value == "") {
+                if (json[y][2] == 2 && value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
                 } else {
-                    if ((isNaN(parseInt(value)) || !(reg.test(value))) && value!="") {
+                    if ((isNaN(parseInt(value)) || !(reg.test(value))) && value != "") {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
                         this.el.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -1426,10 +1426,12 @@ class AddprogramPlanningUnit extends Component {
                 var reg = JEXCEL_INTEGER_REGEX
                 var col = ("J").concat(parseInt(y) + 1);
                 if (rowData[2] == 2 && value == "") {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    // this.el.setStyle(col, "background-color", "transparent");
+                    // this.el.setStyle(col, "background-color", "yellow");
+                    // this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    this.el.setValueFromCoords(9, y, 0, true);
                     this.el.setValueFromCoords(14, y, 1, true);
+
                     valid = false;
                 } else {
                     if ((isNaN(parseInt(value)) || !(reg.test(value))) && value != "") {
