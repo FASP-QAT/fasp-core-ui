@@ -326,6 +326,7 @@ class DefaultHeaderDropdown extends Component {
           <DropdownItem onClick={this.changeLanguage.bind(this, 'pr')}><i className="flag-icon flag-icon-pt"></i>{localStorage.getItem('lang') != null && localStorage.getItem('lang').toString() != 'undefined' && localStorage.getItem('lang').toString() == "pr" ? <b>{i18n.t('static.language.portuguese')}</b> : i18n.t('static.language.portuguese')}</DropdownItem> */}
 
           {checkOnline === 'Online' && <DropdownItem onClick={this.props.onChangePassword}><i className="fa fa-key"></i>{i18n.t('static.dashboard.changepassword')}</DropdownItem>}
+          {checkOnline === 'Online' ? <DropdownItem onClick={this.props.goOffline}>{i18n.t("static.login.goOffline")}</DropdownItem>:<DropdownItem onClick={this.props.goOnline}>{i18n.t("static.login.goOnline")}</DropdownItem>}
           {/* <DropdownItem onClick={this.props.onLogout}><i className="fa fa-sign-out"></i>{i18n.t('static.common.logout')}</DropdownItem> */}
         </DropdownMenu>
       </Dropdown>
