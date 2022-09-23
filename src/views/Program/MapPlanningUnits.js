@@ -354,6 +354,62 @@ export default class MapPlanningUnits extends Component {
             } else {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
+                value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                // var reg = /^[0-9\b]+$/;
+                var reg = JEXCEL_INTEGER_REGEX
+                var col = ("E").concat(parseInt(y) + 1);
+                if (rowData[2] == 1 && value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                } else {
+                    if ((isNaN(parseInt(value)) || !(reg.test(value))) && value != "") {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+                }
+                value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                // var reg = /^[0-9\b]+$/;
+                var reg = JEXCEL_INTEGER_REGEX
+                var col = ("F").concat(parseInt(y) + 1);
+                if (rowData[2] == 2 && value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                } else {
+                    if ((isNaN(parseInt(value)) || !(reg.test(value))) && value != "") {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+                }
+                value = this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                // var reg = /^[0-9\b]+$/;
+                var reg = JEXCEL_INTEGER_REGEX
+                var col = ("J").concat(parseInt(y) + 1);
+                if (rowData[2] == 2 && value == "") {
+                    // this.el.setStyle(col, "background-color", "transparent");
+                    // this.el.setStyle(col, "background-color", "yellow");
+                    // this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    this.el.setValueFromCoords(9, y, 0, true);
+                } else {
+                    if ((isNaN(parseInt(value)) || !(reg.test(value))) && value != "") {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+                }
+
             }
         }
         //reoder frequency
