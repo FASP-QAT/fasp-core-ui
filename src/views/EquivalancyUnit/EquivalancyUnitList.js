@@ -30,6 +30,11 @@ import CryptoJS from 'crypto-js';
 import { Prompt } from 'react-router';
 import { SECRET_KEY, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_SM } from "../../Constants";
 // import { Modal } from "bootstrap";
+import showguidanceforEquivalencyUnitEn from '../../../src/ShowGuidanceFiles/EquivalencyUnitEn.html'
+import showguidanceforEquivalencyUnitFr from '../../../src/ShowGuidanceFiles/EquivalencyUnitFr.html'
+import showguidanceforEquivalencyUnitPr from '../../../src/ShowGuidanceFiles/EquivalencyUnitPr.html'
+import showguidanceforEquivalencyUnitSp from '../../../src/ShowGuidanceFiles/EquivalencyUnitSp.html'
+
 
 const entityname = i18n.t('static.equivalancyUnit.equivalancyUnits')
 
@@ -2938,7 +2943,15 @@ className={'modal-lg ' + this.props.className} >
 </ModalHeader>
 <div>
     <ModalBody>
-       <div>
+    <div dangerouslySetInnerHTML={ {__html:localStorage.getItem('lang') == 'en' ?
+                showguidanceforEquivalencyUnitEn :
+                localStorage.getItem('lang') == 'fr' ?
+                showguidanceforEquivalencyUnitFr :
+                  localStorage.getItem('lang') == 'sp' ?
+                  showguidanceforEquivalencyUnitSp :
+                  showguidanceforEquivalencyUnitPr
+              } } />
+       {/* <div>
            <h3 className='ShowGuidanceHeading'>{i18n.t('static.equivalancyUnit.equivalancyUnits')}</h3>
        </div>
         <p>
@@ -3041,7 +3054,7 @@ className={'modal-lg ' + this.props.className} >
                                 </tr>
                                 </tbody>
                                 </table>
-        </p>
+        </p> */}
 
     </ModalBody>
 </div>

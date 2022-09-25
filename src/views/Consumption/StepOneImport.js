@@ -280,7 +280,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
     }
 
     componentDidMount() {
-        document.getElementById("stepOneBtn").disabled = true;
+        document.getElementById("").disabled = true;
         this.getPrograms();
     }
 

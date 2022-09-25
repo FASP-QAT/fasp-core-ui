@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<meta name="">
+	<title>Show Guidance</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<style>
+		table, td, div, h1, p {font-family: Arial, sans-serif;line-height: 20px;}
+		body{padding: 0;margin: 0;color: #272127;}
+	
+/* .table1 td, th {
+  border: 1px solid #c8ced3;
+  text-align: left;
+  padding: 8px;
+  border-collapse: collapse!important;
+  width: 100%;
+}*/
+.table1 td {
+  border: 1px solid #c8ced3!important;
+  padding: 6px;
+  font-size: 13px;
+}
+.table1 th {
+  border: 1px solid #c8ced3!important;
+  padding: 6px;
+  font-size: 13px;
+}
+.table1 {
+  /* width: 100%; */
+  border-collapse: collapse;
+}
+a {
+    color: #205493;
+    /* text-decoration: none; */
+    background-color: transparent;
+}
+	</style>
+</head>
+<body style="margin:0;padding:0;background:#e4e5e6;">
+	<table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+		<tr>
+			<td align="center" style="padding:0;">
+				<table role="presentation" style="max-width: 910px;min-width:100%;margin-top:20px;margin-bottom:20px;border-collapse:collapse;border:1px solid #fff;border-spacing:0;text-align:left;border-radius: 0.25rem;background-color: #fff;">
+					<tr>
+						<td>
+							<table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+								<tr>
+									
+									<td style="padding:0 0 10px 0;color:#153643;">
+										<h3 style="color: #002f6c;font-weight: 600;font-size: 19px;">Importación de pronóstico QAT</h3>
+										<p style="font-size: 13px;"><span style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold;">Objetivo :</span> Permita que los usuarios importen pronósticos creados por QAT en programas de planes de suministro. Los pronósticos solo están disponibles para importar si 1) están comprometidos como una versión final y 2) hay un pronóstico seleccionado para cada unidad de planificación.</p>
+										
+										<p>
+											<span style="font-size: 13px; font-weight: bold;"><u>Usando esta pantalla :</u></span>
+                                           
+										</p>
+										<p><p style="font-size: 13px;"></p><p><b style="font-size: 13px;">(Paso 1)</b><ul style="font-size: 13px;"><li>Seleccione desde qué programa de pronóstico importar (solo están disponibles los pronósticos finales)</li><li>Seleccione a qué programa de plan de suministro desea importar.</li><li>Seleccione el rango de fechas de los datos de pronóstico para importar, que están restringidos de la siguiente manera<ul style="font-size: 13px;"><li>Debe estar dentro del período de pronóstico</li><li>El consumo previsto más antiguo que puede importar es 6 meses antes del mes actual. </li><li>Si todo el período de pronóstico tiene más de 6 meses en el pasado, el pronóstico no se puede importar y la versión no aparecerá en el menú desplegable del programa. </li></ul></li><li>En la tabla que aparece, seleccione y mapee las unidades de planificación.<ul style="font-size: 13px;"><li>Para cada Unidad de planificación de pronósticos, QAT requiere una Unidad de planificación del plan de suministro y un factor de conversión correspondientes. QAT mapea automáticamente coincidencias exactas de unidades de planificación, pero los usuarios pueden anular tanto el mapeo de unidades de planificación como el factor de conversión. </li><li>No es necesario importar todas las unidades de planificación de previsión; sin embargo, todas las unidades de planificación de previsión deben tener una selección en la tabla de asignación. Por ejemplo, en la siguiente tabla, aunque no se importen 2 productos, deberá seleccionar "No importar".</li><br><img class="img-fluid" src="/importintoqatsupplyplanscreenshot-1.jpg" style="width: 971px;"></ul></li></ul></p><p><b style="font-size: 13px;">(Paso 2) </b><span style="font-size: 13px;">Región(es) de pronóstico:</span><ul style="font-size:13px;"><li>Pronóstico nacional al plan nacional de suministro<div class="pl-lg-4 pr-lg-4 pt-lg-4 table1"><table style="border-collapse: collapse;"><thead><tr><th>Región(es) de pronóstico</th><th>% de Pronóstico</th><th>Región del plan de suministro</th></tr></thead><tbody><tr><td>Nacional</td><td>100</td><td>Nacional</td></tr></tbody></table></div></li></ul><ul style="font-size:13px;"><li>Pronóstico multirregional a plan de suministro multirregional<div class="pl-lg-4 pr-lg-4 pt-lg-4 table1"><table style="border-collapse: collapse;"><thead><tr><th>Región(es) de pronóstico</th><th>% de Pronóstico</th><th>Región del plan de suministro</th></tr></thead><tbody><tr><td>Norte</td><td>100</td><td>Norte</td></tr><tr><td>Este</td><td>100</td><td>Este</td></tr><tr><td>Sur</td><td>100</td><td>Sur</td></tr></tbody></table></div></li></ul><ul style="font-size:13px;"><li>Pronóstico multirregional al plan de suministro nacional -<div class="pl-lg-4 pr-lg-4 pt-lg-4 table1"><table style="border-collapse: collapse;"><thead><tr><th>Región(es) de pronóstico</th><th>% de Pronóstico</th><th>Región del plan de suministro</th></tr></thead><tbody><tr><td>Norte</td><td>100</td><td>Nacional</td></tr><tr><td>Este</td><td>100</td><td>Nacional</td></tr><tr><td>Sur</td><td>100</td><td>Nacional</td></tr></tbody></table></div></li></ul><ul style="font-size:13px;"><li>Pronóstico nacional a plan de suministro de varias regiones: tenga en cuenta que el proceso de importación debe repetirse para cada región del plan de suministro.<div class="pl-lg-4 pr-lg-4 pt-lg-4 table1"><table style="border-collapse: collapse;"><thead><tr><th>Región(es) de pronóstico</th><th>% de Pronóstico</th><th>Región del plan de suministro</th></tr></thead><tbody><tr><td>Nacional</td><td>20</td><td>Norte</td></tr></tbody></table></div><br><div class="pl-lg-4 pr-lg-4 pt-lg-4 table1"><table style="border-collapse: collapse;"><thead><tr><th>Región(es) de pronóstico</th><th>% de Pronóstico</th><th>Región del plan de suministro</th></tr></thead><tbody><tr><td>Nacional</td><td>45</td><td>Sur</td></tr></tbody></table></div><br><div class="pl-lg-4 pr-lg-4 pt-lg-4 table1"><table style="border-collapse: collapse;"><thead><tr><th>Región(es) de pronóstico</th><th>% de Pronóstico</th><th>Región del plan de suministro</th></tr></thead><tbody><tr><td>Nacional</td><td>35</td><td>Este</td></tr></tbody></table></div></li></ul></p><p><b style="font-size: 13px;">(Paso 3) </b><br><span style="font-size:13px">QAT enumerará cada registro de pronóstico que se importará (una fila para cada combinación de unidad de planificación, región y mes).</span><ul style="font-size:13px;"><li>QAT calcula el consumo previsto que se importará de la siguiente manera: </li><img class="formula-img-mr img-fluid mb-lg-0" src="/ForecastedConsumptionimported.png" style="border: 1px solid rgb(255, 255, 255); margin-left: -20px;"><p>Para el siguiente ejemplo:<ul><li>Un pronóstico nacional que se dividirá en dos regiones del 50% cada una</li><li>La Unidad de planificación de previsión está en paquetes de 3 y la Unidad de planificación del plan de suministro está en paquetes de 1 (factor de conversión = 3)</li><li>El pronóstico nacional para el Mes X fue de 100 (paquetes de 3)</li><li>Forecast of 100 * 50% * 3 = 150  (paquetes de 1) se importarán a cada región para el mes X</li></ul></p><li>Si hay un consumo previsto existente en el plan de suministro, la celda "Consumo previsto actual" se resaltará en amarillo. </li><li>Utilice el botón ¿Importar? para anular la selección de cualquier previsión que NO desee importar al plan de suministro. Si está marcado, el Consumo Pronosticado Convertido anulará el pronóstico del Plan de Suministro. Si no se marca, se mantendrá el pronóstico actual del Plan de suministro.</li><br><img class="img-fluid" src="/importintoqatsupplyplanscreenshot-2.jpg" style="width: 971px;"></ul></p></p>
+           
+
+                                            
+				
+						
+				</td>
+				</tr>
+				
+		
+							</table>
+						</td>
+					</tr>
+					
+				</table>
+			</td>
+		</tr>
+	</table>
+</body>
+</html>

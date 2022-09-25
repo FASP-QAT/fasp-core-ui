@@ -32,7 +32,10 @@ import csvicon from '../../assets/img/csv.png';
 import ForecastedConsumptionimported from '../../assets/img/ForecastedConsumptionimported.png';
 import ShowGuidanceScreenshot1 from '../../assets/img/importintoqatsupplyplanscreenshot-1.jpg';
 import ShowGuidanceScreenshot2 from '../../assets/img/importintoqatsupplyplanscreenshot-2.jpg';
-
+import listImportIntoQATSupplyPlanEn from '../../../src/ShowGuidanceFiles/listImportIntoQATSupplyPlanEn.html'
+import listImportIntoQATSupplyPlanFr from '../../../src/ShowGuidanceFiles/listImportIntoQATSupplyPlanFr.html'
+import listImportIntoQATSupplyPlanSp from '../../../src/ShowGuidanceFiles/listImportIntoQATSupplyPlanSp.html'
+import listImportIntoQATSupplyPlanPr from '../../../src/ShowGuidanceFiles/listImportIntoQATSupplyPlanPr.html'
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
@@ -1323,7 +1326,15 @@ export default class StepOneImportMapPlanningUnits extends Component {
                         </ModalHeader>
                         <div>
                             <ModalBody>
-                                <div>
+                            <div dangerouslySetInnerHTML={ {__html:localStorage.getItem('lang') == 'en' ?
+                listImportIntoQATSupplyPlanEn :
+                localStorage.getItem('lang') == 'fr' ?
+                listImportIntoQATSupplyPlanFr :
+                  localStorage.getItem('lang') == 'sp' ?
+                  listImportIntoQATSupplyPlanSp :
+                  listImportIntoQATSupplyPlanPr
+              } } />
+                                {/* <div>
                                     <h3 className='ShowGuidanceHeading'>{i18n.t('static.importIntoQATSupplyPlan.importIntoQATSupplyPlan')}</h3>
                                 </div>
                                 <p>
@@ -1512,7 +1523,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                                         </ul>
 
                                     </p>
-                                </p>
+                                </p> */}
                             </ModalBody>
                         </div>
                     </Modal>
