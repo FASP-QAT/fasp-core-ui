@@ -109,7 +109,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             planningUnitId: "",
             forecastingUnitId: "",
             equivalencyUnitId: "",
-            dataList: [],
+            dataList:[],
             show: false
         }, () => {
             localStorage.setItem("sesVersionIdReport", '');
@@ -1958,13 +1958,13 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                 cell1 += ' %';
                                 return cell1;
                             },
-                            max: 100
+                            max:100
                         },
                         gridLines: {
                             drawBorder: true, lineWidth: 0
                         },
                         position: 'right',
-
+                        
                     }
                 ],
                 xAxes: [{
@@ -2435,10 +2435,6 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                                 </tr>)
                                                             })}
                                                             <tr className="hoverTd">
-
-                                                                <td className="sticky-col first-col clone text-left">{(Number(totalRegion / totalRegionCount).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
-                                                            </tr>
-                                                            <tr className="hoverTd">
                                                                 <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordion(1)}>
                                                                     {this.state.consumptionUnitShowArr.includes(1) ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
                                                                 </td>
@@ -2499,8 +2495,8 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                         )} */}
                                                         </tbody>
                                                     </Table>
-                                            //     </div>
-                                            // </div>
+                                                </div>
+                                            </div>
                                         }
                                     </div>
                                     {/* </div> */}
