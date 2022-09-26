@@ -2842,5 +2842,6 @@
     "static.login.confirmSessionChange":"In order to switch to online mode, you need to log in again.",
     "static.login.goToLogin":"Go to Login",
     "static.login.goOffline":"Go Offline",
-    "static.login.goOnline":"Go Online"
+    "static.login.goOnline":"Go Online",
+    "static.login.loginAgain":"Please login again to access QAT in online mode."
 }
