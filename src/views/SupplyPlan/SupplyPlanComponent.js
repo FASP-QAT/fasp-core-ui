@@ -3,13 +3,12 @@ import ReactDOM from 'react-dom'
 import {
     Card, CardBody, CardHeader,
     Col, Table, Modal, ModalBody, ModalFooter, ModalHeader, Button,
-    Label, FormGroup, Form, Row, Nav, NavItem, NavLink, TabPane, TabContent
+    Label, FormGroup, Form, Row, Nav, NavItem, NavLink, TabPane, TabContent, Input, InputGroup, FormFeedback
 } from 'reactstrap';
 import i18n from '../../i18n';
 import 'react-contexify/dist/ReactContexify.min.css';
-import { Formik } from 'formik';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, MONTHS_IN_PAST_FOR_SUPPLY_PLAN, TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN, CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, NO_OF_MONTHS_ON_LEFT_CLICKED, ON_HOLD_SHIPMENT_STATUS, NO_OF_MONTHS_ON_RIGHT_CLICKED, DATE_FORMAT_CAP, INDEXED_DB_NAME, INDEXED_DB_VERSION, TBD_PROCUREMENT_AGENT_ID, NONE_SELECTED_DATA_SOURCE_ID, USD_CURRENCY_ID, NO_OF_MONTHS_ON_LEFT_CLICKED_REGION, NO_OF_MONTHS_ON_RIGHT_CLICKED_REGION, DATE_FORMAT_CAP_WITHOUT_DATE } from '../../Constants.js'
+import { SECRET_KEY, MONTHS_IN_PAST_FOR_SUPPLY_PLAN, TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN, CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, NO_OF_MONTHS_ON_LEFT_CLICKED, ON_HOLD_SHIPMENT_STATUS, NO_OF_MONTHS_ON_RIGHT_CLICKED, DATE_FORMAT_CAP, INDEXED_DB_NAME, INDEXED_DB_VERSION, TBD_PROCUREMENT_AGENT_ID, NONE_SELECTED_DATA_SOURCE_ID, USD_CURRENCY_ID, NO_OF_MONTHS_ON_LEFT_CLICKED_REGION, NO_OF_MONTHS_ON_RIGHT_CLICKED_REGION, DATE_FORMAT_CAP_WITHOUT_DATE, TBD_FUNDING_SOURCE, QAT_SUGGESTED_DATA_SOURCE_ID, BATCH_PREFIX, SHIPMENT_MODIFIED } from '../../Constants.js'
 import getLabelText from '../../CommonComponent/getLabelText'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
@@ -38,9 +37,47 @@ import MonthBox from '../../CommonComponent/MonthBox.js'
 import { Prompt } from 'react-router'
 import jexcel from 'jspreadsheet';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
+import { generateRandomAplhaNumericCode, isSiteOnline, paddingZero } from "../../CommonComponent/JavascriptCommonFunctions.js";
+import { MultiSelect } from "react-multi-select-component";
+import { Formik } from 'formik';
+import * as Yup from 'yup'
+import '../../views/Forms/ValidationForms/ValidationForms.css'
 
 
 const entityname = i18n.t('static.dashboard.supplyPlan')
+
+const validate = (getValidationSchema) => {
+    return (values) => {
+        const validationSchema = getValidationSchema(values)
+        try {
+            validationSchema.validateSync(values, { abortEarly: false })
+            return {}
+        } catch (error) {
+            return getErrorsFromValidationError(error)
+        }
+    }
+}
+
+const getErrorsFromValidationError = (validationError) => {
+    const FIRST_ERROR = 0
+    return validationError.inner.reduce((errors, error) => {
+        return {
+            ...errors,
+            [error.path]: error.errors[FIRST_ERROR],
+        }
+    }, {})
+}
+
+const validationSchemaReplan = function (values) {
+    return Yup.object().shape({
+        procurementAgentId: Yup.string()
+            .required(i18n.t('static.procurementAgent.selectProcurementAgent')),
+        fundingSourceId: Yup.string()
+            .required(i18n.t('static.subfundingsource.errorfundingsource')),
+        budgetId: Yup.string()
+            .required(i18n.t('static.mt.selectBudget')),
+    })
+}
 
 
 export default class SupplyPlanComponent extends React.Component {
@@ -131,7 +168,22 @@ export default class SupplyPlanComponent extends React.Component {
             batchInfoInInventoryPopUp: [],
             ledgerForBatch: [],
             showBatchSaveButton: false,
-            programQPLDetails: []
+            programQPLDetails: [],
+            replanModal: false,
+            singleValue: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
+            minDateSingle: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
+            maxDateSingle: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
+            planningUnitIdsPlan: [],
+            procurementAgentListPlan: [],
+            procurementAgentId: TBD_PROCUREMENT_AGENT_ID,
+            fundingSourceListPlan: [],
+            fundingSourceId: TBD_FUNDING_SOURCE,
+            budgetListPlan: [],
+            budgetId: "",
+            budgetListPlanAll: [],
+            programResult: "",
+            showPlanningUnitAndQty: 0,
+            showPlanningUnitAndQtyList: []
             // startDateFormat:curDate
         }
 
@@ -171,6 +223,11 @@ export default class SupplyPlanComponent extends React.Component {
         this.hideThirdComponent = this.hideThirdComponent.bind(this);
         this.hideFourthComponent = this.hideFourthComponent.bind(this);
         this.hideFifthComponent = this.hideFifthComponent.bind(this);
+        this.toggleReplan = this.toggleReplan.bind(this);
+        this.setProcurementAgentId = this.setProcurementAgentId.bind(this);
+        this.setFundingSourceId = this.setFundingSourceId.bind(this);
+        this.setBudgetId = this.setBudgetId.bind(this);
+        this.planShipment = this.planShipment.bind(this)
     }
 
     _handleClickRangeBox(e) {
@@ -189,6 +246,7 @@ export default class SupplyPlanComponent extends React.Component {
         const monthDifference = moment(new Date(date)).diff(new Date(currentDate), 'months', true) + MONTHS_IN_PAST_FOR_SUPPLY_PLAN;
         this.setState({ startDate: value, monthCount: monthDifference })
         localStorage.setItem("sesStartDate", JSON.stringify(value));
+        console.log("Mohit form submit 19")
         this.formSubmit(this.state.planningUnit, monthDifference);
     }
 
@@ -306,6 +364,7 @@ export default class SupplyPlanComponent extends React.Component {
         }
         this.setState({ planningUnit: value, planningUnitId: value != "" && value != undefined ? value.value : 0, programJson: programJson }, () => {
             if (this.state.activeTab[0] === '2') {
+                console.log("Mohit form submit 20")
                 this.refs.compareChild.formSubmit(this.state.monthCount)
             }
         });
@@ -381,8 +440,10 @@ export default class SupplyPlanComponent extends React.Component {
             activeTab: newArray,
         });
         if (tab == 2) {
+            console.log("Mohit form submit 21")
             this.refs.compareChild.formSubmit(this.state.monthCount)
         } else {
+            console.log("Mohit form submit 22")
             this.formSubmit(this.state.planningUnit, this.state.monthCount);
         }
     }
@@ -1076,6 +1137,38 @@ export default class SupplyPlanComponent extends React.Component {
 
     tabPane = () => {
 
+        const { procurementAgentListPlan } = this.state;
+        let procurementAgents = procurementAgentListPlan.length > 0
+            && procurementAgentListPlan.map((item, i) => {
+                return (
+                    <option key={i} value={item.procurementAgentId}>
+                        {/* {item.name} */}
+                        {item.procurementAgentCode}
+                    </option>
+                )
+            }, this);
+
+        const { fundingSourceListPlan } = this.state;
+        let fundingSources = fundingSourceListPlan.length > 0
+            && fundingSourceListPlan.map((item, i) => {
+                return (
+                    <option key={i} value={item.fundingSourceId}>
+                        {/* {item.name} */}
+                        {item.fundingSourceCode}
+                    </option>
+                )
+            }, this);
+
+        const { budgetListPlan } = this.state;
+        let budgets = budgetListPlan.length > 0
+            && budgetListPlan.map((item, i) => {
+                return (
+                    <option key={i} value={item.budgetId}>
+                        {/* {item.name} */}
+                        {item.budgetCode}
+                    </option>
+                )
+            }, this);
         var chartOptions = {
             title: {
                 display: true,
@@ -1326,6 +1419,16 @@ export default class SupplyPlanComponent extends React.Component {
                 ]
 
             };
+
+        const pickerLang = {
+            months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            from: 'From', to: 'To',
+        }
+
+        const makeText = m => {
+            if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
+            return '?'
+        }
         return (
             <>
                 <TabPane tabId="1">
@@ -2155,6 +2258,179 @@ export default class SupplyPlanComponent extends React.Component {
                         </div>
                     </Modal>
                     {/* Shipments modal */}
+
+                    <Modal isOpen={this.state.replanModal}
+                        className={'modal-md'}>
+                        <ModalHeader toggle={() => this.toggleReplan()} className="modalHeaderSupplyPlan" id="shipmentModalHeader">
+                            <strong>{this.state.showPlanningUnitAndQty == 1 ? i18n.t("static.supplyPlan.listOfNewShipmentsCreated") : i18n.t("static.supplyPlan.planShipmentsByDate")}</strong>
+                        </ModalHeader>
+                        <Formik
+                            enableReinitialize={true}
+                            initialValues={{
+                                procurementAgentId: this.state.procurementAgentId,
+                                budgetId: this.state.budgetId,
+                                fundingSourceId: this.state.fundingSourceId
+                            }}
+                            validate={validate(validationSchemaReplan)}
+                            onSubmit={(values, { setSubmitting, setErrors }) => {
+                                this.planShipment();
+                            }}
+                            render={
+                                ({
+                                    values,
+                                    errors,
+                                    touched,
+                                    handleChange,
+                                    handleBlur,
+                                    handleSubmit,
+                                    isSubmitting,
+                                    isValid,
+                                    setTouched,
+                                    handleReset,
+                                    setFieldValue,
+                                    setFieldTouched
+                                }) => (
+                                    <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='userForm' autocomplete="off">
+                                        <ModalBody>
+
+                                            {this.state.showPlanningUnitAndQty == 0 && <>
+                                                <FormGroup className="col-md-12">
+                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.mtexpectedDeliveryDate')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                                                    <div className="controls edit">
+                                                        <Picker
+                                                            ref="pickAMonthSingle"
+                                                            years={{ min: this.state.minDateSingle, max: this.state.maxDateSingle }}
+                                                            value={this.state.singleValue}
+                                                            lang={pickerLang.months}
+                                                            theme="dark"
+                                                            key={JSON.stringify(this.state.singleValue)}
+                                                            onChange={this.handleAMonthChangeSingle}
+                                                            onDismiss={this.handleAMonthDissmisSingle}
+                                                        >
+                                                            <MonthBox value={makeText(this.state.singleValue)} onClick={this.handleClickMonthBoxSingle} />
+                                                        </Picker>
+                                                    </div>
+                                                </FormGroup>
+                                                <FormGroup className="col-md-12">
+                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.product.product')}
+                                                        <span className="reportdown-box-icon  fa fa-sort-desc"></span>
+                                                    </Label>
+                                                    <div className="controls ">
+                                                        {/* <InputGroup className="box"> */}
+                                                        <MultiSelect
+                                                            name="planningUnitIdsPlan"
+                                                            id="planningUnitIdsPlan"
+                                                            options={this.state.planningUnitList && this.state.planningUnitList.length > 0 ? this.state.planningUnitList : []}
+                                                            value={this.state.planningUnitIdsPlan}
+                                                            onChange={(e) => { this.setPlanningUnitIdsPlan(e) }}
+                                                            // onChange={(e) => { this.handlePlanningUnitChange(e) }}
+                                                            labelledBy={i18n.t('static.common.select')}
+                                                        />
+
+                                                    </div>
+                                                </FormGroup>
+
+                                                <FormGroup className="col-md-12">
+                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.report.procurementAgentName')}</Label>
+                                                    <div className="controls ">
+                                                        <InputGroup>
+                                                            <Input
+                                                                type="select"
+                                                                name="procurementAgentId"
+                                                                id="procurementAgentId"
+                                                                bsSize="sm"
+                                                                valid={!errors.procurementAgentId}
+                                                                invalid={touched.procurementAgentId && !!errors.procurementAgentId}
+                                                                onBlur={handleBlur}
+                                                                // onChange={this.filterVersion}
+                                                                onChange={(e) => { this.setProcurementAgentId(e); handleChange(e); }}
+                                                                value={this.state.procurementAgentId}
+
+                                                            >
+                                                                <option value="">{i18n.t('static.common.select')}</option>
+                                                                {procurementAgents}
+                                                            </Input>
+                                                            <FormFeedback>{errors.procurementAgentId}</FormFeedback>
+                                                        </InputGroup>
+                                                    </div>
+                                                </FormGroup>
+
+                                                <FormGroup className="col-md-12">
+                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.budget.fundingsource')}</Label>
+                                                    <div className="controls ">
+                                                        <InputGroup>
+                                                            <Input
+                                                                type="select"
+                                                                name="fundingSourceId"
+                                                                id="fundingSourceId"
+                                                                bsSize="sm"
+                                                                valid={!errors.fundingSourceId}
+                                                                invalid={touched.fundingSourceId && !!errors.fundingSourceId}
+                                                                onBlur={handleBlur}
+                                                                // onChange={this.filterVersion}
+                                                                onChange={(e) => { this.setFundingSourceId(e); handleChange(e); }}
+                                                                value={this.state.fundingSourceId}
+
+                                                            >
+                                                                <option value="">{i18n.t('static.common.select')}</option>
+                                                                {fundingSources}
+                                                            </Input>
+                                                            <FormFeedback>{errors.fundingSourceId}</FormFeedback>
+                                                        </InputGroup>
+                                                    </div>
+                                                </FormGroup>
+
+                                                <FormGroup className="col-md-12">
+                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.budget')}</Label>
+                                                    <div className="controls ">
+                                                        <InputGroup>
+                                                            <Input
+                                                                type="select"
+                                                                name="budgetId"
+                                                                id="budgetId"
+                                                                bsSize="sm"
+                                                                valid={!errors.budgetId}
+                                                                invalid={touched.budgetId && !!errors.budgetId}
+                                                                onBlur={handleBlur}
+                                                                // onChange={this.filterVersion}
+                                                                onChange={(e) => { this.setBudgetId(e);; handleChange(e); }}
+                                                                value={this.state.budgetId}
+
+                                                            >
+                                                                <option value="">{i18n.t('static.common.select')}</option>
+                                                                {budgets}
+                                                            </Input>
+                                                            <FormFeedback>{errors.budgetId}</FormFeedback>
+                                                        </InputGroup>
+                                                    </div>
+                                                </FormGroup>
+                                            </>}
+                                            {this.state.showPlanningUnitAndQty == 1 &&
+                                                <>
+                                                    <Table className="table-bordered text-center mt-2 main-table " bordered size="sm">
+                                                        <thead><tr>
+                                                            <th>{i18n.t('static.dashboard.planningunitheader')}</th>
+                                                            <th>{i18n.t('static.supplyPlan.shipmentQty')}</th>
+                                                        </tr></thead>
+                                                        <tbody>
+                                                            {this.state.showPlanningUnitAndQtyList.map(item => (
+                                                                <tr>
+                                                                    <td>{item.planningUnitLabel}</td>
+                                                                    <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.shipmentQty} /></td>
+                                                                </tr>
+                                                            ))}
+                                                        </tbody>
+                                                    </Table>
+                                                </>
+                                            }
+                                        </ModalBody>
+                                        <ModalFooter>
+                                            {this.state.showPlanningUnitAndQty == 0 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAllPlan(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t("static.supplyPlan.plan")}</Button>}
+                                        </ModalFooter>
+                                    </Form>
+                                )} />
+                    </Modal>
+
                     {/* Expired Stock modal */}
                     <Modal isOpen={this.state.expiredStockModal}
                         className={'modal-md modalWidthExpiredStock'}>
@@ -2491,117 +2767,164 @@ export default class SupplyPlanComponent extends React.Component {
                         this.hideFirstComponent()
                     }.bind(this);
                     planningunitRequest.onsuccess = function (e) {
-                        var myResult = [];
-                        var programId = (value != "" && value != undefined ? value.value : 0).split("_")[0];
-                        myResult = planningunitRequest.result.filter(c => c.program.id == programId);
-                        var proList = []
-                        for (var i = 0; i < myResult.length; i++) {
-                            if (myResult[i].program.id == programId && myResult[i].active == true) {
-                                var productJson = {
-                                    label: getLabelText(myResult[i].planningUnit.label, this.state.lang),
-                                    value: myResult[i].planningUnit.id
-                                }
-                                proList.push(productJson);
-                                planningList.push(myResult[i]);
-                            }
-                        }
-                        var puTransaction = db1.transaction(['planningUnit'], 'readwrite');
-                        var puOs = puTransaction.objectStore('planningUnit');
-                        var puRequest = puOs.getAll();
-                        var planningUnitListForConsumption = []
-                        puRequest.onerror = function (event) {
-                            this.setState({
-                                supplyPlanError: i18n.t('static.program.errortext'),
-                                loading: false,
-                                color: "#BA0C2F"
-                            })
-                            this.hideFirstComponent()
-                        }.bind(this);
-                        puRequest.onsuccess = function (e) {
-                            var puResult = [];
-                            puResult = puRequest.result;
-                            planningUnitListForConsumption = puResult;
+                        var paTransaction = db1.transaction(['procurementAgent'], 'readwrite');
+                        var paTransaction = paTransaction.objectStore('procurementAgent');
+                        var paRequest = paTransaction.getAll();
+                        paRequest.onsuccess = function (event) {
 
-                            var dataSourceTransaction = db1.transaction(['dataSource'], 'readwrite');
-                            var dataSourceOs = dataSourceTransaction.objectStore('dataSource');
-                            var dataSourceRequest = dataSourceOs.getAll();
-                            dataSourceRequest.onerror = function (event) {
-                                this.setState({
-                                    supplyPlanError: i18n.t('static.program.errortext'),
-                                    loading: false,
-                                    color: "#BA0C2F"
-                                })
-                                this.hideFirstComponent()
-                            }.bind(this);
-                            dataSourceRequest.onsuccess = function (event) {
-                                var dataSourceResult = [];
-                                dataSourceResult = dataSourceRequest.result;
-                                for (var k = 0; k < dataSourceResult.length; k++) {
-                                    if (dataSourceResult[k].program == null || dataSourceResult[k].program.id == programJson.programId || dataSourceResult[k].program.id == 0 && dataSourceResult[k].active == true) {
-                                        if (dataSourceResult[k].realm.id == programJson.realmCountry.realm.realmId) {
-                                            dataSourceListAll.push(dataSourceResult[k]);
+                            var fsTransaction = db1.transaction(['fundingSource'], 'readwrite');
+                            var fsTransaction = fsTransaction.objectStore('fundingSource');
+                            var fsRequest = fsTransaction.getAll();
+                            fsRequest.onsuccess = function (event) {
 
-                                        }
-                                    }
-                                }
-                                this.setState({
-                                    planningUnitList: proList.sort(function (a, b) {
-                                        a = a.label.toLowerCase();
-                                        b = b.label.toLowerCase();
-                                        return a < b ? -1 : a > b ? 1 : 0;
-                                    }),
-                                    programPlanningUnitList: myResult,
-                                    planningUnitListAll: myResult,
-                                    regionList: regionList.sort(function (a, b) {
-                                        a = a.name.toLowerCase();
-                                        b = b.name.toLowerCase();
-                                        return a < b ? -1 : a > b ? 1 : 0;
-                                    }),
-                                    generalProgramJson: programJson,
-                                    planningUnitDataList: planningUnitDataList,
-                                    dataSourceListAll: dataSourceListAll,
-                                    planningUnitListForConsumption: planningUnitListForConsumption,
-                                    loading: false
-                                }, () => {
-                                    // var planningUnitIdProp = this.props.match.params.planningUnitId || localStorage.getItem("sesPlanningUnitId");
-                                    var planningUnitIdProp = '';
-                                    if (this.props.match.params.planningUnitId != '' && this.props.match.params.planningUnitId != undefined) {
-                                        planningUnitIdProp = this.props.match.params.planningUnitId;
-                                    } else if (localStorage.getItem("sesPlanningUnitId") != '' && localStorage.getItem("sesPlanningUnitId") != undefined) {
-                                        planningUnitIdProp = localStorage.getItem("sesPlanningUnitId");
-                                    } else if (proList.length == 1) {
-                                        planningUnitIdProp = proList[0].value;
-                                    }
-                                    if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
-                                        var planningUnit = proList.filter(c => c.value == planningUnitIdProp).length > 0 ? { value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label } : { value: "", label: "" };
-                                        // var planningUnit = { value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label };
-                                        var planningUnitDataFilter = planningUnitDataList.filter(c => c.planningUnitId == planningUnitIdProp);
-                                        var programJson = {};
-                                        if (planningUnitDataFilter.length > 0) {
-                                            var planningUnitData = planningUnitDataFilter[0]
-                                            var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
-                                            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                                            programJson = JSON.parse(programData);
-                                        } else {
-                                            programJson = {
-                                                consumptionList: [],
-                                                inventoryList: [],
-                                                shipmentList: [],
-                                                batchInfoList: [],
-                                                supplyPlan: []
+                                var bTransaction = db1.transaction(['budget'], 'readwrite');
+                                var bTransaction = bTransaction.objectStore('budget');
+                                var bRequest = bTransaction.getAll();
+                                bRequest.onsuccess = function (event) {
+                                    var programId = (value != "" && value != undefined ? value.value : 0).split("_")[0];
+                                    var paResult = paRequest.result;
+                                    var procurementAgentListPlan = [];
+                                    for (var i = 0; i < paResult.length; i++) {
+                                        for (var j = 0; j < paResult[i].programList.length; j++) {
+                                            if (paResult[i].programList[j].id == programId) {
+                                                procurementAgentListPlan.push(paResult[i]);
                                             }
                                         }
-                                        this.setState({
-                                            planningUnit: planningUnit,
-                                            planningUnitId: planningUnitIdProp,
-                                            programJson: programJson
-                                        })
-                                        this.formSubmit(planningUnit, this.state.monthCount);
                                     }
-                                })
+                                    var fundingSourceListPlan = fsRequest.result;
+                                    // .filter(c => c.realm.id == generalProgramJson.realmCountry.realm.realmId);
+                                    var budgetListPlan = bRequest.result.filter(c => c.program.id == programId);
+                                    console.log("budgetListPlan", budgetListPlan)
+                                    var myResult = [];
+                                    myResult = planningunitRequest.result.filter(c => c.program.id == programId);
+                                    var proList = []
+                                    for (var i = 0; i < myResult.length; i++) {
+                                        if (myResult[i].program.id == programId && myResult[i].active == true) {
+                                            var productJson = {
+                                                label: getLabelText(myResult[i].planningUnit.label, this.state.lang),
+                                                value: myResult[i].planningUnit.id
+                                            }
+                                            proList.push(productJson);
+                                            planningList.push(myResult[i]);
+                                        }
+                                    }
+                                    var puTransaction = db1.transaction(['planningUnit'], 'readwrite');
+                                    var puOs = puTransaction.objectStore('planningUnit');
+                                    var puRequest = puOs.getAll();
+                                    var planningUnitListForConsumption = []
+                                    puRequest.onerror = function (event) {
+                                        this.setState({
+                                            supplyPlanError: i18n.t('static.program.errortext'),
+                                            loading: false,
+                                            color: "#BA0C2F"
+                                        })
+                                        this.hideFirstComponent()
+                                    }.bind(this);
+                                    puRequest.onsuccess = function (e) {
+                                        var puResult = [];
+                                        puResult = puRequest.result;
+                                        planningUnitListForConsumption = puResult;
 
-                            }.bind(this);
-                        }.bind(this);
+                                        var dataSourceTransaction = db1.transaction(['dataSource'], 'readwrite');
+                                        var dataSourceOs = dataSourceTransaction.objectStore('dataSource');
+                                        var dataSourceRequest = dataSourceOs.getAll();
+                                        dataSourceRequest.onerror = function (event) {
+                                            this.setState({
+                                                supplyPlanError: i18n.t('static.program.errortext'),
+                                                loading: false,
+                                                color: "#BA0C2F"
+                                            })
+                                            this.hideFirstComponent()
+                                        }.bind(this);
+                                        dataSourceRequest.onsuccess = function (event) {
+                                            var dataSourceResult = [];
+                                            dataSourceResult = dataSourceRequest.result;
+                                            for (var k = 0; k < dataSourceResult.length; k++) {
+                                                if (dataSourceResult[k].program == null || dataSourceResult[k].program.id == programJson.programId || dataSourceResult[k].program.id == 0 && dataSourceResult[k].active == true) {
+                                                    if (dataSourceResult[k].realm.id == programJson.realmCountry.realm.realmId) {
+                                                        dataSourceListAll.push(dataSourceResult[k]);
+
+                                                    }
+                                                }
+                                            }
+                                            this.setState({
+                                                planningUnitList: proList.sort(function (a, b) {
+                                                    a = a.label.toLowerCase();
+                                                    b = b.label.toLowerCase();
+                                                    return a < b ? -1 : a > b ? 1 : 0;
+                                                }),
+                                                procurementAgentListPlan: procurementAgentListPlan.filter(c => c.active.toString() == "true").sort(function (a, b) {
+                                                    a = a.procurementAgentCode.toLowerCase();
+                                                    b = b.procurementAgentCode.toLowerCase();
+                                                    return a < b ? -1 : a > b ? 1 : 0;
+                                                }),
+                                                fundingSourceListPlan: fundingSourceListPlan.filter(c => c.active.toString() == "true").sort(function (a, b) {
+                                                    a = a.fundingSourceCode.toLowerCase();
+                                                    b = b.fundingSourceCode.toLowerCase();
+                                                    return a < b ? -1 : a > b ? 1 : 0;
+                                                }),
+                                                budgetListPlanAll: budgetListPlan.filter(c => c.active.toString() == "true").sort(function (a, b) {
+                                                    a = a.budgetCode.toLowerCase();
+                                                    b = b.budgetCode.toLowerCase();
+                                                    return a < b ? -1 : a > b ? 1 : 0;
+                                                }),
+
+                                                programPlanningUnitList: myResult,
+                                                planningUnitListAll: myResult,
+                                                regionList: regionList.sort(function (a, b) {
+                                                    a = a.name.toLowerCase();
+                                                    b = b.name.toLowerCase();
+                                                    return a < b ? -1 : a > b ? 1 : 0;
+                                                }),
+                                                generalProgramJson: programJson,
+                                                planningUnitDataList: planningUnitDataList,
+                                                dataSourceListAll: dataSourceListAll,
+                                                planningUnitListForConsumption: planningUnitListForConsumption,
+                                                loading: false
+                                            }, () => {
+                                                // var planningUnitIdProp = this.props.match.params.planningUnitId || localStorage.getItem("sesPlanningUnitId");
+                                                var planningUnitIdProp = '';
+                                                if (this.props.match.params.planningUnitId != '' && this.props.match.params.planningUnitId != undefined) {
+                                                    planningUnitIdProp = this.props.match.params.planningUnitId;
+                                                } else if (localStorage.getItem("sesPlanningUnitId") != '' && localStorage.getItem("sesPlanningUnitId") != undefined) {
+                                                    planningUnitIdProp = localStorage.getItem("sesPlanningUnitId");
+                                                } else if (proList.length == 1) {
+                                                    planningUnitIdProp = proList[0].value;
+                                                }
+                                                if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
+                                                    var planningUnit = proList.filter(c => c.value == planningUnitIdProp).length > 0 ? { value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label } : { value: "", label: "" };
+                                                    // var planningUnit = { value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label };
+                                                    var planningUnitDataFilter = planningUnitDataList.filter(c => c.planningUnitId == planningUnitIdProp);
+                                                    var programJson = {};
+                                                    if (planningUnitDataFilter.length > 0) {
+                                                        var planningUnitData = planningUnitDataFilter[0]
+                                                        var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                                                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                                                        programJson = JSON.parse(programData);
+                                                    } else {
+                                                        programJson = {
+                                                            consumptionList: [],
+                                                            inventoryList: [],
+                                                            shipmentList: [],
+                                                            batchInfoList: [],
+                                                            supplyPlan: []
+                                                        }
+                                                    }
+                                                    this.setState({
+                                                        planningUnit: planningUnit,
+                                                        planningUnitId: planningUnitIdProp,
+                                                        programJson: programJson
+                                                    })
+                                                    console.log("Mohit form submit 23")
+                                                    this.formSubmit(planningUnit, this.state.monthCount);
+                                                }
+                                            })
+
+                                        }.bind(this);
+                                    }.bind(this);
+                                }.bind(this);
+                            }.bind(this)
+                        }.bind(this)
                     }.bind(this);
                 }.bind(this)
             }.bind(this)
@@ -2630,6 +2953,8 @@ export default class SupplyPlanComponent extends React.Component {
     }
 
     formSubmit(value, monthCount) {
+        console.log("In form submit@@@@@",value)
+        console.log("In form submit@@@@@",monthCount)
         // this.setState({
         //     showTotalShipment: false,
         //     showManualShipment: false,
@@ -2800,6 +3125,7 @@ export default class SupplyPlanComponent extends React.Component {
                         var papuResult = [];
                         papuResult = papuRequest.result;
                         var supplyPlanData = [];
+                        console.log("programJson@@@@@@@@",programJson)
                         if (programJson.supplyPlan != undefined) {
                             supplyPlanData = (programJson.supplyPlan).filter(c => c.planningUnitId == planningUnitId);
                         }
@@ -3535,6 +3861,7 @@ export default class SupplyPlanComponent extends React.Component {
                     monthCountConsumption: monthCountConsumption,
                     consumptionStartDateClicked: count != undefined ? this.state.monthsArray[count].startDate : moment(Date.now()).startOf('month').format("YYYY-MM-DD")
                 }, () => {
+                    console.log("Mohit form submit 24")
                     this.formSubmit(this.state.planningUnit, monthCountConsumption);
                 });
             } else if (supplyPlanType == 'SuggestedShipments') {
@@ -3560,6 +3887,7 @@ export default class SupplyPlanComponent extends React.Component {
                     monthCountAdjustments: monthCountAdjustments,
                     inventoryStartDateClicked: count != undefined ? this.state.monthsArray[count].startDate : moment(Date.now()).startOf('month').format("YYYY-MM-DD")
                 }, () => {
+                    console.log("Mohit form submit 25")
                     this.formSubmit(this.state.planningUnit, monthCountAdjustments);
                 });
             } else if (supplyPlanType == 'expiredStock') {
@@ -3669,6 +3997,7 @@ export default class SupplyPlanComponent extends React.Component {
         this.setState({
             monthCount: monthCount
         })
+        console.log("Mohit form submit 26")
         this.formSubmit(this.state.planningUnit, monthCount)
     }
 
@@ -3677,6 +4006,7 @@ export default class SupplyPlanComponent extends React.Component {
         this.setState({
             monthCount: monthCount
         })
+        console.log("Mohit form submit 27")
         this.formSubmit(this.state.planningUnit, monthCount)
     }
 
@@ -3685,6 +4015,7 @@ export default class SupplyPlanComponent extends React.Component {
         this.setState({
             monthCountConsumption: monthCountConsumption
         })
+        console.log("Mohit form submit 28")
         this.formSubmit(this.state.planningUnit, monthCountConsumption)
     }
 
@@ -3693,6 +4024,7 @@ export default class SupplyPlanComponent extends React.Component {
         this.setState({
             monthCountConsumption: monthCountConsumption
         })
+        console.log("Mohit form submit 29")
         this.formSubmit(this.state.planningUnit, monthCountConsumption);
     }
 
@@ -3701,6 +4033,7 @@ export default class SupplyPlanComponent extends React.Component {
         this.setState({
             monthCountAdjustments: monthCountAdjustments
         })
+        console.log("Mohit form submit 30")
         this.formSubmit(this.state.planningUnit, monthCountAdjustments)
     }
 
@@ -3709,6 +4042,7 @@ export default class SupplyPlanComponent extends React.Component {
         this.setState({
             monthCountAdjustments: monthCountAdjustments
         })
+        console.log("Mohit form submit 31")
         this.formSubmit(this.state.planningUnit, monthCountAdjustments);
     }
 
@@ -4039,6 +4373,20 @@ export default class SupplyPlanComponent extends React.Component {
     }
     // Shipments Functionality
 
+    toggleReplan() {
+        var budgetList = this.state.budgetListPlanAll.filter(c => c.fundingSource.fundingSourceId == TBD_FUNDING_SOURCE);
+        this.setState({
+            replanModal: !this.state.replanModal,
+            budgetListPlan: budgetList,
+            procurementAgentId: TBD_PROCUREMENT_AGENT_ID,
+            fundingSourceId: TBD_FUNDING_SOURCE,
+            budgetId: budgetList.length == 1 ? budgetList[0].budgetId : "",
+            showPlanningUnitAndQtyList: [],
+            showPlanningUnitAndQty: 0,
+            planningUnitIdsPlan: [],
+            singleValue: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
+        })
+    }
 
     render() {
         const { programList } = this.state;
@@ -4066,6 +4414,7 @@ export default class SupplyPlanComponent extends React.Component {
                         {/* <strong>{i18n.t('static.dashboard.supplyPlan')}</strong> */}
                         <div className="card-header-actions">
                             <a className="card-header-action">
+                                {this.state.programId != 0 && <a href="javascript:void();" onClick={this.toggleReplan}><i className="fa fa-calendar"></i></a>}&nbsp;&nbsp;
                                 <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggle() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span>
                                 {/* <Link to='/supplyPlanFormulas' target="_blank"><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></Link> */}
                             </a>
@@ -5534,5 +5883,408 @@ export default class SupplyPlanComponent extends React.Component {
             }.bind(this)
         })
 
+    }
+
+    handleClickMonthBoxSingle = (e) => {
+        this.refs.pickAMonthSingle.show()
+    }
+    handleAMonthChangeSingle = (value, text) => {
+        //
+        //
+    }
+    handleAMonthDissmisSingle = (value) => {
+        this.setState({ singleValue: value })
+
+    }
+
+
+
+    setPlanningUnitIdsPlan(e) {
+        this.setState({
+            planningUnitIdsPlan: e,
+        })
+    }
+
+    setProcurementAgentId(e) {
+        this.setState({
+            procurementAgentId: e.target.value
+        })
+    }
+
+
+    setFundingSourceId(e) {
+        var budgetList = this.state.budgetListPlanAll.filter(c => c.fundingSource.fundingSourceId == e.target.value);
+        this.setState({
+            fundingSourceId: e.target.value,
+            budgetListPlan: budgetList,
+            budgetId: budgetList.length == 1 ? budgetList[0].budgetId : "",
+        })
+    }
+
+    setBudgetId(e) {
+        this.setState({
+            budgetId: e.target.value
+        })
+    }
+
+    planShipment() {
+        var programId = document.getElementById('programId').value;
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onerror = function (event) {
+            this.setState({
+                message: i18n.t('static.program.errortext'),
+                color: '#BA0C2F'
+            })
+            this.hideFirstComponent()
+        }.bind(this);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['programData'], 'readwrite');
+            var programTransaction = transaction.objectStore('programData');
+            var programRequest = programTransaction.get(programId);
+            programRequest.onerror = function (event) {
+                this.setState({
+                    message: i18n.t('static.program.errortext'),
+                    color: '#BA0C2F'
+                })
+                this.hideFirstComponent()
+            }.bind(this);
+            programRequest.onsuccess = function (event) {
+
+                var dsTransaction = db1.transaction(['dataSource'], 'readwrite');
+                var dsTransaction1 = dsTransaction.objectStore('dataSource');
+                var dsRequest = dsTransaction1.getAll();
+                dsRequest.onsuccess = function (event) {
+
+                    var ssTransaction = db1.transaction(['shipmentStatus'], 'readwrite');
+                    var ssTransaction1 = ssTransaction.objectStore('shipmentStatus');
+                    var ssRequest = ssTransaction1.getAll();
+                    ssRequest.onsuccess = function (event) {
+
+                        var cTransaction = db1.transaction(['currency'], 'readwrite');
+                        var cTransaction1 = cTransaction.objectStore('currency');
+                        var cRequest = cTransaction1.getAll();
+                        cRequest.onsuccess = function (event) {
+
+                            var papuTransaction = db1.transaction(['procurementAgentPlanningUnit'], 'readwrite');
+                            var papuTransaction1 = papuTransaction.objectStore('procurementAgentPlanningUnit');
+                            var papuRequest = papuTransaction1.getAll();
+                            papuRequest.onsuccess = function (event) {
+
+                                var rcpuTransaction = db1.transaction(['realmCountryPlanningUnit'], 'readwrite');
+                                var rcpuTransaction1 = rcpuTransaction.objectStore('realmCountryPlanningUnit');
+                                var rcpuRequest = rcpuTransaction1.getAll();
+                                rcpuRequest.onsuccess = function (event) {
+                                    var showPlanningUnitAndQtyList = []
+                                    var generalProgramDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
+                                    var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
+                                    var generalProgramJson = JSON.parse(generalProgramData);
+                                    var actionList = generalProgramJson.actionList;
+                                    var realmTransaction = db1.transaction(['realm'], 'readwrite');
+                                    var realmOs = realmTransaction.objectStore('realm');
+                                    var realmRequest = realmOs.get(generalProgramJson.realmCountry.realm.realmId);
+                                    realmRequest.onsuccess = function (event) {
+
+
+                                        var planningUnitsIds = this.state.planningUnitIdsPlan;
+                                        var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+                                        var curUser = AuthenticationService.getLoggedInUserId();
+                                        var username = AuthenticationService.getLoggedInUsername();
+                                        for (var pu = 0; pu < planningUnitsIds.length; pu++) {
+
+                                            var programPlanningUnit = this.state.planningUnitListAll.filter(p => p.program.id == generalProgramJson.programId && p.planningUnit.id == planningUnitsIds[pu].value)[0];
+                                            var maxForMonths = 0;
+                                            var realm = realmRequest.result;
+                                            var DEFAULT_MIN_MONTHS_OF_STOCK = realm.minMosMinGaurdrail;
+                                            var DEFAULT_MIN_MAX_MONTHS_OF_STOCK = realm.minMosMaxGaurdrail;
+                                            if (DEFAULT_MIN_MONTHS_OF_STOCK > programPlanningUnit.minMonthsOfStock) {
+                                                maxForMonths = DEFAULT_MIN_MONTHS_OF_STOCK
+                                            } else {
+                                                maxForMonths = programPlanningUnit.minMonthsOfStock
+                                            }
+                                            var minStockMoSQty = parseInt(maxForMonths);
+
+                                            // Calculations for Max Stock
+                                            var minForMonths = 0;
+                                            var DEFAULT_MAX_MONTHS_OF_STOCK = realm.maxMosMaxGaurdrail;
+                                            if (DEFAULT_MAX_MONTHS_OF_STOCK < (maxForMonths + programPlanningUnit.reorderFrequencyInMonths)) {
+                                                minForMonths = DEFAULT_MAX_MONTHS_OF_STOCK
+                                            } else {
+                                                minForMonths = (maxForMonths + programPlanningUnit.reorderFrequencyInMonths);
+                                            }
+                                            var maxStockMoSQty = parseInt(minForMonths);
+                                            if (maxStockMoSQty < DEFAULT_MIN_MAX_MONTHS_OF_STOCK) {
+                                                maxStockMoSQty = DEFAULT_MIN_MAX_MONTHS_OF_STOCK;
+                                            }
+                                            var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
+                                            var planningUnitDataFilter = planningUnitDataList.filter(c => c.planningUnitId == planningUnitsIds[pu].value);
+                                            var planningUnitDataIndex = planningUnitDataList.findIndex(c => c.planningUnitId == planningUnitsIds[pu].value);
+                                            var programJson = {};
+                                            if (planningUnitDataFilter.length > 0) {
+                                                var planningUnitData = planningUnitDataFilter[0]
+                                                var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                                                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                                                programJson = JSON.parse(programData);
+                                            } else {
+                                                programJson = {
+                                                    consumptionList: [],
+                                                    inventoryList: [],
+                                                    shipmentList: [],
+                                                    batchInfoList: [],
+                                                    supplyPlan: []
+                                                }
+                                            }
+
+
+                                            console.log("ProgramJson@@@@@@@@@@", programJson);
+                                            var month = moment(this.state.singleValue.year + (this.state.singleValue.month <= 9 ? "-0" + this.state.singleValue.month : this.state.singleValue.month) + "-01").format("YYYY-MM-DD")
+                                            var sstd = {}
+                                            var currentMonth = moment(Date.now()).utcOffset('-0500').startOf('month').format("YYYY-MM-DD");
+                                            var compare = (moment(month).format("YYYY-MM") >= moment(currentMonth).format("YYYY-MM"));
+                                            console.log("suingle Mohit", this.state.singleValue)
+                                            console.log("Month Mohit", month)
+                                            console.log("Current minth Mohit", currentMonth)
+                                            console.log("Compare Mohit", compare)
+                                            var supplyPlanData = programJson.supplyPlan;
+                                            var shipmentDataList = programJson.shipmentList;
+                                            var batchInfoList = programJson.batchInfoList;
+                                            // var stockInHand = jsonList[0].closingBalance;
+                                            var spd1 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(month).format("YYYY-MM"));
+                                            var amc = spd1.length > 0 ? Math.round(Number(spd1[0].amc)) : 0;
+                                            var spd2 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(month).add(1, 'months').format("YYYY-MM"));
+                                            var spd3 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(month).add(2, 'months').format("YYYY-MM"));
+                                            var mosForMonth1 = spd1.length > 0 ? spd1[0].mos : 0;
+                                            var mosForMonth2 = spd2.length > 0 ? spd2[0].mos : 0;
+                                            var mosForMonth3 = spd3.length > 0 ? spd3[0].mos : 0;
+
+                                            var suggestShipment = false;
+                                            var useMax = false;
+                                            if (compare) {
+                                                if (Number(amc) == 0) {
+                                                    suggestShipment = false;
+                                                } else if (Number(mosForMonth1) != 0 && Number(mosForMonth1) < Number(minStockMoSQty) && (Number(mosForMonth2) > Number(minStockMoSQty) || Number(mosForMonth3) > Number(minStockMoSQty))) {
+                                                    suggestShipment = false;
+                                                } else if (Number(mosForMonth1) != 0 && Number(mosForMonth1) < Number(minStockMoSQty) && Number(mosForMonth2) < Number(minStockMoSQty) && Number(mosForMonth3) < Number(minStockMoSQty)) {
+                                                    suggestShipment = true;
+                                                    useMax = true;
+                                                } else if (Number(mosForMonth1) == 0) {
+                                                    suggestShipment = true;
+                                                    if (Number(mosForMonth2) < Number(minStockMoSQty) && Number(mosForMonth3) < Number(minStockMoSQty)) {
+                                                        useMax = true;
+                                                    } else {
+                                                        useMax = false;
+                                                    }
+                                                }
+                                            } else {
+                                                suggestShipment = false;
+                                            }
+                                            console.log("suggestShipment Mohit", suggestShipment)
+                                            if (suggestShipment) {
+                                                var suggestedOrd = 0;
+                                                if (useMax) {
+                                                    suggestedOrd = Number((amc * Number(maxStockMoSQty)) - Number(spd1[0].closingBalance) + Number(spd1[0].unmetDemand));
+                                                } else {
+                                                    suggestedOrd = Number((amc * Number(minStockMoSQty)) - Number(spd1[0].closingBalance) + Number(spd1[0].unmetDemand));
+                                                }
+                                                if (suggestedOrd <= 0) {
+                                                } else {
+
+                                                    var procurementAgentPlanningUnit = papuRequest.result.filter(c => c.procurementAgent.id == this.state.procurementAgentId && c.planningUnit.id == planningUnitsIds[pu].value && c.active);
+                                                    var pricePerUnit = 0;
+                                                    var programPriceList = programPlanningUnit.programPlanningUnitProcurementAgentPrices.filter(c => c.program.id == generalProgramJson.programId && c.procurementAgent.id == this.state.procurementAgentId && c.planningUnit.id == planningUnitsIds[pu].value && c.active);
+                                                    if (programPriceList.length > 0) {
+                                                        pricePerUnit = Number(programPriceList[0].price);
+                                                    } else {
+                                                        if (procurementAgentPlanningUnit.length > 0) {
+                                                            pricePerUnit = Number(procurementAgentPlanningUnit[0].catalogPrice);
+                                                        } else {
+                                                            pricePerUnit = programPlanningUnit.catalogPrice
+                                                        }
+                                                    }
+
+
+                                                    console.log("Planning Unit Id", planningUnitsIds[pu]);
+                                                    console.log("Plan shipment with Qty Mohit", suggestedOrd);
+                                                    var c = cRequest.result.filter(c => c.currencyId == USD_CURRENCY_ID)[0];
+                                                    var rcpu = rcpuRequest.result.filter(c => c.multiplier == 1 && c.planningUnit.id == planningUnitsIds[pu].value)[0]
+                                                    var programId = (document.getElementById("programId").value).split("_")[0];
+                                                    var planningUnitId = planningUnitsIds[pu].value;
+                                                    var batchNo = (BATCH_PREFIX).concat(paddingZero(programId, 0, 6)).concat(paddingZero(planningUnitId, 0, 8)).concat(moment(Date.now()).format("YYMMDD")).concat(generateRandomAplhaNumericCode(3));
+                                                    var expiryDate = moment(month).add(programPlanningUnit.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
+                                                    var batchInfo = [{
+                                                        shipmentTransBatchInfoId: 0,
+                                                        batch: {
+                                                            batchNo: batchNo,
+                                                            expiryDate: expiryDate,
+                                                            batchId: 0,
+                                                            autoGenerated: true,
+                                                            createdDate: moment(month).format("YYYY-MM-DD")
+                                                        },
+                                                        shipmentQty: suggestedOrd
+                                                    }]
+                                                    console.log("Number(Number(pricePerUnit)*Number(suggestedOrd)) Mohit", Number(Number(pricePerUnit) * Number(suggestedOrd)))
+                                                    console.log("Number(Number(pricePerUnit)*Number(suggestedOrd)) Mohit 1", generalProgramJson)
+                                                    shipmentDataList.push({
+                                                        accountFlag: true,
+                                                        active: true,
+                                                        dataSource: {
+                                                            id: QAT_SUGGESTED_DATA_SOURCE_ID,
+                                                            label: (dsRequest.result).filter(c => c.dataSourceId == QAT_SUGGESTED_DATA_SOURCE_ID)[0].label
+                                                        },
+                                                        realmCountryPlanningUnit: {
+                                                            id: rcpu.realmCountryPlanningUnitId,
+                                                            label: rcpu.label,
+                                                            multiplier: rcpu.multiplier
+                                                        },
+                                                        erpFlag: false,
+                                                        localProcurement: false,
+                                                        freightCost: Number(Number(pricePerUnit) * Number(suggestedOrd)) * (Number(Number(generalProgramJson.seaFreightPerc) / 100)),
+                                                        notes: i18n.t('static.supplyPlan.planByDateNote'),
+                                                        planningUnit: {
+                                                            id: planningUnitsIds[pu].value,
+                                                            label: (this.state.planningUnitList.filter(c => c.value == planningUnitsIds[pu].value)[0]).label
+                                                        },
+                                                        procurementAgent: {
+                                                            id: this.state.procurementAgentId,
+                                                            code: this.state.procurementAgentListPlan.filter(c => c.procurementAgentId == this.state.procurementAgentId)[0].procurementAgentCode,
+                                                            label: this.state.procurementAgentListPlan.filter(c => c.procurementAgentId == this.state.procurementAgentId)[0].label
+                                                        },
+                                                        productCost: (Number(pricePerUnit) * Number(suggestedOrd)).toFixed(2),
+                                                        shipmentRcpuQty: suggestedOrd,
+                                                        shipmentQty: suggestedOrd,
+                                                        rate: pricePerUnit,
+                                                        shipmentId: 0,
+                                                        shipmentMode: "Sea",
+                                                        shipmentStatus: {
+                                                            id: PLANNED_SHIPMENT_STATUS,
+                                                            label: (ssRequest.result).filter(c => c.shipmentStatusId == PLANNED_SHIPMENT_STATUS)[0].label
+                                                        },
+                                                        suggestedQty: suggestedOrd,
+                                                        budget: {
+                                                            id: this.state.budgetId,
+                                                            code: this.state.budgetListPlanAll.filter(c => c.budgetId == this.state.budgetId)[0].budgetCode,
+                                                            label: this.state.budgetListPlanAll.filter(c => c.budgetId == this.state.budgetId)[0].label,
+                                                        },
+                                                        emergencyOrder: false,
+                                                        currency: c,
+                                                        fundingSource: {
+                                                            id: this.state.fundingSourceId,
+                                                            code: this.state.fundingSourceListPlan.filter(c => c.fundingSourceId == this.state.fundingSourceId)[0].fundingSourceCode,
+                                                            label: this.state.fundingSourceListPlan.filter(c => c.fundingSourceId == this.state.fundingSourceId)[0].label,
+                                                        },
+                                                        plannedDate: null,
+                                                        submittedDate: null,
+                                                        approvedDate: null,
+                                                        shippedDate: null,
+                                                        arrivedDate: null,
+                                                        expectedDeliveryDate: moment(month).format("YYYY-MM-DD"),
+                                                        receivedDate: null,
+                                                        index: shipmentDataList.length,
+                                                        tempShipmentId: planningUnitsIds[pu].value.toString().concat(shipmentDataList.length),
+                                                        batchInfoList: batchInfo,
+                                                        orderNo: "",
+                                                        createdBy: {
+                                                            userId: curUser,
+                                                            username: username
+                                                        },
+                                                        createdDate: curDate,
+                                                        lastModifiedBy: {
+                                                            userId: curUser,
+                                                            username: username
+                                                        },
+                                                        lastModifiedDate: curDate,
+                                                        parentLinkedShipmentId: null,
+                                                        tempParentLinkedShipmentId: null
+                                                    })
+                                                    showPlanningUnitAndQtyList.push({
+                                                        planningUnitLabel: getLabelText(programPlanningUnit.planningUnit.label, this.state.lang),
+                                                        shipmentQty: suggestedOrd
+                                                    })
+                                                    var batchDetails = {
+                                                        batchId: 0,
+                                                        batchNo: batchNo,
+                                                        planningUnitId: planningUnitsIds[pu].value,
+                                                        expiryDate: expiryDate,
+                                                        createdDate: moment(month).format("YYYY-MM-DD"),
+                                                        autoGenerated: true
+                                                    }
+                                                    batchInfoList.push(batchDetails);
+                                                }
+                                            }
+                                            programJson.shipmentList = shipmentDataList;
+                                            programJson.batchInfoList = batchInfoList;
+                                            if (planningUnitDataIndex != -1) {
+                                                planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                                            } else {
+                                                planningUnitDataList.push({ planningUnitId: planningUnitsIds[pu].value, planningUnitData: (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString() });
+                                            }
+
+                                        }
+                                        for (var p = 0; p < planningUnitsIds.length; p++) {
+                                            actionList.push({
+                                                planningUnitId: planningUnitsIds[p].value,
+                                                type: SHIPMENT_MODIFIED,
+                                                date: moment(month).startOf('month').format("YYYY-MM-DD")
+
+                                            })
+                                        }
+                                        this.setState({
+                                            showPlanningUnitAndQtyList: showPlanningUnitAndQtyList
+                                        })
+                                        generalProgramJson.actionList = actionList;
+                                        programRequest.result.programData.planningUnitDataList = planningUnitDataList;
+                                        programRequest.result.programData.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString();
+                                        var transaction1 = db1.transaction(['programData'], 'readwrite');
+                                        var programTransaction1 = transaction1.objectStore('programData');
+                                        var putRequest = programTransaction1.put(programRequest.result);
+                                        putRequest.onsuccess = function (event) {
+                                            var programId = (document.getElementById("programId").value)
+                                            var puList = [...new Set(this.state.planningUnitIdsPlan.map(ele => ele.value))];
+                                            if (puList.length > 0 && showPlanningUnitAndQtyList.length > 0) {
+                                                calculateSupplyPlan(programId, 0, 'programData', 'shipment1', this, puList, moment(this.state.singleValue.year + (this.state.singleValue.month <= 9 ? "-0" + this.state.singleValue.month : this.state.singleValue.month) + "-01").format("YYYY-MM-DD"));
+                                            } else {
+                                                this.setState({
+                                                    showPlanningUnitAndQtyList: [],
+                                                    showPlanningUnitAndQty: 1
+                                                })
+                                            }
+                                        }.bind(this)
+
+                                    }.bind(this)
+                                }.bind(this)
+                            }.bind(this)
+                        }.bind(this)
+                    }.bind(this)
+                }.bind(this)
+            }.bind(this)
+        }.bind(this)
+
+    }
+
+    touchAllPlan(setTouched, errors) {
+        setTouched({
+            procurementAgentId: true,
+            fundingSourceId: true,
+            budgetId: true,
+        }
+        )
+        this.validateFormPlan(errors)
+    }
+
+    validateFormPlan(errors) {
+        this.findFirstErrorPlan('userForm', (fieldName) => {
+            return Boolean(errors[fieldName])
+        })
+    }
+    findFirstErrorPlan(formName, hasError) {
+        const form = document.forms[formName]
+        for (let i = 0; i < form.length; i++) {
+            if (hasError(form[i].name)) {
+                form[i].focus()
+                break
+            }
+        }
     }
 }

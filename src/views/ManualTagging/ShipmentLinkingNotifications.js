@@ -5,7 +5,7 @@ import BootstrapTable from 'react-bootstrap-table-next';
 import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
 import getLabelText from '../../CommonComponent/getLabelText';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import { STRING_TO_DATE_FORMAT, JEXCEL_DATE_FORMAT, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
+import { STRING_TO_DATE_FORMAT, JEXCEL_DATE_FORMAT, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY, JEXCEL_DATE_FORMAT_WITHOUT_DATE } from '../../Constants.js';
 import moment from 'moment';
 import i18n from '../../i18n';
 import ProgramService from '../../api/ProgramService.js';
@@ -21,7 +21,8 @@ import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions.js
 import { MultiSelect } from 'react-multi-select-component';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
-
+import { getDatabase } from '../../CommonComponent/IndexedDbFunctions.js';
+import CryptoJS from 'crypto-js'
 
 
 const entityname = i18n.t('static.mt.shipmentLinkingNotification');
@@ -66,6 +67,7 @@ export default class ShipmentLinkingNotifications extends Component {
         this.buildNotificationSummaryJExcel = this.buildNotificationSummaryJExcel.bind(this);
         this.viewBatchData = this.viewBatchData.bind(this);
         this.oneditionend = this.oneditionend.bind(this);
+        this.selectedForNotification = this.selectedForNotification.bind(this)
     }
 
     viewBatchData(event, row) {
@@ -107,21 +109,12 @@ export default class ShipmentLinkingNotifications extends Component {
     }
 
     displayButton() {
-        var validation = this.checkValidation();
-        var tableJson = this.el.getJson(null, false);
-        let count = 0;
-        for (var i = 0; i < tableJson.length; i++) {
-            var map1 = new Map(Object.entries(tableJson[i]));
-            if (parseInt(map1.get("13")) === 1 && map1.get("0")) {
-                count++;
-            }
-        }
-        console.log("count---", count);
-        console.log("validation---", validation)
+        var validation = true;
+        var tableJson = this.el.getJson(null, false).filter(c => c[19] == 1);
         if (validation == true) {
 
             this.setState({
-                displaySubmitButton: (count > 0 ? true : false)
+                displaySubmitButton: (tableJson.length > 0 ? true : false)
             })
         } else {
             this.setState({
@@ -144,29 +137,18 @@ export default class ShipmentLinkingNotifications extends Component {
         var programId = this.state.programId;
 
         this.setState({ loading: true })
-        var validation = this.checkValidation();
+        var validation = true;
+        var changedmtList = []
         if (validation == true) {
-            var tableJson = this.el.getJson(null, false);
-            let changedmtList = [];
+            var tableJson = this.el.getJson(null, false).filter(c => c[19] == 1);
             for (var i = 0; i < tableJson.length; i++) {
-                var map1 = new Map(Object.entries(tableJson[i]));
-                if (parseInt(map1.get("13")) === 1 && map1.get("0")) {
-                    let json = {
-                        parentShipmentId: (map1.get("2") === '' ? null : map1.get("2")),
-                        conversionFactor: this.el.getValue(`K${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                        notes: (map1.get("12") === '' ? null : map1.get("12")),
-                        orderNo: map1.get("14"),
-                        primeLineNo: parseInt(map1.get("15")),
-                        notificationId: parseInt(map1.get("16")),
-                        notificationType: {
-                            id: parseInt(map1.get("17"))
-                        },
-                        shipmentQty: this.el.getValue(`J${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                        programId: programId,
-                        shipmentId: (map1.get("3") === '' ? null : map1.get("3"))
-                    }
-                    changedmtList.push(json);
+                let json = {
+                    addressed: tableJson[i][0],
+                    notificationType: {},
+                    notificationId: tableJson[i][15],
+                    shipmentLinkingId: 0
                 }
+                changedmtList.push(json);
             }
             console.log("FINAL SUBMIT changedmtList---", changedmtList);
             ManualTaggingService.updateNotification(changedmtList)
@@ -187,6 +169,7 @@ export default class ShipmentLinkingNotifications extends Component {
 
                 }).catch(
                     error => {
+                        console.log("Error@@@@@@@@@@", error)
                         if (error.message === "Network Error") {
                             this.setState({
                                 message: 'static.unkownError',
@@ -293,54 +276,57 @@ export default class ShipmentLinkingNotifications extends Component {
     // -----------start of changed function
     changed = function (instance, cell, x, y, value) {
         //conversion factor
-        if (x == 10) {
+        // if (x == 10) {
 
-            var col = ("K").concat(parseInt(y) + 1);
-            value = this.el.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-            var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                console.log("------------------5----------------------")
-            } else {
-                // if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
-                if (!(reg.test(value))) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                    console.log("------------------6----------------------")
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                    console.log("------------------7----------------------")
+        //     var col = ("K").concat(parseInt(y) + 1);
+        //     value = this.el.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+        //     var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
+        //     if (value == "") {
+        //         this.el.setStyle(col, "background-color", "transparent");
+        //         this.el.setStyle(col, "background-color", "yellow");
+        //         this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+        //         console.log("------------------5----------------------")
+        //     } else {
+        //         // if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
+        //         if (!(reg.test(value))) {
+        //             this.el.setStyle(col, "background-color", "transparent");
+        //             this.el.setStyle(col, "background-color", "yellow");
+        //             this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+        //             console.log("------------------6----------------------")
+        //         } else {
+        //             this.el.setStyle(col, "background-color", "transparent");
+        //             this.el.setComments(col, "");
+        //             console.log("------------------7----------------------")
 
-                }
+        //         }
 
-            }
-            var qty = this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-            this.el.setValueFromCoords(11, y, Math.round(qty * (value != null && value != "" ? value : 1)), true);
-        }
-
-        // if (x == 9) {
-
+        //     }
+        //     var qty = this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+        //     this.el.setValueFromCoords(11, y, Math.round(qty * (value != null && value != "" ? value : 1)), true);
         // }
 
-        // //Active
-        if (x != 13) {
-            this.el.setValueFromCoords(13, y, 1, true);
-            if (x == 0) {
-                value = this.el.getValue(`A${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                if (value === "false") {
-                    this.el.setValueFromCoords(10, y, "", true);
-                    this.el.setValueFromCoords(12, y, "", true);
-                    var qty = this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                    this.el.setValueFromCoords(11, y, Math.round(qty), true);
-                    this.el.setStyle(("K").concat(parseInt(y) + 1), "background-color", "transparent");
-                    this.el.setComments(("K").concat(parseInt(y) + 1), "");
-                    console.log("------------------8----------------------")
-                }
-            }
+        // // if (x == 9) {
+
+        // // }
+
+        // // //Active
+        // if (x != 13) {
+        //     this.el.setValueFromCoords(13, y, 1, true);
+        //     if (x == 0) {
+        //         value = this.el.getValue(`A${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+        //         if (value === "false") {
+        //             this.el.setValueFromCoords(10, y, "", true);
+        //             this.el.setValueFromCoords(12, y, "", true);
+        //             var qty = this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+        //             this.el.setValueFromCoords(11, y, Math.round(qty), true);
+        //             this.el.setStyle(("K").concat(parseInt(y) + 1), "background-color", "transparent");
+        //             this.el.setComments(("K").concat(parseInt(y) + 1), "");
+        //             console.log("------------------8----------------------")
+        //         }
+        //     }
+        // }
+        if (x == 0) {
+            this.el.setValueFromCoords(19, y, 1, true);
         }
         this.displayButton();
 
@@ -376,6 +362,9 @@ export default class ShipmentLinkingNotifications extends Component {
     }
 
     programChange(event) {
+        if (event.target.value != -1) {
+            localStorage.setItem("sesProgramId", event.target.value);
+        }
         this.setState({
             programId: event.target.value,
             hasSelectAll: true
@@ -428,22 +417,81 @@ export default class ShipmentLinkingNotifications extends Component {
                     loading: true,
                     planningUnitIds
                 })
-                var json = {
-                    programId: parseInt(this.state.programId),
-                    planningUnitIdList: this.state.planningUnitValues.map(ele => (ele.value).toString())
-                }
 
-                ManualTaggingService.getShipmentLinkingNotification(json)
+                ManualTaggingService.getShipmentLinkingNotification(this.state.programDataJson.programId, this.state.programDataJson.version)
                     .then(response => {
                         let list = (addressed != -1 ? response.data.filter(c => (c.addressed == (addressed == 1 ? true : false))) : response.data);
-                        this.setState({
-                            outputList: list
-                        }, () => {
-                            localStorage.setItem("sesProgramIdReport", programId)
-                            this.buildJExcel();
-                        });
+                        console.log("List@@@@@@@", list)
+                        var programDataJson = this.state.programDataJson;
+                        console.log("programDataJson@@@@@@@@@@@", programDataJson)
+                        var shipmentList = [];
+                        var roPrimeNoList = [];
+                        var planningUnitDataList = programDataJson.programData.planningUnitDataList;
+                        var gprogramDataBytes = CryptoJS.AES.decrypt(programDataJson.programData.generalData, SECRET_KEY);
+                        var gprogramData = gprogramDataBytes.toString(CryptoJS.enc.Utf8);
+                        var gprogramJson = JSON.parse(gprogramData);
+                        var linkedShipmentsList = gprogramJson.shipmentLinkingList != null ? gprogramJson.shipmentLinkingList : []
+                        console.log("linkedShipmentsList@@@@@@@@@", linkedShipmentsList);
+                        for (var pu = 0; pu < planningUnitIds.length; pu++) {
+                            var planningUnitData = planningUnitDataList.filter(c => c.planningUnitId == planningUnitIds[pu].value)[0];
+                            var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                            var planningUnitDataJson = JSON.parse(programData);
+                            shipmentList = shipmentList.concat(planningUnitDataJson.shipmentList);
+                        }
+                        var outputList = []
+                        for (var l = 0; l < list.length; l++) {
+                            var linkedShipmentListFilter = linkedShipmentsList.filter(c => c.shipmentLinkingId == list[l].shipmentLinkingId);
+                            var shipmentListFilter = shipmentList.filter(c => c.shipmentId == linkedShipmentListFilter[0].childShipmentId);
+                            var json = {
+                                notificationId: list[l].notificationId,
+                                addressed: list[l].addressed,
+                                notificationType: list[l].notificationType,
+                                active: linkedShipmentListFilter[0].active,
+                                parentShipmentId: linkedShipmentListFilter[0].parentShipmentId,
+                                childShipmentId: linkedShipmentListFilter[0].childShipmentId,
+                                roNo: linkedShipmentListFilter[0].roNo,
+                                roPrimeLineNo: linkedShipmentListFilter[0].roPrimeLineNo,
+                                orderNo: linkedShipmentListFilter[0].orderNo,
+                                primeLineNo: linkedShipmentListFilter[0].primeLineNo,
+                                knShipmentNo: linkedShipmentListFilter[0].knShipmentNo,
+                                erpPlanningUnit: linkedShipmentListFilter[0].erpPlanningUnit,
+                                qatPlanningUnit: shipmentListFilter[0].planningUnit,
+                                expectedDeliveryDate: shipmentListFilter[0].expectedDeliveryDate,
+                                erpShipmentStatus: linkedShipmentListFilter[0].erpShipmentStatus,
+                                shipmentQty: shipmentListFilter[0].shipmentQty,
+                                conversionFactor: linkedShipmentListFilter[0].conversionFactor,
+                                notes: shipmentListFilter[0].notes,
+                                shipmentLinkingId: list[l].shipmentLinkingId,
+                                realmCountryPlanningUnit: shipmentListFilter[0].realmCountryPlanningUnit
+                            }
+                            console.log("Json@@@@@@@@", json)
+                            outputList.push(json);
+                        }
+
+                        for (var sl = 0; sl < outputList.length; sl++) {
+                            roPrimeNoList.push({
+                                "roNo": outputList[sl].roNo,
+                                "roPrimeLineNo": outputList[sl].roPrimeLineNo
+                            })
+
+                        }
+                        ManualTaggingService.getDataBasedOnRoNoAndRoPrimeLineNo(roPrimeNoList)
+                            .then(response => {
+                                console.log("In eklseresponse.data@@@@@@@@@@@@@@", response.data)
+                                this.setState({
+                                    outputList: outputList,
+                                    roPrimeNoListOriginal: response.data
+                                }, () => {
+                                    this.buildJExcel();
+                                });
+                            }).catch(
+                                error => {
+                                }
+                            );
                     }).catch(
                         error => {
+                            console.log("Error@@@@@@@@@@", error)
                             if (error.message === "Network Error") {
                                 this.setState({
                                     message: 'static.unkownError',
@@ -498,9 +546,13 @@ export default class ShipmentLinkingNotifications extends Component {
                 this.setState({
                     outputList: []
                 }, () => {
-                    // this.state.languageEl.destroy();
-                    jexcel.destroy(document.getElementById("tableDiv"), true);
+                    try {
+                        // this.state.languageEl.destroy();
+                        jexcel.destroy(document.getElementById("tableDiv"), true);
 
+                    } catch (error) {
+
+                    }
                 })
             }
             // else if (programId == -1) {
@@ -532,105 +584,65 @@ export default class ShipmentLinkingNotifications extends Component {
     }
 
     getProgramList() {
-        ProgramService.getProgramList()
-            .then(response => {
-                if (response.status == 200) {
-                    var listArray = response.data;
-                    listArray.sort((a, b) => {
-                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
-                        return itemLabelA > itemLabelB ? 1 : -1;
-                    });
-
-                    if (response.data.length == 1) {
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['programQPLDetails'], 'readwrite');
+            var program = transaction.objectStore('programQPLDetails');
+            var getRequest = program.getAll();
+            var proList = []
+            getRequest.onsuccess = function (event) {
+                var myResult = [];
+                myResult = getRequest.result;
+                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                for (var i = 0; i < myResult.length; i++) {
+                    if (myResult[i].userId == userId) {
+                        // var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+                        // var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+                        // var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                        // var programJson1 = JSON.parse(programData);
+                        var programJson = {
+                            label: myResult[i].programCode + "~v" + myResult[i].version,
+                            value: myResult[i].id,
+                            programId: myResult[i].programId,
+                            version: myResult[i].version
+                        }
+                        proList.push(programJson)
+                    }
+                }
+                console.log("proList.length@@@@@@@@@@", proList.length)
+                if (proList.length == 1) {
+                    this.setState({
+                        programs: proList,
+                        loading: false,
+                        programId: proList[0].value
+                    }, () => {
+                        this.getPlanningUnitList();
+                    })
+                } else {
+                    if (localStorage.getItem("sesProgramId") != '' && localStorage.getItem("sesProgramId") != undefined) {
                         this.setState({
-                            programs: response.data,
+                            programs: proList,
                             loading: false,
-                            programId: response.data[0].programId
+                            programId: localStorage.getItem("sesProgramId")
                         }, () => {
                             this.getPlanningUnitList();
-                        })
-                    } else {
-                        if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
-                            this.setState({
-                                programs: listArray,
-                                loading: false,
-                                programId: localStorage.getItem("sesProgramIdReport")
-                            }, () => {
-                                this.getPlanningUnitList();
-                            });
-                        } else {
-                            this.setState({
-                                programs: listArray,
-                                loading: false
-                            })
-                        }
-                    }
-
-                }
-                else {
-
-                    this.setState({
-                        message: response.data.messageCode,
-                        color: '#BA0C2F',
-                        loading: false
-                    },
-                        () => {
-                            this.hideSecondComponent();
-                        })
-                }
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({
-                            message: 'static.unkownError',
-                            color: '#BA0C2F',
-                            loading: false
-                        }, () => {
-                            this.hideSecondComponent();
                         });
                     } else {
-                        switch (error.response ? error.response.status : "") {
-
-                            case 401:
-                                this.props.history.push(`/login/static.message.sessionExpired`)
-                                break;
-                            case 403:
-                                this.props.history.push(`/accessDenied`)
-                                break;
-                            case 500:
-                            case 404:
-                            case 406:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    color: '#BA0C2F',
-                                    loading: false
-                                }, () => {
-                                    this.hideSecondComponent();
-                                });
-                                break;
-                            case 412:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    color: '#BA0C2F',
-                                    loading: false
-                                }, () => {
-                                    this.hideSecondComponent();
-                                });
-                                break;
-                            default:
-                                this.setState({
-                                    message: 'static.unkownError',
-                                    color: '#BA0C2F',
-                                    loading: false
-                                }, () => {
-                                    this.hideSecondComponent();
-                                });
-                                break;
-                        }
+                        this.setState({
+                            programs: proList,
+                            loading: false
+                        })
                     }
                 }
-            );
+
+            }.bind(this)
+        }.bind(this)
+
     }
 
 
@@ -740,33 +752,26 @@ export default class ShipmentLinkingNotifications extends Component {
 
         for (var j = 0; j < manualTaggingList.length; j++) {
             data = [];
-
             data[0] = manualTaggingList[j].addressed;
-            data[1] = getLabelText(manualTaggingList[j].notificationType.label);
-            data[2] = manualTaggingList[j].parentShipmentId
-            data[3] = manualTaggingList[j].shipmentId;
-            data[4] = manualTaggingList[j].roNo + " - " + manualTaggingList[j].roPrimeLineNo + " | " + manualTaggingList[j].orderNo + " - " + manualTaggingList[j].primeLineNo;
+            data[1] = manualTaggingList[j].active;
+            data[2] = getLabelText(manualTaggingList[j].notificationType.label);
+            data[3] = manualTaggingList[j].parentShipmentId + " (" + (manualTaggingList[j].childShipmentId + ")");
+            data[4] = manualTaggingList[j].roNo + " - " + manualTaggingList[j].roPrimeLineNo + " | " + (manualTaggingList[j].orderNo + " - " + manualTaggingList[j].primeLineNo) + (manualTaggingList[j].knShipmentNo != "" && manualTaggingList[j].knShipmentNo != null ? " | " + manualTaggingList[j].knShipmentNo : "");
             data[5] = getLabelText(manualTaggingList[j].erpPlanningUnit.label, this.state.lang)
-            data[6] = getLabelText(manualTaggingList[j].planningUnit.label, this.state.lang)
-            data[7] = manualTaggingList[j].expectedDeliveryDate;
-            // data[7] = getLabelText(manualTaggingList[j].shipmentStatus.label, this.state.lang)
-            data[8] = manualTaggingList[j].erpStatus
-            console.log("conversion factor---", manualTaggingList[j].conversionFactor);
-            data[9] = Math.round(manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? (manualTaggingList[j].shipmentQty / manualTaggingList[j].conversionFactor) : manualTaggingList[j].shipmentQty);
-            if ((manualTaggingList[j].addressed && manualTaggingList[j].notificationType.id == 2)) {
-                data[10] = (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? (manualTaggingList[j].conversionFactor) : 1);
-            } else {
-                data[10] = ""
-            }
-            data[11] = Math.round((manualTaggingList[j].addressed && manualTaggingList[j].notificationType.id == 2 ? (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? (manualTaggingList[j].shipmentQty / manualTaggingList[j].conversionFactor) : manualTaggingList[j].shipmentQty) * (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? manualTaggingList[j].conversionFactor : 1) : (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? (manualTaggingList[j].shipmentQty / manualTaggingList[j].conversionFactor) : manualTaggingList[j].shipmentQty)));
-            data[12] = manualTaggingList[j].notes
-            data[13] = 0
-            data[14] = manualTaggingList[j].orderNo
-            data[15] = manualTaggingList[j].primeLineNo
-
-            data[16] = manualTaggingList[j].notificationId
-            data[17] = manualTaggingList[j].notificationType.id;
-
+            data[6] = getLabelText(manualTaggingList[j].qatPlanningUnit.label, this.state.lang)
+            data[7] = getLabelText(manualTaggingList[j].realmCountryPlanningUnit.label, this.state.lang)
+            data[8] = manualTaggingList[j].expectedDeliveryDate
+            data[9] = manualTaggingList[j].erpShipmentStatus
+            data[10] = Math.round((manualTaggingList[j].shipmentQty) / (manualTaggingList[j].conversionFactor) / manualTaggingList[j].realmCountryPlanningUnit.multiplier)
+            data[11] = manualTaggingList[j].realmCountryPlanningUnit.multiplier
+            data[12] = `=ROUND(K${parseInt(j) + 1}*L${parseInt(j) + 1},0)`;
+            data[13] = manualTaggingList[j].notes
+            data[14] = this.state.roPrimeNoListOriginal.filter(c => c.roNo == manualTaggingList[j].roNo && c.roPrimeLineNo == manualTaggingList[j].roPrimeLineNo)[0];
+            data[15] = manualTaggingList[j].notificationId;
+            data[16] = manualTaggingList[j].shipmentLinkingId;
+            data[17] = manualTaggingList[j].roNo;
+            data[18] = manualTaggingList[j].roPrimeLineNo;
+            data[19] = 0;
             manualTaggingArray[count] = data;
             count++;
         }
@@ -781,7 +786,7 @@ export default class ShipmentLinkingNotifications extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [45, 45, 40, 50, 60, 65, 65, 45, 40, 30, 45, 50],
+            colWidths: [40, 40, 0, 50, 0, 80, 80, 30, 35, 25, 35, 35, 80],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
@@ -789,25 +794,25 @@ export default class ShipmentLinkingNotifications extends Component {
                     type: 'checkbox',
                 },
                 {
+                    title: i18n.t('static.mt.linked'),
+                    type: 'checkbox',
+                    readOnly: true
+                    // readOnly: this.state.versionId.toString().includes("Local") ? false : true
+                    // mask: '#,##', decimal: '.'
+                },
+                {
                     title: i18n.t('static.mt.notificationType'),
                     type: 'text',
                     readOnly: true
                 },
-
                 {
-                    title: i18n.t('static.mt.parentShipmentId'),
+                    title: i18n.t('static.mt.parentShipmentId(childShipmentId)'),
                     type: 'numeric',
-                    // mask: '#,##.00', decimal: '.',
                     readOnly: true
+                    // mask: '#,##', decimal: '.'
                 },
                 {
-                    title: i18n.t('static.mt.childShipmentId'),
-                    type: 'numeric',
-                    // mask: '#,##.00', decimal: '.',
-                    readOnly: true
-                },
-                {
-                    title: i18n.t('static.manualTagging.procOrderNo'),
+                    title: i18n.t('static.manualTagging.RONO'),
                     type: 'text',
                     readOnly: true
                 },
@@ -822,31 +827,34 @@ export default class ShipmentLinkingNotifications extends Component {
                     readOnly: true
                 },
                 {
-                    title: i18n.t('static.manualTagging.currentEstimetedDeliveryDate'),
-                    type: 'calendar',
-                    readOnly: true,
-                    options: { format: JEXCEL_DATE_FORMAT },
+                    title: i18n.t('static.manualTagging.aru'),
+                    type: 'text',
+                    readOnly: true
                 },
                 {
-                    title: i18n.t('static.manualTagging.erpStatus'),
+                    title: i18n.t('static.manualTagging.currentEstimetedDeliveryDate'),
+                    type: 'calendar',
+                    options: { format: JEXCEL_DATE_FORMAT },
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.common.status'),
                     type: 'text',
                     readOnly: true
                 },
 
                 {
-                    title: i18n.t('static.supplyPlan.shipmentQty'),
+                    title: i18n.t('static.supplyPlan.qty'),
                     type: 'numeric',
                     mask: '#,##', decimal: '.',
                     readOnly: true
                 },
                 {
-                    title: i18n.t('static.manualTagging.conversionFactor'),
+                    title: i18n.t('static.manualTagging.conversionERPToPU'),
                     type: 'numeric',
-                    mask: '#,##.0000',
-                    decimal: '.',
-                    textEditor: true,
-                    disabledMaskOnEdition: true
-
+                    mask: '#,##0.0000', decimal: '.',
+                    readOnly: true
+                    // readOnly: true
                 },
 
                 {
@@ -855,29 +863,33 @@ export default class ShipmentLinkingNotifications extends Component {
                     mask: '#,##', decimal: '.',
                     readOnly: true
                 },
-
                 {
                     title: i18n.t('static.common.notes'),
                     type: 'text',
+                    readOnly: true
                 },
                 {
-                    title: "changed",
+                    title: "Original data",
                     type: 'hidden',
                 },
                 {
-                    title: "orderNo",
+                    title: "Notification Id",
                     type: 'hidden',
                 },
                 {
-                    title: "primeLineNo",
+                    title: "Shipment Linking Id",
                     type: 'hidden',
                 },
                 {
-                    title: "notificationId",
+                    title: "Order No",
                     type: 'hidden',
                 },
                 {
-                    title: "notificationTypeId",
+                    title: "Prime Line No",
+                    type: 'hidden',
+                },
+                {
+                    title: "Changed",
                     type: 'hidden',
                 },
             ],
@@ -896,47 +908,48 @@ export default class ShipmentLinkingNotifications extends Component {
             allowInsertColumn: false,
             allowManualInsertColumn: false,
             allowDeleteRow: false,
-            // onselection: this.selected,
+            onselection: this.selectedForNotification,
             onchange: this.changed,
+
+            // oneditionend: this.onedit,
+            copyCompatibility: true,
+            allowExport: false,
+            paginationOptions: JEXCEL_PAGINATION_OPTION,
+            position: 'top',
+            filters: true,
+            license: JEXCEL_PRO_KEY,
             updateTable: function (el, cell, x, y, source, value, id) {
-                var elInstance = el;
-                if (y != null) {
-                    var rowData = elInstance.getRowData(y);
-                    if (rowData[0] && parseInt(rowData[13]) != 1) {
-                        var cell;
-                        cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
-                        cell.classList.add('readonly');
-
-
-                        cell = elInstance.getCell(("K").concat(parseInt(y) + 1))
-                        cell.classList.add('readonly');
-
-                        cell = elInstance.getCell(("M").concat(parseInt(y) + 1))
-                        cell.classList.add('readonly');
-                    }
-                    else if (rowData[17] == 1) {
-                        var cell = elInstance.getCell(("K").concat(parseInt(y) + 1))
-                        cell.classList.add('readonly');
-                    }
-                    else {
-                        var cell;
-
-                        cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
-                        cell.classList.remove('readonly');
-                        if (rowData[0]) {
-                            cell = elInstance.getCell(("K").concat(parseInt(y) + 1))
-                            cell.classList.remove('readonly');
-                        }
-                        else {
-                            cell = elInstance.getCell(("K").concat(parseInt(y) + 1))
-                            cell.classList.add('readonly');
-                        }
-
-                        cell = elInstance.getCell(("M").concat(parseInt(y) + 1))
-                        cell.classList.remove('readonly');
-                    }
-
-                }
+                // var elInstance = el.jexcel;
+                // if (y != null) {
+                //     var rowData = elInstance.getRowData(y);
+                //     console.log("RowData@@@@@@@@", rowData)
+                //     if (rowData[20] == 1) {
+                //         var cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
+                //         cell.classList.add('readonly');
+                //         var cell = elInstance.getCell(("K").concat(parseInt(y) + 1))
+                //         cell.classList.add('readonly');
+                //         var cell = elInstance.getCell(("M").concat(parseInt(y) + 1))
+                //         cell.classList.add('readonly');
+                //         if (rowData[0] == false) {
+                //             var cell = elInstance.getCell(("K").concat(parseInt(y) + 1))
+                //             cell.classList.add('readonly');
+                //             var cell = elInstance.getCell(("M").concat(parseInt(y) + 1))
+                //             cell.classList.add('readonly');
+                //         }
+                //     } else {
+                //         if (rowData[0] == false) {
+                //             var cell = elInstance.getCell(("K").concat(parseInt(y) + 1))
+                //             cell.classList.add('readonly');
+                //             var cell = elInstance.getCell(("M").concat(parseInt(y) + 1))
+                //             cell.classList.add('readonly');
+                //         } else {
+                //             var cell = elInstance.getCell(("K").concat(parseInt(y) + 1))
+                //             cell.classList.remove('readonly');
+                //             var cell = elInstance.getCell(("M").concat(parseInt(y) + 1))
+                //             cell.classList.remove('readonly');
+                //         }
+                //     }
+                // }
             }.bind(this),
             onsearch: function (el) {
                 // el.jexcel.updateTable();
@@ -944,63 +957,32 @@ export default class ShipmentLinkingNotifications extends Component {
             onfilter: function (el) {
                 // el.jexcel.updateTable();
             },
-            oneditionend: this.oneditionend,
-            copyCompatibility: true,
-            onpaste: this.onPaste,
-            allowExport: false,
-            paginationOptions: JEXCEL_PAGINATION_OPTION,
-            position: 'top',
-            filters: true,
-            license: JEXCEL_PRO_KEY,
             contextMenu: function (obj, x, y, e) {
                 var items = [];
                 if (y != null) {
                     if (obj.options.allowInsertRow == true) {
                         items.push({
+                            // title: i18n.t('static.dashboard.linkShipment'),
                             title: i18n.t('static.mt.viewArtmisHistory'),
                             onclick: function () {
-                                console.log("my order no.---", this.el.getValueFromCoords(14, y));
-                                let orderNo = this.el.getValueFromCoords(14, y);
-                                let primeLineNo = this.el.getValueFromCoords(15, y);
-                                ManualTaggingService.getARTMISHistory(orderNo, primeLineNo)
+                                let roNo = obj.getValueFromCoords(17, y).toString().trim();
+                                let roPrimeLineNo = obj.getValueFromCoords(18, y).toString().trim();
+                                ManualTaggingService.getARTMISHistory(roNo, roPrimeLineNo)
                                     .then(response => {
-                                        console.log("DATA---->1", response.data);
-
-                                        let responseData = response.data.sort(function (a, b) {
-                                            var dateA = new Date(a.receivedOn).getTime();
-                                            var dateB = new Date(b.receivedOn).getTime();
-                                            return dateA < dateB ? 1 : -1;
-                                        })
-                                        console.log("history---", response.data);
-                                        responseData = responseData.filter((responseData, index, self) =>
-                                            index === self.findIndex((t) => (
-                                                t.procurementAgentOrderNo === responseData.procurementAgentOrderNo && t.erpPlanningUnit.id === responseData.erpPlanningUnit.id && t.calculatedExpectedDeliveryDate === responseData.calculatedExpectedDeliveryDate && t.erpStatus === responseData.erpStatus && t.shipmentQty === responseData.shipmentQty && t.totalCost === responseData.totalCost
-                                                && (t.shipmentList.length > 1 || (t.shipmentList.length == 1 && t.shipmentList[0].batchNo != null)) == (responseData.shipmentList.length > 1 || (responseData.shipmentList.length == 1 && responseData.shipmentList[0].batchNo != null))
-                                            ))
-                                        )
-                                        console.log("history-2--", responseData);
-
-                                        responseData = responseData.sort(function (a, b) {
-                                            var dateA = a.erpOrderId;
-                                            var dateB = b.erpOrderId;
-                                            return dateA < dateB ? 1 : -1;
-                                        })
-                                        console.log("DATA---->3", responseData);
-
                                         this.setState({
-                                            artmisHistory: responseData
+                                            artmisHistory: response.data
                                         }, () => {
                                             this.toggleLarge();
                                         });
                                     }).catch(
                                         error => {
+                                            console.log("Error@@@@@@@@@@", error)
                                             if (error.message === "Network Error") {
                                                 this.setState({
                                                     message: 'static.unkownError',
-                                                    color: '#BA0C2F',
                                                     loading: false
                                                 }, () => {
-                                                    this.hideSecondComponent();
+                                                    this.hideSecondComponent()
                                                 });
                                             } else {
                                                 switch (error.response ? error.response.status : "") {
@@ -1016,28 +998,25 @@ export default class ShipmentLinkingNotifications extends Component {
                                                     case 406:
                                                         this.setState({
                                                             message: error.response.data.messageCode,
-                                                            color: '#BA0C2F',
                                                             loading: false
                                                         }, () => {
-                                                            this.hideSecondComponent();
+                                                            this.hideSecondComponent()
                                                         });
                                                         break;
                                                     case 412:
                                                         this.setState({
                                                             message: error.response.data.messageCode,
-                                                            color: '#BA0C2F',
                                                             loading: false
                                                         }, () => {
-                                                            this.hideSecondComponent();
+                                                            this.hideSecondComponent()
                                                         });
                                                         break;
                                                     default:
                                                         this.setState({
                                                             message: 'static.unkownError',
-                                                            color: '#BA0C2F',
                                                             loading: false
                                                         }, () => {
-                                                            this.hideSecondComponent();
+                                                            this.hideSecondComponent()
                                                         });
                                                         break;
                                                 }
@@ -1050,7 +1029,7 @@ export default class ShipmentLinkingNotifications extends Component {
                 }
 
                 return items;
-            }.bind(this)
+            }.bind(this),
         };
 
 
@@ -1071,7 +1050,11 @@ export default class ShipmentLinkingNotifications extends Component {
             data[0] = getLabelText(notificationSummaryList[j].label);
             data[1] = notificationSummaryList[j].notificationCount;
             data[2] = notificationSummaryList[j].programId;
-
+            data[3] = this.state.programs.filter(c => c.programId == notificationSummaryList[j].programId).sort((a, b) => {
+                var itemLabelA = a.version;
+                var itemLabelB = b.version
+                return itemLabelA < itemLabelB ? 1 : -1;
+            })[0].value
             notificationSummaryArray[count] = data;
             count++;
         }
@@ -1092,14 +1075,18 @@ export default class ShipmentLinkingNotifications extends Component {
                 {
                     title: i18n.t('static.program.programName'),
                     type: 'text',
-                    // readOnly: true
+                    readOnly: true
                 },
 
                 {
                     title: i18n.t('static.mt.notificationCount'),
                     type: 'numeric',
-                    mask: '#,##.00', decimal: '.',
-                    // readOnly: true
+                    mask: '#,##',
+                    readOnly: true
+                },
+                {
+                    title: "programId",
+                    type: 'hidden',
                 },
                 {
                     title: "programId",
@@ -1142,6 +1129,20 @@ export default class ShipmentLinkingNotifications extends Component {
             instance, loading: false
         })
     }
+
+    selectedForNotification = function (instance, cell, x, y, value, e) {
+        if (e.buttons == 1) {
+            if (y != 0) {
+                console.log("ProgramId@@@@@@@", this.state.programId.split("_")[0]);
+                console.log("VersionId@@@@@@@", this.state.programId.split("_")[1].substring(1) + "  (Local)");
+                localStorage.setItem("sesProgramIdReport", this.state.programId.split("_")[0]);
+                localStorage.setItem("sesVersionIdReport", this.state.programId.split("_")[1].substring(1) + "  (Local)");
+
+                window.open(window.location.origin + `/#/shipment/manualTagging/2`);
+            }
+        }
+    }
+
     selected = function (instance, x1, y1, x2, y2, origin) {
         var instance = (instance).jexcel;
         console.log("RESP------>x1", x1);
@@ -1168,7 +1169,7 @@ export default class ShipmentLinkingNotifications extends Component {
         } else {
             console.log("RESP------>not Header");
             this.setState({
-                programId: instance.getValueFromCoords(2, y1)
+                programId: instance.getValueFromCoords(3, y1)
             }, () => {
                 document.getElementById("addressed").value = 0;
                 this.getPlanningUnitList();
@@ -1202,11 +1203,14 @@ export default class ShipmentLinkingNotifications extends Component {
     }
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance, 1);
-        console.log("asterisk---", document.getElementsByClassName("resizable")[2])
-        var asterisk = document.getElementsByClassName("resizable")[2];
+        // console.log("asterisk---", document.getElementsByClassName("resizable")[2])
+        // var asterisk = document.getElementsByClassName("resizable")[2];
+        // console.log("asterisk---", document.getElementsByClassName("jss")[2].firstChild.nextSibling)
+
+        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
 
         var tr = asterisk.firstChild;
-        tr.children[10].classList.add('AsteriskTheadtrTd');
+        // tr.children[10].classList.add('AsteriskTheadtrTd');
     }
 
 
@@ -1244,6 +1248,7 @@ export default class ShipmentLinkingNotifications extends Component {
                 }
             }).catch(
                 error => {
+                    console.log("Error@@@@@@@@@@@", error)
                     if (error.message === "Network Error") {
                         this.setState({
                             message: 'static.unkownError',
@@ -1300,11 +1305,202 @@ export default class ShipmentLinkingNotifications extends Component {
         this.setState({
             manualTag: !this.state.manualTag,
             batchDetails: []
+        }, () => {
+            this.sampleFunction();
         })
     }
 
+    sampleFunction() {
+        this.setState({
+            test: 10
+        }, () => {
+            this.buildJexcel()
+        })
+    }
+
+    buildJexcel() {
+        try {
+            this.el = jexcel(document.getElementById("tableDivOrderDetails"), '');
+            // this.el.destroy();
+            jexcel.destroy(document.getElementById("tableDivOrderDetails"), true);
+
+        } catch (err) {
+
+        }
+        var json = [];
+        var orderHistory = this.state.artmisHistory.erpOrderList.sort((a, b) => {
+            var itemLabelA = moment(a.dataReceivedOn); // ignore upper and lowercase
+            var itemLabelB = moment(b.dataReceivedOn);
+            return itemLabelA < itemLabelB ? 1 : -1;
+        })
+        console.log("Order History", this.state.artmisHistory);
+        for (var sb = 0; sb < orderHistory.length; sb++) {
+            var data = [];
+            data[0] = orderHistory[sb].procurementAgentOrderNo;
+            data[1] = orderHistory[sb].planningUnitName;
+            data[2] = moment(orderHistory[sb].expectedDeliveryDate).format("YYYY-MM-DD");
+            data[3] = orderHistory[sb].status;
+            data[4] = orderHistory[sb].qty;
+            data[5] = orderHistory[sb].cost;
+            data[6] = moment(orderHistory[sb].dataReceivedOn).format("YYYY-MM-DD");
+            data[7] = orderHistory[sb].changeCode;
+            data[8] = sb;
+            json.push(data);
+        }
+        var options = {
+            data: json,
+            columnDrag: true,
+            columns: [
+                { title: i18n.t('static.mt.roNoAndRoLineNo'), type: 'text', width: 150 },
+                { title: i18n.t('static.manualTagging.erpPlanningUnit'), type: 'text', width: 200 },
+                { title: i18n.t('static.supplyPlan.mtexpectedDeliveryDate'), type: 'calendar', options: { format: JEXCEL_DATE_FORMAT }, width: 100 },
+                { title: i18n.t('static.manualTagging.erpStatus'), type: 'text', width: 150 },
+                { title: i18n.t('static.manualTagging.erpShipmentQty'), type: 'numeric', mask: '#,##.00', disabledMaskOnEdition: true, textEditor: true, decimal: '.', width: 100 },
+                { title: i18n.t('static.shipment.totalCost'), type: 'numeric', mask: '#,##.00', disabledMaskOnEdition: true, textEditor: true, decimal: '.', width: 100 },
+                { title: i18n.t('static.mt.dataReceivedOn'), type: 'calendar', options: { format: JEXCEL_DATE_FORMAT }, width: 100 },
+                { title: i18n.t('static.manualTagging.changeCode'), type: 'text', width: 100 },
+                { type: 'hidden' }
+            ],
+            pagination: false,
+            search: false,
+            columnSorting: true,
+            // tableOverflow: true,
+            wordWrap: true,
+            allowInsertColumn: false,
+            allowManualInsertColumn: false,
+            allowDeleteRow: true,
+            copyCompatibility: true,
+            allowInsertRow: true,
+            allowManualInsertRow: false,
+            allowExport: false,
+            editable: false,
+            license: JEXCEL_PRO_KEY,
+            // text: {
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
+            onload: this.loadedOrderHistory,
+            updateTable: function (el, cell, x, y, source, value, id) {
+                var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+                var elInstance = el;
+                var index = elInstance.getJson(null, false).findIndex(c => c[8] == 0);
+                for (var j = 0; j < colArr.length; j++) {
+                    var col = (colArr[j]).concat(parseInt(index) + 1);
+                    var cell = elInstance.getCell(col);
+                    cell.classList.add('historyBold');
+                }
+            }.bind(this),
+            contextMenu: function (obj, x, y, e) {
+                return false;
+            }.bind(this)
+
+        };
+        var elVar = jexcel(document.getElementById("tableDivOrderDetails"), options);
+        this.el = elVar;
+
+        try {
+            this.el = jexcel(document.getElementById("tableDivShipmentDetails"), '');
+            // this.el.destroy();
+            jexcel.destroy(document.getElementById("tableDivShipmentDetails"), true);
+
+        } catch (err) {
+
+        }
+        var json = [];
+        var shipmentHistory = this.state.artmisHistory.erpShipmentList.sort((a, b) => {
+            var itemLabelA = moment(a.dataReceivedOn); // ignore upper and lowercase
+            var itemLabelB = moment(b.dataReceivedOn);
+            return itemLabelA < itemLabelB ? 1 : -1;
+        })
+        console.log("Order History")
+        for (var sb = 0; sb < shipmentHistory.length; sb++) {
+            var data = [];
+            data[0] = shipmentHistory[sb].procurementAgentShipmentNo;
+            data[1] = moment(shipmentHistory[sb].deliveryDate).format("YYYY-MM-DD");
+            data[2] = shipmentHistory[sb].batchNo;
+            data[3] = moment(shipmentHistory[sb].expiryDate).format("YYYY-MM-DD");
+            data[4] = shipmentHistory[sb].qty;
+            data[5] = moment(shipmentHistory[sb].dataReceivedOn).format("YYYY-MM-DD");
+            data[6] = shipmentHistory[sb].changeCode;
+            data[7] = sb;
+            json.push(data);
+        }
+        var options = {
+            data: json,
+            columnDrag: true,
+            columns: [
+                { title: i18n.t('static.mt.roNoAndRoLineNo'), type: 'text', width: 150 },
+                { title: i18n.t('static.supplyPlan.mtexpectedDeliveryDate'), type: 'calendar', options: { format: JEXCEL_DATE_FORMAT }, width: 100 },
+                { title: i18n.t('static.supplyPlan.batchId'), type: 'text', width: 150 },
+                { title: i18n.t('static.supplyPlan.expiryDate'), type: 'calendar', options: { format: JEXCEL_DATE_FORMAT_WITHOUT_DATE }, width: 100 },
+                { title: i18n.t('static.supplyPlan.shipmentQty'), type: 'numeric', mask: '#,##.00', disabledMaskOnEdition: true, textEditor: true, decimal: '.', width: 100 },
+                { title: i18n.t('static.mt.dataReceivedOn'), type: 'calendar', options: { format: JEXCEL_DATE_FORMAT }, width: 100 },
+                { title: i18n.t('static.manualTagging.changeCode'), type: 'text', width: 100 },
+                { type: 'hidden' }
+            ],
+            pagination: false,
+            search: false,
+            columnSorting: true,
+            // tableOverflow: true,
+            wordWrap: true,
+            allowInsertColumn: false,
+            allowManualInsertColumn: false,
+            allowDeleteRow: true,
+            copyCompatibility: true,
+            allowInsertRow: true,
+            allowManualInsertRow: false,
+            allowExport: false,
+            editable: false,
+            license: JEXCEL_PRO_KEY,
+            // text: {
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
+            onload: this.loadedShipmentHistory,
+            updateTable: function (el, cell, x, y, source, value, id) {
+                var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+                var elInstance = el;
+                var index = elInstance.getJson(null, false).findIndex(c => c[7] == 0);
+                for (var j = 0; j < colArr.length; j++) {
+                    var col = (colArr[j]).concat(parseInt(index) + 1);
+                    var cell = elInstance.getCell(col);
+                    cell.classList.add('historyBold');
+                }
+            }.bind(this),
+            contextMenu: function (obj, x, y, e) {
+                return false;
+            }.bind(this)
+
+        };
+        var elVar = jexcel(document.getElementById("tableDivShipmentDetails"), options);
+        this.el = elVar;
+    }
+
+    loadedOrderHistory(instance, cell, x, y, value) {
+        jExcelLoadedFunctionOnlyHideRow(instance);
+        // var asterisk = document.getElementsByClassName("resizable")[4];
+        console.log("document.getElementsByClassName@Mohit", document.getElementsByClassName("jss"))
+        var asterisk = document.getElementsByClassName("jss")[2].firstChild.nextSibling;
+        // console.log("Astrisk Mohit@@@@@@@@@", document.getElementsByClassName("resizable"))
+        var tr = asterisk.firstChild;
+        tr.children[8].title = i18n.t('static.manualTagging.changeOrderOrder');
+    }
+
+    loadedShipmentHistory(instance, cell, x, y, value) {
+        jExcelLoadedFunctionOnlyHideRow(instance);
+        // var asterisk = document.getElementsByClassName("resizable")[6];
+        var asterisk = document.getElementsByClassName("jss")[3].firstChild.nextSibling;
+
+        // console.log("Astrisk Mohit@@@@@@@@@", document.getElementsByClassName("resizable"))
+        var tr = asterisk.firstChild;
+        tr.children[7].title = i18n.t('static.manualTagging.changeOrderShipment');
+    }
+
     getPlanningUnitList() {
-        var programId = this.state.programId;
+        console.log("this.state.programId.split@@@@", this.state.programId);
+        var programId = this.state.programId != -1 && this.state.programId != undefined ? this.state.programId.toString().split("_")[0] : -1;
         if (programId != -1) {
             ProgramService.getProgramPlaningUnitListByProgramId(programId)
                 .then(response => {
@@ -1315,11 +1511,37 @@ export default class ShipmentLinkingNotifications extends Component {
                             var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
                             return itemLabelA > itemLabelB ? 1 : -1;
                         });
-                        this.setState({
-                            planningUnits: listArray
-                        }, () => {
-                            this.getPlanningUnitArray();
-                        })
+                        var db1;
+                        var storeOS;
+                        getDatabase();
+                        var thisAsParameter = this;
+                        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                        openRequest.onerror = function (event) {
+                            this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+                            this.props.updateState("color", "#BA0C2F");
+                            this.props.hideFirstComponent();
+                        }.bind(this);
+                        openRequest.onsuccess = function (e) {
+                            db1 = e.target.result;
+                            var transaction;
+                            var programTransaction;
+                            transaction = db1.transaction(['programData'], 'readwrite');
+                            programTransaction = transaction.objectStore('programData');
+                            // Yaha program Id dalna hai actual wala
+                            var curUser = AuthenticationService.getLoggedInUserId();
+                            var programId = (this.state.programId);
+                            console.log("ProgramId@@@@@@@@@@@@", programId)
+                            var programRequest = programTransaction.get(programId);
+                            programRequest.onsuccess = function (event) {
+                                var programDataJson = programRequest.result;
+                                this.setState({
+                                    planningUnits: listArray,
+                                    programDataJson: programDataJson
+                                }, () => {
+                                    this.getPlanningUnitArray();
+                                })
+                            }.bind(this)
+                        }.bind(this)
                     }
                     else {
 
@@ -1333,6 +1555,7 @@ export default class ShipmentLinkingNotifications extends Component {
                     }
                 }).catch(
                     error => {
+                        console.log("Error@@@@@@@@@@", error)
                         if (error.message === "Network Error") {
                             this.setState({
                                 message: 'static.unkownError',
@@ -1388,9 +1611,13 @@ export default class ShipmentLinkingNotifications extends Component {
                 outputList: [],
                 planningUnits: []
             }, () => {
-                // this.state.languageEl.destroy();
-                jexcel.destroy(document.getElementById("tableDiv"), true);
+                try {
+                    // this.state.languageEl.destroy();
+                    jexcel.destroy(document.getElementById("tableDiv"), true);
 
+                } catch (error) {
+
+                }
             })
         }
         // this.filterData();
@@ -1442,7 +1669,6 @@ export default class ShipmentLinkingNotifications extends Component {
 
 
     render() {
-
         jexcel.setDictionary({
             Show: " ",
             entries: " ",
@@ -1454,79 +1680,7 @@ export default class ShipmentLinkingNotifications extends Component {
                 {i18n.t('static.common.result', { from, to, size })}
             </span>
         );
-        const columns1 = [
-            {
-                dataField: 'erpOrderId',
-                text: i18n.t('static.mt.viewBatchDetails'),
-                align: 'center',
-                headerAlign: 'center',
-                formatter: (cellContent, row) => {
-                    // return (<i className="fa fa-eye eyeIconFontSize" title={i18n.t('static.mt.viewBatchDetails')} onClick={(event) => this.viewBatchData(event, row)} ></i>)
-                    return (
-                        ((row.shipmentList.length > 1 || (row.shipmentList.length == 1 && row.shipmentList[0].batchNo != null)) ? <i className="fa fa-eye eyeIconFontSize" title={i18n.t('static.mt.viewBatchDetails')} onClick={(event) => this.viewBatchData(event, row)} ></i> : "")
-                    )
-                }
-            },
 
-            {
-                dataField: 'procurementAgentOrderNo',
-                text: i18n.t('static.manualTagging.procOrderNo'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
-            },
-            {
-                dataField: 'erpPlanningUnit',
-                text: "ERP Planning Unit",
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: this.formatLabel
-            },
-
-            {
-                dataField: 'calculatedExpectedDeliveryDate',
-                text: i18n.t('static.supplyPlan.mtexpectedDeliveryDate'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: this.formatDate
-            },
-            {
-                dataField: 'erpStatus',
-                text: i18n.t('static.manualTagging.erpStatus'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
-            },
-            {
-                dataField: 'shipmentQty',
-                // text: i18n.t('static.shipment.qty'),
-                text: i18n.t('static.manualTagging.erpShipmentQty'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: this.addCommas
-            },
-            {
-                dataField: 'totalCost',
-                // text: i18n.t('static.shipment.qty'),
-                text: i18n.t('static.shipment.totalCost'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: this.addCommas
-            },
-            {
-                dataField: 'receivedOn',
-                text: i18n.t('static.mt.dataReceivedOn'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: this.formatDate
-            }
-
-        ];
         const options = {
             hidePageListOnlyOnePage: true,
             firstPageText: i18n.t('static.common.first'),
@@ -1554,7 +1708,88 @@ export default class ShipmentLinkingNotifications extends Component {
             }]
         }
 
+        const columns1 = [
+            {
+                dataField: 'procurementAgentOrderNo',
+                text: i18n.t('static.mt.roNoAndRoLineNo'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'planningUnitName',
+                text: i18n.t('static.manualTagging.erpPlanningUnit'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+
+            {
+                dataField: 'expectedDeliveryDate',
+                text: i18n.t('static.supplyPlan.mtexpectedDeliveryDate'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.formatDate
+            },
+            {
+                dataField: 'status',
+                text: i18n.t('static.manualTagging.erpStatus'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'qty',
+                // text: i18n.t('static.shipment.qty'),
+                text: i18n.t('static.manualTagging.erpShipmentQty'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.addCommas
+            },
+            {
+                dataField: 'cost',
+                // text: i18n.t('static.shipment.qty'),
+                text: i18n.t('static.shipment.totalCost'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.addCommas
+            },
+            {
+                dataField: 'dataReceivedOn',
+                text: i18n.t('static.mt.dataReceivedOn'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.formatDate
+            },
+            {
+                dataField: 'changeCode',
+                text: i18n.t('static.manualTagging.changeCode'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            }
+
+        ];
         const columns2 = [
+            {
+                dataField: 'procurementAgentShipmentNo',
+                text: i18n.t('static.mt.roNoAndRoLineNo'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'deliveryDate',
+                text: i18n.t('static.supplyPlan.mtexpectedDeliveryDate'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.formatDate
+            },
             {
                 dataField: 'batchNo',
                 text: i18n.t('static.supplyPlan.batchId'),
@@ -1570,14 +1805,28 @@ export default class ShipmentLinkingNotifications extends Component {
                 headerAlign: 'center',
                 formatter: this.formatExpiryDate
             },
-
             {
-                dataField: 'batchQty',
+                dataField: 'qty',
                 text: i18n.t('static.supplyPlan.shipmentQty'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
                 formatter: this.addCommas
+            },
+            {
+                dataField: 'dataReceivedOn',
+                text: i18n.t('static.mt.dataReceivedOn'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.formatDate
+            },
+            {
+                dataField: 'changeCode',
+                text: i18n.t('static.manualTagging.changeCode'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
             }
 
         ];
@@ -1587,9 +1836,9 @@ export default class ShipmentLinkingNotifications extends Component {
         const { programs } = this.state;
         let programList = programs.length > 0 && programs.map((item, i) => {
             return (
-                <option key={i} value={item.programId}>
+                <option key={i} value={item.value}>
                     {/* {getLabelText(item.label, this.state.lang)} */}
-                    {item.programCode}
+                    {item.label}
                 </option>
             )
         }, this);
@@ -1623,65 +1872,28 @@ export default class ShipmentLinkingNotifications extends Component {
                                 </ModalHeader>
                                 <ModalBody>
                                     <div>
-                                        {/* <div> */}
+                                        <span><b>{i18n.t('static.manualTagging.orderDetails')}</b></span>
+                                        <br />
+                                        <br />
+                                        {/* <div className="ReportSearchMarginTop"> */}
+                                        <div className='consumptionDataEntryTable'>
+                                            <div id="tableDivOrderDetails" className={"jexcelremoveReadonlybackground"}>
+                                            </div>
+                                        </div>
+                                        {/* </div> */}
+                                        <br />
+                                        <span><b>{i18n.t('static.supplyPlan.shipmentsDetails')}</b></span>
+                                        <br />
+                                        <br />
+                                        {/* <div className="ReportSearchMarginTop"> */}
+                                        <div className='consumptionDataEntryTable'>
 
-                                        <ToolkitProvider
-                                            keyField="optList"
-                                            data={this.state.artmisHistory}
-                                            columns={columns1}
-                                            search={{ searchFormatted: true }}
-                                            hover
-                                            filter={filterFactory()}
-                                        >
-                                            {
-                                                props => (
-                                                    <div className="TableCust FortablewidthMannualtaggingtable3 reactTableNotification ">
-                                                        {/* <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
-                                                    <SearchBar {...props.searchProps} />
-                                                    <ClearSearchButton {...props.searchProps} />
-                                                </div> */}
-                                                        <BootstrapTable striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
-                                                            // pagination={paginationFactory(options)}
-                                                            rowEvents={{
-                                                            }}
-                                                            {...props.baseProps}
-                                                        />
-                                                    </div>
-                                                )
-                                            }
-                                        </ToolkitProvider>
-                                    </div>
-                                    <br />
+                                            <div id="tableDivShipmentDetails" className={"jexcelremoveReadonlybackground"}>
+                                            </div>
+                                        </div>
+                                        {/* </div> */}
 
-                                    {this.state.batchDetails.length > 0 &&
-                                        <div>
-                                            <ToolkitProvider
-                                                keyField="optList"
-                                                data={this.state.batchDetails}
-                                                columns={columns2}
-                                                search={{ searchFormatted: true }}
-                                                hover
-                                                filter={filterFactory()}
-                                            >
-                                                {
-                                                    props => (
-                                                        <div className="TableCust ShipmentNotificationtable">
-                                                            {/* <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
-                                                    <SearchBar {...props.searchProps} />
-                                                    <ClearSearchButton {...props.searchProps} />
-                                                </div> */}
-                                                            <BootstrapTable striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
-                                                                // pagination={paginationFactory(options)}
-                                                                rowEvents={{
-                                                                }}
-                                                                {...props.baseProps}
-                                                            />
-                                                        </div>
-                                                    )
-                                                }
-                                            </ToolkitProvider></div>}
-
-                                    <br />
+                                    </div><br />
                                 </ModalBody>
                                 <ModalFooter>
                                     <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.toggleLarge()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
@@ -1708,7 +1920,7 @@ export default class ShipmentLinkingNotifications extends Component {
                             <Row>
 
 
-                                <FormGroup className="col-md-3 ">
+                                <FormGroup className="col-md-3 ZindexFeild">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.inventory.program')}</Label>
                                     <div className="controls ">
                                         <InputGroup>
@@ -1729,7 +1941,7 @@ export default class ShipmentLinkingNotifications extends Component {
                                 </FormGroup>
 
 
-                                <FormGroup className="col-md-3">
+                                <FormGroup className="col-md-3 ZindexFeild">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.procurementUnit.planningUnit')}</Label>
                                     <div className="controls ">
                                         {/* <InMultiputGroup> */}
@@ -1745,7 +1957,7 @@ export default class ShipmentLinkingNotifications extends Component {
 
                                     </div>
                                 </FormGroup>
-                                <FormGroup className="col-md-3 ">
+                                <FormGroup className="col-md-3 ZindexFeild">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.mt.addressed')}</Label>
                                     <div className="controls ">
                                         <InputGroup>

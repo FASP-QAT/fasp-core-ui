@@ -338,6 +338,7 @@ const routes = [
   { path: '/dataset/createTreeTemplate/:templateId', name: 'Create Tree Template', component: CreateTreeTemplate },
   { path: '/dataSet/buildTree/', exact: true, name: 'static.common.managetree', component: BuildTree },
   { path: '/dataSet/buildTree/tree/:treeId/:programId', exact: true, name: 'static.common.managetree', component: BuildTree },
+  { path: '/dataSet/buildTree/treeServer/:treeId/:programId/:isLocal', exact: true, name: 'static.common.managetree', component: BuildTree },
   { path: '/dataSet/buildTree/tree/:treeId/:programId/:scenarioId', name: 'static.common.managetree', component: BuildTree },
   { path: '/dataSet/buildTree/template/:templateId', exact: true, name: 'static.common.managetree', component: BuildTree },
   { path: '/consumptionDetails/:programId/:versionId/:planningUnitId', name: 'static.consumptionDetailHead.consumptionDetail', component: ConsumptionDetails },
@@ -567,7 +568,8 @@ const routes = [
   { path: '/supplyPlan/:programId/:planningUnitId/:batchNo/:expiryDate', exact: true, name: 'static.dashboard.supplyPlan', component: SupplyPlan },
 
   { path: '/report/whatIf', name: 'static.dashboard.whatIf', component: WhatIfReport },
-  { path: '/shipment/manualTagging', name: 'static.dashboard.manualTagging', component: ManualTagging },
+  { path: '/shipment/manualTagging', name: 'static.dashboard.manualTagging',exact:true, component: ManualTagging },
+  { path: '/shipment/manualTagging/:tab', name: 'static.dashboard.manualTagging', component: ManualTagging },
   { path: '/shipment/delinking', name: 'static.dashboard.delinking', component: ShipmentDelinking },
   { path: '/supplyPlanFormulas', name: 'static.supplyplan.supplyplanformula', component: SupplyPlanFormulas },
 
@@ -992,19 +994,19 @@ class DefaultLayout extends Component {
   getNotificationCount() {
     if (localStorage.getItem("sessionType") === 'Online') {
       AuthenticationService.setupAxiosInterceptors();
-      // ManualTaggingService.getNotificationCount()
-      //   .then(response => {
-      //     console.log("notification response===", response.data);
-      //     this.setState({
-      //       notificationCount: response.data
-      //     })
-      //   }).catch(
-      //     error => {
-      //       this.setState({
-      //         notificationCount: 0
-      //       })
-      //     }
-      //   );
+      ManualTaggingService.getNotificationCount()
+        .then(response => {
+          console.log("notification response===", response.data);
+          this.setState({
+            notificationCount: response.data
+          })
+        }).catch(
+          error => {
+            this.setState({
+              notificationCount: 0
+            })
+          }
+        );
     }
   }
   getProgramData() {
