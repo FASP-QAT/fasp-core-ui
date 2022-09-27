@@ -11355,7 +11355,7 @@ export default class BuildTree extends Component {
 
             {/* Branch Template Start */}
             <Modal isOpen={this.state.isBranchTemplateModalOpen}
-                className={'modal-lg ' + this.props.className}>
+                className={'modal-md ' + this.props.className}>
                 <ModalHeader>
                     <strong>{i18n.t('static.dataset.BranchTreeTemplate')}</strong>
                     <Button size="md" onClick={() => { this.setState({ isBranchTemplateModalOpen: false }) }} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
@@ -11395,7 +11395,7 @@ export default class BuildTree extends Component {
 
                                             <div>
                                                 <div className='row'>
-                                                    <FormGroup className="col-md-6">
+                                                    <FormGroup className="col-md-12">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.dataset.BranchTreeTemplate')}<span className="red Reqasterisk">*</span></Label>
                                                         <div className="controls">
 
