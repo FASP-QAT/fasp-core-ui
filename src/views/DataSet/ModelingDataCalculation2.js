@@ -24,11 +24,11 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
             // var datasetDataBytes = CryptoJS.AES.decrypt(dataset.programData, SECRET_KEY);
             // var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
             var datasetJson = {};
-            if (!isTemplate) {
-                datasetJson = dataset.programData;
-            } else {
+            // if (!isTemplate) {
+            //     datasetJson = dataset.programData;
+            // } else {
                 datasetJson = dataset;
-            }
+            // }
             var allNodeDataList = [];
             // console.log("datasetJson modeling--->", datasetJson.treeList);
             var startDate = "";

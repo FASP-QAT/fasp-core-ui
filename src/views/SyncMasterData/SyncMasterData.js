@@ -1006,7 +1006,12 @@ export default class SyncMasterData extends Component {
                     if (this.props.location.state != undefined && this.props.location.state.treeId != "") {
                         this.props.history.push(`/dataSet/buildTree/treeServer/` + `${this.props.location.state.treeId}` + '/' + `${this.props.location.state.programIds}` + `/2`)//2 for server version
                     } else {
-                        this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.masterDataSync.success'))
+                        // this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.masterDataSync.success'))
+                        if (this.props.location.state != undefined && this.props.location.state.programIds.length > 0) {
+                            this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.programLoadedAndmasterDataSync.success'))
+                        } else {
+                            this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.masterDataSync.success'))
+                        }
                     }
                 }.bind(this)
             }.bind(this)
