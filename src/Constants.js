@@ -159,3 +159,4 @@ export const QAT_DATASOURCE_ID = 31;
 export const FORECAST_DATEPICKER_MONTH_DIFF = 6;
 export const SHIPMENT_ID_ARR_MANUAL_TAGGING = ["3", "4", "5", "6", "7", "9"]
 export const SPV_REPORT_DATEPICKER_START_MONTH = 3;
+export const QAT_SUGGESTED_DATA_SOURCE_ID=28
