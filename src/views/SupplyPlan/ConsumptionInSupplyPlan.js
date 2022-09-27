@@ -327,11 +327,11 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                             { title: i18n.t('static.consumption.daysofstockout'), type: 'numeric', mask: '#,##', decimal: '.', disabledMaskOnEdition: true, textEditor: true, width: 80 },
                             { title: i18n.t('static.program.notes'), type: 'text', width: 400 },
                             { title: i18n.t('static.inventory.active'), type: 'checkbox', width: 100, readOnly: !consumptionEditable },
-                            { type: 'hidden', title: i18n.t('static.supplyPlan.batchInfo'), width: 0 },
-                            { type: 'hidden', title: i18n.t('static.supplyPlan.index'), width: 0 },
-                            { type: 'hidden', title: i18n.t('static.supplyPlan.isChanged'), width: 0 },
-                            { type: 'hidden', width: 0 },
-                            { type: 'hidden', width: 0 }
+                            { type: 'hidden', title: i18n.t('static.supplyPlan.batchInfo'), width: 0, readOnly: true },
+                            { type: 'hidden', title: i18n.t('static.supplyPlan.index'), width: 0, readOnly: true },
+                            { type: 'hidden', title: i18n.t('static.supplyPlan.isChanged'), width: 0, readOnly: true },
+                            { type: 'hidden', width: 0, readOnly: true },
+                            { type: 'hidden', width: 0, readOnly: true }
                         ],
                         pagination: paginationOption,
                         onformulachain: this.formulaChanged,
