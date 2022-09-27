@@ -1009,11 +1009,15 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     if (closingBalance - diffBetweenTrueDemandAndConsumption < 0) {
                                         unmetDemandQty = 0 - expectedStock + diffBetweenTrueDemandAndConsumption;
                                         closingBalance = 0;
+                                    }else{
+                                        unmetDemandQty = diffBetweenTrueDemandAndConsumption;
                                     }
 
                                     if (closingBalanceWps - diffBetweenTrueDemandAndConsumption < 0) {
                                         unmetDemandQtyWps = 0 - expectedStockWps + diffBetweenTrueDemandAndConsumption;
                                         closingBalanceWps = 0;
+                                    }else{
+                                        unmetDemandQtyWps = diffBetweenTrueDemandAndConsumption;
                                     }
 
                                     var mos = "";
