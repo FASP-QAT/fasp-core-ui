@@ -148,7 +148,11 @@ export default class ListTreeComponent extends Component {
             // realmCountryId: '',
             datasetIdModal: '',
             tempTreeId: '',
-            versions: []
+            versions: [],
+            allProgramList: [],
+            programs: [],
+
+
 
         }
         this.toggleDeropdownSetting = this.toggleDeropdownSetting.bind(this);
@@ -156,7 +160,7 @@ export default class ListTreeComponent extends Component {
         this.buildJexcel = this.buildJexcel.bind(this);
         this.buildTree = this.buildTree.bind(this);
         this.onTemplateChange = this.onTemplateChange.bind(this);
-        this.getDatasetList = this.getDatasetList.bind(this);
+        // this.getDatasetList = this.getDatasetList.bind(this);
         this.getTreeList = this.getTreeList.bind(this);
         this.getTreeTemplateList = this.getTreeTemplateList.bind(this);
         this.copyDeleteTree = this.copyDeleteTree.bind(this);
@@ -169,9 +173,12 @@ export default class ListTreeComponent extends Component {
         this.saveTreeData = this.saveTreeData.bind(this);
         this.setVersionId = this.setVersionId.bind(this);
         this.setProgramId = this.setProgramId.bind(this);
-
+        this.getPrograms = this.getPrograms.bind(this);
     }
     saveTreeData(operationId, tempProgram, treeTemplateId, programId, treeId, programCopy) {
+        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+        var userId = userBytes.toString(CryptoJS.enc.Utf8);
+        var version = tempProgram.currentVersion.versionId;
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -186,14 +193,24 @@ export default class ListTreeComponent extends Component {
             db1 = e.target.result;
             var transaction = db1.transaction(['datasetData'], 'readwrite');
             var programTransaction = transaction.objectStore('datasetData');
-
-            var programRequest = programTransaction.put(tempProgram);
-            console.log("---hurrey---");
+            var programData = (CryptoJS.AES.encrypt(JSON.stringify(tempProgram), SECRET_KEY)).toString();
+            var id = tempProgram.programId + "_v" + version + "_uId_" + userId;
+            var json = {
+                id: id,
+                programCode: tempProgram.programCode,
+                versionList: tempProgram.versionList,
+                programData: programData,
+                programId: tempProgram.programId,
+                version: version,
+                programName: (CryptoJS.AES.encrypt(JSON.stringify((tempProgram.label)), SECRET_KEY)).toString(),
+                userId: userId
+            }
+            var programRequest = programTransaction.put(json);
 
             transaction.oncomplete = function (event) {
 
                 this.setState({
-                    // loading: false,
+                    loading: false,
                     message: i18n.t('static.mt.dataUpdateSuccess'),
                     color: "green",
                     isSubmitClicked: false
@@ -211,7 +228,7 @@ export default class ListTreeComponent extends Component {
                                     label: i18n.t('static.program.yes'),
                                     onClick: () => {
                                         this.props.history.push({
-                                            pathname: `/dataSet/buildTree/tree/${treeId}/${programId}`,
+                                            pathname: `/dataSet/buildTree/tree/${treeId}/${id}`,
                                             // state: { role }
                                         });
 
@@ -220,14 +237,16 @@ export default class ListTreeComponent extends Component {
                                 {
                                     label: i18n.t('static.program.no'),
                                     onClick: () => {
-                                        this.getDatasetList();
+                                        // this.getDatasetList();
+                                        this.getPrograms();
                                     }
                                 }
                             ]
                         });
                         // }
                     } else {
-                        this.getDatasetList();
+                        // this.getDatasetList();
+                        this.getPrograms();
                     }
 
                 });
@@ -258,10 +277,10 @@ export default class ListTreeComponent extends Component {
                 if (parameterName == 'programId' && value != "") {
                     console.log("tempTreeId---", this.state.tempTreeId)
                     var programId = this.state.programId;
-                    var program = this.state.datasetList.filter(x => x.id == programId)[0];
+                    var program = this.state.datasetListJexcel;
                     console.log("my program---", program);
                     let tempProgram = JSON.parse(JSON.stringify(program))
-                    let treeList = tempProgram.programData.treeList;
+                    let treeList = tempProgram.treeList;
                     var tree = treeList.filter(x => x.treeId == this.state.tempTreeId)[0];
                     console.log("my tree---", tree);
                     var items = tree.tree.flatList;
@@ -288,7 +307,7 @@ export default class ListTreeComponent extends Component {
                     var findTreeIndex = treeList.findIndex(n => n.treeId == this.state.tempTreeId);
                     console.log("findTreeIndex---", findTreeIndex);
                     treeList[findTreeIndex] = tree;
-                    tempProgram.programData.treeList = treeList;
+                    tempProgram.treeList = treeList;
                     var programCopy = JSON.parse(JSON.stringify(tempProgram));
                     var programData = (CryptoJS.AES.encrypt(JSON.stringify(tempProgram.programData), SECRET_KEY)).toString();
                     tempProgram.programData = programData;
@@ -389,13 +408,13 @@ export default class ListTreeComponent extends Component {
         var treeTemplate = this.state.treeTemplate;
         console.log("dataset Id template---", this.state.datasetIdModal);
         if (this.state.datasetIdModal != "" && this.state.datasetIdModal != null) {
-            var dataset = this.state.datasetList.filter(x => x.id == this.state.datasetIdModal)[0];
+            var dataset = this.state.datasetListJexcel;
             console.log("dataset---", dataset);
             console.log("treeTemplate---", treeTemplate);
             var puNodeList = treeTemplate.flatList.filter(x => x.payload.nodeType.id == 5);
             console.log("puNodeList---", puNodeList);
             console.log("planningUnitIdListTemplate---", puNodeList.map((x) => x.payload.nodeDataMap[0][0].puNode.planningUnit.id).join(', '));
-            var planningUnitList = dataset.programData.planningUnitList.filter(x => x.treeForecast == true && x.active == true);
+            var planningUnitList = dataset.planningUnitList.filter(x => x.treeForecast == true && x.active == true);
             console.log("planningUnitList---", planningUnitList);
             console.log("planningUnitIdListPUSettings---", planningUnitList.map((x) => x.planningUnit.id).join(', '));
             for (let i = 0; i < puNodeList.length; i++) {
@@ -456,9 +475,9 @@ export default class ListTreeComponent extends Component {
         var regionList = [];
         var regionMultiList = [];
         if (datasetId != 0 && datasetId != "" && datasetId != null) {
-            var program = (this.state.datasetList.filter(x => x.id == datasetId)[0]);
+            var program = this.state.datasetListJexcel;
             console.log("program details---", program);
-            regionList = program.programData.regionList;
+            regionList = program.regionList;
             console.log("program for display---", program);
             // realmCountryId = program.programData.realmCountry.realmCountryId;
 
@@ -474,54 +493,6 @@ export default class ListTreeComponent extends Component {
             if (this.state.treeTemplate != "")
                 this.findMissingPUs();
         });
-
-
-        // var db1;
-        // getDatabase();
-        // var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        // openRequest.onsuccess = function (e) {
-        //     db1 = e.target.result;
-        //     var transaction = db1.transaction(['region'], 'readwrite');
-        //     var program = transaction.objectStore('region');
-        //     var getRequest = program.getAll();
-
-        //     getRequest.onerror = function (event) {
-        //         // Handle errors!
-        //     };
-        //     getRequest.onsuccess = function (event) {
-        //         var myResult = [];
-        //         myResult = getRequest.result;
-        //         var regionList = [];
-        //         if (this.state.realmCountryId != null && this.state.realmCountryId != "") {
-        //             regionList = myResult.filter(x => x.realmCountry.realmCountryId == this.state.realmCountryId);
-        //             console.log("filter if regionList---", regionList);
-        //         }
-        // else {
-        //     regionList = myResult;
-        //     this.setState({
-        //         regionValues: []
-        //     });
-        //     console.log("filter else regionList---", regionList);
-        // }
-        // var regionMultiList = []
-        // regionList.map(c => {
-        //     regionMultiList.push({ label: getLabelText(c.label, this.state.lang), value: c.regionId })
-        // })
-        // this.setState({
-        //     regionList,
-        //     regionMultiList,
-        //     missingPUList: []
-        // }, () => {
-        //     if (this.state.treeTemplate != "")
-        //         this.findMissingPUs();
-        // });
-        // for (var i = 0; i < myResult.length; i++) {
-        //     console.log("myResult--->", myResult[i])
-
-        // }
-
-        // }.bind(this);
-        // }.bind(this);
     }
     getForecastMethodList() {
         const lan = 'en';
@@ -579,10 +550,11 @@ export default class ListTreeComponent extends Component {
     copyDeleteTree(treeId, programId, versionId, operationId) {
 
         console.log("TreeId--------------->", treeId, programId, versionId, operationId);
-        var program = this.state.treeFlag ? (this.state.datasetList.filter(x => x.programId == programId && x.version == versionId)[0]) : (this.state.datasetList.filter(x => x.id == programId)[0]);
+        // var program = this.state.treeFlag ? (this.state.datasetList.filter(x => x.programId == programId && x.version == versionId)[0]) : (this.state.datasetList.filter(x => x.id == programId)[0]);
+        var program = this.state.datasetListJexcel;
         console.log("delete program---", program);
         let tempProgram = JSON.parse(JSON.stringify(program))
-        let treeList = program.programData.treeList;
+        let treeList = program.treeList;
         console.log("delete treeList---", treeList);
         var treeTemplateId = '';
         if (operationId == 1) {//delete
@@ -629,7 +601,7 @@ export default class ListTreeComponent extends Component {
             var tempTree = {};
             // var curMonth = moment(new Date()).format('YYYY-MM-DD');
             // console
-            var curMonth = moment(program.programData.currentVersion.forecastStartDate).format('YYYY-MM-DD');
+            var curMonth = moment(program.currentVersion.forecastStartDate).format('YYYY-MM-DD');
             treeTemplateId = document.getElementById('templateId').value;
             console.log("treeTemplateId===", treeTemplateId);
             if (treeTemplateId != "" && treeTemplateId != 0) {
@@ -700,7 +672,7 @@ export default class ListTreeComponent extends Component {
                 tempJson = {
                     nodeDataId: 1,
                     notes: '',
-                    month: moment(program.programData.currentVersion.forecastStartDate).startOf('month').subtract(1, 'months').format("YYYY-MM-DD"),
+                    month: moment(program.currentVersion.forecastStartDate).startOf('month').subtract(1, 'months').format("YYYY-MM-DD"),
                     dataValue: "0",
                     extrapolation: false,
                     calculatedDataValue: '0',
@@ -819,10 +791,10 @@ export default class ListTreeComponent extends Component {
             treeList.push(tempTree);
         }
         console.log("TreeList@@@@@@@@@@@@@@", treeList)
-        tempProgram.programData.treeList = treeList;
+        tempProgram.treeList = treeList;
         var programCopy = JSON.parse(JSON.stringify(tempProgram));
-        var programData = (CryptoJS.AES.encrypt(JSON.stringify(tempProgram.programData), SECRET_KEY)).toString();
-        tempProgram.programData = programData;
+        // var programData = (CryptoJS.AES.encrypt(JSON.stringify(tempProgram), SECRET_KEY)).toString();
+        // tempProgram = programData;
         // if (operationId == 3) {
         if (operationId == 3 && (treeTemplateId != "" && treeTemplateId != null)) {
             console.log("programId 1---", programId);
@@ -873,10 +845,6 @@ export default class ListTreeComponent extends Component {
         localStorage.setItem("sesDatasetId", datasetId);
         var datasetList = this.state.datasetListJexcel;
         console.log("filter tree---", datasetList);
-        if (datasetId != 0) {
-            datasetList = datasetList.filter(x => x.programId == datasetId);
-        }
-
         this.setState({
             datasetId,
             datasetIdModal: datasetId,
@@ -886,28 +854,22 @@ export default class ListTreeComponent extends Component {
         });
     }
 
-    getPrograms = () => {
+    getPrograms() {
         if (isSiteOnline()) {
-            // AuthenticationService.setupAxiosInterceptors();
-            ProgramService.getDataSetList().then(response => {
+            ProgramService.getDataSetListAll().then(response => {
                 if (response.status == 200) {
                     var responseData = response.data;
                     var datasetList = [];
-                    for (var rd = 0; rd < responseData.length; rd++) {
-                        var json = {
-                            id: responseData[rd].programId,
-                            name: getLabelText(responseData[rd].label, this.state.lang),
-                            code: responseData[rd].programCode,
-                            versionList: responseData[rd].versionList,
-                            isLocal: 2//1 for local, 2 for server
-                        }
-                        datasetList.push(json);
-                    }
+                    datasetList = responseData.filter(c => c.active == true);
+                    console.log("datasetList--->", responseData)
+
                     this.setState({
                         datasetList: datasetList,
-                        loading: false
+                        loading: false,
+                        allProgramList: responseData
+
                     }, () => {
-                        this.getDatasetList();
+                        this.consolidatedProgramList();
                     })
                 } else {
                     this.setState({
@@ -918,146 +880,185 @@ export default class ListTreeComponent extends Component {
                 }
             }).catch(
                 error => {
-                    this.getDatasetList();
+                    this.consolidatedProgramList();
                 }
             );
         } else {
             console.log('offline')
             this.setState({ loading: false })
-            this.getDatasetList()
+            this.consolidatedProgramList()
         }
-
     }
 
-    getDatasetList() {
-        this.setState({
-            loading: true
-        })
+    consolidatedProgramList = () => {
+        const lan = 'en';
+        const { datasetList } = this.state
+        var proList = datasetList;
+
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function (event) {
-        }.bind(this);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
-            var datasetTransaction = db1.transaction(['datasetData'], 'readwrite');
-            var datasetOs = datasetTransaction.objectStore('datasetData');
-            var getRequest = datasetOs.getAll();
+            var transaction = db1.transaction(['datasetData'], 'readwrite');
+            var program = transaction.objectStore('datasetData');
+            var getRequest = program.getAll();
+
             getRequest.onerror = function (event) {
-            }.bind(this);
+                // Handle errors!
+            };
             getRequest.onsuccess = function (event) {
                 var myResult = [];
                 myResult = getRequest.result;
-                var datasetList = this.state.datasetList;
-                for (var mr = 0; mr < myResult.length; mr++) {
-                    var index = datasetList.findIndex(c => c.id == myResult[mr].programId);
+                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                let downloadedProgramData = [];
+                for (var i = 0; i < myResult.length; i++) {
+                    if (myResult[i].userId == userId) {
+                        var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
+                        console.log(programNameLabel)
 
-                    if (index == -1) {
-                        var programNameBytes = CryptoJS.AES.decrypt(myResult[mr].programName, SECRET_KEY);
-                        var programNameLabel = programNameBytes.toString(CryptoJS.enc.Utf8);
-                        var programNameJson = JSON.parse(programNameLabel)
-                        var json = {
-                            id: myResult[mr].programId,
-                            name: getLabelText(programNameJson, this.state.lang),
-                            code: myResult[mr].programCode,
-                            versionList: [{ versionId: myResult[mr].version + "  (Local)" }],
-                            isLocal: 1//1 for local, 2 for server
-                            // programData:myResult[i].programData = programData;
+                        var f = 0
+                        for (var k = 0; k < this.state.datasetList.length; k++) {
+                            if (this.state.datasetList[k].programId == programData.programId) {
+                                f = 1;
+                                console.log('already exist')
+                            }
                         }
-                        datasetList.push(json)
+                        if (f == 0) {
+                            proList.push(programData)
+                        }
+                        downloadedProgramData.push(programData);
+                    }
+
+                }
+                var lang = this.state.lang;
+
+                if (proList.length == 1) {
+                    this.setState({
+                        datasetList: proList.sort(function (a, b) {
+                            a = (a.programCode).toLowerCase();
+                            b = (b.programCode).toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        }),
+                        datasetId: proList[0].programId,
+                        loading: false,
+                        downloadedProgramData: downloadedProgramData,
+                    }, () => {
+                        console.log("programs------------------>", this.state.datasetList);
+
+                        this.filterVersion();
+                    })
+                } else {
+                    console.log("this.props.match.params.programId@@@", this.props.match.params.programId);
+                    if (this.props.match.params.programId != "" && this.props.match.params.programId != undefined) {
+                        this.setState({
+                            datasetList: proList.sort(function (a, b) {
+                                a = (a.programCode).toLowerCase();
+                                b = (b.programCode).toLowerCase();
+                                return a < b ? -1 : a > b ? 1 : 0;
+                            }),
+                            datasetId: this.props.match.params.programId,
+                            downloadedProgramData: downloadedProgramData,
+                            loading: false
+                        }, () => {
+                            console.log("programs------------------>", this.state.datasetList);
+
+                            this.filterVersion();
+                        })
+                    }
+                    else if (localStorage.getItem("sesDatasetId") != '' && localStorage.getItem("sesDatasetId") != undefined) {
+                        this.setState({
+                            datasetList: proList.sort(function (a, b) {
+                                a = (a.programCode).toLowerCase();
+                                b = (b.programCode).toLowerCase();
+                                return a < b ? -1 : a > b ? 1 : 0;
+                            }),
+                            datasetId: localStorage.getItem("sesDatasetId"),
+                            loading: false,
+                            downloadedProgramData: downloadedProgramData,
+                        }, () => {
+                            console.log("programs------------------>", this.state.datasetList);
+
+                            this.filterVersion();
+                        })
                     } else {
-                        var existingVersionList = datasetList[index].versionList;
-                        existingVersionList.push({ versionId: myResult[mr].version + "  (Local)" })
-                        datasetList[index].versionList = existingVersionList
+                        this.setState({
+                            datasetList: proList.sort(function (a, b) {
+                                a = (a.programCode).toLowerCase();
+                                b = (b.programCode).toLowerCase();
+                                return a < b ? -1 : a > b ? 1 : 0;
+                            }),
+                            loading: false,
+                            downloadedProgramData: downloadedProgramData,
+                        }, () => {
+                            console.log("programs------------------>1", this.state.datasetList);
+                        })
                     }
+
                 }
-                var datasetId = "";
-                var event = {
-                    target: {
-                        value: ""
-                    }
-                };
-                if (datasetList.length == 1) {
-                    datasetId = datasetList[0].id;
-                    event.target.value = datasetList[0].id;
-                } else if (localStorage.getItem("sesLiveDatasetId") != "" && datasetList.filter(c => c.id == localStorage.getItem("sesLiveDatasetId")).length > 0) {
-                    datasetId = localStorage.getItem("sesLiveDatasetId");
-                    event.target.value = localStorage.getItem("sesLiveDatasetId");
-                    console.log("tetststfet", this.state.datasetList.filter(x => x.id == datasetId)[0])
-                }
-                this.setState({
-                    datasetList: datasetList.sort(function (a, b) {
-                        a = a.code.toLowerCase();
-                        b = b.code.toLowerCase();
-                        return a < b ? -1 : a > b ? 1 : 0;
-                    }),
-                    loading: false,
-                    datasetId,
-                    datasetIdModal: datasetId,
-                    // realmCountryId
-                }, () => {
-                    console.log("datasetList", datasetList)
-                    // if (datasetId != "") {
-                    // this.setDatasetId(event);
-                    // this.filterVersion();
-                    this.filterVersion()
-                    // }
-                })
-            }.bind(this)
-        }.bind(this)
+
+
+
+            }.bind(this);
+
+        }.bind(this);
+
+
     }
 
     filterVersion() {
         // let programId = document.getElementById("programId").value;
         let programId = this.state.datasetId;
-
-        // let programId = event.target.value;
-
         if (programId != 0) {
 
-            localStorage.setItem("sesLiveDatasetId", programId);
-            const program = this.state.datasetList.filter(c => c.id == programId)
-            console.log("apoe", program[0].versionList)
-            var verList = []
-
+            const program = this.state.datasetList.filter(c => c.programId == programId)
+            // console.log(program)
             if (program.length == 1) {
                 if (isSiteOnline()) {
                     this.setState({
-                        versions: []
+                        versions: [],
                     }, () => {
-                        var versionList = program[0].versionList;
-                        this.setState({
-                            versions: versionList.filter(function (x, i, a) {
-                                return a.indexOf(x) === i;
-                            })
-                        }, () => {
+                        let inactiveProgram = this.state.allProgramList.filter(c => c.active == false);
+                        inactiveProgram = inactiveProgram.filter(c => c.programId == programId);
+
+                        if (inactiveProgram.length > 0) {//Inactive
                             this.consolidatedVersionList(programId)
-                        });
+                        } else {
+                            this.setState({
+                                versions: program[0].versionList.filter(function (x, i, a) {
+                                    return a.indexOf(x) === i;
+                                })
+                            }, () => { this.consolidatedVersionList(programId) });
+                        }
+
                     });
 
 
                 } else {
                     this.setState({
-                        versions: []
-                    }, () => { this.consolidatedVersionList(programId) })
+                        versions: [],
+
+                    }, () => {
+                        this.consolidatedVersionList(programId)
+                    })
                 }
             } else {
 
                 this.setState({
-                    versions: []
-                })
+                    versions: [],
+
+                }, () => { })
 
             }
         } else {
             this.setState({
                 versions: [],
-                message: i18n.t('static.common.selectProgram'),
-                outPutList: []
-            }, () => {
-                this.el = jexcel(document.getElementById("tableDiv"), '');
-                // this.el.destroy();
-                jexcel.destroy(document.getElementById("tableDiv"), true);
-            });
+
+            }, () => { })
         }
     }
 
@@ -1072,8 +1073,8 @@ export default class ListTreeComponent extends Component {
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
-            var transaction = db1.transaction(['programData'], 'readwrite');
-            var program = transaction.objectStore('programData');
+            var transaction = db1.transaction(['datasetData'], 'readwrite');
+            var program = transaction.objectStore('datasetData');
             var getRequest = program.getAll();
 
             getRequest.onerror = function (event) {
@@ -1087,7 +1088,8 @@ export default class ListTreeComponent extends Component {
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId && myResult[i].programId == programId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
+                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
                         var programData = databytes.toString(CryptoJS.enc.Utf8)
                         var version = JSON.parse(programData).currentVersion
 
@@ -1098,138 +1100,112 @@ export default class ListTreeComponent extends Component {
                     }
                 }
 
-                console.log("ppp", verList)
+                console.log(verList)
                 let versionList = verList.filter(function (x, i, a) {
                     return a.indexOf(x) === i;
-                });
+                })
                 versionList.reverse();
-
-                if (localStorage.getItem("sesVersionIdReport") != '' && localStorage.getItem("sesVersionIdReport") != undefined) {
-
-                    let versionVar = versionList.filter(c => c.versionId == localStorage.getItem("sesVersionIdReport"));
-                    if (versionVar != '' && versionVar != undefined) {
-                        this.setState({
-                            versions: versionList,
-                            versionId: localStorage.getItem("sesVersionIdReport")
-                        }, () => {
-                            // this.getPlanningUnit();
-                            // this.getTreeList();
-                            this.consolidatedDataSetList(programId, this.state.versionId)
-
-                        })
-                    } else {
-                        this.setState({
-                            versions: versionList,
-                            versionId: versionList[0].versionId
-                        }, () => {
-                            // this.getPlanningUnit();
-                            // this.getTreeList();
-                            this.consolidatedDataSetList(programId, this.state.versionId)
-
-
-                        })
-                    }
-
-                } else {
+                console.log("versionList----->", versionList);
+                if (this.props.match.params.versionId != "" && this.props.match.params.versionId != undefined) {
+                    // let versionVar = versionList.filter(c => c.versionId == this.props.match.params.versionId+" (Local)");
                     this.setState({
                         versions: versionList,
-                        versionId: versionList[0].versionId
+                        versionId: this.props.match.params.versionId + " (Local)",
                     }, () => {
-                        // this.getPlanningUnit();
-                        // this.getTreeList();
+                        // this.setVersionId();
                         this.consolidatedDataSetList(programId, this.state.versionId)
 
                     })
                 }
+                else if (localStorage.getItem("sesVersionIdReport") != '' && localStorage.getItem("sesVersionIdReport") != undefined) {
+                    let versionVar = versionList.filter(c => c.versionId == localStorage.getItem("sesVersionIdReport"));
+                    this.setState({
+                        versions: versionList,
+                        versionId: (versionVar != '' && versionVar != undefined ? localStorage.getItem("sesVersionIdReport") : versionList[0].versionId),
+                    }, () => {
+                        // this.setVersionId();
+                        this.consolidatedDataSetList(programId, this.state.versionId)
 
+                    })
+                } else {
+                    this.setState({
+                        versions: versionList,
+                        versionId: (versionList.length > 0 ? versionList[0].versionId : ''),
+                    }, () => {
+                        this.consolidatedDataSetList(programId, this.state.versionId)
 
+                    })
+                }
             }.bind(this);
-
-
-
         }.bind(this)
-
     }
+
     consolidatedDataSetList = (programId, versionId) => {
-        if (versionId != 0 && !versionId.toString().includes("(Local)")) {
-            confirmAlert({
-                message: i18n.t('static.treeList.confirmAlert'),
-                buttons: [
-                    {
-                        label: i18n.t('static.report.ok'),
-                        onClick: () => {
-                            this.loadConsolidatedDataSetList(programId, versionId)
+        console.log("progverId", programId, "==", versionId)
+        this.setState({
+            versionId: ((versionId == null || versionId == '' || versionId == undefined) ? (this.state.versionId) : versionId)
+        }, () => {
+            if (versionId != 0 && !versionId.toString().includes("(Local)")) {
+                confirmAlert({
+                    message: i18n.t('static.treeList.confirmAlert'),
+                    buttons: [
+                        {
+                            label: i18n.t('static.report.ok'),
+                            onClick: () => {
+                                DatasetService.getDatasetData(programId, versionId)
+                                    .then(response => {
+                                        if (response.status == 200) {
+                                            var responseData = response.data;
+                                            this.setState({
+                                                datasetListJexcel: responseData
+                                            }, () => {
+                                                this.getTreeList();
+                                            })
+                                        }
+                                    })
+                            }
+                        },
+                        {
+                            label: i18n.t('static.common.cancel'),
+                            onClick: () => {
+                                jexcel.destroy(document.getElementById("tableDiv"), true);
+                            }
                         }
-                    },
-                    {
-                        label: i18n.t('static.common.cancel'),
-                        onClick: () => {
-                            jexcel.destroy(document.getElementById("tableDiv"), true);
-                        }
-                    }
-                ]
-            });
-        } else {
-            this.loadConsolidatedDataSetList(programId, versionId)
-        }
-    }
+                    ]
+                });
+            } else {
 
-
-    loadConsolidatedDataSetList = (programId, versionId) => {
-        if (programId != 0 && versionId != 0) {
-            console.log("parseInt(versionId)", parseInt(versionId))
-            var selectedProgram = [];
-            var json = {
-                programId: programId,
-                versionId: parseInt(versionId)
-            }
-            selectedProgram = selectedProgram.concat([json]);
-            DatasetService.getAllDatasetData(selectedProgram)
-                .then(response => {
-                    var json = response.data;
-
-                    this.setState({
-                        datasetListJexcel: json.sort(function (a, b) {
-                            a = a.programCode.toLowerCase();
-                            b = b.programCode.toLowerCase();
-                            return a < b ? -1 : a > b ? 1 : 0;
-                        })
-                    }, () => {
-                        this.getTreeList();
-                    })
-                }).catch(error => {
-                    this.setState({
-                        loading: false,
-                        message: i18n.t("static.program.errortext"),
-                        color: "red"
-                    }, () => {
-                        this.hideFirstComponent()
-                    })
-                    // this.props.history.push(`/dashboard/`+'green/' + 'Dataset loaded successfully')
-                    // this.setState({ loading: false })
+                let selectedForecastProgram = this.state.downloadedProgramData.filter(c => c.programId == programId && c.currentVersion.versionId == versionId.toString().split(" ")[0])[0];
+                console.log("selectedForecastProgram===2", this.state.downloadedProgramData, "===", versionId)
+                this.setState({
+                    datasetListJexcel: selectedForecastProgram
+                }, () => {
+                    this.getTreeList();
 
                 })
-        } else {
-            // this.el = jexcel(document.getElementById("tableDiv"), '');
-            // this.el.destroy();
-            jexcel.destroy(document.getElementById("tableDiv"), true);
-        }
+            }
+        })
     }
 
     setVersionId(event) {
+        var versionId = event.target.value
+        localStorage.setItem("sesVersionIdReport", versionId);
+
         this.setState(
             {
-                versionId: event.target.value
+                versionId: versionId
             }, () => {
                 // this.getPlanningUnit();
-                this.consolidatedDataSetList(this.state.datasetId, this.state.versionId);
+                this.consolidatedDataSetList(this.state.datasetId, versionId);
             })
     }
 
     setProgramId(event) {
+        var datasetId = event.target.value
+        localStorage.setItem("sesDatasetId", datasetId);
         this.setState(
             {
-                datasetId: event.target.value
+                datasetId: datasetId
             }, () => {
                 this.filterVersion();
             })
@@ -1314,42 +1290,40 @@ export default class ListTreeComponent extends Component {
         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
         var userId = userBytes.toString(CryptoJS.enc.Utf8);
 
-        for (var j = 0; j < programList.length; j++) {
-            console.log("programList[j]---", programList[j]);
-            var treeList = programList[j].treeList;
+        var treeList = programList.treeList;
 
-            if (treeList.length > 0) {
-                for (var k = 0; k < treeList.length; k++) {
+        if (treeList.length > 0) {
+            for (var k = 0; k < treeList.length; k++) {
 
-                    data = [];
-                    data[0] = treeList[k].treeId
-                    data[1] = programList[j].programCode + "~v" + programList[j].currentVersion.versionId
-                    // data[1] = programList[j].programCode
-                    data[2] = getLabelText(treeList[k].label, this.state.lang)
-                    data[3] = treeList[k].regionList.map(x => getLabelText(x.label, this.state.lang)).join(", ")
-                    console.log("forecast method--->", treeList[k].forecastMethod.label)
-                    data[4] = getLabelText(treeList[k].forecastMethod.label, this.state.lang)
-                    data[5] = treeList[k].scenarioList.map(x => getLabelText(x.label, this.state.lang)).join(", ")
-                    data[6] = treeList[k].notes
-                    data[7] = programList[j].programId
-                    data[8] = programList[j].programId + "_v" + programList[j].currentVersion.versionId + "_uId_" + userId
-                    data[9] = programList[j].version
-                    data[10] = treeList[k].active
-                    data[11] = this.state.versionId.toString().includes("(Local)") ? 1 : 2
-                    console.log("selStatus---", this.state.versionId.toString().includes("(Local)"))
-                    if (selStatus != "") {
-                        if (tempSelStatus == treeList[k].active) {
-                            // treeArray = treeArray.filter(x => x[10] == tempSelStatus);
-                            treeArray[count] = data;
-                            count++;
-                        }
-                    } else {
+                data = [];
+                data[0] = treeList[k].treeId
+                data[1] = programList.programCode + "~v" + programList.currentVersion.versionId
+                // data[1] = programList[j].programCode
+                data[2] = getLabelText(treeList[k].label, this.state.lang)
+                data[3] = treeList[k].regionList.map(x => getLabelText(x.label, this.state.lang)).join(", ")
+                console.log("forecast method--->", treeList[k].forecastMethod.label)
+                data[4] = getLabelText(treeList[k].forecastMethod.label, this.state.lang)
+                data[5] = treeList[k].scenarioList.map(x => getLabelText(x.label, this.state.lang)).join(", ")
+                data[6] = treeList[k].notes
+                data[7] = programList.programId
+                data[8] = programList.programId + "_v" + programList.currentVersion.versionId + "_uId_" + userId
+                data[9] = programList.version
+                data[10] = treeList[k].active
+                data[11] = this.state.versionId.toString().includes("(Local)") ? 1 : 2
+                console.log("selStatus---", this.state.versionId.toString().includes("(Local)"))
+                if (selStatus != "") {
+                    if (tempSelStatus == treeList[k].active) {
+                        // treeArray = treeArray.filter(x => x[10] == tempSelStatus);
                         treeArray[count] = data;
                         count++;
                     }
+                } else {
+                    treeArray[count] = data;
+                    count++;
                 }
             }
         }
+        // }
 
 
 
@@ -1415,7 +1389,7 @@ export default class ListTreeComponent extends Component {
                 {
                     title: 'ProgramId',
                     type: 'hidden',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: 'id',
@@ -1772,8 +1746,8 @@ export default class ListTreeComponent extends Component {
         let datasets = datasetList.length > 0
             && datasetList.map((item, i) => {
                 return (
-                    <option key={i} value={item.id}>
-                        {item.code}
+                    <option key={i} value={item.programId}>
+                        {item.programCode}
                     </option>
                 )
             }, this);
@@ -1835,7 +1809,7 @@ export default class ListTreeComponent extends Component {
                                 </a>
                                 <Col md="12 pl-0 pr-lg-0">
                                     <div className="d-md-flex">
-                                        {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_TREE') && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') &&
+                                        {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_TREE') && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && this.state.versionId.toString().includes("(Local)") &&
                                             // <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.createTreeFromTemplate')}</Button>
                                             // <Col md="3" className="pl-0">
                                             <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
@@ -1913,7 +1887,7 @@ export default class ListTreeComponent extends Component {
                                                 onChange={(e) => { this.setVersionId(e); }}
                                                 value={this.state.versionId}
                                             >
-                                                <option value="0">{i18n.t('static.common.select')}</option>
+                                                {/* <option value="0">{i18n.t('static.common.select')}</option> */}
                                                 {versionList}
                                             </Input>
 
