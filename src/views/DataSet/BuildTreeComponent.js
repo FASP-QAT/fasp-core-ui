@@ -6439,30 +6439,24 @@ export default class BuildTree extends Component {
             planningunitRequest.onsuccess = function (e) {
                 var myResult = [];
                 myResult = planningunitRequest.result;
-                var proList = []
-                console.log("Branch nodeTypeId---", nodeTypeId);
-                console.log("branch template list===============5", myResult)
-
-                // this.setState({ isBranchTemplateModalOpen: true });
                 var nodeTypeList = [];
                 var nodeType = this.state.nodeTypeList.filter(c => c.id == nodeTypeId)[0];
-                console.log("Branch node type obj--->", nodeType);
                 for (let i = 0; i < nodeType.allowedChildList.length; i++) {
-                    console.log("Branch allowed value---", nodeType.allowedChildList[i]);
+                    // console.log("Branch allowed value---", nodeType.allowedChildList[i]);
                     var obj = this.state.nodeTypeList.filter(c => c.id == nodeType.allowedChildList[i])[0];
                     nodeTypeList.push(nodeType.allowedChildList[i]);
                 }
-                console.log("Branch nodeType list---", nodeTypeList);
+                // console.log("Branch nodeType list---", nodeTypeList);
                 var fullBranchTemplateList = myResult.filter(x => x.active == true && x.forecastMethod.id == this.state.curTreeObj.forecastMethod.id);
                 var branchTemplateList = [];
-                console.log("Branch branchTemplateList---", fullBranchTemplateList);
+                // console.log("Branch branchTemplateList---", fullBranchTemplateList);
                 for (let i = 0; i < fullBranchTemplateList.length; i++) {
                     var flatList = fullBranchTemplateList[i].flatList;
-                    console.log("Branch flatList---", flatList);
+                    // console.log("Branch flatList---", flatList);
                     var node = flatList.filter(x => x.level == 0)[0];
-                    console.log("Branch node---", node);
+                    // console.log("Branch node---", node);
                     var result = nodeTypeList.indexOf(node.payload.nodeType.id) != -1;
-                    console.log("Branch template result---", result);
+                    // console.log("Branch template result---", result);
                     if (result) {
                         branchTemplateList.push(fullBranchTemplateList[i]);
                     }
@@ -6481,6 +6475,7 @@ export default class BuildTree extends Component {
 
     generateBranchFromTemplate(treeTemplateId) {
         var items = this.state.items;
+        var parentItem = JSON.parse(JSON.stringify(this.state.items.filter(x => x.id == this.state.parentNodeIdForBranch)[0]));
         var curMonth = moment(this.state.forecastStartDate).format('YYYY-MM-DD');
         var branchTemplate = this.state.branchTemplateList.filter(x => x.treeTemplateId == treeTemplateId)[0];
         var flatList = JSON.parse(JSON.stringify(branchTemplate.flatList));
@@ -6497,6 +6492,7 @@ export default class BuildTree extends Component {
         // for (let i = 0; i < flatList.length; i++) {
 
         // }
+        var parentLevel = parentItem.level;
         for (let i = 0; i < flatList.length; i++) {
             nodeDataMap = {};
             tempArray = [];
@@ -6521,6 +6517,8 @@ export default class BuildTree extends Component {
 
             flatList[i].id = nodeId;
             flatList[i].payload.nodeId = nodeId;
+
+
             if (flatList[i].level != 0) {
                 flatList[i].parent = nodeData.newId;
             }
@@ -6564,10 +6562,15 @@ export default class BuildTree extends Component {
                 }
             }
             flatList[i].payload.nodeDataMap = nodeDataMap;
-            items.push(flatList[i]);
+            items.push(JSON.parse(JSON.stringify(flatList[i])));
+            // flatList[i].level = parseInt(parentLevel + 1);
+            // parentLevel++;
+            var findNodeIndex = items.findIndex(n => n.id == flatList[i].id);
+            items[findNodeIndex].level = parseInt(parentLevel + 1);
+            parentLevel++;
         }
         console.log("Branch flatList---", flatList);
-        items.push(...flatList);
+        // items.push(...flatList);
         this.setState({
             items,
             isBranchTemplateModalOpen: false
@@ -7850,7 +7853,7 @@ export default class BuildTree extends Component {
                 // const filtered = this.state.items.filter(({ id }, index) => !ids.includes(id, index + 1))
                 // console.log("edit unique items---", filtered)
                 var scenarioId = this.state.selectedScenario;
-                console.log("cursor change current item config---", this.state.currentItemConfig);
+                console.log("cursor change current item config---", this.state.currentScenario);
                 if (data.context.level != 0) {
                     this.calculateParentValueFromMOM(data.context.payload.nodeDataMap[this.state.selectedScenario][0].month);
                     // this.setState({
@@ -8894,7 +8897,7 @@ export default class BuildTree extends Component {
                                                 <Input type="number"
                                                     id="puPerVisit"
                                                     name="puPerVisit"
-                                                    readOnly={this.state.parentScenario.fuNode != null && (this.state.currentScenario.puNode.sharePlanningUnit == "false" || this.state.currentScenario.puNode.sharePlanningUnit == false || this.state.parentScenario.fuNode.usageType.id == 2) ? false : true}
+                                                    readOnly={this.state.parentScenario.fuNode != null && this.state.currentScenario.puNode != null && (this.state.currentScenario.puNode.sharePlanningUnit == "false" || this.state.currentScenario.puNode.sharePlanningUnit == false || this.state.parentScenario.fuNode.usageType.id == 2) ? false : true}
                                                     bsSize="sm"
                                                     valid={!errors.puPerVisit && this.state.currentItemConfig.context.payload.nodeType.id == 5 ? this.state.currentScenario.puNode.puPerVisit != '' : !errors.puPerVisit}
                                                     invalid={touched.puPerVisit && !!errors.puPerVisit}
@@ -8904,7 +8907,7 @@ export default class BuildTree extends Component {
                                                         this.dataChange(e)
                                                     }}
                                                     value={this.state.currentItemConfig.parentItem != null
-                                                        && this.state.parentScenario.fuNode != null ?
+                                                        && this.state.parentScenario.fuNode != null && this.state.currentScenario.puNode != null ?
                                                         (this.state.currentScenario.puNode.sharePlanningUnit == "false" || this.state.currentScenario.puNode.sharePlanningUnit == false || this.state.parentScenario.fuNode.usageType.id == 2) ?
                                                             addCommas(this.state.currentScenario.puNode.puPerVisit) : addCommas(this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor) : ""}
                                                 // value={addCommas(this.state.parentScenario.fuNode.usageType.id == 2 ? (((this.state.parentScenario.fuNode.noOfForecastingUnitsPerPerson /
