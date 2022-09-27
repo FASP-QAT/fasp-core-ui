@@ -638,7 +638,7 @@ class Consumption extends Component {
               if (!a[consumptionDate])
                 a[consumptionDate] = Object.assign({}, { consumptionId, consumptionDate, actualFlag, consumptionQty });
               else
-                a[consumptionDate].consumptionQty += consumptionQty;
+              a[consumptionDate].consumptionQty += Number(consumptionQty);
               return a;
             }, {}));
             console.log("resultTrue---->", resultTrue);
@@ -649,7 +649,7 @@ class Consumption extends Component {
               if (!a[consumptionDate])
                 a[consumptionDate] = Object.assign({}, { consumptionId, consumptionDate, actualFlag, consumptionQty });
               else
-                a[consumptionDate].consumptionQty += consumptionQty;
+              a[consumptionDate].consumptionQty += Number(consumptionQty);
               return a;
             }, {}));
             console.log("resultFalse---->", resultFalse);
@@ -671,8 +671,8 @@ class Consumption extends Component {
             for (var j = 0; j < dateArray.length; j++) {
               let objActual = sorted.filter(c => (moment(dateArray[j], 'MM-YYYY').isSame(moment(moment(c.consumptionDate, 'YYYY-MM-dd').format('MM-YYYY'), 'MM-YYYY'))) != 0 && c.actualFlag == true);
               let objForecast = sorted.filter(c => (moment(dateArray[j], 'MM-YYYY').isSame(moment(moment(c.consumptionDate, 'YYYY-MM-dd').format('MM-YYYY'), 'MM-YYYY'))) != 0 && c.actualFlag == false);
-              let actualValue = null;
-              let forecastValue = null;
+              let actualValue = 0;
+              let forecastValue = 0;
               let transDate = '';
               if (objActual.length > 0) {
                 actualValue = this.round(objActual[0].consumptionQty);
@@ -1790,7 +1790,7 @@ class Consumption extends Component {
                                   &&
                                   this.state.consumptions.map((item, idx) =>
                                     <td id="addr0" key={idx} className="textcolor-purple">
-                                      {this.formatter(this.state.consumptions[idx].forecastedConsumption)}
+                                      {this.state.consumptions[idx].forecastedConsumption}
                                     </td>
                                   )
                                 }
