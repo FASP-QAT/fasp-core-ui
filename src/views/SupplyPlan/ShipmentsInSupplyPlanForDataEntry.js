@@ -2116,7 +2116,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
             }
             if (validation) {
                 if (rowData[4] == DELIVERED_SHIPMENT_STATUS && rowData[5] != "" && rowData[5] != null && rowData[5] != undefined && rowData[5] != "Invalid date" && elInstance.getValue(`M${parseInt(y) + 1}`, true).toString().replaceAll("\,", "") > 0) {
-                    this.batchDetailsClicked(elInstance, x, y, true, true);
+                    this.batchDetailsClicked(elInstance, x, y, true, !(rowData[27] == -1 || rowData[27] === "" || rowData[27] == null || rowData[27] == undefined) ? true : false);
                 }
             }
         }
@@ -2163,7 +2163,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                 var shipmentDates = rowData[30];
                 if (value == DELIVERED_SHIPMENT_STATUS) {
                     if (rowData[5] != "" && rowData[5] != null && rowData[5] != undefined && rowData[5] != "Invalid date" && elInstance.getValue(`M${parseInt(y) + 1}`, true).toString().replaceAll("\,", "") > 0) {
-                        this.batchDetailsClicked(elInstance, x, y, true, true);
+                        this.batchDetailsClicked(elInstance, x, y, true, !(rowData[27] == -1 || rowData[27] === "" || rowData[27] == null || rowData[27] == undefined) ? true : false);
                     }
                 } else {
                     if (shipmentDates.expectedDeliveryDate != "" && shipmentDates.expectedDeliveryDate != null && shipmentDates.expectedDeliveryDate != "Invalid date") {
@@ -2453,7 +2453,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                     }
                 }
                 if (rowData[4] == DELIVERED_SHIPMENT_STATUS && rowData[5] != "" && rowData[5] != null && rowData[5] != undefined && rowData[5] != "Invalid date" && elInstance.getValue(`M${parseInt(y) + 1}`, true).toString().replaceAll("\,", "") > 0) {
-                    this.batchDetailsClicked(elInstance, x, y, true, true);
+                    this.batchDetailsClicked(elInstance, x, y, true, !(rowData[27] == -1 || rowData[27] === "" || rowData[27] == null || rowData[27] == undefined) ? true : false);
                 }
             }
         }
@@ -3351,11 +3351,16 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
         var valid = true;
         var elInstance = this.state.shipmentsEl;
         var json = elInstance.getJson(null, false);
-        var checkIfShipmentBatchIsConfirmed = json.filter(c => c[4] == DELIVERED_SHIPMENT_STATUS && c[37] == 0);
+        var checkIfShipmentBatchIsConfirmed = json.filter(c => c[4] == DELIVERED_SHIPMENT_STATUS && c[37] == 0 && !(c[27] == -1 || c[27] === "" || c[27] == null || c[27] == undefined));
         var checkOtherValidation = true;
         if (checkIfShipmentBatchIsConfirmed.length > 0) {
             checkOtherValidation = false;
             this.props.updateState("shipmentBatchError", i18n.t('static.supplyPlan.confirmBatchInfo'));
+            for (var j = 0; j < json.length; j++) {
+                if (json[j][4] == DELIVERED_SHIPMENT_STATUS && json[j][37] == 0 && !(json[j][27] == -1 || json[j][27] === "" || json[j][27] == null || json[j][27] == undefined)) {
+                    inValid("M", j, i18n.t('static.supplyPlan.confirmBatchInfo'), elInstance);
+                }
+            }
         } else {
             checkOtherValidation = true;
         }
