@@ -1490,6 +1490,7 @@
     "static.problemReport.resolvedExample": "Une unité de planification est signalée pour ne pas suivre les prévisions dynamiques. L`utilisateur doit ajouter une remarque indiquant que cette unité de planification ne suit pas la prévision dynamique car il ne s`agit pas d`un produit saisonnier. Le réviseur marque cela comme résolu car l`explication ne changera probablement pas à l`avenir.",
     "static.compareAndSelect.actuals": "Données réelles (ajustées)",
     "static.dataEntry.dateValidation": "Veuillez utiliser le format de date (AAAA-MM-JJ)",
+    "static.shipment.groupByProcurementAgentType": "Regrouper par type d`agent d`approvisionnement",
     "static.mt.selectFundingSource": "Veuillez sélectionner la source de financement",
     "static.inventory.inventorydetils": "Détails de l`inventaire",
     "static.supplyPlan.budgetArray": "Tableau de budget",
@@ -2305,6 +2306,7 @@
     "static.tree.hideMonthlyData": "Masquer les données mensuelles",
     "static.budget.allocatedShipmentOrdered": "Alloué aux envois (soumis ou plus tard)",
     "static.common.jun": "Juin",
+    "static.shipment.shipmentProcurementAgentType": "Type d`agent d`approvisionnement d`expédition",
     "static.user.validphonemaxdigit": "Le numéro de téléphone peut comporter 15 chiffres maximum",
     "static.mt.masterDataSyncNote": "Rappel: si vous apportez des modifications dans cet écran, vous devrez cliquer sur «synchronisation des données de base» pour que ces modifications soient visibles dans tout l'outil. Veuillez également noter que seules les commandes ERP après le statut «approuvé» peuvent être liées aux envois QAT.\n",
     "static.common.viewDashBoard": "Afficher le tableau de bord",
@@ -2767,7 +2769,5 @@
     "static.supplyPlanFormula.maxMonthOfStockEx2": "Max = MIN ([MAX (4,3) +3], 18)",
     "static.organisation.organisationheader": "Organisation",
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Max = 7",
-    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18)",
-    "static.shipment.shipmentProcurementAgentType": "Type d`agent d`approvisionnement d`expédition",
-    "static.shipment.groupByProcurementAgentType": "Regrouper par type d`agent d`approvisionnement"
+    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18)"
 }
