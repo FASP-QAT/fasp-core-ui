@@ -10,7 +10,7 @@ import getLabelText from '../../CommonComponent/getLabelText'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import ShipmentsInSupplyPlanComponent from "../SupplyPlan/ShipmentsInSupplyPlan";
+import ShipmentsInSupplyPlanComponent from "../SupplyPlan/ShipmentsInSupplyPlanForDataEntry";
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import AuthenticationService from "../Common/AuthenticationService.js";
@@ -82,6 +82,8 @@ export default class ShipmentDetails extends React.Component {
             consumptionDataList: [],
             changedFlag: 0,
             planningUnitList: [],
+            planningUnitListForJexcel: [],
+            planningUnitListForJexcelAll: [],
             productCategoryId: '',
             shipmentsEl: '',
             timeout: 0,
@@ -117,7 +119,11 @@ export default class ShipmentDetails extends React.Component {
             budgetListPlanAll: [],
             programResult: "",
             showPlanningUnitAndQty: 0,
-            showPlanningUnitAndQtyList: []
+            showPlanningUnitAndQtyList: [],
+            planningUnit: [],
+            puData: [],
+            shipmentListForSelectedPlanningUnits: [],
+            shipmentListForSelectedPlanningUnitsUnfiltered: []
         }
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this)
         this.formSubmit = this.formSubmit.bind(this);
@@ -154,29 +160,33 @@ export default class ShipmentDetails extends React.Component {
         //Add Header Row
 
         worksheet.columns = [
-            { header: i18n.t('static.common.active'), key: 'string', width: 25 },
-            { header: i18n.t('static.report.id'), key: 'name', width: 25 },
-            { header: i18n.t('static.dataEntry.planningUnitId'), key: 'name', width: 25 },
-            { header: i18n.t('static.shipmentDataEntry.shipmentStatus'), key: 'name', width: 25 },
-            { header: i18n.t('static.common.receivedate'), key: 'string', width: 25, style: { numFmt: 'YYYY-MM-DD' } },
-            { header: i18n.t('static.supplyPlan.shipmentMode'), key: 'name', width: 40 },
-            { header: i18n.t('static.procurementagent.procurementagent'), key: 'name', width: 40 },
-            { header: i18n.t('static.shipmentDataEntry.localProcurement'), key: 'name', width: 32 },
-            { header: i18n.t('static.shipmentDataentry.procurementAgentOrderNo'), key: 'name', width: 32 },
-            { header: i18n.t('static.shipmentDataentry.procurementAgentPrimeLineNo'), key: 'name', width: 12 },
-            { header: i18n.t('static.supplyPlan.adjustesOrderQty'), key: 'name', width: 12 },
-            { header: i18n.t('static.supplyPlan.emergencyOrder'), key: 'name', width: 25 },
-            { header: i18n.t('static.subfundingsource.fundingsource'), key: 'string', width: 25 },
+            { header: i18n.t('static.common.active'), key: 'string', width: 25 },//A
+            { header: i18n.t('static.supplyPlan.erpFlag'), key: 'string', width: 25 },//A
+            { header: i18n.t('static.report.id'), key: 'name', width: 25 },//B
+            { header: i18n.t('static.dataEntry.planningUnitId'), key: 'name', width: 25 },//C
+            { header: i18n.t('static.shipmentDataEntry.shipmentStatus'), key: 'name', width: 25 },//D
+            { header: i18n.t('static.common.receivedate'), key: 'string', width: 25, style: { numFmt: 'YYYY-MM-DD' } },//E
+            { header: i18n.t('static.supplyPlan.shipmentMode'), key: 'name', width: 40 },//F
+            { header: i18n.t('static.procurementagent.procurementagent'), key: 'name', width: 40 },//G
+            { header: i18n.t('static.shipmentDataEntry.localProcurement'), key: 'name', width: 32 },//H
+            { header: i18n.t('static.shipmentDataentry.procurementAgentOrderNo'), key: 'name', width: 32 },//I
+            { header: i18n.t('static.shipmentDataentry.procurementAgentPrimeLineNo'), key: 'name', width: 12 },//J
+            { header: i18n.t('static.supplyPlan.alternatePlanningUnit'), key: 'name', width: 32 },//K
+            { header: i18n.t('static.shipment.shipmentQtyARU'), key: 'name', width: 12 },//L
+            { header: i18n.t('static.unit.multiplierFromARUTOPU'), key: 'name', width: 12 },//M
+            { header: i18n.t('static.supplyPlan.quantityPU'), key: 'name', width: 12 },//N
+            { header: i18n.t('static.supplyPlan.emergencyOrder'), key: 'name', width: 25 },//O
+            { header: i18n.t('static.subfundingsource.fundingsource'), key: 'string', width: 25 },//P
 
-            { header: i18n.t('static.dashboard.budget'), key: 'string', width: 25 },
-            { header: i18n.t('static.dashboard.currency'), key: 'string', width: 25 },
-            { header: i18n.t('static.supplyPlan.pricePerPlanningUnit'), key: 'string', width: 25 },
-            { header: i18n.t('static.shipment.productcost'), key: 'string', width: 25 },
-            { header: i18n.t('static.shipment.freightcost'), key: 'string', width: 25 },
-            { header: i18n.t('static.shipment.totalCost'), key: 'string', width: 25 },
+            { header: i18n.t('static.dashboard.budget'), key: 'string', width: 25 },//Q
+            { header: i18n.t('static.dashboard.currency'), key: 'string', width: 25 },//R
+            { header: i18n.t('static.supplyPlan.pricePerPlanningUnit'), key: 'string', width: 25 },//S
+            { header: i18n.t('static.shipment.productcost'), key: 'string', width: 25 },//T
+            { header: i18n.t('static.shipment.freightcost'), key: 'string', width: 25 },//U
+            { header: i18n.t('static.shipment.totalCost'), key: 'string', width: 25 },//V
 
-            { header: i18n.t('static.datasource.datasource'), key: 'string', width: 25 },
-            { header: i18n.t('static.program.notes'), key: 'string', width: 25 },
+            { header: i18n.t('static.datasource.datasource'), key: 'string', width: 25 },//W
+            { header: i18n.t('static.program.notes'), key: 'string', width: 25 },//X
 
 
         ];
@@ -219,11 +229,11 @@ export default class ShipmentDetails extends React.Component {
         // });
 
         for (let i = 0; i < 100; i++) {
-            worksheet.getCell('E' + (+i + 2)).note = i18n.t('static.dataEntry.dateValidation');
+            worksheet.getCell('F' + (+i + 2)).note = i18n.t('static.dataEntry.dateValidation');
         }
 
         let shipmentModeDropdown = [i18n.t('static.supplyPlan.sea'), i18n.t('static.supplyPlan.air')];
-        worksheet.dataValidations.add('F2:F100', {
+        worksheet.dataValidations.add('G2:G100', {
             type: 'list',
             allowBlank: false,
             formulae: [`"${shipmentModeDropdown.join(",")}"`],
@@ -234,7 +244,7 @@ export default class ShipmentDetails extends React.Component {
 
         // let isLocalProcurementAgentDropdown = [i18n.t('static.dataEntry.True'), i18n.t('static.dataEntry.False')];
         let isLocalProcurementAgentDropdown = ["True", "False"];
-        worksheet.dataValidations.add('H2:H100', {
+        worksheet.dataValidations.add('I2:I100', {
             type: 'list',
             allowBlank: false,
             formulae: [`"${isLocalProcurementAgentDropdown.join(",")}"`],
@@ -245,7 +255,7 @@ export default class ShipmentDetails extends React.Component {
 
         // let emergencyShipmentDropdown = [i18n.t('static.dataEntry.True'), i18n.t('static.dataEntry.False')];
         let emergencyShipmentDropdown = ["True", "False"];
-        worksheet.dataValidations.add('L2:L100', {
+        worksheet.dataValidations.add('P2:P100', {
             type: 'list',
             allowBlank: false,
             formulae: [`"${emergencyShipmentDropdown.join(",")}"`],
@@ -265,7 +275,7 @@ export default class ShipmentDetails extends React.Component {
             dataSourceVar.push(datasourceList[i].name);
         }
 
-        worksheet.dataValidations.add('T2:T100', {
+        worksheet.dataValidations.add('X2:X100', {
             type: 'list',
             allowBlank: false,
             formulae: [`"${dataSourceVar.join(",")}"`],
@@ -286,7 +296,7 @@ export default class ShipmentDetails extends React.Component {
             currencyVar.push(currencyList[i].name);
         }
 
-        worksheet.dataValidations.add('O2:O100', {
+        worksheet.dataValidations.add('S2:S100', {
             type: 'list',
             allowBlank: false,
             formulae: [`"${currencyVar.join(",")}"`],
@@ -306,7 +316,7 @@ export default class ShipmentDetails extends React.Component {
             fundingSourceVar.push(fundingSourceList[i].name);
         }
 
-        worksheet.dataValidations.add('M2:M100', {
+        worksheet.dataValidations.add('Q2:Q100', {
             type: 'list',
             allowBlank: false,
             formulae: [`"${fundingSourceVar.join(",")}"`],
@@ -326,7 +336,7 @@ export default class ShipmentDetails extends React.Component {
             procurementAgentVar.push(procurementAgentList[i].name);
         }
 
-        worksheet.dataValidations.add('G2:G100', {
+        worksheet.dataValidations.add('H2:H100', {
             type: 'list',
             allowBlank: false,
             formulae: [`"${procurementAgentVar.join(",")}"`],
@@ -346,7 +356,7 @@ export default class ShipmentDetails extends React.Component {
             budgetVar.push(budgetList[i].name);
         }
 
-        worksheet.dataValidations.add('N2:N100', {
+        worksheet.dataValidations.add('R2:R100', {
             type: 'list',
             allowBlank: false,
             formulae: [`"${budgetVar.join(",")}"`],
@@ -355,6 +365,20 @@ export default class ShipmentDetails extends React.Component {
             // error: 'Invalid value',
         });
 
+        // let planningUnitVar = [];
+        // let planningUnitList = this.state.planningUnitListForJexcel;
+        // for (let i = 0; i < planningUnitList.length; i++) {
+        //     planningUnitVar.push(planningUnitList[i].name);
+        // }
+
+        // worksheet.dataValidations.add('C2:C100', {
+        //     type: 'list',
+        //     allowBlank: false,
+        //     formulae: [`"${planningUnitVar.join(",")}"`],
+        //     showErrorMessage: true,
+        //     // errorStyle: 'error',
+        //     // error: 'Invalid value',
+        // });
 
         let shipmentStatusVar = [];
         let shipmentStatusList = this.state.shipmentStatusList.filter(c => c.active.toString() == "true");
@@ -362,7 +386,7 @@ export default class ShipmentDetails extends React.Component {
             shipmentStatusVar.push(shipmentStatusList[i].name);
         }
 
-        worksheet.dataValidations.add('D2:D100', {
+        worksheet.dataValidations.add('E2:E100', {
             type: 'list',
             allowBlank: false,
             formulae: [`"${shipmentStatusVar.join(",")}"`],
@@ -375,7 +399,7 @@ export default class ShipmentDetails extends React.Component {
 
         //Validations
 
-        worksheet.dataValidations.add('K2:K100', {
+        worksheet.dataValidations.add('M2:M100', {
             type: 'whole',
             operator: 'greaterThan',
             showErrorMessage: true,
@@ -385,7 +409,7 @@ export default class ShipmentDetails extends React.Component {
             // error: 'Invalid Value'
         });
 
-        worksheet.dataValidations.add('P2:P100', {
+        worksheet.dataValidations.add('T2:T100', {
             type: 'whole',
             operator: 'greaterThan',
             showErrorMessage: true,
@@ -395,7 +419,7 @@ export default class ShipmentDetails extends React.Component {
             // error: 'Invalid Value'
         });
 
-        worksheet.dataValidations.add('R2:R100', {
+        worksheet.dataValidations.add('V2:V100', {
             type: 'whole',
             operator: 'greaterThan',
             showErrorMessage: true,
@@ -420,19 +444,43 @@ export default class ShipmentDetails extends React.Component {
                 fgColor: { argb: 'cccccc' },
                 bgColor: { argb: '96C8FB' }
             }
-            worksheet.getCell('J' + (+i + 2)).fill = {
+            // worksheet.getCell('C' + (+i + 2)).fill = {
+            //     type: 'pattern',
+            //     pattern: 'solid',
+            //     fgColor: { argb: 'cccccc' },
+            //     bgColor: { argb: '96C8FB' }
+            // }
+            worksheet.getCell('K' + (+i + 2)).fill = {
                 type: 'pattern',
                 pattern: 'solid',
                 fgColor: { argb: 'cccccc' },
                 bgColor: { argb: '96C8FB' }
             }
-            worksheet.getCell('Q' + (+i + 2)).fill = {
+            worksheet.getCell('O' + (+i + 2)).fill = {
                 type: 'pattern',
                 pattern: 'solid',
                 fgColor: { argb: 'cccccc' },
                 bgColor: { argb: '96C8FB' }
             }
-            worksheet.getCell('S' + (+i + 2)).fill = {
+            worksheet.getCell('W' + (+i + 2)).fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'cccccc' },
+                bgColor: { argb: '96C8FB' }
+            }
+            worksheet.getCell('N' + (+i + 2)).fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'cccccc' },
+                bgColor: { argb: '96C8FB' }
+            }
+            worksheet.getCell('O' + (+i + 2)).fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'cccccc' },
+                bgColor: { argb: '96C8FB' }
+            }
+            worksheet.getCell('U' + (+i + 2)).fill = {
                 type: 'pattern',
                 pattern: 'solid',
                 fgColor: { argb: 'cccccc' },
@@ -464,26 +512,20 @@ export default class ShipmentDetails extends React.Component {
         worksheet.getColumn('I').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
             cell.protection = { locked: false };
         });
-        worksheet.getColumn('K').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+        worksheet.getColumn('J').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
             cell.protection = { locked: false };
         });
         worksheet.getColumn('L').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
             cell.protection = { locked: false };
         });
-
         worksheet.getColumn('M').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
             cell.protection = { locked: false };
         });
-
-        worksheet.getColumn('N').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
-            cell.protection = { locked: false };
-        });
-
-        worksheet.getColumn('O').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
-            cell.protection = { locked: false };
-        });
-
         worksheet.getColumn('P').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+
+        worksheet.getColumn('Q').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
             cell.protection = { locked: false };
         });
 
@@ -491,11 +533,23 @@ export default class ShipmentDetails extends React.Component {
             cell.protection = { locked: false };
         });
 
+        worksheet.getColumn('S').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+
         worksheet.getColumn('T').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
             cell.protection = { locked: false };
         });
 
-        worksheet.getColumn('U').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+        worksheet.getColumn('V').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+
+        worksheet.getColumn('X').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+
+        worksheet.getColumn('Y').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
             cell.protection = { locked: false };
         });
 
@@ -557,7 +611,7 @@ export default class ShipmentDetails extends React.Component {
                 if (document.getElementById("addRowButtonId") != null) {
                     document.getElementById("addRowButtonId").style.display = "none";
                 }
-                if (this.state.planningUnit != 0 && (value != "" && value != undefined ? value.value : 0) != 0) {
+                if (this.state.planningUnit.length > 0 && (value != "" && value != undefined ? value.value : 0) != 0) {
                     this.formSubmit(this.state.planningUnit, this.state.rangeValue);
                 }
             })
@@ -704,8 +758,8 @@ export default class ShipmentDetails extends React.Component {
             cont = true;
         }
         if (cont == true) {
-            document.getElementById("planningUnitId").value = 0;
-            document.getElementById("planningUnit").value = "";
+            // document.getElementById("planningUnitId").value = 0;
+            // document.getElementById("planningUnit").value = "";
             document.getElementById("shipmentsDetailsTableDiv").style.display = "none";
             if (document.getElementById("addRowButtonId") != null) {
                 document.getElementById("addRowButtonId").style.display = "none";
@@ -713,8 +767,8 @@ export default class ShipmentDetails extends React.Component {
             this.setState({
                 programSelect: value,
                 programId: value != "" && value != undefined ? value != "" && value != undefined ? value.value : 0 : 0,
-                planningUnit: "",
-                planningUnitId: "",
+                planningUnit: [],
+                // planningUnitId: "",
                 loading: true,
                 shipmentChangedFlag: 0
             })
@@ -777,7 +831,8 @@ export default class ShipmentDetails extends React.Component {
                                     console.log("budgetListPlan", budgetListPlan)
                                     var myResult = [];
                                     myResult = planningunitRequest.result.filter(c => c.program.id == programId);
-                                    var proList = []
+                                    var proList = [];
+                                    var planningUnitListForJexcel = [];
                                     for (var i = 0; i < myResult.length; i++) {
                                         if (myResult[i].program.id == programId && myResult[i].active == true) {
                                             var productJson = {
@@ -785,12 +840,22 @@ export default class ShipmentDetails extends React.Component {
                                                 value: myResult[i].planningUnit.id
                                             }
                                             proList.push(productJson)
+                                            var productJson1 = {
+                                                name: getLabelText(myResult[i].planningUnit.label, this.state.lang),
+                                                id: myResult[i].planningUnit.id
+                                            }
+                                            planningUnitListForJexcel.push(productJson1)
                                         }
                                     }
                                     this.setState({
                                         planningUnitList: proList.sort(function (a, b) {
                                             a = a.label.toLowerCase();
                                             b = b.label.toLowerCase();
+                                            return a < b ? -1 : a > b ? 1 : 0;
+                                        }),
+                                        planningUnitListForJexcelAll: planningUnitListForJexcel.sort(function (a, b) {
+                                            a = a.name.toLowerCase();
+                                            b = b.name.toLowerCase();
                                             return a < b ? -1 : a > b ? 1 : 0;
                                         }),
                                         planningUnitListAll: myResult,
@@ -815,19 +880,46 @@ export default class ShipmentDetails extends React.Component {
                                     var planningUnitIdProp = '';
                                     if (this.props.match.params.planningUnitId != '' && this.props.match.params.planningUnitId != undefined) {
                                         planningUnitIdProp = this.props.match.params.planningUnitId;
-                                    } else if (localStorage.getItem("sesPlanningUnitId") != '' && localStorage.getItem("sesPlanningUnitId") != undefined) {
-                                        planningUnitIdProp = localStorage.getItem("sesPlanningUnitId");
-                                    } else if (proList.length == 1) {
+                                        var proListFiltered=proList.filter(c => c.value == planningUnitIdProp);
+                                        if (planningUnitIdProp != '' && planningUnitIdProp != undefined && proListFiltered.length>0) {
+                                            var planningUnit = [{ value: planningUnitIdProp, label: proListFiltered[0].label }];
+                                            this.setState({
+                                                planningUnit: planningUnit,
+                                                // planningUnitId: planningUnitIdProp
+                                            })
+                                            this.formSubmit(planningUnit, this.state.rangeValue);
+                                        }
+                                    }
+                                    else if (localStorage.getItem("sesPlanningUnitIdMulti") != '' && localStorage.getItem("sesPlanningUnitIdMulti") != undefined) {
+                                        planningUnitIdProp = localStorage.getItem("sesPlanningUnitIdMulti");
+                                        if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
+                                            var planningUnitIdSession=JSON.parse(planningUnitIdProp);
+                                            var updatePlanningUnitList=[];
+                                            for(var pu=0;pu<planningUnitIdSession.length;pu++){
+                                                if(proList.filter(c=>c.value==planningUnitIdSession[pu].value).length>0){
+                                                    updatePlanningUnitList.push(planningUnitIdSession[pu]);
+                                                }
+                                            }
+                                            // var planningUnit = [{ value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label }];
+                                            this.setState({
+                                                planningUnit: updatePlanningUnitList,
+                                                // planningUnitId: planningUnitIdProp
+                                            })
+                                            this.formSubmit(updatePlanningUnitList, this.state.rangeValue);
+                                        }
+                                    }
+                                    else if (proList.length == 1) {
                                         planningUnitIdProp = proList[0].value;
+                                        if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
+                                            var planningUnit = [{ value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label }];
+                                            this.setState({
+                                                planningUnit: planningUnit,
+                                                // planningUnitId: planningUnitIdProp
+                                            })
+                                            this.formSubmit(planningUnit, this.state.rangeValue);
+                                        }
                                     }
-                                    if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
-                                        var planningUnit = { value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label };
-                                        this.setState({
-                                            planningUnit: planningUnit,
-                                            planningUnitId: planningUnitIdProp
-                                        })
-                                        this.formSubmit(planningUnit, this.state.rangeValue);
-                                    }
+
                                 }.bind(this);
                             }.bind(this)
                         }.bind(this)
@@ -836,13 +928,17 @@ export default class ShipmentDetails extends React.Component {
             } else {
                 this.setState({
                     loading: false,
-                    planningUnitList: []
+                    planningUnitList: [],
+                    planningUnitListForJexcel: [],
+                    planningUnitListForJexcelAll: [],
+                    puData: []
                 })
             }
         }
     }
 
     formSubmit(value, rangeValue) {
+        console.log("Value@@@@@@@@@", value)
         var cont = false;
         if (this.state.shipmentChangedFlag == 1) {
             var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
@@ -859,11 +955,12 @@ export default class ShipmentDetails extends React.Component {
             let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
             this.setState({ loading: true, shipmentChangedFlag: 0 })
             var programId = document.getElementById('programId').value;
-            this.setState({ programId: programId, planningUnitId: value != "" && value != undefined ? value.value : 0, planningUnit: value });
-            var planningUnitId = value != "" && value != undefined ? value.value : 0;
+            this.setState({ programId: programId, planningUnit: value });
+            // var planningUnitId = value != "" && value != undefined ? value.value : 0;
+            var puList = value;
             var programId = document.getElementById("programId").value;
-            if (planningUnitId != 0) {
-                localStorage.setItem("sesPlanningUnitId", planningUnitId);
+            if (puList.length > 0) {
+                localStorage.setItem("sesPlanningUnitIdMulti", JSON.stringify(value));
                 document.getElementById("shipmentsDetailsTableDiv").style.display = "block";
                 if (document.getElementById("addRowButtonId") != null) {
                     if ((this.state.shipmentTypeIds).includes(1)) {
@@ -900,49 +997,69 @@ export default class ShipmentDetails extends React.Component {
                     }.bind(this);
                     programRequest.onsuccess = function (event) {
                         var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
-                        var planningUnitDataFilter = planningUnitDataList.filter(c => c.planningUnitId == planningUnitId);
-                        var programJson = {};
-                        if (planningUnitDataFilter.length > 0) {
-                            var planningUnitData = planningUnitDataFilter[0]
-                            var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
-                            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                            programJson = JSON.parse(programData);
-                        } else {
-                            programJson = {
-                                consumptionList: [],
-                                inventoryList: [],
-                                shipmentList: [],
-                                batchInfoList: [],
-                                supplyPlan: []
-                            }
-                        }
-
+                        var puData = [];
+                        var shipmentListForSelectedPlanningUnits = [];
+                        var shipmentListForSelectedPlanningUnitsUnfiltered = [];
+                        console.log("puList@@@@@@@@", puList)
                         var generalProgramDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
                         var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
                         var generalProgramJson = JSON.parse(generalProgramData);
+                        var planningUnitListForJexcel = this.state.planningUnitListForJexcelAll;
+                        console.log("planningUnitListForJexcel@@@@@@@@", planningUnitListForJexcel)
+                        var planningUnitListForJexcelUpdated = [];
+                        for (var pu = 0; pu < puList.length; pu++) {
+                            planningUnitListForJexcelUpdated.push(planningUnitListForJexcel.filter(c => c.id == puList[pu].value)[0]);
+                            console.log("puList[pu].value@@@@@@@@@Mohit", puList[pu].value)
+                            var planningUnitDataFilter = planningUnitDataList.filter(c => c.planningUnitId == puList[pu].value);
+                            console.log("planningUnitDataFilter[pu].value@@@@@@@@@Mohit", planningUnitDataFilter)
+                            var programJson = {};
+                            if (planningUnitDataFilter.length > 0) {
+                                var planningUnitData = planningUnitDataFilter[0]
+                                var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                                programJson = JSON.parse(programData);
+                            } else {
+                                programJson = {
+                                    consumptionList: [],
+                                    inventoryList: [],
+                                    shipmentList: [],
+                                    batchInfoList: [],
+                                    supplyPlan: []
+                                }
+                            }
 
-                        var programPlanningUnit = ((this.state.planningUnitListAll).filter(p => p.planningUnit.id == planningUnitId))[0];
-                        var shipmentListUnFiltered = programJson.shipmentList;
-                        this.setState({
-                            shipmentListUnFiltered: shipmentListUnFiltered
-                        })
-                        var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == (value != "" && value != undefined ? value.value : 0) && c.active.toString() == "true");
-                        if (this.state.shipmentTypeIds.length == 1 && (this.state.shipmentTypeIds).includes(1)) {
-                            shipmentList = shipmentList.filter(c => c.erpFlag.toString() == "false");
-                        } else if (this.state.shipmentTypeIds.length == 1 && (this.state.shipmentTypeIds).includes(2)) {
-                            shipmentList = shipmentList.filter(c => c.erpFlag.toString() == "true");
+
+                            var programPlanningUnit = ((this.state.planningUnitListAll).filter(p => p.planningUnit.id == puList[pu].value))[0];
+                            var shipmentListUnFiltered = programJson.shipmentList;
+                            shipmentListForSelectedPlanningUnitsUnfiltered = shipmentListForSelectedPlanningUnitsUnfiltered.concat(shipmentListUnFiltered);
+                            var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == puList[pu].value && c.active.toString() == "true");
+                            if (this.state.shipmentTypeIds.length == 1 && (this.state.shipmentTypeIds).includes(1)) {
+                                shipmentList = shipmentList.filter(c => c.erpFlag.toString() == "false");
+                            } else if (this.state.shipmentTypeIds.length == 1 && (this.state.shipmentTypeIds).includes(2)) {
+                                shipmentList = shipmentList.filter(c => c.erpFlag.toString() == "true");
+                            }
+                            shipmentList = shipmentList.filter(c => c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? moment(c.receivedDate).format("YYYY-MM-DD") >= moment(startDate).format("YYYY-MM-DD") && moment(c.receivedDate).format("YYYY-MM-DD") <= moment(stopDate).format("YYYY-MM-DD") : moment(c.expectedDeliveryDate).format("YYYY-MM-DD") >= moment(startDate).format("YYYY-MM-DD") && moment(c.expectedDeliveryDate).format("YYYY-MM-DD") <= moment(stopDate).format("YYYY-MM-DD"))
+                            shipmentListForSelectedPlanningUnits = shipmentListForSelectedPlanningUnits.concat(shipmentList);
+                            console.log("ShipmentList@@@@@@@@@@@@@@", shipmentList)
+                            console.log("ShipmentList@@@@@@@@@@@@@@", shipmentList)
+                            puData.push({
+                                id: puList[pu].value,
+                                shelfLife: programPlanningUnit.shelfLife,
+                                catalogPrice: programPlanningUnit.catalogPrice,
+                                programJson: programJson,
+                                shipmentListUnFiltered: shipmentListUnFiltered,
+                                shipmentList: shipmentList,
+                                showShipments: 1,
+                                programPlanningUnitForPrice: programPlanningUnit,
+                            })
                         }
-                        shipmentList = shipmentList.filter(c => c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? moment(c.receivedDate).format("YYYY-MM-DD") >= moment(startDate).format("YYYY-MM-DD") && moment(c.receivedDate).format("YYYY-MM-DD") <= moment(stopDate).format("YYYY-MM-DD") : moment(c.expectedDeliveryDate).format("YYYY-MM-DD") >= moment(startDate).format("YYYY-MM-DD") && moment(c.expectedDeliveryDate).format("YYYY-MM-DD") <= moment(stopDate).format("YYYY-MM-DD"))
-                        console.log("ShipmentList@@@@@@@@@@@@@@", shipmentList)
+                        console.log("planningUnitListForJexcelUpdated", planningUnitListForJexcelUpdated)
                         this.setState({
-                            shelfLife: programPlanningUnit.shelfLife,
-                            catalogPrice: programPlanningUnit.catalogPrice,
-                            programJson: programJson,
                             generalProgramJson: generalProgramJson,
-                            shipmentListUnFiltered: shipmentListUnFiltered,
-                            shipmentList: shipmentList,
-                            showShipments: 1,
-                            programPlanningUnitForPrice: programPlanningUnit
+                            puData: puData,
+                            shipmentListForSelectedPlanningUnits: shipmentListForSelectedPlanningUnits,
+                            shipmentListForSelectedPlanningUnitsUnfiltered: shipmentListForSelectedPlanningUnitsUnfiltered,
+                            planningUnitListForJexcel: planningUnitListForJexcelUpdated
                         })
                         this.refs.shipmentChild.showShipmentData();
                     }.bind(this)
@@ -1126,8 +1243,8 @@ export default class ShipmentDetails extends React.Component {
                             <div className="card-header-actions">
                                 <div className="card-header-action">
                                     <a className="card-header-action">
-                                        {/* {this.state.programId != 0 && }&nbsp;&nbsp; */}
-                                        {this.state.programId != 0 && this.state.planningUnitId != 0 &&
+                                        {this.state.programId != 0 && <a href="javascript:void();" onClick={this.toggleReplan}><i className="fa fa-calendar"></i></a>}&nbsp;&nbsp;
+                                        {this.state.programId != 0 && this.state.planningUnit.length > 0 &&
                                             <a href='javascript:;' onClick={this.exportCSV} ><span style={{ cursor: 'pointer' }}><small className="supplyplanformulas">{i18n.t('static.dataentry.downloadTemplate')}</small></span></a>
                                         }
                                         {/* <a href={`${API_URL}/file/shipmentDataEntryTemplate`}><span style={{ cursor: 'pointer' }}><small className="supplyplanformulas">{i18n.t('static.dataentry.downloadTemplate')}</small></span></a> */}
@@ -1176,17 +1293,21 @@ export default class ShipmentDetails extends React.Component {
                                                         />
                                                     </div>
                                                 </FormGroup>
-                                                <FormGroup className="col-md-3 ">
+                                                <FormGroup className="col-md-3">
                                                     <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.qatProduct')}</Label>
+                                                    <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                                                     <div className="controls ">
-                                                        <Select
+                                                        {/* <InputGroup className="box"> */}
+                                                        <MultiSelect
                                                             name="planningUnit"
                                                             id="planningUnit"
-                                                            bsSize="sm"
-                                                            options={this.state.planningUnitList}
+                                                            options={this.state.planningUnitList.length > 0 ? this.state.planningUnitList : []}
                                                             value={this.state.planningUnit}
                                                             onChange={(e) => { this.formSubmit(e, this.state.rangeValue); }}
+                                                            // onChange={(e) => { this.handlePlanningUnitChange(e) }}
+                                                            labelledBy={i18n.t('static.common.select')}
                                                         />
+
                                                     </div>
                                                 </FormGroup>
                                                 <FormGroup className="col-md-3 ">
