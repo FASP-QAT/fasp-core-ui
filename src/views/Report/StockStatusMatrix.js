@@ -464,6 +464,8 @@ export default class StockStatusMatrix extends React.Component {
               for (var from = this.state.startYear, to = this.state.endYear; from <= to; from++) {
                 var monthlydata = [];
                 var monthlydata1 = [];
+                var monthlydataTotal =0;
+                var totalMonths=0;
                 for (var month = 1; month <= 12; month++) {
                   var dtstr = from + "-" + String(month).padStart(2, '0') + "-01"
                   var enddtStr = from + "-" + String(month).padStart(2, '0') + '-' + new Date(from, month, 0).getDate()
@@ -476,11 +478,15 @@ export default class StockStatusMatrix extends React.Component {
                     if (includePlannedShipments.toString() == "true") {
                       monthlydata.push(pu.planBasedOn == 1 ? list[0].mos : list[0].maxStock)
                       monthlydata1.push(list[0].closingBalance)
+                      monthlydataTotal+=Number(list[0].maxStock);
+                      totalMonths+=1;
                     }
                     else {
 
                       monthlydata.push(pu.planBasedOn == 1 ? list[0].mosWps : list[0].maxStock)
                       monthlydata1.push(list[0].closingBalanceWps)
+                      monthlydataTotal+=Number(list[0].maxStock);
+                      totalMonths+=1;
                     }
                   } else {
                     monthlydata.push(null)
@@ -489,6 +495,10 @@ export default class StockStatusMatrix extends React.Component {
 
                 }
                 console.log(monthlydata)
+                console.log("Planning Unit Mohit",pu.planningUnit)
+                console.log("monthlydataTotal Mohit",monthlydataTotal);
+                console.log("totalMonths Mohit",totalMonths);
+
                 var json = {
                   tracerCategoryId: this.state.planningUnitList.filter(c => c.planningUnitId == planningUnitId)[0].forecastingUnit.tracerCategory.id,
                   planningUnit: pu.planningUnit,
@@ -521,6 +531,7 @@ export default class StockStatusMatrix extends React.Component {
                   octStock: monthlydata1[9],
                   novStock: monthlydata1[10],
                   decStock: monthlydata1[11],
+                  maxStock: totalMonths!=0?Number(monthlydataTotal)/totalMonths:""
                 }
                 data.push(json)
 
@@ -1365,6 +1376,22 @@ export default class StockStatusMatrix extends React.Component {
       return ''
     }
   }
+  formatterMaxQty = value => {
+    if (value != null) {
+      var cell1 = value
+      cell1 += '';
+      var x = cell1.split('.');
+      var x1 = x[0];
+      var x2 = x.length > 1 ? '.' + x[1] : '';
+      var rgx = /(\d+)(\d{3})/;
+      while (rgx.test(x1)) {
+        x1 = x1.replace(rgx, '$1' + ',' + '$2');
+      }
+      return x1 + x2;
+    } else {
+      return ''
+    }
+  }
   addDoubleQuoteToRowContent = (arr) => {
     return arr.map(ele => '"' + ele + '"')
   }
@@ -1395,7 +1422,7 @@ export default class StockStatusMatrix extends React.Component {
     columns.map((item, idx) => { headers[idx] = ((item.text).replaceAll(' ', '%20').replaceAll('#', '%23')) });
     var A = [this.addDoubleQuoteToRowContent(headers)]
     var re = this.state.data
-    this.state.data.map(ele => A.push(this.addDoubleQuoteToRowContent([ele.planningUnit.id, (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.planBasedOn == 1 ? i18n.t('static.report.mos') : i18n.t('static.report.qty'), ele.minMonthsOfStock, ele.planBasedOn == 1 ? Number(ele.minMonthsOfStock) + Number(ele.reorderFrequency) : i18n.t('static.report.variable'), ele.year,
+    this.state.data.map(ele => A.push(this.addDoubleQuoteToRowContent([ele.planningUnit.id, (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.planBasedOn == 1 ? i18n.t('static.report.mos') : i18n.t('static.report.qty'), ele.minMonthsOfStock, ele.planBasedOn == 1 ? Number(ele.minMonthsOfStock) + Number(ele.reorderFrequency) : Math.round(ele.maxStock), ele.year,
     ele.planBasedOn == 1 ? (ele.jan != null ? isNaN(ele.jan) ? '' : this.roundN(ele.jan) : i18n.t("static.supplyPlanFormula.na")) : (ele.janStock != null ? isNaN(ele.janStock) ? '' : this.roundN(ele.janStock) : i18n.t("static.supplyPlanFormula.na")),
     ele.planBasedOn == 1 ? (ele.feb != null ? isNaN(ele.feb) ? '' : this.roundN(ele.feb) : i18n.t("static.supplyPlanFormula.na")) : (ele.febStock != null ? isNaN(ele.febStock) ? '' : this.roundN(ele.febStock) : i18n.t("static.supplyPlanFormula.na")),
     ele.planBasedOn == 1 ? (ele.mar != null ? isNaN(ele.mar) ? '' : this.roundN(ele.mar) : i18n.t("static.supplyPlanFormula.na")) : (ele.marStock != null ? isNaN(ele.marStock) ? '' : this.roundN(ele.marStock) : i18n.t("static.supplyPlanFormula.na")),
@@ -1516,7 +1543,7 @@ export default class StockStatusMatrix extends React.Component {
     header = [[{ content: i18n.t('static.report.qatPID'), styles: { halign: 'center' } }, { content: i18n.t('static.planningunit.planningunit'), styles: { halign: 'center' } },
     { content: i18n.t('static.stockStatus.plannedBy'), styles: { halign: 'center' } },
     { content: i18n.t('static.report.minMosOrQty'), styles: { halign: 'center' } },
-    { content: i18n.t('static.supplyPlan.max'), styles: { halign: 'center' } },
+    { content: i18n.t('static.report.maxMosOrQty'), styles: { halign: 'center' } },
     { content: i18n.t('static.common.year'), styles: { halign: 'center' } },
     { content: i18n.t('static.month.jan'), styles: { halign: 'center' } },
     { content: i18n.t('static.month.feb'), styles: { halign: 'center' } },
@@ -1532,7 +1559,7 @@ export default class StockStatusMatrix extends React.Component {
     { content: i18n.t('static.month.dec'), styles: { halign: 'center' } }
     ]]
     let data;
-    data = this.state.data.map(ele => [ele.planningUnit.id, getLabelText(ele.planningUnit.label, this.state.lang), ele.planBasedOn == 1 ? i18n.t('static.report.mos') : i18n.t('static.report.qty'), this.formatterDouble(ele.minMonthsOfStock), ele.planBasedOn == 1 ? Number(ele.minMonthsOfStock) + Number(ele.reorderFrequency) : i18n.t('static.report.variable'), ele.year,
+    data = this.state.data.map(ele => [ele.planningUnit.id, getLabelText(ele.planningUnit.label, this.state.lang), ele.planBasedOn == 1 ? i18n.t('static.report.mos') : i18n.t('static.report.qty'), this.formatterDouble(ele.minMonthsOfStock), ele.planBasedOn == 1 ? this.formatterMaxQty(Number(ele.minMonthsOfStock) + Number(ele.reorderFrequency)) : this.formatterMaxQty(Math.round(ele.maxStock)), ele.year,
     (ele.planBasedOn == 1 ? (ele.jan != null ? isNaN(ele.jan) ? '' : this.formatter(ele.jan) : i18n.t("static.supplyPlanFormula.na")) : (ele.janStock != null ? isNaN(ele.janStock) ? '' : this.formatter(ele.janStock) : i18n.t("static.supplyPlanFormula.na"))),
     (ele.planBasedOn == 1 ? (ele.feb != null ? isNaN(ele.feb) ? '' : this.formatter(ele.feb) : i18n.t("static.supplyPlanFormula.na")) : (ele.febStock != null ? isNaN(ele.febStock) ? '' : this.formatter(ele.febStock) : i18n.t("static.supplyPlanFormula.na"))),
     (ele.planBasedOn == 1 ? (ele.mar != null ? isNaN(ele.mar) ? '' : this.formatter(ele.mar) : i18n.t("static.supplyPlanFormula.na")) : (ele.marStock != null ? isNaN(ele.marStock) ? '' : this.formatter(ele.marStock) : i18n.t("static.supplyPlanFormula.na"))),
@@ -1703,7 +1730,7 @@ export default class StockStatusMatrix extends React.Component {
         headerAlign: 'center'
       }, {
         dataField: 'reorderFrequency',
-        text: i18n.t('static.supplyPlan.max'),
+        text: i18n.t('static.report.maxMosOrQty'),
         sort: true,
         align: 'center',
         headerAlign: 'center'
@@ -2022,7 +2049,7 @@ export default class StockStatusMatrix extends React.Component {
                       <th className="text-center" style={{ width: "20%" }}>{i18n.t('static.planningunit.planningunit')}</th>
                       <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.stockStatus.plannedBy')}</th>
                       <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.report.minMosOrQty')}</th>
-                      <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.supplyPlan.max')}</th>
+                      <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.report.maxMosOrQty')}</th>
                       <th className="text-center" style={{ width: "5%" }} >{i18n.t('static.common.year')}</th>
                       <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.jan')}</th>
                       <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.feb')}</th>
@@ -2043,21 +2070,21 @@ export default class StockStatusMatrix extends React.Component {
                       return (<tr>
                         <td className="text-center"> {getLabelText(ele.planningUnit.label, this.state.lang)}</td>
                         <td className="text-center"> {ele.planBasedOn == 1 ? i18n.t('static.report.mos') : i18n.t('static.report.qty')}</td>
-                        <td className="text-center">{ele.minMonthsOfStock}</td>
-                        <td className="text-center">{ele.planBasedOn == 1 ? Number(ele.minMonthsOfStock) + Number(ele.reorderFrequency) : i18n.t('static.report.variable')}</td>
+                        <td className="text-center">{this.formatterMaxQty(ele.minMonthsOfStock)}</td>
+                        <td className="text-center">{ele.planBasedOn == 1 ? this.formatterMaxQty(Number(ele.minMonthsOfStock) + Number(ele.reorderFrequency)) : this.formatterMaxQty(Math.round(ele.maxStock))}</td>
                         <td className="text-center">{ele.year}</td>
-                        <td className="text-center" style={this.cellStyle(ele.planBasedOn, ele.minMonthsOfStock, ele.reorderFrequency, ele.jan, ele.janStock)}>{ele.planBasedOn == 1 ? isNaN(ele.jan) ? '' : ele.jan != null ? this.formatter(ele.jan) : i18n.t("static.supplyPlanFormula.na") : ""}</td>
-                        <td className="text-center" style={this.cellStyle(ele.planBasedOn, ele.minMonthsOfStock, ele.reorderFrequency, ele.feb, ele.febStock)} > {ele.planBasedOn == 1 ? isNaN(ele.feb) ? '' : ele.feb != null ? this.formatter(ele.feb) : i18n.t("static.supplyPlanFormula.na") : ""}</td>
-                        <td className="text-center" style={this.cellStyle(ele.planBasedOn, ele.minMonthsOfStock, ele.reorderFrequency, ele.mar, ele.marStock)} > {ele.planBasedOn == 1 ? isNaN(ele.mar) ? '' : ele.mar != null ? this.formatter(ele.mar) : i18n.t("static.supplyPlanFormula.na") : ""}</td>
-                        <td className="text-center" style={this.cellStyle(ele.planBasedOn, ele.minMonthsOfStock, ele.reorderFrequency, ele.apr, ele.aprStock)}> {ele.planBasedOn == 1 ? isNaN(ele.apr) ? '' : ele.apr != null ? this.formatter(ele.apr) : i18n.t("static.supplyPlanFormula.na") : ""}</td>
-                        <td className="text-center" style={this.cellStyle(ele.planBasedOn, ele.minMonthsOfStock, ele.reorderFrequency, ele.may, ele.mayStock)}> {ele.planBasedOn == 1 ? isNaN(ele.may) ? '' : ele.may != null ? this.formatter(ele.may) : i18n.t("static.supplyPlanFormula.na") : ""}</td>
-                        <td className="text-center" style={this.cellStyle(ele.planBasedOn, ele.minMonthsOfStock, ele.reorderFrequency, ele.jun, ele.junStock)}> {ele.planBasedOn == 1 ? isNaN(ele.jun) ? '' : ele.jun != null ? this.formatter(ele.jun) : i18n.t("static.supplyPlanFormula.na") : ""}</td>
-                        <td className="text-center" style={this.cellStyle(ele.planBasedOn, ele.minMonthsOfStock, ele.reorderFrequency, ele.jul, ele.julStock)}> {ele.planBasedOn == 1 ? isNaN(ele.jul) ? '' : ele.jul != null ? this.formatter(ele.jul) : i18n.t("static.supplyPlanFormula.na") : ""}</td>
-                        <td className="text-center" style={this.cellStyle(ele.planBasedOn, ele.minMonthsOfStock, ele.reorderFrequency, ele.aug, ele.augStock)}> {ele.planBasedOn == 1 ? isNaN(ele.aug) ? '' : ele.aug != null ? this.formatter(ele.aug) : i18n.t("static.supplyPlanFormula.na") : ""}</td>
-                        <td className="text-center" style={this.cellStyle(ele.planBasedOn, ele.minMonthsOfStock, ele.reorderFrequency, ele.sep, ele.sepStock)}> {ele.planBasedOn == 1 ? isNaN(ele.sep) ? '' : ele.sep != null ? this.formatter(ele.sep) : i18n.t("static.supplyPlanFormula.na") : ""}</td>
-                        <td className="text-center" style={this.cellStyle(ele.planBasedOn, ele.minMonthsOfStock, ele.reorderFrequency, ele.oct, ele.octStock)}> {ele.planBasedOn == 1 ? isNaN(ele.oct) ? '' : ele.oct != null ? this.formatter(ele.oct) : i18n.t("static.supplyPlanFormula.na") : ""}</td>
-                        <td className="text-center" style={this.cellStyle(ele.planBasedOn, ele.minMonthsOfStock, ele.reorderFrequency, ele.nov, ele.novStock)}> {ele.planBasedOn == 1 ? isNaN(ele.nov) ? '' : ele.nov != null ? this.formatter(ele.nov) : i18n.t("static.supplyPlanFormula.na") : ""}</td>
-                        <td className="text-center" style={this.cellStyle(ele.planBasedOn, ele.minMonthsOfStock, ele.reorderFrequency, ele.dec, ele.decStock)}> {ele.planBasedOn == 1 ? isNaN(ele.dec) ? '' : ele.dec != null ? this.formatter(ele.dec) : i18n.t("static.supplyPlanFormula.na") : ""}</td></tr>)
+                        <td className="text-center" style={this.cellStyle(ele.planBasedOn, ele.minMonthsOfStock, ele.reorderFrequency, ele.jan, ele.janStock)}>{ele.planBasedOn == 1 ? isNaN(ele.jan) ? '' : ele.jan != null ? this.formatter(ele.jan) : i18n.t("static.supplyPlanFormula.na") : isNaN(ele.janStock) ? '' : ele.janStock != null ? this.formatter(ele.janStock) : ""}</td>
+                        <td className="text-center" style={this.cellStyle(ele.planBasedOn, ele.minMonthsOfStock, ele.reorderFrequency, ele.feb, ele.febStock)} > {ele.planBasedOn == 1 ? isNaN(ele.feb) ? '' : ele.feb != null ? this.formatter(ele.feb) : i18n.t("static.supplyPlanFormula.na") : isNaN(ele.febStock) ? '' : ele.febStock != null ? this.formatter(ele.febStock) : ""}</td>
+                        <td className="text-center" style={this.cellStyle(ele.planBasedOn, ele.minMonthsOfStock, ele.reorderFrequency, ele.mar, ele.marStock)} > {ele.planBasedOn == 1 ? isNaN(ele.mar) ? '' : ele.mar != null ? this.formatter(ele.mar) : i18n.t("static.supplyPlanFormula.na") : isNaN(ele.marStock) ? '' : ele.marStock != null ? this.formatter(ele.marStock) : ""}</td>
+                        <td className="text-center" style={this.cellStyle(ele.planBasedOn, ele.minMonthsOfStock, ele.reorderFrequency, ele.apr, ele.aprStock)}> {ele.planBasedOn == 1 ? isNaN(ele.apr) ? '' : ele.apr != null ? this.formatter(ele.apr) : i18n.t("static.supplyPlanFormula.na") : isNaN(ele.aprStock) ? '' : ele.aprStock != null ? this.formatter(ele.aprStock) : ""}</td>
+                        <td className="text-center" style={this.cellStyle(ele.planBasedOn, ele.minMonthsOfStock, ele.reorderFrequency, ele.may, ele.mayStock)}> {ele.planBasedOn == 1 ? isNaN(ele.may) ? '' : ele.may != null ? this.formatter(ele.may) : i18n.t("static.supplyPlanFormula.na") : isNaN(ele.mayStock) ? '' : ele.mayStock != null ? this.formatter(ele.mayStock) : ""}</td>
+                        <td className="text-center" style={this.cellStyle(ele.planBasedOn, ele.minMonthsOfStock, ele.reorderFrequency, ele.jun, ele.junStock)}> {ele.planBasedOn == 1 ? isNaN(ele.jun) ? '' : ele.jun != null ? this.formatter(ele.jun) : i18n.t("static.supplyPlanFormula.na") : isNaN(ele.junStock) ? '' : ele.junStock != null ? this.formatter(ele.junStock) : ""}</td>
+                        <td className="text-center" style={this.cellStyle(ele.planBasedOn, ele.minMonthsOfStock, ele.reorderFrequency, ele.jul, ele.julStock)}> {ele.planBasedOn == 1 ? isNaN(ele.jul) ? '' : ele.jul != null ? this.formatter(ele.jul) : i18n.t("static.supplyPlanFormula.na") : isNaN(ele.julStock) ? '' : ele.julStock != null ? this.formatter(ele.julStock) : ""}</td>
+                        <td className="text-center" style={this.cellStyle(ele.planBasedOn, ele.minMonthsOfStock, ele.reorderFrequency, ele.aug, ele.augStock)}> {ele.planBasedOn == 1 ? isNaN(ele.aug) ? '' : ele.aug != null ? this.formatter(ele.aug) : i18n.t("static.supplyPlanFormula.na") : isNaN(ele.augStock) ? '' : ele.augStock != null ? this.formatter(ele.augStock) : ""}</td>
+                        <td className="text-center" style={this.cellStyle(ele.planBasedOn, ele.minMonthsOfStock, ele.reorderFrequency, ele.sep, ele.sepStock)}> {ele.planBasedOn == 1 ? isNaN(ele.sep) ? '' : ele.sep != null ? this.formatter(ele.sep) : i18n.t("static.supplyPlanFormula.na") : isNaN(ele.sepStock) ? '' : ele.sepStock != null ? this.formatter(ele.sepStock) : ""}</td>
+                        <td className="text-center" style={this.cellStyle(ele.planBasedOn, ele.minMonthsOfStock, ele.reorderFrequency, ele.oct, ele.octStock)}> {ele.planBasedOn == 1 ? isNaN(ele.oct) ? '' : ele.oct != null ? this.formatter(ele.oct) : i18n.t("static.supplyPlanFormula.na") : isNaN(ele.octStock) ? '' : ele.octStock != null ? this.formatter(ele.octStock) : ""}</td>
+                        <td className="text-center" style={this.cellStyle(ele.planBasedOn, ele.minMonthsOfStock, ele.reorderFrequency, ele.nov, ele.novStock)}> {ele.planBasedOn == 1 ? isNaN(ele.nov) ? '' : ele.nov != null ? this.formatter(ele.nov) : i18n.t("static.supplyPlanFormula.na") : isNaN(ele.novStock) ? '' : ele.novStock != null ? this.formatter(ele.novStock) : ""}</td>
+                        <td className="text-center" style={this.cellStyle(ele.planBasedOn, ele.minMonthsOfStock, ele.reorderFrequency, ele.dec, ele.decStock)}> {ele.planBasedOn == 1 ? isNaN(ele.dec) ? '' : ele.dec != null ? this.formatter(ele.dec) : i18n.t("static.supplyPlanFormula.na") : isNaN(ele.decStock) ? '' : ele.decStock != null ? this.formatter(ele.decStock) : ""}</td></tr>)
                     })}
 
                   </tbody>
