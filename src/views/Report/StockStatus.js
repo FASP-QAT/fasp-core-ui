@@ -3892,7 +3892,7 @@ class StockStatus extends Component {
                               {this.formatter(this.formatAmc(this.state.stockStatusList[idx].amc))}
                             </td>
                             <td>
-                              {this.state.stockStatusList[0].planBasedOn == 1 ? this.state.stockStatusList[idx].mos != null ? this.roundN(this.state.stockStatusList[idx].mos) : i18n.t("static.supplyPlanFormula.na") : this.roundN(this.state.stockStatusList[idx].maxStock)}
+                              {this.state.stockStatusList[0].planBasedOn == 1 ? this.state.stockStatusList[idx].mos != null ? this.roundN(this.state.stockStatusList[idx].mos) : i18n.t("static.supplyPlanFormula.na") : this.formatter(this.state.stockStatusList[idx].maxStock)}
                             </td>
                             <td>
                               {this.state.stockStatusList[idx].unmetDemand != 0 ? this.formatter(this.state.stockStatusList[idx].unmetDemand) : ''}
