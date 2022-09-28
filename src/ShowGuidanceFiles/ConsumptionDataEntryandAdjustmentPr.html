@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<meta name="">
+	<title>Mostrar orientação</title>
+	<style>
+		table, td, div, h1, p {font-family: Arial, sans-serif;line-height: 20px;}
+		body{padding: 0;margin: 0;color: #272127;}
+		a {
+    color: #205493;
+    /* text-decoration: none; */
+    background-color: transparent;
+}
+	</style>
+</head>
+<body style="margin:0;padding:0;background:#e4e5e6;">
+	<table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+		<tr>
+			<td align="center" style="padding:0;">
+				<table role="presentation" style="max-width: 910px;min-width:100%;margin-top:20px;margin-bottom:20px;border-collapse:collapse;border:1px solid #fff;border-spacing:0;text-align:left;border-radius: 0.25rem;background-color: #fff;">
+					<tr>
+						<td style="padding:10px 30px 20px 30px;">
+							<table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+								
+								<tr>
+									<h3 style="color: #002f6c;font-weight: 600;font-size: 19px;">Entrada e Ajuste de Dados</h3>
+									<td style="padding:0 0 10px 0;color:#153643;">
+										<p style="font-size: 13px;"><span style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold;">Objetivo :</span> Permita que os usuários preparem dados históricos de consumo antes de avançar '<a href="/#/Extrapolation/extrapolateData" target="_blank" style="text-decoration: underline;">Extrapolação</a>' tela. O consumo real histórico pode ser quantidades vendidas, quantidades dispensadas ao usuário ou quantidades emitidas por instalações de armazenamento. Nesta tela, os usuários podem ajustar os dados históricos de consumo que foram inseridos manualmente nesta tela ou que foram importados de um programa de plano de abastecimento QAT (se desejar importar, prossiga primeiro para o '<a href="/#/importFromQATSupplyPlan/listImportFromQATSupplyPlan" target="_blank" style="text-decoration: underline;">Importar do plano de abastecimento QAT</a>' screen). </p>
+										<p style="font-size: 13px;"><span style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold;">Usando esta tela :</span></p>
+					
+											<ol type="1">
+												<li style="font-size:13px;">Selecione o programa de previsão e o período de revisão desejado. Por padrão, o QAT pré-seleciona um intervalo de datas de 36 meses antes do início do período de previsão. Uma tabela não editável e todos os produtos relacionados a este programa de previsão são exibidos, juntamente com seus dados de consumo ajustados, caso você tenha inserido esses dados anteriormente; caso contrário, você verá células amarelas indicando que nenhum dado de consumo foi inserido. Por padrão, os produtos e o consumo são mostrados em unidades de planejamento. O usuário também pode expandir cada linha da tabela para exibir o consumo por região, se estiver gerenciando um programa multirregional.  </li>
+												<li style="font-size:13px;">Na tabela superior, clique em um produto para exibir a tabela de dados detalhada desse produto. A tabela de dados detalhada terá uma seção para cada região em seu programa.</li>
+												<li style="font-size:13px;">A tabela de dados detalhada permite que os usuários adicionem, editem, ajustem ou excluam registros históricos de consumo.
+													<ol type="a">
+														<li style="font-size:13px;">Se desejar inserir dados manualmente, insira o consumo histórico para cada região e 
+															mês na linha "Consumo real".  </li>
+														<li style="font-size:13px;">Se você importou dados do QAT, verá seu consumo histórico importado na linha "Consumo real".  </li>
+														<li style="font-size:13px;">Por padrão, supõe-se que os dados sejam inseridos na Unidade de planejamento. No entanto, o usuário pode especificar a unidade apropriada 
+															para os dados detalhados clicando no link alterar sob o nome do produto e no pop-up 
+															subsequente, optando por inserir dados usando a unidade de planejamento, as quantidades 
+															da unidade de previsão (aplicando um domínio -fator de conversão gerenciado) ou outra unidade 
+															inserida pelo usuário (e fator de conversão). </li>
+														</ol>
+													</li>
+											<li style="font-size:13px;">Existem três maneiras de ajustar os dados:
+												<ol type="a">
+													<li><b>Ajustar para subnotificação</b>: O valor padrão é 100% de relatórios todos os meses. O usuário pode 
+														alterar isso para o valor correto. A QAT calculará o consumo ajustado devido à subnotificação. </li>
+													<li><b>Ajuste para falta de estoque</b>: Para dados importados, o número de dias de falta de estoque é obtido do programa 
+														de plano de fornecimento QAT, se os dados forem coletados. O valor padrão para dias 
+														de falta de estoque é zero dias (produto assumido sempre em estoque). O usuário pode 
+														alterar isso para o valor correto. O valor padrão para o número de dias em um mês é baseado 
+														nos dias do calendário, mas os usuários podem ajustar o número de dias usados para o 
+														cálculo de falta de estoque em '<a href="/#/dataset/versionSettings" target="_blank" style="text-decoration: underline;">Atualizar configurações de versão</a>'. </li>
+														<p class="pl-lg-5"><span style="font-style: italic;"><b>Taxa de Falta de Estoque</b> = Esgotado (dias)/ (Nº de dias no mês). </span><br>
+															<span style="font-style: italic;"><b>Consumo Ajustado</b> = Consumo real / Taxa de Relatório / (1 - Taxa de Esgotamento) </span>
+														</p>
+														<p>Por exemplo, se para um determinado mês, um produto teve um consumo de 1.000 unidades, 
+															ficou fora de estoque por 5 dos 31 dias do mês e a taxa de relatório foi de 98%: <br>
+															<span class="pl-lg-5" style="font-style: italic;"><b> Taxa de Falta de Estoque </b>= 5 days stocked out /31 days in a month = 16.1%. </span><br>
+															<span class="pl-lg-5" style="font-style: italic;"><b>  Consumo Ajustado </b>= 1,000 units / 98% Reporting / (1 - 16.1%) = 1,217</span>  
+														</p>
+														<li>Interpolação de valores ausentes: Clique no botão verde "Interpolar" no meio direito da tela para procurar períodos
+															 em que o valor de consumo está em branco e substituí-los por um valor interpolado. 
+															 QAT interpola encontrando os valores mais próximos em cada lado (antes ou depois do branco), 
+															 calcula a linha reta entre eles e usa essa fórmula de linha reta para calcular o valor do(s) 
+															 branco(s).  Observe que o QAT não fará a interpolação para meses em que o consumo real for 
+															 zero. O QAT apenas interpolará se houver pelo menos um ponto de dados antes e um ponto de 
+															 dados após o(s) valor(es) em branco.<br>Matematicamente:<br>
+															 <ul>
+																<li>Onde xs representam meses e ys representam o consumo real,</li>
+																<li>Onde os valores de dados conhecidos são (x0 , y0) e (x1 , y1) </li>
+																<li>Onde quaisquer valores de dados desconhecidos são (x, y) </li>
+																<li>A fórmula da linha interpolada é </li>
+															</ul>
+															<span><img class="formula-img-mr img-fluid mb-lg-0" src="../ShowGuidanceFiles/img/dataentryScreenshot-1.png" style="border: 1px solid rgb(255, 255, 255); width: 250px;"></span><br>
+															<span><img class="formula-img-mr img-fluid mb-lg-0 mt-lg-0" src="../ShowGuidanceFiles/img/dataentryScreenshot-2.png" style="border: 1px solid rgb(255, 255, 255); width: 250px;"></span>
+														</li>
+														<li>Use o gráfico abaixo da tabela Dados Detalhados para visualizar os dados ajustados  </li>
+													</ol>
+												</li>
+												<li style="font-size:13px;">Clique em "Enviar" para salvar os dados inseridos </li>
+												<li style="font-size:13px;">Repita as etapas 2-4 para cada unidade de planejamento</li>
+
+								</ol>
+							</p>
+				</td>
+				</tr>
+	
+							</table>
+						</td>
+					</tr>
+					
+				</table>
+			</td>
+		</tr>
+	</table>
+</body>
+</html>

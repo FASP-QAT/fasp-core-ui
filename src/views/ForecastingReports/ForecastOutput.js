@@ -32,6 +32,11 @@ import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 import NumberFormat from 'react-number-format';
 import EquivalancyUnitService from "../../api/EquivalancyUnitService";
 import ReportService from '../../api/ReportService';
+import showguidanceforecastOutputEn from '../../../src/ShowGuidanceFiles/ForecastOutputEn.html'
+import showguidanceforecastOutputFr from '../../../src/ShowGuidanceFiles/ForecastOutputFr.html'
+import showguidanceforecastOutputSp from '../../../src/ShowGuidanceFiles/ForecastOutputSp.html'
+import showguidanceforecastOutputPr from '../../../src/ShowGuidanceFiles/ForecastOutputPr.html'
+
 const ref = React.createRef();
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -3879,7 +3884,15 @@ class ForecastOutput extends Component {
                     </ModalHeader>
                     <div>
                         <ModalBody>
-                            <div>
+                        <div dangerouslySetInnerHTML={ {__html:localStorage.getItem('lang') == 'en' ?
+                showguidanceforecastOutputEn :
+                localStorage.getItem('lang') == 'fr' ?
+                showguidanceforecastOutputFr :
+                  localStorage.getItem('lang') == 'sp' ?
+                  showguidanceforecastOutputSp :
+                  showguidanceforecastOutputPr
+              } } />
+                            {/* <div>
                                 <h3 className='ShowGuidanceHeading'>{i18n.t('static.dashboard.monthlyForecast')}</h3>
                             </div>
                             <p>
@@ -3903,7 +3916,7 @@ class ForecastOutput extends Component {
                                         </li>
                                     </ul>
                                 </p>
-                            </p>
+                            </p> */}
 
                         </ModalBody>
                     </div>
