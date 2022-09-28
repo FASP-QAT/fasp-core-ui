@@ -86,6 +86,7 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
             var cbForMonth1 = spd1.length > 0 ? spd1[0].closingBalance : 0;
             var cbForMonth2 = spd2.length > 0 ? spd2[0].closingBalance : 0;
             var cbForMonth3 = spd3.length > 0 ? spd3[0].closingBalance : 0;
+            var unmetDemandForMonth1=spd1.length > 0 ? spd1[0].unmetDemand : 0;
 
             var maxStockForMonth1 = spd1.length > 0 ? spd1[0].maxStock : 0;
             var minStockForMonth1 = spd1.length > 0 ? spd1[0].minStock : 0;
@@ -124,9 +125,9 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
             if (suggestShipment) {
                 var suggestedOrd = 0;
                 if (useMax) {
-                    suggestedOrd = Number((Number(maxStockForMonth1)) - Number(jsonList[0].closingBalance) + Number(jsonList[0].unmetDemand));
+                    suggestedOrd = Number((Number(maxStockForMonth1)) - Number(cbForMonth1) + Number(unmetDemandForMonth1));
                 } else {
-                    suggestedOrd = Number((Number(minStockForMonth1)) - Number(jsonList[0].closingBalance) + Number(jsonList[0].unmetDemand));
+                    suggestedOrd = Number((Number(minStockForMonth1)) - Number(cbForMonth1) + Number(unmetDemandForMonth1));
                 }
             }
         }

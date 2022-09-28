@@ -875,19 +875,23 @@ class DefaultLayout extends Component {
   goOffline(e) {
     // localStorage.setItem("loginOnline", false);
     console.log("window.location", window.location)
-    var url = window.location.href;
-    if ((url.indexOf("green/") > -1) || (url.indexOf("red/") > -1)) {
-      // "The specific word exists";
+    // var url = window.location.href;
+    // if ((url.indexOf("green/") > -1) || (url.indexOf("red/") > -1)) {
+    //   // "The specific word exists";
+    //   localStorage.setItem("loginOnline", false);
+    //   var getSplit = ((url.indexOf("green/") > -1 ? url.split("green/") : url.split("red/")))
+    //   window.location.href = getSplit[0] + '%20/' + '%20';
+    //   window.location.reload();
+    // } else {
+    //   // "The specific word doesn't exist";
       localStorage.setItem("loginOnline", false);
-      var getSplit = ((url.indexOf("green/") > -1 ? url.split("green/") : url.split("red/")))
-      window.location.href = getSplit[0] + '%20/' + '%20';
-      window.location.reload();
-    } else {
-      // "The specific word doesn't exist";
-      localStorage.setItem("loginOnline", false);
-      window.location.reload();
-    }
+    //   window.location.reload();
+    // }
     // window.location.reload();
+    let id = AuthenticationService.displayDashboardBasedOnRole();
+    this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.login.successOffline'))
+    window.location.reload();
+
   }
 
   goOnline(e) {

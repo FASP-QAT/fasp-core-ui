@@ -45,6 +45,9 @@ export default class MapPlanningUnits extends Component {
         data[9] = "";
         data[10] = "";
         data[11] = "";
+        data[12] = "";
+        data[13] = "";
+        data[14] = "";
         this.el.insertRow(
             data, 0, 1
         );
@@ -302,6 +305,7 @@ export default class MapPlanningUnits extends Component {
     }
     changed = function (instance, cell, x, y, value) {
         this.props.removeMessageText();
+        var rowData=this.el.getRowData(y);
         if (x == 0) {
             var col = ("A").concat(parseInt(y) + 1);
             if (value == "") {
@@ -411,15 +415,21 @@ export default class MapPlanningUnits extends Component {
                 }
 
             }
+            if (rowData[2] == 2) {
+                this.el.setValueFromCoords(4, y, "", true);
+                this.el.setValueFromCoords(5, y, rowData[13], true);
+                this.el.setValueFromCoords(9, y, rowData[14] != "" ? rowData[14] : 0, true);
+            } else {
+                this.el.setValueFromCoords(5, y, "", true);
+                this.el.setValueFromCoords(9, y, "", true);
+                this.el.setValueFromCoords(4, y, rowData[12], true);
+            }
         }
         //reoder frequency
         if (x == 3) {
             // var reg = /^[0-9\b]+$/;
             var reg = JEXCEL_INTEGER_REGEX;
             var col = ("D").concat(parseInt(y) + 1);
-            console.log("this.el@@@@@@@@@",y)
-            console.log("this.el@@@@@@@@@",this.el.getValue(`D0`));
-            console.log("this.el@@@@@@@@@",this.el.getValue(`D1`));
             value = this.el.getValue(`D${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -436,7 +446,6 @@ export default class MapPlanningUnits extends Component {
                 }
             }
         }
-        var rowData = this.el.getRowData(y);
         //min month of stock
         if (x == 4) {
             var reg = JEXCEL_INTEGER_REGEX
@@ -455,6 +464,9 @@ export default class MapPlanningUnits extends Component {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
                 }
+            }
+            if (value !== "") {
+                this.el.setValueFromCoords(12, y, value, true);
             }
         }
         //min qty
@@ -476,6 +488,9 @@ export default class MapPlanningUnits extends Component {
                     this.el.setComments(col, "");
                 }
             }
+            if (value !== "") {
+                this.el.setValueFromCoords(13, y, value, true);
+            }
         }
         //Distribution Lead Time
         if (x == 9) {
@@ -495,6 +510,9 @@ export default class MapPlanningUnits extends Component {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
                 }
+            }
+            if (value !== "") {
+                this.el.setValueFromCoords(14, y, value, true);
             }
         }
         //month in future amc
@@ -604,10 +622,10 @@ export default class MapPlanningUnits extends Component {
     }
 
 
-    dropdownFilter = function (o, cell, c, r, source,config) {
+    dropdownFilter = function (o, cell, c, r, source, config) {
         var mylist = [];
         // var value = (instance.jexcel.getJson(null, false)[r])[c - 1];
-        var value = o.getValueFromCoords(c-1,r);
+        var value = o.getValueFromCoords(c - 1, r);
         // AuthenticationService.setupAxiosInterceptors();
         // PlanningUnitService.getActivePlanningUnitList()
         //     .then(response => {
@@ -641,7 +659,7 @@ export default class MapPlanningUnits extends Component {
             }
             mylist.push(planningUnitJson);
         }
-        config.source=mylist;
+        config.source = mylist;
         return config;
     }
 
@@ -744,6 +762,9 @@ export default class MapPlanningUnits extends Component {
                                 data[9] = "";
                                 data[10] = "";
                                 data[11] = "";
+                                data[12] = "";
+                                data[13] = "";
+                                data[14] = "";
                                 productDataArr[0] = data;
                                 // }
 
@@ -848,10 +869,18 @@ export default class MapPlanningUnits extends Component {
                                             mask: '#,##.00',
                                             disabledMaskOnEdition: true
                                         },
-                                        // {
-                                        //     title: 'Batch Required',
-                                        //     type: 'checkbox'
-                                        // }
+                                        {
+                                            title: 'Min Mos',
+                                            type: 'hidden'
+                                        },
+                                        {
+                                            title: 'Min Qty',
+                                            type: 'hidden'
+                                        },
+                                        {
+                                            title: 'Lead Distribution Time',
+                                            type: 'hidden'
+                                        },
 
                                     ],
                                     updateTable: function (el, cell, x, y, source, value, id) {
@@ -983,6 +1012,9 @@ export default class MapPlanningUnits extends Component {
                                                         data[9] = "";
                                                         data[10] = "";
                                                         data[11] = "";
+                                                        data[12] = "";
+                                                        data[13] = "";
+                                                        data[14] = "";
                                                         // this.el.insertRow();
                                                         // var json = this.el.getJson();
                                                         obj.insertRow(data, parseInt(y), 1);
@@ -1007,6 +1039,9 @@ export default class MapPlanningUnits extends Component {
                                                         data[9] = "";
                                                         data[10] = "";
                                                         data[11] = "";
+                                                        data[12] = "";
+                                                        data[13] = "";
+                                                        data[14] = "";
                                                         obj.insertRow(data, parseInt(y));
                                                         // obj.insertRow(parseInt(y), 1);
                                                     }.bind(this)
@@ -1230,7 +1265,7 @@ export default class MapPlanningUnits extends Component {
                 planningUnit: {
                     id: map.get("1"),
                 },
-                reorderFrequencyInMonths: this.el.getValue(`D${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                reorderFrequencyInMonths: this.el.getValue(`M${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                 minMonthsOfStock: this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                 monthsInFutureForAmc: this.el.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                 monthsInPastForAmc: this.el.getValue(`H${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
@@ -1239,8 +1274,8 @@ export default class MapPlanningUnits extends Component {
                 catalogPrice: this.el.getValue(`L${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                 active: true,
                 programPlanningUnitId: 0,
-                minQty: this.el.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                distributionLeadTime: this.el.getValue(`J${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                minQty: this.el.getValue(`N${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                distributionLeadTime: this.el.getValue(`O${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                 planBasedOn: map.get("2")
 
             }
