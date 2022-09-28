@@ -2813,12 +2813,12 @@
     "static.supplyPlan.listOfNewShipmentsCreated": "List of new shipments created",
     "static.treeList.confirmAlert": "Server version will take some time to load. Are you sure you want to load the server version ?",
     "static.supplyPlan.planMultiplePusByDate": "Plan multiple PUs by date",
-    "static.programPU.planBasedOn": "Plan Based On",
+    "static.programPU.planBasedOn": "Plan By",
     "static.product.minQuantity": "Min Quantity",
     "static.product.distributionLeadTime": "Distribution Lead Time (months)",
     "static.supplyPlan.minQty": "Min Qty",
     "static.programPU.planBasedOnTooltip": "Choose `quantity` for products where months of stock (MOS) planning doesn’t make sense (ie products that are high expiry, low consumption)",
-    "static.stockStatus.plannedBy": "Planned By",
+    "static.stockStatus.plannedBy": "Plan By",
     "static.report.minMosOrQty": "Min (months or qty)",
     "static.report.maxMosOrQty": "Max (months or qty)",
     "static.report.variable": "Variable",
@@ -2843,5 +2843,6 @@
     "static.login.goOffline": "Go Offline",
     "static.login.goOnline": "Go Online",
     "static.login.loginAgain": "Please login again to access QAT in online mode.",
-    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )"
+    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )",
+    "static.supplyPlanFormula.minMaxNote":"QAT converts max/min MOS into quantities by multiplying the number by the AMC for the current month."
 }
