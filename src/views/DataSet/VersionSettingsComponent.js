@@ -21,8 +21,14 @@ import { Prompt } from 'react-router';
 import { exportPDF, noForecastSelectedClicked, missingMonthsClicked, missingBranchesClicked, nodeWithPercentageChildrenClicked } from '../DataSet/DataCheckComponent.js';
 import pdfIcon from '../../assets/img/pdf.png';
 import ProgramService from '../../api/ProgramService';
+import showguidanceEn from '../../../src/ShowGuidanceFiles/UpdateVersionSettingsEn.html'
+import showguidanceFr from '../../../src/ShowGuidanceFiles/UpdateVersionSettingsFr.html'
+import showguidanceSp from '../../../src/ShowGuidanceFiles/UpdateVersionSettingsSp.html'
+import showguidancePr from '../../../src/ShowGuidanceFiles/UpdateVersionSettingsPr.html'
+
 import DatasetService from '../../api/DatasetService';
 import { resolve } from "path";
+
 const ref = React.createRef();
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -643,13 +649,15 @@ class VersionSettingsComponent extends Component {
                 versionSettingsList.push(dataset);
             }
         })
-        versionSettingsListOffLine= versionSettingsList.filter(c=>c.id)
+        versionSettingsListOffLine = versionSettingsList.filter(c => c.id)
         console.log("versionSettingsListOffLine!!!!", versionSettingsListOffLine)
         console.log("versionSettingsList!!!!", versionSettingsList)
-        this.setState({ 
-            versionSettingsList:versionSettingsListOffLine,
-            datasetIds }, () => { this.getOnLineDatasetsVersion() 
-            });
+        this.setState({
+            versionSettingsList: versionSettingsListOffLine,
+            datasetIds
+        }, () => {
+            this.getOnLineDatasetsVersion()
+        });
 
     }
 
@@ -823,14 +831,14 @@ class VersionSettingsComponent extends Component {
         var rangeValue = this.state.rangeValue;
         let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
         let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
-        var dataList1 =[];
+        var dataList1 = [];
         var inputjson = {
             programIds: programIdsarr,
             versionTypeId: versionTypeId,
             startDate: startDate,
             stopDate: stopDate
         }
-        console.log("Input Json",inputjson)
+        console.log("Input Json", inputjson)
         ProgramService.getDatasetVersions(inputjson).then(response => {
             if (response.status == 200) {
                 var responseData = response.data;
@@ -875,7 +883,7 @@ class VersionSettingsComponent extends Component {
                     () => {
                         this.buildJExcel();
                     })
-                }
+            }
         }).catch(
             error => {
                 this.setState({
@@ -886,7 +894,7 @@ class VersionSettingsComponent extends Component {
                     })
             }
         );
-    
+
         // }
     }
 
@@ -1353,7 +1361,7 @@ class VersionSettingsComponent extends Component {
                         programId: responseData[rd].programId,
                         name: getLabelText(responseData[rd].label, this.state.lang),
                         programCode: responseData[rd].programCode,
-                        isOnline:1
+                        isOnline: 1
                     }
                     datasetList.push(json);
                 }
@@ -1707,10 +1715,20 @@ class VersionSettingsComponent extends Component {
                         <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
                     </ModalHeader>
                     <div>
-                        <ModalBody>
+                        <ModalBody className="ModalBodyPadding">
+                            <div dangerouslySetInnerHTML={{
+                                __html: localStorage.getItem('lang') == 'en' ?
+                                    showguidanceEn :
+                                    localStorage.getItem('lang') == 'fr' ?
+                                        showguidanceFr :
+                                        localStorage.getItem('lang') == 'sp' ?
+                                            showguidanceSp :
+                                            showguidancePr
+                            }} />
+                            {/*                        
                             <div>
-                                <h3 className='ShowGuidanceHeading'>{i18n.t('static.UpdateversionSettings.UpdateversionSettings')}</h3>
-                            </div>
+                               <h3 className='ShowGuidanceHeading'>{i18n.t('static.UpdateversionSettings.UpdateversionSettings')}</h3>
+                           </div>
                             <p>
                                 <p style={{ fontSize: '13px' }}><span className="UnderLineText">{i18n.t('static.listTree.purpose')}</span> {i18n.t('static.VersionSetting.enableUsersTo')}</p>
                             </p>
@@ -1738,7 +1756,9 @@ class VersionSettingsComponent extends Component {
                                         </ol>
                                     </li>
                                 </ol>
-                            </p>
+                                </li>
+                            </ol>
+                            </p>  */}
                         </ModalBody>
                     </div>
                 </Modal>
@@ -1780,12 +1800,12 @@ class VersionSettingsComponent extends Component {
                             <br />
                             <br />
                             <span><b>1. {i18n.t('static.commitTree.noForecastSelected')}: </b>
-                            <a href="/#/report/compareAndSelectScenario" target="_blank">{i18n.t('static.commitTree.compare&Select')}</a>,
-                            {/* (<a href="/#/report/compareAndSelectScenario" target="_blank">{i18n.t('static.commitTree.compare&Select')}</a>, <a href={this.state.programId != -1 && this.state.programId != "" && this.state.programId != undefined ? "/#/forecastReport/forecastSummary/" + this.state.programId.toString().split("_")[0] + "/" + (this.state.programId.toString().split("_")[1]).toString().substring(1) : "/#/forecastReport/forecastSummary/"} target="_blank">{i18n.t('static.commitTree.forecastSummary')}</a>)</span><br />   */} 
-                            {(this.state.version != undefined && this.state.version.toString().includes('Local'))?
-                            (<a href={this.state.programId != -1 && this.state.programId != "" && this.state.programId != undefined ? "/#/forecastReport/forecastSummary/" + this.state.programId.toString().split("_")[0] + "/" + (this.state.programId.toString().split("_")[1]).toString().substring(1) : "/#/forecastReport/forecastSummary/"} target="_blank">{i18n.t('static.commitTree.forecastSummary')}</a>)
-                           :(<a href="/#/forecastReport/forecastSummary/" target="_blank">{i18n.t('static.commitTree.forecastSummary')}</a>)}
-                           </span><br />
+                                <a href="/#/report/compareAndSelectScenario" target="_blank">{i18n.t('static.commitTree.compare&Select')}</a>,
+                                {/* (<a href="/#/report/compareAndSelectScenario" target="_blank">{i18n.t('static.commitTree.compare&Select')}</a>, <a href={this.state.programId != -1 && this.state.programId != "" && this.state.programId != undefined ? "/#/forecastReport/forecastSummary/" + this.state.programId.toString().split("_")[0] + "/" + (this.state.programId.toString().split("_")[1]).toString().substring(1) : "/#/forecastReport/forecastSummary/"} target="_blank">{i18n.t('static.commitTree.forecastSummary')}</a>)</span><br />   */}
+                                {(this.state.version != undefined && this.state.version.toString().includes('Local')) ?
+                                    (<a href={this.state.programId != -1 && this.state.programId != "" && this.state.programId != undefined ? "/#/forecastReport/forecastSummary/" + this.state.programId.toString().split("_")[0] + "/" + (this.state.programId.toString().split("_")[1]).toString().substring(1) : "/#/forecastReport/forecastSummary/"} target="_blank">{i18n.t('static.commitTree.forecastSummary')}</a>)
+                                    : (<a href="/#/forecastReport/forecastSummary/" target="_blank">{i18n.t('static.commitTree.forecastSummary')}</a>)}
+                            </span><br />
                             <ul>{noForecastSelected}</ul>
 
                             <span><b>2. {i18n.t('static.commitTree.consumptionForecast')}: </b>(<a href="/#/dataentry/consumptionDataEntryAndAdjustment" target="_blank">{i18n.t('static.commitTree.dataEntry&Adjustment')}</a>, <a href="/#/extrapolation/extrapolateData" target="_blank">{i18n.t('static.commitTree.extrapolation')}</a>)</span><br />

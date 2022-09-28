@@ -305,6 +305,7 @@ export default class MapPlanningUnits extends Component {
     }
     changed = function (instance, cell, x, y, value) {
         this.props.removeMessageText();
+        var rowData=this.el.getRowData(y);
         if (x == 0) {
             var col = ("A").concat(parseInt(y) + 1);
             if (value == "") {
@@ -445,7 +446,6 @@ export default class MapPlanningUnits extends Component {
                 }
             }
         }
-        var rowData = this.el.getRowData(y);
         //min month of stock
         if (x == 4) {
             var reg = JEXCEL_INTEGER_REGEX
