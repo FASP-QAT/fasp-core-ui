@@ -338,6 +338,7 @@ const routes = [
   { path: '/dataset/createTreeTemplate/:templateId', name: 'Create Tree Template', component: CreateTreeTemplate },
   { path: '/dataSet/buildTree/', exact: true, name: 'static.common.managetree', component: BuildTree },
   { path: '/dataSet/buildTree/tree/:treeId/:programId', exact: true, name: 'static.common.managetree', component: BuildTree },
+  { path: '/dataSet/buildTree/treeServer/:treeId/:programId/:isLocal', exact: true, name: 'static.common.managetree', component: BuildTree },
   { path: '/dataSet/buildTree/tree/:treeId/:programId/:scenarioId', name: 'static.common.managetree', component: BuildTree },
   { path: '/dataSet/buildTree/template/:templateId', exact: true, name: 'static.common.managetree', component: BuildTree },
   { path: '/consumptionDetails/:programId/:versionId/:planningUnitId', name: 'static.consumptionDetailHead.consumptionDetail', component: ConsumptionDetails },
@@ -511,7 +512,7 @@ const routes = [
 
   // { path: '/dashboard/:message', component: Dashboard },
   { path: '/dashboard/:color/:message', component: Dashboard },
-  { path: '/program/downloadProgram', name: 'static.dashboard.downloadprogram', component: ProgramTree },
+  { path: '/program/downloadProgram', name: 'static.loadDeleteProgram.loadDeleteProgram', component: ProgramTree },
   { path: '/program/syncPage', name: "static.dashboard.commitVersion", component: syncPage },
   { path: '/program/downloadProgram/:message', component: ProgramTree },
   { path: '/program/exportProgram', name: 'static.dashboard.exportprogram', component: ExportProgram },
@@ -567,7 +568,8 @@ const routes = [
   { path: '/supplyPlan/:programId/:planningUnitId/:batchNo/:expiryDate', exact: true, name: 'static.dashboard.supplyPlan', component: SupplyPlan },
 
   { path: '/report/whatIf', name: 'static.dashboard.whatIf', component: WhatIfReport },
-  { path: '/shipment/manualTagging', name: 'static.dashboard.manualTagging', component: ManualTagging },
+  { path: '/shipment/manualTagging', name: 'static.dashboard.manualTagging',exact:true, component: ManualTagging },
+  { path: '/shipment/manualTagging/:tab', name: 'static.dashboard.manualTagging', component: ManualTagging },
   { path: '/shipment/delinking', name: 'static.dashboard.delinking', component: ShipmentDelinking },
   { path: '/supplyPlanFormulas', name: 'static.supplyplan.supplyplanformula', component: SupplyPlanFormulas },
 
@@ -792,10 +794,18 @@ class DefaultLayout extends Component {
   }
 
   refreshPage() {
+    // setTimeout(()=>{
+    //     window.location.reload(false);
+    // }, 500);
+    // console.log('page to reload')
+    // this.componentDidMount()
+}
+ 
+  // refreshPage() {
     // setTimeout(() => {
     // window.location.reload(false);
     // }, 0);
-  }
+  // }
 
   checkEvent = (e) => {
     // console.log("checkEvent called---", e);
@@ -861,6 +871,45 @@ class DefaultLayout extends Component {
       });
     }
   }
+
+  goOffline(e) {
+    // localStorage.setItem("loginOnline", false);
+    console.log("window.location", window.location)
+    var url = window.location.href;
+    if ((url.indexOf("green/") > -1) || (url.indexOf("red/") > -1)) {
+      // "The specific word exists";
+      localStorage.setItem("loginOnline", false);
+      var getSplit = ((url.indexOf("green/") > -1 ? url.split("green/") : url.split("red/")))
+      window.location.href = getSplit[0] + '%20/' + '%20';
+      window.location.reload();
+    } else {
+      // "The specific word doesn't exist";
+      localStorage.setItem("loginOnline", false);
+      window.location.reload();
+    }
+    // window.location.reload();
+  }
+
+  goOnline(e) {
+    confirmAlert({
+      message: i18n.t("static.login.confirmSessionChange"),
+      buttons: [
+        {
+          label: i18n.t("static.login.goToLogin"),
+          onClick: () => {
+            localStorage.setItem("sessionChanged", 1)
+            this.props.history.push("/login/static.login.loginAgain");
+          }
+        },
+        {
+          label: i18n.t("static.common.cancel"),
+          className: "dangerColor",
+          onClick: () => {
+          }
+        },
+      ]
+    })
+  }
   componentDidMount() {
     console.log("timeout default layout component did mount---------------")
     // this.refs.programChangeChild.checkIfLocalProgramVersionChanged()
@@ -916,7 +965,7 @@ class DefaultLayout extends Component {
     this.props.history.push(`/changePassword`);
   }
 
-  goToMasterDataSync(e){
+  goToMasterDataSync(e) {
     e.preventDefault();
     this.props.history.push({ pathname: `/syncProgram`, state: { "isFullSync": true } })
   }
@@ -992,19 +1041,19 @@ class DefaultLayout extends Component {
   getNotificationCount() {
     if (localStorage.getItem("sessionType") === 'Online') {
       AuthenticationService.setupAxiosInterceptors();
-      // ManualTaggingService.getNotificationCount()
-      //   .then(response => {
-      //     console.log("notification response===", response.data);
-      //     this.setState({
-      //       notificationCount: response.data
-      //     })
-      //   }).catch(
-      //     error => {
-      //       this.setState({
-      //         notificationCount: 0
-      //       })
-      //     }
-      //   );
+      ManualTaggingService.getNotificationCount()
+        .then(response => {
+          console.log("notification response===", response.data);
+          this.setState({
+            notificationCount: response.data
+          })
+        }).catch(
+          error => {
+            this.setState({
+              notificationCount: 0
+            })
+          }
+        );
     }
   }
   getProgramData() {
@@ -1239,7 +1288,7 @@ class DefaultLayout extends Component {
 
         <AppHeader fixed >
           <Suspense fallback={this.loading()}>
-            <DefaultHeader onLogout={e => this.signOut(e)} onChangePassword={e => this.changePassword(e)} onChangeDashboard={e => this.showDashboard(e)} shipmentLinkingAlerts={e => this.showShipmentLinkingAlerts(e)} latestProgram={e => this.goToLoadProgram(e)} latestProgramFC={e => this.goToLoadProgramFC(e)} title={this.state.name} notificationCount={this.state.notificationCount} changeIcon={this.state.changeIcon} commitProgram={e => this.goToCommitProgram(e)} commitProgramFC={e => this.goToCommitProgramFC(e)} activeModule={this.state.activeTab == 1 ? 1 : 2} />
+            <DefaultHeader onLogout={e => this.signOut(e)} onChangePassword={e => this.changePassword(e)} onChangeDashboard={e => this.showDashboard(e)} shipmentLinkingAlerts={e => this.showShipmentLinkingAlerts(e)} latestProgram={e => this.goToLoadProgram(e)} latestProgramFC={e => this.goToLoadProgramFC(e)} title={this.state.name} notificationCount={this.state.notificationCount} changeIcon={this.state.changeIcon} commitProgram={e => this.goToCommitProgram(e)} commitProgramFC={e => this.goToCommitProgramFC(e)} goOffline={e => this.goOffline(e)} goOnline={e => this.goOnline(e)} activeModule={this.state.activeTab == 1 ? 1 : 2} />
           </Suspense>
         </AppHeader>
         <div className="app-body">
@@ -1799,12 +1848,12 @@ class DefaultLayout extends Component {
                               }
                             }
                           },
-                          // {
-                          //   name: i18n.t('static.common.loadDeleteDataSet'),
-                          //   url: '/dataset/loadDeleteDataSet',
-                          //   icon: 'fa fa-download',
-                          //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
-                          // },
+                          {
+                            name: i18n.t('static.loadDeleteProgram.loadDeleteProgram'),
+                            url: '/dataset/loadDeleteDataSet',
+                            icon: 'fa fa-download',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LOAD_DELETE_DATASET') && this.state.activeTab == 1 ? false : true) }
+                          },
                           {
                             name: 'Import Program',
                             url: '/dataset/importDataset',
@@ -1827,17 +1876,17 @@ class DefaultLayout extends Component {
                               }
                             }
                           },
-                          {
-                            name: i18n.t('static.common.loadDeleteDataSet'),
-                            url: '/dataset/loadDeleteDataSet',
-                            icon: 'cui-cloud-download FontBoldIcon',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_LOAD_DELETE_DATASET') && this.state.activeTab == 1 ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
+                          // {
+                          //   name: i18n.t('static.common.loadDeleteDataSet'),
+                          //   url: '/dataset/loadDeleteDataSet',
+                          //   icon: 'cui-cloud-download FontBoldIcon',
+                          //   attributes: {
+                          //     hidden: (this.state.businessFunctions.includes('ROLE_BF_LOAD_DELETE_DATASET') && this.state.activeTab == 1 ? false : true),
+                          //     onClick: e => {
+                          //       this.refreshPage();
+                          //     }
+                          //   }
+                          // },
                           {
                             name: i18n.t('static.commitProgram.commitProgram'),
                             url: '/dataset/commitTree',
@@ -2203,7 +2252,7 @@ class DefaultLayout extends Component {
                             }
                           },
                           {
-                            name: i18n.t('static.dashboard.downloadprogram'),
+                            name: i18n.t('static.loadDeleteProgram.loadDeleteProgram'),
                             url: '/program/downloadProgram',
                             icon: 'cui-cloud-download FontBoldIcon',
                             attributes: {
@@ -2213,18 +2262,18 @@ class DefaultLayout extends Component {
                               }
                             }
                           },
-                          {
-                            name: i18n.t('static.program.deleteLocalProgram'),
-                            url: '/program/deleteLocalProgram',
-                            icon: 'fa fa-trash',
-                            attributes: {
-                              hidden: ((this.state.businessFunctions.includes('ROLE_BF_DELETE_LOCAL_PROGRAM') && this.state.activeTab == 2) ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                            // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DOWNLOAD_PROGARM') ? false : true) }
-                          },
+                          // {
+                          //   name: i18n.t('static.program.deleteLocalProgram'),
+                          //   url: '/program/deleteLocalProgram',
+                          //   icon: 'fa fa-trash',
+                          //   attributes: {
+                          //     hidden: ((this.state.businessFunctions.includes('ROLE_BF_DELETE_LOCAL_PROGRAM') && this.state.activeTab == 2) ? false : true),
+                          //     onClick: e => {
+                          //       this.refreshPage();
+                          //     }
+                          //   }
+                          //   // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DOWNLOAD_PROGARM') ? false : true) }
+                          // },
                           {
                             name: i18n.t('static.dashboard.programimport'),
                             // url: '/pipeline/pipelineProgramImport',
@@ -2854,17 +2903,17 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-list',
                             attributes: { hidden: ((((this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_GLOBAL_VIEW_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_FORECAST_MATRIX_REPORT'))) && this.state.activeTab == 2) ? false : true) },
                             children: [
-                              {
-                                name: i18n.t('static.dashboard.consumption'),
-                                url: '/report/consumption',
-                                icon: 'fa fa-bar-chart',
-                                attributes: {
-                                  hidden: ((this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_REPORT') && this.state.activeTab == 2) ? false : true),
-                                  onClick: e => {
-                                    this.refreshPage();
-                                  }
-                                }
-                              },
+                              // {
+                              //   name: i18n.t('static.dashboard.consumption'),
+                              //   url: '/report/consumption',
+                              //   icon: 'fa fa-bar-chart',
+                              //   attributes: {
+                              //     hidden: ((this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_REPORT') && this.state.activeTab == 2) ? false : true),
+                              //     onClick: e => {
+                              //       this.refreshPage();
+                              //     }
+                              //   }
+                              // },
                               {
                                 name: i18n.t('static.dashboard.globalconsumption'),
                                 url: '/report/globalConsumption',
@@ -2876,20 +2925,9 @@ class DefaultLayout extends Component {
                                   }
                                 }
                               },
-                              {
-                                name: i18n.t('static.report.forecasterrorovertime'),
-                                url: '/report/forecastOverTheTime',
-                                icon: 'fa fa-line-chart',
-                                attributes: {
-                                  hidden: ((this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT') && this.state.activeTab == 2) ? false : true),
-                                  onClick: e => {
-                                    this.refreshPage();
-                                  }
-                                }
-                              },
                               // {
-                              //   name: 'Forecast Error (Monthly) (New)',
-                              //   url: '/report/consumptionForecastErrorSupplyPlan',
+                              //   name: i18n.t('static.report.forecasterrorovertime'),
+                              //   url: '/report/forecastOverTheTime',
                               //   icon: 'fa fa-line-chart',
                               //   attributes: {
                               //     hidden: ((this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT') && this.state.activeTab == 2) ? false : true),
@@ -2898,6 +2936,17 @@ class DefaultLayout extends Component {
                               //     }
                               //   }
                               // },
+                              {
+                                name: 'Forecast Error (Monthly) (New)',
+                                url: '/report/consumptionForecastErrorSupplyPlan',
+                                icon: 'fa fa-line-chart',
+                                attributes: {
+                                  hidden: ((this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT') && this.state.activeTab == 2) ? false : true),
+                                  onClick: e => {
+                                    this.refreshPage();
+                                  }
+                                }
+                              },
                               {
                                 name: i18n.t('static.dashboard.forecastmetrics'),
                                 url: '/report/forecastMetrics',
@@ -4235,7 +4284,7 @@ class DefaultLayout extends Component {
         </div>
         <AppFooter>
           <Suspense fallback={this.loading()}>
-            <DefaultFooter syncProgram={e => this.goToMasterDataSync(e)}/>
+            <DefaultFooter syncProgram={e => this.goToMasterDataSync(e)} />
           </Suspense>
         </AppFooter>
       </div>

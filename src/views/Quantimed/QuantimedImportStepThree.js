@@ -277,13 +277,13 @@ class QuantimedImportStepThree extends Component {
                             isValid,
                             setTouched
                         }) => (
-                                <div className="animated fadeIn">
-                                    <div style={{ display: this.state.loading ? "none" : "block" }}>
-                                        <Form className="needs-validation" onSubmit={handleSubmit} noValidate name='healthAreaForm'>
-                                            <CardBody className="pb-lg-2 pt-lg-2">
-                                                {/* <div className="pl-0"> */}
-                                                {/* <div className="row"> */}
-                                                {/* <FormGroup className="col-md-4">
+                            <div className="animated fadeIn">
+                                <div style={{ display: this.state.loading ? "none" : "block" }}>
+                                    <Form className="needs-validation" onSubmit={handleSubmit} noValidate name='healthAreaForm'>
+                                        <CardBody className="pb-lg-2 pt-lg-2">
+                                            {/* <div className="pl-0"> */}
+                                            {/* <div className="row"> */}
+                                            {/* <FormGroup className="col-md-4">
                                                     <Label htmlFor="appendedInputButton">{i18n.t('static.quantimed.quantimedImportCosumptionPeriod')}<span className="stock-box-icon fa fa-sort-desc ml-1"></span></Label>
                                                     <div className="controls edit">
 
@@ -301,77 +301,78 @@ class QuantimedImportStepThree extends Component {
                                                     </div>
                                                 </FormGroup> */}
 
-                                                <FormGroup>
-                                                    <Label htmlFor="select">{i18n.t('static.region.region')}<span class="red Reqasterisk">*</span></Label>
-                                                    <Input
-                                                        valid={!errors.regionId}
-                                                        invalid={touched.regionId && !!errors.regionId}
-                                                        bsSize="sm"
-                                                        className="col-md-4"
-                                                        onBlur={handleBlur}
-                                                        type="select" name="regionId" id="regionId"
-                                                        value={this.state.region.regionId}
-                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                    >
-                                                        <option value="">{i18n.t('static.common.select')}</option>
-                                                        {regions}
-                                                    </Input>
-                                                    <FormFeedback className="red">{errors.regionId}</FormFeedback>
-                                                    {/* <Button color="info" size="md" className="float-right mr-1" type="button" name="planningPrevious" id="planningPrevious" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}>Next <i className="fa fa-angle-double-right"></i></Button> */}
+                                            <FormGroup>
+                                                <Label htmlFor="select">{i18n.t('static.region.region')}<span class="red Reqasterisk">*</span></Label>
+                                                <Input
+                                                    valid={!errors.regionId}
+                                                    invalid={touched.regionId && !!errors.regionId}
+                                                    bsSize="sm"
+                                                    className="col-md-4"
+                                                    onBlur={handleBlur}
+                                                    type="select" name="regionId" id="regionId"
+                                                    value={this.state.region.regionId}
+                                                    onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                    required
+                                                >
+                                                    <option value="">{i18n.t('static.common.select')}</option>
+                                                    {regions}
+                                                </Input>
+                                                <FormFeedback className="red">{errors.regionId}</FormFeedback>
+                                                {/* <Button color="info" size="md" className="float-right mr-1" type="button" name="planningPrevious" id="planningPrevious" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}>Next <i className="fa fa-angle-double-right"></i></Button> */}
 
-                                                </FormGroup>
+                                            </FormGroup>
 
-                                                <FormGroup>
-                                                    <Label for="regionConversionFactor">{i18n.t('static.quantimed.regionPercentage')}<span className="red Reqasterisk">*</span></Label>
-                                                    <Input
-                                                        type="number"
-                                                        min="1" max="100"
-                                                        name="regionConversionFactor"
-                                                        id="regionConversionFactor"
-                                                        bsSize="sm"
-                                                        className="col-md-4"
-                                                        valid={!errors.regionConversionFactor && this.state.region.regionConversionFactor != ''}
-                                                        invalid={touched.regionConversionFactor && !!errors.regionConversionFactor}
-                                                        onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                        onBlur={handleBlur}
-                                                        value={this.state.region.regionConversionFactor}
-                                                        placeholder="1-100"
-                                                        required />
-                                                    <FormFeedback className="red">{errors.regionConversionFactor}</FormFeedback>
-                                                </FormGroup>
+                                            <FormGroup>
+                                                <Label for="regionConversionFactor">{i18n.t('static.quantimed.regionPercentage')}<span className="red Reqasterisk">*</span></Label>
+                                                <Input
+                                                    type="number"
+                                                    min="1" max="100"
+                                                    name="regionConversionFactor"
+                                                    id="regionConversionFactor"
+                                                    bsSize="sm"
+                                                    className="col-md-4"
+                                                    valid={!errors.regionConversionFactor && this.state.region.regionConversionFactor != ''}
+                                                    invalid={touched.regionConversionFactor && !!errors.regionConversionFactor}
+                                                    onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                    onBlur={handleBlur}
+                                                    value={this.state.region.regionConversionFactor}
+                                                    placeholder="1-100"
+                                                    required />
+                                                <FormFeedback className="red">{errors.regionConversionFactor}</FormFeedback>
+                                            </FormGroup>
 
 
 
-                                                {/* </div> */}
-                                                {/* </div> */}
-                                                {/* </CardBody>
+                                            {/* </div> */}
+                                            {/* </div> */}
+                                            {/* </CardBody>
                                     <CardFooter className="pb-0 pr-0"> */}
-                                                <br></br>
-                                                <FormGroup>
+                                            <br></br>
+                                            <FormGroup>
 
-                                                    <Button color="success" size="md" className="float-right mr-1" type="submit" name="healthAreaSub" id="healthAreaSub" disabled={!isValid} onClick={() => this.touchAll(setTouched, errors)}>{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
-                                                    &nbsp;
-                                        <Button color="info" size="md" className="float-right mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.props.previousToStepTwo} ><i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
-                                                    &nbsp;
-                                        </FormGroup>
+                                                <Button color="success" size="md" className="float-right mr-1" type="submit" name="healthAreaSub" id="healthAreaSub" onClick={() => this.touchAll(setTouched, errors)}>{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
                                                 &nbsp;
-                                    {/* </CardFooter> */}
-                                            </CardBody>
-                                        </Form>
-                                    </div>
-                                    <div style={{ display: this.state.loading ? "block" : "none" }}>
-                                        <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                                            <div class="align-items-center">
-                                                <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+                                                <Button color="info" size="md" className="float-right mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.props.previousToStepTwo} ><i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
+                                                &nbsp;
+                                            </FormGroup>
+                                            &nbsp;
+                                            {/* </CardFooter> */}
+                                        </CardBody>
+                                    </Form>
+                                </div>
+                                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                        <div class="align-items-center">
+                                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-                                                <div class="spinner-border blue ml-4" role="status">
+                                            <div class="spinner-border blue ml-4" role="status">
 
-                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            )} />
+                            </div>
+                        )} />
 
             </>
 

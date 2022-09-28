@@ -1,9 +1,9 @@
 // export const API_URL='https://fasp.altius.cc/FASP'
 // export const API_URL='https://api-mod2.altius.cc'
-export const API_URL = 'http://localhost:8084'
+// export const API_URL = 'http://localhost:8084'
 // export const API_URL = 'http://server6.altius.cc:8080/FASP'
 
-// export const API_URL = 'https://uat-api.quantificationanalytics.org'
+export const API_URL = 'https://uat-api.quantificationanalytics.org'
 // export const API_URL = 'https://api.quantificationanalytics.org'
 // export const API_URL = 'https://demo-api.quantificationanalytics.org'
 
@@ -67,7 +67,7 @@ export const SPACE_REGEX = /^[^\s]+(\s+[^\s]+)*$/
 export const PERCENTAGE_REGEX = /^0?[0-9]?[0-9]$|^(100)$/
 export const NO_DECIMAL_PERCENTAGE_REGEX = /^[0-9\b]+$/
 export const INDEXED_DB_NAME = "fasp"
-export const INDEXED_DB_VERSION = 7
+export const INDEXED_DB_VERSION = 8
 export const ACTUAL_CONSUMPTION_TYPE = 1;
 export const FORCASTED_CONSUMPTION_TYPE = 2;
 export const LATEST_VERSION_COLOUR = "#e5edf5"
@@ -157,4 +157,6 @@ export const MAX_DATE_RESTRICTION_IN_DATA_ENTRY = 200;
 export const FORECAST_DATEPICKER_START_MONTH = 3;
 export const QAT_DATASOURCE_ID = 31;
 export const FORECAST_DATEPICKER_MONTH_DIFF = 6;
-export const SHIPMENT_ID_ARR_MANUAL_TAGGING=["3","4","5","6","7","9"]
+export const QAT_SUGGESTED_DATA_SOURCE_ID = 28
+export const SHIPMENT_ID_ARR_MANUAL_TAGGING = ["3", "4", "5", "6", "7", "9"]
+export const SPV_REPORT_DATEPICKER_START_MONTH = 3;

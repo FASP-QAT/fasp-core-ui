@@ -21,8 +21,8 @@ import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import CryptoJS from 'crypto-js';
 import csvicon from '../../assets/img/csv.png'
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import TracerCategoryService from '../../api/TracerCategoryService';
 import ProcurementAgentService from "../../api/ProcurementAgentService";
 import PlanningUnitService from '../../api/PlanningUnitService';
@@ -635,7 +635,7 @@ export default class PlanningUnitSetting extends Component {
 
     oneditionend = function (instance, cell, x, y, value) {
         console.log("oneditionend---------Start");
-        var elInstance = instance.jexcel;
+        var elInstance = instance;
         var rowData = elInstance.getRowData(y);
         var reg = /^0[0-9].*$/; //any no start with 0;
 
@@ -659,20 +659,20 @@ export default class PlanningUnitSetting extends Component {
             console.log("-----------------onPaste---------------------1", data[i]);
             if (z != data[i].y) {
                 console.log("-----------------onPaste---------------------2");
-                var index = (instance.jexcel).getValue(`N${parseInt(data[i].y) + 1}`, true);
+                var index = (instance).getValue(`N${parseInt(data[i].y) + 1}`, true);
                 if (index === "" || index == null || index == undefined) {
                     console.log("-----------------onPaste---------------------3");
                     // (instance.jexcel).setValueFromCoords(8, data[i].y, true, true);
                     // (instance.jexcel).setValueFromCoords(2, data[i].y, true, true);
                     // (instance.jexcel).setValueFromCoords(3, data[i].y, true, true);
-                    (instance.jexcel).setValueFromCoords(9, data[i].y, true, true);
-                    (instance.jexcel).setValueFromCoords(10, data[i].y, 1, true);
-                    (instance.jexcel).setValueFromCoords(11, data[i].y, 1, true);
-                    (instance.jexcel).setValueFromCoords(12, data[i].y, {}, true);
-                    (instance.jexcel).setValueFromCoords(13, data[i].y, 0, true);
-                    (instance.jexcel).setValueFromCoords(14, data[i].y, true, true);
+                    (instance).setValueFromCoords(9, data[i].y, true, true);
+                    (instance).setValueFromCoords(10, data[i].y, 1, true);
+                    (instance).setValueFromCoords(11, data[i].y, 1, true);
+                    (instance).setValueFromCoords(12, data[i].y, {}, true);
+                    (instance).setValueFromCoords(13, data[i].y, 0, true);
+                    (instance).setValueFromCoords(14, data[i].y, true, true);
                     // (instance.jexcel).setValueFromCoords(15, data[i].y, "", true);
-                    (instance.jexcel).setValueFromCoords(16, data[i].y, true, true);
+                    (instance).setValueFromCoords(16, data[i].y, true, true);
                     z = data[i].y;
                 }
             }
@@ -1753,7 +1753,8 @@ export default class PlanningUnitSetting extends Component {
                     loading: false
                 }, () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
-                    this.el.destroy();
+                    // this.el.destroy();
+                    jexcel.destroy(document.getElementById("tableDiv"), true);
                     this.filterData();
                 })
         }
@@ -2094,7 +2095,8 @@ export default class PlanningUnitSetting extends Component {
         }
         // console.log("outPutListArray---->", outPutListArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("tableDiv"), true);
         var json = [];
         var data = outPutListArray;
 
@@ -2144,7 +2146,7 @@ export default class PlanningUnitSetting extends Component {
                     title: i18n.t('static.planningUnitSetting.stockEndOf') + ' ' + this.state.beforeEndDateDisplay + ')',
                     type: 'numeric',
                     textEditor: true,
-                    decimal: '.',
+                    // decimal: '.',
                     mask: '#,##',
                     width: '150',
                     disabledMaskOnEdition: true
@@ -2154,17 +2156,17 @@ export default class PlanningUnitSetting extends Component {
                     title: i18n.t('static.planningUnitSetting.existingShipments') + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ')',
                     type: 'numeric',
                     textEditor: true,
-                    decimal: '.',
+                    // decimal: '.',
                     mask: '#,##',
                     width: '150',
                     disabledMaskOnEdition: true
                     // readOnly: true //5F
                 },
                 {
-                    title: i18n.t('static.planningUnitSetting.desiredMonthsOfStock') + ' ' +this.state.endDateDisplay + ')',
+                    title: i18n.t('static.planningUnitSetting.desiredMonthsOfStock') + ' ' + this.state.endDateDisplay + ')',
                     type: 'numeric',
                     textEditor: true,
-                    decimal: '.',
+                    // decimal: '.',
                     mask: '#,##',
                     disabledMaskOnEdition: true,
                     width: '150'
@@ -2174,7 +2176,7 @@ export default class PlanningUnitSetting extends Component {
                     title: i18n.t('static.forecastReport.priceType'),
                     type: 'autocomplete',
                     source: this.state.allProcurementAgentList,
-                    width: '180'
+                    width: '100'
                     // filter: this.filterProcurementAgentByPlanningUnit
                     // readOnly: true //7H
                 },
@@ -2266,18 +2268,18 @@ export default class PlanningUnitSetting extends Component {
                 // }
 
             },
-            text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
             onload: this.loaded,
             // selectionCopy: false,
             pagination: localStorage.getItem("sesRecordCount"),
             filters: true,
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
@@ -2379,42 +2381,44 @@ export default class PlanningUnitSetting extends Component {
     // }.bind(this)
 
 
-    filterPlanningUnitListByTracerCategoryId = function (instance, cell, c, r, source) {
-        var mylist = [];
-        var tracerCategoryId = (instance.jexcel.getJson(null, false)[r])[0];
-        // let planningUnitId = this.getPlanningUnitByTracerCategoryId(tracerCategoryId);
-        // let allPlanningUnitList = this.state.allPlanningUnitList;
+    // filterPlanningUnitListByTracerCategoryId = function (instance, cell, c, r, source) {
+    //     var mylist = [];
+    //     var tracerCategoryId = (instance.jexcel.getJson(null, false)[r])[0];
+    //     // let planningUnitId = this.getPlanningUnitByTracerCategoryId(tracerCategoryId);
+    //     // let allPlanningUnitList = this.state.allPlanningUnitList;
 
-        // for (var i = 0; i < planningUnitId.length; i++) {
-        //     let list = allPlanningUnitList.filter(c => c.id == planningUnitId[i].id)[0];
-        //     mylist.push(list);
-        // }
-        if (tracerCategoryId == -1) {
-            mylist = this.state.allPlanningUnitList
-        } else {
-            mylist = this.state.allPlanningUnitList.filter(c => c.forecastingUnit.tracerCategory.id == tracerCategoryId);
-        }
+    //     // for (var i = 0; i < planningUnitId.length; i++) {
+    //     //     let list = allPlanningUnitList.filter(c => c.id == planningUnitId[i].id)[0];
+    //     //     mylist.push(list);
+    //     // }
+    //     if (tracerCategoryId == -1) {
+    //         mylist = this.state.allPlanningUnitList
+    //     } else {
+    //         mylist = this.state.allPlanningUnitList.filter(c => c.forecastingUnit.tracerCategory.id == tracerCategoryId);
+    //     }
 
-        console.log("mylist--------->32", mylist);
+    //     console.log("mylist--------->32", mylist);
 
-        // var tableJson = this.el.getJson(null, false);
-        // let tempList = [];
-        // for (var i = 0; i < tableJson.length; i++) {
-        //     var map1 = new Map(Object.entries(tableJson[i]));
-        //     tempList.push(parseInt(map1.get("1")));
-        // }
+    //     // var tableJson = this.el.getJson(null, false);
+    //     // let tempList = [];
+    //     // for (var i = 0; i < tableJson.length; i++) {
+    //     //     var map1 = new Map(Object.entries(tableJson[i]));
+    //     //     tempList.push(parseInt(map1.get("1")));
+    //     // }
 
-        // for (var i = 0; i < tempList.length; i++) {
-        //     mylist = mylist.filter(c => c.id != tempList[i]);
-        // }
+    //     // for (var i = 0; i < tempList.length; i++) {
+    //     //     mylist = mylist.filter(c => c.id != tempList[i]);
+    //     // }
 
-        return mylist;
+    //     return mylist;
 
-    }.bind(this)
+    // }.bind(this)
 
     filterPlanningUnitListByProductCategoryId = function (instance, cell, c, r, source) {
         var mylist = [];
-        var value = (instance.jexcel.getJson(null, false)[r])[0];
+        // var value = (instance.jexcel.getJson(null, false)[r])[0];
+        var value = (this.state.languageEl.getJson(null, false)[r])[0];
+
         console.log("mylist--------->3.2", value);
 
         // if (productCategoryId == -1) {
@@ -2491,19 +2495,19 @@ export default class PlanningUnitSetting extends Component {
     }.bind(this)
 
     onchangepage(el, pageNo, oldPageNo) {
-        var elInstance = el.jexcel;
+        var elInstance = el;
         var json = elInstance.getJson(null, false);
 
         var colArr = ['A', 'B'];
 
-        var jsonLength = (pageNo + 1) * (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+        var jsonLength = (pageNo + 1) * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
         if (jsonLength == undefined) {
             jsonLength = 15
         }
         if (json.length < jsonLength) {
             jsonLength = json.length;
         }
-        var start = pageNo * (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+        var start = pageNo * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
 
         for (var j = start; j < jsonLength; j++) {
             var rowData = elInstance.getRowData(j);
@@ -2530,7 +2534,8 @@ export default class PlanningUnitSetting extends Component {
 
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
-        var asterisk = document.getElementsByClassName("resizable")[0];
+        // var asterisk = document.getElementsByClassName("resizable")[0];
+        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
         tr.children[1].classList.add('AsteriskTheadtrTd');
         tr.children[2].classList.add('AsteriskTheadtrTd');
@@ -2550,14 +2555,14 @@ export default class PlanningUnitSetting extends Component {
         tr.children[8].title = i18n.t('static.tooltip.PriceType');
 
 
-        var elInstance = instance.jexcel;
+        var elInstance = instance.worksheets[0];
         var json = elInstance.getJson();
         var colArr = ['A', 'B'];
 
         var jsonLength;
 
-        if ((document.getElementsByClassName("jexcel_pagination_dropdown")[0] != undefined)) {
-            jsonLength = 1 * (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+        if ((document.getElementsByClassName("jss_pagination_dropdown")[0] != undefined)) {
+            jsonLength = 1 * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
         }
 
         if (jsonLength == undefined) {
@@ -3123,7 +3128,10 @@ export default class PlanningUnitSetting extends Component {
 
 
     render() {
-
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
         const { SearchBar, ClearSearchButton } = Search;
         const customTotal = (from, to, size) => (
             <span className="react-bootstrap-table-pagination-total">
@@ -3273,7 +3281,7 @@ export default class PlanningUnitSetting extends Component {
                                     {this.state.isChanged1 &&
                                         <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                     }
-                                    <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>
+                                    <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> {i18n.t('static.common.addRow')}</Button>
                                     &nbsp;
                                 </FormGroup>
                             }

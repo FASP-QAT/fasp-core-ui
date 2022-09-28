@@ -967,8 +967,8 @@ class StockStatus extends Component {
                 shipmentList: [],
                 batchInfoList: [],
                 supplyPlan: []
+              }
             }
-          }
             var generalProgramDataBytes = CryptoJS.AES.decrypt(programDataJson.generalData, SECRET_KEY);
             var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
             var generalProgramJson = JSON.parse(generalProgramData);
@@ -1155,17 +1155,17 @@ class StockStatus extends Component {
                             }
                           })
                           var conList = consumptionList.filter(c => c.actualFlag == false && (c.consumptionDate >= dt && c.consumptionDate <= enddtStr))
-                          var totalforecastConsumption = null;
+                          var totalforecastConsumption = 0;
                           conList.map(elt => {
-                            totalforecastConsumption = (totalforecastConsumption == null) ? elt.consumptionQty : totalforecastConsumption + elt.consumptionQty
+                            totalforecastConsumption = (totalforecastConsumption == 0) ? elt.consumptionQty : Number(totalforecastConsumption) + Number(elt.consumptionQty)
                           })
                           var conListAct = consumptionList.filter(c => c.actualFlag == true && (c.consumptionDate >= dt && c.consumptionDate <= enddtStr))
-                          var totalActualConsumption = null;
+                          var totalActualConsumption = 0;
                           conListAct.map(elt => {
-                            totalActualConsumption = (totalActualConsumption == null) ? elt.consumptionQty : totalActualConsumption + elt.consumptionQty
+                            totalActualConsumption = (totalActualConsumption == 0) ? elt.consumptionQty : Number(totalActualConsumption) + Number(elt.consumptionQty)
                           })
-                          console.log(conList)
-                          console.log(totalforecastConsumption)
+                          // console.log(conList)
+                          // console.log(totalforecastConsumption)
                           var json = {
                             dt: new Date(from, month - 1),
                             forecastedConsumptionQty: totalforecastConsumption,
@@ -1209,7 +1209,7 @@ class StockStatus extends Component {
                           }
                         }
                         data.push(json)
-                        console.log(json)
+                        // console.log(json)
                         if (month == this.state.rangeValue.to.month && from == to) {
                           this.setState({
                             stockStatusList: data,
@@ -1494,21 +1494,21 @@ class StockStatus extends Component {
                   console.log('planningunitList', planningunitList)
                   planningunitList.map(pu => {
                     var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == pu.planningUnit.id);
-          var programJson = {}
-          if (planningUnitDataIndex != -1) {
-            var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == pu.planningUnit.id))[0];
-            var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
-            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-            programJson = JSON.parse(programData);
-          } else {
-            programJson = {
-              consumptionList: [],
-              inventoryList: [],
-              shipmentList: [],
-              batchInfoList: [],
-              supplyPlan: []
-          }
-        }                    
+                    var programJson = {}
+                    if (planningUnitDataIndex != -1) {
+                      var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == pu.planningUnit.id))[0];
+                      var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                      var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                      programJson = JSON.parse(programData);
+                    } else {
+                      programJson = {
+                        consumptionList: [],
+                        inventoryList: [],
+                        shipmentList: [],
+                        batchInfoList: [],
+                        supplyPlan: []
+                      }
+                    }
                     console.log('**pu', pu)
                     var data = [];
                     var monthstartfrom = this.state.rangeValue.from.month
@@ -1983,7 +1983,8 @@ class StockStatus extends Component {
                                   }
                                   return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
                                 }
-                              },intersect: false,
+                              }
+                              //, intersect: false,
                             },
                             maintainAspectRatio: false,
                             legend: {
@@ -2385,7 +2386,8 @@ class StockStatus extends Component {
                     }
                     return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
                   }
-                },intersect: false
+                }
+                //, intersect: false
               },
               maintainAspectRatio: false,
               legend: {
@@ -3010,7 +3012,7 @@ class StockStatus extends Component {
         return (
           <option key={i} value={item.versionId}>
             {/* {item.versionId} */}
-            {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)}
+            {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)} ({(moment(item.createdDate).format(`MMM DD YYYY`))})
           </option>
         )
       }, this);
@@ -3126,7 +3128,8 @@ class StockStatus extends Component {
             }
             return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
           }
-        },intersect: false
+        } 
+        //, intersect: false
       },
       maintainAspectRatio: false,
       legend: {
@@ -3249,7 +3252,8 @@ class StockStatus extends Component {
             }
             return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
           }
-        },intersect: false
+        }
+        // , intersect: false
       },
       maintainAspectRatio: false,
       legend: {
@@ -3604,94 +3608,107 @@ class StockStatus extends Component {
 
 
                   {this.state.show && this.state.stockStatusList.length > 0 &&
-                    <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px' }} style={{ display: this.state.display }}>
+                    <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px', display: this.state.display }}>
                       <ul className="legendcommitversion list-group">
                         <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.minStockMos")} : {this.state.stockStatusList[0].minMos}</span></li>
                         <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.maxStockMos")} : {this.state.stockStatusList[0].maxMos}</span></li>
                       </ul>
+                      <ul className="legendcommitversion list-group">
+                        <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.stockBalance")}/{i18n.t("static.report.mos")} : </b></span></li>
+                        {/* <li><span className="legendcolor"></span> <span className="legendcommitversionText"><b>{i18n.t('static.supplyPlan.actualBalance')}</b></span></li> */}
+                        <li><span className="legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.projectedBalance')}</span></li>
+                        <li><span className="legendcolor" style={{ backgroundColor: "#BA0C2F" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.stockout')}</span></li>
+                        <li><span className="legendcolor" style={{ backgroundColor: "#f48521" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.lowstock')}</span></li>
+                        <li><span className="legendcolor" style={{ backgroundColor: "#118b70" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.okaystock')}</span></li>
+                        <li><span className="legendcolor" style={{ backgroundColor: "#edb944" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.overstock')}</span></li>
+                        <li><span className="legendcolor" style={{ backgroundColor: "#cfcdc9" }}></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlanFormula.na')}</span></li>
+                      </ul>
                     </FormGroup>
                   }
-                  {this.state.show && this.state.stockStatusList.length > 0 && <Table responsive className="table-striped table-bordered text-center mt-2">
+                  {this.state.show && this.state.stockStatusList.length > 0 &&
+                    <div className='fixTableHead1'>
+                      <Table className="table-striped table-bordered text-center">
+                        <thead className='Theadtablesticky'>
+                          <tr>
+                            <th rowSpan="2" style={{ width: "200px" }}>{i18n.t('static.common.month')}</th>
+                            <th className="text-center" colSpan="1"> {i18n.t('static.report.stock')} </th>
+                            <th className="text-center" colSpan="2"> {i18n.t('static.supplyPlan.consumption')} </th>
+                            <th className="text-center" colSpan="2"> {i18n.t('static.shipment.shipment')} </th>
+                            <th className="text-center" colSpan="6"> {i18n.t('static.report.stock')} </th>
+                          </tr>
+                          <tr>
+                            <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.supplyPlan.openingBalance')}</th>
+                            <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.forecasted')}</th>
+                            <th className="text-center" style={{ width: "200px" }}> {i18n.t('static.report.actual')} </th>
+                            <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.qty')}</th>
+                            <th className="text-center" style={{ width: "600px" }}>{i18n.t('static.report.qty') + " | " + (i18n.t('static.budget.fundingsource') + " | " + i18n.t('static.supplyPlan.shipmentStatus') + " | " + (i18n.t('static.report.procurementAgentName')))}</th>
+                            <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.adjustmentQty')}</th>
+                            <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.supplyplan.exipredStock')}</th>
+                            <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.supplyPlan.endingBalance')}</th>
+                            <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.amc')}</th>
+                            <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.mos')}</th>
+                            <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.supplyPlan.unmetDemandStr')}</th>
+                            {/* <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.maxmonth')}</th> */}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {
+                            this.state.stockStatusList.length > 0
+                            &&
+                            this.state.stockStatusList.map((item, idx) =>
 
-                    <thead>
-                      <tr>
-                        <th rowSpan="2" style={{ width: "200px" }}>{i18n.t('static.common.month')}</th>  
-                      <th className="text-center" colSpan="1"> {i18n.t('static.report.stock')} </th>
-                       <th className="text-center" colSpan="2"> {i18n.t('static.supplyPlan.consumption')} </th>
-                        <th className="text-center" colSpan="2"> {i18n.t('static.shipment.shipment')} </th> 
-                        <th className="text-center" colSpan="6"> {i18n.t('static.report.stock')} </th> 
-                        </tr>
-                        <tr>
-                        <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.supplyPlan.openingBalance')}</th>
-                        <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.forecasted')}</th>
-                        <th className="text-center" style={{ width: "200px" }}> {i18n.t('static.report.actual')} </th>
-                        <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.qty')}</th>
-                        <th className="text-center" style={{ width: "600px" }}>{i18n.t('static.report.qty') + " | " + (i18n.t('static.budget.fundingsource') + " | " + i18n.t('static.supplyPlan.shipmentStatus') + " | " + (i18n.t('static.report.procurementAgentName')))}</th>
-                        <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.adjustmentQty')}</th>
-                        <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.supplyplan.exipredStock')}</th>
-                        <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.supplyPlan.endingBalance')}</th>
-                        <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.amc')}</th>
-                        <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.mos')}</th>
-                        <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.supplyPlan.unmetDemandStr')}</th>
-                        {/* <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.maxmonth')}</th> */}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {
-                        this.state.stockStatusList.length > 0
-                        &&
-                        this.state.stockStatusList.map((item, idx) =>
+                              <tr id="addr0" key={idx} >
+                                <td>
+                                  {this.dateFormatter(this.state.stockStatusList[idx].dt)}
+                                </td>
+                                {(idx == 0 ? this.state.firstMonthRegionCount : this.state.stockStatusList[idx - 1].regionCount) == (idx == 0 ? this.state.firstMonthRegionCountForStock : this.state.stockStatusList[idx - 1].regionCountForStock) ?
+                                  <td><b>{this.formatter(this.state.stockStatusList[idx].openingBalance)}</b></td> : <td>{this.formatter(this.state.stockStatusList[idx].openingBalance)}</td>}
 
-                          <tr id="addr0" key={idx} >
-                            <td>
-                              {this.dateFormatter(this.state.stockStatusList[idx].dt)}
-                            </td>
-                            {(idx == 0 ? this.state.firstMonthRegionCount : this.state.stockStatusList[idx - 1].regionCount) == (idx == 0 ? this.state.firstMonthRegionCountForStock : this.state.stockStatusList[idx - 1].regionCountForStock) ?
-                              <td><b>{this.formatter(this.state.stockStatusList[idx].openingBalance)}</b></td> : <td>{this.formatter(this.state.stockStatusList[idx].openingBalance)}</td>}
+                                <td className={this.rowtextFormatClassName(this.state.stockStatusList[idx])}>
+                                  {this.formatter(this.state.stockStatusList[idx].forecastedConsumptionQty)}
+                                </td> <td>
 
-                            <td className={this.rowtextFormatClassName(this.state.stockStatusList[idx])}>
-                              {this.formatter(this.state.stockStatusList[idx].forecastedConsumptionQty)}
-                            </td> <td>
+                                  {this.formatter(this.state.stockStatusList[idx].actualConsumptionQty)}
+                                </td>
+                                <td>
+                                  {this.formatter(this.state.stockStatusList[idx].shipmentQty)}
+                                </td>
+                                <td align="center"><table >
+                                  {this.state.stockStatusList[idx].shipmentInfo.map((item, index) => {
+                                    return (<tr  ><td padding="0">{this.formatter(item.shipmentQty) + `   |    ${item.fundingSource.code}    |    ${item.shipmentStatus.label.label_en}   |    ${item.procurementAgent.code}`}</td></tr>)
+                                    //return (<tr><td>{item.shipmentQty}</td><td>{item.fundingSource.label.label_en}</td><td>{item.shipmentStatus.label.label_en}</td></tr>)
+                                  })}</table>
+                                </td>
 
-                              {this.formatter(this.state.stockStatusList[idx].actualConsumptionQty)}
-                            </td>
-                            <td>
-                              {this.formatter(this.state.stockStatusList[idx].shipmentQty)}
-                            </td>
-                            <td align="center"><table >
-                              {this.state.stockStatusList[idx].shipmentInfo.map((item, index) => {
-                                return (<tr  ><td padding="0">{this.formatter(item.shipmentQty) + `   |    ${item.fundingSource.code}    |    ${item.shipmentStatus.label.label_en}   |    ${item.procurementAgent.code}`}</td></tr>)
-                                //return (<tr><td>{item.shipmentQty}</td><td>{item.fundingSource.label.label_en}</td><td>{item.shipmentStatus.label.label_en}</td></tr>)
-                              })}</table>
-                            </td>
-
-                            <td>
-                              {this.formatter(this.state.stockStatusList[idx].adjustment == 0 ? this.state.stockStatusList[idx].regionCountForStock > 0 ? this.state.stockStatusList[idx].nationalAdjustment : "" : this.state.stockStatusList[idx].regionCountForStock > 0 ? this.state.stockStatusList[idx].nationalAdjustment : this.state.stockStatusList[idx].adjustment)}
-                            </td>
-                            <td>
-                              {this.state.stockStatusList[idx].expiredStock != 0 ? this.formatter(this.state.stockStatusList[idx].expiredStock) : ''}
-                            </td>
-                            {this.state.stockStatusList[idx].regionCount == this.state.stockStatusList[idx].regionCountForStock ?
-                              <td><b>{this.formatter(this.state.stockStatusList[idx].closingBalance)}</b></td> : <td>{this.formatter(this.state.stockStatusList[idx].closingBalance)}</td>}
-                            <td>
-                              {this.formatter(this.formatAmc(this.state.stockStatusList[idx].amc))}
-                            </td>
-                            <td>
-                              {this.state.stockStatusList[idx].mos != null ? this.roundN(this.state.stockStatusList[idx].mos) : i18n.t("static.supplyPlanFormula.na")}
-                            </td>
-                            <td>
-                              {this.state.stockStatusList[idx].unmetDemand != 0 ? this.formatter(this.state.stockStatusList[idx].unmetDemand) : ''}
-                            </td>
-                            {/* <td>
+                                <td>
+                                  {this.formatter(this.state.stockStatusList[idx].adjustment == 0 ? this.state.stockStatusList[idx].regionCountForStock > 0 ? this.state.stockStatusList[idx].nationalAdjustment : "" : this.state.stockStatusList[idx].regionCountForStock > 0 ? this.state.stockStatusList[idx].nationalAdjustment : this.state.stockStatusList[idx].adjustment)}
+                                </td>
+                                <td>
+                                  {this.state.stockStatusList[idx].expiredStock != 0 ? this.formatter(this.state.stockStatusList[idx].expiredStock) : ''}
+                                </td>
+                                {this.state.stockStatusList[idx].regionCount == this.state.stockStatusList[idx].regionCountForStock ?
+                                  <td><b>{this.formatter(this.state.stockStatusList[idx].closingBalance)}</b></td> : <td>{this.formatter(this.state.stockStatusList[idx].closingBalance)}</td>}
+                                <td>
+                                  {this.formatter(this.formatAmc(this.state.stockStatusList[idx].amc))}
+                                </td>
+                                <td style={{ backgroundColor: this.state.stockStatusList[idx].mos == null ? "#cfcdc9" : this.state.stockStatusList[idx].mos == 0 ? "#BA0C2F" : this.state.stockStatusList[idx].mos < this.state.stockStatusList[idx].minMos ? "#f48521" : this.state.stockStatusList[idx].mos > this.state.stockStatusList[idx].maxMos ? "#edb944" : "#118b70" }}>
+                                  {this.state.stockStatusList[idx].mos != null ? this.roundN(this.state.stockStatusList[idx].mos) : i18n.t("static.supplyPlanFormula.na")}
+                                </td>
+                                <td>
+                                  {this.state.stockStatusList[idx].unmetDemand != 0 ? this.formatter(this.state.stockStatusList[idx].unmetDemand) : ''}
+                                </td>
+                                {/* <td>
                               {this.roundN(this.state.stockStatusList[idx].maxMos)}
                             </td> */}
 
-                          </tr>)
+                              </tr>)
 
-                      }
-                    </tbody>
+                          }
+                        </tbody>
 
-                  </Table>}
+                      </Table>
+                    </div>
+                  }
                 </Col>
 
                 <div style={{ display: this.state.loading ? "block" : "none" }}>

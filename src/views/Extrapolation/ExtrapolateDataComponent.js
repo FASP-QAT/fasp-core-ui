@@ -8,12 +8,12 @@ import {
     CardFooter, Button, Col, Form, InputGroup, Modal, FormFeedback, ModalHeader, ModalFooter, ModalBody, Row, Table, PopoverBody, Popover
 } from 'reactstrap';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, SECRET_KEY, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_MONTH_PICKER_FORMAT, TITLE_FONT } from "../../Constants";
+import { INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, SECRET_KEY, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_MONTH_PICKER_FORMAT, TITLE_FONT, JEXCEL_PRO_KEY, DATE_FORMAT_CAP } from "../../Constants";
 import i18n from '../../i18n';
 import CryptoJS from 'crypto-js'
 import getLabelText from "../../CommonComponent/getLabelText";
-import jexcel from 'jexcel-pro';
-import { DATE_FORMAT_CAP, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY } from '../../Constants.js';
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination } from '../../CommonComponent/JExcelCommonFunctions.js';
 import csvicon from '../../assets/img/csv.png';
 import { Bar, Line, Pie } from 'react-chartjs-2';
@@ -568,7 +568,9 @@ export default class ExtrapolateDataComponent extends React.Component {
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
         try {
-            this.el.destroy();
+            // this.el.destroy();
+            jexcel.destroy(document.getElementById("tableDiv"), true);
+
         } catch (error) { }
         var options = {
             data: dataArray,
@@ -654,15 +656,15 @@ export default class ExtrapolateDataComponent extends React.Component {
                         mask: '#,##.00', decimal: '.'
                     },
                 ],
-            text: {
-                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
             updateTable: function (el, cell, x, y, source, value, id) {
                 if (y != null) {
-                    var elInstance = el.jexcel;
+                    var elInstance = el;
                     var rowData = elInstance.getRowData(y);
                     if (moment(rowData[0]).format("YYYY-MM") < moment(this.state.datasetJson.currentVersion.forecastStartDate).format("YYYY-MM")) {
                         // var cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
@@ -716,7 +718,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             pagination: false,
             search: false,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             defaultColWidth: 130,
             wordWrap: true,
             allowInsertColumn: false,
@@ -976,7 +978,9 @@ export default class ExtrapolateDataComponent extends React.Component {
     loaded = function (instance, cell, x, y, value) {
         // jExcelLoadedFunctionWithoutPagination(instance);
         jExcelLoadedFunctionOnlyHideRow(instance);
-        var asterisk = document.getElementsByClassName("resizable")[0];
+        // var asterisk = document.getElementsByClassName("resizable")[0];
+        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
+
         var tr = asterisk.firstChild;
 
         tr.children[2].classList.add('InfoTr');
@@ -1070,7 +1074,9 @@ export default class ExtrapolateDataComponent extends React.Component {
                 })
             } else {
                 this.el = jexcel(document.getElementById("tableDiv"), '');
-                this.el.destroy();
+                // this.el.destroy();
+                jexcel.destroy(document.getElementById("tableDiv"), true);
+
                 this.setState({
                     forecastProgramId: forecastProgramId,
                     planningUnitList: [],
@@ -1387,7 +1393,9 @@ export default class ExtrapolateDataComponent extends React.Component {
             var planningUnitId = e.target.value;
             localStorage.setItem("sesDatasetPlanningUnitId", e.target.value);
             this.el = jexcel(document.getElementById("tableDiv"), '');
-            this.el.destroy();
+            // this.el.destroy();
+            jexcel.destroy(document.getElementById("tableDiv"), true);
+
             this.setState({
                 planningUnitId: planningUnitId,
                 showData: false,
@@ -1416,7 +1424,9 @@ export default class ExtrapolateDataComponent extends React.Component {
             var regionId = e.target.value;
             localStorage.setItem("sesDatasetRegionId", e.target.value);
             this.el = jexcel(document.getElementById("tableDiv"), '');
-            this.el.destroy();
+            // this.el.destroy();
+            jexcel.destroy(document.getElementById("tableDiv"), true);
+
             this.setState({
                 regionId: regionId,
                 showData: false,
@@ -1731,7 +1741,18 @@ export default class ExtrapolateDataComponent extends React.Component {
         if (this.state.planningUnitId > 0 && this.state.regionId > 0) {
 
             console.log("Inside if parameter", this.state.loading)
-            this.setState({ loading: true })
+            this.setState({ loading: true,
+                movingAvgData: [],
+                semiAvgData: [],
+                linearRegressionData: [],
+                tesData: [],
+                arimaData: [],
+                movingAvgError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" },
+                semiAvgError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" },
+                linearRegressionError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" },
+                tesError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" },
+                arimaError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" }
+            })
             console.log("after Inside if parameter", this.state.loading)
             var datasetJson = this.state.datasetJson;
             // Need to filter
@@ -1855,7 +1876,9 @@ export default class ExtrapolateDataComponent extends React.Component {
                 })
             } else {
                 this.el = jexcel(document.getElementById("tableDiv"), '');
-                this.el.destroy();
+                // this.el.destroy();
+                jexcel.destroy(document.getElementById("tableDiv"), true);
+
                 this.setState({
                     showData: false,
                     dataEl: "",
@@ -1865,7 +1888,9 @@ export default class ExtrapolateDataComponent extends React.Component {
             }
         } else {
             this.el = jexcel(document.getElementById("tableDiv"), '');
-            this.el.destroy();
+            // this.el.destroy();
+            jexcel.destroy(document.getElementById("tableDiv"), true);
+
             this.setState({
                 dataEl: "",
                 showData: false,
@@ -2715,6 +2740,12 @@ export default class ExtrapolateDataComponent extends React.Component {
     }
 
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
+
         const pickerLang = {
             months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
             from: 'From', to: 'To',

@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import i18n from '../../i18n'
 import { DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, LATEST_VERSION_COLOUR, LOCAL_VERSION_COLOUR, OPEN_PROBLEM_STATUS_ID, TITLE_FONT } from '../../Constants';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import getLabelText from '../../CommonComponent/getLabelText'
 import {
@@ -479,25 +479,26 @@ export default class CompareVersionTableCompareVersion extends Component {
                 var selectedForecastData1 = pu1.length > 0 ? pu1[0].selectedForecastMap : '';
                 var selectedForecastData2 = pu2.length > 0 ? pu2[0].selectedForecastMap : '';
 
-                var puFiltered=pu.filter(c=>c.region.id==regionSet[k]);
-                var puFiltered1=pu1.filter(c=>c.region.id==regionSet[k]);
+                var puFiltered = pu.filter(c => c.region.id == regionSet[k]);
+                var puFiltered1 = pu1.filter(c => c.region.id == regionSet[k]);
                 // console.log("consumptionExtrapolation", consumptionExtrapolation);
                 data[0] = pu.length > 0 ? getLabelText(pu[0].planningUnit.label, this.state.lang) + " | " + pu[0].planningUnit.id : getLabelText(pu1[0].planningUnit.label) + " | " + pu1[0].planningUnit.id;
                 data[1] = rg.length > 0 ? getLabelText(rg[0].label) : getLabelText(rg1[0].label);
-                data[2]=puFiltered.length>0?getLabelText(puFiltered[0].selectedForecast):""
-                data[3]=puFiltered.length>0?puFiltered[0].totalForecast!==""  && puFiltered[0].totalForecast!=null?Number(puFiltered[0].totalForecast).toFixed(2):"":"";
-                data[4]=puFiltered.length>0?(puFiltered[0].notes != null && puFiltered[0].notes!='' ? puFiltered[0].notes.label_en : ''):""
-                data[5]=puFiltered1.length>0?getLabelText(puFiltered1[0].selectedForecast):""
-                data[6]=puFiltered1.length>0?puFiltered1[0].totalForecast!=="" && puFiltered1[0].totalForecast!=null?Number(puFiltered1[0].totalForecast).toFixed(2):"":"";
-                data[7]=puFiltered1.length>0?(puFiltered1[0].notes != null && puFiltered1[0].notes!='' ? puFiltered1[0].notes.label_en : ''):""
-                data[8]=""
-                data[9]=""
-                data[10]=""
+                data[2] = puFiltered.length > 0 ? getLabelText(puFiltered[0].selectedForecast) : ""
+                data[3] = puFiltered.length > 0 ? puFiltered[0].totalForecast !== "" && puFiltered[0].totalForecast != null ? Number(puFiltered[0].totalForecast).toFixed(2) : "" : "";
+                data[4] = puFiltered.length > 0 ? (puFiltered[0].notes != null && puFiltered[0].notes != '' ? puFiltered[0].notes.label_en : '') : ""
+                data[5] = puFiltered1.length > 0 ? getLabelText(puFiltered1[0].selectedForecast) : ""
+                data[6] = puFiltered1.length > 0 ? puFiltered1[0].totalForecast !== "" && puFiltered1[0].totalForecast != null ? Number(puFiltered1[0].totalForecast).toFixed(2) : "" : "";
+                data[7] = puFiltered1.length > 0 ? (puFiltered1[0].notes != null && puFiltered1[0].notes != '' ? puFiltered1[0].notes.label_en : '') : ""
+                data[8] = ""
+                data[9] = ""
+                data[10] = ""
                 dataArray.push(data);
             }
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("tableDiv"), true);
 
         var options = {
             data: dataArray,
@@ -505,17 +506,17 @@ export default class CompareVersionTableCompareVersion extends Component {
             colHeaderClasses: ["Reqasterisk"],
             columns: columns,
             nestedHeaders: nestedHeaders,
-            text: {
-                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
@@ -601,20 +602,20 @@ export default class CompareVersionTableCompareVersion extends Component {
                     type: 'text',
                 }
             ],
-            text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
             pagination: false,
             search: false,
             columnSorting: false,
-            tableOverflow: false,
+            // tableOverflow: false,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
             allowDeleteRow: false,
-            tableOverflow: false,
+            // tableOverflow: false,
             editable: false,
             filters: false,
             license: JEXCEL_PRO_KEY,
@@ -634,7 +635,7 @@ export default class CompareVersionTableCompareVersion extends Component {
 
     loadedResolveConflicts = function (instance) {
         jExcelLoadedFunctionOnlyHideRow(instance);
-        var elInstance = instance.jexcel;
+        var elInstance = instance.worksheets[0];
         var jsonData = elInstance.getJson();
         var colArr = ['A', 'B', 'C', 'D', 'E']
         for (var j = 0; j < 8; j++) {
@@ -676,7 +677,7 @@ export default class CompareVersionTableCompareVersion extends Component {
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
         if (this.props.page == "commit") {
-            var elInstance = instance.jexcel;
+            var elInstance = instance.worksheets[0];
             var json = elInstance.getJson(null, false);
 
             var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X']
@@ -733,7 +734,8 @@ export default class CompareVersionTableCompareVersion extends Component {
             }
         }
         else {
-            var asterisk = document.getElementsByClassName("resizable")[0];
+            // var asterisk = document.getElementsByClassName("resizable")[0];
+            var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
             // var tr = asterisk.firstChild;
             var tr = asterisk.firstChild.nextSibling;
             console.log("asterisk", asterisk.firstChild.nextSibling)
@@ -751,6 +753,11 @@ export default class CompareVersionTableCompareVersion extends Component {
     }
 
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
         return (
             <div>
                 {/* Resolve conflicts modal */}

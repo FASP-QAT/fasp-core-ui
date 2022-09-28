@@ -8,8 +8,8 @@ import {
 import { FastField, Formik } from 'formik';
 import * as Yup from 'yup'
 import i18n from '../../i18n'
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js';
 import getLabelText from '../../CommonComponent/getLabelText';
@@ -113,7 +113,8 @@ class EquivalancyUnit extends Component {
     loaded1 = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance, 1);
         jExcelLoadedFunctionOnlyHideRow(instance);
-        var asterisk = document.getElementsByClassName("resizable")[0];
+        // var asterisk = document.getElementsByClassName("resizable")[0];
+        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
         // tr.children[1].classList.add('AsteriskTheadtrTd');
         tr.children[2].classList.add('AsteriskTheadtrTd');
@@ -134,11 +135,11 @@ class EquivalancyUnit extends Component {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
-                var index = (instance.jexcel).getValue(`G${parseInt(data[i].y) + 1}`, true);
+                var index = (instance).getValue(`G${parseInt(data[i].y) + 1}`, true);
                 if (index === "" || index == null || index == undefined) {
-                    (instance.jexcel).setValueFromCoords(0, data[i].y, 0, true);
-                    (instance.jexcel).setValueFromCoords(8, data[i].y, 1, true);
-                    (instance.jexcel).setValueFromCoords(9, data[i].y, 1, true);
+                    (instance).setValueFromCoords(0, data[i].y, 0, true);
+                    (instance).setValueFromCoords(8, data[i].y, 1, true);
+                    (instance).setValueFromCoords(9, data[i].y, 1, true);
                     z = data[i].y;
                 }
             }
@@ -257,7 +258,9 @@ class EquivalancyUnit extends Component {
         //     this.state.eqUnitTableEl.destroy();
         // }
         if (this.state.table2Instance != "" && this.state.table2Instance != undefined) {
-            this.state.table2Instance.destroy();
+            // this.state.table2Instance.destroy();
+            jexcel.destroy(document.getElementById("eqUnitInfoTable"), true);
+
         }
         var json = [];
         var data = papuDataArr;
@@ -271,7 +274,7 @@ class EquivalancyUnit extends Component {
                 {
                     title: 'equivalancyUnitId',
                     type: 'hidden',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.program.healtharea'),
@@ -290,7 +293,7 @@ class EquivalancyUnit extends Component {
                 {
                     title: i18n.t('static.healtharea.realm'),
                     type: 'hidden',
-                    readOnly: true
+                    // readOnly: true
                     // textEditor: true,
                 },
                 {
@@ -327,7 +330,7 @@ class EquivalancyUnit extends Component {
             ],
             updateTable: function (el, cell, x, y, source, value, id) {
                 if (y != null) {
-                    var elInstance = el.jexcel;
+                    var elInstance = el;
                     //left align
                     elInstance.setStyle(`B${parseInt(y) + 1}`, 'text-align', 'left');
 
@@ -355,7 +358,7 @@ class EquivalancyUnit extends Component {
             search: true,
             // pagination: false,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
@@ -368,12 +371,12 @@ class EquivalancyUnit extends Component {
             parseFormulas: true,
             // onpaste: this.onPaste1,
             oneditionend: this.oneditionend1,
-            text: {
-                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
             onload: this.loaded1,
             license: JEXCEL_PRO_KEY,
             editable: true,
@@ -587,11 +590,13 @@ class EquivalancyUnit extends Component {
         // }
 
         if (this.state.table1Instance != "" && this.state.table1Instance != undefined) {
-            this.state.table1Instance.destroy();
+            // this.state.table1Instance.destroy();
+            jexcel.destroy(document.getElementById("paputableDiv"), true);
         }
 
         if (this.state.table2Instance != "" && this.state.table2Instance != undefined) {
-            this.state.table2Instance.destroy();
+            // this.state.table2Instance.destroy();
+            jexcel.destroy(document.getElementById("eqUnitInfoTable"), true);
         }
         var json = [];
         var data = papuDataArr;
@@ -605,7 +610,7 @@ class EquivalancyUnit extends Component {
                 {
                     title: 'equivalancyUnitMappingId',
                     type: 'hidden',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.equivalancyUnit.equivalancyUnitName'),
@@ -704,7 +709,7 @@ class EquivalancyUnit extends Component {
             ],
             updateTable: function (el, cell, x, y, source, value, id) {
                 if (y != null) {
-                    var elInstance = el.jexcel;
+                    var elInstance = el;
                     var rowData = elInstance.getRowData(y);
 
                     //left align
@@ -911,7 +916,7 @@ class EquivalancyUnit extends Component {
             filters: true,
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
@@ -925,12 +930,12 @@ class EquivalancyUnit extends Component {
             parseFormulas: true,
             // onpaste: this.onPaste,
             oneditionend: this.oneditionend,
-            text: {
-                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
             onload: this.loaded,
             editable: true,
             // editable: (( AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_MODELING_TYPE') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_MODELING_TYPE') ) ? true : false),
@@ -986,7 +991,9 @@ class EquivalancyUnit extends Component {
 
     filterForecastingUnitBasedOnTracerCategory = function (instance, cell, c, r, source) {
         var mylist = [];
-        var value = (instance.jexcel.getJson(null, false)[r])[3];
+        // var value = (instance.jexcel.getJson(null, false)[r])[3];
+        var value = (this.state.table1Instance.getJson(null, false)[r])[3];
+
         if (value > 0) {
             mylist = this.state.forecastingUnitList.filter(c => c.tracerCategoryId == value && c.active.toString() == "true");
         }
@@ -1008,7 +1015,9 @@ class EquivalancyUnit extends Component {
 
 
     filterTechnicalAreaList = function (instance, cell, c, r, source) {
-        var selectedEquivalencyUnitId = (instance.jexcel.getJson(null, false)[r])[1];
+        // var selectedEquivalencyUnitId = (instance.jexcel.getJson(null, false)[r])[1];
+        var selectedEquivalencyUnitId = (this.state.table1Instance.getJson(null, false)[r])[1];
+
         let selectedEqObj = this.state.equivalancyUnitList.filter(c => c.id == selectedEquivalencyUnitId)[0];
         // console.log("selectedEqObj-------->", selectedEqObj);
         let mylist = [];
@@ -1026,7 +1035,9 @@ class EquivalancyUnit extends Component {
         // let mylist = this.state.tracerCategoryList.filter(c => c.healthArea.id == selectedHealthAreaId);
         // return mylist;
 
-        var selectedHealthAreaId = (instance.jexcel.getJson(null, false)[r])[2].toString().split(';');
+        // var selectedHealthAreaId = (instance.worksheets[0].getJson(null, false)[r])[2].toString().split(';');
+        var selectedHealthAreaId = (this.state.table1Instance.getJson(null, false)[r])[2].toString().split(';');
+
         let mylist = [];
         // console.log("mylist-------->0", (instance.jexcel.getJson(null, false)[r])[2]);
         // console.log("mylist-------->1", selectedHealthAreaId);
@@ -1887,14 +1898,14 @@ class EquivalancyUnit extends Component {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
-                var index = (instance.jexcel).getValue(`G${parseInt(data[i].y) + 1}`, true);
+                var index = (instance).getValue(`G${parseInt(data[i].y) + 1}`, true);
                 if (index === "" || index == null || index == undefined) {
-                    (instance.jexcel).setValueFromCoords(0, data[i].y, 0, true);
-                    (instance.jexcel).setValueFromCoords(8, data[i].y, true, true);
-                    (instance.jexcel).setValueFromCoords(11, data[i].y, 1, true);
-                    (instance.jexcel).setValueFromCoords(12, data[i].y, 0, true);
-                    (instance.jexcel).setValueFromCoords(13, data[i].y, 0, true);
-                    (instance.jexcel).setValueFromCoords(14, data[i].y, 1, true);
+                    (instance).setValueFromCoords(0, data[i].y, 0, true);
+                    (instance).setValueFromCoords(8, data[i].y, true, true);
+                    (instance).setValueFromCoords(11, data[i].y, 1, true);
+                    (instance).setValueFromCoords(12, data[i].y, 0, true);
+                    (instance).setValueFromCoords(13, data[i].y, 0, true);
+                    (instance).setValueFromCoords(14, data[i].y, 1, true);
                     z = data[i].y;
                 }
             }
@@ -2213,7 +2224,8 @@ class EquivalancyUnit extends Component {
 
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
-        var asterisk = document.getElementsByClassName("resizable")[0];
+        // var asterisk = document.getElementsByClassName("resizable")[0];
+        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
         // tr.children[1].classList.add('AsteriskTheadtrTd');
         tr.children[2].classList.add('AsteriskTheadtrTd');
@@ -2802,6 +2814,11 @@ class EquivalancyUnit extends Component {
 
     render() {
 
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
         const { tracerCategoryList1 } = this.state;
         let tracerCategoryTempList = tracerCategoryList1.length > 0
             && tracerCategoryList1.map((item, i) => {
@@ -2929,7 +2946,7 @@ class EquivalancyUnit extends Component {
                             <FormGroup>
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 {this.state.isChanged && <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
-                                <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>
+                                <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> {i18n.t('static.common.addRow')}</Button>
                                 &nbsp;
                             </FormGroup>
                         }
@@ -2937,21 +2954,22 @@ class EquivalancyUnit extends Component {
                     </CardFooter>
 
                     <Modal isOpen={this.state.showGuidance}
-className={'modal-lg ' + this.props.className} >
-<ModalHeader toggle={() => this.toggleShowGuidance()} className="ModalHead modal-info-Headher">
-    <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
-</ModalHeader>
-<div>
-    <ModalBody>
-    <div dangerouslySetInnerHTML={ {__html:localStorage.getItem('lang') == 'en' ?
-                showguidanceforEquivalencyUnitEn :
-                localStorage.getItem('lang') == 'fr' ?
-                showguidanceforEquivalencyUnitFr :
-                  localStorage.getItem('lang') == 'sp' ?
-                  showguidanceforEquivalencyUnitSp :
-                  showguidanceforEquivalencyUnitPr
-              } } />
-       {/* <div>
+                        className={'modal-lg ' + this.props.className} >
+                        <ModalHeader toggle={() => this.toggleShowGuidance()} className="ModalHead modal-info-Headher">
+                            <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
+                        </ModalHeader>
+                        <div>
+                            <ModalBody>
+                                <div dangerouslySetInnerHTML={{
+                                    __html: localStorage.getItem('lang') == 'en' ?
+                                        showguidanceforEquivalencyUnitEn :
+                                        localStorage.getItem('lang') == 'fr' ?
+                                            showguidanceforEquivalencyUnitFr :
+                                            localStorage.getItem('lang') == 'sp' ?
+                                                showguidanceforEquivalencyUnitSp :
+                                                showguidanceforEquivalencyUnitPr
+                                }} />
+                                {/* <div>
            <h3 className='ShowGuidanceHeading'>{i18n.t('static.equivalancyUnit.equivalancyUnits')}</h3>
        </div>
         <p>
@@ -3056,9 +3074,9 @@ className={'modal-lg ' + this.props.className} >
                                 </table>
         </p> */}
 
-    </ModalBody>
-</div>
-</Modal>
+                            </ModalBody>
+                        </div>
+                    </Modal>
 
                     <Modal isOpen={this.state.isModalOpen}
                         className={'modal-lg ' + this.props.className, "modalWidth"}>
@@ -3079,7 +3097,7 @@ className={'modal-lg ' + this.props.className} >
                             {(this.state.roleArray.includes('ROLE_REALM_ADMIN') || this.state.roleArray.includes('ROLE_DATASET_ADMIN')) &&
                                 <div className="mr-0">
                                     {this.state.isChanged1 && <Button type="submit" size="md" color="success" className="float-right" onClick={this.formSubmit1} ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
-                                    <Button color="info" size="md" className="float-right mr-1" id="eqUnitAddRow" type="button" onClick={() => this.addRow1()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>
+                                    <Button color="info" size="md" className="float-right mr-1" id="eqUnitAddRow" type="button" onClick={() => this.addRow1()}>{i18n.t('static.common.addRow')}</Button>
                                 </div>
                             }
                             <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.modelOpenClose()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
@@ -3097,4 +3115,3 @@ className={'modal-lg ' + this.props.className} >
 }
 
 export default EquivalancyUnit
-

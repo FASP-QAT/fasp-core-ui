@@ -1,22 +1,22 @@
+import jexcel from 'jspreadsheet';
 import React, { Component } from "react";
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
-import "../../../node_modules/jsuites/dist/jsuites.css";
 import {
-    Card, CardBody, CardHeader, InputGroup,
-    Label, Input, FormGroup,
-    CardFooter, Button, Table, Badge, Col, Row, Form, FormFeedback
-
+    Button, Card, CardBody, CardFooter, Col, FormGroup, Input, InputGroup,
+    Label
 } from 'reactstrap';
-import getLabelText from '../../CommonComponent/getLabelText';
-import ProgramService from "../../api/ProgramService";
-import AuthenticationService from '../Common/AuthenticationService.js';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 import PlanningUnitService from "../../api/PlanningUnitService";
-import i18n from '../../i18n';
 import ProductCategoryServcie from '../../api/PoroductCategoryService.js';
+import ProgramService from "../../api/ProgramService";
+import getLabelText from '../../CommonComponent/getLabelText';
 import { jExcelLoadedFunction } from "../../CommonComponent/JExcelCommonFunctions";
-import { JEXCEL_INTEGER_REGEX, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_DECIMAL_CATELOG_PRICE, DECIMAL_NO_REGEX, JEXCEL_PAGINATION_OPTION, MONTHS_IN_PAST_FOR_AMC, MONTHS_IN_FUTURE_FOR_AMC, JEXCEL_PRO_KEY } from "../../Constants";
+import { JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_INTEGER_REGEX, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, MONTHS_IN_FUTURE_FOR_AMC, MONTHS_IN_PAST_FOR_AMC } from "../../Constants";
+import i18n from '../../i18n';
+import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { Prompt } from 'react-router';
+
 const entityname = i18n.t('static.dashboard.programPlanningUnit');
 
 
@@ -49,6 +49,7 @@ class AddprogramPlanningUnit extends Component {
             batchNoRequired: false,
             localProcurementLeadTime: '',
             isValidData: true,
+            isChanged: false,
             loading: true,
             productCategoryList: [],
             programs: [],
@@ -78,7 +79,9 @@ class AddprogramPlanningUnit extends Component {
 
     dropdownFilter = function (instance, cell, c, r, source) {
         var mylist = [];
-        var value = (instance.jexcel.getJson(null, false)[r])[c - 1];
+        // var value = (instance.jexcel.getJson(null, false)[r])[c - 1];
+        var value = (this.state.mapPlanningUnitEl.getJson(null, false)[r])[c - 1];
+
         // AuthenticationService.setupAxiosInterceptors();
         // PlanningUnitService.getActivePlanningUnitList()
         //     .then(response => {
@@ -310,17 +313,20 @@ class AddprogramPlanningUnit extends Component {
                                                                 data = [];
                                                                 data[0] = myReasponse[j].productCategory.id;
                                                                 data[1] = myReasponse[j].planningUnit.id;
-                                                                data[2] = myReasponse[j].reorderFrequencyInMonths;
-                                                                data[3] = myReasponse[j].minMonthsOfStock;
-                                                                data[4] = myReasponse[j].monthsInFutureForAmc;
-                                                                data[5] = myReasponse[j].monthsInPastForAmc;
-                                                                data[6] = myReasponse[j].localProcurementLeadTime;
-                                                                data[7] = myReasponse[j].shelfLife;
-                                                                data[8] = myReasponse[j].catalogPrice;
-                                                                data[9] = myReasponse[j].programPlanningUnitId;
-                                                                data[10] = myReasponse[j].active;
-                                                                data[11] = 0;
-                                                                data[12] = myReasponse[j].program.id;
+                                                                data[2] = myReasponse[j].planBasedOn;
+                                                                data[3] = myReasponse[j].reorderFrequencyInMonths;
+                                                                data[4] = myReasponse[j].minMonthsOfStock;
+                                                                data[5] = myReasponse[j].minQty;
+                                                                data[6] = myReasponse[j].monthsInFutureForAmc;
+                                                                data[7] = myReasponse[j].monthsInPastForAmc;
+                                                                data[8] = myReasponse[j].localProcurementLeadTime;
+                                                                data[9] = myReasponse[j].distributionLeadTime;
+                                                                data[10] = myReasponse[j].shelfLife;
+                                                                data[11] = myReasponse[j].catalogPrice;
+                                                                data[12] = myReasponse[j].programPlanningUnitId;
+                                                                data[13] = myReasponse[j].active;
+                                                                data[14] = 0;
+                                                                data[15] = myReasponse[j].program.id;
                                                                 productDataArr.push(data);
                                                             }
                                                         }
@@ -329,23 +335,27 @@ class AddprogramPlanningUnit extends Component {
                                                             data = [];
                                                             data[0] = 0;
                                                             data[1] = "";
-                                                            data[2] = "";
+                                                            data[2] = 1;
                                                             data[3] = "";
                                                             data[4] = "";
                                                             data[5] = "";
                                                             data[6] = "";
                                                             data[7] = "";
-                                                            data[8] = 0;
-                                                            data[9] = 0;
-                                                            data[10] = 1;
-                                                            data[11] = 1;
-                                                            data[12] = programId;
+                                                            data[8] = "";
+                                                            data[9] = "";
+                                                            data[10] = "";
+                                                            data[11] = 0;
+                                                            data[12] = 0;
+                                                            data[13] = 1;
+                                                            data[14] = 1;
+                                                            data[15] = programId;
                                                             productDataArr[0] = data;
                                                         }
 
 
                                                         this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
-                                                        this.el.destroy();
+                                                        // this.el.destroy();
+                                                        jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
                                                         var json = [];
                                                         var data = productDataArr;
                                                         var options = {
@@ -365,11 +375,16 @@ class AddprogramPlanningUnit extends Component {
                                                                     filter: this.dropdownFilter
                                                                 },
                                                                 {
+                                                                    title: i18n.t('static.programPU.planBasedOn'),
+                                                                    type: 'dropdown',
+                                                                    source: [{ id: 1, name: i18n.t('static.report.mos') }, { id: 2, name: i18n.t('static.report.qty') }],
+                                                                },
+                                                                {
                                                                     title: i18n.t('static.product.reorderFrequency'),
                                                                     type: 'numeric',
                                                                     textEditor: true,
                                                                     // decimal:'.',
-                                                                    mask: '#,##.00',
+                                                                    mask: '#,##',
                                                                     disabledMaskOnEdition: true
 
                                                                 },
@@ -378,7 +393,15 @@ class AddprogramPlanningUnit extends Component {
                                                                     type: 'numeric',
                                                                     textEditor: true,
                                                                     // decimal:'.',
-                                                                    mask: '#,##.00',
+                                                                    mask: '#,##',
+                                                                    disabledMaskOnEdition: true
+                                                                },
+                                                                {
+                                                                    title: i18n.t('static.product.minQuantity'),
+                                                                    type: 'numeric',
+                                                                    textEditor: true,
+                                                                    // decimal:'.',
+                                                                    mask: '#,##',
                                                                     disabledMaskOnEdition: true
                                                                 },
                                                                 {
@@ -386,7 +409,7 @@ class AddprogramPlanningUnit extends Component {
                                                                     type: 'numeric',
                                                                     textEditor: true,
                                                                     // decimal:'.',
-                                                                    mask: '#,##.00',
+                                                                    mask: '#,##',
                                                                     disabledMaskOnEdition: true
                                                                 },
                                                                 {
@@ -394,7 +417,7 @@ class AddprogramPlanningUnit extends Component {
                                                                     type: 'numeric',
                                                                     textEditor: true,
                                                                     // decimal:'.',
-                                                                    mask: '#,##.00',
+                                                                    mask: '#,##',
                                                                     disabledMaskOnEdition: true
                                                                 },
                                                                 {
@@ -406,11 +429,19 @@ class AddprogramPlanningUnit extends Component {
                                                                     disabledMaskOnEdition: true
                                                                 },
                                                                 {
+                                                                    title: i18n.t('static.product.distributionLeadTime'),
+                                                                    type: 'numeric',
+                                                                    textEditor: true,
+                                                                    // decimal:'.',
+                                                                    mask: '#,##',
+                                                                    disabledMaskOnEdition: true
+                                                                },
+                                                                {
                                                                     title: i18n.t('static.report.shelfLife'),
                                                                     type: 'numeric',
                                                                     textEditor: true,
                                                                     // decimal:'.',
-                                                                    mask: '#,##.00',
+                                                                    mask: '#,##',
                                                                     disabledMaskOnEdition: true
                                                                 },
                                                                 {
@@ -442,10 +473,10 @@ class AddprogramPlanningUnit extends Component {
 
                                                             ],
                                                             updateTable: function (el, cell, x, y, source, value, id) {
-                                                                var elInstance = el.jexcel;
+                                                                var elInstance = el;
                                                                 var rowData = elInstance.getRowData(y);
                                                                 // var productCategoryId = rowData[0];
-                                                                var programPlanningUnitId = rowData[9];
+                                                                var programPlanningUnitId = rowData[12];
                                                                 if (programPlanningUnitId == 0) {
                                                                     var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
                                                                     cell1.classList.remove('readonly');
@@ -463,18 +494,34 @@ class AddprogramPlanningUnit extends Component {
 
 
                                                                 }
+                                                                if (rowData[2] == 1) {
+                                                                    var cell1 = elInstance.getCell(`F${parseInt(y) + 1}`)
+                                                                    cell1.classList.add('readonly');
+                                                                    var cell1 = elInstance.getCell(`J${parseInt(y) + 1}`)
+                                                                    cell1.classList.add('readonly');
+                                                                    var cell1 = elInstance.getCell(`E${parseInt(y) + 1}`)
+                                                                    cell1.classList.remove('readonly');
+
+                                                                } else {
+                                                                    var cell1 = elInstance.getCell(`F${parseInt(y) + 1}`)
+                                                                    cell1.classList.remove('readonly');
+                                                                    var cell1 = elInstance.getCell(`J${parseInt(y) + 1}`)
+                                                                    cell1.classList.remove('readonly');
+                                                                    var cell1 = elInstance.getCell(`E${parseInt(y) + 1}`)
+                                                                    cell1.classList.add('readonly');
+                                                                }
                                                             },
                                                             onsearch: function (el) {
-                                                                el.jexcel.updateTable();
+                                                                // el.jexcel.updateTable();
                                                             },
                                                             onfilter: function (el) {
-                                                                el.jexcel.updateTable();
+                                                                // el.jexcel.updateTable();
                                                             },
                                                             pagination: localStorage.getItem("sesRecordCount"),
                                                             filters: true,
                                                             search: true,
                                                             columnSorting: true,
-                                                            tableOverflow: true,
+                                                            // tableOverflow: true,
                                                             wordWrap: true,
                                                             paginationOptions: JEXCEL_PAGINATION_OPTION,
                                                             position: 'top',
@@ -488,12 +535,12 @@ class AddprogramPlanningUnit extends Component {
                                                             parseFormulas: true,
                                                             onpaste: this.onPaste,
                                                             oneditionend: this.oneditionend,
-                                                            text: {
-                                                                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                                                                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                                                                show: '',
-                                                                entries: '',
-                                                            },
+                                                            // text: {
+                                                            //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                                                            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                                                            //     show: '',
+                                                            //     entries: '',
+                                                            // },
                                                             onload: this.loaded,
                                                             license: JEXCEL_PRO_KEY,
                                                             contextMenu: function (obj, x, y, e) {
@@ -568,17 +615,20 @@ class AddprogramPlanningUnit extends Component {
                                                                                 var data = [];
                                                                                 data[0] = -1;
                                                                                 data[1] = "";
-                                                                                data[2] = "";
+                                                                                data[2] = 1;
                                                                                 data[3] = "";
                                                                                 data[4] = "";
                                                                                 data[5] = "";
                                                                                 data[6] = "";
                                                                                 data[7] = "";
-                                                                                data[8] = 0;
-                                                                                data[9] = 0;
-                                                                                data[10] = 1;
-                                                                                data[11] = 1;
-                                                                                data[12] = programId;
+                                                                                data[8] = "";
+                                                                                data[9] = "";
+                                                                                data[10] = "";
+                                                                                data[11] = 0;
+                                                                                data[12] = 0;
+                                                                                data[13] = 1;
+                                                                                data[14] = 1;
+                                                                                data[15] = programId;
                                                                                 obj.insertRow(data, parseInt(y), 1);
                                                                             }.bind(this)
                                                                         });
@@ -591,17 +641,20 @@ class AddprogramPlanningUnit extends Component {
                                                                                 var data = [];
                                                                                 data[0] = -1;
                                                                                 data[1] = "";
-                                                                                data[2] = "";
+                                                                                data[2] = 1;
                                                                                 data[3] = "";
                                                                                 data[4] = "";
                                                                                 data[5] = "";
                                                                                 data[6] = "";
                                                                                 data[7] = "";
-                                                                                data[8] = 0;
-                                                                                data[9] = 0;
-                                                                                data[10] = 1;
-                                                                                data[11] = 1;
-                                                                                data[12] = programId;
+                                                                                data[8] = "";
+                                                                                data[9] = "";
+                                                                                data[10] = "";
+                                                                                data[11] = 0;
+                                                                                data[12] = 0;
+                                                                                data[13] = 1;
+                                                                                data[14] = 1;
+                                                                                data[15] = programId;
                                                                                 obj.insertRow(data, parseInt(y));
                                                                             }.bind(this)
                                                                         });
@@ -609,7 +662,7 @@ class AddprogramPlanningUnit extends Component {
                                                                     // Delete a row
                                                                     if (obj.options.allowDeleteRow == true) {
                                                                         // region id
-                                                                        if (obj.getRowData(y)[9] == 0) {
+                                                                        if (obj.getRowData(y)[12] == 0) {
                                                                             items.push({
                                                                                 title: i18n.t("static.common.deleterow"),
                                                                                 onclick: function () {
@@ -645,7 +698,7 @@ class AddprogramPlanningUnit extends Component {
 
                                                                     //wr
                                                                     if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_COUNTRY_SPECIFIC_PRICES')) {
-                                                                        let cordsValue = `${this.el.getValueFromCoords(9, y)}`;
+                                                                        let cordsValue = `${this.el.getValueFromCoords(12, y)}`;
                                                                         // console.log("CHECK--------->", cordsValue);
                                                                         // if (cordsValue.length != 0) {
                                                                         //     console.log("CHECK--------->not empty", cordsValue);
@@ -659,7 +712,7 @@ class AddprogramPlanningUnit extends Component {
                                                                                     onclick: function () {
                                                                                         // console.log("onclick------>", this.el.getValueFromCoords(0, y));                      
                                                                                         this.props.history.push({
-                                                                                            pathname: `/programProduct/addCountrySpecificPrice/${this.el.getValueFromCoords(9, y)}/${programId}`,
+                                                                                            pathname: `/programProduct/addCountrySpecificPrice/${this.el.getValueFromCoords(12, y)}/${programId}`,
                                                                                         });
 
                                                                                     }.bind(this)
@@ -879,7 +932,9 @@ class AddprogramPlanningUnit extends Component {
                 loading: false
             });
             this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
-            this.el.destroy();
+            // this.el.destroy();
+            jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
+
         }
 
 
@@ -891,41 +946,44 @@ class AddprogramPlanningUnit extends Component {
         var data = [];
         data[0] = "-1";
         data[1] = "";
-        data[2] = "";
+        data[2] = 1;
         data[3] = "";
-        data[4] = MONTHS_IN_FUTURE_FOR_AMC;
-        data[5] = MONTHS_IN_PAST_FOR_AMC;
-        data[6] = "";
-        data[7] = "";
-        data[8] = 0;
-        data[9] = 0;
-        data[10] = 1;
-        data[11] = 1;
-        data[12] = this.state.programId;
+        data[4] = "";
+        data[5] = "";
+        data[6] = MONTHS_IN_FUTURE_FOR_AMC;
+        data[7] = MONTHS_IN_PAST_FOR_AMC;
+        data[8] = "";
+        data[9] = "";
+        data[10] = "";
+        data[11] = 0;
+        data[12] = 0;
+        data[13] = 1;
+        data[14] = 1;
+        data[15] = this.state.programId;
         this.el.insertRow(
             data, 0, 1
         );
     }
 
     oneditionend = function (instance, cell, x, y, value) {
-        var elInstance = instance.jexcel;
+        var elInstance = instance;
         var rowData = elInstance.getRowData(y);
 
-        if (x == 2 && !isNaN(rowData[2]) && rowData[2].toString().indexOf('.') != -1) {
-            console.log("RESP---------", parseFloat(rowData[2]));
-            elInstance.setValueFromCoords(2, y, parseFloat(rowData[2]), true);
-        } else if (x == 3 && !isNaN(rowData[3]) && rowData[3].toString().indexOf('.') != -1) {
+        if (x == 3 && !isNaN(rowData[3]) && rowData[3].toString().indexOf('.') != -1) {
+            console.log("RESP---------", parseFloat(rowData[3]));
             elInstance.setValueFromCoords(3, y, parseFloat(rowData[3]), true);
         } else if (x == 4 && !isNaN(rowData[4]) && rowData[4].toString().indexOf('.') != -1) {
             elInstance.setValueFromCoords(4, y, parseFloat(rowData[4]), true);
-        } else if (x == 5 && !isNaN(rowData[5]) && rowData[5].toString().indexOf('.') != -1) {
-            elInstance.setValueFromCoords(5, y, parseFloat(rowData[5]), true);
         } else if (x == 6 && !isNaN(rowData[6]) && rowData[6].toString().indexOf('.') != -1) {
             elInstance.setValueFromCoords(6, y, parseFloat(rowData[6]), true);
         } else if (x == 7 && !isNaN(rowData[7]) && rowData[7].toString().indexOf('.') != -1) {
             elInstance.setValueFromCoords(7, y, parseFloat(rowData[7]), true);
         } else if (x == 8 && !isNaN(rowData[8]) && rowData[8].toString().indexOf('.') != -1) {
             elInstance.setValueFromCoords(8, y, parseFloat(rowData[8]), true);
+        } else if (x == 10 && !isNaN(rowData[10]) && rowData[10].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(10, y, parseFloat(rowData[10]), true);
+        } else if (x == 11 && !isNaN(rowData[11]) && rowData[11].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(11, y, parseFloat(rowData[11]), true);
         }
 
     }
@@ -934,13 +992,13 @@ class AddprogramPlanningUnit extends Component {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
-                var index = (instance.jexcel).getValue(`J${parseInt(data[i].y) + 1}`, true);
+                var index = (instance).getValue(`M${parseInt(data[i].y) + 1}`, true);
                 if (index === "" || index == null || index == undefined) {
-                    (instance.jexcel).setValueFromCoords(8, data[i].y, 0, true);
-                    (instance.jexcel).setValueFromCoords(9, data[i].y, 0, true);
-                    (instance.jexcel).setValueFromCoords(10, data[i].y, 1, true);
-                    (instance.jexcel).setValueFromCoords(11, data[i].y, 1, true);
-                    (instance.jexcel).setValueFromCoords(12, data[i].y, this.state.programId, true);
+                    (instance).setValueFromCoords(11, data[i].y, 0, true);
+                    (instance).setValueFromCoords(12, data[i].y, 0, true);
+                    (instance).setValueFromCoords(13, data[i].y, 1, true);
+                    (instance).setValueFromCoords(14, data[i].y, 1, true);
+                    (instance).setValueFromCoords(15, data[i].y, this.state.programId, true);
                     z = data[i].y;
                 }
             }
@@ -953,7 +1011,7 @@ class AddprogramPlanningUnit extends Component {
         for (var y = 0; y < json.length; y++) {
 
 
-            var value = this.el.getValueFromCoords(11, y);
+            var value = this.el.getValueFromCoords(14, y);
             if (parseInt(value) == 1) {
                 // console.log("PROBLEM");
 
@@ -997,30 +1055,20 @@ class AddprogramPlanningUnit extends Component {
                     }
                 }
 
-                //Reorder frequency
+                //Plan Based On
                 var col = ("C").concat(parseInt(y) + 1);
                 value = this.el.getValue(`C${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                // var reg = /^[0-9\b]+$/;
-                var reg = JEXCEL_INTEGER_REGEX
-                // console.log("value-----", value);
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
                 } else {
-                    if (isNaN(parseInt(value)) || !(reg.test(value))) {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                        valid = false;
-                    } else {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setComments(col, "");
-                    }
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
                 }
 
-                //Min months of stock
+                //Reorder frequency
                 var col = ("D").concat(parseInt(y) + 1);
                 value = this.el.getValue(`D${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 // var reg = /^[0-9\b]+$/;
@@ -1043,9 +1091,77 @@ class AddprogramPlanningUnit extends Component {
                     }
                 }
 
-                //Months in future for AMC
+                //Min months of stock
                 var col = ("E").concat(parseInt(y) + 1);
                 value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                // var reg = /^[0-9\b]+$/;
+                var reg = JEXCEL_INTEGER_REGEX
+                // console.log("value-----", value);
+                if (json[y][2] == 1 && value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    if ((isNaN(parseInt(value)) || !(reg.test(value))) && value != "") {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+                }
+
+                //Min Qty
+                var col = ("F").concat(parseInt(y) + 1);
+                value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                // var reg = /^[0-9\b]+$/;
+                var reg = JEXCEL_INTEGER_REGEX
+                // console.log("value-----", value);
+                if (json[y][2] == 2 && value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    if ((isNaN(parseInt(value)) || !(reg.test(value))) && value != "") {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+                }
+                //Distribution Lead Time
+                var col = ("J").concat(parseInt(y) + 1);
+                value = this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                // var reg = /^[0-9\b]+$/;
+                var reg = JEXCEL_INTEGER_REGEX
+                // console.log("value-----", value);
+                if (json[y][2] == 2 && value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    if ((isNaN(parseInt(value)) || !(reg.test(value))) && value != "") {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+                }
+
+                //Months in future for AMC
+                var col = ("G").concat(parseInt(y) + 1);
+                value = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 // var reg = /^[0-9\b]+$/;
                 var reg = JEXCEL_INTEGER_REGEX
                 // console.log("value-----", value);
@@ -1067,8 +1183,8 @@ class AddprogramPlanningUnit extends Component {
                 }
 
                 //Months in past for AMC
-                var col = ("F").concat(parseInt(y) + 1);
-                value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                var col = ("H").concat(parseInt(y) + 1);
+                value = this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 // var reg = /^[0-9\b]+$/;
                 var reg = JEXCEL_INTEGER_REGEX
                 // console.log("value-----", value);
@@ -1090,8 +1206,8 @@ class AddprogramPlanningUnit extends Component {
                 }
 
                 //Local procurement lead time
-                var col = ("G").concat(parseInt(y) + 1);
-                value = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                var col = ("I").concat(parseInt(y) + 1);
+                value = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 // var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
                 var reg = JEXCEL_DECIMAL_LEAD_TIME
                 // console.log("value-----", value);
@@ -1115,8 +1231,8 @@ class AddprogramPlanningUnit extends Component {
 
 
                 //Shelf life
-                var col = ("H").concat(parseInt(y) + 1);
-                value = this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                var col = ("K").concat(parseInt(y) + 1);
+                value = this.el.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 // var reg = /^[0-9\b]+$/;
                 var reg = JEXCEL_INTEGER_REGEX
                 // console.log("value-----", value);
@@ -1139,8 +1255,8 @@ class AddprogramPlanningUnit extends Component {
 
 
                 //Catalog price
-                var col = ("I").concat(parseInt(y) + 1);
-                value = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                var col = ("L").concat(parseInt(y) + 1);
+                value = this.el.getValue(`L${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 // var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
                 // var reg = DECIMAL_NO_REGEX;
                 var reg = JEXCEL_DECIMAL_CATELOG_PRICE
@@ -1175,7 +1291,7 @@ class AddprogramPlanningUnit extends Component {
         console.log("changed 1");
         var rowData = this.el.getRowData(y);
         if (x == 0) {
-            console.log("changed 2");
+            console.log("changed 3");
             var col = ("A").concat(parseInt(y) + 1);
             // alert("value--->",value);
             console.log("value--->", rowData[0]);
@@ -1185,29 +1301,31 @@ class AddprogramPlanningUnit extends Component {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                this.el.setValueFromCoords(11, y, 1, true);
+                this.el.setValueFromCoords(14, y, 1, true);
                 valid = false;
             } else {
                 console.log("============in else when category is changed ");
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
-                this.el.setValueFromCoords(11, y, 1, true);
+                this.el.setValueFromCoords(14, y, 1, true);
                 valid = true;
             }
-            var columnName = jexcel.getColumnNameFromId([parseInt(x) + 1, y]);
-            instance.jexcel.setValue(columnName, '');
+            console.log("test11111", jexcel);
+
+            // var columnName = jexcel.getColumnNameFromId([parseInt(x) + 1, y]);
+            // instance.worksheets[0].setValue(columnName, '');
         }
 
         //Planning Unit
         if (x == 1) {
-            console.log("changed 3");
+            console.log("changed 4");
             var json = this.el.getJson(null, false);
             var col = ("B").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                this.el.setValueFromCoords(11, y, 1, true);
+                this.el.setValueFromCoords(14, y, 1, true);
                 valid = false;
             } else {
                 console.log("json.length", json.length);
@@ -1223,13 +1341,13 @@ class AddprogramPlanningUnit extends Component {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
                         this.el.setComments(col, i18n.t('static.message.planningUnitAlreadyExists'));
-                        this.el.setValueFromCoords(11, y, 1, true);
+                        this.el.setValueFromCoords(14, y, 1, true);
                         valid = false;
                         i = -1;
                     } else {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setComments(col, "");
-                        this.el.setValueFromCoords(11, y, 1, true);
+                        this.el.setValueFromCoords(14, y, 1, true);
                         valid = true;
                     }
                 }
@@ -1239,150 +1357,244 @@ class AddprogramPlanningUnit extends Component {
             // instance.jexcel.setValue(columnName, '');
         }
 
-        //Reorder frequency
         if (x == 2) {
-            console.log("changed 4");
             // var reg = /^[0-9\b]+$/;
             value = this.el.getValue(`C${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-            var reg = JEXCEL_INTEGER_REGEX
             var col = ("C").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                this.el.setValueFromCoords(11, y, 1, true);
+                this.el.setValueFromCoords(14, y, 1, true);
                 valid = false;
             } else {
-                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+                this.el.setValueFromCoords(14, y, 1, true);
+                valid = true;
+                console.log("changed 7");
+                value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                // var reg = /^[0-9\b]+$/;
+                var reg = JEXCEL_INTEGER_REGEX
+                var col = ("E").concat(parseInt(y) + 1);
+                if (rowData[2] == 1 && value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                    this.el.setValueFromCoords(11, y, 1, true);
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    this.el.setValueFromCoords(14, y, 1, true);
                     valid = false;
                 } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                    this.el.setValueFromCoords(11, y, 1, true);
-                    valid = true;
+                    if ((isNaN(parseInt(value)) || !(reg.test(value))) && value != "") {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        this.el.setValueFromCoords(14, y, 1, true);
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                        this.el.setValueFromCoords(14, y, 1, true);
+                        valid = true;
+                    }
                 }
+                value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                // var reg = /^[0-9\b]+$/;
+                var reg = JEXCEL_INTEGER_REGEX
+                var col = ("F").concat(parseInt(y) + 1);
+                if (rowData[2] == 2 && value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    this.el.setValueFromCoords(14, y, 1, true);
+                    valid = false;
+                } else {
+                    if ((isNaN(parseInt(value)) || !(reg.test(value))) && value != "") {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        this.el.setValueFromCoords(14, y, 1, true);
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                        this.el.setValueFromCoords(14, y, 1, true);
+                        valid = true;
+                    }
+                }
+                value = this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                // var reg = /^[0-9\b]+$/;
+                var reg = JEXCEL_INTEGER_REGEX
+                var col = ("J").concat(parseInt(y) + 1);
+                if (rowData[2] == 2 && value == "") {
+                    // this.el.setStyle(col, "background-color", "transparent");
+                    // this.el.setStyle(col, "background-color", "yellow");
+                    // this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    this.el.setValueFromCoords(9, y, 0, true);
+                    this.el.setValueFromCoords(14, y, 1, true);
+
+                    valid = false;
+                } else {
+                    if ((isNaN(parseInt(value)) || !(reg.test(value))) && value != "") {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        this.el.setValueFromCoords(14, y, 1, true);
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                        this.el.setValueFromCoords(14, y, 1, true);
+                        valid = true;
+                    }
+                }
+
+
             }
         }
-        //Min months of stock
+        //Reorder frequency
         if (x == 3) {
-            console.log("changed 5");
-            value = this.el.getValue(`D${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            console.log("changed 6");
             // var reg = /^[0-9\b]+$/;
+            value = this.el.getValue(`D${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             var reg = JEXCEL_INTEGER_REGEX
             var col = ("D").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                this.el.setValueFromCoords(11, y, 1, true);
+                this.el.setValueFromCoords(14, y, 1, true);
                 valid = false;
             } else {
                 if (isNaN(parseInt(value)) || !(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                    this.el.setValueFromCoords(11, y, 1, true);
+                    this.el.setValueFromCoords(14, y, 1, true);
                     valid = false;
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
-                    this.el.setValueFromCoords(11, y, 1, true);
+                    this.el.setValueFromCoords(14, y, 1, true);
                     valid = true;
                 }
             }
         }
-        //Months in future for AMC
+        //Min months of stock
         if (x == 4) {
-            console.log("changed 6");
+            console.log("changed 7");
             value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             // var reg = /^[0-9\b]+$/;
             var reg = JEXCEL_INTEGER_REGEX
             var col = ("E").concat(parseInt(y) + 1);
-            if (value == "") {
+            if (rowData[2] == 1 && value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                this.el.setValueFromCoords(11, y, 1, true);
+                this.el.setValueFromCoords(14, y, 1, true);
                 valid = false;
             } else {
-                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                if ((isNaN(parseInt(value)) || !(reg.test(value))) && value != "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                    this.el.setValueFromCoords(11, y, 1, true);
+                    this.el.setValueFromCoords(14, y, 1, true);
                     valid = false;
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
-                    this.el.setValueFromCoords(11, y, 1, true);
+                    this.el.setValueFromCoords(14, y, 1, true);
                     valid = true;
                 }
             }
         }
-        //Months in past for AMC
+        //Min Qty
         if (x == 5) {
             console.log("changed 7");
             value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             // var reg = /^[0-9\b]+$/;
             var reg = JEXCEL_INTEGER_REGEX
             var col = ("F").concat(parseInt(y) + 1);
+            if (rowData[2] == 2 && value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                this.el.setValueFromCoords(14, y, 1, true);
+                valid = false;
+            } else {
+                if ((isNaN(parseInt(value)) || !(reg.test(value))) && value != "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    this.el.setValueFromCoords(14, y, 1, true);
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                    this.el.setValueFromCoords(14, y, 1, true);
+                    valid = true;
+                }
+            }
+        }
+
+        //Distribution Lead Time
+        if (x == 9) {
+            console.log("changed 7");
+            value = this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            // var reg = /^[0-9\b]+$/;
+            var reg = JEXCEL_INTEGER_REGEX
+            var col = ("J").concat(parseInt(y) + 1);
+            if (rowData[2] == 2 && value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                this.el.setValueFromCoords(14, y, 1, true);
+                valid = false;
+            } else {
+                if ((isNaN(parseInt(value)) || !(reg.test(value))) && value != "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    this.el.setValueFromCoords(14, y, 1, true);
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                    this.el.setValueFromCoords(14, y, 1, true);
+                    valid = true;
+                }
+            }
+        }
+        //Months in future for AMC
+        if (x == 6) {
+            console.log("changed 8");
+            value = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            // var reg = /^[0-9\b]+$/;
+            var reg = JEXCEL_INTEGER_REGEX
+            var col = ("G").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                this.el.setValueFromCoords(11, y, 1, true);
+                this.el.setValueFromCoords(14, y, 1, true);
                 valid = false;
             } else {
                 if (isNaN(parseInt(value)) || !(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                    this.el.setValueFromCoords(11, y, 1, true);
+                    this.el.setValueFromCoords(14, y, 1, true);
                     valid = false;
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
-                    this.el.setValueFromCoords(11, y, 1, true);
+                    this.el.setValueFromCoords(14, y, 1, true);
                     valid = true;
                 }
             }
         }
-        //Local procurement lead time
-        if (x == 6) {
-            console.log("changed 8");
-            // var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
-            value = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-            var reg = JEXCEL_DECIMAL_LEAD_TIME
-            var col = ("G").concat(parseInt(y) + 1);
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                this.el.setValueFromCoords(11, y, 1, true);
-                valid = false;
-            } else {
-                // if (isNaN(parseInt(value)) || !(reg.test(value))) {
-                if (!(reg.test(value))) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                    this.el.setValueFromCoords(11, y, 1, true);
-                    valid = false;
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                    this.el.setValueFromCoords(11, y, 1, true);
-                    valid = true;
-                }
-            }
-        }
-        //Shelf life
+        //Months in past for AMC
         if (x == 7) {
-            console.log("changed 9");
+            console.log("changed 10");
             value = this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             // var reg = /^[0-9\b]+$/;
             var reg = JEXCEL_INTEGER_REGEX
@@ -1391,35 +1603,35 @@ class AddprogramPlanningUnit extends Component {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                this.el.setValueFromCoords(11, y, 1, true);
+                this.el.setValueFromCoords(14, y, 1, true);
                 valid = false;
             } else {
                 if (isNaN(parseInt(value)) || !(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                    this.el.setValueFromCoords(11, y, 1, true);
+                    this.el.setValueFromCoords(14, y, 1, true);
                     valid = false;
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
-                    this.el.setValueFromCoords(11, y, 1, true);
+                    this.el.setValueFromCoords(14, y, 1, true);
                     valid = true;
                 }
             }
         }
-        //Catalog price
+        //Local procurement lead time
         if (x == 8) {
-            console.log("changed 10");
+            console.log("changed 11");
             // var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
             value = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-            var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
+            var reg = JEXCEL_DECIMAL_LEAD_TIME
             var col = ("I").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                this.el.setValueFromCoords(11, y, 1, true);
+                this.el.setValueFromCoords(14, y, 1, true);
                 valid = false;
             } else {
                 // if (isNaN(parseInt(value)) || !(reg.test(value))) {
@@ -1427,21 +1639,78 @@ class AddprogramPlanningUnit extends Component {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                    this.el.setValueFromCoords(11, y, 1, true);
+                    this.el.setValueFromCoords(14, y, 1, true);
                     valid = false;
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
-                    this.el.setValueFromCoords(11, y, 1, true);
+                    this.el.setValueFromCoords(14, y, 1, true);
+                    valid = true;
+                }
+            }
+        }
+        //Shelf life
+        if (x == 10) {
+            console.log("changed 12");
+            value = this.el.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            // var reg = /^[0-9\b]+$/;
+            var reg = JEXCEL_INTEGER_REGEX
+            var col = ("K").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                this.el.setValueFromCoords(14, y, 1, true);
+                valid = false;
+            } else {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    this.el.setValueFromCoords(14, y, 1, true);
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                    this.el.setValueFromCoords(14, y, 1, true);
+                    valid = true;
+                }
+            }
+        }
+        //Catalog price
+        if (x == 11) {
+            console.log("changed 13");
+            // var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
+            value = this.el.getValue(`L${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
+            var col = ("L").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                this.el.setValueFromCoords(14, y, 1, true);
+                valid = false;
+            } else {
+                // if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                if (!(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    this.el.setValueFromCoords(14, y, 1, true);
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                    this.el.setValueFromCoords(14, y, 1, true);
                     valid = true;
                 }
             }
         }
 
-        if (x != 11) {
-            this.el.setValueFromCoords(11, y, 1, true);
+        if (x != 14) {
+            this.el.setValueFromCoords(14, y, 1, true);
         }
-        this.setState({ isValidData: valid });
+        this.setState({ isValidData: valid, isChanged: true });
     }
 
 
@@ -1461,29 +1730,32 @@ class AddprogramPlanningUnit extends Component {
             console.log("json.length---" + json.length);
             for (var i = 0; i < json.length; i++) {
                 var map = new Map(Object.entries(json[i]));
-                console.log("(map.get(11)---" + map.get("11"));
-                if (map.get("11") == 1) {
-                    if (map.get("9") == "") {
+                console.log("(map.get(14)---" + map.get("14"));
+                if (map.get("14") == 1) {
+                    if (map.get("12") == "") {
                         var pId = 0;
                     } else {
-                        var pId = map.get("9");
+                        var pId = map.get("12");
                     }
                     var planningUnitJson = {
                         programPlanningUnitId: pId,
                         program: {
-                            id: map.get("12")
+                            id: map.get("15")
                         },
                         planningUnit: {
                             id: map.get("1"),
                         },
-                        reorderFrequencyInMonths: this.el.getValue(`C${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                        minMonthsOfStock: this.el.getValue(`D${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                        monthsInFutureForAmc: this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                        monthsInPastForAmc: this.el.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                        localProcurementLeadTime: this.el.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                        shelfLife: this.el.getValue(`H${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                        catalogPrice: this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                        active: map.get("10")
+                        reorderFrequencyInMonths: this.el.getValue(`D${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                        minMonthsOfStock: this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                        monthsInFutureForAmc: this.el.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                        monthsInPastForAmc: this.el.getValue(`H${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                        localProcurementLeadTime: this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                        shelfLife: this.el.getValue(`K${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                        catalogPrice: this.el.getValue(`L${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                        active: map.get("13"),
+                        minQty: this.el.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                        distributionLeadTime: this.el.getValue(`J${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                        planBasedOn: map.get("2")
                     }
                     planningUnitArray.push(planningUnitJson);
                 }
@@ -1495,7 +1767,7 @@ class AddprogramPlanningUnit extends Component {
                 .then(response => {
                     if (response.status == "200") {
                         this.setState({
-                            message: i18n.t('static.message.planningUnitUpdate'), loading: false, color: 'green'
+                            message: i18n.t('static.message.planningUnitUpdate'), loading: false, color: 'green', isChanged: false
                         },
                             () => {
                                 this.hideSecondComponent();
@@ -1569,20 +1841,27 @@ class AddprogramPlanningUnit extends Component {
 
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
-        var asterisk = document.getElementsByClassName("resizable")[0];
+        // var asterisk = document.getElementsByClassName("resizable")[0];
+        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
         tr.children[1].classList.add('AsteriskTheadtrTd');
         tr.children[2].classList.add('AsteriskTheadtrTd');
-        tr.children[3].classList.add('AsteriskTheadtrTd');
         tr.children[4].classList.add('AsteriskTheadtrTd');
-        tr.children[5].classList.add('AsteriskTheadtrTd');
-        tr.children[6].classList.add('AsteriskTheadtrTd');
         tr.children[7].classList.add('AsteriskTheadtrTd');
         tr.children[8].classList.add('AsteriskTheadtrTd');
         tr.children[9].classList.add('AsteriskTheadtrTd');
+        tr.children[11].classList.add('AsteriskTheadtrTd');
+        tr.children[12].classList.add('AsteriskTheadtrTd');
+        tr.children[3].title = i18n.t('static.programPU.planBasedOnTooltip');
+        tr.children[3].classList.add('AsteriskTheadtrTd');
     }
 
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
         const { programs } = this.state;
         let programList = programs.length > 0
             && programs.map((item, i) => {
@@ -1595,6 +1874,10 @@ class AddprogramPlanningUnit extends Component {
             }, this);
         return (
             <div className="animated fadeIn">
+                <Prompt
+                    when={this.state.isChanged == true}
+                    message={i18n.t("static.dataentry.confirmmsg")}
+                />
                 <AuthenticationServiceComponent history={this.props.history} />
                 {/* <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5> */}
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
@@ -1641,7 +1924,7 @@ class AddprogramPlanningUnit extends Component {
                             </div> */}
                             <div >
                                 <h4 className="red">{this.props.message}</h4>
-                                <div className="table-responsive consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
+                                <div className="consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
                                     <div id="mapPlanningUnit" className="RowheightForaddprogaddRow">
                                     </div>
                                 </div>
@@ -1664,9 +1947,9 @@ class AddprogramPlanningUnit extends Component {
                             <FormGroup>
                                 {this.state.isValidData && this.state.programId != 0 && <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>}
                                 &nbsp;
-                                {this.state.isValidData && this.state.programId != 0 && <Button type="submit" size="md" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
+                                {this.state.isChanged && this.state.isValidData && this.state.programId != 0 && <Button type="submit" size="md" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
                                 &nbsp;
-                                {this.state.isValidData && this.state.programId != 0 && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.addRowInJexcel}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>}
+                                {this.state.isValidData && this.state.programId != 0 && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.addRowInJexcel}> {i18n.t('static.common.addRow')}</Button>}
                                 &nbsp;
                             </FormGroup>
                         </CardFooter>

@@ -51,7 +51,6 @@ import 'chartjs-plugin-annotation';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import {MultiSelect} from "react-multi-select-component";
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
-import jexcel from 'jexcel-pro';
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import "../../../node_modules/react-step-progress-bar/styles.css"
 import { ProgressBar, Step } from "react-step-progress-bar";
