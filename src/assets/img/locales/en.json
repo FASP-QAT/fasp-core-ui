@@ -1502,6 +1502,7 @@
     "static.problemReport.resolvedExample": "A planning unit gets flagged for not following dynamic forecasting. The user enters a note that this planning unit does not follow dynamic forecasting because it is not a seasonal product. The reviewer marks this as 'Resolved' because the explanation will most likely not change in the future.",
     "static.compareAndSelect.actuals": "Actuals (Adjusted)",
     "static.dataEntry.dateValidation": "Please use (YYYY-MM-DD) date format",
+    "static.shipment.groupByProcurementAgentType": "Group by Procurement Agent Type",
     "static.mt.selectFundingSource": "Please select funding source",
     "static.inventory.inventorydetils": "Inventory Details",
     "static.supplyPlan.budgetArray": "Budget Array",
@@ -2327,6 +2328,7 @@
     "static.tree.hideMonthlyData": "Hide monthly data",
     "static.budget.allocatedShipmentOrdered": "Allocated to Shipments (Submitted or later)",
     "static.common.jun": "Jun",
+    "static.shipment.shipmentProcurementAgentType": "Shipment Procurement Agent Type",
     "static.user.validphonemaxdigit": "Phone number can be 15 digits max",
     "static.mt.masterDataSyncNote": "Reminder: If you make any changes in this screen, you will need to click “master data sync” for those changes to be seen throughout the tool. Also, please note that only ERP orders after \"approved\" status are available to be linked to QAT shipments.",
     "static.common.viewDashBoard": "View Dashboard",
@@ -2794,11 +2796,8 @@
     "static.supplyPlanFormula.maxMonthOfStockEx2": "Max = MIN ([ MAX(4,3)+3 ] ,18 )",
     "static.organisation.organisationheader": "Organization",
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Max = 7",
-    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )",
     "static.manualTagging.showAllShipments": "Show All Shipments for",
     "static.login.loginOnline": "Online",
-    "static.shipment.shipmentProcurementAgentType": "Shipment Procurement Agent Type",
-    "static.shipment.groupByProcurementAgentType": "Group by Procurement Agent Type",
     "static.shipment.shipmentQtyARU": "Order Quantity (ARU)",
     "static.shipment.shipmentQtyPU": "Order Quantity (PU)",
     "static.manualTagging.aruQty": "ARU Qty",
@@ -2843,5 +2842,6 @@
     "static.login.goToLogin": "Go to Login",
     "static.login.goOffline": "Go Offline",
     "static.login.goOnline": "Go Online",
-    "static.login.loginAgain": "Please login again to access QAT in online mode."
+    "static.login.loginAgain": "Please login again to access QAT in online mode.",
+    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )"
 }
