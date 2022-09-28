@@ -38,18 +38,18 @@ import dataentryScreenshot1 from '../../assets/img/dataentryScreenshot-1.png';
 import dataentryScreenshot2 from '../../assets/img/dataentryScreenshot-2.png';
 import dataentryScreenshot3 from '../../assets/img/dataentryScreenshot-3.png';
 import { round } from "mathjs";
-<<<<<<< HEAD
+
 import showguidanceConsumptionDataEntryEn from '../../../src/ShowGuidanceFiles/ConsumptionDataEntryandAdjustmentEn.html'
 import showguidanceConsumptionDataEntryFr from '../../../src/ShowGuidanceFiles/ConsumptionDataEntryandAdjustmentFr.html'
 import showguidanceConsumptionDataEntrySp from '../../../src/ShowGuidanceFiles/ConsumptionDataEntryandAdjustmentSp.html'
 import showguidanceConsumptionDataEntryPr from '../../../src/ShowGuidanceFiles/ConsumptionDataEntryandAdjustmentPr.html'
-=======
+
 import { calculateMovingAvg } from '../Extrapolation/MovingAverages';
 import { calculateSemiAverages } from '../Extrapolation/SemiAverages';
 import { calculateLinearRegression } from '../Extrapolation/LinearRegression';
 import { calculateTES } from '../Extrapolation/TESNew';
 import { calculateArima } from '../Extrapolation/Arima';
->>>>>>> uat2
+
 
 const entityname = i18n.t('static.dashboard.dataEntryAndAdjustment');
 const ref = React.createRef();
