@@ -2843,7 +2843,10 @@
     "static.login.goOffline": "Go Offline",
     "static.login.goOnline": "Go Online",
     "static.login.loginAgain": "Please login again to access QAT in online mode.",
-    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )",
     "static.supplyPlanFormula.minMaxNote":"QAT converts max/min MOS into quantities by multiplying the number by the AMC for the current month.",
-    "static.login.successOffline":"You have successfully switched to offline mode."
+    "static.login.successOffline":"You have successfully switched to offline mode.",
+    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )",
+    "static.dataset.BranchTreeTemplate":"Branch Template",
+    "static.dataset.createBranchTreeTemplate":"Create Branch Template",
+    "static.dataset.selectBranchTreeTemplate":"Select Template"
 }

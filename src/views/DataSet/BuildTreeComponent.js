@@ -471,6 +471,37 @@ const getErrorsFromValidationErrorScenario = (validationError) => {
     }, {})
 }
 
+// Branch Validation
+const validationSchemaBranch = function (values) {
+    return Yup.object().shape({
+        branchTemplateId: Yup.string()
+            .required('Please enter template.'),
+
+    })
+}
+
+const validateBranch = (getValidationSchema) => {
+    return (values) => {
+        const validationSchemaBranch = getValidationSchema(values)
+        try {
+            validationSchemaBranch.validateSync(values, { abortEarly: false })
+            return {}
+        } catch (error) {
+            return getErrorsFromValidationErrorBranch(error)
+        }
+    }
+}
+
+const getErrorsFromValidationErrorBranch = (validationError) => {
+    const FIRST_ERROR = 0
+    return validationError.inner.reduce((errors, error) => {
+        return {
+            ...errors,
+            [error.path]: error.errors[FIRST_ERROR],
+        }
+    }, {})
+}
+
 function addCommas(cell1, row) {
 
     if (cell1 != null && cell1 != "") {
@@ -545,6 +576,8 @@ export default class BuildTree extends Component {
         this.pickAMonth4 = React.createRef()
         this.pickAMonth5 = React.createRef()
         this.state = {
+            isBranchTemplateModalOpen: false,
+            branchTemplateList: [],
             isValidError: '',
             isScenarioChanged: false,
             isTreeDataChanged: false,
@@ -954,6 +987,7 @@ export default class BuildTree extends Component {
         this.qatCalculatedPUPerVisit = this.qatCalculatedPUPerVisit.bind(this);
         this.calculateParentValueFromMOM = this.calculateParentValueFromMOM.bind(this);
         this.getNodeTransferList = this.getNodeTransferList.bind(this);
+        this.generateBranchFromTemplate = this.generateBranchFromTemplate.bind(this);
     }
 
     getMomValueForDateRange(startDate) {
@@ -6152,12 +6186,36 @@ export default class BuildTree extends Component {
         this.validateFormScenario(errors)
     }
 
+    touchAllBranch(setTouched, errors) {
+        setTouched({
+            branchTemplateId: true
+        }
+        )
+        this.validateFormBranch(errors)
+    }
+
     validateFormScenario(errors) {
         this.findFirstErrorScenario('userForm', (fieldName) => {
             return Boolean(errors[fieldName])
         })
     }
     findFirstErrorScenario(formName, hasError) {
+        const form = document.forms[formName]
+        for (let i = 0; i < form.length; i++) {
+            if (hasError(form[i].name)) {
+                form[i].focus()
+                break
+            }
+        }
+    }
+
+
+    validateFormBranch(errors) {
+        this.findFirstErrorBranch('userForm', (fieldName) => {
+            return Boolean(errors[fieldName])
+        })
+    }
+    findFirstErrorBranch(formName, hasError) {
         const form = document.forms[formName]
         for (let i = 0; i < form.length; i++) {
             if (hasError(form[i].name)) {
@@ -6387,6 +6445,167 @@ export default class BuildTree extends Component {
         }.bind(this)
     }
 
+
+    getBranchTemplateList(itemConfig) {
+        var nodeTypeId = itemConfig.payload.nodeType.id;
+        const lan = 'en';
+        var db1;
+        var storeOS;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var planningunitTransaction = db1.transaction(['branchTemplate'], 'readwrite');
+            var planningunitOs = planningunitTransaction.objectStore('branchTemplate');
+            var planningunitRequest = planningunitOs.getAll();
+            var planningList = []
+            planningunitRequest.onerror = function (event) {
+                // Handle errors!
+            };
+            planningunitRequest.onsuccess = function (e) {
+                var myResult = [];
+                myResult = planningunitRequest.result;
+                var nodeTypeList = [];
+                var nodeType = this.state.nodeTypeList.filter(c => c.id == nodeTypeId)[0];
+                for (let i = 0; i < nodeType.allowedChildList.length; i++) {
+                    // console.log("Branch allowed value---", nodeType.allowedChildList[i]);
+                    var obj = this.state.nodeTypeList.filter(c => c.id == nodeType.allowedChildList[i])[0];
+                    nodeTypeList.push(nodeType.allowedChildList[i]);
+                }
+                // console.log("Branch nodeType list---", nodeTypeList);
+                var fullBranchTemplateList = myResult.filter(x => x.active == true && x.forecastMethod.id == this.state.curTreeObj.forecastMethod.id);
+                var branchTemplateList = [];
+                // console.log("Branch branchTemplateList---", fullBranchTemplateList);
+                for (let i = 0; i < fullBranchTemplateList.length; i++) {
+                    var flatList = fullBranchTemplateList[i].flatList;
+                    // console.log("Branch flatList---", flatList);
+                    var node = flatList.filter(x => x.level == 0)[0];
+                    // console.log("Branch node---", node);
+                    var result = nodeTypeList.indexOf(node.payload.nodeType.id) != -1;
+                    // console.log("Branch template result---", result);
+                    if (result) {
+                        branchTemplateList.push(fullBranchTemplateList[i]);
+                    }
+                }
+                this.setState({
+                    fullBranchTemplateList,
+                    branchTemplateList,
+                    isBranchTemplateModalOpen: true,
+                    parentNodeIdForBranch: itemConfig.id
+                }, () => {
+
+                })
+            }.bind(this);
+        }.bind(this)
+    }
+
+    generateBranchFromTemplate(treeTemplateId) {
+        var items = this.state.items;
+        var parentItem = JSON.parse(JSON.stringify(this.state.items.filter(x => x.id == this.state.parentNodeIdForBranch)[0]));
+        var curMonth = moment(this.state.forecastStartDate).format('YYYY-MM-DD');
+        var branchTemplate = this.state.branchTemplateList.filter(x => x.treeTemplateId == treeTemplateId)[0];
+        var flatList = JSON.parse(JSON.stringify(branchTemplate.flatList));
+        var nodeDataMap = {};
+        var tempArray = [];
+        var tempJson = {};
+        var tempTree = {};
+        var maxNodeDataId = this.getMaxNodeDataId();
+        var maxNodeId = items.length > 0 ? Math.max(...items.map(o => o.id)) : 0;
+        console.log("Branch initial maxNodeDataId---", maxNodeDataId);
+        var scenarioList = this.state.scenarioList;
+        var nodeArr = [];
+        var json;
+        // for (let i = 0; i < flatList.length; i++) {
+
+        // }
+        var parentLevel = parentItem.level;
+        for (let i = 0; i < flatList.length; i++) {
+            nodeDataMap = {};
+            tempArray = [];
+
+            if (flatList[i].level == 0) {
+                flatList[i].parent = this.state.parentNodeIdForBranch;
+                console.log("Branch parent ===", this.state.parentNodeIdForBranch);
+            }
+            var nodeId = parseInt(maxNodeId + 1);
+            maxNodeId++;
+            console.log("Branch node id---", nodeId);
+            console.log("Branch parent---", flatList[i].parent);
+            console.log("Branch node arr---", nodeArr);
+            var nodeData = nodeArr.length > 0 && flatList[i].level != 0 ? nodeArr.filter(x => x.oldId == flatList[i].parent)[0] : 0;
+            console.log("Branch node data---", nodeData);
+
+            json = {
+                oldId: flatList[i].id,
+                newId: nodeId
+            }
+            nodeArr.push(json);
+
+            flatList[i].id = nodeId;
+            flatList[i].payload.nodeId = nodeId;
+
+
+            if (flatList[i].level != 0) {
+                flatList[i].parent = nodeData.newId;
+            }
+
+            console.log("Branch parent filter 1 ===", flatList[i].parent);
+            console.log("Branch parent filter  2 ===", items.filter(c => c.id == flatList[i].parent));
+            var parentSortOrder = items.filter(c => c.id == flatList[i].parent)[0].sortOrder;
+            var childList1 = items.filter(c => c.parent == flatList[i].parent);
+            var maxSortOrder = childList1.length > 0 ? Math.max(...childList1.map(o => o.sortOrder.replace(parentSortOrder + '.', ''))) : 0;
+            flatList[i].sortOrder = parentSortOrder.concat(".").concat(("0" + (Number(maxSortOrder) + 1)).slice(-2));
+
+            if (flatList[i].payload.nodeDataMap[0][0].nodeDataModelingList.length > 0) {
+                for (let j = 0; j < flatList[i].payload.nodeDataMap[0][0].nodeDataModelingList.length; j++) {
+                    var modeling = (flatList[i].payload.nodeDataMap[0][0].nodeDataModelingList)[j];
+                    var startMonthNoModeling = modeling.startDateNo < 0 ? modeling.startDateNo : parseInt(modeling.startDateNo - 1);
+                    console.log("startMonthNoModeling---", startMonthNoModeling);
+                    modeling.startDate = moment(curMonth).startOf('month').add(startMonthNoModeling, 'months').format("YYYY-MM-DD");
+                    var stopMonthNoModeling = modeling.stopDateNo < 0 ? modeling.stopDateNo : parseInt(modeling.stopDateNo - 1)
+                    console.log("stopMonthNoModeling---", stopMonthNoModeling);
+                    modeling.stopDate = moment(curMonth).startOf('month').add(stopMonthNoModeling, 'months').format("YYYY-MM-DD");
+
+
+                    console.log("modeling---", modeling);
+                    (flatList[i].payload.nodeDataMap[0][0].nodeDataModelingList)[j] = modeling;
+                }
+            }
+            console.log("flatList[i]---", flatList[i]);
+            tempJson = flatList[i].payload.nodeDataMap[0][0];
+            if (flatList[i].payload.nodeType.id != 1) {
+                // console.log("month from tree template---", flatList[i].payload.nodeDataMap[0][0].monthNo + " cur month---", curMonth + " final result---", moment(curMonth).startOf('month').add(flatList[i].payload.nodeDataMap[0][0].monthNo, 'months').format("YYYY-MM-DD"))
+                var monthNo = flatList[i].payload.nodeDataMap[0][0].monthNo < 0 ? flatList[i].payload.nodeDataMap[0][0].monthNo : parseInt(flatList[i].payload.nodeDataMap[0][0].monthNo - 1)
+                tempJson.month = moment(curMonth).startOf('month').add(monthNo, 'months').format("YYYY-MM-DD");
+            }
+            tempArray.push(tempJson);
+            if (scenarioList.length > 0) {
+                for (let i = 0; i < scenarioList.length; i++) {
+                    nodeDataMap[scenarioList[i].id] = tempArray;
+                    nodeDataMap[scenarioList[i].id][0].nodeDataId = maxNodeDataId;
+                    console.log("Branch nodeDataMap---", nodeDataMap);
+                    maxNodeDataId++;
+                }
+            }
+            flatList[i].payload.nodeDataMap = nodeDataMap;
+            items.push(JSON.parse(JSON.stringify(flatList[i])));
+            // flatList[i].level = parseInt(parentLevel + 1);
+            // parentLevel++;
+            var findNodeIndex = items.findIndex(n => n.id == flatList[i].id);
+            items[findNodeIndex].level = parseInt(parentLevel + 1);
+            parentLevel++;
+        }
+        console.log("Branch flatList---", flatList);
+        // items.push(...flatList);
+        this.setState({
+            items,
+            isBranchTemplateModalOpen: false
+        }, () => {
+            console.log("Branch items---", this.state.items);
+            this.calculateMOMData(0, 2);
+        });
+    }
+
     getUsagePeriodList() {
         const lan = 'en';
         var db1;
@@ -6568,6 +6787,7 @@ export default class BuildTree extends Component {
             this.getDatasetList();
             this.getModelingTypeList();
             this.getRegionList();
+            // this.getBranchTemplateList();
             // if (this.props.match.params.scenarioId != null && this.props.match.params.scenarioId != "") {
             //     this.callAfterScenarioChange(this.props.match.params.scenarioId);
             // }
@@ -6875,6 +7095,12 @@ export default class BuildTree extends Component {
         let { currentItemConfig } = this.state;
         let { treeTemplate } = this.state;
         var scenarioId = this.state.selectedScenario;
+
+        if (event.target.name === "branchTemplateId") {
+            this.setState({ branchTemplateId: event.target.value }, () => {
+
+            });
+        }
         if (event.target.name === "currentEndValue") {
 
             this.setState({
@@ -7653,7 +7879,7 @@ export default class BuildTree extends Component {
                 // const filtered = this.state.items.filter(({ id }, index) => !ids.includes(id, index + 1))
                 // console.log("edit unique items---", filtered)
                 var scenarioId = this.state.selectedScenario;
-                console.log("cursor change current item config---", this.state.currentItemConfig);
+                console.log("cursor change current item config---", this.state.currentScenario);
                 if (data.context.level != 0) {
                     this.calculateParentValueFromMOM(data.context.payload.nodeDataMap[this.state.selectedScenario][0].month);
                     // this.setState({
@@ -8918,7 +9144,7 @@ export default class BuildTree extends Component {
                                                 <Input type="number"
                                                     id="puPerVisit"
                                                     name="puPerVisit"
-                                                    readOnly={this.state.parentScenario.fuNode != null && (this.state.currentScenario.puNode.sharePlanningUnit == "false" || this.state.currentScenario.puNode.sharePlanningUnit == false || this.state.parentScenario.fuNode.usageType.id == 2) ? false : true}
+                                                    readOnly={this.state.parentScenario.fuNode != null && this.state.currentScenario.puNode != null && (this.state.currentScenario.puNode.sharePlanningUnit == "false" || this.state.currentScenario.puNode.sharePlanningUnit == false || this.state.parentScenario.fuNode.usageType.id == 2) ? false : true}
                                                     bsSize="sm"
                                                     valid={!errors.puPerVisit && this.state.currentItemConfig.context.payload.nodeType.id == 5 ? this.state.currentScenario.puNode.puPerVisit != '' : !errors.puPerVisit}
                                                     invalid={touched.puPerVisit && !!errors.puPerVisit}
@@ -8928,7 +9154,7 @@ export default class BuildTree extends Component {
                                                         this.dataChange(e)
                                                     }}
                                                     value={this.state.currentItemConfig.parentItem != null
-                                                        && this.state.parentScenario.fuNode != null ?
+                                                        && this.state.parentScenario.fuNode != null && this.state.currentScenario.puNode != null ?
                                                         (this.state.currentScenario.puNode.sharePlanningUnit == "false" || this.state.currentScenario.puNode.sharePlanningUnit == false || this.state.parentScenario.fuNode.usageType.id == 2) ?
                                                             addCommas(this.state.currentScenario.puNode.puPerVisit) : addCommas(this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor) : ""}
                                                 // value={addCommas(this.state.parentScenario.fuNode.usageType.id == 2 ? (((this.state.parentScenario.fuNode.noOfForecastingUnitsPerPerson /
@@ -10557,8 +10783,20 @@ export default class BuildTree extends Component {
                                     {/* <FontAwesomeIcon icon={faTrash} /> */}
                                     <i class="fa fa-trash-o" aria-hidden="true" style={{ fontSize: '16px' }}></i>
                                 </button>}
+
                         </>}
-                    {parseInt(itemConfig.payload.nodeType.id) != 5 && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && this.props.match.params.isLocal != 2 &&
+                    {parseInt(itemConfig.payload.nodeType.id) != 5 && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE')  && this.props.match.params.isLocal != 2 &&
+
+                        <button key="4" type="button" className="StyledButton TreeIconStyle TreeIconStyleCopyPaddingTop" style={{ background: 'none' }}
+                            onClick={(event) => {
+                                event.stopPropagation();
+                                this.getBranchTemplateList(itemConfig);
+                                // this.duplicateNode(JSON.parse(JSON.stringify(itemConfig)));
+                            }}>
+                            <i class="fa fa-sitemap" aria-hidden="true"></i>
+                        </button>
+                    }
+                    {parseInt(itemConfig.payload.nodeType.id) != 5 && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE')  && this.props.match.params.isLocal != 2 &&
                         <button key="1" type="button" className="StyledButton TreeIconStyle TreeIconStylePlusPaddingTop" style={{ background: 'none' }}
                             onClick={(event) => {
                                 console.log("add button called---------");
@@ -11366,6 +11604,100 @@ export default class BuildTree extends Component {
                         </CardBody>
 
                     </Card></Col></Row>
+
+            {/* Branch Template Start */}
+            <Modal isOpen={this.state.isBranchTemplateModalOpen}
+                className={'modal-md ' + this.props.className}>
+                <ModalHeader>
+                    <strong>{i18n.t('static.dataset.BranchTreeTemplate')}</strong>
+                    <Button size="md" onClick={() => { this.setState({ isBranchTemplateModalOpen: false }) }} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
+                </ModalHeader>
+                <ModalBody className='pb-lg-0'>
+                    {/* <h6 className="red" id="div3"></h6> */}
+                    <Col sm={12} style={{ flexBasis: 'auto' }}>
+                        {/* <Card> */}
+                        <Formik
+                            initialValues={{
+                                branchTemplateId: this.state.branchTemplateId
+                            }}
+                            validate={validate(validationSchemaBranch)}
+                            onSubmit={(values, { setSubmitting, setErrors }) => {
+                                this.generateBranchFromTemplate(this.state.branchTemplateId);
+                            }}
+
+
+                            render={
+                                ({
+                                    values,
+                                    errors,
+                                    touched,
+                                    handleChange,
+                                    handleBlur,
+                                    handleSubmit,
+                                    isSubmitting,
+                                    isValid,
+                                    setTouched,
+                                    handleReset,
+                                    setFieldValue,
+                                    setFieldTouched
+                                }) => (
+                                    <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='modalForm' autocomplete="off">
+                                        {/* <CardBody> */}
+                                        <div className="col-md-12">
+
+                                            <div>
+                                                <div className='row'>
+                                                    <FormGroup className="col-md-12">
+                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.dataset.BranchTreeTemplate')}<span className="red Reqasterisk">*</span></Label>
+                                                        <div className="controls">
+
+                                                            <Input
+                                                                type="select"
+                                                                name="branchTemplateId"
+                                                                id="branchTemplateId"
+                                                                bsSize="sm"
+                                                                valid={!errors.branchTemplateId && this.state.branchTemplateId != null ? this.state.branchTemplateId : '' != ''}
+                                                                invalid={touched.branchTemplateId && !!errors.branchTemplateId}
+                                                                onBlur={handleBlur}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                value={this.state.branchTemplateId}
+                                                            >
+                                                                <option value="">{i18n.t('static.dataset.selectBranchTreeTemplate')}</option>
+                                                                {this.state.branchTemplateList.length > 0
+                                                                    && this.state.branchTemplateList.map((item, i) => {
+                                                                        return (
+                                                                            <option key={i} value={item.treeTemplateId}>
+                                                                                {getLabelText(item.label, this.state.lang)}
+                                                                            </option>
+                                                                        )
+                                                                    }, this)}
+                                                            </Input>
+                                                            <FormFeedback>{errors.branchTemplateId}</FormFeedback>
+                                                        </div>
+
+                                                    </FormGroup>
+
+
+                                                </div>
+                                            </div>
+                                            <FormGroup className="col-md-12 float-right pt-lg-4 pr-lg-0">
+                                                <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={() => { this.setState({ isBranchTemplateModalOpen: false }) }}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllBranch(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                &nbsp;
+
+                                            </FormGroup>
+                                        </div>
+                                    </Form>
+
+                                )} />
+
+                        {/* </Card> */}
+                    </Col>
+                    <br />
+                </ModalBody>
+            </Modal>
+
+            {/* Branch Template end */}
             <Modal isOpen={this.state.showGuidanceModelingTransfer}
                 className={'modal-lg ' + this.props.className} >
                 <ModalHeader toggle={() => this.toggleShowGuidanceModelingTransfer()} className="ModalHead modal-info-Headher">
