@@ -435,7 +435,8 @@ class AddprogramPlanningUnit extends Component {
                                                                     textEditor: true,
                                                                     decimal: '.',
                                                                     mask: '#,##.00',
-                                                                    disabledMaskOnEdition: true
+                                                                    disabledMaskOnEdition: true,
+                                                                    tooltip:i18n.t("static.programPU.localProcurementAgentTooltip")
                                                                 },
                                                                 {
                                                                     title: i18n.t('static.product.distributionLeadTime'),
@@ -452,7 +453,8 @@ class AddprogramPlanningUnit extends Component {
                                                                     textEditor: true,
                                                                     // decimal:'.',
                                                                     mask: '#,##',
-                                                                    disabledMaskOnEdition: true
+                                                                    disabledMaskOnEdition: true,
+                                                                    tooltip:i18n.t("static.programPU.shelfLifeTooltip")
                                                                 },
                                                                 {
                                                                     title: i18n.t('static.procurementAgentPlanningUnit.catalogPrice'),
@@ -460,7 +462,8 @@ class AddprogramPlanningUnit extends Component {
                                                                     textEditor: true,
                                                                     // decimal:'.',
                                                                     mask: '#,##.00',
-                                                                    disabledMaskOnEdition: true
+                                                                    disabledMaskOnEdition: true,
+                                                                    tooltip:i18n.t("static.programPU.catalogPriceTooltip")
                                                                 },
                                                                 {
                                                                     title: 'Id',
