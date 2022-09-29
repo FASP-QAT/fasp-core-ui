@@ -162,7 +162,7 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                 var curDate1 = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                 var curUser = AuthenticationService.getLoggedInUserId();
                 var username = AuthenticationService.getLoggedInUsername();
-                var rcpu = props.state.realmCountryPlanningUnitList.filter(c => c.multiplier == 1 && c.planningUnit.id == planningUnitId)[0];
+                var rcpu = props.state.realmCountryPlanningUnitListAll.filter(c => c.multiplier == 1 && c.planningUnit.id == planningUnitId)[0];
                 var shipmentJson = {
                     accountFlag: true,
                     active: true,

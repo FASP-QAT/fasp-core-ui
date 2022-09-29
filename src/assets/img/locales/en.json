@@ -2856,5 +2856,8 @@
     "static.programPU.monthsInFutureTooltip":"How many months should be used for calculating the average monthly consumption (AMC)? Include more months in the past if the past data is more reliable and predicts the future.",
     "static.programPU.monthsInPastTooltip":"How many months should be used for calculating the average monthly consumption (AMC)? Include more months in the future if the forecast data is better basis for stock calculations, such as in the case of seasonal products.",
     "static.programPU.distributionLeadTimeTooltip":"Required if planning by quantity. How many months does it take between shipment receipt and the product to be distributed down to the lowest level? Used for suggested shipments ahead of understock.",
-    "static.programPU.stockStatusMatrixMaxTooltip":"If planning by quantity, the max value is calculated every month by min + reorder interval* AMC. The value displayed here is the average for the year."
+    "static.programPU.stockStatusMatrixMaxTooltip":"If planning by quantity, the max value is calculated every month by min + reorder interval* AMC. The value displayed here is the average for the year.",
+    "static.programPU.localProcurementAgentTooltip":"Lead time from planned to received. Used for shipments where `local procurement` is selected.",
+    "static.programPU.shelfLifeTooltip":"Time from shipment receipt (status = received) to expiry. Used for new batches created via shipments, but actual expiry date for any shipment can be updated by the user.",
+    "static.programPU.catalogPriceTooltip":"This default catalog price is used for any new shipments created, unless the procurement agent specific price is provided. The actual price for any shipment can be by the user."
 }

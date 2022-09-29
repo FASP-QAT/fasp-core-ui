@@ -3016,7 +3016,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                 generalProgramJson: programJson,
                                                 planningUnitDataList: planningUnitDataList,
                                                 dataSourceListAll: dataSourceListAll,
-                                                realmCountryPlanningUnitList:rcpuResult,
+                                                realmCountryPlanningUnitListAll:rcpuResult,
                                                 planningUnitListForConsumption: planningUnitListForConsumption,
                                                 loading: false
                                             }, () => {
@@ -4537,7 +4537,7 @@ export default class SupplyPlanComponent extends React.Component {
         }
         var seaFreightPercentage = this.state.generalProgramJson.seaFreightPerc;
         var freightCost = Number(catalogPrice) * Number(suggestedShipmentList[0].suggestedOrderQty) * (Number(Number(seaFreightPercentage) / 100));
-        var rcpuFilter=this.state.realmCountryPlanningUnitList.filter(c=>c.planningUnit.id==document.getElementById("planningUnitId").value);
+        var rcpuFilter=this.state.realmCountryPlanningUnitListAll.filter(c=>c.planningUnit.id==document.getElementById("planningUnitId").value);
         var rcpuObject={
             id:"",
             multiplier:""
