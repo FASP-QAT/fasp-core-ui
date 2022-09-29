@@ -223,7 +223,8 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                             multiplier: rcpuResult[k].multiplier,
                             active: rcpuResult[k].active,
                             label: rcpuResult[k].label,
-                            planningUnitId: rcpuResult[k].planningUnit.id
+                            planningUnitId: rcpuResult[k].planningUnit.id,
+                            planningUnit:rcpuResult[k].planningUnit
                         }
                         realmCountryPlanningUnitList.push(rcpuJson);
                     }
