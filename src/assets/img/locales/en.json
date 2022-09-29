@@ -2823,7 +2823,7 @@
     "static.report.maxMosOrQty": "Max (months or qty)",
     "static.report.variable": "Variable",
     "static.supplyPlan.maxQty": "Max Quantity",
-    "static.supplyPlan.maxQtyFormula1": "Min Qty for current month = 7,000",
+    "static.supplyPlan.maxQtyFormula1": "Min qty (planning unit setting) = 7,000",
     "static.supplyPlan.maxQtyFormula2": "Reorder Frequency = 3",
     "static.supplyPlan.maxQtyFormula3": "Max Qty = Min Qty + Reorder Frequency * AMC",
     "static.supplyPlan.maxQtyFormula4": "Max Qty = 7,000 + 3 * 6,392",
@@ -2848,5 +2848,13 @@
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )",
     "static.dataset.BranchTreeTemplate":"Branch Template",
     "static.dataset.createBranchTreeTemplate":"Create Branch Template",
-    "static.dataset.selectBranchTreeTemplate":"Select Template"
+    "static.dataset.selectBranchTreeTemplate":"Select Template",
+    "static.programPU.planByTooltip":"Should minimum and maximum inventory parameters be based on quantity or months of stock (MOS)? Most products are better planned by MOS, while some low consumption, higher expiry products are better planned by quantity.",
+    "static.programPU.reorderFrequencyTooltip":"How many months between shipments?",
+    "static.programPU.minMonthsOfStockTooltip":"Required if planning by MOS. Note that maximum MOS = min MOS + reorder interval.",
+    "static.programPU.minQtyTooltip":"Required if planning by quantity. Note that maximum MOS = min MOS + reorder interval. * AMC",
+    "static.programPU.monthsInFutureTooltip":"How many months should be used for calculating the average monthly consumption (AMC)? Include more months in the past if the past data is more reliable and predicts the future.",
+    "static.programPU.monthsInPastTooltip":"How many months should be used for calculating the average monthly consumption (AMC)? Include more months in the future if the forecast data is better basis for stock calculations, such as in the case of seasonal products.",
+    "static.programPU.distributionLeadTimeTooltip":"Required if planning by quantity. How many months does it take between shipment receipt and the product to be distributed down to the lowest level? Used for suggested shipments ahead of understock.",
+    "static.programPU.stockStatusMatrixMaxTooltip":"If planning by quantity, the max value is calculated every month by min + reorder interval* AMC. The value displayed here is the average for the year."
 }

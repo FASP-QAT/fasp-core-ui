@@ -242,7 +242,7 @@ export default class SupplyPlanComponent extends React.Component {
         if (this.state.planBasedOn == 1) {
             csvRow.push("\"" + i18n.t("static.supplyPlan.minStockMos").replaceAll(' ', '%20') + ' : ' + this.state.minStockMoSQty + "\"")
         } else {
-            csvRow.push("\"" + i18n.t("static.supplyPlan.minQty").replaceAll(' ', '%20') + ' : ' + this.state.minQtyPpu + "\"")
+            csvRow.push("\"" + i18n.t("static.product.minQuantity").replaceAll(' ', '%20') + ' : ' + this.state.minQtyPpu + "\"")
         }
         csvRow.push("\"" + i18n.t("static.supplyPlan.reorderInterval").replaceAll(' ', '%20').replaceAll('#', '%23') + ' : ' + this.state.reorderFrequency + "\"")
         if (this.state.planBasedOn == 1) {
@@ -409,7 +409,7 @@ export default class SupplyPlanComponent extends React.Component {
                             align: 'left'
                         })
                     } else {
-                        doc.text(i18n.t('static.supplyPlan.minQty') + ' : ' + this.formatter(this.state.minQtyPpu), doc.internal.pageSize.width / 10, 130, {
+                        doc.text(i18n.t('static.product.minQuantity') + ' : ' + this.formatter(this.state.minQtyPpu), doc.internal.pageSize.width / 10, 130, {
                             align: 'left'
                         })
                     }
@@ -2394,7 +2394,7 @@ export default class SupplyPlanComponent extends React.Component {
                     data: this.state.jsonArrForGraph.map((item, index) => (item.consumption))
                 },
                 {
-                    label: this.state.planBasedOn == 1 ? i18n.t('static.supplyPlan.minStockMos') : i18n.t('static.supplyPlan.minQty'),
+                    label: this.state.planBasedOn == 1 ? i18n.t('static.supplyPlan.minStockMos') : i18n.t('static.product.minQuantity'),
                     type: 'line',
                     stack: 5,
                     yAxisID: this.state.planBasedOn == 1 ? 'B' : 'A',
