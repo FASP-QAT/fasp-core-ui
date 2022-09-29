@@ -1698,7 +1698,7 @@ export default class TreeExtrapolationComponent extends React.Component {
             }
             data[3] = adjustedActuals
 
-            count1 = moment(this.state.minMonth).format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM") ? 0 : moment(this.state.minMonth).format("YYYY-MM") < moment(monthArray[j]).format("YYYY-MM") ? count1 : '';
+            count1 = moment(this.state.minMonth).format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM") ? "0" : moment(this.state.minMonth).format("YYYY-MM") < moment(monthArray[j]).format("YYYY-MM") ? count1 : '';
             console.log("mv data hehehe 2------>>>", this.state.movingAvgData);
             console.log("minMonth hehehe semiAvgData---", this.state.semiAvgData);
             console.log("count 1 hehehe---", count1);
