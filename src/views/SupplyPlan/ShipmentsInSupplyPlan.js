@@ -220,7 +220,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             id: rcpuResult[k].realmCountryPlanningUnitId,
                             multiplier: rcpuResult[k].multiplier,
                             active: rcpuResult[k].active,
-                            label: rcpuResult[k].label
+                            label: rcpuResult[k].label,
+                            planningUnit:rcpuResult[k].planningUnit
                         }
                         realmCountryPlanningUnitList.push(rcpuJson);
                     }
