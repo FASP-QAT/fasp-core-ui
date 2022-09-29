@@ -305,7 +305,7 @@ export default class MapPlanningUnits extends Component {
     }
     changed = function (instance, cell, x, y, value) {
         this.props.removeMessageText();
-        var rowData=this.el.getRowData(y);
+        var rowData = this.el.getRowData(y);
         if (x == 0) {
             var col = ("A").concat(parseInt(y) + 1);
             if (value == "") {
@@ -795,23 +795,24 @@ export default class MapPlanningUnits extends Component {
                                             title: i18n.t('static.programPU.planBasedOn'),
                                             type: 'dropdown',
                                             source: [{ id: 1, name: i18n.t('static.report.mos') }, { id: 2, name: i18n.t('static.report.qty') }],
+                                            tooltip: i18n.t("static.programPU.planByTooltip")
                                         },
                                         {
                                             title: i18n.t('static.report.reorderFrequencyInMonths'),
                                             type: 'numeric',
                                             textEditor: true,
-                                            // decimal: '.',
                                             mask: '#,##',
-                                            disabledMaskOnEdition: true
+                                            disabledMaskOnEdition: true,
+                                            tooltip: i18n.t("static.programPU.reorderFrequencyTooltip")
 
                                         },
                                         {
                                             title: i18n.t('static.supplyPlan.minMonthsOfStock'),
                                             type: 'numeric',
                                             textEditor: true,
-                                            // decimal: '.',
                                             mask: '#,##',
-                                            disabledMaskOnEdition: true
+                                            disabledMaskOnEdition: true,
+                                            tooltip: i18n.t("static.programPU.minMonthsOfStockTooltip")
                                         },
                                         {
                                             title: i18n.t('static.product.minQuantity'),
@@ -819,23 +820,24 @@ export default class MapPlanningUnits extends Component {
                                             textEditor: true,
                                             // decimal:'.',
                                             mask: '#,##',
-                                            disabledMaskOnEdition: true
+                                            disabledMaskOnEdition: true,
+                                            tooltip: i18n.t("static.programPU.minQtyTooltip")
                                         },
                                         {
                                             title: i18n.t('static.program.monthfutureamc'),
                                             type: 'numeric',
                                             textEditor: true,
-                                            // decimal: '.',
                                             mask: '#,##',
-                                            disabledMaskOnEdition: true
+                                            disabledMaskOnEdition: true,
+                                            tooltip: i18n.t("static.programPU.monthsInFutureTooltip")
                                         },
                                         {
                                             title: i18n.t('static.program.monthpastamc'),
                                             type: 'numeric',
                                             textEditor: true,
-                                            // decimal: '.',
                                             mask: '#,##',
-                                            disabledMaskOnEdition: true
+                                            disabledMaskOnEdition: true,
+                                            tooltip: i18n.t("static.programPU.monthsInPastTooltip")
                                         },
                                         {
                                             title: i18n.t('static.report.procurmentAgentLeadTimeReport'),
@@ -851,7 +853,8 @@ export default class MapPlanningUnits extends Component {
                                             textEditor: true,
                                             // decimal:'.',
                                             mask: '#,##',
-                                            disabledMaskOnEdition: true
+                                            disabledMaskOnEdition: true,
+                                            tooltip: i18n.t("static.programPU.distributionLeadTimeTooltip")
                                         },
                                         {
                                             title: i18n.t('static.supplyPlan.shelfLife'),
@@ -1231,14 +1234,14 @@ export default class MapPlanningUnits extends Component {
         tr.children[1].classList.add('AsteriskTheadtrTd');
         tr.children[2].classList.add('AsteriskTheadtrTd');
         tr.children[3].classList.add('AsteriskTheadtrTd');
-        tr.children[3].title = i18n.t('static.programPU.planBasedOnTooltip');
+        // tr.children[3].title = i18n.t('static.programPU.planBasedOnTooltip');
         tr.children[4].classList.add('AsteriskTheadtrTd');
         tr.children[7].classList.add('AsteriskTheadtrTd');
         tr.children[8].classList.add('AsteriskTheadtrTd');
         tr.children[11].classList.add('AsteriskTheadtrTd');
         tr.children[12].classList.add('AsteriskTheadtrTd');
         tr.children[9].classList.add('AsteriskTheadtrTd');
-        tr.children[4].title = i18n.t("static.message.reorderFrequency")
+        // tr.children[4].title = i18n.t("static.message.reorderFrequency")
         var cell1 = instance.worksheets[0].getCell(`F1`)
         cell1.classList.add('readonly');
         var cell1 = instance.worksheets[0].getCell(`J1`)

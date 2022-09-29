@@ -384,6 +384,7 @@ class AddprogramPlanningUnit extends Component {
                                                                     title: i18n.t('static.programPU.planBasedOn'),
                                                                     type: 'dropdown',
                                                                     source: [{ id: 1, name: i18n.t('static.report.mos') }, { id: 2, name: i18n.t('static.report.qty') }],
+                                                                    tooltip: i18n.t("static.programPU.planByTooltip")
                                                                 },
                                                                 {
                                                                     title: i18n.t('static.product.reorderFrequency'),
@@ -391,7 +392,8 @@ class AddprogramPlanningUnit extends Component {
                                                                     textEditor: true,
                                                                     // decimal:'.',
                                                                     mask: '#,##',
-                                                                    disabledMaskOnEdition: true
+                                                                    disabledMaskOnEdition: true,
+                                                                    tooltip: i18n.t("static.programPU.reorderFrequencyTooltip")
 
                                                                 },
                                                                 {
@@ -400,7 +402,8 @@ class AddprogramPlanningUnit extends Component {
                                                                     textEditor: true,
                                                                     // decimal:'.',
                                                                     mask: '#,##',
-                                                                    disabledMaskOnEdition: true
+                                                                    disabledMaskOnEdition: true,
+                                                                    tooltip: i18n.t("static.programPU.minMonthsOfStockTooltip")
                                                                 },
                                                                 {
                                                                     title: i18n.t('static.product.minQuantity'),
@@ -408,7 +411,8 @@ class AddprogramPlanningUnit extends Component {
                                                                     textEditor: true,
                                                                     // decimal:'.',
                                                                     mask: '#,##',
-                                                                    disabledMaskOnEdition: true
+                                                                    disabledMaskOnEdition: true,
+                                                                    tooltip: i18n.t("static.programPU.minQtyTooltip")
                                                                 },
                                                                 {
                                                                     title: i18n.t('static.program.monthfutureamc'),
@@ -416,7 +420,8 @@ class AddprogramPlanningUnit extends Component {
                                                                     textEditor: true,
                                                                     // decimal:'.',
                                                                     mask: '#,##',
-                                                                    disabledMaskOnEdition: true
+                                                                    disabledMaskOnEdition: true,
+                                                                    tooltip: i18n.t("static.programPU.monthsInFutureTooltip")
                                                                 },
                                                                 {
                                                                     title: i18n.t('static.program.monthpastamc'),
@@ -424,7 +429,8 @@ class AddprogramPlanningUnit extends Component {
                                                                     textEditor: true,
                                                                     // decimal:'.',
                                                                     mask: '#,##',
-                                                                    disabledMaskOnEdition: true
+                                                                    disabledMaskOnEdition: true,
+                                                                    tooltip: i18n.t("static.programPU.monthsInPastTooltip")
                                                                 },
                                                                 {
                                                                     title: i18n.t('static.product.localProcurementAgentLeadTime'),
@@ -440,7 +446,8 @@ class AddprogramPlanningUnit extends Component {
                                                                     textEditor: true,
                                                                     // decimal:'.',
                                                                     mask: '#,##',
-                                                                    disabledMaskOnEdition: true
+                                                                    disabledMaskOnEdition: true,
+                                                                    tooltip: i18n.t("static.programPU.distributionLeadTimeTooltip")
                                                                 },
                                                                 {
                                                                     title: i18n.t('static.report.shelfLife'),
@@ -1897,7 +1904,7 @@ class AddprogramPlanningUnit extends Component {
         tr.children[9].classList.add('AsteriskTheadtrTd');
         tr.children[11].classList.add('AsteriskTheadtrTd');
         tr.children[12].classList.add('AsteriskTheadtrTd');
-        tr.children[3].title = i18n.t('static.programPU.planBasedOnTooltip');
+        // tr.children[3].title = i18n.t('static.programPU.planBasedOnTooltip');
         tr.children[3].classList.add('AsteriskTheadtrTd');
     }
 

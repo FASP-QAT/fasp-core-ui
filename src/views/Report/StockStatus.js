@@ -238,7 +238,8 @@ class StockStatus extends Component {
       csvRow.push('"' + (i18n.t('static.supplyPlan.minStockMos').replaceAll(' ', '%20') + ' : ' + this.state.stockStatusList[0].minMos + '"'))
       csvRow.push('"' + (i18n.t('static.supplyPlan.maxStockMos').replaceAll(' ', '%20') + ' : ' + this.state.stockStatusList[0].maxMos + '"'))
     } else {
-      csvRow.push('"' + (i18n.t('static.supplyPlan.minQty').replaceAll(' ', '%20') + ' : ' + this.state.stockStatusList[0].minStock + '"'))
+      csvRow.push('"' + (i18n.t('static.product.minQuantity').replaceAll(' ', '%20') + ' : ' + this.state.stockStatusList[0].minStock + '"'))
+      csvRow.push('"' + (i18n.t('static.product.distributionLeadTime').replaceAll(' ', '%20') + ' : ' + this.state.stockStatusList[0].distributionLeadTime + '"'))
     }
     var ppu = this.state.planningUnits.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0];
     csvRow.push('"' + (i18n.t('static.supplyPlan.amcPast').replaceAll(' ', '%20') + ' : ' + ppu.monthsInPastForAmc + '"'))
@@ -288,7 +289,8 @@ class StockStatus extends Component {
           csvRow.push('"' + (i18n.t('static.supplyPlan.minStockMos').replaceAll(' ', '%20') + ' : ' + item.data[0].minMos + '"'))
           csvRow.push('"' + (i18n.t('static.supplyPlan.maxStockMos').replaceAll(' ', '%20') + ' : ' + item.data[0].maxMos + '"'))
         } else {
-          csvRow.push('"' + (i18n.t('static.supplyPlan.minQty').replaceAll(' ', '%20') + ' : ' + item.data[0].minStock + '"'))
+          csvRow.push('"' + (i18n.t('static.product.minQuantity').replaceAll(' ', '%20') + ' : ' + item.data[0].minStock + '"'))
+          csvRow.push('"' + (i18n.t('static.product.distributionLeadTime').replaceAll(' ', '%20') + ' : ' + item.data[0].distributionLeadTime + '"'))
         }
         var ppu = this.state.planningUnits.filter(c => c.planningUnit.id == item.planningUnit.id)[0];
         csvRow.push('"' + (i18n.t('static.supplyPlan.amcPast').replaceAll(' ', '%20') + ' : ' + ppu.monthsInPastForAmc + '"'))
@@ -364,6 +366,7 @@ class StockStatus extends Component {
         var amcFuture = pageObject.amcFuture;
         var planBasedOn = pageObject.planBasedOn;
         var minStock = pageObject.minStock;
+        var distributionLeadTime=pageObject.distributionLeadTime;
 
         doc.setFontSize(12)
         doc.setFont('helvetica', 'bold')
@@ -413,7 +416,7 @@ class StockStatus extends Component {
             align: 'center'
           })
         } else {
-          doc.text(i18n.t('static.supplyPlan.minQty') + ": " + this.formatter(minStock), doc.internal.pageSize.width / 2, 110, {
+          doc.text(i18n.t('static.product.minQuantity') + ": " + this.formatter(minStock) + ", " + i18n.t("static.product.distributionLeadTime") + ": " + distributionLeadTime, doc.internal.pageSize.width / 2, 110, {
             align: 'center'
           })
         }
@@ -666,7 +669,7 @@ class StockStatus extends Component {
     var lastPage = doc.internal.getCurrentPageInfo().pageNumber;
     var pageArray = [];
     var ppu = this.state.planningUnits.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0];
-    pageArray.push({ "startPage": 1, "endPage": lastPage, "planningUnit": document.getElementById("planningUnitId").selectedOptions[0].text, "min": this.state.stockStatusList[0].minMos, "max": this.state.stockStatusList[0].maxMos, amcPast: ppu.monthsInPastForAmc, amcFuture: ppu.monthsInFutureForAmc, minStock: ppu.minQty, planBasedOn: ppu.planBasedOn });
+    pageArray.push({ "startPage": 1, "endPage": lastPage, "planningUnit": document.getElementById("planningUnitId").selectedOptions[0].text, "min": this.state.stockStatusList[0].minMos, "max": this.state.stockStatusList[0].maxMos, amcPast: ppu.monthsInPastForAmc, amcFuture: ppu.monthsInFutureForAmc, minStock: ppu.minQty,distributionLeadTime:ppu.distributionLeadTime, planBasedOn: ppu.planBasedOn });
     var list = this.state.PlanningUnitDataForExport.filter(c => c.planningUnit.id != document.getElementById("planningUnitId").value)
     console.log("List@@@@@@@@Mohit", list)
     var count = 0;
@@ -891,7 +894,7 @@ class StockStatus extends Component {
           }
         })
         var ppu = this.state.planningUnits.filter(c => c.planningUnit.id == item.planningUnit.id)[0];
-        pageArray.push({ "startPage": lastPage, "endPage": doc.internal.getCurrentPageInfo().pageNumber, "planningUnit": getLabelText(item.planningUnit.label, this.state.lang), "min": item.data[0].minMos, "max": item.data[0].maxMos, amcPast: ppu.monthsInPastForAmc, amcFuture: ppu.monthsInFutureForAmc, minStock: ppu.minQty, planBasedOn: ppu.planBasedOn });
+        pageArray.push({ "startPage": lastPage, "endPage": doc.internal.getCurrentPageInfo().pageNumber, "planningUnit": getLabelText(item.planningUnit.label, this.state.lang), "min": item.data[0].minMos, "max": item.data[0].maxMos, amcPast: ppu.monthsInPastForAmc, amcFuture: ppu.monthsInFutureForAmc, minStock: ppu.minQty, distributionLeadTime:ppu.distributionLeadTime, planBasedOn: ppu.planBasedOn });
         lastPage = doc.internal.getCurrentPageInfo().pageNumber;
         /*  var y = doc.lastAutoTable.finalY + 20
           var cnt=0
@@ -1225,6 +1228,7 @@ class StockStatus extends Component {
                             regionCountForStock: list[0].regionCountForStock,
                             nationalAdjustment: list[0].nationalAdjustment,
                             minStock: list[0].minStock,
+                            distributionLeadTime:pu.distributionLeadTime,
                             maxStock: list[0].maxStock,
                             planBasedOn: pu.planBasedOn
                           }
@@ -1249,7 +1253,8 @@ class StockStatus extends Component {
                             nationalAdjustment: 0,
                             minStock: pu.minQty,
                             maxStock: 0,
-                            planBasedOn: pu.planBasedOn
+                            planBasedOn: pu.planBasedOn,
+                            distributionLeadTime:pu.distributionLeadTime
 
                           }
                         }
@@ -1700,7 +1705,8 @@ class StockStatus extends Component {
                             nationalAdjustment: list[0].nationalAdjustment,
                             minStock: list[0].minStock,
                             maxStock: list[0].maxStock,
-                            planBasedOn: pu.planBasedOn
+                            planBasedOn: pu.planBasedOn,
+                            distributionLeadTime:pu.distributionLeadTime
                           }
                         } else {
                           var json = {
@@ -1722,6 +1728,7 @@ class StockStatus extends Component {
                             regionCountForStock: 0,
                             nationalAdjustment: 0,
                             minStock: pu.minQty,
+                            distributionLeadTime:pu.distributionLeadTime,
                             maxStock: 0,
                             planBasedOn: pu.planBasedOn
                           }
@@ -1823,7 +1830,7 @@ class StockStatus extends Component {
                             {
                               type: "line",
                               yAxisID: data[0].planBasedOn == 1 ? 'B' : 'A',
-                              label: data[0].planBasedOn == 1 ? i18n.t('static.report.minmonth') : i18n.t('static.supplyPlan.minQty'),
+                              label: data[0].planBasedOn == 1 ? i18n.t('static.report.minmonth') : i18n.t('static.product.minQuantity'),
                               backgroundColor: 'rgba(255,193,8,0.2)',
                               borderColor: '#59cacc',
                               borderStyle: 'dotted',
@@ -3569,7 +3576,7 @@ class StockStatus extends Component {
       {
         type: "line",
         yAxisID: this.state.stockStatusList.length > 0 && this.state.stockStatusList[0].planBasedOn == 1 ? 'B' : 'A',
-        label: this.state.stockStatusList.length > 0 && this.state.stockStatusList[0].planBasedOn == 1 ? i18n.t('static.report.minmonth') : i18n.t('static.supplyPlan.minQty'),
+        label: this.state.stockStatusList.length > 0 && this.state.stockStatusList[0].planBasedOn == 1 ? i18n.t('static.report.minmonth') : i18n.t('static.product.minQuantity'),
         backgroundColor: 'rgba(255,193,8,0.2)',
         borderColor: '#59cacc',
         borderStyle: 'dotted',
@@ -3685,7 +3692,7 @@ class StockStatus extends Component {
             {/* <i className="icon-menu"></i><strong>Stock Status Report</strong> */}
             <div className="card-header-actions">
               <a className="card-header-action">
-                <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggleStockStatus() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span>
+                <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggle() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span>
               </a>
               <a className="card-header-action">
                 {/* <span style={{cursor: 'pointer'}} onClick={() => { this.refs.formulaeChild.toggleStockStatus() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span> */}
@@ -3826,7 +3833,7 @@ class StockStatus extends Component {
                     <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px' }} style={{ display: this.state.display }}>
                       <ul className="legendcommitversion list-group">
                         {this.state.stockStatusList[0].planBasedOn == 1 ? <><li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.minStockMos")} : {this.formatter(this.state.stockStatusList[0].minMos)}</span></li>
-                          <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.maxStockMos")} : {this.state.stockStatusList[0].maxMos}</span></li></> : <><li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.minQty")} : {this.formatter(this.state.stockStatusList[0].minStock)}</span></li>
+                          <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.maxStockMos")} : {this.state.stockStatusList[0].maxMos}</span></li></> : <><li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.product.minQuantity")} : {this.formatter(this.state.stockStatusList[0].minStock)}</span></li><li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.product.distributionLeadTime")} : {this.formatter(this.state.stockStatusList[0].distributionLeadTime)}</span></li>
                         </>}
                       </ul>
                     </FormGroup>
