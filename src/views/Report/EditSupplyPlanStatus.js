@@ -2791,7 +2791,7 @@ class EditSupplyPlanStatus extends Component {
                     data: this.state.jsonArrForGraph.map((item, index) => (item.consumption))
                 },
                 {
-                    label: this.state.planBasedOn == 1 ? i18n.t('static.supplyPlan.minStockMos') : i18n.t('static.supplyPlan.minQty'),
+                    label: this.state.planBasedOn == 1 ? i18n.t('static.supplyPlan.minStockMos') : i18n.t('static.product.minQuantity'),
                     type: 'line',
                     stack: 5,
                     yAxisID: this.state.planBasedOn == 1 ? 'B' : 'A',
@@ -2941,7 +2941,7 @@ class EditSupplyPlanStatus extends Component {
                                             <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.planningUnitSettings")} : </b></span></li>
                                             <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.amcPastOrFuture")} : {this.state.monthsInPastForAMC}/{this.state.monthsInFutureForAMC}</span></li>
                                             <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.report.shelfLife")} : {this.state.shelfLife}</span></li>
-                                            {this.state.planBasedOn == 1 ? <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.minStockMos")} : {this.state.minStockMoSQty}</span></li> : <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.minQty")} : {this.formatter(this.state.minQtyPpu)}</span></li>}
+                                            {this.state.planBasedOn == 1 ? <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.minStockMos")} : {this.state.minStockMoSQty}</span></li> : <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.product.minQuantity")} : {this.formatter(this.state.minQtyPpu)}</span></li>}
                                             <li><span className="lightgreenlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.reorderInterval")} : {this.state.reorderFrequency}</span></li>
                                             {this.state.planBasedOn == 1 ? <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.maxStockMos")} : {this.state.maxStockMoSQty}</span></li> : <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.product.distributionLeadTime")} : {this.formatter(this.state.distributionLeadTime)}</span></li>}
                                         </ul>

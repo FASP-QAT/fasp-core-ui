@@ -162,7 +162,7 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                 var curDate1 = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                 var curUser = AuthenticationService.getLoggedInUserId();
                 var username = AuthenticationService.getLoggedInUsername();
-
+                var rcpu = props.state.realmCountryPlanningUnitList.filter(c => c.multiplier == 1 && c.planningUnit.id == planningUnitId)[0];
                 var shipmentJson = {
                     accountFlag: true,
                     active: true,
@@ -177,6 +177,11 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                         id: planningUnitId,
                         label: (props.state.planningUnitListAll.filter(c => c.planningUnit.id == planningUnitId)[0]).planningUnit.label
                     },
+                    realmCountryPlanningUnit: {
+                        id: rcpu.realmCountryPlanningUnitId,
+                        label: rcpu.label,
+                        multiplier: rcpu.multiplier
+                    },                    
                     procurementAgent: {
                         id: pa.procurementAgentId,
                         code: pa.procurementAgentCode,
@@ -191,6 +196,7 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                         label: props.state.budgetIdSingle == "undefined" || props.state.budgetIdSingle == undefined || props.state.budgetIdSingle == "" ? {} : b.label,
                     },
                     shipmentQty: suggestedOrd,
+                    shipmentRcpuQty:suggestedOrd,
                     shipmentId: 0,
                     shipmentMode: "Sea",
                     shipmentStatus: {

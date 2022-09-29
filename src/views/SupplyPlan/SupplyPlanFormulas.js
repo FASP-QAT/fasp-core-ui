@@ -262,6 +262,20 @@ class SupplyPlanFormulas extends Component {
                     {i18n.t('static.supplyPlanFormula.amcEx13')}</p>
                 </ListGroupItemText>
               </ListGroupItem>
+              <ListGroupItem >
+                <ListGroupItemHeading className="formulasheading">{i18n.t("static.supplyPlan.monthsOfStock")}</ListGroupItemHeading>
+                <ListGroupItemText className="formulastext">
+
+                  <img className="formula-img-mr img-fluid" src={mos} />
+                  <p><span className="formulastext-p">{i18n.t("static.common.example") + " :"}</span><br></br>
+                    {i18n.t("static.supplyPlanFormula.monthsOfStockEx1")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.amcEx13")}<br></br>
+                    <br></br>
+                    {i18n.t("static.supplyPlanFormula.monthsOfStockEx2")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.monthsOfStockEx3")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.monthsOfStockEx4")}</p>
+                </ListGroupItemText>
+              </ListGroupItem>
               {/* <ListGroupItem >
                 <ListGroupItemHeading className="formulasheading">{i18n.t("static.supplyPlan.minStock")}</ListGroupItemHeading>
                 <ListGroupItemText className="formulastext">
