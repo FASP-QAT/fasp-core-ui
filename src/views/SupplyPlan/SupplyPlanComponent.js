@@ -3022,9 +3022,9 @@ export default class SupplyPlanComponent extends React.Component {
                                             }, () => {
                                                 // var planningUnitIdProp = this.props.match.params.planningUnitId || localStorage.getItem("sesPlanningUnitId");
                                                 var planningUnitIdProp = '';
-                                                if (this.props.match.params.planningUnitId != '' && this.props.match.params.planningUnitId != undefined) {
+                                                if (this.props.match.params.planningUnitId != '' && this.props.match.params.planningUnitId != undefined && proList.filter(c => c.value == this.props.match.params.planningUnitId).length > 0) {
                                                     planningUnitIdProp = this.props.match.params.planningUnitId;
-                                                } else if (localStorage.getItem("sesPlanningUnitId") != '' && localStorage.getItem("sesPlanningUnitId") != undefined) {
+                                                } else if (localStorage.getItem("sesPlanningUnitId") != '' && localStorage.getItem("sesPlanningUnitId") != undefined && proList.filter(c => c.value == localStorage.getItem("sesPlanningUnitId")).length > 0) {
                                                     planningUnitIdProp = localStorage.getItem("sesPlanningUnitId");
                                                 } else if (proList.length == 1) {
                                                     planningUnitIdProp = proList[0].value;
@@ -6380,7 +6380,7 @@ export default class SupplyPlanComponent extends React.Component {
 
 
                                             console.log("ProgramJson@@@@@@@@@@", programJson);
-                                            var month = moment(this.state.singleValue.year + (this.state.singleValue.month <= 9 ? "-0" + this.state.singleValue.month : this.state.singleValue.month) + "-01").format("YYYY-MM-DD")
+                                            var month = moment(this.state.singleValue.year + (this.state.singleValue.month <= 9 ? "-0" + this.state.singleValue.month : "-"+this.state.singleValue.month) + "-01").format("YYYY-MM-DD")
                                             var sstd = {}
                                             if (programPlanningUnit.planBasedOn == 1) {
                                                 var currentMonth = moment(Date.now()).utcOffset('-0500').startOf('month').format("YYYY-MM-DD");
@@ -6650,7 +6650,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             var programId = (document.getElementById("programId").value)
                                             var puList = [...new Set(this.state.planningUnitIdsPlan.map(ele => ele.value))];
                                             if (puList.length > 0 && showPlanningUnitAndQtyList.length > 0) {
-                                                calculateSupplyPlan(programId, 0, 'programData', 'shipment1', this, puList, moment(this.state.singleValue.year + (this.state.singleValue.month <= 9 ? "-0" + this.state.singleValue.month : this.state.singleValue.month) + "-01").format("YYYY-MM-DD"));
+                                                calculateSupplyPlan(programId, 0, 'programData', 'shipment1', this, puList, moment(this.state.singleValue.year + (this.state.singleValue.month <= 9 ? "-0" + this.state.singleValue.month : "-"+this.state.singleValue.month) + "-01").format("YYYY-MM-DD"));
                                             } else {
                                                 this.setState({
                                                     showPlanningUnitAndQtyList: [],

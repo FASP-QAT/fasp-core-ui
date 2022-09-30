@@ -2691,7 +2691,7 @@ export default class WhatIfReportComponent extends React.Component {
                                     }, () => {
                                         let planningUnitIdProp = '';
 
-                                        if (localStorage.getItem("sesPlanningUnitId") != '' && localStorage.getItem("sesPlanningUnitId") != undefined) {
+                                        if (localStorage.getItem("sesPlanningUnitId") != '' && localStorage.getItem("sesPlanningUnitId") != undefined && proList.filter(c => c.value == localStorage.getItem("sesPlanningUnitId")).length > 0) {
                                             planningUnitIdProp = localStorage.getItem("sesPlanningUnitId");
                                         } else if (proList.length == 1) {
                                             planningUnitIdProp = proList[0].value;
