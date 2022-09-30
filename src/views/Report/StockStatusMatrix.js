@@ -2050,7 +2050,7 @@ export default class StockStatusMatrix extends React.Component {
                       <th className="text-center" style={{ width: "20%" }}>{i18n.t('static.planningunit.planningunit')}</th>
                       <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.stockStatus.plannedBy')}</th>
                       <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.report.minMosOrQty')}</th>
-                      <th className="text-center" style={{ width: "5%" }} title={i18n.t("static.programPU.stockStatusMatrixMaxTooltip")}>{i18n.t('static.report.maxMosOrQty')}</th>
+                      <th className="text-center infoIconStockStatus" style={{ width: "5%" }} title={i18n.t("static.programPU.stockStatusMatrixMaxTooltip")}>{i18n.t('static.report.maxMosOrQty')}</th>
                       <th className="text-center" style={{ width: "5%" }} >{i18n.t('static.common.year')}</th>
                       <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.jan')}</th>
                       <th className="text-center" style={{ width: "5%" }}>{i18n.t('static.month.feb')}</th>
