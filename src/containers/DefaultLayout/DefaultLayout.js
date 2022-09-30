@@ -862,6 +862,49 @@ class DefaultLayout extends Component {
       });
     }
   }
+
+  goOffline(e) {
+    // localStorage.setItem("loginOnline", false);
+    console.log("window.location", window.location)
+    // var url = window.location.href;
+    // if ((url.indexOf("green/") > -1) || (url.indexOf("red/") > -1)) {
+    //   // "The specific word exists";
+    //   localStorage.setItem("loginOnline", false);
+    //   var getSplit = ((url.indexOf("green/") > -1 ? url.split("green/") : url.split("red/")))
+    //   window.location.href = getSplit[0] + '%20/' + '%20';
+    //   window.location.reload();
+    // } else {
+    //   // "The specific word doesn't exist";
+      localStorage.setItem("loginOnline", false);
+    //   window.location.reload();
+    // }
+    // window.location.reload();
+    let id = AuthenticationService.displayDashboardBasedOnRole();
+    this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.login.successOffline'))
+    window.location.reload();
+
+  }
+
+  goOnline(e) {
+    confirmAlert({
+      message: i18n.t("static.login.confirmSessionChange"),
+      buttons: [
+        {
+          label: i18n.t("static.login.goToLogin"),
+          onClick: () => {
+            localStorage.setItem("sessionChanged", 1)
+            this.props.history.push("/login/static.login.loginAgain");
+          }
+        },
+        {
+          label: i18n.t("static.common.cancel"),
+          className: "dangerColor",
+          onClick: () => {
+          }
+        },
+      ]
+    })
+  }
   componentDidMount() {
     console.log("timeout default layout component did mount---------------")
     // this.refs.programChangeChild.checkIfLocalProgramVersionChanged()
@@ -917,7 +960,7 @@ class DefaultLayout extends Component {
     this.props.history.push(`/changePassword`);
   }
 
-  goToMasterDataSync(e){
+  goToMasterDataSync(e) {
     e.preventDefault();
     this.props.history.push({ pathname: `/syncProgram`, state: { "isFullSync": true } })
   }
@@ -1240,7 +1283,7 @@ class DefaultLayout extends Component {
 
         <AppHeader fixed >
           <Suspense fallback={this.loading()}>
-            <DefaultHeader onLogout={e => this.signOut(e)} onChangePassword={e => this.changePassword(e)} onChangeDashboard={e => this.showDashboard(e)} shipmentLinkingAlerts={e => this.showShipmentLinkingAlerts(e)} latestProgram={e => this.goToLoadProgram(e)} latestProgramFC={e => this.goToLoadProgramFC(e)} title={this.state.name} notificationCount={this.state.notificationCount} changeIcon={this.state.changeIcon} commitProgram={e => this.goToCommitProgram(e)} commitProgramFC={e => this.goToCommitProgramFC(e)} activeModule={this.state.activeTab == 1 ? 1 : 2} />
+            <DefaultHeader onLogout={e => this.signOut(e)} onChangePassword={e => this.changePassword(e)} onChangeDashboard={e => this.showDashboard(e)} shipmentLinkingAlerts={e => this.showShipmentLinkingAlerts(e)} latestProgram={e => this.goToLoadProgram(e)} latestProgramFC={e => this.goToLoadProgramFC(e)} title={this.state.name} notificationCount={this.state.notificationCount} changeIcon={this.state.changeIcon} commitProgram={e => this.goToCommitProgram(e)} commitProgramFC={e => this.goToCommitProgramFC(e)} goOffline={e => this.goOffline(e)} goOnline={e => this.goOnline(e)} activeModule={this.state.activeTab == 1 ? 1 : 2} />
           </Suspense>
         </AppHeader>
         <div className="app-body">
@@ -4236,7 +4279,7 @@ class DefaultLayout extends Component {
         </div>
         <AppFooter>
           <Suspense fallback={this.loading()}>
-            <DefaultFooter syncProgram={e => this.goToMasterDataSync(e)}/>
+            <DefaultFooter syncProgram={e => this.goToMasterDataSync(e)} />
           </Suspense>
         </AppFooter>
       </div>
