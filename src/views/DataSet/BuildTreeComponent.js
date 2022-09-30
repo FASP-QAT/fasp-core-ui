@@ -6963,6 +6963,7 @@ export default class BuildTree extends Component {
         }
 
         if (event.target.name === "sharePlanningUnit") {
+            console.log("event.target.name",event.target.value);
             (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.sharePlanningUnit = event.target.value;
             this.qatCalculatedPUPerVisit(0);
             this.getUsageText();
@@ -8827,6 +8828,31 @@ export default class BuildTree extends Component {
                                                                 </Input>
                                                                 <FormFeedback className="red">{errors.refillMonths}</FormFeedback>
                                                             </FormGroup>
+                                                            <FormGroup className="col-md-6">
+                                                                <Label htmlFor="currencyId">{this.state.currentItemConfig.parentItem != null && this.state.parentScenario.fuNode != null && this.state.parentScenario.fuNode.usageType.id == 2 ? "# PU/ Interval /" : "# PU/ "}{this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.parent != null && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id).length > 0 && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id)[0].label.label_en}(s)</Label>
+                                                                <Input type="number"
+                                                                    id="puPerVisit"
+                                                                    name="puPerVisit"
+                                                                    readOnly={this.state.parentScenario.fuNode != null && (this.state.currentScenario.puNode.sharePlanningUnit == "false" || this.state.currentScenario.puNode.sharePlanningUnit == false || this.state.parentScenario.fuNode.usageType.id == 2) ? false : true}
+                                                                    bsSize="sm"
+                                                                    valid={!errors.puPerVisit && this.state.currentItemConfig.context.payload.nodeType.id == 5 ? this.state.currentScenario.puNode.puPerVisit != '' : !errors.puPerVisit}
+                                                                    invalid={touched.puPerVisit && !!errors.puPerVisit}
+                                                                    onBlur={handleBlur}
+                                                                    onChange={(e) => {
+                                                                        handleChange(e);
+                                                                        this.dataChange(e)
+                                                                    }}
+                                                                    value={this.state.currentItemConfig.parentItem != null
+                                                                        && this.state.parentScenario.fuNode != null ?
+                                                                        (this.state.currentScenario.puNode.sharePlanningUnit == "false" || this.state.currentScenario.puNode.sharePlanningUnit == false || this.state.parentScenario.fuNode.usageType.id == 2) ?
+                                                                            addCommas(this.state.currentScenario.puNode.puPerVisit) : addCommas(this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor) : ""}
+                                                                // value={addCommas(this.state.parentScenario.fuNode.usageType.id == 2 ? (((this.state.parentScenario.fuNode.noOfForecastingUnitsPerPerson /
+                                                                //     this.state.noOfMonthsInUsagePeriod) / this.state.conversionFactor) * this.state.currentScenario.puNode.refillMonths) : (this.state.currentScenario.puNode.sharePlanningUnit == "true" || this.state.currentScenario.puNode.sharePlanningUnit == true ? (this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor) : Math.round((this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor))))}
+                                                                >
+
+                                                                </Input>
+                                                                <FormFeedback className="red">{errors.puPerVisit}</FormFeedback>
+                                                            </FormGroup>
                                                         </>}
                                                     {this.state.parentScenario.fuNode.usageType.id == 1 &&
                                                         <>
@@ -8837,7 +8863,7 @@ export default class BuildTree extends Component {
                                                             </div>
                                                             <FormGroup className="col-md-6" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 5 && this.state.parentScenario.fuNode.usageType.id == 1 ? 'block' : 'none' }}>
                                                                 <Label htmlFor="currencyId">{i18n.t('static.tree.willClientsShareOnePU?')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover17" onClick={this.toggleWillClientsShareOnePU} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
-                                                                <Input type="select"
+                                                                {/* <Input type="select"
                                                                     id="sharePlanningUnit"
                                                                     name="sharePlanningUnit"
                                                                     bsSize="sm"
@@ -8854,54 +8880,49 @@ export default class BuildTree extends Component {
                                                                     <option value="true">{i18n.t('static.realm.yes')}</option>
                                                                     <option value="false">{i18n.t('static.program.no')}</option>
 
-                                                                </Input>
-                                                                {/* <FormGroup check inline>
-                                                    <Input
-                                                        className="form-check-input"
-                                                        type="radio"
-                                                        id="sharePlanningUnit"
-                                                        name="sharePlanningUnit"
-                                                        valid={!errors.sharePlanningUnit && this.state.currentItemConfig.context.payload.nodeType.id == 5 ? this.state.currentScenario.puNode.sharePlanningUnit != '' : !errors.sharePlanningUnit}
-                                                        invalid={touched.sharePlanningUnit && !!errors.sharePlanningUnit}
-                                                        value={true}
-                                                        checked={this.state.currentItemConfig.context.payload.nodeType.id == 5 ? this.state.currentScenario.puNode.sharePlanningUnit === true : ""}                                                        
-                                                        onChange={(e) => {
-                                                            handleChange(e);
-                                                            this.dataChange(e)
-                                                        }}
+                                                                </Input> */}
+                                                                <FormGroup check inline>
+                                                                    <Input
+                                                                        className="form-check-input"
+                                                                        type="radio"
+                                                                        id="sharePlanningUnitTrue"
+                                                                        name="sharePlanningUnit"
+                                                                        value={true}
+                                                                        checked={this.state.currentScenario.puNode.sharePlanningUnit === true}
+                                                                        onChange={(e) => {
+                                                                            this.dataChange(e)
+                                                                        }}
 
-                                                    />
-                                                    <Label
-                                                        className="form-check-label"
-                                                        check htmlFor="inline-radio1">
-                                                        {i18n.t('static.realm.yes')}
-                                                    </Label>
-                                                </FormGroup>
-                                                <FormGroup check inline>
-                                                    <Input
-                                                        className="form-check-input"
-                                                        type="radio"
-                                                        id="sharePlanningUnit"
-                                                        name="sharePlanningUnit"
-                                                        valid={!errors.sharePlanningUnit && this.state.currentItemConfig.context.payload.nodeType.id == 5 ? this.state.currentScenario.puNode.sharePlanningUnit != '' : !errors.sharePlanningUnit}
-                                                        invalid={touched.sharePlanningUnit && !!errors.sharePlanningUnit}
-                                                        value={false}
-                                                        checked={this.state.currentItemConfig.context.payload.nodeType.id == 5 ? this.state.currentScenario.puNode.sharePlanningUnit === false : ""}                                                        
-                                                        onChange={(e) => {
-                                                            handleChange(e);
-                                                            this.dataChange(e)
-                                                        }}
-                                                    />
-                                                    <Label
-                                                        className="form-check-label"
-                                                        check htmlFor="inline-radio2">
-                                                        {i18n.t('static.program.no')}
-                                                    </Label>
-                                                </FormGroup> */}
+                                                                    />
+                                                                    <Label
+                                                                        className="form-check-label"
+                                                                        check htmlFor="inline-radio1">
+                                                                        {i18n.t('static.realm.yes')}
+                                                                    </Label>
+                                                                </FormGroup>
+                                                                <FormGroup check inline>
+                                                                    <Input
+                                                                        className="form-check-input"
+                                                                        type="radio"
+                                                                        id="sharePlanningUnitFalse"
+                                                                        name="sharePlanningUnit"
+                                                                        value={false}
+                                                                        checked={this.state.currentScenario.puNode.sharePlanningUnit === false}
+                                                                        onChange={(e) => {
+                                                                            this.dataChange(e)
+                                                                        }}
+                                                                    />
+                                                                    <Label
+                                                                        className="form-check-label"
+                                                                        check htmlFor="inline-radio2">
+                                                                        {i18n.t('static.program.no')}
+                                                                    </Label>
+                                                                </FormGroup>
                                                                 <FormFeedback className="red">{errors.sharePlanningUnit}</FormFeedback>
                                                             </FormGroup>
+                                                            <FormGroup className="col-md-6"></FormGroup>
                                                             <FormGroup className="col-md-6">
-                                                                <Label htmlFor="currencyId">QAT Calculated PU per usage per{this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.parent != null && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id).length > 0 && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id)[0].label.label_en}?</Label>
+                                                                <Label htmlFor="currencyId"># PU/{this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.parent != null && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id).length > 0 && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id)[0].label.label_en}(s) (Calculated)</Label>
                                                                 <Input type="number"
                                                                     id="puPerVisitQATCalculated"
                                                                     name="puPerVisitQATCalculated"
@@ -8912,33 +8933,35 @@ export default class BuildTree extends Component {
                                                                 >
                                                                 </Input>
                                                             </FormGroup>
+                                                            <FormGroup className="col-md-6"></FormGroup>
+                                                            <FormGroup className="col-md-6" style={{ display: this.state.parentScenario.fuNode != null && (this.state.currentScenario.puNode.sharePlanningUnit == "false" || this.state.currentScenario.puNode.sharePlanningUnit == false || this.state.parentScenario.fuNode.usageType.id == 2) ? 'block' : 'none' }}>
+                                                                <Label htmlFor="currencyId">{this.state.currentItemConfig.parentItem != null && this.state.parentScenario.fuNode != null && this.state.parentScenario.fuNode.usageType.id == 2 ? "# PU/ Interval /" : "# PU/ "}{this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.parent != null && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id).length > 0 && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id)[0].label.label_en}(s)</Label>
+                                                                <Input type="number"
+                                                                    id="puPerVisit"
+                                                                    name="puPerVisit"
+                                                                    readOnly={this.state.parentScenario.fuNode != null && (this.state.currentScenario.puNode.sharePlanningUnit == "false" || this.state.currentScenario.puNode.sharePlanningUnit == false || this.state.parentScenario.fuNode.usageType.id == 2) ? false : true}
+                                                                    bsSize="sm"
+                                                                    valid={!errors.puPerVisit && this.state.currentItemConfig.context.payload.nodeType.id == 5 ? this.state.currentScenario.puNode.puPerVisit != '' : !errors.puPerVisit}
+                                                                    invalid={touched.puPerVisit && !!errors.puPerVisit}
+                                                                    onBlur={handleBlur}
+                                                                    onChange={(e) => {
+                                                                        handleChange(e);
+                                                                        this.dataChange(e)
+                                                                    }}
+                                                                    value={this.state.currentItemConfig.parentItem != null
+                                                                        && this.state.parentScenario.fuNode != null ?
+                                                                        (this.state.currentScenario.puNode.sharePlanningUnit == "false" || this.state.currentScenario.puNode.sharePlanningUnit == false || this.state.parentScenario.fuNode.usageType.id == 2) ?
+                                                                            addCommas(this.state.currentScenario.puNode.puPerVisit) : addCommas(this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor) : ""}
+                                                                // value={addCommas(this.state.parentScenario.fuNode.usageType.id == 2 ? (((this.state.parentScenario.fuNode.noOfForecastingUnitsPerPerson /
+                                                                //     this.state.noOfMonthsInUsagePeriod) / this.state.conversionFactor) * this.state.currentScenario.puNode.refillMonths) : (this.state.currentScenario.puNode.sharePlanningUnit == "true" || this.state.currentScenario.puNode.sharePlanningUnit == true ? (this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor) : Math.round((this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor))))}
+                                                                >
+
+                                                                </Input>
+                                                                <FormFeedback className="red">{errors.puPerVisit}</FormFeedback>
+                                                            </FormGroup>
+
 
                                                         </>}
-                                                    <FormGroup className="col-md-6">
-                                                        <Label htmlFor="currencyId">{this.state.currentItemConfig.parentItem != null && this.state.parentScenario.fuNode != null && this.state.parentScenario.fuNode.usageType.id == 2 ? "# PU/ Interval /" : "How many PU per usage per "}{this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.parent != null && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id).length > 0 && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id)[0].label.label_en}(s)</Label>
-                                                        <Input type="number"
-                                                            id="puPerVisit"
-                                                            name="puPerVisit"
-                                                            readOnly={this.state.parentScenario.fuNode != null && (this.state.currentScenario.puNode.sharePlanningUnit == "false" || this.state.currentScenario.puNode.sharePlanningUnit == false || this.state.parentScenario.fuNode.usageType.id == 2) ? false : true}
-                                                            bsSize="sm"
-                                                            valid={!errors.puPerVisit && this.state.currentItemConfig.context.payload.nodeType.id == 5 ? this.state.currentScenario.puNode.puPerVisit != '' : !errors.puPerVisit}
-                                                            invalid={touched.puPerVisit && !!errors.puPerVisit}
-                                                            onBlur={handleBlur}
-                                                            onChange={(e) => {
-                                                                handleChange(e);
-                                                                this.dataChange(e)
-                                                            }}
-                                                            value={this.state.currentItemConfig.parentItem != null
-                                                                && this.state.parentScenario.fuNode != null ?
-                                                                (this.state.currentScenario.puNode.sharePlanningUnit == "false" || this.state.currentScenario.puNode.sharePlanningUnit == false || this.state.parentScenario.fuNode.usageType.id == 2) ?
-                                                                    addCommas(this.state.currentScenario.puNode.puPerVisit) : addCommas(this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor) : ""}
-                                                        // value={addCommas(this.state.parentScenario.fuNode.usageType.id == 2 ? (((this.state.parentScenario.fuNode.noOfForecastingUnitsPerPerson /
-                                                        //     this.state.noOfMonthsInUsagePeriod) / this.state.conversionFactor) * this.state.currentScenario.puNode.refillMonths) : (this.state.currentScenario.puNode.sharePlanningUnit == "true" || this.state.currentScenario.puNode.sharePlanningUnit == true ? (this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor) : Math.round((this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor))))}
-                                                        >
-
-                                                        </Input>
-                                                        <FormFeedback className="red">{errors.puPerVisit}</FormFeedback>
-                                                    </FormGroup>
                                                 </>}
                                         </div>
                                     </div>
