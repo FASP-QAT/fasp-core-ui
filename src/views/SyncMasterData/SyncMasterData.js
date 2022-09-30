@@ -1960,7 +1960,21 @@ export default class SyncMasterData extends Component {
 
                                                     }
 
-                                                })
+                                                }).catch(
+                                                    error => {
+                                                        if (document.getElementById('div1') != null) {
+                                                            document.getElementById('div1').style.display = 'none';
+                                                        }
+                                                        document.getElementById("retryButtonDiv").style.display = "block";
+                                                        this.setState({
+                                                            message: 'static.program.errortext'
+                                                        },
+                                                            () => {
+                                                                this.hideSecondComponent();
+                                                            })
+
+                                                    }
+                                                )
                                         } else {
                                             if (document.getElementById('div1') != null) {
                                                 document.getElementById('div1').style.display = 'none';
