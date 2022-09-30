@@ -473,8 +473,8 @@ export default class TreeExtrapolationComponent extends React.Component {
                             return new Date(a.month) - new Date(b.month);
                         });
                     this.setState({
-                        minMonth: valList[0].month,
-                        maxMonth: valList[valList.length - 1].month
+                        minMonth: valList.length > 0 ? valList[0].month : jexcelData[0].month,
+                        maxMonth: valList.length > 0 ? valList[valList.length - 1].month : jexcelData[jexcelData.length -1].month
                     }, () => {
                         console.log("!!!min month---", this.state.minMonth);
                         console.log("!!!max month---", this.state.maxMonth);
