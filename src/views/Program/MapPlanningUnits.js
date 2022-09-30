@@ -722,10 +722,10 @@ export default class MapPlanningUnits extends Component {
                     });
                     this.setState({ productCategoryList: listArray });
 
-                    PlanningUnitService.getActivePlanningUnitList()
-                        .then(response => {
-                            if (response.status == 200) {
-                                var listArray = response.data;
+                    // PlanningUnitService.getActivePlanningUnitList()
+                    //     .then(response => {
+                    //         if (response.status == 200) {
+                                var listArray = [];
                                 listArray.sort((a, b) => {
                                     var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
                                     var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
@@ -734,18 +734,18 @@ export default class MapPlanningUnits extends Component {
                                 this.setState({
                                     planningUnitList: listArray
                                 });
-                                for (var k = 0; k < (response.data).length; k++) {
-                                    var planningUnitJson = {
-                                        name: response.data[k].label.label_en,
-                                        id: response.data[k].planningUnitId
-                                    }
-                                    list.push(planningUnitJson);
-                                }
-                                list.sort((a, b) => {
-                                    var itemLabelA = a.name.toUpperCase(); // ignore upper and lowercase
-                                    var itemLabelB = b.name.toUpperCase(); // ignore upper and lowercase                   
-                                    return itemLabelA > itemLabelB ? 1 : -1;
-                                });
+                                // for (var k = 0; k < (response.data).length; k++) {
+                                //     var planningUnitJson = {
+                                //         name: response.data[k].label.label_en,
+                                //         id: response.data[k].planningUnitId
+                                //     }
+                                //     list.push(planningUnitJson);
+                                // }
+                                // list.sort((a, b) => {
+                                //     var itemLabelA = a.name.toUpperCase(); // ignore upper and lowercase
+                                //     var itemLabelB = b.name.toUpperCase(); // ignore upper and lowercase                   
+                                //     return itemLabelA > itemLabelB ? 1 : -1;
+                                // });
 
                                 var productDataArr = []
                                 // if (productDataArr.length == 0) {
@@ -804,7 +804,8 @@ export default class MapPlanningUnits extends Component {
                                             decimal: '.',
                                             mask: '#,##.00',
                                             disabledMaskOnEdition: true,
-                                            tooltip: i18n.t("static.programPU.reorderFrequencyTooltip")
+                                            tooltip: i18n.t("static.programPU.reorderFrequencyTooltip"),
+                                            width:120
 
                                         },
                                         {
@@ -850,7 +851,8 @@ export default class MapPlanningUnits extends Component {
                                             decimal: '.',
                                             mask: '#,##.00',
                                             disabledMaskOnEdition: true,
-                                            tooltip:i18n.t("static.programPU.localProcurementAgentTooltip")
+                                            tooltip:i18n.t("static.programPU.localProcurementAgentTooltip"),
+                                            width:130
                                         },
                                         {
                                             title: i18n.t('static.product.distributionLeadTime'),
@@ -868,7 +870,8 @@ export default class MapPlanningUnits extends Component {
                                             decimal: '.',
                                             mask: '#,##.00',
                                             disabledMaskOnEdition: true,
-                                            tooltip:i18n.t("static.programPU.shelfLifeTooltip")
+                                            tooltip:i18n.t("static.programPU.shelfLifeTooltip"),
+                                            width:120
                                         },
                                         {
                                             title: i18n.t('static.procurementAgentPlanningUnit.catalogPrice'),
@@ -877,7 +880,8 @@ export default class MapPlanningUnits extends Component {
                                             decimal: '.',
                                             mask: '#,##.00',
                                             disabledMaskOnEdition: true,
-                                            tooltip:i18n.t("static.programPU.catalogPriceTooltip")
+                                            tooltip:i18n.t("static.programPU.catalogPriceTooltip"),
+                                            width:120
                                         },
                                         {
                                             title: 'Min Mos',
@@ -1115,49 +1119,49 @@ export default class MapPlanningUnits extends Component {
                                 var elVar = jexcel(document.getElementById("mapPlanningUnit"), options);
                                 this.el = elVar;
                                 this.setState({ mapPlanningUnitEl: elVar, loading: false });
-                            } else {
-                                list = [];
-                            }
-                        }).catch(
-                            error => {
-                                if (error.message === "Network Error") {
-                                    this.setState({
-                                        message: 'static.unkownError',
-                                        loading: false
-                                    });
-                                } else {
-                                    switch (error.response ? error.response.status : "") {
+                        //     } else {
+                        //         list = [];
+                        //     }
+                        // }).catch(
+                        //     error => {
+                        //         if (error.message === "Network Error") {
+                        //             this.setState({
+                        //                 message: 'static.unkownError',
+                        //                 loading: false
+                        //             });
+                        //         } else {
+                        //             switch (error.response ? error.response.status : "") {
 
-                                        case 401:
-                                            this.props.history.push(`/login/static.message.sessionExpired`)
-                                            break;
-                                        case 403:
-                                            this.props.history.push(`/accessDenied`)
-                                            break;
-                                        case 500:
-                                        case 404:
-                                        case 406:
-                                            this.setState({
-                                                message: error.response.data.messageCode,
-                                                loading: false
-                                            });
-                                            break;
-                                        case 412:
-                                            this.setState({
-                                                message: error.response.data.messageCode,
-                                                loading: false
-                                            });
-                                            break;
-                                        default:
-                                            this.setState({
-                                                message: 'static.unkownError',
-                                                loading: false
-                                            });
-                                            break;
-                                    }
-                                }
-                            }
-                        );
+                        //                 case 401:
+                        //                     this.props.history.push(`/login/static.message.sessionExpired`)
+                        //                     break;
+                        //                 case 403:
+                        //                     this.props.history.push(`/accessDenied`)
+                        //                     break;
+                        //                 case 500:
+                        //                 case 404:
+                        //                 case 406:
+                        //                     this.setState({
+                        //                         message: error.response.data.messageCode,
+                        //                         loading: false
+                        //                     });
+                        //                     break;
+                        //                 case 412:
+                        //                     this.setState({
+                        //                         message: error.response.data.messageCode,
+                        //                         loading: false
+                        //                     });
+                        //                     break;
+                        //                 default:
+                        //                     this.setState({
+                        //                         message: 'static.unkownError',
+                        //                         loading: false
+                        //                     });
+                        //                     break;
+                        //             }
+                        //         }
+                        //     }
+                        // );
 
 
 
@@ -1240,14 +1244,17 @@ export default class MapPlanningUnits extends Component {
         var tr = asterisk.firstChild;
         tr.children[1].classList.add('AsteriskTheadtrTd');
         tr.children[2].classList.add('AsteriskTheadtrTd');
-        tr.children[3].classList.add('AsteriskTheadtrTd');
+        tr.children[3].classList.add('InfoTrAsteriskTheadtrTdImage');
         // tr.children[3].title = i18n.t('static.programPU.planBasedOnTooltip');
-        tr.children[4].classList.add('AsteriskTheadtrTd');
-        tr.children[7].classList.add('AsteriskTheadtrTd');
-        tr.children[8].classList.add('AsteriskTheadtrTd');
-        tr.children[11].classList.add('AsteriskTheadtrTd');
-        tr.children[12].classList.add('AsteriskTheadtrTd');
-        tr.children[9].classList.add('AsteriskTheadtrTd');
+        tr.children[4].classList.add('InfoTrAsteriskTheadtrTdImage');
+        tr.children[5].classList.add('InfoTr');
+        tr.children[6].classList.add('InfoTr');
+        tr.children[7].classList.add('InfoTrAsteriskTheadtrTdImage');
+        tr.children[8].classList.add('InfoTrAsteriskTheadtrTdImage');
+        tr.children[10].classList.add('InfoTr');
+        tr.children[11].classList.add('InfoTrAsteriskTheadtrTdImage');
+        tr.children[12].classList.add('InfoTrAsteriskTheadtrTdImage');
+        tr.children[9].classList.add('InfoTrAsteriskTheadtrTdImage');
         // tr.children[4].title = i18n.t("static.message.reorderFrequency")
         var cell1 = instance.worksheets[0].getCell(`F1`)
         cell1.classList.add('readonly');
