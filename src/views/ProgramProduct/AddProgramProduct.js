@@ -367,7 +367,7 @@ class AddprogramPlanningUnit extends Component {
                                                         var options = {
                                                             data: data,
                                                             columnDrag: true,
-                                                            colWidths: [290, 290, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+                                                            // colWidths: [290, 290, 100, 100, 100, 100, 100, 100, 150, 100, 150,150],
                                                             columns: [
                                                                 {
                                                                     title: i18n.t('static.productCategory.productCategory'),
@@ -439,7 +439,8 @@ class AddprogramPlanningUnit extends Component {
                                                                     decimal: '.',
                                                                     mask: '#,##.00',
                                                                     disabledMaskOnEdition: true,
-                                                                    tooltip:i18n.t("static.programPU.localProcurementAgentTooltip")
+                                                                    tooltip:i18n.t("static.programPU.localProcurementAgentTooltip"),
+                                                                    width:120
                                                                 },
                                                                 {
                                                                     title: i18n.t('static.product.distributionLeadTime'),
@@ -457,7 +458,8 @@ class AddprogramPlanningUnit extends Component {
                                                                     // decimal:'.',
                                                                     mask: '#,##',
                                                                     disabledMaskOnEdition: true,
-                                                                    tooltip:i18n.t("static.programPU.shelfLifeTooltip")
+                                                                    tooltip:i18n.t("static.programPU.shelfLifeTooltip"),
+                                                                    width:120
                                                                 },
                                                                 {
                                                                     title: i18n.t('static.procurementAgentPlanningUnit.catalogPrice'),
@@ -466,7 +468,8 @@ class AddprogramPlanningUnit extends Component {
                                                                     // decimal:'.',
                                                                     mask: '#,##.00',
                                                                     disabledMaskOnEdition: true,
-                                                                    tooltip:i18n.t("static.programPU.catalogPriceTooltip")
+                                                                    tooltip:i18n.t("static.programPU.catalogPriceTooltip"),
+                                                                    width:120
                                                                 },
                                                                 {
                                                                     title: 'Id',
@@ -1901,14 +1904,17 @@ class AddprogramPlanningUnit extends Component {
         var tr = asterisk.firstChild;
         tr.children[1].classList.add('AsteriskTheadtrTd');
         tr.children[2].classList.add('AsteriskTheadtrTd');
-        tr.children[4].classList.add('AsteriskTheadtrTd');
-        tr.children[7].classList.add('AsteriskTheadtrTd');
-        tr.children[8].classList.add('AsteriskTheadtrTd');
-        tr.children[9].classList.add('AsteriskTheadtrTd');
-        tr.children[11].classList.add('AsteriskTheadtrTd');
-        tr.children[12].classList.add('AsteriskTheadtrTd');
+        tr.children[4].classList.add('InfoTrAsteriskTheadtrTdImage');
+        tr.children[5].classList.add('InfoTr');
+        tr.children[6].classList.add('InfoTr');
+        tr.children[7].classList.add('InfoTrAsteriskTheadtrTdImage');
+        tr.children[8].classList.add('InfoTrAsteriskTheadtrTdImage');
+        tr.children[9].classList.add('InfoTrAsteriskTheadtrTdImage');
+        tr.children[10].classList.add('InfoTr');
+        tr.children[11].classList.add('InfoTrAsteriskTheadtrTdImage');
+        tr.children[12].classList.add('InfoTrAsteriskTheadtrTdImage');
         // tr.children[3].title = i18n.t('static.programPU.planBasedOnTooltip');
-        tr.children[3].classList.add('AsteriskTheadtrTd');
+        tr.children[3].classList.add('InfoTrAsteriskTheadtrTdImage');
     }
 
     render() {
