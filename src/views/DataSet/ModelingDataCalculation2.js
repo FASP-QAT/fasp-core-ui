@@ -24,11 +24,11 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
             // var datasetDataBytes = CryptoJS.AES.decrypt(dataset.programData, SECRET_KEY);
             // var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
             var datasetJson = {};
-            // if (!isTemplate) {
-            //     datasetJson = dataset.programData;
-            // } else {
+            if (!isTemplate) {
+                datasetJson = dataset.programData;
+            } else {
                 datasetJson = dataset;
-            // }
+            }
             var allNodeDataList = [];
             // console.log("datasetJson modeling--->", datasetJson.treeList);
             var startDate = "";
@@ -61,16 +61,16 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
             for (var tl = 0; tl < treeList.length; tl++) {
                 var tree = treeList[tl];
                 var flatListUnsorted = tree.tree.flatList;
-                console.log("flatListUnsorted---",flatListUnsorted);
+                console.log("flatListUnsorted---", flatListUnsorted);
                 var sortOrderArray = [...new Set(flatListUnsorted.map(ele => (ele.sortOrder)))];
-                console.log("sortOrderArray---",sortOrderArray);
+                console.log("sortOrderArray---", sortOrderArray);
                 var sortedArray = sortOrderArray.sort();
-                console.log("sortedArray---",sortedArray);
+                console.log("sortedArray---", sortedArray);
                 var flatList = [];
                 for (var i = 0; i < sortedArray.length; i++) {
                     flatList.push(flatListUnsorted.filter(c => c.sortOrder == sortedArray[i])[0]);
                 }
-                console.log("flatList push---",flatList);
+                console.log("flatList push---", flatList);
                 var transferToNodeList = [];
                 // if (nodeId != -1) {
                 //     var curNode = flatList.filter(c => c.id == nodeId)[0];
@@ -82,12 +82,12 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                 //         flatList = flatList.filter(c => c.id == nodeId);
                 //     }
                 // }
-                console.log("datasetJson calc---",datasetJson);
-                console.log("flatList.length---",flatList.length);
+                console.log("datasetJson calc---", datasetJson);
+                console.log("flatList.length---", flatList.length);
                 for (var fl = 0; fl < flatList.length; fl++) {
-                    console.log("flatList[fl]---",flatList[fl]);
+                    console.log("flatList[fl]---", flatList[fl]);
                     var payload = flatList[fl].payload;
-                    console.log("flatList[fl] payload---",flatList[fl].payload);
+                    console.log("flatList[fl] payload---", flatList[fl].payload);
                     if (payload.nodeType.id != 1) {
                         var nodeDataMap = payload.nodeDataMap;
                         var scenarioList = tree.scenarioList;
@@ -196,7 +196,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                     // console.log("curDate---", curDate);
                                     curDate = moment(nodeDataMapForScenario.month).add(i, 'months').format("YYYY-MM-DD");
                                     var nodeDataModelingList = (nodeDataModelingListWithTransfer).filter(c => moment(curDate).format("YYYY-MM") >= moment(c.startDate).format("YYYY-MM") && moment(curDate).format("YYYY-MM") <= moment(c.stopDate).format("YYYY-MM"));
-                                    nodeDataModelingList=nodeDataModelingList.filter(c=>c.dataValue!="" && c.dataValue!="NaN" && c.dataValue!=undefined && c.increaseDecrease!="");
+                                    nodeDataModelingList = nodeDataModelingList.filter(c => c.dataValue != "" && c.dataValue != "NaN" && c.dataValue != undefined && c.increaseDecrease != "");
                                     var nodeDataOverrideList = (nodeDataMapForScenario.nodeDataOverrideList);
                                     var startValue = 0;
                                     // console.log("nodeDataMapForScenario---", nodeDataMapForScenario)
