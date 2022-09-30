@@ -798,6 +798,7 @@ export default class ListTreeComponent extends Component {
         // if (operationId == 3) {
         if (operationId == 3 && (treeTemplateId != "" && treeTemplateId != null)) {
             console.log("programId 1---", programId);
+            programCopy.programData = tempProgram;
             calculateModelingData(programCopy, this, programId, 0, 1, 1, treeId, false, true);
         } else {
             this.saveTreeData(operationId, tempProgram, treeTemplateId, programId, treeId, programCopy);
