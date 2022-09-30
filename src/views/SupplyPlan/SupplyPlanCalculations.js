@@ -977,8 +977,17 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     }
                                     var maxStockMoSQty = Number(minForMonths);
 
-                                    var minStock = Number(amc) * Number(minStockMoSQty);
-                                    var maxStock = Number(amc) * Number(maxStockMoSQty);
+                                    var minStock = 0;
+                                    var maxStock = 0;
+                                    if (programPlanningUnitList[ppL].planBasedOn == 2) {
+                                        minStock = programPlanningUnitList[ppL].minQty;
+                                        maxStock = Math.round(Number(Number(programPlanningUnitList[ppL].minQty) + Number(programPlanningUnitList[ppL].reorderFrequencyInMonths) * Number(amc)));
+                                        minStockMoSQty = Number(programPlanningUnitList[ppL].minQty) / Number(amc);
+                                        maxStockMoSQty = Number(Number(Number(programPlanningUnitList[ppL].minQty) / Number(amc)) + Number(programPlanningUnitList[ppL].reorderFrequencyInMonths));
+                                    } else {
+                                        minStock = Number(amc) * Number(minStockMoSQty);
+                                        maxStock = Number(amc) * Number(maxStockMoSQty);
+                                    }
 
                                     // Calculations of Closing balance
                                     var closingBalance = 0;
@@ -1258,6 +1267,8 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                         props.formSubmit(props.state.planningUnit, props.state.monthCount);
                                         props.updateState("loading", false);
                                     } else {
+                                        var programDataJson = programRequest.result.programData;
+                                        var planningUnitDataList = programDataJson.planningUnitDataList;
                                         var rangeValue = props.state.rangeValue1;
                                         let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
                                         if (rangeValue.from.month <= 9) {

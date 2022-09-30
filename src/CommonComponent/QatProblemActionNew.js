@@ -994,6 +994,7 @@ export default class QatProblemActionNew extends Component {
                                                                     //     console.log("in case 22+++");
                                                                     //     break;
                                                                     case 23:
+                                                                        if (planningUnitList[p].planBasedOn == 1) {
                                                                         // console.log("planning unit***", planningUnitList[p].planningUnit.id);
                                                                         // console.log("problem***",typeProblemList[prob].problem.problemId);
                                                                         // console.log("data1***",typeProblemList[prob].data1,"data2***",typeProblemList[prob].data2);
@@ -1173,6 +1174,7 @@ export default class QatProblemActionNew extends Component {
                                                                                 incomplianceProblem(index, username, userId, problemActionList, incomplianceProblemStatusObj);
                                                                             }
                                                                         }
+                                                                    }
                                                                         break;
                                                                     case 24:
                                                                         // console.log("planning unit***", planningUnitList[p].planningUnit.id);
@@ -1250,6 +1252,212 @@ export default class QatProblemActionNew extends Component {
                                                                         } else {
                                                                             if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].generalData.programId) {
                                                                                 incomplianceProblem(index, username, userId, problemActionList, incomplianceProblemStatusObj);
+                                                                            }
+                                                                        }
+                                                                        break;
+                                                                    case 29:
+                                                                        if (planningUnitList[p].planBasedOn == 2) {
+                                                                            console.log("In case 29@@@@@@@@@@")
+                                                                            // console.log("planning unit***", planningUnitList[p].planningUnit.id);
+                                                                            // console.log("problem***",typeProblemList[prob].problem.problemId);
+                                                                            // console.log("data1***",typeProblemList[prob].data1,"data2***",typeProblemList[prob].data2);
+                                                                            // problem for mos is less then min having shipments within lead time 1-6/7-18 months months ============
+                                                                            // var mosArray = [];
+                                                                            // typeProblemList[prob].data1 AND typeProblemList[prob].data2 is the range  i:e t+1 to t+6 months
+                                                                            // typeProblemList[prob].data1=1
+                                                                            // typeProblemList[prob].data2=6
+                                                                            var region = {};
+                                                                            region["regionId"] = 0;
+                                                                            region["label"] = {};
+                                                                            var monthWithMosLessThenMinWithing6months = [];
+                                                                            var monthWithMosAboveThenMinWithing6months = [];
+                                                                            var filteredShipmentListWithin6Months = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM') >= moment(curDate).add(1, "months").format('YYYY-MM') && moment(c.expectedDeliveryDate).format('YYYY-MM') <= moment(curDate).add(parseInt(typeProblemList[prob].data1), "months").format('YYYY-MM'));
+
+                                                                            var monthWithMosLessThenMinWithing7to18months = [];
+                                                                            var monthWithMosAboveThenMaxWithing7to18months = [];
+                                                                            var filteredShipmentListWithin7to18Months = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM') >= moment(curDate).add(parseInt(typeProblemList[prob].data1) + 1, "months").format('YYYY-MM') && moment(c.expectedDeliveryDate).format('YYYY-MM') <= moment(curDate).add(parseInt(typeProblemList[prob].data2), "months").format('YYYY-MM'));
+
+                                                                            // var toleranceAndCutoffValues = typeProblemList[prob].data3;
+                                                                            // var toleranceAndCutoffArray = [];
+                                                                            // if (toleranceAndCutoffValues != null && toleranceAndCutoffValues != "") {
+                                                                            //     var toleranceAndCutoffSplit = toleranceAndCutoffValues.split(',');
+                                                                            //     for (var t = 0; t < toleranceAndCutoffSplit.length; t++) {
+                                                                            //         toleranceAndCutoffArray.push(parseInt(toleranceAndCutoffSplit[t]));
+                                                                            //     }
+                                                                            // }
+
+                                                                            var toleranceNoOfMonthsBelowMin = 0;//2
+                                                                            var toleranceCutoffMinMoS = 0;//5
+                                                                            var toleranceNoOfMonthsOverMax = 0;//2
+
+                                                                            // console.log("toleranceNoOfMonthsBelowMin+++",toleranceNoOfMonthsBelowMin,"toleranceCutoffMinMoS+++",toleranceCutoffMinMoS,"toleranceNoOfMonthsOverMax+++",toleranceNoOfMonthsOverMax);
+
+                                                                            for (var mosCounter = 1; mosCounter <= parseInt(typeProblemList[prob].data1); mosCounter++) {
+                                                                                var m = moment(curDate).add(mosCounter, 'months');
+                                                                                var supplyPlanJson = programJsonForPlanningUnit.supplyPlan.filter(c =>
+                                                                                    c.planningUnitId == planningUnitList[p].planningUnit.id
+                                                                                    && moment(c.transDate).format("YYYY-MM") == moment(m).format("YYYY-MM"));
+                                                                                var mos = "";
+                                                                                var maxForMonths = "";
+                                                                                var minForMonths = "";
+                                                                                // var closingBalance = "";
+                                                                                // var amcCalcualted = "";
+                                                                                if (supplyPlanJson.length > 0 && supplyPlanJson[0].closingBalance != 0) {
+                                                                                    mos = Number(supplyPlanJson[0].closingBalance);
+                                                                                    maxForMonths = Number(supplyPlanJson[0].maxStock);
+                                                                                    minForMonths = Number(supplyPlanJson[0].minStock);
+                                                                                    // closingBalance = supplyPlanJson[0].closingBalance;
+                                                                                    // amcCalcualted = supplyPlanJson[0].amc;
+
+                                                                                    // *****new  logic of buffer for monts with mos less then min 1-6 months
+                                                                                    if (minForMonths <= parseInt(toleranceCutoffMinMoS)) {
+                                                                                        if (mos < minForMonths && mos != 0) {
+                                                                                            monthWithMosLessThenMinWithing6months.push(moment(m).format('YYYY-MM'));
+                                                                                        }
+
+                                                                                    } else {
+                                                                                        if (mos < (minForMonths - parseInt(toleranceNoOfMonthsBelowMin)) && mos != 0) {
+                                                                                            monthWithMosLessThenMinWithing6months.push(moment(m).format('YYYY-MM'));
+                                                                                        }
+                                                                                    }
+
+                                                                                    if (mos > (maxForMonths + parseInt(toleranceNoOfMonthsOverMax)) && mos != 0) {
+                                                                                        var count = 0;
+                                                                                        for (var dlt = 1; dlt <= (planningUnitList[p].distributionLeadTime); dlt++) {
+                                                                                            var mosDlt = programJsonForPlanningUnit.supplyPlan.filter(c =>
+                                                                                                c.planningUnitId == planningUnitList[p].planningUnit.id
+                                                                                                && moment(c.transDate).format("YYYY-MM") == moment(m).add(dlt, 'months').format("YYYY-MM"));
+                                                                                            if (mosDlt.length > 0 && mosDlt[0].closingBalance > maxForMonths && mosDlt[0].closingBalance != 0) {
+                                                                                                count = count + 1;
+                                                                                            }
+                                                                                        }
+                                                                                        if (count == (planningUnitList[p].distributionLeadTime)) {
+                                                                                            monthWithMosAboveThenMinWithing6months.push(moment(m).format('YYYY-MM'));
+                                                                                        }
+                                                                                    }
+                                                                                    // *****new  logic of buffer for monts with mos less then min 1-6 months
+
+
+                                                                                    // if (mos < minForMonths && mos != 0) {
+                                                                                    //     monthWithMosLessThenMinWithing6months.push(moment(m).format('YYYY-MM'));
+                                                                                    // } else if (mos > maxForMonths && mos != 0) {
+                                                                                    //     monthWithMosAboveThenMinWithing6months.push(moment(m).format('YYYY-MM'));
+                                                                                    // }
+                                                                                }
+                                                                            }
+                                                                            for (var mosCounter7to18 = parseInt(typeProblemList[prob].data1) + 1; mosCounter7to18 <= parseInt(typeProblemList[prob].data2); mosCounter7to18++) {
+                                                                                var m7to18 = moment(curDate).add(mosCounter7to18, 'months');
+                                                                                var supplyPlanJson7to18 = programJsonForPlanningUnit.supplyPlan.filter(c =>
+                                                                                    c.planningUnitId == planningUnitList[p].planningUnit.id
+                                                                                    && moment(c.transDate).format("YYYY-MM") == moment(m7to18).format("YYYY-MM"));
+                                                                                var mos7to18 = "";
+                                                                                var maxForMonths7to18 = "";
+                                                                                var minForMonths7to18 = "";
+                                                                                // var closingBalance = "";
+                                                                                // var amcCalcualted = "";
+                                                                                if (supplyPlanJson7to18.length > 0 && supplyPlanJson7to18[0].closingBalance != null) {
+                                                                                    mos7to18 = Number(supplyPlanJson7to18[0].closingBalance);
+                                                                                    maxForMonths7to18 = Number(supplyPlanJson7to18[0].maxStock);
+                                                                                    minForMonths7to18 = Number(supplyPlanJson7to18[0].minStock);
+                                                                                    // closingBalance = supplyPlanJson[0].closingBalance;
+                                                                                    // amcCalcualted = supplyPlanJson[0].amc;
+
+                                                                                    // *****new  logic of buffer for monts with mos less then min 7-18 months
+                                                                                    if (minForMonths7to18 <= parseInt(toleranceCutoffMinMoS)) {
+                                                                                        if (mos7to18 < minForMonths7to18 && mos7to18 != 0) {
+                                                                                            monthWithMosLessThenMinWithing7to18months.push(moment(m7to18).format('YYYY-MM'));
+                                                                                        }
+
+                                                                                    } else {
+                                                                                        if (mos7to18 < (minForMonths7to18 - parseInt(toleranceNoOfMonthsBelowMin)) && mos7to18 != 0) {
+                                                                                            monthWithMosLessThenMinWithing7to18months.push(moment(m7to18).format('YYYY-MM'));
+                                                                                        }
+                                                                                    }
+
+                                                                                    if (mos7to18 > (maxForMonths7to18 + parseInt(toleranceNoOfMonthsOverMax)) && mos7to18 != 0) {
+                                                                                        var count = 0;
+                                                                                        for (var dlt = 1; dlt <= (planningUnitList[p].distributionLeadTime); dlt++) {
+                                                                                            var mosDlt = programJsonForPlanningUnit.supplyPlan.filter(c =>
+                                                                                                c.planningUnitId == planningUnitList[p].planningUnit.id
+                                                                                                && moment(c.transDate).format("YYYY-MM") == moment(m7to18).add(dlt, 'months').format("YYYY-MM"));
+                                                                                            if (mosDlt.length > 0 && mosDlt[0].closingBalance > maxForMonths && mosDlt[0].closingBalance != 0) {
+                                                                                                count = count + 1;
+                                                                                            }
+                                                                                        }
+                                                                                        if (count == (planningUnitList[p].distributionLeadTime)) {
+                                                                                            monthWithMosAboveThenMaxWithing7to18months.push(moment(m7to18).format('YYYY-MM'));
+                                                                                        }
+                                                                                    }
+                                                                                    // *****new  logic of buffer for monts with mos less then min 7-18 months
+
+
+                                                                                    // if (mos7to18 < minForMonths7to18 && mos7to18 != 0) {
+                                                                                    //     monthWithMosLessThenMinWithing7to18months.push(moment(m7to18).format('YYYY-MM'));
+                                                                                    // } else if (mos7to18 > maxForMonths7to18 && mos7to18 != 0) {
+                                                                                    //     monthWithMosAboveThenMaxWithing7to18months.push(moment(m7to18).format('YYYY-MM'));
+                                                                                    // }
+                                                                                }
+                                                                            }
+
+                                                                            // console.log("1-6 months values mos less then min array+++", monthWithMosLessThenMinWithing6months.length);
+                                                                            // console.log("1-6 months values mos above then max array+++", monthWithMosAboveThenMinWithing6months.length);
+                                                                            // console.log("7-18 months values mos less then min array+++", monthWithMosLessThenMinWithing7to18months.length);
+                                                                            // console.log("7-18 months values mos above then max array+++", monthWithMosAboveThenMaxWithing7to18months.length);
+                                                                            // console.log("shipments in 1-6 months+++", filteredShipmentListWithin6Months.length);
+                                                                            // console.log("shipments in 7-18 months+++", filteredShipmentListWithin7to18Months.length);
+                                                                            // console.log("date range 1-6 months+++", moment(curDate).add(1, "months").format('MMM-YY') + " to " + moment(curDate).add(6, "months").format('MMM-YY'))
+                                                                            // console.log("date range 7-18 months+++", moment(curDate).add(7, "months").format('MMM-YY') + " to " + moment(curDate).add(18, "months").format('MMM-YY'))
+
+                                                                            var cause = {};
+                                                                            cause["monthWithMosLessThenMinWithing6months"] = monthWithMosLessThenMinWithing6months.length;
+                                                                            cause["monthWithMosAboveThenMaxWithing6months"] = monthWithMosAboveThenMinWithing6months.length;
+                                                                            cause["monthWithMosLessThenMinWithing7to18months"] = monthWithMosLessThenMinWithing7to18months.length;
+                                                                            cause["monthWithMosAboveThenMaxWithing7to18months"] = monthWithMosAboveThenMaxWithing7to18months.length;
+                                                                            cause["shipmentListWithin6Months"] = filteredShipmentListWithin6Months.length;
+                                                                            cause["shipmentListWithin7to18Months"] = filteredShipmentListWithin7to18Months.length;
+                                                                            cause["range1to6months"] = moment(curDate).add(1, "months").format('MMM-YY') + " to " + moment(curDate).add(parseInt(typeProblemList[prob].data1), "months").format('MMM-YY');
+                                                                            cause["range7to18months"] = moment(curDate).add(parseInt(typeProblemList[prob].data1) + 1, "months").format('MMM-YY') + " to " + moment(curDate).add(parseInt(typeProblemList[prob].data2), "months").format('MMM-YY');
+                                                                            // console.log("cause+++", cause);
+
+                                                                            var index = problemActionList.findIndex(
+                                                                                c =>
+                                                                                    c.planningUnit.id == planningUnitList[p].planningUnit.id
+                                                                                    && c.program.id == programList[pp].generalData.programId
+                                                                                    && c.realmProblem.problem.problemId == typeProblemList[prob].problem.problemId
+                                                                            );
+
+                                                                            if (monthWithMosLessThenMinWithing6months.length > 0 || monthWithMosAboveThenMinWithing6months.length > 0 || monthWithMosLessThenMinWithing7to18months.length > 0 || monthWithMosAboveThenMaxWithing7to18months.length > 0) {
+                                                                                // if (monthWithMosLessThenMinWithing6months.length > 0) {
+                                                                                //     criticalityArray.push(3);
+                                                                                // } if (monthWithMosAboveThenMinWithing6months.length > 0) {
+                                                                                //     criticalityArray.push(1);
+                                                                                // } if (monthWithMosLessThenMinWithing7to18months.length > 0) {
+                                                                                //     criticalityArray.push(3);
+                                                                                // } if (monthWithMosAboveThenMaxWithing7to18months.length > 0) {
+                                                                                //     criticalityArray.push(2);
+                                                                                // }
+                                                                                // var problemCriticality = Math.max(...criticalityArray);
+                                                                                // console.log("problemCriticality+++", problemCriticality);
+                                                                                // console.log("cId+++", getProblemCriticality(problemCriticality));
+
+                                                                                if (index == -1) {
+                                                                                    createMinMaxProblems(programList[pp].generalData, versionID, typeProblemList[prob], region, planningUnitList[p], cause, problemActionIndex, userId, username, problemActionList, openProblemStatusObj);
+                                                                                    problemActionIndex++;
+                                                                                } else {
+                                                                                    //auto open for index=======>
+                                                                                    // update curDate i.e dt and also update the cuse i.e data5
+                                                                                    problemActionList[index].dt = curDate;
+                                                                                    problemActionList[index].data5 = JSON.stringify(cause);
+                                                                                    // problemActionList[index].realmProblem.criticality = getProblemCriticality(problemCriticality);
+                                                                                    if (problemActionList[index].problemStatus.id == 4) {
+                                                                                        openProblem(index, username, userId, problemActionList, openProblemStatusObj);
+                                                                                    }
+                                                                                }
+
+                                                                            } else {
+                                                                                if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].generalData.programId) {
+                                                                                    incomplianceProblem(index, username, userId, problemActionList, incomplianceProblemStatusObj);
+                                                                                }
                                                                             }
                                                                         }
                                                                         break;

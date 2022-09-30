@@ -1749,53 +1749,117 @@ export default class ShipmentDetails extends React.Component {
                                             console.log("ProgramJson@@@@@@@@@@", programJson);
                                             var month = moment(this.state.singleValue.year + (this.state.singleValue.month <= 9 ? "-0" + this.state.singleValue.month : this.state.singleValue.month) + "-01").format("YYYY-MM-DD")
                                             var sstd = {}
-                                            var currentMonth = moment(Date.now()).utcOffset('-0500').startOf('month').format("YYYY-MM-DD");
-                                            var compare = (moment(month).format("YYYY-MM") >= moment(currentMonth).format("YYYY-MM"));
-                                            console.log("suingle Mohit", this.state.singleValue)
-                                            console.log("Month Mohit", month)
-                                            console.log("Current minth Mohit", currentMonth)
-                                            console.log("Compare Mohit", compare)
-                                            var supplyPlanData = programJson.supplyPlan;
-                                            var shipmentDataList = programJson.shipmentList;
-                                            var batchInfoList = programJson.batchInfoList;
-                                            // var stockInHand = jsonList[0].closingBalance;
-                                            var spd1 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(month).format("YYYY-MM"));
-                                            var amc = spd1.length > 0 ? Math.round(Number(spd1[0].amc)) : 0;
-                                            var spd2 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(month).add(1, 'months').format("YYYY-MM"));
-                                            var spd3 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(month).add(2, 'months').format("YYYY-MM"));
-                                            var mosForMonth1 = spd1.length > 0 ? spd1[0].mos : 0;
-                                            var mosForMonth2 = spd2.length > 0 ? spd2[0].mos : 0;
-                                            var mosForMonth3 = spd3.length > 0 ? spd3[0].mos : 0;
+                                            if (programPlanningUnit.planBasedOn == 1) {
+                                                var currentMonth = moment(Date.now()).utcOffset('-0500').startOf('month').format("YYYY-MM-DD");
+                                                var compare = (moment(month).format("YYYY-MM") >= moment(currentMonth).format("YYYY-MM"));
+                                                console.log("suingle Mohit", this.state.singleValue)
+                                                console.log("Month Mohit", month)
+                                                console.log("Current minth Mohit", currentMonth)
+                                                console.log("Compare Mohit", compare)
+                                                var supplyPlanData = programJson.supplyPlan;
+                                                var shipmentDataList = programJson.shipmentList;
+                                                var batchInfoList = programJson.batchInfoList;
+                                                // var stockInHand = jsonList[0].closingBalance;
+                                                var spd1 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(month).format("YYYY-MM"));
+                                                var amc = spd1.length > 0 ? Math.round(Number(spd1[0].amc)) : 0;
+                                                var spd2 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(month).add(1, 'months').format("YYYY-MM"));
+                                                var spd3 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(month).add(2, 'months').format("YYYY-MM"));
+                                                var mosForMonth1 = spd1.length > 0 ? spd1[0].mos : 0;
+                                                var mosForMonth2 = spd2.length > 0 ? spd2[0].mos : 0;
+                                                var mosForMonth3 = spd3.length > 0 ? spd3[0].mos : 0;
 
-                                            var suggestShipment = false;
-                                            var useMax = false;
-                                            if (compare) {
-                                                if (Number(amc) == 0) {
-                                                    suggestShipment = false;
-                                                } else if (Number(mosForMonth1) != 0 && Number(mosForMonth1) < Number(minStockMoSQty) && (Number(mosForMonth2) > Number(minStockMoSQty) || Number(mosForMonth3) > Number(minStockMoSQty))) {
-                                                    suggestShipment = false;
-                                                } else if (Number(mosForMonth1) != 0 && Number(mosForMonth1) < Number(minStockMoSQty) && Number(mosForMonth2) < Number(minStockMoSQty) && Number(mosForMonth3) < Number(minStockMoSQty)) {
-                                                    suggestShipment = true;
-                                                    useMax = true;
-                                                } else if (Number(mosForMonth1) == 0) {
-                                                    suggestShipment = true;
-                                                    if (Number(mosForMonth2) < Number(minStockMoSQty) && Number(mosForMonth3) < Number(minStockMoSQty)) {
+                                                var suggestShipment = false;
+                                                var useMax = false;
+                                                if (compare) {
+                                                    if (Number(amc) == 0) {
+                                                        suggestShipment = false;
+                                                    } else if (Number(mosForMonth1) != 0 && Number(mosForMonth1) < Number(minStockMoSQty) && (Number(mosForMonth2) > Number(minStockMoSQty) || Number(mosForMonth3) > Number(minStockMoSQty))) {
+                                                        suggestShipment = false;
+                                                    } else if (Number(mosForMonth1) != 0 && Number(mosForMonth1) < Number(minStockMoSQty) && Number(mosForMonth2) < Number(minStockMoSQty) && Number(mosForMonth3) < Number(minStockMoSQty)) {
+                                                        suggestShipment = true;
                                                         useMax = true;
+                                                    } else if (Number(mosForMonth1) == 0) {
+                                                        suggestShipment = true;
+                                                        if (Number(mosForMonth2) < Number(minStockMoSQty) && Number(mosForMonth3) < Number(minStockMoSQty)) {
+                                                            useMax = true;
+                                                        } else {
+                                                            useMax = false;
+                                                        }
+                                                    }
+                                                } else {
+                                                    suggestShipment = false;
+                                                }
+
+                                                console.log("suggestShipment Mohit", suggestShipment)
+                                                if (suggestShipment) {
+                                                    var suggestedOrd = 0;
+                                                    if (useMax) {
+                                                        suggestedOrd = Number((amc * Number(maxStockMoSQty)) - Number(spd1[0].closingBalance) + Number(spd1[0].unmetDemand));
                                                     } else {
-                                                        useMax = false;
+                                                        suggestedOrd = Number((amc * Number(minStockMoSQty)) - Number(spd1[0].closingBalance) + Number(spd1[0].unmetDemand));
                                                     }
                                                 }
                                             } else {
-                                                suggestShipment = false;
-                                            }
-                                            console.log("suggestShipment Mohit", suggestShipment)
-                                            if (suggestShipment) {
-                                                var suggestedOrd = 0;
-                                                if (useMax) {
-                                                    suggestedOrd = Number((amc * Number(maxStockMoSQty)) - Number(spd1[0].closingBalance) + Number(spd1[0].unmetDemand));
+                                                var currentMonth = moment(Date.now()).utcOffset('-0500').startOf('month').format("YYYY-MM-DD");
+                                                var compare = (moment(month).format("YYYY-MM") >= moment(currentMonth).format("YYYY-MM"));
+                                                console.log("suingle Mohit", this.state.singleValue)
+                                                console.log("Month Mohit", month)
+                                                console.log("Current minth Mohit", currentMonth)
+                                                console.log("Compare Mohit", compare)
+                                                var supplyPlanData = programJson.supplyPlan;
+                                                var shipmentDataList = programJson.shipmentList;
+                                                var batchInfoList = programJson.batchInfoList;
+                                                // var stockInHand = jsonList[0].closingBalance;
+                                                var spd0 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(month).format("YYYY-MM"));
+                                                var spd1 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(month).add(programPlanningUnit.distributionLeadTime, 'months').format("YYYY-MM"));
+                                                var amc = spd1.length > 0 ? Math.round(Number(spd1[0].amc)) : 0;
+                                                var spd2 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(month).add(1 + programPlanningUnit.distributionLeadTime, 'months').format("YYYY-MM"));
+                                                var spd3 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(month).add(2 + programPlanningUnit.distributionLeadTime, 'months').format("YYYY-MM"));
+                                                var mosForMonth1 = spd1.length > 0 ? spd1[0].mos : 0;
+                                                var mosForMonth2 = spd2.length > 0 ? spd2[0].mos : 0;
+                                                var mosForMonth3 = spd3.length > 0 ? spd3[0].mos : 0;
+                                                var cbForMonth1 = spd1.length > 0 ? spd1[0].closingBalance : 0;
+                                                var cbForMonth2 = spd2.length > 0 ? spd2[0].closingBalance : 0;
+                                                var cbForMonth3 = spd3.length > 0 ? spd3[0].closingBalance : 0;
+
+                                                var maxStockForMonth1 = spd1.length > 0 ? spd1[0].maxStock : 0;//
+                                                var minStockForMonth1 = spd1.length > 0 ? spd1[0].minStock : 0;
+
+                                                var suggestShipment = false;
+                                                var useMax = false;
+                                                if (compare) {
+                                                    if (Number(amc) == 0) {
+                                                        suggestShipment = false;
+                                                    } else if (Number(cbForMonth1) != 0 && Number(cbForMonth1) < Number(programPlanningUnit.minQty) && (Number(cbForMonth2) > Number(programPlanningUnit.minQty) || Number(cbForMonth3) > Number(programPlanningUnit.minQty))) {
+                                                        suggestShipment = false;
+                                                    } else if (Number(cbForMonth1) != 0 && Number(cbForMonth1) < Number(programPlanningUnit.minQty) && Number(cbForMonth2) < Number(programPlanningUnit.minQty) && Number(cbForMonth3) < Number(programPlanningUnit.minQty)) {
+                                                        suggestShipment = true;
+                                                        useMax = true;
+                                                    } else if (Number(cbForMonth1) == 0) {
+                                                        suggestShipment = true;
+                                                        if (Number(cbForMonth2) < Number(programPlanningUnit.minQty) && Number(cbForMonth3) < Number(programPlanningUnit.minQty)) {
+                                                            useMax = true;
+                                                        } else {
+                                                            useMax = false;
+                                                        }
+                                                    }
                                                 } else {
-                                                    suggestedOrd = Number((amc * Number(minStockMoSQty)) - Number(spd1[0].closingBalance) + Number(spd1[0].unmetDemand));
+                                                    suggestShipment = false;
                                                 }
+
+                                                console.log("suggestShipment Mohit", suggestShipment)
+                                                console.log("maxStockForMonth1 Mohit", maxStockForMonth1)
+                                                console.log("maxStockForMonth1 spd1 Mohit", spd1)
+                                                if (suggestShipment) {
+                                                    var suggestedOrd = 0;
+                                                    if (useMax) {
+                                                        suggestedOrd = Number((Number(maxStockForMonth1)) - Number(spd0[0].closingBalance) + Number(spd0[0].unmetDemand));
+                                                    } else {
+                                                        suggestedOrd = Number((Number(minStockForMonth1)) - Number(spd0[0].closingBalance) + Number(spd0[0].unmetDemand));
+                                                    }
+                                                }
+                                            }
+                                            if (suggestShipment) {
                                                 if (suggestedOrd <= 0) {
                                                 } else {
 
