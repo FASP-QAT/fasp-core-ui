@@ -845,7 +845,8 @@ export default class MapPlanningUnits extends Component {
                                             textEditor: true,
                                             // decimal: '.',
                                             mask: '#,##',
-                                            disabledMaskOnEdition: true
+                                            disabledMaskOnEdition: true,
+                                            tooltip:i18n.t("static.programPU.localProcurementAgentTooltip")
                                         },
                                         {
                                             title: i18n.t('static.product.distributionLeadTime'),
@@ -862,7 +863,8 @@ export default class MapPlanningUnits extends Component {
                                             textEditor: true,
                                             // decimal: '.',
                                             mask: '#,##',
-                                            disabledMaskOnEdition: true
+                                            disabledMaskOnEdition: true,
+                                            tooltip:i18n.t("static.programPU.shelfLifeTooltip")
                                         },
                                         {
                                             title: i18n.t('static.procurementAgentPlanningUnit.catalogPrice'),
@@ -870,7 +872,8 @@ export default class MapPlanningUnits extends Component {
                                             textEditor: true,
                                             decimal: '.',
                                             mask: '#,##.00',
-                                            disabledMaskOnEdition: true
+                                            disabledMaskOnEdition: true,
+                                            tooltip:i18n.t("static.programPU.catalogPriceTooltip")
                                         },
                                         {
                                             title: 'Min Mos',
