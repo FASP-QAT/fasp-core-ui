@@ -241,13 +241,17 @@ class ProgramService {
         );
     }
 
-    getProgramManagerListByProgramId(programId) {
-        return axios.get(`${API_URL}/api/user/programId/${programId}`, {}
+    checkIfLinkingExistsWithOtherProgram(json) {
+        return axios.post(`${API_URL}/api/erpLinking/otherProgramCheck`, json, {}
         );
     }
 
     checkIfLinkingExistsWithOtherProgram(json) {
         return axios.post(`${API_URL}/api/erpLinking/otherProgramCheck`, json, {}
+        );
+    }
+    getProgramManagerListByProgramId(programId) {
+        return axios.get(`${API_URL}/api/user/programId/${programId}`, {}
         );
     }
 

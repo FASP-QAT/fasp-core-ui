@@ -7,7 +7,7 @@ import React, { Component } from 'react';
 import i18n from '../../../i18n';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
-import { Button, CardBody, CardGroup, Col, Container, Form, FormFeedback, Input, InputGroup, InputGroupAddon, InputGroupText, DropdownItem, DropdownMenu, DropdownToggle, ButtonDropdown, Row } from 'reactstrap';
+import { Button, CardBody, CardGroup, Col, Container, Form, FormFeedback, Input, InputGroup, InputGroupAddon, InputGroupText, DropdownItem, DropdownMenu, DropdownToggle, ButtonDropdown, Row, Label,FormGroup } from 'reactstrap';
 import * as Yup from 'yup';
 import InnerBgImg from '../../../../src/assets/img/bg-image/bg-login.jpg';
 import LoginService from '../../../api/LoginService';
@@ -81,6 +81,7 @@ class Login extends Component {
       languageList: [],
       updatedSyncDate: '',
       lang: localStorage.getItem('lastLoggedInUsersLanguage'),
+      loginOnline:true,
       popupShown:0
     }
     this.forgotPassword = this.forgotPassword.bind(this);
@@ -90,6 +91,7 @@ class Login extends Component {
     this.changeLanguage = this.changeLanguage.bind(this);
     this.getLanguageList = this.getLanguageList.bind(this);
     this.getAllLanguages = this.getAllLanguages.bind(this);
+    this.dataChangeCheckbox=this.dataChangeCheckbox.bind(this);
   }
   getAllLanguages() {
     var db1;
@@ -239,6 +241,7 @@ class Login extends Component {
 
   componentDidMount() {
     // console.log("############## Login component did mount #####################");
+    localStorage.setItem("loginOnline", this.state.loginOnline);
     delete axios.defaults.headers.common["Authorization"];
     this.logoutMessagehide();
     // console.log("--------Going to call version api-----------")
@@ -334,6 +337,12 @@ class Login extends Component {
       });
   }
 
+  dataChangeCheckbox(event){
+    this.setState({
+      loginOnline: (event.target.checked ? true : false)
+  })
+  }
+
   logoutMessagehide() {
     // console.log("-----------logoutMessagehide---------------");
     setTimeout(function () { document.getElementById('div1').style.display = 'none'; }, 30000);
@@ -419,7 +428,8 @@ class Login extends Component {
                           AuthenticationService.setRecordCount(JEXCEL_DEFAULT_PAGINATION);
                           localStorage.setItem("sessionTimedOut", 0);
                           localStorage.setItem("sessionChanged", 0)
-                          if (isSiteOnline()) {
+                          localStorage.setItem("loginOnline", this.state.loginOnline);
+                          if (this.state.loginOnline==true && isSiteOnline()) {
                             var languageCode = AuthenticationService.getDefaultUserLanguage();
                             var lastLoggedInUsersLanguageChanged = localStorage.getItem('lastLoggedInUsersLanguageChanged');
                             console.log("Language change flag---", lastLoggedInUsersLanguageChanged);
@@ -543,63 +553,83 @@ class Login extends Component {
                             isValid,
                             setTouched
                           }) => (
-                            <Form onSubmit={handleSubmit} noValidate name="loginForm">
-                              <h5 id="div1">{i18n.t(this.props.match.params.message)}</h5>
-                              <h5 id="div2">{i18n.t(this.state.message)}</h5>
+                              <Form onSubmit={handleSubmit} noValidate name="loginForm">
+                                <h5 id="div1">{i18n.t(this.props.match.params.message)}</h5>
+                                <h5 id="div2">{i18n.t(this.state.message)}</h5>
 
-                              {/* <h1>{i18n.t('static.login.login')}</h1> */}
+                                {/* <h1>{i18n.t('static.login.login')}</h1> */}
 
-                              <p className="text-muted login-text">{i18n.t('static.login.signintext')}</p>
+                                <p className="text-muted login-text">{i18n.t('static.login.signintext')}</p>
 
-                              <InputGroup className="mb-3">
-                                <InputGroupAddon addonType="prepend">
-                                  <InputGroupText>
-                                    <i className="cui-user Loginicon"></i>
-                                  </InputGroupText>
-                                </InputGroupAddon>
-                                <Input
-                                  type="text"
-                                  placeholder={i18n.t('static.login.emailId')}
-                                  autoComplete="emailId"
-                                  name="emailId"
-                                  id="emailId"
-                                  valid={!errors.emailId}
-                                  invalid={touched.emailId && !!errors.emailId}
-                                  onChange={handleChange}
-                                  onBlur={handleBlur}
-                                  required />
-                                <FormFeedback>{errors.emailId}</FormFeedback>
-                              </InputGroup>
-                              <InputGroup className="mb-4">
-                                <InputGroupAddon addonType="prepend">
-                                  <InputGroupText>
-                                    <i className="cui-lock-locked Loginicon"></i>
-                                  </InputGroupText>
-                                </InputGroupAddon>
-                                <Input
-                                  type="password"
-                                  placeholder={i18n.t('static.login.password')}
-                                  autoComplete="current-password"
-                                  name="password"
-                                  id="password"
-                                  valid={!errors.password}
-                                  invalid={touched.password && !!errors.password}
-                                  onChange={handleChange}
-                                  onBlur={handleBlur}
-                                  required />
-                                <FormFeedback>{errors.password}</FormFeedback>
-                              </InputGroup>
-                              <Row>
-                                <Col xs="6">
-                                  <Button type="submit" color="primary" className="px-4" onClick={() => { this.touchAll(setTouched, errors); this.incorrectPassmessageHide() }} >{i18n.t('static.login.login')}</Button>
-                                </Col>
-                                <Col xs="6" className="text-right">
-                                  <Button type="button" color="link" className="px-0" onClick={this.forgotPassword}>{i18n.t('static.login.forgotpassword')}?</Button>
-                                </Col>
+                                <InputGroup className="mb-3">
+                                  <InputGroupAddon addonType="prepend">
+                                    <InputGroupText>
+                                      <i className="cui-user Loginicon"></i>
+                                    </InputGroupText>
+                                  </InputGroupAddon>
+                                  <Input
+                                    type="text"
+                                    placeholder={i18n.t('static.login.emailId')}
+                                    autoComplete="emailId"
+                                    name="emailId"
+                                    id="emailId"
+                                    valid={!errors.emailId}
+                                    invalid={touched.emailId && !!errors.emailId}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    required />
+                                  <FormFeedback>{errors.emailId}</FormFeedback>
+                                </InputGroup>
+                                <InputGroup className="mb-3">
+                                  <InputGroupAddon addonType="prepend">
+                                    <InputGroupText>
+                                      <i className="cui-lock-locked Loginicon"></i>
+                                    </InputGroupText>
+                                  </InputGroupAddon>
+                                  <Input
+                                    type="password"
+                                    placeholder={i18n.t('static.login.password')}
+                                    autoComplete="current-password"
+                                    name="password"
+                                    id="password"
+                                    valid={!errors.password}
+                                    invalid={touched.password && !!errors.password}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    required />
+                                  <FormFeedback>{errors.password}</FormFeedback>
+                                </InputGroup>
+                                <Row>
+                                <InputGroup check inline  className="mb-4 ml-3">
+                                  <Input
+                                    type="checkbox"
+                                    id="loginOnline"
+                                    name="loginOnline"
+                                    style={{
+                                      position: "relative",
+                                      marginTop: "0.2rem",
+                                      marginLeft: "0rem"}}
+                                    checked={this.state.loginOnline}
+                                    onChange={(e) => { this.dataChangeCheckbox(e) }}
+                                   />
+                                   <Label
+                                     className="form-check-label ml-2"
+                                     check htmlFor="inline-radio2">
+                                     <b>{i18n.t('static.login.loginOnline')}</b>
+                                   </Label>
+                                </InputGroup>
+                                </Row>
+                                <Row>
+                                  <Col xs="6">
+                                    <Button type="submit" color="primary" className="px-4" onClick={() => { this.touchAll(setTouched, errors); this.incorrectPassmessageHide() }} >{i18n.t('static.login.login')}</Button>
+                                  </Col>
+                                  <Col xs="6" className="text-right">
+                                    <Button type="button" color="link" className="px-0" onClick={this.forgotPassword}>{i18n.t('static.login.forgotpassword')}?</Button>
+                                  </Col>
 
-                              </Row>
-                            </Form>
-                          )} />
+                                </Row>
+                              </Form>
+                            )} />
                     </CardBody>
 
                   </div>

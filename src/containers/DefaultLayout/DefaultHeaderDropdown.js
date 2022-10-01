@@ -294,7 +294,7 @@ class DefaultHeaderDropdown extends Component {
         </DropdownToggle>
         <DropdownMenu right>
           <DropdownItem header tag="div" className="text-center"><strong>{i18n.t('static.common.profile')}</strong></DropdownItem>
-          <DropdownItem className="nonclickablebox"><i className="cui-user icons icon-size"></i><span className="tittle-role">{AuthenticationService.getLoggedInUsername() ? AuthenticationService.getLoggedInUsername() : i18n.t("static.unknown")}</span>
+          <DropdownItem className="nonclickablebox" style={{borderBottom:"2px solid #000"}}><i className="cui-user icons icon-size"></i><span className="tittle-role">{AuthenticationService.getLoggedInUsername() ? AuthenticationService.getLoggedInUsername() : i18n.t("static.unknown")}</span>
             {this.state.roleList != null && this.state.roleList != '' && this.state.roleList.map(
               role =>
 
@@ -304,6 +304,8 @@ class DefaultHeaderDropdown extends Component {
                 </div>
             )}
           </DropdownItem>
+          {checkOnline === 'Online' && <DropdownItem onClick={this.props.onChangePassword}><i className="fa fa-key"></i>{i18n.t('static.dashboard.changepassword')}</DropdownItem>}
+          {checkOnline === 'Online' ? <DropdownItem onClick={this.props.goOffline}><i class="fa fa-solid fa-circle fa-lg" style={{color:"#BA0C2F"}}></i>{i18n.t("static.login.goOffline")}</DropdownItem>:<DropdownItem onClick={this.props.goOnline}><i class="fa fa-solid fa-circle fa-lg" style={{color:"#4dbd74"}}></i>{i18n.t("static.login.goOnline")}</DropdownItem>}
           <DropdownItem header tag="div" className="text-center"><b>{i18n.t('static.language.preferredlng')}</b></DropdownItem>
           {this.state.languageList != null && this.state.languageList != '' && this.state.languageList.filter(c => c.active).map(
             language =>
@@ -325,7 +327,6 @@ class DefaultHeaderDropdown extends Component {
           <DropdownItem onClick={this.changeLanguage.bind(this, 'sp')}><i className="flag-icon flag-icon-es"></i>{localStorage.getItem('lang') != null && localStorage.getItem('lang').toString() != 'undefined' && localStorage.getItem('lang').toString() == "sp" ? <b>{i18n.t('static.language.spanish')}</b> : i18n.t('static.language.spanish')}</DropdownItem>
           <DropdownItem onClick={this.changeLanguage.bind(this, 'pr')}><i className="flag-icon flag-icon-pt"></i>{localStorage.getItem('lang') != null && localStorage.getItem('lang').toString() != 'undefined' && localStorage.getItem('lang').toString() == "pr" ? <b>{i18n.t('static.language.portuguese')}</b> : i18n.t('static.language.portuguese')}</DropdownItem> */}
 
-          {checkOnline === 'Online' && <DropdownItem onClick={this.props.onChangePassword}><i className="fa fa-key"></i>{i18n.t('static.dashboard.changepassword')}</DropdownItem>}
           {/* <DropdownItem onClick={this.props.onLogout}><i className="fa fa-sign-out"></i>{i18n.t('static.common.logout')}</DropdownItem> */}
         </DropdownMenu>
       </Dropdown>
