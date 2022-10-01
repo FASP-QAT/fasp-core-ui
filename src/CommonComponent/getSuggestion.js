@@ -648,7 +648,7 @@ export default function getSuggestion(row, lang) {
 
         return getLabelText(label, lang);
     }
-    if (row.realmProblem.problem.problemId == 23) {
+    if (row.realmProblem.problem.problemId == 23 || row.realmProblem.problem.problemId == 29) {
         var label = row.realmProblem.problem.actionLabel;
         // label.label_en = "Inventory doen't fall within min/max range";
         return getLabelText(label, lang);
@@ -682,7 +682,10 @@ export default function getSuggestion(row, lang) {
         return getLabelText(label, lang);
     }
     if (row.realmProblem.problem.problemId == 26 || row.realmProblem.problem.problemId == 27 || row.realmProblem.problem.problemId == 28) {
-        var obj = JSON.parse(row.data5);
+        console.log("row.data5", row.data5);
+        var abc='{"problemDescription":"pass #1234 !@#$%^&*()_+-={}|;,./<>?[]", "suggession":"PO 6581 for 420,881 schedule should be revised. Per information that we receive from the supplier, this order was split into three shipments. Details are below. Delivery dates are my estimates. They will go for kitting first, so it is hard to know how long that could take.- 99,881 picked up in July; estimate delivery in Oct.- 150,145 picked up in August; estimate delivery in Nov.- 170,880 likely to be picked up in Sept/Oct; estimate delivery in Jan 2023"}';
+        var obj = JSON.parse(abc);
+        //  var obj = JSON.parse(row.data5);
         var label = obj.suggession;
         return label;
     }

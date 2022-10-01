@@ -234,8 +234,13 @@ class StockStatus extends Component {
     csvRow.push('"' + (i18n.t('static.report.versionFinal*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
     csvRow.push('')
     csvRow.push('"' + (i18n.t('static.planningunit.planningunit').replaceAll(' ', '%20') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
-    csvRow.push('"' + (i18n.t('static.supplyPlan.minStockMos').replaceAll(' ', '%20') + ' : ' + this.state.stockStatusList[0].minMos + '"'))
-    csvRow.push('"' + (i18n.t('static.supplyPlan.maxStockMos').replaceAll(' ', '%20') + ' : ' + this.state.stockStatusList[0].maxMos + '"'))
+    if (this.state.stockStatusList.length > 0 && this.state.stockStatusList[0].planBasedOn == 1) {
+      csvRow.push('"' + (i18n.t('static.supplyPlan.minStockMos').replaceAll(' ', '%20') + ' : ' + this.state.stockStatusList[0].minMos + '"'))
+      csvRow.push('"' + (i18n.t('static.supplyPlan.maxStockMos').replaceAll(' ', '%20') + ' : ' + this.state.stockStatusList[0].maxMos + '"'))
+    } else {
+      csvRow.push('"' + (i18n.t('static.product.minQuantity').replaceAll(' ', '%20') + ' : ' + this.state.stockStatusList[0].minStock + '"'))
+      csvRow.push('"' + (i18n.t('static.product.distributionLeadTime').replaceAll(' ', '%20') + ' : ' + this.state.stockStatusList[0].distributionLeadTime + '"'))
+    }
     var ppu = this.state.planningUnits.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0];
     csvRow.push('"' + (i18n.t('static.supplyPlan.amcPast').replaceAll(' ', '%20') + ' : ' + ppu.monthsInPastForAmc + '"'))
     csvRow.push('"' + (i18n.t('static.supplyPlan.amcFuture').replaceAll(' ', '%20') + ' : ' + ppu.monthsInFutureForAmc + '"'))
@@ -254,7 +259,7 @@ class StockStatus extends Component {
     i18n.t('static.supplyplan.exipredStock').replaceAll(' ', '%20'),
     i18n.t('static.supplyPlan.endingBalance').replaceAll(' ', '%20'),
     i18n.t('static.report.amc').replaceAll(' ', '%20'),
-    i18n.t('static.report.mos').replaceAll(' ', '%20'),
+    this.state.stockStatusList.length > 0 && this.state.stockStatusList[0].planBasedOn == 1 ? i18n.t('static.report.mos').replaceAll(' ', '%20') : i18n.t('static.supplyPlan.maxQty').replaceAll(' ', '%20'),
     i18n.t('static.supplyPlan.unmetDemandStr').replaceAll(' ', '%20')
       // i18n.t('static.report.maxmonth').replaceAll(' ', '%20')]
     ])];
@@ -266,7 +271,7 @@ class StockStatus extends Component {
         item.shipmentQty + " | " + item.fundingSource.code + " | " + getLabelText(item.shipmentStatus.label, this.state.lang) + " | " + item.procurementAgent.code
       )
     }).join(' \n')).replaceAll(' ', '%20')
-      , (ele.adjustment == 0 ? ele.regionCountForStock > 0 ? ele.nationalAdjustment : "" : ele.regionCountForStock > 0 ? ele.nationalAdjustment : ele.adjustment != null ? ele.adjustment : ""), ele.expiredStock != 0 ? ele.expiredStock : '', ele.closingBalance, ele.amc != null ? this.formatAmc(ele.amc) : "", ele.mos != null ? this.roundN(ele.mos) : i18n.t("static.supplyPlanFormula.na"), ele.unmetDemand != 0 ? ele.unmetDemand : ''])));
+      , (ele.adjustment == 0 ? ele.regionCountForStock > 0 ? ele.nationalAdjustment : "" : ele.regionCountForStock > 0 ? ele.nationalAdjustment : ele.adjustment != null ? ele.adjustment : ""), ele.expiredStock != 0 ? ele.expiredStock : '', ele.closingBalance, ele.amc != null ? this.formatAmc(ele.amc) : "", ele.planBasedOn == 1 ? ele.mos != null ? this.roundN(ele.mos) : i18n.t("static.supplyPlanFormula.na") : ele.maxStock != null ? this.roundN(ele.maxStock) : "", ele.unmetDemand != 0 ? ele.unmetDemand : ''])));
 
 
     for (var i = 0; i < A.length; i++) {
@@ -280,8 +285,13 @@ class StockStatus extends Component {
         csvRow.push("")
         csvRow.push("")
         csvRow.push('"' + (i18n.t('static.planningunit.planningunit').replaceAll(' ', '%20') + ' : ' + getLabelText(item.planningUnit.label, this.state.lang)).replaceAll(' ', '%20') + '"')
-        csvRow.push('"' + (i18n.t('static.supplyPlan.minStockMos').replaceAll(' ', '%20') + ' : ' + item.data[0].minMos + '"'))
-        csvRow.push('"' + (i18n.t('static.supplyPlan.maxStockMos').replaceAll(' ', '%20') + ' : ' + item.data[0].maxMos + '"'))
+        if (item.data.length > 0 && item.data[0].planBasedOn == 1) {
+          csvRow.push('"' + (i18n.t('static.supplyPlan.minStockMos').replaceAll(' ', '%20') + ' : ' + item.data[0].minMos + '"'))
+          csvRow.push('"' + (i18n.t('static.supplyPlan.maxStockMos').replaceAll(' ', '%20') + ' : ' + item.data[0].maxMos + '"'))
+        } else {
+          csvRow.push('"' + (i18n.t('static.product.minQuantity').replaceAll(' ', '%20') + ' : ' + item.data[0].minStock + '"'))
+          csvRow.push('"' + (i18n.t('static.product.distributionLeadTime').replaceAll(' ', '%20') + ' : ' + item.data[0].distributionLeadTime + '"'))
+        }
         var ppu = this.state.planningUnits.filter(c => c.planningUnit.id == item.planningUnit.id)[0];
         csvRow.push('"' + (i18n.t('static.supplyPlan.amcPast').replaceAll(' ', '%20') + ' : ' + ppu.monthsInPastForAmc + '"'))
         csvRow.push('"' + (i18n.t('static.supplyPlan.amcFuture').replaceAll(' ', '%20') + ' : ' + ppu.monthsInFutureForAmc + '"'))
@@ -296,7 +306,7 @@ class StockStatus extends Component {
         i18n.t('static.supplyplan.exipredStock').replaceAll(' ', '%20'),
         i18n.t('static.supplyPlan.endingBalance').replaceAll(' ', '%20'),
         i18n.t('static.report.amc').replaceAll(' ', '%20'),
-        i18n.t('static.report.mos').replaceAll(' ', '%20'),
+        item.data.length > 0 && item.data[0].planBasedOn == 1 ? i18n.t('static.report.mos').replaceAll(' ', '%20') : i18n.t('static.supplyPlan.maxQty').replaceAll(' ', '%20'),
         i18n.t('static.supplyPlan.unmetDemandStr').replaceAll(' ', '%20')
           // i18n.t('static.report.maxmonth').replaceAll(' ', '%20')]
         ])];
@@ -308,7 +318,7 @@ class StockStatus extends Component {
             item1.shipmentQty + " | " + item1.fundingSource.code + " | " + getLabelText(item1.shipmentStatus.label, this.state.lang) + " | " + item1.procurementAgent.code
           )
         }).join(' \n')).replaceAll(' ', '%20')
-          , (ele.adjustment == 0 ? ele.regionCountForStock > 0 ? ele.nationalAdjustment : "" : ele.regionCountForStock > 0 ? ele.nationalAdjustment : ele.adjustment != null ? ele.adjustment : ""), ele.expiredStock != 0 ? ele.expiredStock : '', ele.closingBalance, ele.amc != null ? this.formatAmc(ele.amc) : "", this.roundN(ele.mos), ele.unmetDemand != 0 ? ele.unmetDemand : ''])));
+          , (ele.adjustment == 0 ? ele.regionCountForStock > 0 ? ele.nationalAdjustment : "" : ele.regionCountForStock > 0 ? ele.nationalAdjustment : ele.adjustment != null ? ele.adjustment : ""), ele.expiredStock != 0 ? ele.expiredStock : '', ele.closingBalance, ele.amc != null ? this.formatAmc(ele.amc) : "", ele.planBasedOn == 1 ? this.roundN(ele.mos) : this.roundN(ele.maxStock), ele.unmetDemand != 0 ? ele.unmetDemand : ''])));
 
         console.log('A===>', A)
         for (var i = 0; i < A.length; i++) {
@@ -354,6 +364,9 @@ class StockStatus extends Component {
         var max = pageObject.max;
         var amcPast = pageObject.amcPast;
         var amcFuture = pageObject.amcFuture;
+        var planBasedOn = pageObject.planBasedOn;
+        var minStock = pageObject.minStock;
+        var distributionLeadTime=pageObject.distributionLeadTime;
 
         doc.setFontSize(12)
         doc.setFont('helvetica', 'bold')
@@ -398,9 +411,15 @@ class StockStatus extends Component {
         })
         doc.setFontSize(10)
         doc.setFont('helvetica', 'normal')
-        doc.text(i18n.t("static.report.min") + ": " + min + ", " + i18n.t("static.supplyPlan.max") + ": " + max, doc.internal.pageSize.width / 2, 110, {
-          align: 'center'
-        })
+        if (planBasedOn == 1) {
+          doc.text(i18n.t("static.report.min") + ": " + min + ", " + i18n.t("static.supplyPlan.max") + ": " + max, doc.internal.pageSize.width / 2, 110, {
+            align: 'center'
+          })
+        } else {
+          doc.text(i18n.t('static.product.minQuantity') + ": " + this.formatter(minStock) + ", " + i18n.t("static.product.distributionLeadTime") + ": " + distributionLeadTime, doc.internal.pageSize.width / 2, 110, {
+            align: 'center'
+          })
+        }
         doc.text(i18n.t("static.report.amc") + ": " + amcPast + " (" + i18n.t("static.supplyPlan.past") + "), " + amcFuture + " (" + i18n.t("static.supplyPlan.currentAndFuture") + ")", doc.internal.pageSize.width / 2, 130, {
           align: 'center'
         })
@@ -467,7 +486,7 @@ class StockStatus extends Component {
       i18n.t('static.supplyplan.exipredStock'),
       i18n.t('static.supplyPlan.endingBalance'),
       i18n.t('static.report.amc'),
-      i18n.t('static.report.mos'),
+      this.state.stockStatusList.length > 0 && this.state.stockStatusList[0].planBasedOn == 1 ? i18n.t('static.report.mos') : i18n.t('static.supplyPlan.maxQty'),
       i18n.t('static.supplyPlan.unmetDemandStr'),
       // i18n.t('static.report.maxmonth')
     ]];
@@ -478,7 +497,7 @@ class StockStatus extends Component {
         return (
           item.shipmentQty + " | " + item.fundingSource.code + " | " + getLabelText(item.shipmentStatus.label, this.state.lang) + " | " + item.procurementAgent.code)
       }).join(' \n')
-        , this.formatter(ele.adjustment == 0 ? ele.regionCountForStock > 0 ? ele.nationalAdjustment : "" : ele.regionCountForStock > 0 ? ele.nationalAdjustment : ele.adjustment), ele.expiredStock != 0 ? this.formatter(ele.expiredStock) : '', this.formatter(ele.closingBalance), this.formatter(this.formatAmc(ele.amc)), ele.mos != null ? this.formatter(this.roundN(ele.mos)) : i18n.t("static.supplyPlanFormula.na"), ele.unmetDemand != 0 ? this.formatter(ele.unmetDemand) : '']);
+        , this.formatter(ele.adjustment == 0 ? ele.regionCountForStock > 0 ? ele.nationalAdjustment : "" : ele.regionCountForStock > 0 ? ele.nationalAdjustment : ele.adjustment), ele.expiredStock != 0 ? this.formatter(ele.expiredStock) : '', this.formatter(ele.closingBalance), this.formatter(this.formatAmc(ele.amc)), ele.planBasedOn == 1 ? ele.mos != null ? this.formatter(this.roundN(ele.mos)) : i18n.t("static.supplyPlanFormula.na") : (ele.maxStock != null ? this.formatter(this.roundN(ele.maxStock)) : ""), ele.unmetDemand != 0 ? this.formatter(ele.unmetDemand) : '']);
 
     let content = {
       margin: { top: 150, bottom: 50 },
@@ -650,8 +669,9 @@ class StockStatus extends Component {
     var lastPage = doc.internal.getCurrentPageInfo().pageNumber;
     var pageArray = [];
     var ppu = this.state.planningUnits.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0];
-    pageArray.push({ "startPage": 1, "endPage": lastPage, "planningUnit": document.getElementById("planningUnitId").selectedOptions[0].text, "min": this.state.stockStatusList[0].minMos, "max": this.state.stockStatusList[0].maxMos, amcPast: ppu.monthsInPastForAmc, amcFuture: ppu.monthsInFutureForAmc });
+    pageArray.push({ "startPage": 1, "endPage": lastPage, "planningUnit": document.getElementById("planningUnitId").selectedOptions[0].text, "min": this.state.stockStatusList[0].minMos, "max": this.state.stockStatusList[0].maxMos, amcPast: ppu.monthsInPastForAmc, amcFuture: ppu.monthsInFutureForAmc, minStock: ppu.minQty,distributionLeadTime:ppu.distributionLeadTime, planBasedOn: ppu.planBasedOn });
     var list = this.state.PlanningUnitDataForExport.filter(c => c.planningUnit.id != document.getElementById("planningUnitId").value)
+    console.log("List@@@@@@@@Mohit", list)
     var count = 0;
     list.map(
       (item, itemCount) => {
@@ -681,12 +701,33 @@ class StockStatus extends Component {
             return (
               item1.shipmentQty + " | " + item1.fundingSource.code + " | " + getLabelText(item1.shipmentStatus.label, this.state.lang) + " | " + item1.procurementAgent.code)
           }).join(' \n')
-            , this.formatter(ele.adjustment == 0 ? ele.regionCountForStock > 0 ? ele.nationalAdjustment : "" : ele.regionCountForStock > 0 ? ele.nationalAdjustment : ele.adjustment), ele.expiredStock != 0 ? this.formatter(ele.expiredStock) : '', this.formatter(ele.closingBalance), this.formatter(this.formatAmc(ele.amc)), this.formatter(this.roundN(ele.mos)), ele.unmetDemand != 0 ? this.formatter(ele.unmetDemand) : '']);
+            , this.formatter(ele.adjustment == 0 ? ele.regionCountForStock > 0 ? ele.nationalAdjustment : "" : ele.regionCountForStock > 0 ? ele.nationalAdjustment : ele.adjustment), ele.expiredStock != 0 ? this.formatter(ele.expiredStock) : '', this.formatter(ele.closingBalance), this.formatter(this.formatAmc(ele.amc)), ele.planBasedOn == 1 ? this.formatter(this.roundN(ele.mos)) : this.formatter(this.roundN(ele.maxStock)), ele.unmetDemand != 0 ? this.formatter(ele.unmetDemand) : '']);
+
+        var header1 = [[{ content: i18n.t('static.common.month'), rowSpan: 2 },
+        { content: i18n.t("static.report.stock"), colSpan: 1 },
+        { content: i18n.t("static.supplyPlan.consumption"), colSpan: 2 },
+        { content: i18n.t("static.shipment.shipment"), colSpan: 2 },
+        { content: i18n.t("static.report.stock"), colSpan: 6 }
+        ],
+        [
+          i18n.t('static.supplyPlan.openingBalance'),
+          i18n.t('static.report.forecasted'),
+          i18n.t('static.report.actual'),
+          i18n.t('static.supplyPlan.qty'),
+          (i18n.t('static.supplyPlan.qty') + " | " + i18n.t('static.supplyPlan.funding') + " | " + i18n.t('static.shipmentDataEntry.shipmentStatus') + " | " + (i18n.t('static.supplyPlan.procAgent'))),
+          i18n.t('static.supplyPlan.adj'),
+          i18n.t('static.supplyplan.exipredStock'),
+          i18n.t('static.supplyPlan.endingBalance'),
+          i18n.t('static.report.amc'),
+          item.data[0].planBasedOn == 1 ? i18n.t('static.report.mos') : i18n.t('static.supplyPlan.maxQty'),
+          i18n.t('static.supplyPlan.unmetDemandStr'),
+          // i18n.t('static.report.maxmonth')
+        ]];
 
         let content = {
           margin: { top: 150, bottom: 50 },
           startY: height,
-          head: header,
+          head: header1,
           body: otherdata,
           styles: { lineWidth: 1, fontSize: 8, cellWidth: 55, halign: 'center' },
           headStyles: { fillColor: "#e5edf5", textColor: "#000", fontStyle: "normal" },
@@ -853,7 +894,7 @@ class StockStatus extends Component {
           }
         })
         var ppu = this.state.planningUnits.filter(c => c.planningUnit.id == item.planningUnit.id)[0];
-        pageArray.push({ "startPage": lastPage, "endPage": doc.internal.getCurrentPageInfo().pageNumber, "planningUnit": getLabelText(item.planningUnit.label, this.state.lang), "min": item.data[0].minMos, "max": item.data[0].maxMos, amcPast: ppu.monthsInPastForAmc, amcFuture: ppu.monthsInFutureForAmc });
+        pageArray.push({ "startPage": lastPage, "endPage": doc.internal.getCurrentPageInfo().pageNumber, "planningUnit": getLabelText(item.planningUnit.label, this.state.lang), "min": item.data[0].minMos, "max": item.data[0].maxMos, amcPast: ppu.monthsInPastForAmc, amcFuture: ppu.monthsInFutureForAmc, minStock: ppu.minQty, distributionLeadTime:ppu.distributionLeadTime, planBasedOn: ppu.planBasedOn });
         lastPage = doc.internal.getCurrentPageInfo().pageNumber;
         /*  var y = doc.lastAutoTable.finalY + 20
           var cnt=0
@@ -1155,17 +1196,17 @@ class StockStatus extends Component {
                             }
                           })
                           var conList = consumptionList.filter(c => c.actualFlag == false && (c.consumptionDate >= dt && c.consumptionDate <= enddtStr))
-                          var totalforecastConsumption = 0;
+                          var totalforecastConsumption = null;
                           conList.map(elt => {
-                            totalforecastConsumption = (totalforecastConsumption == 0) ? elt.consumptionQty : Number(totalforecastConsumption) + Number(elt.consumptionQty)
+                            totalforecastConsumption = (totalforecastConsumption == null) ? elt.consumptionQty : totalforecastConsumption + elt.consumptionQty
                           })
                           var conListAct = consumptionList.filter(c => c.actualFlag == true && (c.consumptionDate >= dt && c.consumptionDate <= enddtStr))
-                          var totalActualConsumption = 0;
+                          var totalActualConsumption = null;
                           conListAct.map(elt => {
-                            totalActualConsumption = (totalActualConsumption == 0) ? elt.consumptionQty : Number(totalActualConsumption) + Number(elt.consumptionQty)
+                            totalActualConsumption = (totalActualConsumption == null) ? elt.consumptionQty : totalActualConsumption + elt.consumptionQty
                           })
-                          // console.log(conList)
-                          // console.log(totalforecastConsumption)
+                          console.log(conList)
+                          console.log(totalforecastConsumption)
                           var json = {
                             dt: new Date(from, month - 1),
                             forecastedConsumptionQty: totalforecastConsumption,
@@ -1185,7 +1226,11 @@ class StockStatus extends Component {
                             unmetDemand: list[0].unmetDemand,
                             regionCount: list[0].regionCount,
                             regionCountForStock: list[0].regionCountForStock,
-                            nationalAdjustment: list[0].nationalAdjustment
+                            nationalAdjustment: list[0].nationalAdjustment,
+                            minStock: list[0].minStock,
+                            distributionLeadTime:pu.distributionLeadTime,
+                            maxStock: list[0].maxStock,
+                            planBasedOn: pu.planBasedOn
                           }
                         } else {
                           var json = {
@@ -1206,10 +1251,15 @@ class StockStatus extends Component {
                             regionCount: 1,
                             regionCountForStock: 0,
                             nationalAdjustment: 0,
+                            minStock: pu.minQty,
+                            maxStock: 0,
+                            planBasedOn: pu.planBasedOn,
+                            distributionLeadTime:pu.distributionLeadTime
+
                           }
                         }
                         data.push(json)
-                        // console.log(json)
+                        console.log(json)
                         if (month == this.state.rangeValue.to.month && from == to) {
                           this.setState({
                             stockStatusList: data,
@@ -1300,7 +1350,7 @@ class StockStatus extends Component {
               c.shipmentInfo.map(si => shipmentList.push(si))
             }
             );
-            console.log("ConsumptionList+++", consumptionList);
+            console.log("ConsumptionList+++", filteredResponseData);
             this.setState({
               firstMonthRegionCount: response.data.length > 0 ? response.data[0].regionCount : 1,
               firstMonthRegionCountForStock: response.data.length > 0 ? response.data[0].regionCountForStock : 0,
@@ -1652,7 +1702,11 @@ class StockStatus extends Component {
                             unmetDemand: list[0].unmetDemand,
                             regionCount: list[0].regionCount,
                             regionCountForStock: list[0].regionCountForStock,
-                            nationalAdjustment: list[0].nationalAdjustment
+                            nationalAdjustment: list[0].nationalAdjustment,
+                            minStock: list[0].minStock,
+                            maxStock: list[0].maxStock,
+                            planBasedOn: pu.planBasedOn,
+                            distributionLeadTime:pu.distributionLeadTime
                           }
                         } else {
                           var json = {
@@ -1672,205 +1726,213 @@ class StockStatus extends Component {
                             unmetDemand: 0,
                             regionCount: 1,
                             regionCountForStock: 0,
-                            nationalAdjustment: 0
+                            nationalAdjustment: 0,
+                            minStock: pu.minQty,
+                            distributionLeadTime:pu.distributionLeadTime,
+                            maxStock: 0,
+                            planBasedOn: pu.planBasedOn
                           }
                         }
                         data.push(json)
                         if (month == this.state.rangeValue.to.month && from == to) {
                           month = 12
+                          let datasets = [
+                            {
+                              label: i18n.t('static.supplyplan.exipredStock'),
+                              yAxisID: 'A',
+                              type: 'line',
+                              stack: 7,
+                              data: this.state.stockStatusList.map((item, index) => (item.expiredStock > 0 ? item.expiredStock : null)),
+                              fill: false,
+                              borderColor: 'rgb(75, 192, 192)',
+                              tension: 0.1,
+                              showLine: false,
+                              pointStyle: 'triangle',
+                              pointBackgroundColor: '#ED8944',
+                              pointBorderColor: '#212721',
+                              pointRadius: 10
+
+                            },
+                            {
+                              label: i18n.t('static.supplyPlan.delivered'),
+                              yAxisID: 'A',
+                              stack: 1,
+                              backgroundColor: '#002f6c',
+                              borderColor: 'rgba(179,181,198,1)',
+                              pointBackgroundColor: 'rgba(179,181,198,1)',
+                              pointBorderColor: '#fff',
+                              pointHoverBackgroundColor: '#fff',
+                              pointHoverBorderColor: 'rgba(179,181,198,1)',
+                              data: data.map((item, index) => {
+                                let count = 0;
+                                (item.shipmentInfo.map((ele, index) => {
+
+                                  ele.shipmentStatus.id == 7 ? count = count + ele.shipmentQty : count = count
+                                }))
+                                return count
+                              })
+                            },
+                            {
+                              label: i18n.t('static.supplyPlan.shipped'),
+                              yAxisID: 'A',
+                              stack: 1,
+                              backgroundColor: '#49A4A1',
+                              borderColor: 'rgba(179,181,198,1)',
+                              pointBackgroundColor: 'rgba(179,181,198,1)',
+                              pointBorderColor: '#fff',
+                              pointHoverBackgroundColor: '#fff',
+                              pointHoverBorderColor: 'rgba(179,181,198,1)',
+                              data: data.map((item, index) => {
+                                let count = 0;
+                                (item.shipmentInfo.map((ele, index) => {
+                                  (ele.shipmentStatus.id == 5 || ele.shipmentStatus.id == 6) ? count = count + ele.shipmentQty : count = count
+                                }))
+                                return count
+                              })
+                            },
+
+                            {
+                              label: i18n.t('static.supplyPlan.approved'),
+                              yAxisID: 'A',
+                              stack: 1,
+                              backgroundColor: '#0067B9',
+                              borderColor: 'rgba(179,181,198,1)',
+                              pointBackgroundColor: 'rgba(179,181,198,1)',
+                              pointBorderColor: '#fff',
+                              pointHoverBackgroundColor: '#fff',
+                              pointHoverBorderColor: 'rgba(179,181,198,1)',
+                              data: data.map((item, index) => {
+                                let count = 0;
+                                (item.shipmentInfo.map((ele, index) => {
+                                  (ele.shipmentStatus.id == 4) ? count = count + ele.shipmentQty : count = count
+                                }))
+                                return count
+                              })
+                            },
+                            {
+                              label: i18n.t('static.supplyPlan.planned'),
+                              backgroundColor: '#A7C6ED',
+                              borderColor: 'rgba(179,181,198,1)',
+                              pointBackgroundColor: 'rgba(179,181,198,1)',
+                              pointBorderColor: '#fff',
+                              pointHoverBackgroundColor: '#fff',
+                              pointHoverBorderColor: 'rgba(179,181,198,1)',
+                              yAxisID: 'A',
+                              stack: 1,
+                              data: data.map((item, index) => {
+                                let count = 0;
+                                (item.shipmentInfo.map((ele, index) => {
+                                  (ele.shipmentStatus.id == 1 || ele.shipmentStatus.id == 2 || ele.shipmentStatus.id == 3 || ele.shipmentStatus.id == 9) ? count = count + ele.shipmentQty : count = count
+                                }))
+                                return count
+                              })
+                            },
+                            {
+                              type: "line",
+                              yAxisID: data[0].planBasedOn == 1 ? 'B' : 'A',
+                              label: data[0].planBasedOn == 1 ? i18n.t('static.report.minmonth') : i18n.t('static.product.minQuantity'),
+                              backgroundColor: 'rgba(255,193,8,0.2)',
+                              borderColor: '#59cacc',
+                              borderStyle: 'dotted',
+                              borderDash: [10, 10],
+                              fill: '+1',
+                              backgroundColor: 'transparent',
+                              ticks: {
+                                fontSize: 2,
+                                fontColor: 'transparent',
+                              },
+                              showInLegend: true,
+                              pointStyle: 'line',
+                              pointRadius: 0,
+                              yValueFormatString: "$#,##0",
+                              lineTension: 0,
+                              data: data.map((item, index) => (data[0].planBasedOn == 1 ? item.minMos : item.minStock))
+                            }
+                            , {
+                              type: "line",
+                              yAxisID: data[0].planBasedOn == 1 ? 'B' : 'A',
+                              label: data[0].planBasedOn == 1 ? i18n.t('static.report.maxmonth') : i18n.t('static.supplyPlan.maxQty'),
+                              backgroundColor: 'rgba(0,0,0,0)',
+                              borderColor: '#59cacc',
+                              borderStyle: 'dotted',
+                              backgroundColor: 'transparent',
+                              borderDash: [10, 10],
+                              fill: true,
+                              ticks: {
+                                fontSize: 2,
+                                fontColor: 'transparent',
+                              },
+                              lineTension: 0,
+                              pointStyle: 'line',
+                              pointRadius: 0,
+                              showInLegend: true,
+                              yValueFormatString: "$#,##0",
+                              data: data.map((item, index) => (data[0].planBasedOn == 1 ? item.maxMos : item.maxStock))
+                            }
+
+                            , {
+                              type: "line",
+                              yAxisID: 'A',
+                              label: i18n.t('static.supplyPlan.consumption'),
+                              backgroundColor: 'transparent',
+                              borderColor: '#ba0c2f',
+                              ticks: {
+                                fontSize: 2,
+                                fontColor: 'transparent',
+                              },
+                              lineTension: 0,
+                              showInLegend: true,
+                              pointStyle: 'line',
+                              pointRadius: 0,
+                              yValueFormatString: "$#,##0",
+                              data: data.map((item, index) => (item.finalConsumptionQty))
+                            },
+                            {
+                              label: i18n.t('static.report.stock'),
+                              yAxisID: 'A',
+                              type: 'line',
+                              borderColor: '#cfcdc9',
+                              ticks: {
+                                fontSize: 2,
+                                fontColor: 'transparent',
+                              },
+                              lineTension: 0,
+                              pointStyle: 'line',
+                              pointRadius: 0,
+                              showInLegend: true,
+                              data: data.map((item, index) => (item.closingBalance))
+                            }
+
+                          ];
+                          if (data.length > 0 && data[0].planBasedOn == 1) {
+                            datasets.push({
+                              type: "line",
+                              yAxisID: 'B',
+                              label: i18n.t('static.report.mos'),
+                              borderColor: '#118b70',
+                              backgroundColor: 'transparent',
+                              ticks: {
+                                fontSize: 2,
+                                fontColor: 'transparent',
+                              },
+                              lineTension: 0,
+                              showInLegend: true,
+                              pointStyle: 'line',
+                              pointRadius: 0,
+                              yValueFormatString: "$#,##0",
+                              data: data.map((item, index) => {
+                                if (item.mos != '') {
+                                  return Number(Math.round(item.mos * Math.pow(10, 1)) / Math.pow(10, 1)).toFixed(1);
+                                } else {
+                                  return ''
+                                }
+                              })
+                            })
+                          }
                           var bar = {
 
                             labels: data.map((item, index) => (moment(item.dt).format('MMM YY'))),
-                            datasets: [
-                              {
-                                label: i18n.t('static.supplyplan.exipredStock'),
-                                yAxisID: 'A',
-                                type: 'line',
-                                stack: 7,
-                                data: this.state.stockStatusList.map((item, index) => (item.expiredStock > 0 ? item.expiredStock : null)),
-                                fill: false,
-                                borderColor: 'rgb(75, 192, 192)',
-                                tension: 0.1,
-                                showLine: false,
-                                pointStyle: 'triangle',
-                                pointBackgroundColor: '#ED8944',
-                                pointBorderColor: '#212721',
-                                pointRadius: 10
-
-                              },
-                              {
-                                label: i18n.t('static.supplyPlan.delivered'),
-                                yAxisID: 'A',
-                                stack: 1,
-                                backgroundColor: '#002f6c',
-                                borderColor: 'rgba(179,181,198,1)',
-                                pointBackgroundColor: 'rgba(179,181,198,1)',
-                                pointBorderColor: '#fff',
-                                pointHoverBackgroundColor: '#fff',
-                                pointHoverBorderColor: 'rgba(179,181,198,1)',
-                                data: data.map((item, index) => {
-                                  let count = 0;
-                                  (item.shipmentInfo.map((ele, index) => {
-
-                                    ele.shipmentStatus.id == 7 ? count = count + ele.shipmentQty : count = count
-                                  }))
-                                  return count
-                                })
-                              },
-                              {
-                                label: i18n.t('static.supplyPlan.shipped'),
-                                yAxisID: 'A',
-                                stack: 1,
-                                backgroundColor: '#49A4A1',
-                                borderColor: 'rgba(179,181,198,1)',
-                                pointBackgroundColor: 'rgba(179,181,198,1)',
-                                pointBorderColor: '#fff',
-                                pointHoverBackgroundColor: '#fff',
-                                pointHoverBorderColor: 'rgba(179,181,198,1)',
-                                data: data.map((item, index) => {
-                                  let count = 0;
-                                  (item.shipmentInfo.map((ele, index) => {
-                                    (ele.shipmentStatus.id == 5 || ele.shipmentStatus.id == 6) ? count = count + ele.shipmentQty : count = count
-                                  }))
-                                  return count
-                                })
-                              },
-
-                              {
-                                label: i18n.t('static.supplyPlan.approved'),
-                                yAxisID: 'A',
-                                stack: 1,
-                                backgroundColor: '#0067B9',
-                                borderColor: 'rgba(179,181,198,1)',
-                                pointBackgroundColor: 'rgba(179,181,198,1)',
-                                pointBorderColor: '#fff',
-                                pointHoverBackgroundColor: '#fff',
-                                pointHoverBorderColor: 'rgba(179,181,198,1)',
-                                data: data.map((item, index) => {
-                                  let count = 0;
-                                  (item.shipmentInfo.map((ele, index) => {
-                                    (ele.shipmentStatus.id == 4) ? count = count + ele.shipmentQty : count = count
-                                  }))
-                                  return count
-                                })
-                              },
-                              {
-                                label: i18n.t('static.supplyPlan.planned'),
-                                backgroundColor: '#A7C6ED',
-                                borderColor: 'rgba(179,181,198,1)',
-                                pointBackgroundColor: 'rgba(179,181,198,1)',
-                                pointBorderColor: '#fff',
-                                pointHoverBackgroundColor: '#fff',
-                                pointHoverBorderColor: 'rgba(179,181,198,1)',
-                                yAxisID: 'A',
-                                stack: 1,
-                                data: data.map((item, index) => {
-                                  let count = 0;
-                                  (item.shipmentInfo.map((ele, index) => {
-                                    (ele.shipmentStatus.id == 1 || ele.shipmentStatus.id == 2 || ele.shipmentStatus.id == 3 || ele.shipmentStatus.id == 9) ? count = count + ele.shipmentQty : count = count
-                                  }))
-                                  return count
-                                })
-                              },
-                              {
-                                type: "line",
-                                yAxisID: 'B',
-                                label: i18n.t('static.report.minmonth'),
-                                backgroundColor: 'rgba(255,193,8,0.2)',
-                                borderColor: '#59cacc',
-                                borderStyle: 'dotted',
-                                borderDash: [10, 10],
-                                fill: '+1',
-                                backgroundColor: 'transparent',
-                                ticks: {
-                                  fontSize: 2,
-                                  fontColor: 'transparent',
-                                },
-                                showInLegend: true,
-                                pointStyle: 'line',
-                                pointRadius: 0,
-                                yValueFormatString: "$#,##0",
-                                lineTension: 0,
-                                data: data.map((item, index) => (item.minMos))
-                              }
-                              , {
-                                type: "line",
-                                yAxisID: 'B',
-                                label: i18n.t('static.report.maxmonth'),
-                                backgroundColor: 'rgba(0,0,0,0)',
-                                borderColor: '#59cacc',
-                                borderStyle: 'dotted',
-                                backgroundColor: 'transparent',
-                                borderDash: [10, 10],
-                                fill: true,
-                                ticks: {
-                                  fontSize: 2,
-                                  fontColor: 'transparent',
-                                },
-                                lineTension: 0,
-                                pointStyle: 'line',
-                                pointRadius: 0,
-                                showInLegend: true,
-                                yValueFormatString: "$#,##0",
-                                data: data.map((item, index) => (item.maxMos))
-                              }
-                              , {
-                                type: "line",
-                                yAxisID: 'B',
-                                label: i18n.t('static.report.mos'),
-                                borderColor: '#118b70',
-                                backgroundColor: 'transparent',
-                                ticks: {
-                                  fontSize: 2,
-                                  fontColor: 'transparent',
-                                },
-                                lineTension: 0,
-                                showInLegend: true,
-                                pointStyle: 'line',
-                                pointRadius: 0,
-                                yValueFormatString: "$#,##0",
-                                data: data.map((item, index) => {
-                                  if (item.mos != '') {
-                                    return Number(Math.round(item.mos * Math.pow(10, 1)) / Math.pow(10, 1)).toFixed(1);
-                                  } else {
-                                    return ''
-                                  }
-                                })
-                              }
-                              , {
-                                type: "line",
-                                yAxisID: 'A',
-                                label: i18n.t('static.supplyPlan.consumption'),
-                                backgroundColor: 'transparent',
-                                borderColor: '#ba0c2f',
-                                ticks: {
-                                  fontSize: 2,
-                                  fontColor: 'transparent',
-                                },
-                                lineTension: 0,
-                                showInLegend: true,
-                                pointStyle: 'line',
-                                pointRadius: 0,
-                                yValueFormatString: "$#,##0",
-                                data: data.map((item, index) => (item.finalConsumptionQty))
-                              },
-                              {
-                                label: i18n.t('static.report.stock'),
-                                yAxisID: 'A',
-                                type: 'line',
-                                borderColor: '#cfcdc9',
-                                ticks: {
-                                  fontSize: 2,
-                                  fontColor: 'transparent',
-                                },
-                                lineTension: 0,
-                                pointStyle: 'line',
-                                pointRadius: 0,
-                                showInLegend: true,
-                                data: data.map((item, index) => (item.closingBalance))
-                              }
-
-                            ],
+                            datasets: datasets,
 
                           };
                           var chartOptions = {
@@ -1879,7 +1941,7 @@ class StockStatus extends Component {
                               text: ""
                             },
                             scales: {
-                              yAxes: [{
+                              yAxes: data.length > 0 && data[0].planBasedOn == 1 ? [{
                                 id: 'A',
                                 position: 'left',
                                 scaleLabel: {
@@ -1941,6 +2003,37 @@ class StockStatus extends Component {
                                   color: 'rgba(171,171,171,1)',
                                   lineWidth: 0
                                 }
+                              }] : [{
+                                id: 'A',
+                                position: 'left',
+                                scaleLabel: {
+                                  labelString: i18n.t('static.shipment.qty'),
+                                  display: true,
+                                  fontSize: "12",
+                                  fontColor: 'black'
+                                },
+                                ticks: {
+                                  beginAtZero: true,
+                                  fontColor: 'black',
+                                  callback: function (value) {
+                                    var cell1 = value
+                                    cell1 += '';
+                                    var x = cell1.split('.');
+                                    var x1 = x[0];
+                                    var x2 = x.length > 1 ? '.' + x[1] : '';
+                                    var rgx = /(\d+)(\d{3})/;
+                                    while (rgx.test(x1)) {
+                                      x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                                    }
+                                    return x1 + x2;
+
+                                  }
+
+                                }, gridLines: {
+                                  color: 'rgba(171,171,171,1)',
+                                  lineWidth: 0
+                                }
+
                               }],
                               xAxes: [{
 
@@ -1983,7 +2076,8 @@ class StockStatus extends Component {
                                   }
                                   return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
                                 }
-                              }, intersect: false,
+                              }
+                              // , intersect: false,
                             },
                             maintainAspectRatio: false,
                             legend: {
@@ -2385,7 +2479,8 @@ class StockStatus extends Component {
                     }
                     return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
                   }
-                }, intersect: false
+                }
+                // , intersect: false
               },
               maintainAspectRatio: false,
               legend: {
@@ -3126,7 +3221,101 @@ class StockStatus extends Component {
             }
             return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
           }
-        }, intersect: false
+        }
+        // , intersect: false
+      },
+      maintainAspectRatio: false,
+      legend: {
+        display: true,
+        position: 'bottom',
+        labels: {
+          usePointStyle: true,
+          fontColor: 'black'
+        }
+      }
+    }
+
+    const options1 = {
+      title: {
+        display: true,
+        text: this.state.planningUnitLabel != "" && this.state.planningUnitLabel != undefined && this.state.planningUnitLabel != null ? entityname1 + " - " + this.state.planningUnitLabel : entityname1
+      },
+      scales: {
+        yAxes: [{
+          id: 'A',
+          position: 'left',
+          scaleLabel: {
+            labelString: i18n.t('static.shipment.qty'),
+            display: true,
+            fontSize: "12",
+            fontColor: 'black'
+          },
+          ticks: {
+            beginAtZero: true,
+            fontColor: 'black',
+            callback: function (value) {
+              var cell1 = value
+              cell1 += '';
+              var x = cell1.split('.');
+              var x1 = x[0];
+              var x2 = x.length > 1 ? '.' + x[1] : '';
+              var rgx = /(\d+)(\d{3})/;
+              while (rgx.test(x1)) {
+                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+              }
+              return x1 + x2;
+
+            }
+
+          }, gridLines: {
+            color: 'rgba(171,171,171,1)',
+            lineWidth: 0
+          }
+
+        }],
+        xAxes: [{
+
+          scaleLabel: {
+            display: true,
+            labelString: i18n.t('static.common.month'),
+            fontColor: 'black',
+            fontStyle: "normal",
+            fontSize: "12"
+          },
+          ticks: {
+            fontColor: 'black',
+            fontStyle: "normal",
+            fontSize: "12"
+          },
+          gridLines: {
+            color: 'rgba(171,171,171,1)',
+            lineWidth: 0
+          }
+        }]
+      },
+
+      tooltips: {
+        enabled: false,
+        custom: CustomTooltips,
+        callbacks: {
+          label: function (tooltipItem, data) {
+
+            let label = data.labels[tooltipItem.index];
+            let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+
+            var cell1 = value
+            cell1 += '';
+            var x = cell1.split('.');
+            var x1 = x[0];
+            var x2 = x.length > 1 ? '.' + x[1] : '';
+            var rgx = /(\d+)(\d{3})/;
+            while (rgx.test(x1)) {
+              x1 = x1.replace(rgx, '$1' + ',' + '$2');
+            }
+            return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
+          }
+        }
+        // , intersect: false
       },
       maintainAspectRatio: false,
       legend: {
@@ -3145,7 +3334,7 @@ class StockStatus extends Component {
         text: ""
       },
       scales: {
-        yAxes: [{
+        yAxes: this.state.stockStatusList.length > 0 && this.state.stockStatusList[0].planBasedOn == 1 ? [{
           id: 'A',
           position: 'left',
           scaleLabel: {
@@ -3207,6 +3396,37 @@ class StockStatus extends Component {
             color: 'rgba(171,171,171,1)',
             lineWidth: 0
           }
+        }] : [{
+          id: 'A',
+          position: 'left',
+          scaleLabel: {
+            labelString: i18n.t('static.shipment.qty'),
+            display: true,
+            fontSize: "12",
+            fontColor: 'black'
+          },
+          ticks: {
+            beginAtZero: true,
+            fontColor: 'black',
+            callback: function (value) {
+              var cell1 = value
+              cell1 += '';
+              var x = cell1.split('.');
+              var x1 = x[0];
+              var x2 = x.length > 1 ? '.' + x[1] : '';
+              var rgx = /(\d+)(\d{3})/;
+              while (rgx.test(x1)) {
+                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+              }
+              return x1 + x2;
+
+            }
+
+          }, gridLines: {
+            color: 'rgba(171,171,171,1)',
+            lineWidth: 0
+          }
+
         }],
         xAxes: [{
 
@@ -3249,7 +3469,8 @@ class StockStatus extends Component {
             }
             return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
           }
-        }, intersect: false
+        }
+        // , intersect: false
       },
       maintainAspectRatio: false,
       legend: {
@@ -3261,193 +3482,197 @@ class StockStatus extends Component {
         }
       }
     }
+    let datasets = [
+      {
+        label: i18n.t('static.supplyplan.exipredStock'),
+        yAxisID: 'A',
+        type: 'line',
+        stack: 7,
+        data: this.state.stockStatusList.map((item, index) => (item.expiredStock > 0 ? item.expiredStock : null)),
+        fill: false,
+        borderColor: 'rgb(75, 192, 192)',
+        tension: 0.1,
+        showLine: false,
+        pointStyle: 'triangle',
+        pointBackgroundColor: '#ED8944',
+        pointBorderColor: '#212721',
+        pointRadius: 10
+
+      },
+      {
+        label: i18n.t('static.supplyPlan.delivered'),
+        yAxisID: 'A',
+        stack: 1,
+        backgroundColor: '#002f6c',
+        borderColor: 'rgba(179,181,198,1)',
+        pointBackgroundColor: 'rgba(179,181,198,1)',
+        pointBorderColor: '#fff',
+        pointHoverBackgroundColor: '#fff',
+        pointHoverBorderColor: 'rgba(179,181,198,1)',
+        data: this.state.stockStatusList.map((item, index) => {
+          let count = 0;
+          (item.shipmentInfo.map((ele, index) => {
+
+            ele.shipmentStatus.id == 7 ? count = count + Number(ele.shipmentQty) : count = count
+          }))
+          return count
+        })
+      },
+      {
+        label: i18n.t('static.supplyPlan.shipped'),
+        yAxisID: 'A',
+        stack: 1,
+        backgroundColor: '#49a4a1',
+        borderColor: 'rgba(179,181,198,1)',
+        pointBackgroundColor: 'rgba(179,181,198,1)',
+        pointBorderColor: '#fff',
+        pointHoverBackgroundColor: '#fff',
+        pointHoverBorderColor: 'rgba(179,181,198,1)',
+        data: this.state.stockStatusList.map((item, index) => {
+          let count = 0;
+          (item.shipmentInfo.map((ele, index) => {
+            (ele.shipmentStatus.id == 5 || ele.shipmentStatus.id == 6) ? count = count + Number(ele.shipmentQty) : count = count
+          }))
+          return count
+        })
+      },
+
+      {
+        label: i18n.t('static.supplyPlan.approved'),
+        yAxisID: 'A',
+        stack: 1,
+        backgroundColor: '#0067B9',
+        borderColor: 'rgba(179,181,198,1)',
+        pointBackgroundColor: 'rgba(179,181,198,1)',
+        pointBorderColor: '#fff',
+        pointHoverBackgroundColor: '#fff',
+        pointHoverBorderColor: 'rgba(179,181,198,1)',
+        data: this.state.stockStatusList.map((item, index) => {
+          let count = 0;
+          (item.shipmentInfo.map((ele, index) => {
+            (ele.shipmentStatus.id == 3 || ele.shipmentStatus.id == 4) ? count = count + Number(ele.shipmentQty) : count = count
+          }))
+          return count
+        })
+      },
+      {
+        label: i18n.t('static.supplyPlan.planned'),
+        backgroundColor: '#A7C6ED',
+        borderColor: 'rgba(179,181,198,1)',
+        pointBackgroundColor: 'rgba(179,181,198,1)',
+        pointBorderColor: '#fff',
+        pointHoverBackgroundColor: '#fff',
+        pointHoverBorderColor: 'rgba(179,181,198,1)',
+        yAxisID: 'A',
+        stack: 1,
+        data: this.state.stockStatusList.map((item, index) => {
+          let count = 0;
+          (item.shipmentInfo.map((ele, index) => {
+            (ele.shipmentStatus.id == 1 || ele.shipmentStatus.id == 2 || ele.shipmentStatus.id == 9) ? count = count + Number(ele.shipmentQty) : count = count
+          }))
+          return count
+        })
+      },
+      {
+        type: "line",
+        yAxisID: this.state.stockStatusList.length > 0 && this.state.stockStatusList[0].planBasedOn == 1 ? 'B' : 'A',
+        label: this.state.stockStatusList.length > 0 && this.state.stockStatusList[0].planBasedOn == 1 ? i18n.t('static.report.minmonth') : i18n.t('static.product.minQuantity'),
+        backgroundColor: 'rgba(255,193,8,0.2)',
+        borderColor: '#59cacc',
+        borderStyle: 'dotted',
+        borderDash: [10, 10],
+        fill: '+1',
+        backgroundColor: 'transparent',
+        ticks: {
+          fontSize: 2,
+          fontColor: 'transparent',
+        },
+        showInLegend: true,
+        pointStyle: 'line',
+        pointRadius: 0,
+        yValueFormatString: "$#,##0",
+        lineTension: 0,
+        data: this.state.stockStatusList.map((item, index) => (this.state.stockStatusList.length > 0 && this.state.stockStatusList[0].planBasedOn == 1 ? item.minMos : item.minStock))
+      }
+      , {
+        type: "line",
+        yAxisID: this.state.stockStatusList.length > 0 && this.state.stockStatusList[0].planBasedOn == 1 ? 'B' : 'A',
+        label: this.state.stockStatusList.length > 0 && this.state.stockStatusList[0].planBasedOn == 1 ? i18n.t('static.report.maxmonth') : i18n.t('static.supplyPlan.maxQty'),
+        backgroundColor: 'rgba(0,0,0,0)',
+        borderColor: '#59cacc',
+        borderStyle: 'dotted',
+        backgroundColor: 'transparent',
+        borderDash: [10, 10],
+        fill: true,
+        ticks: {
+          fontSize: 2,
+          fontColor: 'transparent',
+        },
+        lineTension: 0,
+        pointStyle: 'line',
+        pointRadius: 0,
+        showInLegend: true,
+        yValueFormatString: "$#,##0",
+        data: this.state.stockStatusList.map((item, index) => (this.state.stockStatusList.length > 0 && this.state.stockStatusList[0].planBasedOn == 1 ? item.maxMos : item.maxStock))
+      }
+
+      , {
+        type: "line",
+        yAxisID: 'A',
+        label: i18n.t('static.supplyPlan.consumption'),
+        backgroundColor: 'transparent',
+        borderColor: '#ba0c2f',
+        ticks: {
+          fontSize: 2,
+          fontColor: 'transparent',
+        },
+        lineTension: 0,
+        showInLegend: true,
+        pointStyle: 'line',
+        pointRadius: 0,
+        yValueFormatString: "$#,##0",
+        data: this.state.stockStatusList.map((item, index) => (item.finalConsumptionQty))
+      },
+      {
+        label: i18n.t('static.report.stock'),
+        yAxisID: 'A',
+        type: 'line',
+        borderColor: '#cfcdc9',
+        ticks: {
+          fontSize: 2,
+          fontColor: 'transparent',
+        },
+        lineTension: 0,
+        pointStyle: 'line',
+        pointRadius: 0,
+        showInLegend: true,
+        data: this.state.stockStatusList.map((item, index) => (item.closingBalance))
+      }
+
+    ]
+    if (this.state.stockStatusList.length > 0 && this.state.stockStatusList[0].planBasedOn == 1) {
+      datasets.push({
+        type: "line",
+        yAxisID: 'B',
+        label: i18n.t('static.report.mos'),
+        borderColor: '#118b70',
+        backgroundColor: 'transparent',
+        ticks: {
+          fontSize: 2,
+          fontColor: 'transparent',
+        },
+        lineTension: 0,
+        showInLegend: true,
+        pointStyle: 'line',
+        pointRadius: 0,
+        yValueFormatString: "$#,##0",
+        data: this.state.stockStatusList.map((item, index) => (item.mos != null ? this.roundN(item.mos) : item.mos))
+      })
+    }
     const bar = {
 
       labels: this.state.stockStatusList.map((item, index) => (this.dateFormatter(item.dt))),
-      datasets: [
-        {
-          label: i18n.t('static.supplyplan.exipredStock'),
-          yAxisID: 'A',
-          type: 'line',
-          stack: 7,
-          data: this.state.stockStatusList.map((item, index) => (item.expiredStock > 0 ? item.expiredStock : null)),
-          fill: false,
-          borderColor: 'rgb(75, 192, 192)',
-          tension: 0.1,
-          showLine: false,
-          pointStyle: 'triangle',
-          pointBackgroundColor: '#ED8944',
-          pointBorderColor: '#212721',
-          pointRadius: 10
-
-        },
-        {
-          label: i18n.t('static.supplyPlan.delivered'),
-          yAxisID: 'A',
-          stack: 1,
-          backgroundColor: '#002f6c',
-          borderColor: 'rgba(179,181,198,1)',
-          pointBackgroundColor: 'rgba(179,181,198,1)',
-          pointBorderColor: '#fff',
-          pointHoverBackgroundColor: '#fff',
-          pointHoverBorderColor: 'rgba(179,181,198,1)',
-          data: this.state.stockStatusList.map((item, index) => {
-            let count = 0;
-            (item.shipmentInfo.map((ele, index) => {
-
-              ele.shipmentStatus.id == 7 ? count = count + Number(ele.shipmentQty) : count = count
-            }))
-            return count
-          })
-        },
-        {
-          label: i18n.t('static.supplyPlan.shipped'),
-          yAxisID: 'A',
-          stack: 1,
-          backgroundColor: '#49a4a1',
-          borderColor: 'rgba(179,181,198,1)',
-          pointBackgroundColor: 'rgba(179,181,198,1)',
-          pointBorderColor: '#fff',
-          pointHoverBackgroundColor: '#fff',
-          pointHoverBorderColor: 'rgba(179,181,198,1)',
-          data: this.state.stockStatusList.map((item, index) => {
-            let count = 0;
-            (item.shipmentInfo.map((ele, index) => {
-              (ele.shipmentStatus.id == 5 || ele.shipmentStatus.id == 6) ? count = count + Number(ele.shipmentQty) : count = count
-            }))
-            return count
-          })
-        },
-
-        {
-          label: i18n.t('static.supplyPlan.approved'),
-          yAxisID: 'A',
-          stack: 1,
-          backgroundColor: '#0067B9',
-          borderColor: 'rgba(179,181,198,1)',
-          pointBackgroundColor: 'rgba(179,181,198,1)',
-          pointBorderColor: '#fff',
-          pointHoverBackgroundColor: '#fff',
-          pointHoverBorderColor: 'rgba(179,181,198,1)',
-          data: this.state.stockStatusList.map((item, index) => {
-            let count = 0;
-            (item.shipmentInfo.map((ele, index) => {
-              (ele.shipmentStatus.id == 3 || ele.shipmentStatus.id == 4) ? count = count + Number(ele.shipmentQty) : count = count
-            }))
-            return count
-          })
-        },
-        {
-          label: i18n.t('static.supplyPlan.planned'),
-          backgroundColor: '#A7C6ED',
-          borderColor: 'rgba(179,181,198,1)',
-          pointBackgroundColor: 'rgba(179,181,198,1)',
-          pointBorderColor: '#fff',
-          pointHoverBackgroundColor: '#fff',
-          pointHoverBorderColor: 'rgba(179,181,198,1)',
-          yAxisID: 'A',
-          stack: 1,
-          data: this.state.stockStatusList.map((item, index) => {
-            let count = 0;
-            (item.shipmentInfo.map((ele, index) => {
-              (ele.shipmentStatus.id == 1 || ele.shipmentStatus.id == 2 || ele.shipmentStatus.id == 9) ? count = count + Number(ele.shipmentQty) : count = count
-            }))
-            return count
-          })
-        },
-        {
-          type: "line",
-          yAxisID: 'B',
-          label: i18n.t('static.report.minmonth'),
-          backgroundColor: 'rgba(255,193,8,0.2)',
-          borderColor: '#59cacc',
-          borderStyle: 'dotted',
-          borderDash: [10, 10],
-          fill: '+1',
-          backgroundColor: 'transparent',
-          ticks: {
-            fontSize: 2,
-            fontColor: 'transparent',
-          },
-          showInLegend: true,
-          pointStyle: 'line',
-          pointRadius: 0,
-          yValueFormatString: "$#,##0",
-          lineTension: 0,
-          data: this.state.stockStatusList.map((item, index) => (item.minMos))
-        }
-        , {
-          type: "line",
-          yAxisID: 'B',
-          label: i18n.t('static.report.maxmonth'),
-          backgroundColor: 'rgba(0,0,0,0)',
-          borderColor: '#59cacc',
-          borderStyle: 'dotted',
-          backgroundColor: 'transparent',
-          borderDash: [10, 10],
-          fill: true,
-          ticks: {
-            fontSize: 2,
-            fontColor: 'transparent',
-          },
-          lineTension: 0,
-          pointStyle: 'line',
-          pointRadius: 0,
-          showInLegend: true,
-          yValueFormatString: "$#,##0",
-          data: this.state.stockStatusList.map((item, index) => (item.maxMos))
-        }
-        , {
-          type: "line",
-          yAxisID: 'B',
-          label: i18n.t('static.report.mos'),
-          borderColor: '#118b70',
-          backgroundColor: 'transparent',
-          ticks: {
-            fontSize: 2,
-            fontColor: 'transparent',
-          },
-          lineTension: 0,
-          showInLegend: true,
-          pointStyle: 'line',
-          pointRadius: 0,
-          yValueFormatString: "$#,##0",
-          data: this.state.stockStatusList.map((item, index) => (item.mos != null ? this.roundN(item.mos) : item.mos))
-        }
-        , {
-          type: "line",
-          yAxisID: 'A',
-          label: i18n.t('static.supplyPlan.consumption'),
-          backgroundColor: 'transparent',
-          borderColor: '#ba0c2f',
-          ticks: {
-            fontSize: 2,
-            fontColor: 'transparent',
-          },
-          lineTension: 0,
-          showInLegend: true,
-          pointStyle: 'line',
-          pointRadius: 0,
-          yValueFormatString: "$#,##0",
-          data: this.state.stockStatusList.map((item, index) => (item.finalConsumptionQty))
-        },
-        {
-          label: i18n.t('static.report.stock'),
-          yAxisID: 'A',
-          type: 'line',
-          borderColor: '#cfcdc9',
-          ticks: {
-            fontSize: 2,
-            fontColor: 'transparent',
-          },
-          lineTension: 0,
-          pointStyle: 'line',
-          pointRadius: 0,
-          showInLegend: true,
-          data: this.state.stockStatusList.map((item, index) => (item.closingBalance))
-        }
-
-      ],
+      datasets: datasets,
 
     };
 
@@ -3467,7 +3692,7 @@ class StockStatus extends Component {
             {/* <i className="icon-menu"></i><strong>Stock Status Report</strong> */}
             <div className="card-header-actions">
               <a className="card-header-action">
-                <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggleStockStatus() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span>
+                <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggle() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span>
               </a>
               <a className="card-header-action">
                 {/* <span style={{cursor: 'pointer'}} onClick={() => { this.refs.formulaeChild.toggleStockStatus() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span> */}
@@ -3579,14 +3804,15 @@ class StockStatus extends Component {
                       <div className="col-md-12 p-0">
                         <div className="col-md-12">
                           <div className="chart-wrapper chart-graph-report">
-                            <Bar id="cool-canvas" data={bar} options={options} />
+                            {this.state.stockStatusList[0].planBasedOn == 1 && <Bar id="cool-canvas" data={bar} options={options} />}
+                            {this.state.stockStatusList[0].planBasedOn == 2 && <Bar id="cool-canvas" data={bar} options={options1} />}
 
                           </div>
                           <div id="bars_div" style={{ display: "none" }}>
                             <div className="chart-wrapper chart-graph-report"><Bar id="cool-canvas-without-header" data={bar} options={optionsWithoutHeader} /></div>
                             {this.state.PlanningUnitDataForExport.filter(c => c.planningUnit.id != document.getElementById("planningUnitId").value).map((ele, index) => {
-                              console.log(index)
-                              return (<div className="chart-wrapper chart-graph-report"><Bar id={"cool-canvas" + index} data={ele.bar} options={ele.chartOptions} /></div>)
+                              return (<>{ele.data[0].planBasedOn == 1 && <div className="chart-wrapper chart-graph-report"><Bar id={"cool-canvas" + index} data={ele.bar} options={ele.chartOptions} /></div>}
+                                {ele.data[0].planBasedOn == 2 && <div className="chart-wrapper chart-graph-report"><Bar id={"cool-canvas" + index} data={ele.bar} options={ele.chartOptions} /></div>}</>)
 
                             })}
                           </div>
@@ -3604,108 +3830,110 @@ class StockStatus extends Component {
 
 
                   {this.state.show && this.state.stockStatusList.length > 0 &&
+                  <>
                     <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px' }} style={{ display: this.state.display }}>
                       <ul className="legendcommitversion list-group">
-                        <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.minStockMos")} : {this.state.stockStatusList[0].minMos}</span></li>
-                        <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.maxStockMos")} : {this.state.stockStatusList[0].maxMos}</span></li>
+                        {this.state.stockStatusList[0].planBasedOn == 1 ? <><li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.minStockMos")} : {this.formatter(this.state.stockStatusList[0].minMos)}</span></li>
+                          <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.maxStockMos")} : {this.state.stockStatusList[0].maxMos}</span></li></> : <><li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.product.minQuantity")} : {this.formatter(this.state.stockStatusList[0].minStock)}</span></li><li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.product.distributionLeadTime")} : {this.formatter(this.state.stockStatusList[0].distributionLeadTime)}</span></li>
+                        </>}
                       </ul>
-                      <ul className="legendcommitversion list-group">
-                        <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.stockBalance")}/{i18n.t("static.report.mos")} : </b></span></li>
-                        {/* <li><span className="legendcolor"></span> <span className="legendcommitversionText"><b>{i18n.t('static.supplyPlan.actualBalance')}</b></span></li> */}
-                        <li><span className="legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.projectedBalance')}</span></li>
-                        <li><span className="legendcolor" style={{ backgroundColor: "#BA0C2F" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.stockout')}</span></li>
-                        <li><span className="legendcolor" style={{ backgroundColor: "#f48521" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.lowstock')}</span></li>
-                        <li><span className="legendcolor" style={{ backgroundColor: "#118b70" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.okaystock')}</span></li>
-                        <li><span className="legendcolor" style={{ backgroundColor: "#edb944" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.overstock')}</span></li>
-                        <li><span className="legendcolor" style={{ backgroundColor: "#cfcdc9" }}></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlanFormula.na')}</span></li>
-                      </ul>
-                    </FormGroup>
+                      </FormGroup>
+                      <FormGroup className="col-md-12 mt-2 " style={{ display: this.state.display }}>
+                  <ul className="legendcommitversion list-group">
+                    {
+                      <><li><span className="legendcolor" style={{ backgroundColor: "#BA0C2F" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.stockout')}</span></li>
+                      <li><span className="legendcolor" style={{ backgroundColor: "#f48521" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.lowstock')}</span></li>
+                      <li><span className="legendcolor" style={{ backgroundColor: "#118b70" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.okaystock')}</span></li>
+                      <li><span className="legendcolor" style={{ backgroundColor: "#edb944" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.overstock')}</span></li>
+                      <li><span className="legendcolor" style={{ backgroundColor: "#cfcdc9" }}></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlanFormula.na')}</span></li></>
+                    }
+                  </ul>
+                </FormGroup>
+</>
+                      
+
                   }
-                  {this.state.show && this.state.stockStatusList.length > 0 &&
-                    <div className='fixTableHead1'>
-                      <Table className="table-striped table-bordered text-center">
+                  {this.state.show && this.state.stockStatusList.length > 0 && <Table responsive className="table-striped table-bordered text-center mt-2">
 
-                        <thead className='Theadtablesticky'>
-                          <tr>
-                            <th rowSpan="2" style={{ width: "200px" }}>{i18n.t('static.common.month')}</th>
-                            <th className="text-center" colSpan="1"> {i18n.t('static.report.stock')} </th>
-                            <th className="text-center" colSpan="2"> {i18n.t('static.supplyPlan.consumption')} </th>
-                            <th className="text-center" colSpan="2"> {i18n.t('static.shipment.shipment')} </th>
-                            <th className="text-center" colSpan="6"> {i18n.t('static.report.stock')} </th>
-                          </tr>
-                          <tr>
-                            <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.supplyPlan.openingBalance')}</th>
-                            <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.forecasted')}</th>
-                            <th className="text-center" style={{ width: "200px" }}> {i18n.t('static.report.actual')} </th>
-                            <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.qty')}</th>
-                            <th className="text-center" style={{ width: "600px" }}>{i18n.t('static.report.qty') + " | " + (i18n.t('static.budget.fundingsource') + " | " + i18n.t('static.supplyPlan.shipmentStatus') + " | " + (i18n.t('static.report.procurementAgentName')))}</th>
-                            <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.adjustmentQty')}</th>
-                            <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.supplyplan.exipredStock')}</th>
-                            <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.supplyPlan.endingBalance')}</th>
-                            <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.amc')}</th>
-                            <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.mos')}</th>
-                            <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.supplyPlan.unmetDemandStr')}</th>
-                            {/* <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.maxmonth')}</th> */}
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {
-                            this.state.stockStatusList.length > 0
-                            &&
-                            this.state.stockStatusList.map((item, idx) =>
+                    <thead>
+                      <tr>
+                        <th rowSpan="2" style={{ width: "200px" }}>{i18n.t('static.common.month')}</th>
+                        <th className="text-center" colSpan="1"> {i18n.t('static.report.stock')} </th>
+                        <th className="text-center" colSpan="2"> {i18n.t('static.supplyPlan.consumption')} </th>
+                        <th className="text-center" colSpan="2"> {i18n.t('static.shipment.shipment')} </th>
+                        <th className="text-center" colSpan="6"> {i18n.t('static.report.stock')} </th>
+                      </tr>
+                      <tr>
+                        <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.supplyPlan.openingBalance')}</th>
+                        <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.forecasted')}</th>
+                        <th className="text-center" style={{ width: "200px" }}> {i18n.t('static.report.actual')} </th>
+                        <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.qty')}</th>
+                        <th className="text-center" style={{ width: "600px" }}>{i18n.t('static.report.qty') + " | " + (i18n.t('static.budget.fundingsource') + " | " + i18n.t('static.supplyPlan.shipmentStatus') + " | " + (i18n.t('static.report.procurementAgentName')))}</th>
+                        <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.adjustmentQty')}</th>
+                        <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.supplyplan.exipredStock')}</th>
+                        <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.supplyPlan.endingBalance')}</th>
+                        <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.amc')}</th>
+                        <th className="text-center" style={{ width: "200px" }}>{this.state.stockStatusList.length > 0 && this.state.stockStatusList[0].planBasedOn == 1 ? i18n.t('static.report.mos') : i18n.t('static.supplyPlan.maxQty')}</th>
+                        <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.supplyPlan.unmetDemandStr')}</th>
+                        {/* <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.maxmonth')}</th> */}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {
+                        this.state.stockStatusList.length > 0
+                        &&
+                        this.state.stockStatusList.map((item, idx) =>
 
-                              <tr id="addr0" key={idx} >
-                                <td>
-                                  {this.dateFormatter(this.state.stockStatusList[idx].dt)}
-                                </td>
-                                {(idx == 0 ? this.state.firstMonthRegionCount : this.state.stockStatusList[idx - 1].regionCount) == (idx == 0 ? this.state.firstMonthRegionCountForStock : this.state.stockStatusList[idx - 1].regionCountForStock) ?
-                                  <td><b>{this.formatter(this.state.stockStatusList[idx].openingBalance)}</b></td> : <td>{this.formatter(this.state.stockStatusList[idx].openingBalance)}</td>}
+                          <tr id="addr0" key={idx} >
+                            <td>
+                              {this.dateFormatter(this.state.stockStatusList[idx].dt)}
+                            </td>
+                            {(idx == 0 ? this.state.firstMonthRegionCount : this.state.stockStatusList[idx - 1].regionCount) == (idx == 0 ? this.state.firstMonthRegionCountForStock : this.state.stockStatusList[idx - 1].regionCountForStock) ?
+                              <td><b>{this.formatter(this.state.stockStatusList[idx].openingBalance)}</b></td> : <td>{this.formatter(this.state.stockStatusList[idx].openingBalance)}</td>}
 
-                                <td className={this.rowtextFormatClassName(this.state.stockStatusList[idx])}>
-                                  {this.formatter(this.state.stockStatusList[idx].forecastedConsumptionQty)}
-                                </td> <td>
+                            <td className={this.rowtextFormatClassName(this.state.stockStatusList[idx])}>
+                              {this.formatter(this.state.stockStatusList[idx].forecastedConsumptionQty)}
+                            </td> <td>
 
-                                  {this.formatter(this.state.stockStatusList[idx].actualConsumptionQty)}
-                                </td>
-                                <td>
-                                  {this.formatter(this.state.stockStatusList[idx].shipmentQty)}
-                                </td>
-                                <td align="center"><table >
-                                  {this.state.stockStatusList[idx].shipmentInfo.map((item, index) => {
-                                    return (<tr  ><td padding="0">{this.formatter(item.shipmentQty) + `   |    ${item.fundingSource.code}    |    ${item.shipmentStatus.label.label_en}   |    ${item.procurementAgent.code}`}</td></tr>)
-                                    //return (<tr><td>{item.shipmentQty}</td><td>{item.fundingSource.label.label_en}</td><td>{item.shipmentStatus.label.label_en}</td></tr>)
-                                  })}</table>
-                                </td>
+                              {this.formatter(this.state.stockStatusList[idx].actualConsumptionQty)}
+                            </td>
+                            <td>
+                              {this.formatter(this.state.stockStatusList[idx].shipmentQty)}
+                            </td>
+                            <td align="center"><table >
+                              {this.state.stockStatusList[idx].shipmentInfo.map((item, index) => {
+                                return (<tr  ><td padding="0">{this.formatter(item.shipmentQty) + `   |    ${item.fundingSource.code}    |    ${item.shipmentStatus.label.label_en}   |    ${item.procurementAgent.code}`}</td></tr>)
+                                //return (<tr><td>{item.shipmentQty}</td><td>{item.fundingSource.label.label_en}</td><td>{item.shipmentStatus.label.label_en}</td></tr>)
+                              })}</table>
+                            </td>
 
-                                <td>
-                                  {this.formatter(this.state.stockStatusList[idx].adjustment == 0 ? this.state.stockStatusList[idx].regionCountForStock > 0 ? this.state.stockStatusList[idx].nationalAdjustment : "" : this.state.stockStatusList[idx].regionCountForStock > 0 ? this.state.stockStatusList[idx].nationalAdjustment : this.state.stockStatusList[idx].adjustment)}
-                                </td>
-                                <td>
-                                  {this.state.stockStatusList[idx].expiredStock != 0 ? this.formatter(this.state.stockStatusList[idx].expiredStock) : ''}
-                                </td>
-                                {this.state.stockStatusList[idx].regionCount == this.state.stockStatusList[idx].regionCountForStock ?
-                                  <td><b>{this.formatter(this.state.stockStatusList[idx].closingBalance)}</b></td> : <td>{this.formatter(this.state.stockStatusList[idx].closingBalance)}</td>}
-                                <td>
-                                  {this.formatter(this.formatAmc(this.state.stockStatusList[idx].amc))}
-                                </td>
-                                <td style={{ backgroundColor: this.state.stockStatusList[idx].mos == null ? "#cfcdc9" : this.state.stockStatusList[idx].mos == 0 ? "#BA0C2F" : this.state.stockStatusList[idx].mos < this.state.stockStatusList[idx].minMos ? "#f48521" : this.state.stockStatusList[idx].mos > this.state.stockStatusList[idx].maxMos ? "#edb944" : "#118b70" }}>
-                                  {this.state.stockStatusList[idx].mos != null ? this.roundN(this.state.stockStatusList[idx].mos) : i18n.t("static.supplyPlanFormula.na")}
-                                </td>
-                                <td>
-                                  {this.state.stockStatusList[idx].unmetDemand != 0 ? this.formatter(this.state.stockStatusList[idx].unmetDemand) : ''}
-                                </td>
-                                {/* <td>
+                            <td>
+                              {this.formatter(this.state.stockStatusList[idx].adjustment == 0 ? this.state.stockStatusList[idx].regionCountForStock > 0 ? this.state.stockStatusList[idx].nationalAdjustment : "" : this.state.stockStatusList[idx].regionCountForStock > 0 ? this.state.stockStatusList[idx].nationalAdjustment : this.state.stockStatusList[idx].adjustment)}
+                            </td>
+                            <td>
+                              {this.state.stockStatusList[idx].expiredStock != 0 ? this.formatter(this.state.stockStatusList[idx].expiredStock) : ''}
+                            </td>
+                            {this.state.stockStatusList[idx].regionCount == this.state.stockStatusList[idx].regionCountForStock ?
+                              <td  style={{backgroundColor: this.state.stockStatusList[0].planBasedOn==2?this.state.stockStatusList[idx].closingBalance == null ? "#cfcdc9" : this.state.stockStatusList[idx].closingBalance == 0 ? "#BA0C2F" : this.state.stockStatusList[idx].closingBalance < this.state.stockStatusList[idx].minStock ? "#f48521" : this.state.stockStatusList[idx].closingBalance > this.state.stockStatusList[idx].maxStock ? "#edb944" : "#118b70":"" }}><b>{this.formatter(this.state.stockStatusList[idx].closingBalance)}</b></td> : <td  style={{backgroundColor: this.state.stockStatusList[0].planBasedOn==2?this.state.stockStatusList[idx].closingBalance == null ? "#cfcdc9" : this.state.stockStatusList[idx].closingBalance == 0 ? "#BA0C2F" : this.state.stockStatusList[idx].closingBalance < this.state.stockStatusList[idx].minStock ? "#f48521" : this.state.stockStatusList[idx].closingBalance > this.state.stockStatusList[idx].maxStock ? "#edb944" : "#118b70":"" }}>{this.formatter(this.state.stockStatusList[idx].closingBalance)}</td>}
+                            <td>
+                              {this.formatter(this.formatAmc(this.state.stockStatusList[idx].amc))}
+                            </td>
+                            <td style={{backgroundColor: this.state.stockStatusList[0].planBasedOn==1?this.state.stockStatusList[idx].mos == null ? "#cfcdc9" : this.state.stockStatusList[idx].mos == 0 ? "#BA0C2F" : this.state.stockStatusList[idx].mos < this.state.stockStatusList[idx].minMos ? "#f48521" : this.state.stockStatusList[idx].mos > this.state.stockStatusList[idx].maxMos ? "#edb944" : "#118b70":"" }}>
+                              {this.state.stockStatusList[0].planBasedOn == 1 ? this.state.stockStatusList[idx].mos != null ? this.roundN(this.state.stockStatusList[idx].mos) : i18n.t("static.supplyPlanFormula.na") : this.formatter(this.state.stockStatusList[idx].maxStock)}
+                            </td>
+                            <td>
+                              {this.state.stockStatusList[idx].unmetDemand != 0 ? this.formatter(this.state.stockStatusList[idx].unmetDemand) : ''}
+                            </td>
+                            {/* <td>
                               {this.roundN(this.state.stockStatusList[idx].maxMos)}
                             </td> */}
 
-                              </tr>)
+                          </tr>)
 
-                          }
-                        </tbody>
+                      }
+                    </tbody>
 
-                      </Table>
-                    </div>
-                  }
+                  </Table>}
                 </Col>
 
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
@@ -3732,4 +3960,3 @@ class StockStatus extends Component {
 }
 
 export default StockStatus;
-
