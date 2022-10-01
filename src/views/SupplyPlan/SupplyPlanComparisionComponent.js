@@ -242,11 +242,13 @@ export default class SupplyPlanComponent extends React.Component {
         if (this.state.planBasedOn == 1) {
             csvRow.push("\"" + i18n.t("static.supplyPlan.minStockMos").replaceAll(' ', '%20') + ' : ' + this.state.minStockMoSQty + "\"")
         } else {
-            csvRow.push("\"" + i18n.t("static.supplyPlan.minQty").replaceAll(' ', '%20') + ' : ' + this.state.minQtyPpu + "\"")
+            csvRow.push("\"" + i18n.t("static.product.minQuantity").replaceAll(' ', '%20') + ' : ' + this.state.minQtyPpu + "\"")
         }
         csvRow.push("\"" + i18n.t("static.supplyPlan.reorderInterval").replaceAll(' ', '%20').replaceAll('#', '%23') + ' : ' + this.state.reorderFrequency + "\"")
         if (this.state.planBasedOn == 1) {
             csvRow.push("\"" + i18n.t("static.supplyPlan.maxStockMos").replaceAll(' ', '%20') + ' : ' + this.state.maxStockMoSQty + "\"")
+        }else{
+            csvRow.push("\"" + i18n.t("static.product.distributionLeadTime").replaceAll(' ', '%20') + ' : ' + this.state.distributionLeadTime + "\"")
         }
 
         csvRow.push('')
@@ -407,7 +409,7 @@ export default class SupplyPlanComponent extends React.Component {
                             align: 'left'
                         })
                     } else {
-                        doc.text(i18n.t('static.supplyPlan.minQty') + ' : ' + this.formatter(this.state.minQtyPpu), doc.internal.pageSize.width / 10, 130, {
+                        doc.text(i18n.t('static.product.minQuantity') + ' : ' + this.formatter(this.state.minQtyPpu), doc.internal.pageSize.width / 10, 130, {
                             align: 'left'
                         })
                     }
@@ -416,6 +418,10 @@ export default class SupplyPlanComponent extends React.Component {
                     })
                     if (this.state.planBasedOn == 1) {
                         doc.text(i18n.t('static.supplyPlan.maxStockMos') + ' : ' + this.state.maxStockMoSQty, doc.internal.pageSize.width / 10, 150, {
+                            align: 'left'
+                        })
+                    }else{
+                        doc.text(i18n.t('static.product.distributionLeadTime') + ' : ' + this.formatter(this.state.distributionLeadTime), doc.internal.pageSize.width / 10, 150, {
                             align: 'left'
                         })
                     }
@@ -1532,6 +1538,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     var cbForMonth1 = spd1.length > 0 ? spd1[0].closingBalance : 0;
                                     var cbForMonth2 = spd2.length > 0 ? spd2[0].closingBalance : 0;
                                     var cbForMonth3 = spd3.length > 0 ? spd3[0].closingBalance : 0;
+                                    var unmetDemandForMonth1=spd1.length > 0 ? spd1[0].unmetDemand : 0;
 
                                     var maxStockForMonth1 = spd1.length > 0 ? spd1[0].maxStock : 0;
                                     var minStockForMonth1 = spd1.length > 0 ? spd1[0].minStock : 0;
@@ -1570,9 +1577,9 @@ export default class SupplyPlanComponent extends React.Component {
                                     if (suggestShipment) {
                                         var suggestedOrd = 0;
                                         if (useMax) {
-                                            suggestedOrd = Number((Number(maxStockForMonth1)) - Number(jsonList[0].closingBalance) + Number(jsonList[0].unmetDemand));
+                                            suggestedOrd = Number((Number(maxStockForMonth1)) - Number(cbForMonth1) + Number(unmetDemandForMonth1));
                                         } else {
-                                            suggestedOrd = Number((Number(minStockForMonth1)) - Number(jsonList[0].closingBalance) + Number(jsonList[0].unmetDemand));
+                                            suggestedOrd = Number((Number(minStockForMonth1)) - Number(cbForMonth1) + Number(unmetDemandForMonth1));
                                         }
                                         if (suggestedOrd <= 0) {
                                             sstd = { "suggestedOrderQty": "", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) };
@@ -2387,7 +2394,7 @@ export default class SupplyPlanComponent extends React.Component {
                     data: this.state.jsonArrForGraph.map((item, index) => (item.consumption))
                 },
                 {
-                    label: this.state.planBasedOn == 1 ? i18n.t('static.supplyPlan.minStockMos') : i18n.t('static.supplyPlan.minQty'),
+                    label: this.state.planBasedOn == 1 ? i18n.t('static.supplyPlan.minStockMos') : i18n.t('static.product.minQuantity'),
                     type: 'line',
                     stack: 5,
                     yAxisID: this.state.planBasedOn == 1 ? 'B' : 'A',

@@ -41,7 +41,7 @@ class SupplyPlanFormulas extends Component {
       stockstatusacrossplaningunit: false,
       shipmentcost: false,
       stockstatusmatrix: false,
-      showtermslogic:false,
+      showtermslogic: false,
     };
     this.toggle = this.toggle.bind(this);
     this.toggleLarge = this.toggleLarge.bind(this);
@@ -156,7 +156,7 @@ class SupplyPlanFormulas extends Component {
           <ModalHeader toggle={this.toggle} className="ModalHead modal-info-Headher"><strong className="TextWhite" >{i18n.t('static.common.formulae')}</strong></ModalHeader>
           <ModalBody >
             <ListGroup style={{ height: '490px', overflowY: 'scroll' }}>
-            <ListGroupItem >
+              <ListGroupItem >
                 <ListGroupItemHeading className="formulasheading">{i18n.t('static.dataentry.adjustedConsumption')}</ListGroupItemHeading>
                 <ListGroupItemText className="formulastext">
                   <img src={adjustedConsumption} className="formula-img-mr img-fluid" />
@@ -165,15 +165,15 @@ class SupplyPlanFormulas extends Component {
 
                     {i18n.t("static.supplyPlanFormula.forecastConsumption") + " = 10,000"}<br></br>
                     {i18n.t("static.dataentry.adjustedConsumption") + " = 10,000"}<br></br></p>
-                    <p><span className="formulastext-p">{i18n.t("static.common.example") + " :"}</span><br></br>
+                  <p><span className="formulastext-p">{i18n.t("static.common.example") + " :"}</span><br></br>
                     {i18n.t("static.report.actualConsumption") + " = 10,000"}<br></br>
                     {i18n.t("static.consumption.daysofstockout") + " = 10"}<br></br>
                     {i18n.t("static.supplyPlanFormula.noOfDaysInMonth") + " = 30"}<br></br>
-                    {i18n.t("static.dataentry.adjustedConsumption") + " = "+ i18n.t("static.report.actualConsumption")+ " * "+i18n.t("static.supplyPlanFormula.noOfDaysInMonth")+" / ("+i18n.t("static.supplyPlanFormula.noOfDaysInMonth")+" - "+i18n.t("static.consumption.daysofstockout")+")"}<br></br>
+                    {i18n.t("static.dataentry.adjustedConsumption") + " = " + i18n.t("static.report.actualConsumption") + " * " + i18n.t("static.supplyPlanFormula.noOfDaysInMonth") + " / (" + i18n.t("static.supplyPlanFormula.noOfDaysInMonth") + " - " + i18n.t("static.consumption.daysofstockout") + ")"}<br></br>
                     {i18n.t("static.dataentry.adjustedConsumption") + " = 1000 * 30 / (30-10)"}<br></br>
                     {i18n.t("static.dataentry.adjustedConsumption") + " = 30000 / 20"}<br></br>
                     {i18n.t("static.dataentry.adjustedConsumption") + " = 1500"}<br></br>
-                    </p>
+                  </p>
                 </ListGroupItemText>
               </ListGroupItem>
               <ListGroupItem >
@@ -263,6 +263,20 @@ class SupplyPlanFormulas extends Component {
                 </ListGroupItemText>
               </ListGroupItem>
               <ListGroupItem >
+                <ListGroupItemHeading className="formulasheading">{i18n.t("static.supplyPlan.monthsOfStock")}</ListGroupItemHeading>
+                <ListGroupItemText className="formulastext">
+
+                  <img className="formula-img-mr img-fluid" src={mos} />
+                  <p><span className="formulastext-p">{i18n.t("static.common.example") + " :"}</span><br></br>
+                    {i18n.t("static.supplyPlanFormula.monthsOfStockEx1")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.amcEx13")}<br></br>
+                    <br></br>
+                    {i18n.t("static.supplyPlanFormula.monthsOfStockEx2")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.monthsOfStockEx3")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.monthsOfStockEx4")}</p>
+                </ListGroupItemText>
+              </ListGroupItem>
+              {/* <ListGroupItem >
                 <ListGroupItemHeading className="formulasheading">{i18n.t("static.supplyPlan.minStock")}</ListGroupItemHeading>
                 <ListGroupItemText className="formulastext">
                   <img className="formula-img-mr img-fluid" src={minstock} />
@@ -277,12 +291,12 @@ class SupplyPlanFormulas extends Component {
                     {i18n.t("static.supplyPlanFormula.minStockEx7")}<br></br>
                     {i18n.t("static.supplyPlanFormula.minStockEx8")}</p>
                 </ListGroupItemText>
-              </ListGroupItem>
-              <ListGroupItem >
-                <ListGroupItemHeading className="formulasheading">{i18n.t("static.supplyPlan.maxStock")}</ListGroupItemHeading>
-                <ListGroupItemText className="formulastext">
-                  {/* Max = AMC * MIN(MAX(MIN_MONTHS_OF_STOCK,3)+REORDER_FREQUENCY,18) */}
-                  <img className="formula-img-mr img-fluid" src={maxstock} />
+              </ListGroupItem> */}
+              {/* <ListGroupItem > */}
+              {/* <ListGroupItemHeading className="formulasheading">{i18n.t("static.supplyPlan.maxStock")}</ListGroupItemHeading> */}
+              {/* <ListGroupItemText className="formulastext"> */}
+              {/* Max = AMC * MIN(MAX(MIN_MONTHS_OF_STOCK,3)+REORDER_FREQUENCY,18) */}
+              {/* <img className="formula-img-mr img-fluid" src={maxstock} />
                   <p><span className="formulastext-p">{i18n.t("static.common.example") + " :"}</span><br></br>
                     {i18n.t("static.supplyPlanFormula.maxStockEx1")}<br></br>
                     {i18n.t("static.supplyPlanFormula.maxStockEx2")}<br></br>
@@ -295,9 +309,9 @@ class SupplyPlanFormulas extends Component {
                     {i18n.t("static.supplyPlanFormula.maxStockEx8")}<br></br>
                     {i18n.t("static.supplyPlanFormula.maxStockEx9")}<br></br>
                     {i18n.t("static.supplyPlanFormula.maxStockEx10")}<br></br>
-                    {i18n.t("static.supplyPlanFormula.maxStockEx11")}</p>
-                </ListGroupItemText>
-              </ListGroupItem>
+                    {i18n.t("static.supplyPlanFormula.maxStockEx11")}</p> */}
+              {/* </ListGroupItemText> */}
+              {/* </ListGroupItem> */}
               <ListGroupItem >
                 <ListGroupItemHeading className="formulasheading">{i18n.t('static.supplyPlan.minMonthsOfStock')}</ListGroupItemHeading>
                 <ListGroupItemText className="formulastext">
@@ -310,7 +324,9 @@ class SupplyPlanFormulas extends Component {
                     <br></br>
                     {i18n.t("static.supplyPlanFormula.minMonthOfStockEx4")}<br></br>
                     {i18n.t("static.supplyPlanFormula.minMonthOfStockEx5")}<br></br>
-                    {i18n.t("static.supplyPlanFormula.minMonthOfStockEx6")}</p>
+                    {i18n.t("static.supplyPlanFormula.minMonthOfStockEx6")}<br></br><br></br>
+                    {i18n.t("static.supplyPlanFormula.minMaxNote")}
+                  </p>
                 </ListGroupItemText>
               </ListGroupItem>
 
@@ -328,7 +344,9 @@ class SupplyPlanFormulas extends Component {
                     {i18n.t("static.supplyPlanFormula.maxMonthOfStockEx2")} <br></br>
                     {i18n.t("static.supplyPlanFormula.maxMonthOfStockEx3")}<br></br>
                     {i18n.t("static.supplyPlanFormula.maxMonthOfStockEx4")}<br></br>
-                    {i18n.t("static.supplyPlanFormula.maxMonthOfStockEx5")}</p>
+                    {i18n.t("static.supplyPlanFormula.maxMonthOfStockEx5")}<br></br><br></br>
+                    {i18n.t("static.supplyPlanFormula.minMaxNote")}
+                  </p>
                 </ListGroupItemText>
               </ListGroupItem>
               <ListGroupItem >
@@ -354,7 +372,7 @@ class SupplyPlanFormulas extends Component {
 
                   <img className="formula-img-mr img-fluid" src={suggestorder} />
                   <p><span className="formulastext-p">{i18n.t("static.common.example") + " :"}</span><br></br>
-                  <b>{i18n.t('static.supplyPlan.whenToSuggestQty1')}</b><br></br><br></br>
+                    <b>{i18n.t('static.supplyPlan.whenToSuggestQty1')}</b><br></br><br></br>
                     {i18n.t("static.supplyPlanFormula.suggestShipmentEx1")}<br></br>
                     {i18n.t("static.supplyPlanFormula.suggestShipmentEx2")}<br></br>
                     {i18n.t("static.supplyPlanFormula.suggestShipmentEx3")}<br></br>
@@ -382,21 +400,21 @@ class SupplyPlanFormulas extends Component {
 
                   <img className="formula-img-mr img-fluid" src={suggestorderqty} />
                   <p><span className="formulastext-p">{i18n.t("static.common.example") + " :"}</span><br></br>
-                  <b>{i18n.t('static.supplyPlan.whenToSuggestQty1')}</b><br></br><br></br>
+                    <b>{i18n.t('static.supplyPlan.whenToSuggestQty1')}</b><br></br><br></br>
                     {i18n.t("static.supplyPlanFormula.suggestedOrderQtyEx1")}<br></br>
                     {i18n.t("static.supplyPlanFormula.suggestedOrderQtyEx2")}<br></br>
                     <br></br>
                     {i18n.t("static.supplyPlanFormula.suggestedOrderQtyEx3")}<br></br>
                     {i18n.t("static.supplyPlanFormula.suggestedOrderQtyEx4")}<br></br>
                     {i18n.t("static.supplyPlanFormula.suggestedOrderQtyEx5")}</p><br></br>
-                    <b>{i18n.t("static.supplyPlan.whenToSuggestQty2")}</b><br></br><br></br>
-                    {i18n.t("static.supplyPlan.suggestedMaxQty1")}<br></br>
-                    {i18n.t("static.supplyPlanFormula.suggestedOrderQtyEx2")}<br></br>
-                    {i18n.t("static.supplyPlanFormula.suggestedOrderQtyEx6")}<br></br><br></br>
+                  <b>{i18n.t("static.supplyPlan.whenToSuggestQty2")}</b><br></br><br></br>
+                  {i18n.t("static.supplyPlan.suggestedMaxQty1")}<br></br>
+                  {i18n.t("static.supplyPlanFormula.suggestedOrderQtyEx2")}<br></br>
+                  {i18n.t("static.supplyPlanFormula.suggestedOrderQtyEx6")}<br></br><br></br>
 
-                    {i18n.t("static.supplyPlan.suggestedMaxQty2")}<br></br>
-                    {i18n.t("static.supplyPlanFormula.suggestedOrderQtyEx4")}<br></br>
-                    {i18n.t("static.supplyPlanFormula.suggestedOrderQtyEx5")}<br></br>
+                  {i18n.t("static.supplyPlan.suggestedMaxQty2")}<br></br>
+                  {i18n.t("static.supplyPlanFormula.suggestedOrderQtyEx4")}<br></br>
+                  {i18n.t("static.supplyPlanFormula.suggestedOrderQtyEx5")}<br></br>
                 </ListGroupItemText>
               </ListGroupItem>
 
@@ -629,23 +647,20 @@ class SupplyPlanFormulas extends Component {
                 </ListGroupItemText>
               </ListGroupItem>
               <ListGroupItem >
-                <ListGroupItemHeading className="formulasheading">{i18n.t("static.supplyPlan.maxStock")}</ListGroupItemHeading>
+                <ListGroupItemHeading className="formulasheading">{i18n.t("static.supplyPlan.maxQty")}</ListGroupItemHeading>
                 <ListGroupItemText className="formulastext">
-                  {/* Max = AMC * MIN(MAX(MIN_MONTHS_OF_STOCK,3)+REORDER_FREQUENCY,18) */}
-                  <img className="formula-img-mr img-fluid" src={maxstock} />
+
+                  <img className="formula-img-mr img-fluid" src={maxQty} />
                   <p><span className="formulastext-p">{i18n.t("static.common.example") + " :"}</span><br></br>
-                    {i18n.t("static.supplyPlanFormula.maxStockEx1")}<br></br>
-                    {i18n.t("static.supplyPlanFormula.maxStockEx2")}<br></br>
+                    {i18n.t('static.supplyPlan.maxQtyFormula1')}<br></br>
+                    {i18n.t('static.supplyPlan.maxQtyFormula2')}<br></br>
                     {i18n.t("static.supplyPlanFormula.maxStockEx3")}<br></br>
-                    {i18n.t("static.supplyPlanFormula.maxStockEx4")}<br></br>
-                    {i18n.t("static.supplyPlanFormula.maxStockEx5")}<br></br>
                     <br></br>
-                    {i18n.t("static.supplyPlanFormula.maxStockEx6")}<br></br>
-                    {i18n.t("static.supplyPlanFormula.maxStockEx7")}<br></br>
-                    {i18n.t("static.supplyPlanFormula.maxStockEx8")}<br></br>
-                    {i18n.t("static.supplyPlanFormula.maxStockEx9")}<br></br>
-                    {i18n.t("static.supplyPlanFormula.maxStockEx10")}<br></br>
-                    {i18n.t("static.supplyPlanFormula.maxStockEx11")}</p>
+                    {i18n.t('static.supplyPlan.maxQtyFormula3')}<br></br>
+                    {i18n.t('static.supplyPlan.maxQtyFormula4')}<br></br>
+                    {i18n.t('static.supplyPlan.maxQtyFormula5')}<br></br>
+                    {i18n.t('static.supplyPlan.maxQtyFormula6')}<br></br>
+                  </p>
                 </ListGroupItemText>
               </ListGroupItem>
             </ListGroup>
@@ -752,8 +767,8 @@ class SupplyPlanFormulas extends Component {
           </ModalBody>
         </Modal>
 
-         {/*Show term logic*/}
-         <Modal isOpen={this.state.showtermslogic} className={'modal-xl ' + this.props.className} >
+        {/*Show term logic*/}
+        <Modal isOpen={this.state.showtermslogic} className={'modal-xl ' + this.props.className} >
           <ModalHeader toggle={this.toggleShowTermLogic} className="ModalHead modal-info-Headher"><strong className="TextWhite">{i18n.t("static.common.formulae")}</strong></ModalHeader>
           <ModalBody >
             <ListGroup style={{ height: '300px', overflowY: 'scroll' }}>

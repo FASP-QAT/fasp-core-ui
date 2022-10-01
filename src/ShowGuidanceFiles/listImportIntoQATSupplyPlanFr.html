@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<meta name="">
+	<title>Show Guidance</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<style>
+		table, td, div, h1, p {font-family: Arial, sans-serif;line-height: 20px;}
+		body{padding: 0;margin: 0;color: #272127;}
+	
+/* .table1 td, th {
+  border: 1px solid #c8ced3;
+  text-align: left;
+  padding: 8px;
+  border-collapse: collapse!important;
+  width: 100%;
+}*/
+.table1 td {
+  border: 1px solid #c8ced3!important;
+  padding: 6px;
+  font-size: 13px;
+}
+.table1 th {
+  border: 1px solid #c8ced3!important;
+  padding: 6px;
+  font-size: 13px;
+}
+.table1 {
+  /* width: 100%; */
+  border-collapse: collapse;
+}
+a {
+    color: #205493;
+    /* text-decoration: none; */
+    background-color: transparent;
+}
+	</style>
+</head>
+<body style="margin:0;padding:0;background:#e4e5e6;">
+	<table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+		<tr>
+			<td align="center" style="padding:0;">
+				<table role="presentation" style="max-width: 910px;min-width:100%;margin-top:20px;margin-bottom:20px;border-collapse:collapse;border:1px solid #fff;border-spacing:0;text-align:left;border-radius: 0.25rem;background-color: #fff;">
+					<tr>
+						<td>
+							<table role="presentation" style="font-size:13px;width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+								<tr>
+									
+									<td style="padding:0 0 10px 0;color:#153643;">
+										<h3 style="color: #002f6c;font-weight: 600;font-size: 19px;">Importation des prévisions QAT</h3>
+										<p style="font-size: 13px;"><span style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold;">But :</span>Permettre aux utilisateurs d'importer des prévisions créées dans QAT dans des programmes de plan d'approvisionnement. Les prévisions ne peuvent être importées que si 1) elles sont validées en tant que version finale et 2) une prévision est sélectionnée pour chaque unité de planification.</p>
+										
+										<p>
+											<span style="font-size: 13px; font-weight: bold;"><u>Utilisation de cet écran:</u></span>
+                                           
+										</p>
+										<p><p style="font-size: 13px;"></p><p><b>(Etape 1)</b><ul><li>Sélectionner le programme de prévision à importer (seules les prévisions finales sont disponibles)</li><li>Sélectionner le programme du plan d'approvisionnement vers lequel importer. </li><li>Sélectionner la période des données de prévision à importer, qui sont limitées comme suit:<ul><li>Doit être compris dans la période de prévision</li><li>La consommation prévue que vous pouvez importer ne doit pas être ancienne de plus de 6 mois par rapport au mois en cours. </li><li>Si la période de prévision entière remonte à plus de 6 mois dans le passé, la prévision ne peut pas être importée et la version n'apparaîtra pas dans la liste déroulante du programme. </li></ul></li><li>Dans le tableau qui s'affiche, sélectionner et faire correspondre les unités de planification.<ul><li>Pour chaque unité de planification du module prévision, QAT requiert une unité de planification correspondante du module plan d'approvisionnement   et un facteur de conversion. QAT marque automatiquement les correspondances exactes entre les unités de planification, mais les utilisateurs peuvent remplacer à la fois les correspondances des unités de planification et le facteur de conversion. </li><li>Toutes les unités de planification du module prévision n'ont pas besoin d'être importées, cependant, toutes les unités de planification du module prévision doivent avoir une sélection dans la table de correspondance. Par exemple, dans le tableau ci-dessous, même si 2 produits ne sont pas importés, vous devrez toujours sélectionner "Ne pas importer".</li><br><img class="img-fluid" src="/importintoqatsupplyplanscreenshot-1.jpg" style="width: 971px;"></ul></li></ul></p><p><b>(Etape 2) </b>Région(s) de prévision:<ul><li>Prévision nationale au plan d'approvisionnement national<div class="pl-lg-4 pr-lg-4 pt-lg-4 table1"><table style="border-collapse: collapse;"><thead><tr><th>Région(s) de prévision</th><th>% de Prévision</th><th>Région du plan d'approvisionnement</th></tr></thead><tbody><tr><td>National</td><td>100</td><td>National</td></tr></tbody></table></div></li></ul><ul><li>Prévision multirégionale vers plan d'approvisionnement multirégional<div class="pl-lg-4 pr-lg-4 pt-lg-4 table1"><table style="border-collapse: collapse;"><thead><tr><th>Région(s) de prévision</th><th>% de Prévision</th><th>Région du plan d'approvisionnement</th></tr></thead><tbody><tr><td>Nord</td><td>100</td><td>Nord</td></tr><tr><td>Est</td><td>100</td><td>Est</td></tr><tr><td>Sud</td><td>100</td><td>Sud</td></tr></tbody></table></div></li></ul><ul><li>Prévision multirégionale au plan d'approvisionnement national -<div class="pl-lg-4 pr-lg-4 pt-lg-4 table1"><table style="border-collapse: collapse;"><thead><tr><th>Région(s) de prévision</th><th>% de Prévision</th><th>Région du plan d'approvisionnement</th></tr></thead><tbody><tr><td>Nord</td><td>100</td><td>National</td></tr><tr><td>Est</td><td>100</td><td>National</td></tr><tr><td>Sud</td><td>100</td><td>National</td></tr></tbody></table></div></li></ul><ul><li>Prévision nationale vers plan d'approvisionnement multirégional : notez que le processus d'importation doit être répété pour chaque région du plan d'approvisionnement.<div class="pl-lg-4 pr-lg-4 pt-lg-4 table1"><table style="border-collapse: collapse;"><thead><tr><th>Région(s) de prévision</th><th>% de Prévision</th><th>Région du plan d'approvisionnement</th></tr></thead><tbody><tr><td>National</td><td>20</td><td>Nord</td></tr></tbody></table></div><br><div class="pl-lg-4 pr-lg-4 pt-lg-4 table1"><table style="border-collapse: collapse;"><thead><tr><th>Région(s) de prévision</th><th>% de Prévision</th><th>Région du plan d'approvisionnement</th></tr></thead><tbody><tr><td>National</td><td>45</td><td>Sud</td></tr></tbody></table></div><br><div class="pl-lg-4 pr-lg-4 pt-lg-4 table1"><table style="border-collapse: collapse;"><thead><tr><th>Région(s) de prévision</th><th>% de Prévision</th><th>Région du plan d'approvisionnement</th></tr></thead><tbody><tr><td>National</td><td>35</td><td>Est</td></tr></tbody></table></div></li></ul></p><p><b>(Etape 3) </b><br>QAT listera chaque enregistrement de prévision à importer (une ligne pour chaque combinaison d'unité de planification, de région et de mois).<ul><li>QAT calcule la consommation prévisionnelle à importer comme suit: </li><img class="formula-img-mr img-fluid mb-lg-0" src="/ForecastedConsumptionimported.png" style="border: 1px solid rgb(255, 255, 255); margin-left: -20px;"><p>Pour l'exemple suivant:<ul><li>Une prévision nationale qui sera divisée en deux régions de 50 % chacune</li><li>L'unité de planification prévisionnelle est en pack de 3, et l'unité de planification plan d'approvisionnement est en pack de 1 (facteur de conversion = 3)</li><li>La prévision nationale pour le mois X était de 100 (paquets de 3)</li><li>Forecast of 100 * 50% * 3 = 150  (pack de 1) seront importés dans chaque région pour le mois X</li></ul></p><li>S'il existe une consommation prévisionnelle dans le plan d'approvisionnement, la cellule « Consommation actuelle prévue » sera surlignée en jaune. </li><li>la colonne Utiliser l'Importation ? permet de désélectionner les prévisions que vous ne souhaitez pas importer dans le plan d'approvisionnement. Si cette case est cochée, la consommation prévue convertie remplacera la prévision du plan d'approvisionnement. Si elle n'est pas cochée, la prévision actuelle du plan d'approvisionnement sera conservée.</li><br><img class="img-fluid" src="/importintoqatsupplyplanscreenshot-2.jpg" style="width: 971px;"></ul></p></p>
+           
+
+                                            
+				
+						
+				</td>
+				</tr>
+				
+		
+							</table>
+						</td>
+					</tr>
+					
+				</table>
+			</td>
+		</tr>
+	</table>
+</body>
+</html>

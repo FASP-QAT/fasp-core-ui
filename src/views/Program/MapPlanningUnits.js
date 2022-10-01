@@ -45,6 +45,9 @@ export default class MapPlanningUnits extends Component {
         data[9] = "";
         data[10] = "";
         data[11] = "";
+        data[12] = "";
+        data[13] = "";
+        data[14] = "";
         this.el.insertRow(
             data, 0, 1
         );
@@ -302,6 +305,7 @@ export default class MapPlanningUnits extends Component {
     }
     changed = function (instance, cell, x, y, value) {
         this.props.removeMessageText();
+        var rowData = this.el.getRowData(y);
         if (x == 0) {
             var col = ("A").concat(parseInt(y) + 1);
             if (value == "") {
@@ -411,15 +415,21 @@ export default class MapPlanningUnits extends Component {
                 }
 
             }
+            if (rowData[2] == 2) {
+                this.el.setValueFromCoords(4, y, "", true);
+                this.el.setValueFromCoords(5, y, rowData[13], true);
+                this.el.setValueFromCoords(9, y, rowData[14] != "" ? rowData[14] : 0, true);
+            } else {
+                this.el.setValueFromCoords(5, y, "", true);
+                this.el.setValueFromCoords(9, y, "", true);
+                this.el.setValueFromCoords(4, y, rowData[12], true);
+            }
         }
         //reoder frequency
         if (x == 3) {
             // var reg = /^[0-9\b]+$/;
             var reg = JEXCEL_INTEGER_REGEX;
             var col = ("D").concat(parseInt(y) + 1);
-            console.log("this.el@@@@@@@@@",y)
-            console.log("this.el@@@@@@@@@",this.el.getValue(`D0`));
-            console.log("this.el@@@@@@@@@",this.el.getValue(`D1`));
             value = this.el.getValue(`D${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -436,7 +446,6 @@ export default class MapPlanningUnits extends Component {
                 }
             }
         }
-        var rowData = this.el.getRowData(y);
         //min month of stock
         if (x == 4) {
             var reg = JEXCEL_INTEGER_REGEX
@@ -455,6 +464,9 @@ export default class MapPlanningUnits extends Component {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
                 }
+            }
+            if (value !== "") {
+                this.el.setValueFromCoords(12, y, value, true);
             }
         }
         //min qty
@@ -476,6 +488,9 @@ export default class MapPlanningUnits extends Component {
                     this.el.setComments(col, "");
                 }
             }
+            if (value !== "") {
+                this.el.setValueFromCoords(13, y, value, true);
+            }
         }
         //Distribution Lead Time
         if (x == 9) {
@@ -495,6 +510,9 @@ export default class MapPlanningUnits extends Component {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
                 }
+            }
+            if (value !== "") {
+                this.el.setValueFromCoords(14, y, value, true);
             }
         }
         //month in future amc
@@ -604,10 +622,10 @@ export default class MapPlanningUnits extends Component {
     }
 
 
-    dropdownFilter = function (o, cell, c, r, source,config) {
+    dropdownFilter = function (o, cell, c, r, source, config) {
         var mylist = [];
         // var value = (instance.jexcel.getJson(null, false)[r])[c - 1];
-        var value = o.getValueFromCoords(c-1,r);
+        var value = o.getValueFromCoords(c - 1, r);
         // AuthenticationService.setupAxiosInterceptors();
         // PlanningUnitService.getActivePlanningUnitList()
         //     .then(response => {
@@ -641,7 +659,7 @@ export default class MapPlanningUnits extends Component {
             }
             mylist.push(planningUnitJson);
         }
-        config.source=mylist;
+        config.source = mylist;
         return config;
     }
 
@@ -704,10 +722,10 @@ export default class MapPlanningUnits extends Component {
                     });
                     this.setState({ productCategoryList: listArray });
 
-                    PlanningUnitService.getActivePlanningUnitList()
-                        .then(response => {
-                            if (response.status == 200) {
-                                var listArray = response.data;
+                    // PlanningUnitService.getActivePlanningUnitList()
+                    //     .then(response => {
+                    //         if (response.status == 200) {
+                                var listArray = [];
                                 listArray.sort((a, b) => {
                                     var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
                                     var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
@@ -716,18 +734,18 @@ export default class MapPlanningUnits extends Component {
                                 this.setState({
                                     planningUnitList: listArray
                                 });
-                                for (var k = 0; k < (response.data).length; k++) {
-                                    var planningUnitJson = {
-                                        name: response.data[k].label.label_en,
-                                        id: response.data[k].planningUnitId
-                                    }
-                                    list.push(planningUnitJson);
-                                }
-                                list.sort((a, b) => {
-                                    var itemLabelA = a.name.toUpperCase(); // ignore upper and lowercase
-                                    var itemLabelB = b.name.toUpperCase(); // ignore upper and lowercase                   
-                                    return itemLabelA > itemLabelB ? 1 : -1;
-                                });
+                                // for (var k = 0; k < (response.data).length; k++) {
+                                //     var planningUnitJson = {
+                                //         name: response.data[k].label.label_en,
+                                //         id: response.data[k].planningUnitId
+                                //     }
+                                //     list.push(planningUnitJson);
+                                // }
+                                // list.sort((a, b) => {
+                                //     var itemLabelA = a.name.toUpperCase(); // ignore upper and lowercase
+                                //     var itemLabelB = b.name.toUpperCase(); // ignore upper and lowercase                   
+                                //     return itemLabelA > itemLabelB ? 1 : -1;
+                                // });
 
                                 var productDataArr = []
                                 // if (productDataArr.length == 0) {
@@ -744,6 +762,9 @@ export default class MapPlanningUnits extends Component {
                                 data[9] = "";
                                 data[10] = "";
                                 data[11] = "";
+                                data[12] = "";
+                                data[13] = "";
+                                data[14] = "";
                                 productDataArr[0] = data;
                                 // }
 
@@ -774,23 +795,25 @@ export default class MapPlanningUnits extends Component {
                                             title: i18n.t('static.programPU.planBasedOn'),
                                             type: 'dropdown',
                                             source: [{ id: 1, name: i18n.t('static.report.mos') }, { id: 2, name: i18n.t('static.report.qty') }],
+                                            tooltip: i18n.t("static.programPU.planByTooltip")
                                         },
                                         {
                                             title: i18n.t('static.report.reorderFrequencyInMonths'),
                                             type: 'numeric',
                                             textEditor: true,
-                                            // decimal: '.',
                                             mask: '#,##',
-                                            disabledMaskOnEdition: true
+                                            disabledMaskOnEdition: true,
+                                            tooltip: i18n.t("static.programPU.reorderFrequencyTooltip"),
+                                            width:120
 
                                         },
                                         {
                                             title: i18n.t('static.supplyPlan.minMonthsOfStock'),
                                             type: 'numeric',
                                             textEditor: true,
-                                            // decimal: '.',
                                             mask: '#,##',
-                                            disabledMaskOnEdition: true
+                                            disabledMaskOnEdition: true,
+                                            tooltip: i18n.t("static.programPU.minMonthsOfStockTooltip")
                                         },
                                         {
                                             title: i18n.t('static.product.minQuantity'),
@@ -798,23 +821,24 @@ export default class MapPlanningUnits extends Component {
                                             textEditor: true,
                                             // decimal:'.',
                                             mask: '#,##',
-                                            disabledMaskOnEdition: true
+                                            disabledMaskOnEdition: true,
+                                            tooltip: i18n.t("static.programPU.minQtyTooltip")
                                         },
                                         {
                                             title: i18n.t('static.program.monthfutureamc'),
                                             type: 'numeric',
                                             textEditor: true,
-                                            // decimal: '.',
                                             mask: '#,##',
-                                            disabledMaskOnEdition: true
+                                            disabledMaskOnEdition: true,
+                                            tooltip: i18n.t("static.programPU.monthsInFutureTooltip")
                                         },
                                         {
                                             title: i18n.t('static.program.monthpastamc'),
                                             type: 'numeric',
                                             textEditor: true,
-                                            // decimal: '.',
                                             mask: '#,##',
-                                            disabledMaskOnEdition: true
+                                            disabledMaskOnEdition: true,
+                                            tooltip: i18n.t("static.programPU.monthsInPastTooltip")
                                         },
                                         {
                                             title: i18n.t('static.report.procurmentAgentLeadTimeReport'),
@@ -822,7 +846,9 @@ export default class MapPlanningUnits extends Component {
                                             textEditor: true,
                                             // decimal: '.',
                                             mask: '#,##',
-                                            disabledMaskOnEdition: true
+                                            disabledMaskOnEdition: true,
+                                            tooltip:i18n.t("static.programPU.localProcurementAgentTooltip"),
+                                            width:130
                                         },
                                         {
                                             title: i18n.t('static.product.distributionLeadTime'),
@@ -830,7 +856,8 @@ export default class MapPlanningUnits extends Component {
                                             textEditor: true,
                                             // decimal:'.',
                                             mask: '#,##',
-                                            disabledMaskOnEdition: true
+                                            disabledMaskOnEdition: true,
+                                            tooltip: i18n.t("static.programPU.distributionLeadTimeTooltip")
                                         },
                                         {
                                             title: i18n.t('static.supplyPlan.shelfLife'),
@@ -838,7 +865,9 @@ export default class MapPlanningUnits extends Component {
                                             textEditor: true,
                                             // decimal: '.',
                                             mask: '#,##',
-                                            disabledMaskOnEdition: true
+                                            disabledMaskOnEdition: true,
+                                            tooltip:i18n.t("static.programPU.shelfLifeTooltip"),
+                                            width:120
                                         },
                                         {
                                             title: i18n.t('static.procurementAgentPlanningUnit.catalogPrice'),
@@ -846,12 +875,22 @@ export default class MapPlanningUnits extends Component {
                                             textEditor: true,
                                             decimal: '.',
                                             mask: '#,##.00',
-                                            disabledMaskOnEdition: true
+                                            disabledMaskOnEdition: true,
+                                            tooltip:i18n.t("static.programPU.catalogPriceTooltip"),
+                                            width:120
                                         },
-                                        // {
-                                        //     title: 'Batch Required',
-                                        //     type: 'checkbox'
-                                        // }
+                                        {
+                                            title: 'Min Mos',
+                                            type: 'hidden'
+                                        },
+                                        {
+                                            title: 'Min Qty',
+                                            type: 'hidden'
+                                        },
+                                        {
+                                            title: 'Lead Distribution Time',
+                                            type: 'hidden'
+                                        },
 
                                     ],
                                     updateTable: function (el, cell, x, y, source, value, id) {
@@ -983,6 +1022,9 @@ export default class MapPlanningUnits extends Component {
                                                         data[9] = "";
                                                         data[10] = "";
                                                         data[11] = "";
+                                                        data[12] = "";
+                                                        data[13] = "";
+                                                        data[14] = "";
                                                         // this.el.insertRow();
                                                         // var json = this.el.getJson();
                                                         obj.insertRow(data, parseInt(y), 1);
@@ -1007,6 +1049,9 @@ export default class MapPlanningUnits extends Component {
                                                         data[9] = "";
                                                         data[10] = "";
                                                         data[11] = "";
+                                                        data[12] = "";
+                                                        data[13] = "";
+                                                        data[14] = "";
                                                         obj.insertRow(data, parseInt(y));
                                                         // obj.insertRow(parseInt(y), 1);
                                                     }.bind(this)
@@ -1070,49 +1115,49 @@ export default class MapPlanningUnits extends Component {
                                 var elVar = jexcel(document.getElementById("mapPlanningUnit"), options);
                                 this.el = elVar;
                                 this.setState({ mapPlanningUnitEl: elVar, loading: false });
-                            } else {
-                                list = [];
-                            }
-                        }).catch(
-                            error => {
-                                if (error.message === "Network Error") {
-                                    this.setState({
-                                        message: 'static.unkownError',
-                                        loading: false
-                                    });
-                                } else {
-                                    switch (error.response ? error.response.status : "") {
+                        //     } else {
+                        //         list = [];
+                        //     }
+                        // }).catch(
+                        //     error => {
+                        //         if (error.message === "Network Error") {
+                        //             this.setState({
+                        //                 message: 'static.unkownError',
+                        //                 loading: false
+                        //             });
+                        //         } else {
+                        //             switch (error.response ? error.response.status : "") {
 
-                                        case 401:
-                                            this.props.history.push(`/login/static.message.sessionExpired`)
-                                            break;
-                                        case 403:
-                                            this.props.history.push(`/accessDenied`)
-                                            break;
-                                        case 500:
-                                        case 404:
-                                        case 406:
-                                            this.setState({
-                                                message: error.response.data.messageCode,
-                                                loading: false
-                                            });
-                                            break;
-                                        case 412:
-                                            this.setState({
-                                                message: error.response.data.messageCode,
-                                                loading: false
-                                            });
-                                            break;
-                                        default:
-                                            this.setState({
-                                                message: 'static.unkownError',
-                                                loading: false
-                                            });
-                                            break;
-                                    }
-                                }
-                            }
-                        );
+                        //                 case 401:
+                        //                     this.props.history.push(`/login/static.message.sessionExpired`)
+                        //                     break;
+                        //                 case 403:
+                        //                     this.props.history.push(`/accessDenied`)
+                        //                     break;
+                        //                 case 500:
+                        //                 case 404:
+                        //                 case 406:
+                        //                     this.setState({
+                        //                         message: error.response.data.messageCode,
+                        //                         loading: false
+                        //                     });
+                        //                     break;
+                        //                 case 412:
+                        //                     this.setState({
+                        //                         message: error.response.data.messageCode,
+                        //                         loading: false
+                        //                     });
+                        //                     break;
+                        //                 default:
+                        //                     this.setState({
+                        //                         message: 'static.unkownError',
+                        //                         loading: false
+                        //                     });
+                        //                     break;
+                        //             }
+                        //         }
+                        //     }
+                        // );
 
 
 
@@ -1195,15 +1240,18 @@ export default class MapPlanningUnits extends Component {
         var tr = asterisk.firstChild;
         tr.children[1].classList.add('AsteriskTheadtrTd');
         tr.children[2].classList.add('AsteriskTheadtrTd');
-        tr.children[3].classList.add('AsteriskTheadtrTd');
-        tr.children[3].title = i18n.t('static.programPU.planBasedOnTooltip');
-        tr.children[4].classList.add('AsteriskTheadtrTd');
-        tr.children[7].classList.add('AsteriskTheadtrTd');
-        tr.children[8].classList.add('AsteriskTheadtrTd');
-        tr.children[11].classList.add('AsteriskTheadtrTd');
-        tr.children[12].classList.add('AsteriskTheadtrTd');
-        tr.children[9].classList.add('AsteriskTheadtrTd');
-        tr.children[4].title = i18n.t("static.message.reorderFrequency")
+        tr.children[3].classList.add('InfoTrAsteriskTheadtrTdImage');
+        // tr.children[3].title = i18n.t('static.programPU.planBasedOnTooltip');
+        tr.children[4].classList.add('InfoTrAsteriskTheadtrTdImage');
+        tr.children[5].classList.add('InfoTr');
+        tr.children[6].classList.add('InfoTr');
+        tr.children[7].classList.add('InfoTrAsteriskTheadtrTdImage');
+        tr.children[8].classList.add('InfoTrAsteriskTheadtrTdImage');
+        tr.children[10].classList.add('InfoTr');
+        tr.children[11].classList.add('InfoTrAsteriskTheadtrTdImage');
+        tr.children[12].classList.add('InfoTrAsteriskTheadtrTdImage');
+        tr.children[9].classList.add('InfoTrAsteriskTheadtrTdImage');
+        // tr.children[4].title = i18n.t("static.message.reorderFrequency")
         var cell1 = instance.worksheets[0].getCell(`F1`)
         cell1.classList.add('readonly');
         var cell1 = instance.worksheets[0].getCell(`J1`)
@@ -1230,7 +1278,7 @@ export default class MapPlanningUnits extends Component {
                 planningUnit: {
                     id: map.get("1"),
                 },
-                reorderFrequencyInMonths: this.el.getValue(`D${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                reorderFrequencyInMonths: this.el.getValue(`M${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                 minMonthsOfStock: this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                 monthsInFutureForAmc: this.el.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                 monthsInPastForAmc: this.el.getValue(`H${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
@@ -1239,8 +1287,8 @@ export default class MapPlanningUnits extends Component {
                 catalogPrice: this.el.getValue(`L${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                 active: true,
                 programPlanningUnitId: 0,
-                minQty: this.el.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                distributionLeadTime: this.el.getValue(`J${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                minQty: this.el.getValue(`N${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                distributionLeadTime: this.el.getValue(`O${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                 planBasedOn: map.get("2")
 
             }

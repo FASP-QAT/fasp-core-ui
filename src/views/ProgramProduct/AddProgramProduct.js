@@ -315,18 +315,21 @@ class AddprogramPlanningUnit extends Component {
                                                                 data[1] = myReasponse[j].planningUnit.id;
                                                                 data[2] = myReasponse[j].planBasedOn;
                                                                 data[3] = myReasponse[j].reorderFrequencyInMonths;
-                                                                data[4] = myReasponse[j].minMonthsOfStock;
-                                                                data[5] = myReasponse[j].minQty;
+                                                                data[4] = myReasponse[j].planBasedOn == 1 ? myReasponse[j].minMonthsOfStock : "";
+                                                                data[5] = myReasponse[j].planBasedOn == 2 ? myReasponse[j].minQty : "";
                                                                 data[6] = myReasponse[j].monthsInFutureForAmc;
                                                                 data[7] = myReasponse[j].monthsInPastForAmc;
                                                                 data[8] = myReasponse[j].localProcurementLeadTime;
-                                                                data[9] = myReasponse[j].distributionLeadTime;
+                                                                data[9] = myReasponse[j].planBasedOn == 2 ? myReasponse[j].distributionLeadTime : "";
                                                                 data[10] = myReasponse[j].shelfLife;
                                                                 data[11] = myReasponse[j].catalogPrice;
                                                                 data[12] = myReasponse[j].programPlanningUnitId;
                                                                 data[13] = myReasponse[j].active;
                                                                 data[14] = 0;
                                                                 data[15] = myReasponse[j].program.id;
+                                                                data[16] = myReasponse[j].minMonthsOfStock;
+                                                                data[17] = myReasponse[j].minQty;
+                                                                data[18] = myReasponse[j].distributionLeadTime;
                                                                 productDataArr.push(data);
                                                             }
                                                         }
@@ -349,6 +352,9 @@ class AddprogramPlanningUnit extends Component {
                                                             data[13] = 1;
                                                             data[14] = 1;
                                                             data[15] = programId;
+                                                            data[16] = "";
+                                                            data[17] = "";
+                                                            data[18] = "";
                                                             productDataArr[0] = data;
                                                         }
 
@@ -361,7 +367,7 @@ class AddprogramPlanningUnit extends Component {
                                                         var options = {
                                                             data: data,
                                                             columnDrag: true,
-                                                            colWidths: [290, 290, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+                                                            // colWidths: [290, 290, 100, 100, 100, 100, 100, 100, 150, 100, 150,150],
                                                             columns: [
                                                                 {
                                                                     title: i18n.t('static.productCategory.productCategory'),
@@ -378,6 +384,7 @@ class AddprogramPlanningUnit extends Component {
                                                                     title: i18n.t('static.programPU.planBasedOn'),
                                                                     type: 'dropdown',
                                                                     source: [{ id: 1, name: i18n.t('static.report.mos') }, { id: 2, name: i18n.t('static.report.qty') }],
+                                                                    tooltip: i18n.t("static.programPU.planByTooltip")
                                                                 },
                                                                 {
                                                                     title: i18n.t('static.product.reorderFrequency'),
@@ -385,7 +392,8 @@ class AddprogramPlanningUnit extends Component {
                                                                     textEditor: true,
                                                                     // decimal:'.',
                                                                     mask: '#,##',
-                                                                    disabledMaskOnEdition: true
+                                                                    disabledMaskOnEdition: true,
+                                                                    tooltip: i18n.t("static.programPU.reorderFrequencyTooltip")
 
                                                                 },
                                                                 {
@@ -394,7 +402,8 @@ class AddprogramPlanningUnit extends Component {
                                                                     textEditor: true,
                                                                     // decimal:'.',
                                                                     mask: '#,##',
-                                                                    disabledMaskOnEdition: true
+                                                                    disabledMaskOnEdition: true,
+                                                                    tooltip: i18n.t("static.programPU.minMonthsOfStockTooltip")
                                                                 },
                                                                 {
                                                                     title: i18n.t('static.product.minQuantity'),
@@ -402,7 +411,8 @@ class AddprogramPlanningUnit extends Component {
                                                                     textEditor: true,
                                                                     // decimal:'.',
                                                                     mask: '#,##',
-                                                                    disabledMaskOnEdition: true
+                                                                    disabledMaskOnEdition: true,
+                                                                    tooltip: i18n.t("static.programPU.minQtyTooltip")
                                                                 },
                                                                 {
                                                                     title: i18n.t('static.program.monthfutureamc'),
@@ -410,7 +420,8 @@ class AddprogramPlanningUnit extends Component {
                                                                     textEditor: true,
                                                                     // decimal:'.',
                                                                     mask: '#,##',
-                                                                    disabledMaskOnEdition: true
+                                                                    disabledMaskOnEdition: true,
+                                                                    tooltip: i18n.t("static.programPU.monthsInFutureTooltip")
                                                                 },
                                                                 {
                                                                     title: i18n.t('static.program.monthpastamc'),
@@ -418,7 +429,8 @@ class AddprogramPlanningUnit extends Component {
                                                                     textEditor: true,
                                                                     // decimal:'.',
                                                                     mask: '#,##',
-                                                                    disabledMaskOnEdition: true
+                                                                    disabledMaskOnEdition: true,
+                                                                    tooltip: i18n.t("static.programPU.monthsInPastTooltip")
                                                                 },
                                                                 {
                                                                     title: i18n.t('static.product.localProcurementAgentLeadTime'),
@@ -426,7 +438,9 @@ class AddprogramPlanningUnit extends Component {
                                                                     textEditor: true,
                                                                     decimal: '.',
                                                                     mask: '#,##.00',
-                                                                    disabledMaskOnEdition: true
+                                                                    disabledMaskOnEdition: true,
+                                                                    tooltip:i18n.t("static.programPU.localProcurementAgentTooltip"),
+                                                                    width:120
                                                                 },
                                                                 {
                                                                     title: i18n.t('static.product.distributionLeadTime'),
@@ -434,7 +448,8 @@ class AddprogramPlanningUnit extends Component {
                                                                     textEditor: true,
                                                                     // decimal:'.',
                                                                     mask: '#,##',
-                                                                    disabledMaskOnEdition: true
+                                                                    disabledMaskOnEdition: true,
+                                                                    tooltip: i18n.t("static.programPU.distributionLeadTimeTooltip")
                                                                 },
                                                                 {
                                                                     title: i18n.t('static.report.shelfLife'),
@@ -442,7 +457,9 @@ class AddprogramPlanningUnit extends Component {
                                                                     textEditor: true,
                                                                     // decimal:'.',
                                                                     mask: '#,##',
-                                                                    disabledMaskOnEdition: true
+                                                                    disabledMaskOnEdition: true,
+                                                                    tooltip:i18n.t("static.programPU.shelfLifeTooltip"),
+                                                                    width:120
                                                                 },
                                                                 {
                                                                     title: i18n.t('static.procurementAgentPlanningUnit.catalogPrice'),
@@ -450,7 +467,9 @@ class AddprogramPlanningUnit extends Component {
                                                                     textEditor: true,
                                                                     // decimal:'.',
                                                                     mask: '#,##.00',
-                                                                    disabledMaskOnEdition: true
+                                                                    disabledMaskOnEdition: true,
+                                                                    tooltip:i18n.t("static.programPU.catalogPriceTooltip"),
+                                                                    width:120
                                                                 },
                                                                 {
                                                                     title: 'Id',
@@ -467,6 +486,18 @@ class AddprogramPlanningUnit extends Component {
                                                                 },
                                                                 {
                                                                     title: 'ProgramId',
+                                                                    type: 'hidden'
+                                                                },
+                                                                {
+                                                                    title: 'Min Mos',
+                                                                    type: 'hidden'
+                                                                },
+                                                                {
+                                                                    title: 'Min Qty',
+                                                                    type: 'hidden'
+                                                                },
+                                                                {
+                                                                    title: 'Distribution Lead Time',
                                                                     type: 'hidden'
                                                                 }
 
@@ -629,6 +660,9 @@ class AddprogramPlanningUnit extends Component {
                                                                                 data[13] = 1;
                                                                                 data[14] = 1;
                                                                                 data[15] = programId;
+                                                                                data[16] = "";
+                                                                                data[17] = "";
+                                                                                data[18] = "";
                                                                                 obj.insertRow(data, parseInt(y), 1);
                                                                             }.bind(this)
                                                                         });
@@ -655,6 +689,9 @@ class AddprogramPlanningUnit extends Component {
                                                                                 data[13] = 1;
                                                                                 data[14] = 1;
                                                                                 data[15] = programId;
+                                                                                data[16] = "";
+                                                                                data[17] = "";
+                                                                                data[18] = "";
                                                                                 obj.insertRow(data, parseInt(y));
                                                                             }.bind(this)
                                                                         });
@@ -960,6 +997,9 @@ class AddprogramPlanningUnit extends Component {
         data[13] = 1;
         data[14] = 1;
         data[15] = this.state.programId;
+        data[16] = "";
+        data[17] = "";
+        data[18] = "";
         this.el.insertRow(
             data, 0, 1
         );
@@ -1450,6 +1490,15 @@ class AddprogramPlanningUnit extends Component {
 
 
             }
+            if (rowData[2] == 2) {
+                this.el.setValueFromCoords(4, y, "", true);
+                this.el.setValueFromCoords(5, y, rowData[17], true);
+                this.el.setValueFromCoords(9, y, rowData[18] != "" ? rowData[18] : 0, true);
+            } else {
+                this.el.setValueFromCoords(5, y, "", true);
+                this.el.setValueFromCoords(9, y, "", true);
+                this.el.setValueFromCoords(4, y, rowData[16], true);
+            }
         }
         //Reorder frequency
         if (x == 3) {
@@ -1506,6 +1555,9 @@ class AddprogramPlanningUnit extends Component {
                     valid = true;
                 }
             }
+            if (value !== "") {
+                this.el.setValueFromCoords(16, y, value, true);
+            }
         }
         //Min Qty
         if (x == 5) {
@@ -1533,6 +1585,9 @@ class AddprogramPlanningUnit extends Component {
                     this.el.setValueFromCoords(14, y, 1, true);
                     valid = true;
                 }
+            }
+            if (value !== "") {
+                this.el.setValueFromCoords(17, y, value, true);
             }
         }
 
@@ -1562,6 +1617,9 @@ class AddprogramPlanningUnit extends Component {
                     this.el.setValueFromCoords(14, y, 1, true);
                     valid = true;
                 }
+            }
+            if (value !== "") {
+                this.el.setValueFromCoords(18, y, value, true);
             }
         }
         //Months in future for AMC
@@ -1746,15 +1804,15 @@ class AddprogramPlanningUnit extends Component {
                             id: map.get("1"),
                         },
                         reorderFrequencyInMonths: this.el.getValue(`D${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                        minMonthsOfStock: this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                        minMonthsOfStock: this.el.getValue(`Q${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                         monthsInFutureForAmc: this.el.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                         monthsInPastForAmc: this.el.getValue(`H${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                         localProcurementLeadTime: this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                         shelfLife: this.el.getValue(`K${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                         catalogPrice: this.el.getValue(`L${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                         active: map.get("13"),
-                        minQty: this.el.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                        distributionLeadTime: this.el.getValue(`J${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                        minQty: this.el.getValue(`R${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                        distributionLeadTime: this.el.getValue(`S${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                         planBasedOn: map.get("2")
                     }
                     planningUnitArray.push(planningUnitJson);
@@ -1846,14 +1904,17 @@ class AddprogramPlanningUnit extends Component {
         var tr = asterisk.firstChild;
         tr.children[1].classList.add('AsteriskTheadtrTd');
         tr.children[2].classList.add('AsteriskTheadtrTd');
-        tr.children[4].classList.add('AsteriskTheadtrTd');
-        tr.children[7].classList.add('AsteriskTheadtrTd');
-        tr.children[8].classList.add('AsteriskTheadtrTd');
-        tr.children[9].classList.add('AsteriskTheadtrTd');
-        tr.children[11].classList.add('AsteriskTheadtrTd');
-        tr.children[12].classList.add('AsteriskTheadtrTd');
-        tr.children[3].title = i18n.t('static.programPU.planBasedOnTooltip');
-        tr.children[3].classList.add('AsteriskTheadtrTd');
+        tr.children[4].classList.add('InfoTrAsteriskTheadtrTdImage');
+        tr.children[5].classList.add('InfoTr');
+        tr.children[6].classList.add('InfoTr');
+        tr.children[7].classList.add('InfoTrAsteriskTheadtrTdImage');
+        tr.children[8].classList.add('InfoTrAsteriskTheadtrTdImage');
+        tr.children[9].classList.add('InfoTrAsteriskTheadtrTdImage');
+        tr.children[10].classList.add('InfoTr');
+        tr.children[11].classList.add('InfoTrAsteriskTheadtrTdImage');
+        tr.children[12].classList.add('InfoTrAsteriskTheadtrTdImage');
+        // tr.children[3].title = i18n.t('static.programPU.planBasedOnTooltip');
+        tr.children[3].classList.add('InfoTrAsteriskTheadtrTdImage');
     }
 
     render() {

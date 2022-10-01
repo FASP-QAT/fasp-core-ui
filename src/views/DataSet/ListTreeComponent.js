@@ -25,6 +25,10 @@ import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import moment from 'moment';
 import { calculateModelingData } from '../../views/DataSet/ModelingDataCalculation2';
+import ListTreeEn from '../../../src/ShowGuidanceFiles/ManageTreeListTreeEn.html'
+import ListTreeFr from '../../../src/ShowGuidanceFiles/ManageTreeListTreeFr.html'
+import ListTreeSp from '../../../src/ShowGuidanceFiles/ManageTreeListTreeSp.html'
+import ListTreePr from '../../../src/ShowGuidanceFiles/ManageTreeListTreePr.html'
 const entityname = i18n.t('static.common.listtree');
 
 const validationSchema = function (values) {
@@ -798,6 +802,7 @@ export default class ListTreeComponent extends Component {
         // if (operationId == 3) {
         if (operationId == 3 && (treeTemplateId != "" && treeTemplateId != null)) {
             console.log("programId 1---", programId);
+            programCopy.programData = tempProgram;
             calculateModelingData(programCopy, this, programId, 0, 1, 1, treeId, false, true);
         } else {
             this.saveTreeData(operationId, tempProgram, treeTemplateId, programId, treeId, programCopy);
@@ -1143,38 +1148,22 @@ export default class ListTreeComponent extends Component {
     consolidatedDataSetList = (programId, versionId) => {
         console.log("progverId", programId, "==", versionId)
         this.setState({
-            versionId: ((versionId == null || versionId == '' || versionId == undefined) ? (this.state.versionId) : versionId)
+            versionId: ((versionId == null || versionId == '' || versionId == undefined) ? (this.state.versionId) : versionId),
+            loading: true
         }, () => {
             if (versionId != 0 && !versionId.toString().includes("(Local)")) {
-                confirmAlert({
-                    message: i18n.t('static.treeList.confirmAlert'),
-                    buttons: [
-                        {
-                            label: i18n.t('static.report.ok'),
-                            onClick: () => {
-                                DatasetService.getDatasetData(programId, versionId)
-                                    .then(response => {
-                                        if (response.status == 200) {
-                                            var responseData = response.data;
-                                            this.setState({
-                                                datasetListJexcel: responseData
-                                            }, () => {
-                                                this.getTreeList();
-                                            })
-                                        }
-                                    })
-                            }
-                        },
-                        {
-                            label: i18n.t('static.common.cancel'),
-                            onClick: () => {
-                                jexcel.destroy(document.getElementById("tableDiv"), true);
-                            }
+                DatasetService.getDatasetData(programId, versionId)
+                    .then(response => {
+                        if (response.status == 200) {
+                            var responseData = response.data;
+                            this.setState({
+                                datasetListJexcel: responseData
+                            }, () => {
+                                this.getTreeList();
+                            })
                         }
-                    ]
-                });
+                    })
             } else {
-
                 let selectedForecastProgram = this.state.downloadedProgramData.filter(c => c.programId == programId && c.currentVersion.versionId == versionId.toString().split(" ")[0])[0];
                 console.log("selectedForecastProgram===2", this.state.downloadedProgramData, "===", versionId)
                 this.setState({
@@ -1590,25 +1579,41 @@ export default class ListTreeComponent extends Component {
                             pathname: `/dataSet/buildTree/tree/${treeId}/${programId}`,
                         });
                     } else {
-                        var db1;
-                        getDatabase();
-                        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                        openRequest.onerror = function (event) {
-                            this.setState({
-                                message: i18n.t('static.program.errortext'),
-                                color: 'red'
-                            })
-                            this.hideFirstComponent()
-                        }.bind(this);
-                        openRequest.onsuccess = function (e) {
-                            db1 = e.target.result;
-                            var programDataTransaction1 = db1.transaction(['datasetDataServer'], 'readwrite');
-                            var programDataOs1 = programDataTransaction1.objectStore('datasetDataServer');
-                            var ddatasetDataServerRequest = programDataOs1.clear();
-                            ddatasetDataServerRequest.onsuccess = function (event) {
-                                this.downloadClicked(treeId);
-                            }.bind(this)
-                        }.bind(this)
+                        confirmAlert({
+                            message: i18n.t('static.treeList.confirmAlert'),
+                            buttons: [
+                                {
+                                    label: i18n.t('static.report.ok'),
+                                    onClick: () => {
+                                        var db1;
+                                        getDatabase();
+                                        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                                        openRequest.onerror = function (event) {
+                                            this.setState({
+                                                message: i18n.t('static.program.errortext'),
+                                                color: 'red'
+                                            })
+                                            this.hideFirstComponent()
+                                        }.bind(this);
+                                        openRequest.onsuccess = function (e) {
+                                            db1 = e.target.result;
+                                            var programDataTransaction1 = db1.transaction(['datasetDataServer'], 'readwrite');
+                                            var programDataOs1 = programDataTransaction1.objectStore('datasetDataServer');
+                                            var ddatasetDataServerRequest = programDataOs1.clear();
+                                            ddatasetDataServerRequest.onsuccess = function (event) {
+                                                this.downloadClicked(treeId);
+                                            }.bind(this)
+                                        }.bind(this)
+                                    }
+                                },
+                                {
+                                    label: i18n.t('static.common.cancel'),
+                                    onClick: () => {
+                                        // jexcel.destroy(document.getElementById("tableDiv"), true);
+                                    }
+                                }
+                            ]
+                        });
                     }
 
                 }
@@ -1937,8 +1942,18 @@ export default class ListTreeComponent extends Component {
                             <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
                         </ModalHeader>
                         <div>
-                            <ModalBody>
-                                <div>
+                            <ModalBody className="ModalBodyPadding">
+
+                                <div dangerouslySetInnerHTML={{
+                                    __html: localStorage.getItem('lang') == 'en' ?
+                                        ListTreeEn :
+                                        localStorage.getItem('lang') == 'fr' ?
+                                            ListTreeFr :
+                                            localStorage.getItem('lang') == 'sp' ?
+                                                ListTreeSp :
+                                                ListTreePr
+                                }} />
+                                {/* <div>
                                     <h3 className='ShowGuidanceHeading'>{i18n.t('static.listTree.manageTreeTreeList')}</h3>
                                 </div>
                                 <p>
@@ -1965,7 +1980,7 @@ export default class ListTreeComponent extends Component {
                                             <li>{i18n.t('static.listTree.submitHelpDeskTicket')} </li>
                                         </ul>
                                     </p>
-                                </p>
+                                </p> */}
 
                             </ModalBody>
                         </div>

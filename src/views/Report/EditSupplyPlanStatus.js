@@ -48,13 +48,13 @@ const entityname = i18n.t('static.report.problem');
 const validationSchemaForAddingProblem = function (values) {
     return Yup.object().shape({
         problemDescription: Yup.string()
-            .matches(/^[^'":]+$/, i18n.t("static.label.someSpecialCaseNotAllowed"))
+            .matches(/^[^'":\\]+$/, i18n.t("static.label.someSpecialCaseNotAllowed"))
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.editStatus.problemDescText')),
         modelPlanningUnitId: Yup.string()
             .required(i18n.t('static.procurementUnit.validPlanningUnitText')),
         suggession: Yup.string()
-            .matches(/^[^'":]+$/, i18n.t('static.label.someSpecialCaseNotAllowed'))
+            .matches(/^[^'":\\]+$/, i18n.t('static.label.someSpecialCaseNotAllowed'))
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.editStatus.problemSuggestionText')),
         modelCriticalityId: Yup.string()
@@ -1897,6 +1897,7 @@ class EditSupplyPlanStatus extends Component {
                                     var cbForMonth1 = spd1.length > 0 ? spd1[0].closingBalance : 0;
                                     var cbForMonth2 = spd2.length > 0 ? spd2[0].closingBalance : 0;
                                     var cbForMonth3 = spd3.length > 0 ? spd3[0].closingBalance : 0;
+                                    var unmetDemandForMonth1=spd1.length > 0 ? spd1[0].unmetDemand : 0;
 
                                     var maxStockForMonth1 = spd1.length > 0 ? spd1[0].maxStock : 0;
                                     var minStockForMonth1 = spd1.length > 0 ? spd1[0].minStock : 0;
@@ -1935,9 +1936,9 @@ class EditSupplyPlanStatus extends Component {
                                     if (suggestShipment) {
                                         var suggestedOrd = 0;
                                         if (useMax) {
-                                            suggestedOrd = Number((Number(maxStockForMonth1)) - Number(jsonList[0].closingBalance) + Number(jsonList[0].unmetDemand));
+                                            suggestedOrd = Number((Number(maxStockForMonth1)) - Number(cbForMonth1) + Number(unmetDemandForMonth1));
                                         } else {
-                                            suggestedOrd = Number((Number(minStockForMonth1)) - Number(jsonList[0].closingBalance) + Number(jsonList[0].unmetDemand));
+                                            suggestedOrd = Number((Number(minStockForMonth1)) - Number(cbForMonth1) + Number(unmetDemandForMonth1));
                                         }
                                         if (suggestedOrd <= 0) {
                                             sstd = { "suggestedOrderQty": "", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) };
@@ -2865,7 +2866,7 @@ class EditSupplyPlanStatus extends Component {
                     data: this.state.jsonArrForGraph.map((item, index) => (item.consumption))
                 },
                 {
-                    label: this.state.planBasedOn == 1 ? i18n.t('static.supplyPlan.minStockMos') : i18n.t('static.supplyPlan.minQty'),
+                    label: this.state.planBasedOn == 1 ? i18n.t('static.supplyPlan.minStockMos') : i18n.t('static.product.minQuantity'),
                     type: 'line',
                     stack: 5,
                     yAxisID: this.state.planBasedOn == 1 ? 'B' : 'A',
@@ -3015,9 +3016,9 @@ class EditSupplyPlanStatus extends Component {
                                             <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.planningUnitSettings")} : </b></span></li>
                                             <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.amcPastOrFuture")} : {this.state.monthsInPastForAMC}/{this.state.monthsInFutureForAMC}</span></li>
                                             <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.report.shelfLife")} : {this.state.shelfLife}</span></li>
-                                            {this.state.planBasedOn == 1 ? <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.minStockMos")} : {this.state.minStockMoSQty}</span></li> : <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.minQty")} : {this.formatter(this.state.minQtyPpu)}</span></li>}
+                                            {this.state.planBasedOn == 1 ? <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.minStockMos")} : {this.state.minStockMoSQty}</span></li> : <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.product.minQuantity")} : {this.formatter(this.state.minQtyPpu)}</span></li>}
                                             <li><span className="lightgreenlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.reorderInterval")} : {this.state.reorderFrequency}</span></li>
-                                            {this.state.planBasedOn == 1 && <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.maxStockMos")} : {this.state.maxStockMoSQty}</span></li>}
+                                            {this.state.planBasedOn == 1 ? <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.maxStockMos")} : {this.state.maxStockMoSQty}</span></li> : <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.product.distributionLeadTime")} : {this.formatter(this.state.distributionLeadTime)}</span></li>}
                                         </ul>
                                     </FormGroup>
                                     <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px' }} style={{ display: this.state.display }}>
