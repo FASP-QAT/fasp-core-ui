@@ -383,8 +383,15 @@ export default class TreeExtrapolationComponent extends React.Component {
             this.getDateDifference();
 
             var rangeValue = value;
+            let stopDate;
             let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
-            let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
+            let forecastStopDate = this.props.items.forecastStopDate;
+            let rangeStopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
+            if (moment(forecastStopDate).format('YYYY-MM-DD') > moment(rangeStopDate).format('YYYY-MM-DD')) {
+                stopDate = forecastStopDate;
+            } else {
+                stopDate = rangeStopDate;
+            }
             var minStartDate = moment(startDate).format('YYYY-MM-DD');
             console.log("minStartDate---", minStartDate);
             var monthArray = [];
@@ -474,7 +481,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                         });
                     this.setState({
                         minMonth: valList.length > 0 ? valList[0].month : jexcelData[0].month,
-                        maxMonth: valList.length > 0 ? valList[valList.length - 1].month : jexcelData[jexcelData.length -1].month
+                        maxMonth: valList.length > 0 ? valList[valList.length - 1].month : jexcelData[jexcelData.length - 1].month
                     }, () => {
                         console.log("!!!min month---", this.state.minMonth);
                         console.log("!!!max month---", this.state.maxMonth);
@@ -643,13 +650,14 @@ export default class TreeExtrapolationComponent extends React.Component {
                 }
                 semiAveragesData.push(semiAveragesJson);
 
-                var linearRegressionJson = {
-                    month: map1.get("0"),
-                    amount: map1.get("6") != "" && map1.get("6") != null ? map1.get("6").toString().replaceAll("%", "") : null,
-                    ci: this.state.linearRegressionData.filter(x => x.month == count)[0].ci
+                if (this.state.linearRegressionData.length > 0) {
+                    var linearRegressionJson = {
+                        month: map1.get("0"),
+                        amount: map1.get("6") != "" && map1.get("6") != null ? map1.get("6").toString().replaceAll("%", "") : null,
+                        ci: this.state.linearRegressionData.filter(x => x.month == count)[0].ci
+                    }
+                    linearRegressionData.push(linearRegressionJson);
                 }
-                linearRegressionData.push(linearRegressionJson);
-
 
                 if (this.state.tesData.length > 0) {
                     console.log("result here rama---", map1.get("7") != "" && map1.get("7") != null && map1.get("7") != 'NaN' ? "A" : "B");
@@ -1412,6 +1420,9 @@ export default class TreeExtrapolationComponent extends React.Component {
                         changed: 1
                     }, () => {
                         var month = this.props.items.currentScenario.month;
+                        let forecastStopDate = this.props.items.forecastStopDate;
+                        // let rangeStopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
+
                         // var forecastStartDate = this.props.items.forecastStartDate;
                         // var forecastStopDate = this.props.items.forecastStopDate;
                         // var minStartDate = month;
@@ -1449,6 +1460,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                             console.log("inside temp data if");
                             console.log("tempStartDate---", tempStartDate);
                             console.log("tempStopDate", tempStopDate);
+
                             rangeValue1 = { from: { year: Number(moment(tempStartDate).startOf('month').format("YYYY")), month: Number(moment(tempStartDate).startOf('month').format("M")) }, to: { year: Number(moment(tempStopDate).startOf('month').format("YYYY")), month: Number(moment(tempStopDate).startOf('month').format("M")) } };
                             this.setState({ nodeDataExtrapolation },
                                 () => {
@@ -1459,8 +1471,15 @@ export default class TreeExtrapolationComponent extends React.Component {
                             rangeValue1 = { from: { year: Number(moment(this.props.items.currentScenario.nodeDataExtrapolation.startDate).startOf('month').format("YYYY")), month: Number(moment(this.props.items.currentScenario.nodeDataExtrapolation.startDate).startOf('month').format("M")) }, to: { year: Number(moment(this.props.items.currentScenario.nodeDataExtrapolation.stopDate).startOf('month').format("YYYY")), month: Number(moment(this.props.items.currentScenario.nodeDataExtrapolation.stopDate).startOf('month').format("M")) } };
                         }
                         console.log("rangeValue123---", rangeValue1);
+                        let stopDate;
                         let startDate = rangeValue1.from.year + '-' + rangeValue1.from.month + '-01';
-                        let stopDate = rangeValue1.to.year + '-' + rangeValue1.to.month + '-' + new Date(rangeValue1.to.year, rangeValue1.to.month, 0).getDate();
+                        let rangeStopDate = rangeValue1.to.year + '-' + rangeValue1.to.month + '-' + new Date(rangeValue1.to.year, rangeValue1.to.month, 0).getDate();
+                        if (moment(forecastStopDate).format('YYYY-MM-DD') > moment(rangeStopDate).format('YYYY-MM-DD')) {
+                            stopDate = forecastStopDate;
+                        } else {
+                            stopDate = rangeStopDate;
+                        }
+
                         var minStartDate = startDate;
                         // console.log("month---", month);
                         // console.log("forecastStartDate---", forecastStartDate);
@@ -1541,7 +1560,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                     console.log("movingAvgDataTemp---", nodeDataExtrapolationOptionList[i].extrapolationOptionDataList)
                                     if (movingAvgDataTemp.length > 0) {
                                         for (let i = 0; i < movingAvgDataTemp.length; i++) {
-                                            console.log("i value for ma---",i);
+                                            console.log("i value for ma---", i);
                                             var mvData = extrapolationDataList.filter(x => moment(x.month).format('YYYY-MM') == moment(movingAvgDataTemp[i].month).format('YYYY-MM'));
                                             json = {
                                                 month: parseInt(i + 1),
@@ -2800,14 +2819,14 @@ export default class TreeExtrapolationComponent extends React.Component {
 
         var data2 = this.state.jexcelDataArr.map((item, index) =>
         (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM')
-                || (moment(this.state.minMonth).format('YYYY-MM') <= moment(item.month).format('YYYY-MM'))
+            || (moment(this.state.minMonth).format('YYYY-MM') <= moment(item.month).format('YYYY-MM'))
             ? "Inside if data " : "Inside else data"));
         console.log("Stop Date 8&&&", data2);
 
         var data3 = this.state.jexcelDataArr.map((item, index) =>
         (
             (item.amount == "" || item.amount == null)
-            ? "Inside if data " : "Inside else data"));
+                ? "Inside if data " : "Inside else data"));
         console.log("Stop Date 9&&&", data3);
 
         if (this.state.nodeDataExtrapolation != null && this.state.nodeDataExtrapolation.extrapolationMethod != null && this.state.nodeDataExtrapolation.extrapolationMethod.id == 7) {
