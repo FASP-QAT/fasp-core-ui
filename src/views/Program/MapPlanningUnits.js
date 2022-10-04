@@ -722,10 +722,10 @@ export default class MapPlanningUnits extends Component {
                     });
                     this.setState({ productCategoryList: listArray });
 
-                    // PlanningUnitService.getActivePlanningUnitList()
-                    //     .then(response => {
-                    //         if (response.status == 200) {
-                                var listArray = [];
+                    PlanningUnitService.getActivePlanningUnitList()
+                        .then(response => {
+                            if (response.status == 200) {
+                                var listArray = response.data;
                                 listArray.sort((a, b) => {
                                     var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
                                     var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
@@ -734,18 +734,18 @@ export default class MapPlanningUnits extends Component {
                                 this.setState({
                                     planningUnitList: listArray
                                 });
-                                // for (var k = 0; k < (response.data).length; k++) {
-                                //     var planningUnitJson = {
-                                //         name: response.data[k].label.label_en,
-                                //         id: response.data[k].planningUnitId
-                                //     }
-                                //     list.push(planningUnitJson);
-                                // }
-                                // list.sort((a, b) => {
-                                //     var itemLabelA = a.name.toUpperCase(); // ignore upper and lowercase
-                                //     var itemLabelB = b.name.toUpperCase(); // ignore upper and lowercase                   
-                                //     return itemLabelA > itemLabelB ? 1 : -1;
-                                // });
+                                for (var k = 0; k < (response.data).length; k++) {
+                                    var planningUnitJson = {
+                                        name: response.data[k].label.label_en,
+                                        id: response.data[k].planningUnitId
+                                    }
+                                    list.push(planningUnitJson);
+                                }
+                                list.sort((a, b) => {
+                                    var itemLabelA = a.name.toUpperCase(); // ignore upper and lowercase
+                                    var itemLabelB = b.name.toUpperCase(); // ignore upper and lowercase                   
+                                    return itemLabelA > itemLabelB ? 1 : -1;
+                                });
 
                                 var productDataArr = []
                                 // if (productDataArr.length == 0) {
@@ -801,16 +801,18 @@ export default class MapPlanningUnits extends Component {
                                             title: i18n.t('static.report.reorderFrequencyInMonths'),
                                             type: 'numeric',
                                             textEditor: true,
+                                            // decimal: '.',
                                             mask: '#,##',
                                             disabledMaskOnEdition: true,
                                             tooltip: i18n.t("static.programPU.reorderFrequencyTooltip"),
-                                            width:120
+                                            width: 120
 
                                         },
                                         {
                                             title: i18n.t('static.supplyPlan.minMonthsOfStock'),
                                             type: 'numeric',
                                             textEditor: true,
+                                            // decimal: '.',
                                             mask: '#,##',
                                             disabledMaskOnEdition: true,
                                             tooltip: i18n.t("static.programPU.minMonthsOfStockTooltip")
@@ -828,6 +830,7 @@ export default class MapPlanningUnits extends Component {
                                             title: i18n.t('static.program.monthfutureamc'),
                                             type: 'numeric',
                                             textEditor: true,
+                                            // decimal: '.',
                                             mask: '#,##',
                                             disabledMaskOnEdition: true,
                                             tooltip: i18n.t("static.programPU.monthsInFutureTooltip")
@@ -836,6 +839,7 @@ export default class MapPlanningUnits extends Component {
                                             title: i18n.t('static.program.monthpastamc'),
                                             type: 'numeric',
                                             textEditor: true,
+                                            // decimal: '.',
                                             mask: '#,##',
                                             disabledMaskOnEdition: true,
                                             tooltip: i18n.t("static.programPU.monthsInPastTooltip")
@@ -847,8 +851,8 @@ export default class MapPlanningUnits extends Component {
                                             // decimal: '.',
                                             mask: '#,##',
                                             disabledMaskOnEdition: true,
-                                            tooltip:i18n.t("static.programPU.localProcurementAgentTooltip"),
-                                            width:130
+                                            tooltip: i18n.t("static.programPU.localProcurementAgentTooltip"),
+                                            width: 130
                                         },
                                         {
                                             title: i18n.t('static.product.distributionLeadTime'),
@@ -866,8 +870,8 @@ export default class MapPlanningUnits extends Component {
                                             // decimal: '.',
                                             mask: '#,##',
                                             disabledMaskOnEdition: true,
-                                            tooltip:i18n.t("static.programPU.shelfLifeTooltip"),
-                                            width:120
+                                            tooltip: i18n.t("static.programPU.shelfLifeTooltip"),
+                                            width: 120
                                         },
                                         {
                                             title: i18n.t('static.procurementAgentPlanningUnit.catalogPrice'),
@@ -876,8 +880,8 @@ export default class MapPlanningUnits extends Component {
                                             decimal: '.',
                                             mask: '#,##.00',
                                             disabledMaskOnEdition: true,
-                                            tooltip:i18n.t("static.programPU.catalogPriceTooltip"),
-                                            width:120
+                                            tooltip: i18n.t("static.programPU.catalogPriceTooltip"),
+                                            width: 120
                                         },
                                         {
                                             title: 'Min Mos',
@@ -1115,49 +1119,49 @@ export default class MapPlanningUnits extends Component {
                                 var elVar = jexcel(document.getElementById("mapPlanningUnit"), options);
                                 this.el = elVar;
                                 this.setState({ mapPlanningUnitEl: elVar, loading: false });
-                        //     } else {
-                        //         list = [];
-                        //     }
-                        // }).catch(
-                        //     error => {
-                        //         if (error.message === "Network Error") {
-                        //             this.setState({
-                        //                 message: 'static.unkownError',
-                        //                 loading: false
-                        //             });
-                        //         } else {
-                        //             switch (error.response ? error.response.status : "") {
+                            } else {
+                                list = [];
+                            }
+                        }).catch(
+                            error => {
+                                if (error.message === "Network Error") {
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
+                                } else {
+                                    switch (error.response ? error.response.status : "") {
 
-                        //                 case 401:
-                        //                     this.props.history.push(`/login/static.message.sessionExpired`)
-                        //                     break;
-                        //                 case 403:
-                        //                     this.props.history.push(`/accessDenied`)
-                        //                     break;
-                        //                 case 500:
-                        //                 case 404:
-                        //                 case 406:
-                        //                     this.setState({
-                        //                         message: error.response.data.messageCode,
-                        //                         loading: false
-                        //                     });
-                        //                     break;
-                        //                 case 412:
-                        //                     this.setState({
-                        //                         message: error.response.data.messageCode,
-                        //                         loading: false
-                        //                     });
-                        //                     break;
-                        //                 default:
-                        //                     this.setState({
-                        //                         message: 'static.unkownError',
-                        //                         loading: false
-                        //                     });
-                        //                     break;
-                        //             }
-                        //         }
-                        //     }
-                        // );
+                                        case 401:
+                                            this.props.history.push(`/login/static.message.sessionExpired`)
+                                            break;
+                                        case 403:
+                                            this.props.history.push(`/accessDenied`)
+                                            break;
+                                        case 500:
+                                        case 404:
+                                        case 406:
+                                            this.setState({
+                                                message: error.response.data.messageCode,
+                                                loading: false
+                                            });
+                                            break;
+                                        case 412:
+                                            this.setState({
+                                                message: error.response.data.messageCode,
+                                                loading: false
+                                            });
+                                            break;
+                                        default:
+                                            this.setState({
+                                                message: 'static.unkownError',
+                                                loading: false
+                                            });
+                                            break;
+                                    }
+                                }
+                            }
+                        );
 
 
 

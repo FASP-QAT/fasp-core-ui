@@ -341,7 +341,7 @@ class EditSupplyPlanStatus extends Component {
             }
         }
 
-        if (x == 10 || x == 20) {
+        if (x == 10 || x == 20 || x == 21) {
             var rowData = elInstance.getRowData(y);
             // console.log("problemStatus on server ***", problemList[0].problemStatus.id);
             // console.log("current problem status ***", rowData[10]);
@@ -349,7 +349,7 @@ class EditSupplyPlanStatus extends Component {
             // console.log("current problem status ***", rowData[20]);
             // console.log("condition1***", problemList[0].problemStatus.id != rowData[10]);
             // console.log("condition2***", problemList[0].reviewed.toString() != rowData[20].toString());
-            if ((problemList[0].problemStatus.id != rowData[10]) || (problemList[0].reviewed.toString() != rowData[20].toString())) {
+            if ((problemList[0].problemStatus.id != rowData[10]) || (problemList[0].reviewed.toString() != rowData[20].toString()) || (problemList[0].reviewNotes.toString() != rowData[21].toString())) {
                 // console.log("in if***");
                 elInstance.setValueFromCoords(22, y, 1, true);
             } else {
