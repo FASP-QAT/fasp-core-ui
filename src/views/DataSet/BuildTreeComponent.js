@@ -6964,7 +6964,7 @@ export default class BuildTree extends Component {
 
         if (event.target.name === "sharePlanningUnit") {
             console.log("event.target.name",event.target.value);
-            (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.sharePlanningUnit = event.target.value;
+            (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.sharePlanningUnit = event.target.id === "sharePlanningUnitFalse" ? false : true;
             this.qatCalculatedPUPerVisit(0);
             this.getUsageText();
         }
