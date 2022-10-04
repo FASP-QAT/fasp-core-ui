@@ -606,7 +606,7 @@ class Program extends Component {
         console.log(">>>", changed);
         confirmAlert({
             title: i18n.t('static.program.confirm'),
-            message: changed == 1 ? "Changes are not saved still do you want to delete this version." : "Delete this version",
+            message: changed == 1 ?  i18n.t('static.loadDelDataset.changesNotSaved') : i18n.t('static.loadDelDataset.deleteThisLocalVersion'),
             buttons: [
                 {
                     label: i18n.t('static.program.yes'),
@@ -845,6 +845,7 @@ class Program extends Component {
                                 <Button type="button" size="md" color="success" className="float-right mr-1" onClick={() => this.downloadClicked()}><i className="fa fa-check"></i>{i18n.t('static.common.download')}</Button>
                             </CardFooter>
                         </Card>
+                        <span align="right">{i18n.t("static.loadProgram.loadProgramNotePart1")}{" '"}<a href="/#/report/supplyPlanVersionAndReview" target="_blank">{i18n.t('static.report.supplyplanversionandreviewReport')}</a>{"' "}{i18n.t('static.loadProgram.loadProgramNotePart2')}</span>
                     </Col>
                 </Row>
 
@@ -964,7 +965,7 @@ class Program extends Component {
         confirmAlert({
             title: i18n.t('static.program.confirmsubmit'),
             // message: changed == 1 ? "Changes are not saved still do you want to delete this version." : "Delete this version",
-            message: "Do you want to clean up this program?",
+            message: i18n.t('static.program.cleanUpConfirmation'),
             buttons: [
                 {
                     label: i18n.t('static.program.yes'),

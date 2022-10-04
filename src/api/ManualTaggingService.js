@@ -8,13 +8,13 @@ class ManualTaggingSerice {
         });
     }
 
-    getShipmentLinkingNotification(json) {
-        return axios.post(`${API_URL}/api/shipmentLinkingNotification/`, json, {
+    getShipmentLinkingNotification(programId,versionId) {
+        return axios.get(`${API_URL}/api/erpLinking/shipmentLinkingNotification/programId/${programId}/versionId/${versionId}`, {
         });
     }
 
     updateNotification(json) {
-        return axios.post(`${API_URL}/api/updateNotification/`, json, {
+        return axios.put(`${API_URL}/api/erpLinking/updateNotification/`, json, {
         });
     }
 
@@ -23,13 +23,13 @@ class ManualTaggingSerice {
         });
     }
 
-    getARTMISHistory(orderNo, primeLineNo) {
-        return axios.get(`${API_URL}/api/artmisHistory/${orderNo}/${primeLineNo}`, {
+    getARTMISHistory(roNo, roPrimeLineNo) {
+        return axios.get(`${API_URL}/api/erpLinking/artmisHistory/${roNo}/${roPrimeLineNo}`, {
         });
     }
 
     getNotificationCount() {
-        return axios.get(`${API_URL}/api/getNotificationCount`, {
+        return axios.get(`${API_URL}/api/erpLinking/getNotificationCount`, {
         });
     }
     getOrderDetailsByOrderNoAndPrimeLineNo(roNoOrderNo, programId, erpPlanningUnitId, linkingType, parentShipmentId) {
@@ -61,7 +61,7 @@ class ManualTaggingSerice {
     }
 
     getNotificationSummary() {
-        return axios.get(`${API_URL}/api/getNotificationSummary/`, {
+        return axios.get(`${API_URL}/api/erpLinking/getNotificationSummary/`, {
         });
     }
 
@@ -71,13 +71,19 @@ class ManualTaggingSerice {
         });
     }
 
-    autocompleteDataOrderNo(roNo, programId, erpPlanningUnit) {
-        return axios.get(`${API_URL}/api/erpLinking/autoCompleteOrder/${programId}/${erpPlanningUnit}/${roNo}`, {
+    autocompleteDataOrderNo(roNo, programId, erpPlanningUnit,qatPlanningUnit) {
+        return axios.get(`${API_URL}/api/erpLinking/autoCompleteOrder/${programId}/${erpPlanningUnit}/${roNo}/${qatPlanningUnit}`, {
         });
     }
 
-    autocompletePlanningUnit(planningUnitId, term) {
-        return axios.get(`${API_URL}/api/erpLinking/autoCompletePu/${planningUnitId}/${term}`, {
+    autocompletePlanningUnit(planningUnitId, term,programId) {
+        var json={
+            planningUnitId:planningUnitId,
+            puName:term,
+            programId:programId
+        }
+        console.log("Planning Unit @@@@@@@@@@@@@@@@",json)
+        return axios.post(`${API_URL}/api/erpLinking/autoCompletePu`, json,{
         });
     }
 
@@ -94,6 +100,11 @@ class ManualTaggingSerice {
     getLinkedQatShipments(programId, versionId, json) {
         console.log('Json@@@@@@@@@', json)
         return axios.post(`${API_URL}/api/erpLinking/linkedShipments/programId/${programId}/versionId/${versionId}`, json, {
+        });
+    }
+
+    getDataBasedOnRoNoAndRoPrimeLineNo(json) {
+        return axios.post(`${API_URL}/api/erpLinking/batchDetails`, json, {
         });
     }
 

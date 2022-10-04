@@ -35,13 +35,19 @@ export default class MapPlanningUnits extends Component {
         var data = [];
         data[0] = "-1";
         data[1] = "";
-        data[2] = "";
+        data[2] = 1;
         data[3] = "";
-        data[4] = MONTHS_IN_FUTURE_FOR_AMC;
-        data[5] = MONTHS_IN_PAST_FOR_AMC;
-        data[6] = "";
-        data[7] = "";
+        data[4] = "";
+        data[5] = "";
+        data[6] = MONTHS_IN_FUTURE_FOR_AMC;
+        data[7] = MONTHS_IN_PAST_FOR_AMC;
         data[8] = "";
+        data[9] = "";
+        data[10] = "";
+        data[11] = "";
+        data[12] = "";
+        data[13] = "";
+        data[14] = "";
         this.el.insertRow(
             data, 0, 1
         );
@@ -94,28 +100,18 @@ export default class MapPlanningUnits extends Component {
                 }
 
             }
-            //reorder frequency
             var col = ("C").concat(parseInt(y) + 1);
-            value = this.el.getValue(`C${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-            var reg = JEXCEL_INTEGER_REGEX
+            var value = this.el.getValueFromCoords(2, y);
             if (value === "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                 valid = false;
             } else {
-                if (isNaN(parseInt(value)) || !(reg.test(value))) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                    valid = false;
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                }
-
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
             }
-            //min month of stock
+            //reorder frequency
             var col = ("D").concat(parseInt(y) + 1);
             value = this.el.getValue(`D${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             var reg = JEXCEL_INTEGER_REGEX
@@ -136,9 +132,72 @@ export default class MapPlanningUnits extends Component {
                 }
 
             }
-            //month in future amc
+            //min month of stock
             var col = ("E").concat(parseInt(y) + 1);
             value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            var reg = JEXCEL_INTEGER_REGEX
+            if (json[y][2] == 1 && value === "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                if ((isNaN(parseInt(value)) || !(reg.test(value))) && value != "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+
+            }
+            //min Qty
+            var col = ("F").concat(parseInt(y) + 1);
+            value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            var reg = JEXCEL_INTEGER_REGEX
+            if (json[y][2] == 2 && value === "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                if ((isNaN(parseInt(value)) || !(reg.test(value))) && value != "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+
+            }
+            //Distribution Lead Time
+            var col = ("J").concat(parseInt(y) + 1);
+            value = this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            var reg = JEXCEL_INTEGER_REGEX
+            if (json[y][2] == 2 && value === "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                if ((isNaN(parseInt(value)) || !(reg.test(value))) && value != "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+
+            }
+            //month in future amc
+            var col = ("G").concat(parseInt(y) + 1);
+            value = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             var reg = JEXCEL_INTEGER_REGEX
             if (value === "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -158,48 +217,6 @@ export default class MapPlanningUnits extends Component {
 
             }
             //month in past amc
-            var col = ("F").concat(parseInt(y) + 1);
-            value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-            var reg = JEXCEL_INTEGER_REGEX
-            if (value === "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                valid = false;
-            } else {
-                if (isNaN(parseInt(value)) || !(reg.test(value))) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                    valid = false;
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                }
-
-            }
-            //procuementAgent lead time
-            var col = ("G").concat(parseInt(y) + 1);
-            value = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-            var reg = JEXCEL_DECIMAL_LEAD_TIME
-            if (value === "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                valid = false;
-            } else {
-                if (!(reg.test(value))) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                    valid = false;
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                }
-
-            }
-            //shelf life
             var col = ("H").concat(parseInt(y) + 1);
             value = this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             var reg = JEXCEL_INTEGER_REGEX
@@ -220,9 +237,51 @@ export default class MapPlanningUnits extends Component {
                 }
 
             }
-            //catelog price
+            //procuementAgent lead time
             var col = ("I").concat(parseInt(y) + 1);
             value = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            var reg = JEXCEL_DECIMAL_LEAD_TIME
+            if (value === "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                if (!(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+
+            }
+            //shelf life
+            var col = ("K").concat(parseInt(y) + 1);
+            value = this.el.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            var reg = JEXCEL_INTEGER_REGEX
+            if (value === "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+
+            }
+            //catelog price
+            var col = ("L").concat(parseInt(y) + 1);
+            value = this.el.getValue(`L${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
             if (value === "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -245,7 +304,8 @@ export default class MapPlanningUnits extends Component {
         return valid;
     }
     changed = function (instance, cell, x, y, value) {
-        this.props.removeMessageText && this.props.removeMessageText();
+        this.props.removeMessageText();
+        var rowData = this.el.getRowData(y);
         if (x == 0) {
             var col = ("A").concat(parseInt(y) + 1);
             if (value == "") {
@@ -289,30 +349,86 @@ export default class MapPlanningUnits extends Component {
 
             }
         }
-        //reoder frequency
         if (x == 2) {
-            // var reg = /^[0-9\b]+$/;
-            var reg = JEXCEL_INTEGER_REGEX;
             var col = ("C").concat(parseInt(y) + 1);
-            value = this.el.getValue(`C${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+                value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                // var reg = /^[0-9\b]+$/;
+                var reg = JEXCEL_INTEGER_REGEX
+                var col = ("E").concat(parseInt(y) + 1);
+                if (rowData[2] == 1 && value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                 } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
+                    if ((isNaN(parseInt(value)) || !(reg.test(value))) && value != "") {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
                 }
+                value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                // var reg = /^[0-9\b]+$/;
+                var reg = JEXCEL_INTEGER_REGEX
+                var col = ("F").concat(parseInt(y) + 1);
+                if (rowData[2] == 2 && value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                } else {
+                    if ((isNaN(parseInt(value)) || !(reg.test(value))) && value != "") {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+                }
+                value = this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                // var reg = /^[0-9\b]+$/;
+                var reg = JEXCEL_INTEGER_REGEX
+                var col = ("J").concat(parseInt(y) + 1);
+                if (rowData[2] == 2 && value == "") {
+                    // this.el.setStyle(col, "background-color", "transparent");
+                    // this.el.setStyle(col, "background-color", "yellow");
+                    // this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    this.el.setValueFromCoords(9, y, 0, true);
+                } else {
+                    if ((isNaN(parseInt(value)) || !(reg.test(value))) && value != "") {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+                }
+
+            }
+            if (rowData[2] == 2) {
+                this.el.setValueFromCoords(4, y, "", true);
+                this.el.setValueFromCoords(5, y, rowData[13], true);
+                this.el.setValueFromCoords(9, y, rowData[14] != "" ? rowData[14] : 0, true);
+            } else {
+                this.el.setValueFromCoords(5, y, "", true);
+                this.el.setValueFromCoords(9, y, "", true);
+                this.el.setValueFromCoords(4, y, rowData[12], true);
             }
         }
-        //min month of stock
+        //reoder frequency
         if (x == 3) {
-            var reg = JEXCEL_INTEGER_REGEX
+            // var reg = /^[0-9\b]+$/;
+            var reg = JEXCEL_INTEGER_REGEX;
             var col = ("D").concat(parseInt(y) + 1);
             value = this.el.getValue(`D${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             if (value == "") {
@@ -330,11 +446,80 @@ export default class MapPlanningUnits extends Component {
                 }
             }
         }
-        //month in future amc
+        //min month of stock
         if (x == 4) {
             var reg = JEXCEL_INTEGER_REGEX
             var col = ("E").concat(parseInt(y) + 1);
             value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            if (rowData[2] == 1 && value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                if ((isNaN(parseInt(value)) || !(reg.test(value))) && value != "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+            if (value !== "") {
+                this.el.setValueFromCoords(12, y, value, true);
+            }
+        }
+        //min qty
+        if (x == 5) {
+            var reg = JEXCEL_INTEGER_REGEX
+            var col = ("F").concat(parseInt(y) + 1);
+            value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            if (rowData[2] == 2 && value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                if ((isNaN(parseInt(value)) || !(reg.test(value))) && value != "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+            if (value !== "") {
+                this.el.setValueFromCoords(13, y, value, true);
+            }
+        }
+        //Distribution Lead Time
+        if (x == 9) {
+            var reg = JEXCEL_INTEGER_REGEX
+            var col = ("J").concat(parseInt(y) + 1);
+            value = this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            if (rowData[2] == 2 && value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                if ((isNaN(parseInt(value)) || !(reg.test(value))) && value != "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+            if (value !== "") {
+                this.el.setValueFromCoords(14, y, value, true);
+            }
+        }
+        //month in future amc
+        if (x == 6) {
+            var reg = JEXCEL_INTEGER_REGEX
+            var col = ("G").concat(parseInt(y) + 1);
+            value = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -351,49 +536,7 @@ export default class MapPlanningUnits extends Component {
             }
         }
         //month in past amc
-        if (x == 5) {
-            var reg = JEXCEL_INTEGER_REGEX
-            var col = ("F").concat(parseInt(y) + 1);
-            value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                if (isNaN(parseInt(value)) || !(reg.test(value))) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                }
-            }
-        }
-        //procurementAgent lead time
-        if (x == 6) {
-            // var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
-            var reg = JEXCEL_DECIMAL_LEAD_TIME
-            var col = ("G").concat(parseInt(y) + 1);
-            value = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                if (!(reg.test(value))) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                }
-            }
-        }
-        //Shelf life
         if (x == 7) {
-            // var reg = /^[0-9\b]+$/;
             var reg = JEXCEL_INTEGER_REGEX
             var col = ("H").concat(parseInt(y) + 1);
             value = this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
@@ -412,13 +555,55 @@ export default class MapPlanningUnits extends Component {
                 }
             }
         }
-        //Catelog price
+        //procurementAgent lead time
         if (x == 8) {
+            // var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
+            var reg = JEXCEL_DECIMAL_LEAD_TIME
+            var col = ("I").concat(parseInt(y) + 1);
+            value = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                if (!(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+        }
+        //Shelf life
+        if (x == 10) {
+            // var reg = /^[0-9\b]+$/;
+            var reg = JEXCEL_INTEGER_REGEX
+            var col = ("K").concat(parseInt(y) + 1);
+            value = this.el.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+        }
+        //Catelog price
+        if (x == 11) {
             // var reg = /^[0-9]+.[0-9]+$/;
             // var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
             var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
-            var col = ("I").concat(parseInt(y) + 1);
-            value = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            var col = ("L").concat(parseInt(y) + 1);
+            value = this.el.getValue(`L${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -437,10 +622,10 @@ export default class MapPlanningUnits extends Component {
     }
 
 
-    dropdownFilter = function (instance, cell, c, r, source) {
+    dropdownFilter = function (o, cell, c, r, source, config) {
         var mylist = [];
         // var value = (instance.jexcel.getJson(null, false)[r])[c - 1];
-        var value = (this.state.mapPlanningUnitEl.getJson(null, false)[r])[c - 1];
+        var value = o.getValueFromCoords(c - 1, r);
         // AuthenticationService.setupAxiosInterceptors();
         // PlanningUnitService.getActivePlanningUnitList()
         //     .then(response => {
@@ -474,7 +659,8 @@ export default class MapPlanningUnits extends Component {
             }
             mylist.push(planningUnitJson);
         }
-        return mylist;
+        config.source = mylist;
+        return config;
     }
 
     getRealmId() {
@@ -566,13 +752,19 @@ export default class MapPlanningUnits extends Component {
                                 data = [];
                                 data[0] = "-1";
                                 data[1] = "";
-                                data[2] = "";
+                                data[2] = 1;
                                 data[3] = "";
-                                data[4] = MONTHS_IN_FUTURE_FOR_AMC;
-                                data[5] = MONTHS_IN_PAST_FOR_AMC;
-                                data[6] = "";
-                                data[7] = "";
+                                data[4] = "";
+                                data[5] = "";
+                                data[6] = MONTHS_IN_FUTURE_FOR_AMC;
+                                data[7] = MONTHS_IN_PAST_FOR_AMC;
                                 data[8] = "";
+                                data[9] = "";
+                                data[10] = "";
+                                data[11] = "";
+                                data[12] = "";
+                                data[13] = "";
+                                data[14] = "";
                                 productDataArr[0] = data;
                                 // }
 
@@ -597,56 +789,89 @@ export default class MapPlanningUnits extends Component {
                                             title: i18n.t('static.planningunit.planningunit'),
                                             type: 'autocomplete',
                                             source: list,
-                                            filter: this.dropdownFilter
+                                            filterOptions: this.dropdownFilter
+                                        },
+                                        {
+                                            title: i18n.t('static.programPU.planBasedOn'),
+                                            type: 'dropdown',
+                                            source: [{ id: 1, name: i18n.t('static.report.mos') }, { id: 2, name: i18n.t('static.report.qty') }],
+                                            tooltip: i18n.t("static.programPU.planByTooltip")
                                         },
                                         {
                                             title: i18n.t('static.report.reorderFrequencyInMonths'),
                                             type: 'numeric',
                                             textEditor: true,
-                                            decimal: '.',
-                                            mask: '#,##.00',
-                                            disabledMaskOnEdition: true
+                                            // decimal: '.',
+                                            mask: '#,##',
+                                            disabledMaskOnEdition: true,
+                                            tooltip: i18n.t("static.programPU.reorderFrequencyTooltip"),
+                                            width: 120
 
                                         },
                                         {
                                             title: i18n.t('static.supplyPlan.minMonthsOfStock'),
                                             type: 'numeric',
                                             textEditor: true,
-                                            decimal: '.',
-                                            mask: '#,##.00',
-                                            disabledMaskOnEdition: true
+                                            // decimal: '.',
+                                            mask: '#,##',
+                                            disabledMaskOnEdition: true,
+                                            tooltip: i18n.t("static.programPU.minMonthsOfStockTooltip")
+                                        },
+                                        {
+                                            title: i18n.t('static.product.minQuantity'),
+                                            type: 'numeric',
+                                            textEditor: true,
+                                            // decimal:'.',
+                                            mask: '#,##',
+                                            disabledMaskOnEdition: true,
+                                            tooltip: i18n.t("static.programPU.minQtyTooltip")
                                         },
                                         {
                                             title: i18n.t('static.program.monthfutureamc'),
                                             type: 'numeric',
                                             textEditor: true,
-                                            decimal: '.',
-                                            mask: '#,##.00',
-                                            disabledMaskOnEdition: true
+                                            // decimal: '.',
+                                            mask: '#,##',
+                                            disabledMaskOnEdition: true,
+                                            tooltip: i18n.t("static.programPU.monthsInFutureTooltip")
                                         },
                                         {
                                             title: i18n.t('static.program.monthpastamc'),
                                             type: 'numeric',
                                             textEditor: true,
-                                            decimal: '.',
-                                            mask: '#,##.00',
-                                            disabledMaskOnEdition: true
+                                            // decimal: '.',
+                                            mask: '#,##',
+                                            disabledMaskOnEdition: true,
+                                            tooltip: i18n.t("static.programPU.monthsInPastTooltip")
                                         },
                                         {
                                             title: i18n.t('static.report.procurmentAgentLeadTimeReport'),
                                             type: 'numeric',
                                             textEditor: true,
-                                            decimal: '.',
-                                            mask: '#,##.00',
-                                            disabledMaskOnEdition: true
+                                            // decimal: '.',
+                                            mask: '#,##',
+                                            disabledMaskOnEdition: true,
+                                            tooltip: i18n.t("static.programPU.localProcurementAgentTooltip"),
+                                            width: 130
+                                        },
+                                        {
+                                            title: i18n.t('static.product.distributionLeadTime'),
+                                            type: 'numeric',
+                                            textEditor: true,
+                                            // decimal:'.',
+                                            mask: '#,##',
+                                            disabledMaskOnEdition: true,
+                                            tooltip: i18n.t("static.programPU.distributionLeadTimeTooltip")
                                         },
                                         {
                                             title: i18n.t('static.supplyPlan.shelfLife'),
                                             type: 'numeric',
                                             textEditor: true,
-                                            decimal: '.',
-                                            mask: '#,##.00',
-                                            disabledMaskOnEdition: true
+                                            // decimal: '.',
+                                            mask: '#,##',
+                                            disabledMaskOnEdition: true,
+                                            tooltip: i18n.t("static.programPU.shelfLifeTooltip"),
+                                            width: 120
                                         },
                                         {
                                             title: i18n.t('static.procurementAgentPlanningUnit.catalogPrice'),
@@ -654,14 +879,46 @@ export default class MapPlanningUnits extends Component {
                                             textEditor: true,
                                             decimal: '.',
                                             mask: '#,##.00',
-                                            disabledMaskOnEdition: true
+                                            disabledMaskOnEdition: true,
+                                            tooltip: i18n.t("static.programPU.catalogPriceTooltip"),
+                                            width: 120
                                         },
-                                        // {
-                                        //     title: 'Batch Required',
-                                        //     type: 'checkbox'
-                                        // }
+                                        {
+                                            title: 'Min Mos',
+                                            type: 'hidden'
+                                        },
+                                        {
+                                            title: 'Min Qty',
+                                            type: 'hidden'
+                                        },
+                                        {
+                                            title: 'Lead Distribution Time',
+                                            type: 'hidden'
+                                        },
 
                                     ],
+                                    updateTable: function (el, cell, x, y, source, value, id) {
+                                        console.log("In update table@@@@@@@@@@@@@")
+                                        var elInstance = el;
+                                        var rowData = elInstance.getRowData(y);
+                                        // var productCategoryId = rowData[0];
+                                        if (rowData[2] == 1) {
+                                            var cell1 = elInstance.getCell(`F${parseInt(y) + 1}`)
+                                            cell1.classList.add('readonly');
+                                            var cell1 = elInstance.getCell(`J${parseInt(y) + 1}`)
+                                            cell1.classList.add('readonly');
+                                            var cell1 = elInstance.getCell(`E${parseInt(y) + 1}`)
+                                            cell1.classList.remove('readonly');
+
+                                        } else {
+                                            var cell1 = elInstance.getCell(`F${parseInt(y) + 1}`)
+                                            cell1.classList.remove('readonly');
+                                            var cell1 = elInstance.getCell(`J${parseInt(y) + 1}`)
+                                            cell1.classList.remove('readonly');
+                                            var cell1 = elInstance.getCell(`E${parseInt(y) + 1}`)
+                                            cell1.classList.add('readonly');
+                                        }
+                                    },
                                     pagination: false,
                                     search: true,
                                     columnSorting: true,
@@ -759,13 +1016,19 @@ export default class MapPlanningUnits extends Component {
                                                         var data = [];
                                                         data[0] = "";
                                                         data[1] = "";
-                                                        data[2] = "";
+                                                        data[2] = 1;
                                                         data[3] = "";
                                                         data[4] = "";
                                                         data[5] = "";
                                                         data[6] = "";
                                                         data[7] = "";
                                                         data[8] = "";
+                                                        data[9] = "";
+                                                        data[10] = "";
+                                                        data[11] = "";
+                                                        data[12] = "";
+                                                        data[13] = "";
+                                                        data[14] = "";
                                                         // this.el.insertRow();
                                                         // var json = this.el.getJson();
                                                         obj.insertRow(data, parseInt(y), 1);
@@ -780,13 +1043,19 @@ export default class MapPlanningUnits extends Component {
                                                         var data = [];
                                                         data[0] = "";
                                                         data[1] = "";
-                                                        data[2] = "";
+                                                        data[2] = 1;
                                                         data[3] = "";
                                                         data[4] = "";
                                                         data[5] = "";
                                                         data[6] = "";
                                                         data[7] = "";
                                                         data[8] = "";
+                                                        data[9] = "";
+                                                        data[10] = "";
+                                                        data[11] = "";
+                                                        data[12] = "";
+                                                        data[13] = "";
+                                                        data[14] = "";
                                                         obj.insertRow(data, parseInt(y));
                                                         // obj.insertRow(parseInt(y), 1);
                                                     }.bind(this)
@@ -795,7 +1064,7 @@ export default class MapPlanningUnits extends Component {
                                             // Delete a row
                                             if (obj.options.allowDeleteRow == true) {
                                                 // region id
-                                                // if (obj.getRowData(y)[8] == 0) {
+                                                // if (obj.getRowData(y)[11] == 0) {
                                                 items.push({
                                                     title: i18n.t("static.common.deleterow"),
                                                     onclick: function () {
@@ -949,41 +1218,56 @@ export default class MapPlanningUnits extends Component {
         var elInstance = instance;
         var rowData = elInstance.getRowData(y);
 
-        if (x == 2 && !isNaN(rowData[2]) && rowData[2].toString().indexOf('.') != -1) {
-            console.log("RESP---------", parseFloat(rowData[2]));
-            elInstance.setValueFromCoords(2, y, parseFloat(rowData[2]), true);
-        } else if (x == 3 && !isNaN(rowData[3]) && rowData[3].toString().indexOf('.') != -1) {
+        if (x == 3 && !isNaN(rowData[3]) && rowData[3].toString().indexOf('.') != -1) {
+            console.log("RESP---------", parseFloat(rowData[3]));
             elInstance.setValueFromCoords(3, y, parseFloat(rowData[3]), true);
         } else if (x == 4 && !isNaN(rowData[4]) && rowData[4].toString().indexOf('.') != -1) {
             elInstance.setValueFromCoords(4, y, parseFloat(rowData[4]), true);
-        } else if (x == 5 && !isNaN(rowData[5]) && rowData[5].toString().indexOf('.') != -1) {
-            elInstance.setValueFromCoords(5, y, parseFloat(rowData[5]), true);
         } else if (x == 6 && !isNaN(rowData[6]) && rowData[6].toString().indexOf('.') != -1) {
             elInstance.setValueFromCoords(6, y, parseFloat(rowData[6]), true);
         } else if (x == 7 && !isNaN(rowData[7]) && rowData[7].toString().indexOf('.') != -1) {
             elInstance.setValueFromCoords(7, y, parseFloat(rowData[7]), true);
         } else if (x == 8 && !isNaN(rowData[8]) && rowData[8].toString().indexOf('.') != -1) {
             elInstance.setValueFromCoords(8, y, parseFloat(rowData[8]), true);
+        } else if (x == 10 && !isNaN(rowData[10]) && rowData[10].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(10, y, parseFloat(rowData[10]), true);
+        } else if (x == 11 && !isNaN(rowData[11]) && rowData[11].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(11, y, parseFloat(rowData[11]), true);
         }
 
     }
 
     loaded = function (instance, cell, x, y, value) {
-        jExcelLoadedFunctionWithoutPagination(instance);
-        // var asterisk = document.getElementsByClassName("resizable")[0];
+        console.log("In loaded@@@@@@@@@@")
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
 
         var tr = asterisk.firstChild;
         tr.children[1].classList.add('AsteriskTheadtrTd');
         tr.children[2].classList.add('AsteriskTheadtrTd');
-        tr.children[3].classList.add('AsteriskTheadtrTd');
-        tr.children[4].classList.add('AsteriskTheadtrTd');
-        tr.children[5].classList.add('AsteriskTheadtrTd');
-        tr.children[6].classList.add('AsteriskTheadtrTd');
-        tr.children[7].classList.add('AsteriskTheadtrTd');
-        tr.children[8].classList.add('AsteriskTheadtrTd');
-        tr.children[9].classList.add('AsteriskTheadtrTd');
-        tr.children[3].title = i18n.t("static.message.reorderFrequency")
+        tr.children[3].classList.add('InfoTrAsteriskTheadtrTdImage');
+        // tr.children[3].title = i18n.t('static.programPU.planBasedOnTooltip');
+        tr.children[4].classList.add('InfoTrAsteriskTheadtrTdImage');
+        tr.children[5].classList.add('InfoTr');
+        tr.children[6].classList.add('InfoTr');
+        tr.children[7].classList.add('InfoTrAsteriskTheadtrTdImage');
+        tr.children[8].classList.add('InfoTrAsteriskTheadtrTdImage');
+        tr.children[10].classList.add('InfoTr');
+        tr.children[11].classList.add('InfoTrAsteriskTheadtrTdImage');
+        tr.children[12].classList.add('InfoTrAsteriskTheadtrTdImage');
+        tr.children[9].classList.add('InfoTrAsteriskTheadtrTdImage');
+        // tr.children[4].title = i18n.t("static.message.reorderFrequency")
+        var cell1 = instance.worksheets[0].getCell(`F1`)
+        cell1.classList.add('readonly');
+        var cell1 = instance.worksheets[0].getCell(`J1`)
+        cell1.classList.add('readonly');
+        var cell1 = instance.worksheets[0].getCell(`E1`)
+        cell1.classList.remove('readonly');
+        console.log("Tr@@@@@@@@", tr)
+        jExcelLoadedFunctionWithoutPagination(instance);
+
+        // var asterisk = document.getElementsByClassName("resizable")[0];
+
+
     }
 
     myFunction() {
@@ -998,15 +1282,18 @@ export default class MapPlanningUnits extends Component {
                 planningUnit: {
                     id: map.get("1"),
                 },
-                reorderFrequencyInMonths: this.el.getValue(`C${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                minMonthsOfStock: this.el.getValue(`D${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                monthsInFutureForAmc: this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                monthsInPastForAmc: this.el.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                localProcurementLeadTime: this.el.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                shelfLife: this.el.getValue(`H${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                catalogPrice: this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                reorderFrequencyInMonths: this.el.getValue(`M${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                minMonthsOfStock: this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                monthsInFutureForAmc: this.el.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                monthsInPastForAmc: this.el.getValue(`H${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                localProcurementLeadTime: this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                shelfLife: this.el.getValue(`K${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                catalogPrice: this.el.getValue(`L${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                 active: true,
-                programPlanningUnitId: 0
+                programPlanningUnitId: 0,
+                minQty: this.el.getValue(`N${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                distributionLeadTime: this.el.getValue(`O${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                planBasedOn: map.get("2")
 
             }
             planningUnitArray.push(planningUnitJson);

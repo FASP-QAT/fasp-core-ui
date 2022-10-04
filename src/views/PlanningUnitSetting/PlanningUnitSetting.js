@@ -2070,7 +2070,8 @@ export default class PlanningUnitSetting extends Component {
             outPutListArray[count] = data;
             count++;
             indexVar = indexVar + 1;
-        }
+        }   console.log("outPutListArray---->", outPutListArray);
+        
         if (outPutList.length == 0) {
             data = [];
             data[0] = -1;
@@ -2831,7 +2832,7 @@ export default class PlanningUnitSetting extends Component {
                     // });
 
                     this.setState({
-                        loading: false,
+                        // loading: false,
                         message: i18n.t('static.mt.dataUpdateSuccess'),
                         color: "green",
                         isChanged1: false,
@@ -2843,11 +2844,10 @@ export default class PlanningUnitSetting extends Component {
                             this.disablePUConsumptionData(listOfDisablePuNode);
                         }
 
-
+                        this.getDatasetList();
                         this.hideSecondComponent();
                         // this.filterData();
                         // this.setProgramId();
-                        // this.getDatasetList();
                     });
                     console.log("Data update success1");
                     // alert("success");

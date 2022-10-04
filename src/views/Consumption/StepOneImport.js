@@ -418,8 +418,11 @@ export default class StepOneImportMapPlanningUnits extends Component {
         //
     }
     handleRangeDissmis(value) {
-        this.setState({ rangeValue: value })
-        this.filterData(value);
+        this.setState({
+            rangeValue: value
+        }, () => {
+            this.filterData();
+        })
     }
 
     _handleClickRangeBox(e) {

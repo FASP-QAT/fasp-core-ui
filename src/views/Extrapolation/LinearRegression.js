@@ -69,6 +69,10 @@ export function calculateLinearRegression(inputData, confidence, noOfProjectionM
             }
         }).catch(error => {
             console.log("Error@@@@@@", error)
+            if (page == "DataEntry" || page == "ImportFromSupplyPlan") {
+                var linearRegressionData = { "data": [], "PlanningUnitId": props.state.selectedConsumptionUnitId, "regionId": regionId }
+                props.updateLinearRegressionData(linearRegressionData);
+            } else {
             if (!isTreeExtrapolation) {
                 // props.updateState("showData", false);
                 // props.updateState("dataEl", "");
@@ -79,6 +83,7 @@ export function calculateLinearRegression(inputData, confidence, noOfProjectionM
                 // props.el = jexcel(document.getElementById("tableDiv"), '');
                 // props.el.destroy();
             }
+        }
         })
 }
 
