@@ -1017,14 +1017,14 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     if (closingBalance - diffBetweenTrueDemandAndConsumption < 0) {
                                         unmetDemandQty = 0 - expectedStock + diffBetweenTrueDemandAndConsumption;
                                         closingBalance = 0;
-                                    }else{
+                                    } else {
                                         unmetDemandQty = diffBetweenTrueDemandAndConsumption;
                                     }
 
                                     if (closingBalanceWps - diffBetweenTrueDemandAndConsumption < 0) {
                                         unmetDemandQtyWps = 0 - expectedStockWps + diffBetweenTrueDemandAndConsumption;
                                         closingBalanceWps = 0;
-                                    }else{
+                                    } else {
                                         unmetDemandQtyWps = diffBetweenTrueDemandAndConsumption;
                                     }
 
@@ -1123,6 +1123,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                             var programQPLDetailsRequest1 = programQPLDetailsOs1.put(programQPLDetailsJson);
                             programQPLDetailsRequest1.onsuccess = function (event) {
                                 console.log("### completed calculations", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
+                                console.log("planningUnitDataListMohit", planningUnitDataList)
                                 if (page == "consumption") {
                                     props.updateState("message", i18n.t('static.message.consumptionSaved'));
                                     props.updateState("color", 'green');
@@ -1213,17 +1214,17 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                             props.toggleLarge('shipments');
                                         }
                                         if (props.shipmentPage != "supplyPlanCompare") {
-                                            var programDataJson = programRequest.result.programData;
-                                            var planningUnitDataList = programDataJson.planningUnitDataList;
-                                            var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == props.state.planningUnit.value);
-                                            var programJson = {};
-                                            if (planningUnitDataIndex != -1) {
-                                                var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == props.state.planningUnit.value))[0];
-                                                var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
-                                                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                                                programJson = JSON.parse(programData);
+                                            var programDataJson1 = programRequest.result.programData;
+                                            var planningUnitDataList1 = programDataJson1.planningUnitDataList;
+                                            var planningUnitDataIndex1 = (planningUnitDataList1).findIndex(c => c.planningUnitId == props.state.planningUnit.value);
+                                            var programJson1 = {};
+                                            if (planningUnitDataIndex1 != -1) {
+                                                var planningUnitData1 = ((planningUnitDataList1).filter(c => c.planningUnitId == props.state.planningUnit.value))[0];
+                                                var programDataBytes1 = CryptoJS.AES.decrypt(planningUnitData1.planningUnitData, SECRET_KEY);
+                                                var programData1 = programDataBytes1.toString(CryptoJS.enc.Utf8);
+                                                programJson1 = JSON.parse(programData1);
                                             } else {
-                                                programJson = {
+                                                programJson1 = {
                                                     consumptionList: [],
                                                     inventoryList: [],
                                                     shipmentList: [],
@@ -1231,8 +1232,8 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                                     supplyPlan: []
                                                 }
                                             }
-                                            props.updateState("programJson", programJson);
-                                            props.updateState("planningUnitDataList", planningUnitDataList);
+                                            props.updateState("programJson", programJson1);
+                                            props.updateState("planningUnitDataList", planningUnitDataList1);
                                             try {
                                                 props.formSubmit(props.items.planningUnit, props.items.monthCount);
                                             } catch (err) {
@@ -1266,8 +1267,8 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                         props.formSubmit(props.state.planningUnit, props.state.monthCount);
                                         props.updateState("loading", false);
                                     } else {
-                                        var programDataJson = programRequest.result.programData;
-                                        var planningUnitDataList = programDataJson.planningUnitDataList;
+                                        var programDataJson2 = programRequest.result.programData;
+                                        var planningUnitDataList2 = programDataJson2.planningUnitDataList;
                                         var rangeValue = props.state.rangeValue1;
                                         let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
                                         if (rangeValue.from.month <= 9) {
@@ -1277,7 +1278,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                         if (rangeValue.to.month <= 9) {
                                             stopDate = rangeValue.to.year + '-0' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
                                         }
-                                        convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDate, programJsonForStoringTheResult, generalProgramJson, props, planningUnitId, programPlanningUnitList.filter(c => c.planningUnit.id == planningUnitId)[0], regionListFiltered, programId, programJsonForStoringTheResult, programDataJson, programRequest)
+                                        convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDate, programJsonForStoringTheResult, generalProgramJson, props, planningUnitId, programPlanningUnitList.filter(c => c.planningUnit.id == planningUnitId)[0], regionListFiltered, programId, programJsonForStoringTheResult, programDataJson2, programRequest)
                                     }
                                 } else if (page == "supplyPlan") {
                                     props.formSubmit(props.state.planningUnit, props.state.monthCount);
