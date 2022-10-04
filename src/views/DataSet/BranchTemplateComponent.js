@@ -1632,7 +1632,7 @@ export default class BranchTemplate extends Component {
                         treeTemplate
                     }, () => {
                         console.log("treeTemplate mom---", treeTemplate);
-                        // calculateModelingData(treeTemplate, this, '', currentItemConfig.context.id, 0, 1, -1, true);
+                        calculateModelingData(treeTemplate, this, '', currentItemConfig.context.id, 0, 1, -1, true);
                     });
                 });
 
@@ -7085,6 +7085,8 @@ export default class BranchTemplate extends Component {
 
             };
         }
+
+        console.log("Loader@@@@@@@@@@@",this.state.momJexcelLoader);
 
         return (
             <>
