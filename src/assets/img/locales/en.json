@@ -2909,5 +2909,6 @@
     "static.programPU.stockStatusMatrixMaxTooltip":"If planning by quantity, the max value is calculated every month by min + reorder interval* AMC. The value displayed here is the average for the year.",
     "static.programPU.localProcurementAgentTooltip":"Lead time from planned to received. Used for shipments where `local procurement` is selected.",
     "static.programPU.shelfLifeTooltip":"Time from shipment receipt (status = received) to expiry. Used for new batches created via shipments, but actual expiry date for any shipment can be updated by the user.",
-    "static.programPU.catalogPriceTooltip":"This default catalog price is used for any new shipments created, unless the procurement agent specific price is provided. The actual price for any shipment can be by the user."
+    "static.programPU.catalogPriceTooltip":"This default catalog price is used for any new shipments created, unless the procurement agent specific price is provided. The actual price for any shipment can be by the user.",
+    "static.versionSettings.confirmUpdate":"Note: if you changed the forecast period, you will need to update one node per every scenario for every tree for tree forecasts to properly extend."
 }
