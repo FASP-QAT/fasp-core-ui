@@ -9609,7 +9609,7 @@ export default class BranchTemplate extends Component {
                                                             this.setState({
                                                                 treeTemplate: response.data,
                                                                 items,
-                                                                message: i18n.t('static.message.addTreeTemplate'),
+                                                                message: i18n.t('static.message.addBranchTemplate'),
                                                                 color: 'green',
                                                                 loading: true,
                                                                 isChanged: false,
@@ -9700,7 +9700,7 @@ export default class BranchTemplate extends Component {
                                                         this.setState({
                                                             treeTemplate: response.data,
                                                             items,
-                                                            message: i18n.t('static.message.editTreeTemplate'),
+                                                            message: i18n.t('static.message.editBranchTemplate'),
                                                             loading: true,
                                                             color: 'green',
                                                             isChanged: false,
