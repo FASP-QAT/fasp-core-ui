@@ -5891,7 +5891,7 @@ export default class CreateTreeTemplate extends Component {
         }
 
         if (event.target.name === "sharePlanningUnit") {
-            (currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.sharePlanningUnit = event.target.value;
+            (currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.sharePlanningUnit = event.target.id=== "sharePlanningUnitFalse" ? false : true;
             this.qatCalculatedPUPerVisit(0);
             this.getUsageText();
         }
