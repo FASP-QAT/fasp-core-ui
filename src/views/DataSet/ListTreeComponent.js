@@ -1188,12 +1188,21 @@ export default class ListTreeComponent extends Component {
     setProgramId(event) {
         var datasetId = event.target.value
         localStorage.setItem("sesDatasetId", datasetId);
-        this.setState(
-            {
-                datasetId: datasetId
-            }, () => {
-                this.filterVersion();
-            })
+        if (datasetId != 0 && datasetId != "") {
+            this.setState(
+                {
+                    datasetId: datasetId
+                }, () => {
+                    this.filterVersion();
+                })
+        } else {
+            this.setState(
+                {
+                    message: i18n.t('static.mt.selectProgram'),
+                }, () => {
+                    jexcel.destroy(document.getElementById("tableDiv"), true);
+                })
+        }
     }
 
     onTemplateChange(event) {
