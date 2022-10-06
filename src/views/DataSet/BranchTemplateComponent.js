@@ -1632,7 +1632,7 @@ export default class BranchTemplate extends Component {
                         treeTemplate
                     }, () => {
                         console.log("treeTemplate mom---", treeTemplate);
-                        // calculateModelingData(treeTemplate, this, '', currentItemConfig.context.id, 0, 1, -1, true);
+                        calculateModelingData(treeTemplate, this, '', currentItemConfig.context.id, 0, 1, -1, true);
                     });
                 });
 
@@ -7086,6 +7086,8 @@ export default class BranchTemplate extends Component {
             };
         }
 
+        console.log("Loader@@@@@@@@@@@",this.state.momJexcelLoader);
+
         return (
             <>
                 <TabPane tabId="1">
@@ -9607,7 +9609,7 @@ export default class BranchTemplate extends Component {
                                                             this.setState({
                                                                 treeTemplate: response.data,
                                                                 items,
-                                                                message: i18n.t('static.message.addTreeTemplate'),
+                                                                message: i18n.t('static.message.addBranchTemplate'),
                                                                 color: 'green',
                                                                 loading: true,
                                                                 isChanged: false,
@@ -9698,7 +9700,7 @@ export default class BranchTemplate extends Component {
                                                         this.setState({
                                                             treeTemplate: response.data,
                                                             items,
-                                                            message: i18n.t('static.message.editTreeTemplate'),
+                                                            message: i18n.t('static.message.editBranchTemplate'),
                                                             loading: true,
                                                             color: 'green',
                                                             isChanged: false,
