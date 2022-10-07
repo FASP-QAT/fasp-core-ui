@@ -1202,6 +1202,8 @@ export default class ListTreeComponent extends Component {
         } else {
             this.setState(
                 {
+                    datasetId: datasetId,
+                    versions: [],
                     message: i18n.t('static.mt.selectProgram'),
                 }, () => {
                     jexcel.destroy(document.getElementById("tableDiv"), true);
