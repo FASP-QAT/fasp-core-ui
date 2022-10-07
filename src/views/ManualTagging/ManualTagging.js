@@ -1049,7 +1049,7 @@ export default class ManualTagging extends Component {
                                 // console.log("jsonvalue@@@@@@@@################",json[j][1])
                                 if (json[j][17] == this.state.instance.getValueFromCoords(17, y, true)) {
                                     if (j != y) {
-                                        this.state.instance.setValueFromCoords(9, j, value, true);
+                                        this.state.instance.setValueFromCoords(9, j, rcpuFilter.id, true);
                                         this.state.instance.setValueFromCoords(12, j, Math.round(this.state.instance.getValueFromCoords(10, j) * rcpuFilter.multiplier), true);
                                         this.state.instance.setValueFromCoords(11, j, Number(rcpuFilter.multiplier), true);
                                         this.state.instance.setValueFromCoords(19, j, Math.round(this.state.instance.getValueFromCoords(10, j)), true);
