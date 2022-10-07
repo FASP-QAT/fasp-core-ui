@@ -124,12 +124,13 @@ export default class StepOneImportMapPlanningUnits extends Component {
     getTracerCategoryList() {
         TracerCategoryService.getTracerCategoryListAll()
             .then(response => {
-                // console.log("response.data----", response.data);
+                console.log("response.data----", response.data);
                 this.setState({
                     tracerCategoryList: response.data,
                 },
                     () => {
                         this.props.updateStepOneData("loading", false);
+                        document.getElementById("stepOneBtn").disabled = true;
                     })
             }).catch(
                 error => {
@@ -267,7 +268,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
     }
 
     componentDidMount() {
-        document.getElementById("").disabled = true;
+        // document.getElementById("stepOneBtn").disabled = true;
         this.getPrograms();
     }
 
@@ -873,6 +874,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
                         var cell1 = elInstance.getCell(`J${parseInt(y) + 1}`)
                         cell1.classList.add('readonly');
+                        elInstance.setComments(`J${parseInt(y) + 1}`, "");
 
                     } else {
                     }
@@ -1300,6 +1302,9 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
                     <div id="mapPlanningUnit">
                     </div>
+                    <FormGroup>
+                        <Button color="info" size="md" className="float-right mr-1" id="stepOneBtn" type="submit" onClick={() => this.formSubmit()} >{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
+                    </FormGroup>
                 </div>
                 <div style={{ display: this.props.items.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
@@ -1312,9 +1317,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                         </div>
                     </div>
                 </div>
-                <FormGroup>
-                    <Button color="info" size="md" className="float-right mr-1" id="stepOneBtn" type="submit" onClick={() => this.formSubmit()} >{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
-                </FormGroup>
+
             </>
         );
     }
