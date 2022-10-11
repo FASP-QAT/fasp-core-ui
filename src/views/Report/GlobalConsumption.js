@@ -1394,7 +1394,7 @@ class GlobalConsumption extends Component {
                     {
                       this.state.consumptions.length > 0
                       &&
-                      <div className="col-md-12 p-0 grapg-margin " >
+                      <div className="col-md-12 p-0" >
                         <div className="offset-md-1 col-md-11">
                           <div className="chart-wrapper chart-graph-report">
                             <Bar id="cool-canvas" data={bar} options={options} />
@@ -1410,11 +1410,11 @@ class GlobalConsumption extends Component {
 
                   </div>
                   <div className="row">
-                    <div className="col-md-12">
+                    <div className="col-md-12 mt-lg-2">
                       {this.state.show && this.state.consumptions.length > 0 &&
-                        <div className="table-responsive ">
+                        <div className="fixTableHead">
 
-                          <Table responsive className="table-striped  table-fixed table-bordered text-center mt-2">
+                          <Table className="table-striped  table-fixed table-bordered text-center">
 
                             <thead>
                               <tr>

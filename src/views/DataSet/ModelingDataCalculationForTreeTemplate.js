@@ -172,6 +172,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                         if (i != 0) {
                             countOfI += 1;
                             var nodeDataModelingList = (nodeDataModelingListWithTransfer).filter(c => i >= c.startDateNo && i <= c.stopDateNo);
+                            nodeDataModelingList=nodeDataModelingList.filter(c=>c.dataValue!="" && c.dataValue!="NaN" && c.dataValue!=undefined && c.increaseDecrease!="");
                             var nodeDataOverrideList = (nodeDataMapForScenario.nodeDataOverrideList);
                             var startValue = 0;
                             // console.log("nodeDataMapForScenario---", nodeDataMapForScenario)
@@ -455,7 +456,9 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                 var parent = (flatList[fl].parent);
                                 var parentFiltered = (flatListUnsorted.filter(c => c.id == parent))[0];
                                 var parentNodeNodeData = (parentFiltered.payload.nodeDataMap[scenarioList[ndm].id])[0];
-                                if (parentNodeNodeData.fuNode.usageType.id == 2 && nodeDataMapForScenario.puNode.refillMonths > 1) {
+                                if (parentNodeNodeData.fuNode.usageType.id == 2
+                                    //  && nodeDataMapForScenario.puNode.refillMonths > 1
+                                ) {
                                     var daysPerMonth = 365 / 12;
 
                                     var grandParent = parentFiltered.parent;
@@ -464,7 +467,18 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                     var grandParentNodeData = (grandParentFiltered.payload.nodeDataMap[scenarioList[ndm].id])[0];
                                     console.log("grandParentNodeData$$$%%%", grandParentNodeData)
                                     if (grandParentNodeData != undefined) {
-                                        patients = grandParentNodeData.calculatedDataValue != null ? grandParentNodeData.calculatedDataValue : grandParentNodeData.dataValue;
+                                        var minusNumber = (nodeDataMapForScenario.month == 1 ? nodeDataMapForScenario.month - 2 : nodeDataMapForScenario.month - 1);
+                                        var grandParentPrevMonthMMDValue = grandParentNodeData.nodeDataMomList.filter(c => c.month == minusNumber);
+                                        if (grandParentPrevMonthMMDValue.length > 0) {
+                                            patients = grandParentPrevMonthMMDValue[0].calculatedValue;
+                                        } else {
+                                            var grandParentCurMonthMMDValue = grandParentNodeData.nodeDataMomList.filter(c => c.month == nodeDataMapForScenario.month);
+                                            if (grandParentCurMonthMMDValue.length > 0) {
+                                                patients = grandParentCurMonthMMDValue[0].calculatedValue;
+                                            } else {
+                                                patients = 0;
+                                            }
+                                        }
                                     } else {
                                         patients = 0;
                                     }

@@ -283,9 +283,12 @@ export default function getProblemDesc(row, lang) {
     }
     if (row.realmProblem.problem.problemId == 13) {
         // Inventory doen't fall within min/max range
-        var label = row.realmProblem.problem.label;
+        // var label = row.realmProblem.problem.label;
+        var label = row.data5.problemDescription;
         // label.label_en="Inventory doen't fall within min/max range";
-        return getLabelText(label, lang);
+        return label;
+        // return getLabelText(label, lang);
+
     }
     if (row.realmProblem.problem.problemId == 14) {
         // Dynamic forecasting is not used for certain commodity groups (Malaria, ARV, VMMC)
@@ -339,7 +342,7 @@ export default function getProblemDesc(row, lang) {
         // label.label_en = "Inventory doen't fall within min/max range";
         return getLabelText(label, lang);
     }
-    if (row.realmProblem.problem.problemId == 23) {
+    if (row.realmProblem.problem.problemId == 23 || row.realmProblem.problem.problemId == 29) {
         var obj = JSON.parse(row.data5);
         var desc_en = row.realmProblem.problem.label.label_en;
         var desc_fr = row.realmProblem.problem.label.label_fr;
@@ -395,6 +398,14 @@ export default function getProblemDesc(row, lang) {
         var label = row.realmProblem.problem.label;
         // label.label_en = "Inventory doen't fall within min/max range";
         return getLabelText(label, lang);
+    }
+    if (row.realmProblem.problem.problemId == 26 || row.realmProblem.problem.problemId == 27 || row.realmProblem.problem.problemId == 28) {
+        console.log("row.data5", row.data5);
+        const regex = /(?:\r\n|\r|\n)/g;
+        var obj = JSON.parse(row.data5.toString().replaceAll(regex, '<br/>'));
+        // var obj = JSON.parse(row.data5);
+        var label = obj.problemDescription;
+        return label;
     }
 
 }

@@ -6,8 +6,8 @@ import {
     Form, FormGroup, Label, Input, CardFooter, Col, Card
 } from 'reactstrap';
 import getLabelText from '../../CommonComponent/getLabelText';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import "../ProductCategory/style.css"
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination } from '../../CommonComponent/JExcelCommonFunctions.js';
@@ -141,7 +141,9 @@ export default class QunatimedImportStepTwo extends Component {
 
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunctionWithoutPagination(instance);
-        var asterisk = document.getElementsByClassName("resizable")[0];
+        // var asterisk = document.getElementsByClassName("resizable")[0];
+        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
+
         var tr = asterisk.firstChild;
         tr.children[3].classList.add('AsteriskTheadtrTd');
         tr.children[5].title = `${i18n.t('static.quantimed.conversionFactor')} = 1 / ${i18n.t('static.unit.multiplier')}`
@@ -493,7 +495,9 @@ export default class QunatimedImportStepTwo extends Component {
                         }
 
                         this.el = jexcel(document.getElementById("paputableDiv"), '');
-                        this.el.destroy();
+                        // this.el.destroy();
+                        jexcel.destroy(document.getElementById("paputableDiv"), true);
+
 
                         var json = this.props.items.importData.products;
                         var data = [];
@@ -533,27 +537,27 @@ export default class QunatimedImportStepTwo extends Component {
                         var options = {
                             data: products,
                             contextMenu: function () { return false; },
-                            colHeaders: [
-                                i18n.t('static.quantimed.quantimedProductIdLabel'),
-                                i18n.t('static.quantimed.quantimedPlanningUnitLabel'),
-                                i18n.t('static.supplyPlan.qatProduct'),
-                                'Previous Program Planning Unit',
-                                i18n.t('static.quantimed.conversionFactor')
-                            ],
+                            // colHeaders: [
+                            //     i18n.t('static.quantimed.quantimedProductIdLabel'),
+                            //     i18n.t('static.quantimed.quantimedPlanningUnitLabel'),
+                            //     i18n.t('static.supplyPlan.qatProduct'),
+                            //     'Previous Program Planning Unit',
+                            //     i18n.t('static.quantimed.conversionFactor')
+                            // ],
                             colWidths: [80, 120, 120, 0, 80],
                             columns: [
-                                { type: 'text', readOnly: true },
-                                { type: 'text', readOnly: true },
-                                { type: 'dropdown', source: programPlanningUnitsArr, autocomplete: true },
-                                { type: 'hidden' },
-                                { type: 'numeric', mask: '#,##.00', decimal: '.', readOnly: true },
+                                { type: 'text', title: i18n.t('static.quantimed.quantimedProductIdLabel'), readOnly: true },
+                                { type: 'text', title: i18n.t('static.quantimed.quantimedPlanningUnitLabel'), readOnly: true },
+                                { type: 'dropdown', source: programPlanningUnitsArr, title: i18n.t('static.supplyPlan.qatProduct'), autocomplete: true },
+                                { type: 'hidden', title: 'Previous Program Planning Unit' },
+                                { type: 'numeric', title: i18n.t('static.quantimed.conversionFactor'), mask: '#,##.00', decimal: '.', readOnly: true },
                             ],
-                            text: {
-                                // showingPage: 'Showing {0} to {1} of {1}',
-                                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
-                                show: '',
-                                entries: '',
-                            },
+                            // text: {
+                            //     // showingPage: 'Showing {0} to {1} of {1}',
+                            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
+                            //     show: '',
+                            //     entries: '',
+                            // },
                             pagination: false,
                             search: true,
                             columnSorting: false,
@@ -564,10 +568,11 @@ export default class QunatimedImportStepTwo extends Component {
                             onchange: this.programPlanningUnitChanged,
                             // oneditionstart: this.editStart,
                             allowDeleteRow: false,
-                            tableOverflow: true,
+                            // tableOverflow: true,
                             onload: this.loaded,
                             license: JEXCEL_PRO_KEY,
-                            filters: true
+                            filters: true,
+                            editable: true,
                             // tableHeight: '500px',
                         };
                         myVar = jexcel(document.getElementById("paputableDiv"), options);
@@ -593,7 +598,10 @@ export default class QunatimedImportStepTwo extends Component {
 
 
     render() {
-
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
 
         return (
             <div className="animated fadeIn">
@@ -603,7 +611,7 @@ export default class QunatimedImportStepTwo extends Component {
                     {/* <Card> */}
                     <CardBody className="pl-0 pr-0 pt-lg-0">
                         {/* <Col xs="12" sm="12"> */}
-                        <div className="table-responsive consumptionDataEntryTable">
+                        <div className="consumptionDataEntryTable">
                             <div id="paputableDiv" >
                             </div>
                         </div>

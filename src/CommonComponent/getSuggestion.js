@@ -124,7 +124,7 @@ export default function getSuggestion(row, lang) {
 
         if (desc_en != null && desc_en != '') {
             const result_en = desc_en.split('<%SHIPMENT_ID%>').join(row.shipmentId).split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%PROCUREMNET_AGENT%>').join(row.data5 != "" ? obj.procurementAgentCode : "").split('<%RO_NO%>').join(row.data5 != "" ? (obj.orderNo == null ? "" : obj.orderNo) : "").split('<%SHIPMENT_QTY%>').join(row.data5 != "" ? obj.shipmentQuantity.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + " " + i18n.t("static.qpl.units") : "").split('<%SHIPMENT_DATE%>').join(row.data5 != "" ? moment(obj.shipmentDate).format("MMM DD, YYYY") : "").split('<%SUBMITTED_DATE%>').join(row.data5 != "" ? moment(obj.submittedDate).format("MMM DD, YYYY") : "");
-            label.label_en = row.data5 == "" ? (result_en.replace("(",'').replace("|",'').replace("|",'').replace("|",'').replace(")",'')).replace(/  +/g, ' ') : result_en;
+            label.label_en = row.data5 == "" ? (result_en.replace("(", '').replace("|", '').replace("|", '').replace("|", '').replace(")", '')).replace(/  +/g, ' ') : result_en;
         } if (desc_fr != null && desc_fr != '') {
             const result_fr = desc_fr.split('<%SHIPMENT_ID%>').join(row.shipmentId).split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%PROCUREMNET_AGENT%>').join(row.data5 != "" ? obj.procurementAgentCode : "").split('<%RO_NO%>').join(row.data5 != "" ? (obj.orderNo == null ? "" : obj.orderNo) : "").split('<%SHIPMENT_QTY%>').join(row.data5 != "" ? obj.shipmentQuantity.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + " " + i18n.t("static.qpl.units") : "").split('<%SHIPMENT_DATE%>').join(row.data5 != "" ? moment(obj.shipmentDate).format("MMM DD, YYYY") : "").split('<%SUBMITTED_DATE%>').join(row.data5 != "" ? moment(obj.submittedDate).format("MMM DD, YYYY") : "");
             label.label_fr = row.data5 == "" ? (result_fr.replace("(", "").replace("|", "").replace("|", "").replace("|", "").replace(")", "")).replace(/  +/g, ' ') : result_fr;
@@ -336,27 +336,31 @@ export default function getSuggestion(row, lang) {
         // const result = desc.split('<%PLANNING_UNIT%>').join(row.planningUnit.label.label_en);
         // var label = row.realmProblem.problem.actionLabel;
         // label.label_en = result;
-        var desc_en = row.realmProblem.problem.actionLabel.label_en;
-        var desc_fr = row.realmProblem.problem.actionLabel.label_fr;
-        var desc_sp = row.realmProblem.problem.actionLabel.label_sp;
-        var desc_pr = row.realmProblem.problem.actionLabel.label_pr;
+        // var desc_en = row.realmProblem.problem.actionLabel.label_en;
+        // var desc_fr = row.realmProblem.problem.actionLabel.label_fr;
+        // var desc_sp = row.realmProblem.problem.actionLabel.label_sp;
+        // var desc_pr = row.realmProblem.problem.actionLabel.label_pr;
 
-        var label = row.realmProblem.problem.actionLabel;
-        if (desc_en != null && desc_en != '') {
-            const result_en = desc_en.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang));
-            label.label_en = result_en;
-        } if (desc_fr != null && desc_fr != '') {
-            const result_fr = desc_fr.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang));
-            label.label_fr = result_fr;
-        } if (desc_sp != null && desc_sp != '') {
-            const result_sp = desc_sp.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang));
-            label.label_sp = result_sp;
-        } if (desc_pr != null && desc_pr != '') {
-            const result_pr = desc_pr.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang));
-            label.label_pr = result_pr;
-        }
+        // var label = row.realmProblem.problem.actionLabel;
+        // if (desc_en != null && desc_en != '') {
+        //     const result_en = desc_en.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang));
+        //     label.label_en = result_en;
+        // } if (desc_fr != null && desc_fr != '') {
+        //     const result_fr = desc_fr.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang));
+        //     label.label_fr = result_fr;
+        // } if (desc_sp != null && desc_sp != '') {
+        //     const result_sp = desc_sp.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang));
+        //     label.label_sp = result_sp;
+        // } if (desc_pr != null && desc_pr != '') {
+        //     const result_pr = desc_pr.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang));
+        //     label.label_pr = result_pr;
+        // }
+        console.log("row.data5", row.data5.suggession)
+        var label = row.data5.suggession;
 
-        return getLabelText(label, lang);
+        return label;
+        // return getLabelText(label, lang);
+
     }
     if (row.realmProblem.problem.problemId == 14) {
         // Dynamic forecasting is not used for certain commodity groups (Malaria, ARV, VMMC)
@@ -644,7 +648,7 @@ export default function getSuggestion(row, lang) {
 
         return getLabelText(label, lang);
     }
-    if (row.realmProblem.problem.problemId == 23) {
+    if (row.realmProblem.problem.problemId == 23 || row.realmProblem.problem.problemId == 29) {
         var label = row.realmProblem.problem.actionLabel;
         // label.label_en = "Inventory doen't fall within min/max range";
         return getLabelText(label, lang);
@@ -676,5 +680,13 @@ export default function getSuggestion(row, lang) {
             label.label_pr = result_pr;
         }
         return getLabelText(label, lang);
+    }
+    if (row.realmProblem.problem.problemId == 26 || row.realmProblem.problem.problemId == 27 || row.realmProblem.problem.problemId == 28) {
+        console.log("row.data5", row.data5);
+        var abc='{"problemDescription":"pass #1234 !@#$%^&*()_+-={}|;,./<>?[]", "suggession":"PO 6581 for 420,881 schedule should be revised. Per information that we receive from the supplier, this order was split into three shipments. Details are below. Delivery dates are my estimates. They will go for kitting first, so it is hard to know how long that could take.- 99,881 picked up in July; estimate delivery in Oct.- 150,145 picked up in August; estimate delivery in Nov.- 170,880 likely to be picked up in Sept/Oct; estimate delivery in Jan 2023"}';
+        var obj = JSON.parse(abc);
+        //  var obj = JSON.parse(row.data5);
+        var label = obj.suggession;
+        return label;
     }
 }

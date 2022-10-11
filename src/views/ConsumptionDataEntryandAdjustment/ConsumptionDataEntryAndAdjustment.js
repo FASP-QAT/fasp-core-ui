@@ -16,12 +16,12 @@ import 'react-select/dist/react-select.min.css';
 import AuthenticationService from "../Common/AuthenticationService.js";
 import '../Forms/ValidationForms/ValidationForms.css';
 import moment from "moment"
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import csvicon from '../../assets/img/csv.png';
 import { JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
-import { jExcelLoadedFunctionOnlyHideRow, checkValidtion, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
+import { jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination, checkValidtion, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
 import NumberFormat from 'react-number-format';
 import { CustomTooltips } from "@coreui/coreui-plugin-chartjs-custom-tooltips";
 import { Prompt } from "react-router-dom";
@@ -38,6 +38,11 @@ import dataentryScreenshot1 from '../../assets/img/dataentryScreenshot-1.png';
 import dataentryScreenshot2 from '../../assets/img/dataentryScreenshot-2.png';
 import dataentryScreenshot3 from '../../assets/img/dataentryScreenshot-3.png';
 import { round } from "mathjs";
+import { calculateMovingAvg } from '../Extrapolation/MovingAverages';
+import { calculateSemiAverages } from '../Extrapolation/SemiAverages';
+import { calculateLinearRegression } from '../Extrapolation/LinearRegression';
+import { calculateTES } from '../Extrapolation/TESNew';
+import { calculateArima } from '../Extrapolation/Arima';
 
 const entityname = i18n.t('static.dashboard.dataEntryAndAdjustment');
 const ref = React.createRef();
@@ -114,10 +119,33 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       tempConsumptionUnitObject: { "consumptionDataType": "" },
       dataEnteredInUnitList: [],
       minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
-      singleValue2: localStorage.getItem("sesDataentryDateRange") != "" ? JSON.parse(localStorage.getItem("sesDataentryDateRange")) : { from: { year: Number(moment(startDate).startOf('month').format("YYYY")), month: Number(moment(startDate).startOf('month').format("M")) }, to: { year: Number(moment(stopDate).startOf('month').format("YYYY")), month: Number(moment(stopDate).startOf('month').format("M")) } },
+      singleValue2: localStorage.getItem("sesDataentryStartDateRange") != "" ? JSON.parse(localStorage.getItem("sesDataentryStartDateRange")) : { year: Number(moment(startDate).startOf('month').format("YYYY")), month: Number(moment(startDate).startOf('month').format("M")) },
       maxDate: { year: Number(moment(Date.now()).startOf('month').format("YYYY")), month: Number(moment(Date.now()).startOf('month').format("M")) },
       planningUnitTotalList: [],
-      dataEnteredInTableExSpan: 0
+      dataEnteredInTableExSpan: 0,
+      confidenceLevelId: 0.85,
+      confidenceLevelIdLinearRegression: 0.85,
+      confidenceLevelIdArima: 0.85,
+      alpha: 0.2,
+      beta: 0.2,
+      gamma: 0.2,
+      noOfMonthsForASeason: 4,
+      confidence: 0.95,
+      monthsForMovingAverage: 6,
+      seasonality: 1,
+      p: 0,
+      d: 1,
+      q: 1,
+      CI: "",
+      tesData: [],
+      arimaData: [],
+      jsonDataMovingAvg: [],
+      jsonDataSemiAverage: [],
+      jsonDataLinearRegression: [],
+      jsonDataTes: [],
+      jsonDataArima: [],
+      count: 0,
+      countRecived: 0
     }
     this.loaded = this.loaded.bind(this);
     this.loadedJexcel = this.loadedJexcel.bind(this);
@@ -130,6 +158,11 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     this.resetClicked = this.resetClicked.bind(this)
     this.buildJexcel = this.buildJexcel.bind(this);
     this.saveConsumptionList = this.saveConsumptionList.bind(this);
+    this.updateMovingAvgData = this.updateMovingAvgData.bind(this);
+    this.updateSemiAveragesData = this.updateSemiAveragesData.bind(this);
+    this.updateLinearRegressionData = this.updateLinearRegressionData.bind(this);
+    this.updateTESData = this.updateTESData.bind(this);
+    this.updateArimaData = this.updateArimaData.bind(this);
   }
 
   makeText = m => {
@@ -207,7 +240,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       }, () => {
         var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN']
         var consumptionList = isInterpolate == 1 ? this.state.tempConsumptionList : this.state.consumptionList;
-        console.log("consumptionList All--->", consumptionList)
+        console.log("consumptionList All--->", this.state.tempConsumptionList)
         var consumptionUnit = {};
         var consumptionNotes = "";
         if (consumptionUnitId > 0) {
@@ -324,7 +357,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           data[0] = i18n.t('static.dataentry.adjustedConsumption')
           for (var j = 0; j < monthArray.length; j++) {
             // data[j + 1] = `=ROUND((${colArr[j + 1]}${parseInt(dataArray.length - 3)}/${colArr[j + 1]}${parseInt(dataArray.length - 2)}/(1-(${colArr[j + 1]}${parseInt(dataArray.length - 1)}/${colArr[j + 1] + "1"})))*100,0)`;
-            data[j + 1] = `=IF(${colArr[j + 1]}${parseInt(dataArray.length - 3)}=='','',ROUND((${colArr[j + 1]}${parseInt(dataArray.length - 3)}/${colArr[j + 1]}${parseInt(dataArray.length - 2)}/(1-(${colArr[j + 1]}${parseInt(dataArray.length - 1)}/${colArr[j + 1] + "1"})))*100,0))`;
+            // data[j + 1] = `=IF(${colArr[j + 1]}${parseInt(dataArray.length - 3)}=='','',ROUND((${colArr[j + 1]}${parseInt(dataArray.length - 3)}/${colArr[j + 1]}${parseInt(dataArray.length - 2)}/(1-(${colArr[j + 1]}${parseInt(dataArray.length - 1)}/${colArr[j + 1] + "1"})))*100,0))`;
+            data[j + 1] = `=IF(ISBLANK(${colArr[j + 1]}${parseInt(dataArray.length - 3)}),'',ROUND((${colArr[j + 1]}${parseInt(dataArray.length - 3)}/${colArr[j + 1]}${parseInt(dataArray.length - 2)}/(1-(${colArr[j + 1]}${parseInt(dataArray.length - 1)}/${colArr[j + 1] + "1"})))*100,0))`;
+
           }
           data[monthArray.length + 1] = multiplier;
           dataArray.push(data);
@@ -334,7 +369,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           for (var j = 0; j < monthArray.length; j++) {
             // data[j + 1] = `=ROUND(${colArr[j + 1]}${parseInt(dataArray.length)}/${colArr[monthArray.length + 1] + "0"},0)`;
             console.log("Multiplier 1@@@@@@@@@@@@@@@", multiplier1);
-            data[j + 1] = `=IF(${colArr[j + 1]}${parseInt(dataArray.length - 4)}=='','',ROUND(${colArr[j + 1]}${parseInt(dataArray.length)}/${colArr[monthArray.length + 1] + "1"},0))`;
+            data[j + 1] = `=IF(ISBLANK(${colArr[j + 1]}${parseInt(dataArray.length - 4)}),'',ROUND(${colArr[j + 1]}${parseInt(dataArray.length)}/${colArr[monthArray.length + 1] + "1"},0))`;
           }
           data[monthArray.length + 1] = multiplier;
 
@@ -367,18 +402,20 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         //   languageArray[count] = data;
         //   count++;
         // }
-        this.el = jexcel(document.getElementById("tableDiv"), '');
-        this.el.destroy();
+        // this.el = jexcel(document.getElementById("tableDiv"), '');
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById('tableDiv'), true);
         var options = {
           data: dataArray,
           columnDrag: true,
           columns: columns,
-          text: {
-            // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-            showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-            show: '',
-            entries: '',
-          },
+          colWidths: [10, 50, 100, 100, 100, 100, 50, 100],
+          // text: {
+          //   // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+          //   showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+          //   show: '',
+          //   entries: '',
+          // },
           updateTable: function (el, cell, x, y, source, value, id) {
           },
           onload: this.loaded,
@@ -393,7 +430,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           pagination: false,
           search: false,
           columnSorting: false,
-          tableOverflow: true,
+          // tableOverflow: true,
           wordWrap: true,
           allowInsertColumn: false,
           allowManualInsertColumn: false,
@@ -405,10 +442,10 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           paginationOptions: JEXCEL_PAGINATION_OPTION,
           position: 'top',
           filters: false,
-          freezeColumns: 1,
+          // freezeColumns: 1,
           license: JEXCEL_PRO_KEY,
           parseFormulas: true,
-          editable:AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT')?true:false,
+          editable: AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT') ? true : false,
           contextMenu: function (obj, x, y, e) {
             return [];
           }.bind(this),
@@ -436,6 +473,506 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       })
     }
   }
+
+  //.................................................................. Extrapolate..................................
+  ExtrapolatedParameters() {
+    console.log("datasetJson--------> inside", this.state.selectedConsumptionUnitId);
+    if (this.state.selectedConsumptionUnitId > 0) {
+      this.setState({ loading: true })
+      var datasetJson = this.state.datasetJson;
+      console.log("datasetJson**********", datasetJson)
+      // Need to filter
+      var regionList = this.state.regionList;
+      var count = 0;
+      for (var i = 0; i < regionList.length; i++) {
+        var actualConsumptionListForPlanningUnitAndRegion = datasetJson.actualConsumptionList.filter(c => c.planningUnit.id == this.state.selectedConsumptionUnitId && c.region.id == regionList[i].regionId);
+        if (actualConsumptionListForPlanningUnitAndRegion.length > 1) {
+          let minDate = moment.min(actualConsumptionListForPlanningUnitAndRegion.filter(c => c.puAmount >= 0).map(d => moment(d.month)));
+          let maxDate = moment.max(actualConsumptionListForPlanningUnitAndRegion.filter(c => c.puAmount >= 0).map(d => moment(d.month)));
+          let curDate = minDate;
+          var inputDataMovingAvg = [];
+          var inputDataSemiAverage = [];
+          var inputDataLinearRegression = [];
+          var inputDataTes = [];
+          var inputDataArima = [];
+
+          console.log("minDate", moment(minDate).format("YYYY-MM"));
+          console.log("maxDate", moment(maxDate).format("YYYY-MM"));
+          for (var j = 0; moment(curDate).format("YYYY-MM") < moment(maxDate).format("YYYY-MM"); j++) {
+            curDate = moment(minDate).startOf('month').add(j, 'months').format("YYYY-MM-DD");
+            console.log("curdate", curDate)
+            var consumptionData = actualConsumptionListForPlanningUnitAndRegion.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM"))
+            console.log("consumptionData--->", consumptionData)
+            console.log("Value@@@@@@@@@@@", consumptionData.length > 0 ? Number(consumptionData[0].puAmount) : null);
+            inputDataMovingAvg.push({ "month": inputDataMovingAvg.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].puAmount) : null, "forecast": null })
+            inputDataSemiAverage.push({ "month": inputDataSemiAverage.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].puAmount) : null, "forecast": null })
+            inputDataLinearRegression.push({ "month": inputDataLinearRegression.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].puAmount) : null, "forecast": null })
+            inputDataTes.push({ "month": inputDataTes.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].puAmount) : null, "forecast": null })
+            inputDataArima.push({ "month": inputDataArima.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].puAmount) : null, "forecast": null })
+          }
+          var forecastMinDate = moment(datasetJson.currentVersion.forecastStartDate).format("YYYY-MM-DD");
+          var forecastMaxDate = moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM-DD");
+          const monthsDiff = moment(new Date(moment(maxDate).format("YYYY-MM-DD")>moment(forecastMaxDate).format("YYYY-MM-DD")?moment(maxDate).format("YYYY-MM-DD"):moment(forecastMaxDate).format("YYYY-MM-DD"))).diff(new Date(moment(minDate).format("YYYY-MM-DD")<moment(forecastMinDate).format("YYYY-MM-DD")?moment(minDate).format("YYYY-MM-DD"):moment(forecastMinDate).format("YYYY-MM-DD")), 'months', true);
+          const noOfMonthsForProjection = (monthsDiff+1) - inputDataMovingAvg.length;
+
+          if (inputDataMovingAvg.filter(c => c.actual != null).length >= 3) {
+            count++;
+            calculateMovingAvg(inputDataMovingAvg, this.state.monthsForMovingAverage, noOfMonthsForProjection, this, "DataEntry", regionList[i].regionId);
+          }
+          if (inputDataMovingAvg.filter(c => c.actual != null).length >= 3) {
+            count++;
+            calculateSemiAverages(inputDataSemiAverage, noOfMonthsForProjection, this, "DataEntry", regionList[i].regionId);
+          }
+          if (inputDataMovingAvg.filter(c => c.actual != null).length >= 3) {
+            count++;
+            calculateLinearRegression(inputDataLinearRegression, this.state.confidenceLevelIdLinearRegression, noOfMonthsForProjection, this, false, "DataEntry", regionList[i].regionId);
+          }
+          if (inputDataMovingAvg.filter(c => c.actual != null).length >= 24) {
+            count++;
+            calculateTES(inputDataTes, this.state.alpha, this.state.beta, this.state.gamma, this.state.confidenceLevelId, noOfMonthsForProjection, this, minDate, false, "DataEntry", regionList[i].regionId);
+          }
+          if (((this.state.seasonality && inputDataMovingAvg.filter(c => c.actual != null).length >= 13) || (!this.state.seasonality && inputDataMovingAvg.filter(c => c.actual != null).length >= 2))) {
+            count++;
+            calculateArima(inputDataArima, this.state.p, this.state.d, this.state.q, this.state.confidenceLevelIdArima, noOfMonthsForProjection, this, minDate, false, this.state.seasonality, "DataEntry", regionList[i].regionId);
+          }
+        }
+      }
+      this.setState({
+        count: count
+      })
+    }
+  }
+
+  updateMovingAvgData(data) {
+
+    var jsonDataMovingAvg = this.state.jsonDataMovingAvg;
+    jsonDataMovingAvg.push(data);
+    console.log("jsonDataMovingAvg--->", jsonDataMovingAvg)
+    var countR = this.state.countRecived
+    console.log("countR--->", countR)
+
+    this.setState({
+      jsonDataMovingAvg: jsonDataMovingAvg,
+      countRecived: countR + 1
+    }, () => {
+      console.log("countRecivedMov", this.state.countRecived)
+      console.log("countMov", this.state.count)
+
+console.log("outSide****",(this.state.jsonDataMovingAvg.length
+  + this.state.jsonDataSemiAverage.length
+  + this.state.jsonDataLinearRegression.length
+  + this.state.jsonDataTes.length
+  + this.state.jsonDataArima.length
+  == this.state.count))
+      if (this.state.jsonDataMovingAvg.length
+        + this.state.jsonDataSemiAverage.length
+        + this.state.jsonDataLinearRegression.length
+        + this.state.jsonDataTes.length
+        + this.state.jsonDataArima.length
+        == this.state.count) {
+          console.log("inside if")
+        this.saveForecastConsumptionExtrapolation();
+      }
+    })
+  }
+
+  updateSemiAveragesData(data) {
+    var jsonDataSemiAverage = this.state.jsonDataSemiAverage;
+    jsonDataSemiAverage.push(data);
+    console.log("jsonDataSemiAverage--->", jsonDataSemiAverage)
+    var countR = this.state.countRecived
+    console.log("countR--->", countR)
+
+    this.setState({
+      jsonDataSemiAverage: jsonDataSemiAverage,
+      countRecived: countR + 1
+    }, () => {
+      console.log("countRecivedSemi", this.state.countRecived)
+      console.log("countSemi", this.state.count)
+console.log("Semi outside if", this.state.jsonDataMovingAvg.length
++ this.state.jsonDataSemiAverage.length
++ this.state.jsonDataLinearRegression.length
++ this.state.jsonDataTes.length
++ this.state.jsonDataArima.length
+== this.state.count)
+      if (this.state.jsonDataMovingAvg.length
+        + this.state.jsonDataSemiAverage.length
+        + this.state.jsonDataLinearRegression.length
+        + this.state.jsonDataTes.length
+        + this.state.jsonDataArima.length
+        == this.state.count) {
+        this.saveForecastConsumptionExtrapolation();
+      }
+    })
+  }
+
+  updateLinearRegressionData(data) {
+    var jsonDataLinearRegression = this.state.jsonDataLinearRegression;
+    jsonDataLinearRegression.push(data);
+    console.log("jsonDataLinearRegression--->", jsonDataLinearRegression)
+    this.setState({
+      jsonDataLinearRegression: jsonDataLinearRegression,
+      countRecived: this.state.countRecived++
+    }, () => {
+      console.log("countRecivedL", this.state.countRecived)
+      console.log("countL", this.state.count)
+console.log("linear outside***",this.state.jsonDataMovingAvg.length
++ this.state.jsonDataSemiAverage.length
++ this.state.jsonDataLinearRegression.length
++ this.state.jsonDataTes.length
++ this.state.jsonDataArima.length
+== this.state.count)
+
+      if (this.state.jsonDataMovingAvg.length
+        + this.state.jsonDataSemiAverage.length
+        + this.state.jsonDataLinearRegression.length
+        + this.state.jsonDataTes.length
+        + this.state.jsonDataArima.length
+        == this.state.count) {
+        this.saveForecastConsumptionExtrapolation();
+      }
+    })
+  }
+
+  updateTESData(data) {
+    var jsonDataTes = this.state.jsonDataTes;
+    jsonDataTes.push(data);
+    console.log("jsonDataTes--->", jsonDataTes)
+    this.setState({
+      jsonDataTes: jsonDataTes,
+      countRecived: this.state.countRecived++
+    }, () => {
+      console.log("countRecivedT", this.state.countRecived)
+      console.log("countT", this.state.count)
+console.log("TES",this.state.jsonDataMovingAvg.length
++ this.state.jsonDataSemiAverage.length
++ this.state.jsonDataLinearRegression.length
++ this.state.jsonDataTes.length
++ this.state.jsonDataArima.length
+== this.state.count)
+
+      if (this.state.jsonDataMovingAvg.length
+        + this.state.jsonDataSemiAverage.length
+        + this.state.jsonDataLinearRegression.length
+        + this.state.jsonDataTes.length
+        + this.state.jsonDataArima.length
+        == this.state.count) {
+        this.saveForecastConsumptionExtrapolation();
+      }
+    })
+  }
+
+  updateArimaData(data) {
+    var jsonDataArima = this.state.jsonDataArima;
+    jsonDataArima.push(data);
+    console.log("jsonDataArima--->", jsonDataArima)
+    this.setState({
+      jsonDataArima: jsonDataArima,
+      countRecived: this.state.countRecived++
+    }, () => {
+      console.log("countRecivedA", this.state.countRecived)
+      console.log("countA", this.state.count)
+      console.log("Arima", this.state.jsonDataMovingAvg.length
+      + this.state.jsonDataSemiAverage.length
+      + this.state.jsonDataLinearRegression.length
+      + this.state.jsonDataTes.length
+      + this.state.jsonDataArima.length
+      == this.state.count)
+      if (this.state.jsonDataMovingAvg.length
+        + this.state.jsonDataSemiAverage.length
+        + this.state.jsonDataLinearRegression.length
+        + this.state.jsonDataTes.length
+        + this.state.jsonDataArima.length
+        == this.state.count) {
+        this.saveForecastConsumptionExtrapolation();
+      }
+    })
+  }
+
+  saveForecastConsumptionExtrapolation() {
+    console.log("inside saveForecastConsumptionExtrapolation")
+    this.setState({
+      loading: true
+    })
+    var db1;
+    var storeOS;
+    getDatabase();
+    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+    openRequest.onerror = function (event) {
+      this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+      this.props.updateState("color", "red");
+      this.props.hideFirstComponent();
+    }.bind(this);
+    openRequest.onsuccess = function (e) {
+      db1 = e.target.result;
+      var extrapolationMethodTransaction = db1.transaction(['extrapolationMethod'], 'readwrite');
+      var extrapolationMethodObjectStore = extrapolationMethodTransaction.objectStore('extrapolationMethod');
+      var extrapolationMethodRequest = extrapolationMethodObjectStore.getAll();
+      extrapolationMethodRequest.onerror = function (event) {
+      }.bind(this);
+      extrapolationMethodRequest.onsuccess = function (event) {
+        var transaction = db1.transaction(['datasetData'], 'readwrite');
+        var datasetTransaction = transaction.objectStore('datasetData');
+        console.log("dataset", this.state.datasetId)
+        var datasetRequest = datasetTransaction.get(this.state.datasetId);
+        datasetRequest.onerror = function (event) {
+        }.bind(this);
+        datasetRequest.onsuccess = function (event) {
+          var extrapolationMethodList = extrapolationMethodRequest.result;
+          var myResult = datasetRequest.result;
+          var datasetDataBytes = CryptoJS.AES.decrypt(myResult.programData, SECRET_KEY);
+          var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
+          var datasetJson = JSON.parse(datasetData);
+          var consumptionExtrapolationDataUnFiltered = (datasetJson.consumptionExtrapolation);
+          console.log("consumptionExtrapolationDataUnFiltered@@@@@@@@@@", consumptionExtrapolationDataUnFiltered);
+          console.log("this.state.planningUnitId@@@@@@@@@@", this.state.planningUnitId);
+          var regionList = this.state.regionList;
+          for (var r = 0; r < regionList.length; r++) {
+            var consumptionExtrapolationList = datasetJson.consumptionExtrapolation.filter(c => c.planningUnit.id == this.state.selectedConsumptionUnitId && c.region.id == regionList[i].regionId);
+            console.log("consumptionExtrapolationList@@@@@@@@@@", consumptionExtrapolationList);
+            var consumptionExtrapolationData = -1//Semi Averages
+            var consumptionExtrapolationMovingData = -1//Moving averages
+            var consumptionExtrapolationRegression = -1//Linear Regression
+            var consumptionExtrapolationTESL = -1//TES L
+            console.log("consumptionExtrapolationTESL+++", consumptionExtrapolationTESL)
+            var consumptionExtrapolationTESM = -1//TES M
+            var consumptionExtrapolationTESH = -1//TES H
+            //----------------------------
+            // var rangeValue = this.state.rangeValue1;
+            // let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
+            // let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
+
+            var inputDataFilter = this.state.jsonDataSemiAverage;
+            var inputDataAverageFilter = this.state.movingAvgData;
+            var inputDataRegressionFilter = this.state.linearRegressionData;
+            console.log("consumptionExtrapolationData", consumptionExtrapolationData);
+            console.log("inputDataFilter", inputDataFilter);
+            var id = consumptionExtrapolationDataUnFiltered.length > 0 ? Math.max(...consumptionExtrapolationDataUnFiltered.map(o => o.consumptionExtrapolationId)) + 1 : 1;
+            var planningUnitObj = this.state.planningUnitList.filter(c => c.planningUnit.id == this.state.selectedConsumptionUnitId)[0].planningUnit;
+            console.log("this.state.regionList", this.state.regionList);
+            var regionObj = this.state.regionList.filter(c => c.regionId == regionList[r].regionId)[0];
+            console.log("Planning Unit Obj****", planningUnitObj);
+            console.log("Region Obj****", regionObj);
+            var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+            var curUser = AuthenticationService.getLoggedInUserId();
+            var datasetJson = this.state.datasetJson;
+            var actualConsumptionListForPlanningUnitAndRegion = datasetJson.actualConsumptionList.filter(c => c.planningUnit.id == this.state.selectedConsumptionUnitId && c.region.id == regionList[r].regionId);
+            var minDate = moment.min(actualConsumptionListForPlanningUnitAndRegion.filter(c => c.puAmount >= 0).map(d => moment(d.month)));
+            var maxDate = moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM-DD");
+
+            //Semi - averages
+            console.log("this.state.jsonDataSemiAverage----------->", this.state.jsonDataSemiAverage);
+            var jsonDataSemiAvgFilter = this.state.jsonDataSemiAverage.filter(c => c.PlanningUnitId == this.state.selectedConsumptionUnitId && c.regionId == regionList[r].regionId)
+            if (jsonDataSemiAvgFilter.length > 0) {
+              var jsonSemi = jsonDataSemiAvgFilter[0].data;
+              console.log("this.state.jsonDataSemiAverage--json--------->", jsonSemi);
+              var data = [];
+              for (var i = 0; i < jsonSemi.length; i++) {
+                data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonSemi[i].forecast != null ? (jsonSemi[i].forecast).toFixed(2) : null, ci: null })
+              }
+              console.log("data--------->", data);
+
+              consumptionExtrapolationList.push(
+                {
+                  "consumptionExtrapolationId": id,
+                  "planningUnit": planningUnitObj,
+                  "region": {
+                    id: regionObj.regionId,
+                    label: regionObj.label
+                  },
+                  "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 6)[0],
+                  "jsonProperties": {
+                    startDate: moment(minDate).format("YYYY-MM-DD"),
+                    stopDate: moment(maxDate).format("YYYY-MM-DD")
+                  },
+                  "createdBy": {
+                    "userId": curUser
+                  },
+                  "createdDate": curDate,
+                  "extrapolationDataList": data
+                })
+              id += 1;
+            }
+            console.log("this.state.monthsForMovingAverage+++", this.state.monthsForMovingAverage)
+            //Moving Averages
+            var data = [];
+            var jsonDataMovingFilter = this.state.jsonDataMovingAvg.filter(c => c.PlanningUnitId == this.state.selectedConsumptionUnitId && c.regionId == regionList[r].regionId)
+            if (jsonDataMovingFilter.length > 0) {
+              var jsonDataMoving = jsonDataMovingFilter[0].data;
+              console.log("this.state.jsonDataMovingAvg--json--------->", jsonDataMoving);
+              for (var i = 0; i < jsonDataMoving.length; i++) {
+                data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonDataMoving[i].forecast != null ? (jsonDataMoving[i].forecast).toFixed(2) : null, ci: null })
+              }
+              consumptionExtrapolationList.push(
+                {
+                  "consumptionExtrapolationId": id,
+                  "planningUnit": planningUnitObj,
+                  "region": {
+                    id: regionObj.regionId,
+                    label: regionObj.label
+                  },
+                  "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 7)[0],
+                  "jsonProperties": {
+                    months: this.state.monthsForMovingAverage,
+                    startDate: moment(minDate).format("YYYY-MM-DD"),
+                    stopDate: moment(maxDate).format("YYYY-MM-DD")
+                  },
+                  "createdBy": {
+                    "userId": curUser
+                  },
+                  "createdDate": curDate,
+                  "extrapolationDataList": data
+                })
+            }
+            id += 1;
+            //Linear Regression
+            var data = [];
+            var jsonDataLinearFilter = this.state.jsonDataLinearRegression.filter(c => c.PlanningUnitId == this.state.selectedConsumptionUnitId && c.regionId == regionList[r].regionId)
+            if (jsonDataLinearFilter.length > 0) {
+              var jsonDataLinear = jsonDataLinearFilter[0].data;
+              console.log("this.state.jsonDataLinear--json--------->", jsonDataLinear);
+              for (var i = 0; i < jsonDataLinear.length; i++) {
+                data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonDataLinear[i].forecast != null ? (jsonDataLinear[i].forecast).toFixed(2) : null, ci: (jsonDataLinear[i].ci) })
+              }
+              consumptionExtrapolationList.push(
+                {
+                  "consumptionExtrapolationId": id,
+                  "planningUnit": planningUnitObj,
+                  "region": {
+                    id: regionObj.regionId,
+                    label: regionObj.label
+                  },
+                  "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 5)[0],
+                  "jsonProperties": {
+                    confidenceLevel: this.state.confidenceLevelIdLinearRegression,
+                    startDate: moment(minDate).format("YYYY-MM-DD"),
+                    stopDate: moment(maxDate).format("YYYY-MM-DD")
+                  },
+                  "createdBy": {
+                    "userId": curUser
+                  },
+                  "createdDate": curDate,
+                  "extrapolationDataList": data
+                })
+              id += 1;
+            }
+            //TES L
+            //TES M
+            console.log("in if2")
+            var data = [];
+            var jsonDataTesFilter = this.state.jsonDataTes.filter(c => c.PlanningUnitId == this.state.selectedConsumptionUnitId && c.regionId == regionList[r].regionId)
+            if (jsonDataTesFilter.length > 0) {
+              var jsonDataTes = jsonDataTesFilter[0].data;
+              console.log("this.state.jsonDataTes--json--------->", jsonDataTes);
+
+              for (var i = 0; i < jsonDataTes.length; i++) {
+                data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonDataTes[i].forecast != null ? (jsonDataTes[i].forecast).toFixed(2) : null, ci: (jsonDataTes[i].ci) })
+              }
+              consumptionExtrapolationList.push(
+                {
+                  "consumptionExtrapolationId": id,
+                  "planningUnit": planningUnitObj,
+                  "region": {
+                    id: regionObj.regionId,
+                    label: regionObj.label
+                  },
+                  "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 2)[0],
+                  "jsonProperties": {
+                    confidenceLevel: this.state.confidenceLevelId,
+                    seasonality: this.state.noOfMonthsForASeason,
+                    alpha: this.state.alpha,
+                    beta: this.state.beta,
+                    gamma: this.state.gamma,
+                    startDate: moment(minDate).format("YYYY-MM-DD"),
+                    stopDate: moment(maxDate).format("YYYY-MM-DD")
+                  },
+                  "createdBy": {
+                    "userId": curUser
+                  },
+                  "createdDate": curDate,
+                  "extrapolationDataList": data
+                })
+              id += 1;
+            }
+            //Arima L
+            //TES M
+            console.log("in if2")
+            var data = [];
+            var jsonDataArimaFilter = this.state.jsonDataArima.filter(c => c.PlanningUnitId == this.state.selectedConsumptionUnitId && c.regionId == regionList[r].regionId)
+            if (jsonDataArimaFilter.length > 0) {
+              var jsonDataArima = jsonDataArimaFilter[0].data;
+              console.log("this.state.jsonDataArima--json--------->", jsonDataArima);
+              for (var i = 0; i < jsonDataArima.length; i++) {
+                data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonDataArima[i].forecast != null ? (jsonDataArima[i].forecast).toFixed(2) : null, ci: (jsonDataArima[i].ci) })
+              }
+              consumptionExtrapolationList.push(
+                {
+                  "consumptionExtrapolationId": id,
+                  "planningUnit": planningUnitObj,
+                  "region": {
+                    id: regionObj.regionId,
+                    label: regionObj.label
+                  },
+                  "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 4)[0],
+                  "jsonProperties": {
+                    confidenceLevel: this.state.confidenceLevelIdArima,
+                    seasonality: this.state.seasonality,
+                    p: this.state.p,
+                    d: this.state.d,
+                    q: this.state.q,
+                    startDate: moment(minDate).format("YYYY-MM-DD"),
+                    stopDate: moment(maxDate).format("YYYY-MM-DD")
+                  },
+                  "createdBy": {
+                    "userId": curUser
+                  },
+                  "createdDate": curDate,
+                  "extrapolationDataList": data
+                })
+              id += 1;
+            }
+          }
+          console.log('consumptionExtrapolationRegression', consumptionExtrapolationRegression);
+          datasetJson.consumptionExtrapolation = consumptionExtrapolationList;
+          console.log("consumptionExtrapolationList@@@@@@@@@@", consumptionExtrapolationList)
+          datasetData = (CryptoJS.AES.encrypt(JSON.stringify(datasetJson), SECRET_KEY)).toString()
+          myResult.programData = datasetData;
+          var putRequest = datasetTransaction.put(myResult);
+          this.setState({
+            dataChanged: false
+          })
+          putRequest.onerror = function (event) {
+          }.bind(this);
+          putRequest.onsuccess = function (event) {
+            console.log("save");
+            // let id = AuthenticationService.displayDashboardBasedOnRole();
+            // this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.compareAndSelect.dataSaved'));
+            this.setState({
+              // dataEl: "",
+              loading: false,
+              dataChanged: false,
+              message: i18n.t('static.compareAndSelect.dataSaved'),
+              extrapolateClicked: false,
+              countRecived: 0,
+              count: 0
+            }, () => {
+              this.hideFirstComponent();
+              this.componentDidMount()
+            })
+
+
+            // console.log(" after save",this.state.message);
+            // , () => {
+            //     this.componentDidMount();
+            // })
+
+          }.bind(this);
+        }.bind(this);
+      }.bind(this);
+    }.bind(this);
+    // }
+  }
+  //------------------------------------------------------------------------------------
 
   consumptionDataChanged = function (instance, cell, x, y, value) {
     var possibleActualConsumptionY = [];
@@ -659,8 +1196,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     var consumptionUnit = this.state.selectedConsumptionUnitObject;
     var rangeValue = this.state.singleValue2;
     console.log("RangeValuie@@@@@@@@@@@@", rangeValue);
-    var startDate = moment(rangeValue.from.year + '-' + rangeValue.from.month + '-01').format("YYYY-MM-DD");
-    var stopDate = moment(rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate()).format("YYYY-MM-DD");
+    var startDate = moment(rangeValue.year + '-' + rangeValue.month + '-01').format("YYYY-MM-DD");
+    var stopDate = moment(startDate).add(35, 'months').format("YYYY-MM-DD");
     var fullConsumptionList = this.state.tempConsumptionList.filter(c => (c.planningUnit.id != consumptionUnit.planningUnit.id) || (c.planningUnit.id == consumptionUnit.planningUnit.id && (moment(c.month).format("YYYY-MM") < moment(startDate).format("YYYY-MM") || moment(c.month).format("YYYY-MM") > moment(stopDate).format("YYYY-MM"))));
     var elInstance = this.state.dataEl;
     for (var i = 0; i < monthArray.length; i++) {
@@ -836,8 +1373,10 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           // var fullConsumptionList = this.state.consumptionList.filter(c => c.planningUnit.id != consumptionUnit.planningUnit.id);
           var rangeValue = this.state.singleValue2;
           console.log("RangeValuie@@@@@@@@@@@@", rangeValue);
-          var startDate = moment(rangeValue.from.year + '-' + rangeValue.from.month + '-01').format("YYYY-MM-DD");
-          var stopDate = moment(rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate()).format("YYYY-MM-DD");
+          var startDate = moment(rangeValue.year + '-' + rangeValue.month + '-01').format("YYYY-MM-DD");
+          // var stopDate = moment(rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate()).format("YYYY-MM-DD");
+          var stopDate = moment(startDate).add(35, 'months').format("YYYY-MM-DD");
+
           var fullConsumptionList = this.state.consumptionList.filter(c => (c.planningUnit.id != consumptionUnit.planningUnit.id) || (c.planningUnit.id == consumptionUnit.planningUnit.id && (moment(c.month).format("YYYY-MM") < moment(startDate).format("YYYY-MM") || moment(c.month).format("YYYY-MM") > moment(stopDate).format("YYYY-MM"))));
           console.log("Full ConsumptionList @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@", fullConsumptionList)
           var monthArray = this.state.monthArray;
@@ -881,7 +1420,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                       userId: curUser
                     },
                     createdDate: curDate,
-                    daysOfStockOut: daysOfStockOutValue,
+                    daysOfStockOut: daysOfStockOutValue!==""?Math.round(daysOfStockOutValue):daysOfStockOutValue,
                     exculde: false,
                     forecastConsumptionId: 0,
                     month: moment(monthArray[i].date).startOf('month').format("YYYY-MM-DD"),
@@ -922,6 +1461,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
 
           datasetJson.actualConsumptionList = fullConsumptionList;
           datasetJson.planningUnitList = planningUnitList;
+          datasetJson.consumptionExtrapolation = [];
+          console.log("datasetJson----------->925", datasetJson);
           datasetData = (CryptoJS.AES.encrypt(JSON.stringify(datasetJson), SECRET_KEY)).toString()
           myResult.programData = datasetData;
           var putRequest = datasetTransaction.put(myResult);
@@ -942,10 +1483,12 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               loading: false,
               message: i18n.t('static.compareAndSelect.dataSaved'),
               messageColor: "green",
-              consumptionChanged: false
+              consumptionChanged: false,
+              datasetJson:datasetJson
             }, () => {
               this.getDatasetData();
               this.hideFirstComponent();
+              this.ExtrapolatedParameters();
             })
           }.bind(this)
         }.bind(this)
@@ -967,54 +1510,63 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
   }
 
   hideSecondComponent() {
-    document.getElementById('div2').style.display = 'block';
-    this.state.timeout = setTimeout(function () {
-      document.getElementById('div2').style.display = 'none';
-    }, 30000);
+    try {
+      document.getElementById('div2').style.display = 'block';
+      this.state.timeout = setTimeout(function () {
+        document.getElementById('div2').style.display = 'none';
+      }, 30000);
+    } catch (Expection) {
+
+    }
   }
 
   loadedJexcel = function (instance, cell, x, y, value) {
     jExcelLoadedFunctionOnlyHideRow(instance);
 
-    var elInstance = instance.jexcel;
+    var elInstance = instance.worksheets[0];
     var consumptionDataType = this.state.tempConsumptionUnitObject.consumptionDataType;
 
-    var cell1 = elInstance.getCell(`C1`)//other name
-    var cell2 = elInstance.getCell(`C2`)//other name
-    cell1.classList.add('readonly');
-    cell2.classList.add('readonly');
+    var json = elInstance.getJson();
 
-    var cell1 = elInstance.getCell(`D1`)//other name
-    var cell2 = elInstance.getCell(`D2`)//other multiplier
-    cell1.classList.add('readonly');
-    cell2.classList.add('readonly');
+    var colArr = ['A', 'B', 'C', 'D', , 'E', 'F']
+    for (var j = 0; j < json.length; j++) {
+      for (var i = 0; i < colArr.length; i++) {
+        var cell = elInstance.getCell("C1")
+        cell.classList.add('readonly');
+        var cell = elInstance.getCell("C2")
+        cell.classList.add('readonly');
 
-    if (consumptionDataType == 3) {// grade out
-      // console.log("other consumptionDataType")
-      var cell1 = elInstance.getCell(`C3`)//other name
-      var cell2 = elInstance.getCell(`D3`)//other multiplier
-      cell1.classList.remove('readonly');
-      cell2.classList.remove('readonly');
-      document.getElementById("dataEnteredInTableExLabel").style.display = "block";
-      // document.getElementById("dataEnteredInTableExSpan").innerHTML = Math.round(Number(1 / this.state.tempConsumptionUnitObject.planningUnit.multiplier * this.state.tempConsumptionUnitObject.otherUnit.multiplier).toFixed(4) * 1000);
-      this.setState({
-        dataEnteredInTableExSpan: Math.round(Number(1 / this.state.tempConsumptionUnitObject.planningUnit.multiplier * this.state.tempConsumptionUnitObject.otherUnit.multiplier).toFixed(4) * 1000)
-      })
-    } else {
-      // console.log("consumptionDataType", consumptionDataType)
-      var cell1 = elInstance.getCell(`C3`)//other name
-      var cell2 = elInstance.getCell(`D3`)//other multiplier
-      cell1.classList.add('readonly');
-      cell2.classList.add('readonly');
-      document.getElementById("dataEnteredInTableExLabel").style.display = "none";
+        if (consumptionDataType == 3) {// grade out
+          // console.log("other consumptionDataType")
+          var cell1 = elInstance.getCell(`C3`)//other name
+          var cell2 = elInstance.getCell(`D3`)//other multiplier
+          cell1.classList.remove('readonly');
+          cell2.classList.remove('readonly');
+          document.getElementById("dataEnteredInTableExLabel").style.display = "block";
+          // document.getElementById("dataEnteredInTableExSpan").innerHTML = Math.round(Number(1 / this.state.tempConsumptionUnitObject.planningUnit.multiplier * this.state.tempConsumptionUnitObject.otherUnit.multiplier).toFixed(4) * 1000);
+          this.setState({
+            dataEnteredInTableExSpan: Math.round(Number(1 / this.state.tempConsumptionUnitObject.planningUnit.multiplier * this.state.tempConsumptionUnitObject.otherUnit.multiplier).toFixed(4) * 1000)
+          })
+        } else {
+          // console.log("consumptionDataType", consumptionDataType)
+          var cell1 = elInstance.getCell(`C3`)//other name
+          var cell2 = elInstance.getCell(`D3`)//other multiplier
+          cell1.classList.add('readonly');
+          cell2.classList.add('readonly');
+          document.getElementById("dataEnteredInTableExLabel").style.display = "none";
+
+        }
+      }
 
     }
+    // }
+
   }
 
   loaded = function (instance, cell, x, y, value) {
     jExcelLoadedFunctionOnlyHideRow(instance);
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM'];
-    var elInstance = instance.jexcel;
+    var elInstance = instance.worksheets[0];
     var json = elInstance.getJson(null, false);
     var arr = [];
     var count = 1;
@@ -1372,6 +1924,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       getRequest.onsuccess = function (event) {
         var myResult = [];
         myResult = getRequest.result;
+        console.log("")
         var datasetList = this.state.datasetList;
         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
         var userId = userBytes.toString(CryptoJS.enc.Utf8);
@@ -1443,7 +1996,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       }, () => {
         try {
           this.el = jexcel(document.getElementById("tableDiv"), '');
-          this.el.destroy();
+          // this.el.destroy();
+          jexcel.destroy(document.getElementById("tableDiv"), true);
         } catch (error) {
 
         }
@@ -1526,8 +2080,10 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               });
               var rangeValue = this.state.singleValue2;
               console.log("RangeValuie@@@@@@@@@@@@", rangeValue);
-              var startDate = moment(rangeValue.from.year + '-' + rangeValue.from.month + '-01').format("YYYY-MM-DD");
-              var stopDate = moment(rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate()).format("YYYY-MM-DD");
+              var startDate = moment(rangeValue.year + '-' + rangeValue.month + '-01').format("YYYY-MM-DD");
+              // var stopDate = moment(rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate()).format("YYYY-MM-DD");
+              var stopDate = moment(startDate).add(35, 'months').format("YYYY-MM-DD");
+
               console.log("stopDate@@@@@@@@@@@@", stopDate);
               var daysInMonth = datasetJson.currentVersion.daysInMonth;
               var monthArray = [];
@@ -1898,34 +2454,38 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       cont = true;
     }
     console.log("Value@@@@@@@@@@@@@@@", value)
-    let startDate = moment(value.from.year + '-' + value.from.month + '-01').format("YYYY-MM");
-    let endDate = moment(value.to.year + '-' + value.to.month + '-' + new Date(value.to.year, value.to.month, 0).getDate()).format("YYYY-MM");
-    console.log("startDate-->", startDate);
-    console.log("endDate-->", endDate);
+    // let startDate = moment(value.from.year + '-' + value.from.month + '-01').format("YYYY-MM");
+    // let endDate = moment(value.to.year + '-' + value.to.month + '-' + new Date(value.to.year, value.to.month, 0).getDate()).format("YYYY-MM");
+    // console.log("startDate-->", startDate);
+    // console.log("endDate-->", endDate);
     // var monthsDiff = moment(endDate).diff(startDate, 'months', true);
-    const monthsDiff = moment(new Date(endDate)).diff(new Date(startDate), 'months', true);
+    // const monthsDiff = moment(new Date(endDate)).diff(new Date(startDate), 'months', true);
     if (cont == true) {
-      if (monthsDiff <= 36) {
-        this.setState({
-          consumptionChanged: false
-        }, () => {
-          this.setState({ singleValue2: value, }, () => {
-            localStorage.setItem("sesDataentryDateRange", JSON.stringify(value))
-            this.getDatasetData()
-          })
+      // if (monthsDiff <= 36) {
+      this.setState({
+        consumptionChanged: false
+      }, () => {
+        this.setState({ singleValue2: value, }, () => {
+          localStorage.setItem("sesDataentryStartDateRange", JSON.stringify(value))
+          this.getDatasetData()
         })
-      } else {
-        alert(i18n.t('static.dataentry.maxRange'));
-        let rangeValue = this.state.singleValue2;
-        let startDate = moment(rangeValue.from.year + '-' + rangeValue.from.month + '-01').format("YYYY-MM");
-        let stopDate = moment(rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate()).format("YYYY-MM");
-        this.setState({ singleValue2: { from: { year: Number(moment(startDate).startOf('month').format("YYYY")), month: Number(moment(startDate).startOf('month').format("M")) }, to: { year: Number(moment(stopDate).startOf('month').format("YYYY")), month: Number(moment(stopDate).startOf('month').format("M")) } } });
-      }
+      })
+      // } else {
+      //   alert(i18n.t('static.dataentry.maxRange'));
+      //   let rangeValue = this.state.singleValue2;
+      //   let startDate = moment(rangeValue.from.year + '-' + rangeValue.from.month + '-01').format("YYYY-MM");
+      //   let stopDate = moment(rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate()).format("YYYY-MM");
+      //   this.setState({ singleValue2: { from: { year: Number(moment(startDate).startOf('month').format("YYYY")), month: Number(moment(startDate).startOf('month').format("M")) }, to: { year: Number(moment(stopDate).startOf('month').format("YYYY")), month: Number(moment(stopDate).startOf('month').format("M")) } } });
+      // }
     }
 
   }
 
   render() {
+    jexcel.setDictionary({
+      Show: " ",
+      entries: " ",
+    });
 
     const pickerLang = {
       months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -1966,7 +2526,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         yAxes: [{
           scaleLabel: {
             display: true,
-            labelString: getLabelText(this.state.tempConsumptionUnitObject.consumptionDataType == "" ? "" : this.state.tempConsumptionUnitObject.consumptionDataType == 1 ? this.state.tempConsumptionUnitObject.planningUnit.forecastingUnit.label : this.state.tempConsumptionUnitObject.consumptionDataType == 2 ? this.state.tempConsumptionUnitObject.planningUnit.label : this.state.tempConsumptionUnitObject.otherUnit.label, this.state.lang),
+            labelString: this.state.selectedConsumptionUnitId > 0 ? getLabelText(this.state.selectedConsumptionUnitObject.planningUnit.label, this.state.lang) : "",
+            // labelString: getLabelText(this.state.tempConsumptionUnitObject.consumptionDataType == "" ? "" : this.state.tempConsumptionUnitObject.consumptionDataType == 1 ? this.state.tempConsumptionUnitObject.planningUnit.forecastingUnit.label : this.state.tempConsumptionUnitObject.consumptionDataType == 2 ? this.state.tempConsumptionUnitObject.planningUnit.label : this.state.tempConsumptionUnitObject.otherUnit.label, this.state.lang),
             fontColor: 'black'
           },
           stacked: true,
@@ -2033,8 +2594,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       if (elInstance != undefined) {
         var colourCount = 0;
         datasetListForGraph.push({
-          label: getLabelText(this.state.tempConsumptionUnitObject.consumptionDataType == 1 ? this.state.tempConsumptionUnitObject.planningUnit.forecastingUnit.label : this.state.tempConsumptionUnitObject.consumptionDataType == 2 ? this.state.tempConsumptionUnitObject.planningUnit.label : this.state.tempConsumptionUnitObject.otherUnit.label, this.state.lang),
-          data: this.state.planningUnitTotalList.filter(c => c.planningUnitId == this.state.selectedConsumptionUnitObject.planningUnit.id).map(item => (item.qty !== "" ? item.qty : null)),
+          // label: getLabelText(this.state.tempConsumptionUnitObject.consumptionDataType == 1 ? this.state.tempConsumptionUnitObject.planningUnit.forecastingUnit.label : this.state.tempConsumptionUnitObject.consumptionDataType == 2 ? this.state.tempConsumptionUnitObject.planningUnit.label : this.state.tempConsumptionUnitObject.otherUnit.label, this.state.lang),
+          label: "Total",
+          data: this.state.planningUnitTotalList.filter(c => c.planningUnitId == this.state.selectedConsumptionUnitObject.planningUnit.id).map(item => (item.qtyInPU !== "" ? item.qtyInPU : null)),
           type: 'line',
           // stack: 1,
           backgroundColor: 'transparent',
@@ -2062,7 +2624,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           // columnData.shift()
           datasetListForGraph.push({
             label: getLabelText(item.label, this.state.lang),
-            data: this.state.planningUnitTotalListRegion.filter(c => c.planningUnitId == this.state.selectedConsumptionUnitObject.planningUnit.id && c.region.regionId == item.regionId).map(item => (item.qty > 0 ? item.qty : null)),
+            data: this.state.planningUnitTotalListRegion.filter(c => c.planningUnitId == this.state.selectedConsumptionUnitObject.planningUnit.id && c.region.regionId == item.regionId).map(item => (item.qtyInPU > 0 ? item.qtyInPU : null)),
             // type: 'line'
             stack: 1,
             // backgroundColor: 'transparent',
@@ -2177,7 +2739,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                       </div>
                     </FormGroup>
                     <FormGroup className="col-md-3">
-                      <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                      <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.startMonth')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                       <div className="controls edit">
                         <Picker
                           ref="pickAMonth2"
@@ -2191,7 +2753,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                         // onChange={this.handleRangeChange}
                         // onDismiss={this.handleRangeDissmis}
                         >
-                          <MonthBox value={makeText(this.state.singleValue2.from) + ' ~ ' + makeText(this.state.singleValue2.to)} onClick={this.handleClickMonthBox2} />
+                          {/* <MonthBox value={makeText(this.state.singleValue2.from) + ' ~ ' + makeText(this.state.singleValue2.to)} onClick={this.handleClickMonthBox2} /> */}
+                          <MonthBox value={makeText(this.state.singleValue2)} onClick={this.handleClickMonthBox2} />
+
                         </Picker>
                       </div>
                     </FormGroup>
@@ -2210,10 +2774,10 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               <div style={{ display: this.state.loading ? "none" : "block" }}>
                 {this.state.showSmallTable &&
                   <div className="row">
-                    <div className="col-md-12">
+                    <div className="col-md-12 mt-2">
                       <div className="table-scroll">
-                        <div className="table-wrap DataEntryTable table-responsive">
-                          <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" options={this.options}>
+                        <div className="table-wrap DataEntryTable table-responsive fixTableHeadSupplyPlan">
+                          <Table className="table-bordered text-center overflowhide main-table " bordered size="sm" options={this.options}>
                             <thead>
                               <tr>
                                 <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th>
@@ -2282,7 +2846,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                               </Label><br />
                               <Label htmlFor="appendedInputButton">{i18n.t('static.common.dataEnteredIn')}: <b>{this.state.tempConsumptionUnitObject.consumptionDataType == 1 ? (this.state.tempConsumptionUnitObject.planningUnit.forecastingUnit.label.label_en) : this.state.tempConsumptionUnitObject.consumptionDataType == 2 ? this.state.tempConsumptionUnitObject.planningUnit.label.label_en : this.state.tempConsumptionUnitObject.otherUnit.label.label_en}</b>
                                 <a className="card-header-action">
-                                 {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT') && <span style={{ cursor: 'pointer' }} className="hoverDiv" onClick={() => { this.changeUnit(this.state.selectedConsumptionUnitId) }}>({i18n.t('static.dataentry.change')})</span>}
+                                  {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT') && <span style={{ cursor: 'pointer' }} className="hoverDiv" onClick={() => { this.changeUnit(this.state.selectedConsumptionUnitId) }}><u>({i18n.t('static.dataentry.change')})</u></span>}
                                 </a>
                               </Label><br />
                               <Label htmlFor="appendedInputButton">{i18n.t('static.dataentry.conversionToPu')}: <b>{this.state.tempConsumptionUnitObject.consumptionDataType == 1 ? Number(1 / this.state.tempConsumptionUnitObject.planningUnit.multiplier).toFixed(4) : this.state.tempConsumptionUnitObject.consumptionDataType == 2 ? 1 : Number(1 / this.state.tempConsumptionUnitObject.planningUnit.multiplier * this.state.tempConsumptionUnitObject.otherUnit.multiplier).toFixed(4)}</b>
@@ -2298,7 +2862,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                                 name="consumptionNotes"
                                 id="consumptionNotes"
                                 bsSize="sm"
-                                readOnly={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT')?false:true}
+                                readOnly={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT') ? false : true}
                                 onChange={(e) => this.setState({ consumptionChanged: true })}
                               >
                               </Input>
@@ -2306,7 +2870,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                           </div>
                         </FormGroup>
                         <FormGroup className="col-md-4" style={{ paddingTop: '30px', display: this.state.showDetailTable ? 'block' : 'none' }}>
-                         {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT') && <Button type="button" id="formSubmitButton" size="md" color="success" className="float-right mr-1" onClick={() => this.interpolationMissingActualConsumption()}>
+                          {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT') && <Button type="button" id="formSubmitButton" size="md" color="success" className="float-right mr-1" onClick={() => this.interpolationMissingActualConsumption()}>
                             <i className="fa fa-check"></i>{i18n.t('static.pipeline.interpolateMissingValues')}</Button>}
                         </FormGroup>
                       </div>
@@ -2340,7 +2904,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                       {/* <br></br> */}
                       {/* <br></br> */}
                       <div className="row">
-                        <div className="col-md-12 pl-2 pr-2 datdEntryRow">
+                        <div className="col-md-12 pl-2 pr-2 datdEntryRow consumptionDataEntryTable">
                           <div id="tableDiv" className="leftAlignTable">
                           </div>
                         </div>
@@ -2659,12 +3223,11 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       multiplier = 1;
       // changedConsumptionDataDesc = getLabelText(consumptionUnit.planningUnit.label, this.state.lang) + ' | ' + consumptionUnit.planningUnit.id;;
     } else {
-      multiplier = (1 / Number((elInstance1.D3).toString().replaceAll(",", ""))) * consumptionUnitTemp.planningUnit.multiplier;
-      // multiplier = 1 / (document.getElementById('otherUnitMultiplier').value / consumptionUnitTemp.planningUnit.multiplier);
-
-      // changedConsumptionDataDesc = getLabelText(consumptionUnit.otherUnit.label, this.state.lang);
+      var conversionToFuOtherUnit = elInstance1.getValue(`D3`, true);
+      var descOtherUnit = elInstance1.getValue(`C3`, true);
+      multiplier = (1 / Number(conversionToFuOtherUnit.toString().replaceAll(",", ""))) * consumptionUnitTemp.planningUnit.multiplier;
     }
-    console.log("test", multiplier, "======", Number((elInstance1.D3).toString().replaceAll(",", "")), "======", consumptionUnitTemp.planningUnit.multiplier)
+    // console.log("test", multiplier, "======", Number(conversionToFuOtherUnit.toString().replaceAll(",", "")), "======", consumptionUnitTemp.planningUnit.multiplier)
 
     var consumptionUnitForUpdate = {};
     consumptionUnitForUpdate = {
@@ -2673,14 +3236,14 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       otherUnit: this.state.dataEnteredIn == 3 ? {
         label: {
           labelId: null,
-          label_en: elInstance1.C3,
+          label_en: descOtherUnit,
           // label_en: this.state.otherUnitName,
           label_fr: "",
           label_sp: "",
           label_pr: ""
         },
         // multiplier: this.state.selectedPlanningUnitMultiplier
-        multiplier: Number((elInstance1.D3).toString().replaceAll(",", ""))
+        multiplier: Number(conversionToFuOtherUnit.toString().replaceAll(",", ""))
 
       } : null
     }
@@ -2718,7 +3281,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     // console.log("this.state.tempConsumptionUnitObject", this.el.getValueFromCoords(1, y))
     // console.log("start----", new Date())
 
-    var elInstance = instance.jexcel;
+    var elInstance = instance;
     var rowData = elInstance.getRowData(y);
 
     var consumptionDataType = rowData[5];
@@ -2803,20 +3366,21 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       data[0] = this.state.tempConsumptionUnitObject.consumptionDataType == 3 ? true : false;
       data[1] = 'Other Unit';
       data[2] = this.state.tempConsumptionUnitObject.consumptionDataType == 3 ? this.state.otherUnitName : "";
-      data[3] = this.state.tempConsumptionUnitObject.consumptionDataType == 3 ? this.state.selectedPlanningUnitMultiplier : "";
+      data[3] = this.state.tempConsumptionUnitObject.consumptionDataType == 3 ? this.state.selectedPlanningUnitMultiplier : Number(0);
       data[4] = `=ROUND(1/D1*ROUND(D3,4),4)`;
       data[5] = 3
       dataArray1.push(data);
     }
 
     this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
-    this.el.destroy();
+    // this.el.destroy();
+    jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
 
     var data = dataArray1;
     var options = {
       data: data,
       columnDrag: true,
-      colWidths: [20, 100, 200, 50, 50, 50],
+      // colWidths: [20, 100, 200, 50, 50, 50],
       columns: [
         { title: ' ', type: 'radio' },//0 A
         { title: ' ', type: 'text', readOnly: true },//1 B
@@ -2825,34 +3389,29 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         { title: i18n.t('static.dataentry.conversionToPu'), type: 'numeric', decimal: '.', readOnly: true },//4 E
         { title: 'Conversion Type', type: 'hidden' }//5 F
       ],
-      text: {
-        // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-        show: '',
-        entries: '',
-      },
-      updateTable: function (el, cell, x, y, source, value, id) {
-      },
+      // text: {
+      //   // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+      //   showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+      //   show: '',
+      //   entries: '',
+      // },
       onload: this.loadedJexcel,
-      onchange: this.changed,
       pagination: false,
+      filters: false,
       search: false,
-      columnSorting: false,
-      tableOverflow: true,
+      columnSorting: true,
       wordWrap: true,
-      allowInsertColumn: false,
-      allowManualInsertColumn: false,
-      allowInsertRow: false,
-      allowManualInsertRow: false,
-      allowDeleteRow: false,
-      copyCompatibility: true,
-      allowExport: false,
       paginationOptions: JEXCEL_PAGINATION_OPTION,
       position: 'top',
-      filters: false,
-      freezeColumns: 1,
-      license: JEXCEL_PRO_KEY,
+      allowInsertColumn: false,
+      allowManualInsertColumn: false,
+      allowDeleteRow: false,
+      onchange: this.changed,
+      copyCompatibility: true,
+      allowManualInsertRow: false,
       parseFormulas: true,
+      editable: true,
+      license: JEXCEL_PRO_KEY,
       contextMenu: function (obj, x, y, e) {
         return [];
       }.bind(this),

@@ -700,7 +700,13 @@ class AddProcurementAgentComponent extends Component {
                                         loading: true
                                     })
                                     console.log("on submit---", this.state.procurementAgent)
-                                    ProcurementAgentService.addProcurementAgent(this.state.procurementAgent)
+                                    var pAgent = this.state.procurementAgent;
+                                    for (var i = 0; i < pAgent.programList.length; i++) {
+                                        if (pAgent.programList[i].id == 0) {
+                                            pAgent.programList = []
+                                        }
+                                    }
+                                    ProcurementAgentService.addProcurementAgent(pAgent)
                                         .then(response => {
                                             if (response.status == 200) {
                                                 this.props.history.push(`/procurementAgent/listProcurementAgent/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
@@ -793,7 +799,7 @@ class AddProcurementAgentComponent extends Component {
                                                     <FormFeedback className="red">{errors.realmId}</FormFeedback>
                                                 </FormGroup>
                                                 <FormGroup className="Selectcontrol-bdrNone">
-                                                    <Label htmlFor="programId">{i18n.t('static.dataSource.program')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Label htmlFor="programId">{i18n.t('static.dataSource.program')}</Label>
                                                     <Select
                                                         className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
                                                             { 'is-valid': !errors.programId && this.state.procurementAgent.programList.length != 0 },
@@ -810,7 +816,7 @@ class AddProcurementAgentComponent extends Component {
                                                         id="programId"
                                                         multi
                                                         required
-                                                        min={1}
+                                                        // min={1}
                                                         options={this.state.programList}
                                                         value={this.state.programId}
                                                     />

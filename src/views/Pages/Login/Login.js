@@ -7,7 +7,7 @@ import React, { Component } from 'react';
 import i18n from '../../../i18n';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
-import { Button, CardBody, CardGroup, Col, Container, Form, FormFeedback, Input, InputGroup, InputGroupAddon, InputGroupText, DropdownItem, DropdownMenu, DropdownToggle, ButtonDropdown, Row } from 'reactstrap';
+import { Button, CardBody, CardGroup, Col, Container, Form, FormFeedback, Input, InputGroup, InputGroupAddon, InputGroupText, DropdownItem, DropdownMenu, DropdownToggle, ButtonDropdown, Row, Label,FormGroup } from 'reactstrap';
 import * as Yup from 'yup';
 import InnerBgImg from '../../../../src/assets/img/bg-image/bg-login.jpg';
 import LoginService from '../../../api/LoginService';
@@ -74,13 +74,15 @@ class Login extends Component {
       message: '',
       loading: false,
       apiVersion: '',
-      apiVersionForDisplay:'',
+      apiVersionForDisplay: '',
       dropdownOpen: new Array(19).fill(false),
       icon: AuthenticationService.getIconAndStaticLabel("icon"),
       staticLabel: AuthenticationService.getIconAndStaticLabel("label"),
       languageList: [],
       updatedSyncDate: '',
-      lang: localStorage.getItem('lastLoggedInUsersLanguage')
+      lang: localStorage.getItem('lastLoggedInUsersLanguage'),
+      loginOnline:true,
+      popupShown:0
     }
     this.forgotPassword = this.forgotPassword.bind(this);
     this.incorrectPassmessageHide = this.incorrectPassmessageHide.bind(this);
@@ -89,6 +91,7 @@ class Login extends Component {
     this.changeLanguage = this.changeLanguage.bind(this);
     this.getLanguageList = this.getLanguageList.bind(this);
     this.getAllLanguages = this.getAllLanguages.bind(this);
+    this.dataChangeCheckbox=this.dataChangeCheckbox.bind(this);
   }
   getAllLanguages() {
     var db1;
@@ -238,6 +241,7 @@ class Login extends Component {
 
   componentDidMount() {
     // console.log("############## Login component did mount #####################");
+    localStorage.setItem("loginOnline", this.state.loginOnline);
     delete axios.defaults.headers.common["Authorization"];
     this.logoutMessagehide();
     // console.log("--------Going to call version api-----------")
@@ -251,7 +255,7 @@ class Login extends Component {
     console.log("timeout going to change language")
     this.getLanguageList();
     i18n.changeLanguage(AuthenticationService.getDefaultUserLanguage())
-    this.checkIfApiIsActive()
+    this.checkIfApiIsActive();
   }
 
   checkIfApiIsActive() {
@@ -260,7 +264,7 @@ class Login extends Component {
       apiVersionForDisplay = "Offline"
       setTimeout(function () {
         this.checkIfApiIsActive();
-      }.bind(this), 10000);
+      }.bind(this), 20000);
     } else {
       LoginService.getApiVersion()
         .then(response => {
@@ -268,9 +272,21 @@ class Login extends Component {
           if (response != null && response != "") {
             this.setState({
               apiVersionForDisplay: response.data.app.version,
-              apiVersion:response.data.app.version,
-
-            },()=>{
+              apiVersion: response.data.app.version,
+            }, () => {
+              if (this.state.popupShown==0 && response.data.app.frontEndVersion != APP_VERSION_REACT) {
+                this.setState({
+                  popupShown:1
+                })
+                confirmAlert({
+                  message: i18n.t('static.coreui.oldVersion'),
+                  buttons: [
+                    {
+                      label: i18n.t('static.report.ok')
+                    }
+                  ]
+                });
+              }
               setTimeout(function () {
                 this.checkIfApiIsActive();
               }.bind(this), 10000);
@@ -319,6 +335,12 @@ class Login extends Component {
 
 
       });
+  }
+
+  dataChangeCheckbox(event){
+    this.setState({
+      loginOnline: (event.target.checked ? true : false)
+  })
   }
 
   logoutMessagehide() {
@@ -406,7 +428,8 @@ class Login extends Component {
                           AuthenticationService.setRecordCount(JEXCEL_DEFAULT_PAGINATION);
                           localStorage.setItem("sessionTimedOut", 0);
                           localStorage.setItem("sessionChanged", 0)
-                          if (isSiteOnline()) {
+                          localStorage.setItem("loginOnline", this.state.loginOnline);
+                          if (this.state.loginOnline==true && isSiteOnline()) {
                             var languageCode = AuthenticationService.getDefaultUserLanguage();
                             var lastLoggedInUsersLanguageChanged = localStorage.getItem('lastLoggedInUsersLanguageChanged');
                             console.log("Language change flag---", lastLoggedInUsersLanguageChanged);
@@ -415,7 +438,7 @@ class Login extends Component {
                                 var decoded = jwt_decode(response.data.token);
                                 // console.log("decoded token---", decoded);
 
-                                let keysToRemove = ["token-" + decoded.userId, "user-" + decoded.userId, "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "lastLoggedInUsersLanguage","sessionType"];
+                                let keysToRemove = ["token-" + decoded.userId, "user-" + decoded.userId, "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "lastLoggedInUsersLanguage", "sessionType"];
                                 keysToRemove.forEach(k => localStorage.removeItem(k))
                                 decoded.user.syncExpiresOn = moment().format("YYYY-MM-DD HH:mm:ss");
                                 decoded.user.apiVersion = this.state.apiVersion;
@@ -487,7 +510,7 @@ class Login extends Component {
                                   // console.log("offline tempuser---", tempUser)
                                   let user = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + tempUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
                                   // console.log("offline user next---", user)
-                                  let keysToRemove = ["curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "lastLoggedInUsersLanguage","sessionType"];
+                                  let keysToRemove = ["curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "lastLoggedInUsersLanguage", "sessionType"];
                                   keysToRemove.forEach(k => localStorage.removeItem(k))
 
                                   localStorage.setItem('typeOfSession', "Offline");
@@ -557,7 +580,7 @@ class Login extends Component {
                                     required />
                                   <FormFeedback>{errors.emailId}</FormFeedback>
                                 </InputGroup>
-                                <InputGroup className="mb-4">
+                                <InputGroup className="mb-3">
                                   <InputGroupAddon addonType="prepend">
                                     <InputGroupText>
                                       <i className="cui-lock-locked Loginicon"></i>
@@ -576,6 +599,26 @@ class Login extends Component {
                                     required />
                                   <FormFeedback>{errors.password}</FormFeedback>
                                 </InputGroup>
+                                <Row>
+                                <InputGroup check inline  className="mb-4 ml-3">
+                                  <Input
+                                    type="checkbox"
+                                    id="loginOnline"
+                                    name="loginOnline"
+                                    style={{
+                                      position: "relative",
+                                      marginTop: "0.2rem",
+                                      marginLeft: "0rem"}}
+                                    checked={this.state.loginOnline}
+                                    onChange={(e) => { this.dataChangeCheckbox(e) }}
+                                   />
+                                   <Label
+                                     className="form-check-label ml-2"
+                                     check htmlFor="inline-radio2">
+                                     <b>{i18n.t('static.login.loginOnline')}</b>
+                                   </Label>
+                                </InputGroup>
+                                </Row>
                                 <Row>
                                   <Col xs="6">
                                     <Button type="submit" color="primary" className="px-4" onClick={() => { this.touchAll(setTouched, errors); this.incorrectPassmessageHide() }} >{i18n.t('static.login.login')}</Button>
@@ -600,16 +643,16 @@ class Login extends Component {
                 <CardBody>
 
                   <p className="Login-p">The USAID Global Health Supply Chain Program-Procurement and Supply
-                  Management (GHSC-PSM) project is funded under USAID Contract No. AID-OAA-I-15-0004. GHSC-PSM connects
-                  technical solutions and proven commercial processes to promote efficient and cost-effective
-                  health supply chains worldwide. Our goal is to ensure uninterrupted supplies of health
-                  commodities to save lives and create a healthier future for all. The project purchases
-                  and delivers health commodities, offers comprehensive technical assistance to strengthen
-                  national supply chain systems, and provides global supply chain leadership. For more
-                  information, visit <a href="https://www.ghsupplychain.org/" target="_blank">ghsupplychain.org</a>. The information provided in this tool is not
-                                                                                                                                                                                    official U.S. government information and does not represent the views or positions of the
-                                                                                                                                                                                    Agency for International Development or the U.S. government.
-              </p>
+                    Management (GHSC-PSM) project is funded under USAID Contract No. AID-OAA-I-15-0004. GHSC-PSM connects
+                    technical solutions and proven commercial processes to promote efficient and cost-effective
+                    health supply chains worldwide. Our goal is to ensure uninterrupted supplies of health
+                    commodities to save lives and create a healthier future for all. The project purchases
+                    and delivers health commodities, offers comprehensive technical assistance to strengthen
+                    national supply chain systems, and provides global supply chain leadership. For more
+                    information, visit <a href="https://www.ghsupplychain.org/" target="_blank">ghsupplychain.org</a>. The information provided in this tool is not
+                    official U.S. government information and does not represent the views or positions of the
+                    Agency for International Development or the U.S. government.
+                  </p>
                 </CardBody>
                 <Row className="text-center Login-bttom-logo">
                   <Col md="4">

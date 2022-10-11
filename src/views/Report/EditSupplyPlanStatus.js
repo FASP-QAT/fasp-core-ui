@@ -7,8 +7,8 @@ import NumberFormat from 'react-number-format';
 import { Button, Card, CardBody, CardFooter, Col, Form, FormFeedback, FormGroup, Input, InputGroup, Label, Modal, ModalBody, ModalFooter, ModalHeader, Nav, NavItem, NavLink, Row, TabContent, Table, TabPane } from 'reactstrap';
 import * as Yup from 'yup';
 // import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, DATE_FORMAT_CAP,JEXCEL_PAGINATION_OPTION } from '../../Constants.js'
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import ProgramService from '../../api/ProgramService';
 import getLabelText from '../../CommonComponent/getLabelText';
@@ -31,7 +31,7 @@ import { Link } from 'react-router-dom';
 // import { NavLink } from 'react-router-dom';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import AuthenticationService from '../Common/AuthenticationService';
-import {MultiSelect} from 'react-multi-select-component';
+import { MultiSelect } from 'react-multi-select-component';
 import ProblemListFormulas from '../Report/ProblemListFormulas.js'
 import DataSourceService from '../../api/DataSourceService';
 import RealmCountryService from '../../api/RealmCountryService';
@@ -41,8 +41,39 @@ import CurrencyService from '../../api/CurrencyService';
 import BudgetService from '../../api/BudgetService';
 import ProcurementAgentService from '../../api/ProcurementAgentService';
 import CryptoJS from 'crypto-js'
+import { confirmAlert } from 'react-confirm-alert'; // Import
 
-const entityname = i18n.t('static.program.program');
+const entityname = i18n.t('static.report.problem');
+
+const validationSchemaForAddingProblem = function (values) {
+    return Yup.object().shape({
+        problemDescription: Yup.string()
+            .matches(/^[^'":\\]+$/, i18n.t("static.label.someSpecialCaseNotAllowed"))
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
+            .required(i18n.t('static.editStatus.problemDescText')),
+        modelPlanningUnitId: Yup.string()
+            .required(i18n.t('static.procurementUnit.validPlanningUnitText')),
+        suggession: Yup.string()
+            .matches(/^[^'":\\]+$/, i18n.t('static.label.someSpecialCaseNotAllowed'))
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
+            .required(i18n.t('static.editStatus.problemSuggestionText')),
+        modelCriticalityId: Yup.string()
+            .required(i18n.t('static.editStatus.validCriticality'))
+    })
+}
+const validateForAddingProblem = (getValidationSchema) => {
+    return (values) => {
+        const validationSchema = getValidationSchema(values)
+        try {
+            validationSchema.validateSync(values, { abortEarly: false })
+            return {}
+        } catch (error) {
+            return getErrorsFromValidationError(error)
+        }
+    }
+}
+
+
 
 const validationSchema = function (values) {
     return Yup.object().shape({
@@ -146,6 +177,7 @@ class EditSupplyPlanStatus extends Component {
             openingBalanceArray: [],
             closingBalanceArray: [],
             monthsOfStockArray: [],
+            maxQtyArray: [],
             suggestedShipmentChangedFlag: 0,
             message: '',
             activeTab: new Array(3).fill('1'),
@@ -220,7 +252,14 @@ class EditSupplyPlanStatus extends Component {
             problemCategoryList: [],
             problemReportChanged: 0,
             problemReviewedList: [{ name: i18n.t("static.program.yes"), id: 1 }, { name: i18n.t("static.program.no"), id: 0 }],
-            problemReviewedValues: [{ label: i18n.t("static.program.no"), value: 0 }]
+            problemReviewedValues: [{ label: i18n.t("static.program.no"), value: 0 }],
+            isModalOpen: false,
+            planningUnitList: [],
+            regionList: [],
+            isSubmitClicked: false,
+            criticalities: [],
+            criticalitiesList: [],
+
         }
         this.formSubmit = this.formSubmit.bind(this);
         this.consumptionDetailsClicked = this.consumptionDetailsClicked.bind(this);
@@ -236,6 +275,42 @@ class EditSupplyPlanStatus extends Component {
         this.handleProblemReviewedChange = this.handleProblemReviewedChange.bind(this);
         this.buildProblemTransJexcel = this.buildProblemTransJexcel.bind(this);
         this.loaded1 = this.loaded1.bind(this);
+        this.addMannualProblem = this.addMannualProblem.bind(this);
+        this.modelOpenClose = this.modelOpenClose.bind(this);
+    }
+
+    getProblemCriticality() {
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['problemCriticality'], 'readwrite');
+            var problemCriticality = transaction.objectStore('problemCriticality');
+            var getRequest = problemCriticality.getAll();
+            var problemCriticalities = [];
+
+            getRequest.onerror = function (event) {
+                // Handle errors!
+            };
+            getRequest.onsuccess = function (event) {
+                var myResult = [];
+                myResult = getRequest.result;
+                var filteredGetRequestList = myResult;
+                for (var i = 0; i < filteredGetRequestList.length; i++) {
+                    problemCriticalities.push({
+                        name: filteredGetRequestList[i].label.label_en,
+                        id: filteredGetRequestList[i].id,
+                    });
+                }
+                // console.log("DATASET-------->", problemCriticalities);
+                this.setState({
+                    criticalitiesList: problemCriticalities,
+                    loading: false
+                })
+            }.bind(this);
+        }.bind(this);
+
     }
 
     updateState(parameterName, value) {
@@ -266,7 +341,7 @@ class EditSupplyPlanStatus extends Component {
             }
         }
 
-        if (x == 10 || x == 20) {
+        if (x == 10 || x == 20 || x == 21) {
             var rowData = elInstance.getRowData(y);
             // console.log("problemStatus on server ***", problemList[0].problemStatus.id);
             // console.log("current problem status ***", rowData[10]);
@@ -274,7 +349,7 @@ class EditSupplyPlanStatus extends Component {
             // console.log("current problem status ***", rowData[20]);
             // console.log("condition1***", problemList[0].problemStatus.id != rowData[10]);
             // console.log("condition2***", problemList[0].reviewed.toString() != rowData[20].toString());
-            if ((problemList[0].problemStatus.id != rowData[10]) || (problemList[0].reviewed.toString() != rowData[20].toString())) {
+            if ((problemList[0].problemStatus.id != rowData[10]) || (problemList[0].reviewed.toString() != rowData[20].toString()) || (problemList[0].reviewNotes.toString() != rowData[21].toString())) {
                 // console.log("in if***");
                 elInstance.setValueFromCoords(22, y, 1, true);
             } else {
@@ -481,7 +556,8 @@ class EditSupplyPlanStatus extends Component {
         this.setState({ loading: true, consumptionStartDateClicked: startDate });
         var elInstance = this.state.consumptionBatchInfoTableEl;
         if (elInstance != undefined && elInstance != "") {
-            elInstance.destroy();
+            // elInstance.destroy();
+            jexcel.destroy(document.getElementById("consumptionBatchInfoTable"), true);
         }
         var planningUnitId = document.getElementById("planningUnitId").value;
         var programId = document.getElementById("programId").value;
@@ -614,7 +690,9 @@ class EditSupplyPlanStatus extends Component {
         this.setState({ loading: true, inventoryStartDateClicked: moment(endDate).startOf('month').format("YYYY-MM-DD") })
         var elInstance = this.state.inventoryBatchInfoTableEl;
         if (elInstance != undefined && elInstance != "") {
-            elInstance.destroy();
+            // elInstance.destroy();
+            jexcel.destroy(document.getElementById("inventoryBatchInfoTable"), true);
+
         }
         var planningUnitId = document.getElementById("planningUnitId").value;
         var programId = document.getElementById("programId").value;
@@ -1072,8 +1150,11 @@ class EditSupplyPlanStatus extends Component {
     actionCanceledShipments(type) {
         if (type == "qtyCalculator") {
             document.getElementById("showSaveQtyButtonDiv").style.display = 'none';
-            (this.refs.shipmentChild.state.qtyCalculatorTableEl).destroy();
-            (this.refs.shipmentChild.state.qtyCalculatorTableEl1).destroy();
+            // (this.refs.shipmentChild.state.qtyCalculatorTableEl).destroy();
+            // (this.refs.shipmentChild.state.qtyCalculatorTableEl1).destroy();
+            jexcel.destroy(document.getElementById("qtyCalculatorTable"), true);
+            jexcel.destroy(document.getElementById("qtyCalculatorTable1"), true);
+
             this.refs.shipmentChild.state.shipmentQtyChangedFlag = 0;
             this.setState({
                 qtyCalculatorValidationError: "",
@@ -1081,7 +1162,9 @@ class EditSupplyPlanStatus extends Component {
             })
         } else if (type == "shipmentDates") {
             document.getElementById("showSaveShipmentsDatesButtonsDiv").style.display = 'none';
-            (this.refs.shipmentChild.state.shipmentDatesTableEl).destroy();
+            // (this.refs.shipmentChild.state.shipmentDatesTableEl).destroy();
+            jexcel.destroy(document.getElementById("shipmentDatesTable"), true);
+
             this.refs.shipmentChild.state.shipmentDatesChangedFlag = 0;
             this.setState({
                 shipmentDatesChangedFlag: 0,
@@ -1089,7 +1172,9 @@ class EditSupplyPlanStatus extends Component {
             })
         } else if (type == "shipmentBatch") {
             document.getElementById("showShipmentBatchInfoButtonsDiv").style.display = 'none';
-            (this.refs.shipmentChild.state.shipmentBatchInfoTableEl).destroy();
+            // (this.refs.shipmentChild.state.shipmentBatchInfoTableEl).destroy();
+            jexcel.destroy(document.getElementById("shipmentBatchInfoTable"), true);
+
             this.refs.shipmentChild.state.shipmentBatchInfoChangedFlag = 0;
             this.setState({
                 shipmentBatchInfoChangedFlag: 0,
@@ -1101,7 +1186,9 @@ class EditSupplyPlanStatus extends Component {
 
     actionCanceledInventory() {
         document.getElementById("showInventoryBatchInfoButtonsDiv").style.display = 'none';
-        (this.refs.inventoryChild.state.inventoryBatchInfoTableEl).destroy();
+        // (this.refs.inventoryChild.state.inventoryBatchInfoTableEl).destroy();
+        jexcel.destroy(document.getElementById("inventoryBatchInfoTable"), true);
+
         this.refs.inventoryChild.state.inventoryBatchInfoChangedFlag = 0;
         this.setState({
             inventoryBatchInfoChangedFlag: 0,
@@ -1113,7 +1200,9 @@ class EditSupplyPlanStatus extends Component {
 
     actionCanceledConsumption() {
         document.getElementById("showConsumptionBatchInfoButtonsDiv").style.display = 'none';
-        (this.refs.consumptionChild.state.consumptionBatchInfoTableEl).destroy();
+        // (this.refs.consumptionChild.state.consumptionBatchInfoTableEl).destroy();
+        jexcel.destroy(document.getElementById("consumptionBatchInfoTable"), true);
+
         this.refs.consumptionChild.state.consumptionBatchInfoChangedFlag = 0;
         this.setState({
             consumptionBatchInfoChangedFlag: 0,
@@ -1185,6 +1274,7 @@ class EditSupplyPlanStatus extends Component {
         var closingBalanceArray = [];
         var jsonArrForGraph = [];
         var monthsOfStockArray = [];
+        var maxQtyArray = [];
         var unmetDemand = [];
         var consumptionArrayForRegion = [];
         var inventoryArrayForRegion = [];
@@ -1254,7 +1344,11 @@ class EditSupplyPlanStatus extends Component {
                     reorderFrequency: programPlanningUnit.reorderFrequencyInMonths,
                     minMonthsOfStock: programPlanningUnit.minMonthsOfStock,
                     minStockMoSQty: minStockMoSQty,
-                    maxStockMoSQty: maxStockMoSQty
+                    maxStockMoSQty: maxStockMoSQty,
+                    planBasedOn: programPlanningUnit.planBasedOn,
+                    minQtyPpu: programPlanningUnit.minQty,
+                    distributionLeadTime: programPlanningUnit.distributionLeadTime
+
                 })
 
                 var shipmentStatusTransaction = db1.transaction(['shipmentStatus'], 'readwrite');
@@ -1710,6 +1804,7 @@ class EditSupplyPlanStatus extends Component {
                                 inventoryTotalData.push(jsonList[0].adjustmentQty == 0 ? jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : "" : jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : jsonList[0].adjustmentQty);
                                 totalExpiredStockArr.push({ qty: jsonList[0].expiredStock, details: jsonList[0].batchDetails.filter(c => moment(c.expiryDate).format("YYYY-MM-DD") >= m[n].startDate && moment(c.expiryDate).format("YYYY-MM-DD") <= m[n].endDate), month: m[n] });
                                 monthsOfStockArray.push(jsonList[0].mos != null ? parseFloat(jsonList[0].mos).toFixed(1) : jsonList[0].mos);
+                                maxQtyArray.push(jsonList[0].maxStock)
                                 amcTotalData.push(jsonList[0].amc != null ? Math.round(Number(jsonList[0].amc)) : "");
                                 minStockMoS.push(jsonList[0].minStockMoS)
                                 maxStockMoS.push(jsonList[0].maxStockMoS)
@@ -1726,64 +1821,135 @@ class EditSupplyPlanStatus extends Component {
                                 // consumptionArrayForRegion = consumptionArrayForRegion.concat(jsonList[0].consumptionArrayForRegion);
                                 // inventoryArrayForRegion = inventoryArrayForRegion.concat(jsonList[0].inventoryArrayForRegion);
                                 var sstd = {}
-                                var currentMonth = moment(Date.now()).utcOffset('-0500').startOf('month').format("YYYY-MM-DD");
-                                var compare = (m[n].startDate >= currentMonth);
-                                // var stockInHand = jsonList[0].closingBalance;
-                                var amc = Math.round(Number(jsonList[0].amc));
-                                var spd1 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).format("YYYY-MM"));
-                                var spd2 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).add(1, 'months').format("YYYY-MM"));
-                                var spd3 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).add(2, 'months').format("YYYY-MM"));
-                                var mosForMonth1 = spd1.length > 0 ? spd1[0].mos : 0;
-                                var mosForMonth2 = spd2.length > 0 ? spd2[0].mos : 0;
-                                var mosForMonth3 = spd3.length > 0 ? spd3[0].mos : 0;
+                                if (this.state.planBasedOn == 1) {
+                                    var currentMonth = moment(Date.now()).utcOffset('-0500').startOf('month').format("YYYY-MM-DD");
+                                    var compare = (m[n].startDate >= currentMonth);
+                                    // var stockInHand = jsonList[0].closingBalance;
+                                    var amc = Math.round(Number(jsonList[0].amc));
+                                    var spd1 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).format("YYYY-MM"));
+                                    var spd2 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).add(1, 'months').format("YYYY-MM"));
+                                    var spd3 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).add(2, 'months').format("YYYY-MM"));
+                                    var mosForMonth1 = spd1.length > 0 ? spd1[0].mos : 0;
+                                    var mosForMonth2 = spd2.length > 0 ? spd2[0].mos : 0;
+                                    var mosForMonth3 = spd3.length > 0 ? spd3[0].mos : 0;
 
-                                var suggestShipment = false;
-                                var useMax = false;
-                                if (compare) {
-                                    if (Number(amc) == 0) {
-                                        suggestShipment = false;
-                                    } else if (Number(mosForMonth1) != 0 && Number(mosForMonth1) < Number(minStockMoSQty) && (Number(mosForMonth2) > Number(minStockMoSQty) || Number(mosForMonth3) > Number(minStockMoSQty))) {
-                                        suggestShipment = false;
-                                    } else if (Number(mosForMonth1) != 0 && Number(mosForMonth1) < Number(minStockMoSQty) && Number(mosForMonth2) < Number(minStockMoSQty) && Number(mosForMonth3) < Number(minStockMoSQty)) {
-                                        suggestShipment = true;
-                                        useMax = true;
-                                    } else if (Number(mosForMonth1) == 0) {
-                                        suggestShipment = true;
-                                        if (Number(mosForMonth2) < Number(minStockMoSQty) && Number(mosForMonth3) < Number(minStockMoSQty)) {
+                                    var suggestShipment = false;
+                                    var useMax = false;
+                                    if (compare) {
+                                        if (Number(amc) == 0) {
+                                            suggestShipment = false;
+                                        } else if (Number(mosForMonth1) != 0 && Number(mosForMonth1) < Number(minStockMoSQty) && (Number(mosForMonth2) > Number(minStockMoSQty) || Number(mosForMonth3) > Number(minStockMoSQty))) {
+                                            suggestShipment = false;
+                                        } else if (Number(mosForMonth1) != 0 && Number(mosForMonth1) < Number(minStockMoSQty) && Number(mosForMonth2) < Number(minStockMoSQty) && Number(mosForMonth3) < Number(minStockMoSQty)) {
+                                            suggestShipment = true;
                                             useMax = true;
-                                        } else {
-                                            useMax = false;
+                                        } else if (Number(mosForMonth1) == 0) {
+                                            suggestShipment = true;
+                                            if (Number(mosForMonth2) < Number(minStockMoSQty) && Number(mosForMonth3) < Number(minStockMoSQty)) {
+                                                useMax = true;
+                                            } else {
+                                                useMax = false;
+                                            }
                                         }
-                                    }
-                                } else {
-                                    suggestShipment = false;
-                                }
-                                var addLeadTimes = parseFloat(programJson.plannedToSubmittedLeadTime) + parseFloat(programJson.submittedToApprovedLeadTime) +
-                                    parseFloat(programJson.approvedToShippedLeadTime) + parseFloat(programJson.shippedToArrivedBySeaLeadTime) +
-                                    parseFloat(programJson.arrivedToDeliveredLeadTime);
-                                var expectedDeliveryDate = moment(m[n].startDate).subtract(Number(addLeadTimes * 30), 'days').format("YYYY-MM-DD");
-                                var isEmergencyOrder = 0;
-                                if (expectedDeliveryDate >= currentMonth) {
-                                    isEmergencyOrder = 0;
-                                } else {
-                                    isEmergencyOrder = 1;
-                                }
-                                if (suggestShipment) {
-                                    var suggestedOrd = 0;
-                                    if (useMax) {
-                                        suggestedOrd = Number((amc * Number(maxStockMoSQty)) - Number(jsonList[0].closingBalance) + Number(jsonList[0].unmetDemand));
                                     } else {
-                                        suggestedOrd = Number((amc * Number(minStockMoSQty)) - Number(jsonList[0].closingBalance) + Number(jsonList[0].unmetDemand));
+                                        suggestShipment = false;
                                     }
-                                    if (suggestedOrd <= 0) {
+                                    var addLeadTimes = parseFloat(programJson.plannedToSubmittedLeadTime) + parseFloat(programJson.submittedToApprovedLeadTime) +
+                                        parseFloat(programJson.approvedToShippedLeadTime) + parseFloat(programJson.shippedToArrivedBySeaLeadTime) +
+                                        parseFloat(programJson.arrivedToDeliveredLeadTime);
+                                    var expectedDeliveryDate = moment(m[n].startDate).subtract(Number(addLeadTimes * 30), 'days').format("YYYY-MM-DD");
+                                    var isEmergencyOrder = 0;
+                                    if (expectedDeliveryDate >= currentMonth) {
+                                        isEmergencyOrder = 0;
+                                    } else {
+                                        isEmergencyOrder = 1;
+                                    }
+                                    if (suggestShipment) {
+                                        var suggestedOrd = 0;
+                                        if (useMax) {
+                                            suggestedOrd = Number((amc * Number(maxStockMoSQty)) - Number(jsonList[0].closingBalance) + Number(jsonList[0].unmetDemand));
+                                        } else {
+                                            suggestedOrd = Number((amc * Number(minStockMoSQty)) - Number(jsonList[0].closingBalance) + Number(jsonList[0].unmetDemand));
+                                        }
+                                        if (suggestedOrd <= 0) {
+                                            sstd = { "suggestedOrderQty": "", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) };
+                                        } else {
+                                            sstd = { "suggestedOrderQty": suggestedOrd, "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) + Number(suggestedOrd) };
+                                        }
+                                    } else {
                                         sstd = { "suggestedOrderQty": "", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) };
-                                    } else {
-                                        sstd = { "suggestedOrderQty": suggestedOrd, "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) + Number(suggestedOrd) };
                                     }
+                                    suggestedShipmentsTotalData.push(sstd);
                                 } else {
-                                    sstd = { "suggestedOrderQty": "", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) };
+                                    var currentMonth = moment(Date.now()).utcOffset('-0500').startOf('month').format("YYYY-MM-DD");
+                                    var compare = (m[n].startDate >= currentMonth);
+                                    // var stockInHand = jsonList[0].closingBalance;
+                                    var spd1 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).add(this.state.distributionLeadTime, 'months').format("YYYY-MM"));
+                                    console.log("Spd1@@@@@@@@@@@", spd1)
+                                    console.log("Spd1@@@@@@@@@@@mn.startDate", m[n].startDate)
+                                    var spd2 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).add(1 + this.state.distributionLeadTime, 'months').format("YYYY-MM"));
+                                    var spd3 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).add(2 + this.state.distributionLeadTime, 'months').format("YYYY-MM"));
+                                    var amc = spd1.length > 0 ? Math.round(Number(spd1[0].amc)) : 0;
+                                    var mosForMonth1 = spd1.length > 0 ? spd1[0].mos : 0;
+                                    var mosForMonth2 = spd2.length > 0 ? spd2[0].mos : 0;
+                                    var mosForMonth3 = spd3.length > 0 ? spd3[0].mos : 0;
+
+                                    var cbForMonth1 = spd1.length > 0 ? spd1[0].closingBalance : 0;
+                                    var cbForMonth2 = spd2.length > 0 ? spd2[0].closingBalance : 0;
+                                    var cbForMonth3 = spd3.length > 0 ? spd3[0].closingBalance : 0;
+                                    var unmetDemandForMonth1=spd1.length > 0 ? spd1[0].unmetDemand : 0;
+
+                                    var maxStockForMonth1 = spd1.length > 0 ? spd1[0].maxStock : 0;
+                                    var minStockForMonth1 = spd1.length > 0 ? spd1[0].minStock : 0;
+
+                                    var suggestShipment = false;
+                                    var useMax = false;
+                                    if (compare) {
+                                        if (Number(amc) == 0) {
+                                            suggestShipment = false;
+                                        } else if (Number(cbForMonth1) != 0 && Number(cbForMonth1) < Number(this.state.minQtyPpu) && (Number(cbForMonth2) > Number(this.state.minQtyPpu) || Number(cbForMonth3) > Number(this.state.minQtyPpu))) {
+                                            suggestShipment = false;
+                                        } else if (Number(cbForMonth1) != 0 && Number(cbForMonth1) < Number(this.state.minQtyPpu) && Number(cbForMonth2) < Number(this.state.minQtyPpu) && Number(cbForMonth3) < Number(this.state.minQtyPpu)) {
+                                            suggestShipment = true;
+                                            useMax = true;
+                                        } else if (Number(cbForMonth1) == 0) {
+                                            suggestShipment = true;
+                                            if (Number(cbForMonth2) < Number(this.state.minQtyPpu) && Number(cbForMonth3) < Number(this.state.minQtyPpu)) {
+                                                useMax = true;
+                                            } else {
+                                                useMax = false;
+                                            }
+                                        }
+                                    } else {
+                                        suggestShipment = false;
+                                    }
+                                    var addLeadTimes = parseFloat(programJson.plannedToSubmittedLeadTime) + parseFloat(programJson.submittedToApprovedLeadTime) +
+                                        parseFloat(programJson.approvedToShippedLeadTime) + parseFloat(programJson.shippedToArrivedBySeaLeadTime) +
+                                        parseFloat(programJson.arrivedToDeliveredLeadTime);
+                                    var expectedDeliveryDate = moment(m[n].startDate).subtract(Number(addLeadTimes * 30), 'days').format("YYYY-MM-DD");
+                                    var isEmergencyOrder = 0;
+                                    if (expectedDeliveryDate >= currentMonth) {
+                                        isEmergencyOrder = 0;
+                                    } else {
+                                        isEmergencyOrder = 1;
+                                    }
+                                    if (suggestShipment) {
+                                        var suggestedOrd = 0;
+                                        if (useMax) {
+                                            suggestedOrd = Number((Number(maxStockForMonth1)) - Number(cbForMonth1) + Number(unmetDemandForMonth1));
+                                        } else {
+                                            suggestedOrd = Number((Number(minStockForMonth1)) - Number(cbForMonth1) + Number(unmetDemandForMonth1));
+                                        }
+                                        if (suggestedOrd <= 0) {
+                                            sstd = { "suggestedOrderQty": "", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) };
+                                        } else {
+                                            sstd = { "suggestedOrderQty": suggestedOrd, "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) + Number(suggestedOrd) };
+                                        }
+                                    } else {
+                                        sstd = { "suggestedOrderQty": "", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) };
+                                    }
+                                    suggestedShipmentsTotalData.push(sstd);
                                 }
-                                suggestedShipmentsTotalData.push(sstd);
 
                                 var consumptionListForRegion = (programJson.consumptionList).filter(c => (c.consumptionDate >= m[n].startDate && c.consumptionDate <= m[n].endDate) && c.planningUnit.id == planningUnitId && c.active == true);
                                 var inventoryListForRegion = (programJson.inventoryList).filter(c => (c.inventoryDate >= m[n].startDate && c.inventoryDate <= m[n].endDate) && c.planningUnit.id == planningUnitId && c.active == true);
@@ -1868,7 +2034,10 @@ class EditSupplyPlanStatus extends Component {
                                     ordered: parseInt(orderedShipmentsTotalData[n] != "" ? orderedShipmentsTotalData[n].qty : 0) + parseInt(orderedErpShipmentsTotalData[n] != "" ? orderedErpShipmentsTotalData[n].qty : 0),
                                     mos: jsonList[0].mos != null ? parseFloat(jsonList[0].mos).toFixed(2) : jsonList[0].mos,
                                     minMos: minStockMoSQty,
-                                    maxMos: maxStockMoSQty
+                                    maxMos: maxStockMoSQty,
+                                    minQty: jsonList[0].minStock,
+                                    maxQty: jsonList[0].maxStock,
+                                    planBasedOn: programPlanningUnit.planBasedOn
                                 }
                                 jsonArrForGraph.push(json);
                             } else {
@@ -1889,6 +2058,7 @@ class EditSupplyPlanStatus extends Component {
                                 inventoryTotalData.push("");
                                 totalExpiredStockArr.push({ qty: 0, details: [], month: m[n] });
                                 monthsOfStockArray.push(null)
+                                maxQtyArray.push(null)
                                 amcTotalData.push("");
                                 minStockMoS.push(minStockMoSQty);
                                 maxStockMoS.push(maxStockMoSQty)
@@ -1912,7 +2082,10 @@ class EditSupplyPlanStatus extends Component {
                                     ordered: 0,
                                     mos: "",
                                     minMos: minStockMoSQty,
-                                    maxMos: maxStockMoSQty
+                                    maxMos: maxStockMoSQty,
+                                    minQty: 0,
+                                    maxQty: 0,
+                                    planBasedOn: programPlanningUnit.planBasedOn
                                 }
                                 jsonArrForGraph.push(json);
                             }
@@ -1937,6 +2110,7 @@ class EditSupplyPlanStatus extends Component {
                             plannedErpShipmentsTotalData: plannedErpShipmentsTotalData,
                             inventoryTotalData: inventoryTotalData,
                             monthsOfStockArray: monthsOfStockArray,
+                            maxQtyArray: maxQtyArray,
                             amcTotalData: amcTotalData,
                             minStockMoS: minStockMoS,
                             maxStockMoS: maxStockMoS,
@@ -2141,7 +2315,7 @@ class EditSupplyPlanStatus extends Component {
 
                 }, () => {
                     this.getPlanningUnit()
-                    this.getDatasource()
+                    // this.getDatasource()
                     this.fetchData();
                     this.buildJExcel()
                     var fields = document.getElementsByClassName("totalShipments");
@@ -2381,6 +2555,25 @@ class EditSupplyPlanStatus extends Component {
 
     }
 
+    formatter = value => {
+        if (value != null && value !== '' && !isNaN(Number(value))) {
+            var cell1 = value
+            cell1 += '';
+            var x = cell1.split('.');
+            var x1 = x[0];
+            var x2 = x.length > 1 ? '.' + x[1] : '';
+            var rgx = /(\d+)(\d{3})/;
+            while (rgx.test(x1)) {
+                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+            }
+            return x1 + x2;
+        } else if (value != null && isNaN(Number(value))) {
+            return value;
+        } else {
+            return ''
+        }
+    }
+
     toggle(tabPane, tab) {
         const newArray = this.state.activeTab.slice()
         newArray[tabPane] = tab
@@ -2473,6 +2666,72 @@ class EditSupplyPlanStatus extends Component {
             }
         }
 
+        var chartOptions1 = {
+            title: {
+                display: true,
+                text: this.state.planningUnitName != "" && this.state.planningUnitName != undefined && this.state.planningUnitName != null ? (this.state.program.programCode + "~v" + this.state.program.currentVersion.versionId + " - " + this.state.planningUnitName) : entityname
+            },
+            scales: {
+                yAxes: [{
+                    id: 'A',
+                    scaleLabel: {
+                        display: true,
+                        labelString: i18n.t('static.shipment.qty'),
+                        fontColor: 'black'
+                    },
+                    stacked: false,
+                    ticks: {
+                        beginAtZero: true,
+                        fontColor: 'black',
+                        callback: function (value) {
+                            return value.toLocaleString();
+                        }
+                    },
+                    gridLines: {
+                        drawBorder: true, lineWidth: 0
+                    },
+                    position: 'left',
+                }
+                ],
+                xAxes: [{
+                    ticks: {
+                        fontColor: 'black'
+                    },
+                    gridLines: {
+                        drawBorder: true, lineWidth: 0
+                    }
+                }]
+            },
+            tooltips: {
+                callbacks: {
+                    label: function (tooltipItems, data) {
+                        if (tooltipItems.datasetIndex == 0) {
+                            var details = this.state.expiredStockArr[tooltipItems.index].details;
+                            var infoToShow = [];
+                            details.map(c => {
+                                infoToShow.push(c.batchNo + " - " + c.expiredQty.toLocaleString());
+                            });
+                            return (infoToShow.join(' | '));
+                        } else {
+                            return (tooltipItems.yLabel.toLocaleString());
+                        }
+                    }.bind(this)
+                },
+                enabled: false,
+                custom: CustomTooltips
+            },
+            maintainAspectRatio: false
+            ,
+            legend: {
+                display: true,
+                position: 'bottom',
+                labels: {
+                    usePointStyle: true,
+                    fontColor: 'black'
+                }
+            }
+        }
+
         const { planningUnits } = this.state;
 
         let planningUnitList = planningUnits.length > 0
@@ -2505,172 +2764,178 @@ class EditSupplyPlanStatus extends Component {
                 return ({ label: item.name, value: item.id })
             }, this);
 
+
         let bar = {}
-        if (this.state.jsonArrForGraph.length > 0)
+        if (this.state.jsonArrForGraph.length > 0) {
+            var datasets = [
+                {
+                    label: i18n.t('static.supplyplan.exipredStock'),
+                    yAxisID: 'A',
+                    type: 'line',
+                    stack: 7,
+                    data: this.state.expiredStockArr.map((item, index) => (item.qty > 0 ? item.qty : null)),
+                    fill: false,
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1,
+                    showLine: false,
+                    pointStyle: 'triangle',
+                    pointBackgroundColor: '#ED8944',
+                    pointBorderColor: '#212721',
+                    pointRadius: 10
+
+                },
+                {
+                    label: i18n.t('static.supplyPlan.planned'),
+                    stack: 1,
+                    yAxisID: 'A',
+                    backgroundColor: '#A7C6ED',
+                    borderColor: 'rgba(179,181,198,1)',
+                    pointBackgroundColor: 'rgba(179,181,198,1)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgba(179,181,198,1)',
+                    data: this.state.jsonArrForGraph.map((item, index) => (item.planned)),
+                },
+                {
+                    label: i18n.t('static.supplyPlan.submitted'),
+                    stack: 1,
+                    yAxisID: 'A',
+                    backgroundColor: '#0067B9',
+                    borderColor: 'rgba(179,181,198,1)',
+                    pointBackgroundColor: 'rgba(179,181,198,1)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgba(179,181,198,1)',
+                    data: this.state.jsonArrForGraph.map((item, index) => (item.ordered)),
+                },
+                {
+                    label: i18n.t('static.supplyPlan.shipped'),
+                    stack: 1,
+                    yAxisID: 'A',
+                    backgroundColor: '#49A4A1',
+                    borderColor: 'rgba(179,181,198,1)',
+                    pointBackgroundColor: 'rgba(179,181,198,1)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgba(179,181,198,1)',
+                    data: this.state.jsonArrForGraph.map((item, index) => (item.shipped)),
+                },
+                {
+                    label: i18n.t('static.supplyPlan.delivered'),
+                    stack: 1,
+                    yAxisID: 'A',
+                    backgroundColor: '#002f6c',
+                    borderColor: 'rgba(179,181,198,1)',
+                    pointBackgroundColor: 'rgba(179,181,198,1)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgba(179,181,198,1)',
+                    data: this.state.jsonArrForGraph.map((item, index) => (item.delivered)),
+                }, {
+                    label: i18n.t('static.report.stock'),
+                    stack: 2,
+                    type: 'line',
+                    yAxisID: 'A',
+                    borderColor: '#cfcdc9',
+                    borderStyle: 'dotted',
+                    ticks: {
+                        fontSize: 2,
+                        fontColor: 'transparent',
+                    },
+                    lineTension: 0,
+                    pointStyle: 'line',
+                    pointRadius: 0,
+                    showInLegend: true,
+                    data: this.state.jsonArrForGraph.map((item, index) => (item.stock))
+                }, {
+                    label: i18n.t('static.supplyPlan.consumption'),
+                    type: 'line',
+                    stack: 3,
+                    yAxisID: 'A',
+                    backgroundColor: 'transparent',
+                    borderColor: '#ba0c2f',
+                    borderStyle: 'dotted',
+                    ticks: {
+                        fontSize: 2,
+                        fontColor: 'transparent',
+                    },
+                    lineTension: 0,
+                    pointStyle: 'line',
+                    pointRadius: 0,
+                    showInLegend: true,
+                    data: this.state.jsonArrForGraph.map((item, index) => (item.consumption))
+                },
+                {
+                    label: this.state.planBasedOn == 1 ? i18n.t('static.supplyPlan.minStockMos') : i18n.t('static.product.minQuantity'),
+                    type: 'line',
+                    stack: 5,
+                    yAxisID: this.state.planBasedOn == 1 ? 'B' : 'A',
+                    backgroundColor: 'transparent',
+                    borderColor: '#59cacc',
+                    borderStyle: 'dotted',
+                    borderDash: [10, 10],
+                    fill: '+1',
+                    ticks: {
+                        fontSize: 2,
+                        fontColor: 'transparent',
+                    },
+                    showInLegend: true,
+                    pointStyle: 'line',
+                    pointRadius: 0,
+                    yValueFormatString: "$#,##0",
+                    lineTension: 0,
+                    data: this.state.jsonArrForGraph.map((item, index) => (this.state.planBasedOn == 1 ? item.minMos : item.minQty))
+                },
+                {
+                    label: this.state.planBasedOn == 1 ? i18n.t('static.supplyPlan.maxStockMos') : i18n.t('static.supplyPlan.maxQty'),
+                    type: 'line',
+                    stack: 6,
+                    yAxisID: this.state.planBasedOn == 1 ? 'B' : 'A',
+                    backgroundColor: 'rgba(0,0,0,0)',
+                    borderColor: '#59cacc',
+                    borderStyle: 'dotted',
+                    borderDash: [10, 10],
+                    fill: true,
+                    ticks: {
+                        fontSize: 2,
+                        fontColor: 'transparent',
+                    },
+                    lineTension: 0,
+                    pointStyle: 'line',
+                    pointRadius: 0,
+                    showInLegend: true,
+                    yValueFormatString: "$#,##0",
+                    data: this.state.jsonArrForGraph.map((item, index) => (this.state.planBasedOn == 1 ? item.maxMos : item.maxQty))
+                }
+            ];
+            if (this.state.jsonArrForGraph.length > 0 && this.state.planBasedOn == 1) {
+                datasets.push({
+                    label: i18n.t('static.supplyPlan.monthsOfStock'),
+                    type: 'line',
+                    stack: 4,
+                    yAxisID: 'B',
+                    backgroundColor: 'transparent',
+                    borderColor: '#118b70',
+                    borderStyle: 'dotted',
+                    ticks: {
+                        fontSize: 2,
+                        fontColor: 'transparent',
+                    },
+                    lineTension: 0,
+                    pointStyle: 'line',
+                    pointRadius: 0,
+                    showInLegend: true,
+                    data: this.state.jsonArrForGraph.map((item, index) => (item.mos))
+                })
+            }
             bar = {
 
                 labels: [...new Set(this.state.jsonArrForGraph.map(ele => (ele.month)))],
-                datasets: [
-                    {
-                        label: i18n.t('static.supplyplan.exipredStock'),
-                        yAxisID: 'A',
-                        type: 'line',
-                        stack: 7,
-                        data: this.state.expiredStockArr.map((item, index) => (item.qty > 0 ? item.qty : null)),
-                        fill: false,
-                        borderColor: 'rgb(75, 192, 192)',
-                        tension: 0.1,
-                        showLine: false,
-                        pointStyle: 'triangle',
-                        pointBackgroundColor: '#ED8944',
-                        pointBorderColor: '#212721',
-                        pointRadius: 10
-
-                    },
-                    {
-                        label: i18n.t('static.supplyPlan.planned'),
-                        stack: 1,
-                        yAxisID: 'A',
-                        backgroundColor: '#a7c6ed',
-                        borderColor: 'rgba(179,181,198,1)',
-                        pointBackgroundColor: 'rgba(179,181,198,1)',
-                        pointBorderColor: '#fff',
-                        pointHoverBackgroundColor: '#fff',
-                        pointHoverBorderColor: 'rgba(179,181,198,1)',
-                        data: this.state.jsonArrForGraph.map((item, index) => (item.planned)),
-                    },
-                    {
-                        label: i18n.t('static.supplyPlan.submitted'),
-                        stack: 1,
-                        yAxisID: 'A',
-                        backgroundColor: '#205493',
-                        borderColor: 'rgba(179,181,198,1)',
-                        pointBackgroundColor: 'rgba(179,181,198,1)',
-                        pointBorderColor: '#fff',
-                        pointHoverBackgroundColor: '#fff',
-                        pointHoverBorderColor: 'rgba(179,181,198,1)',
-                        data: this.state.jsonArrForGraph.map((item, index) => (item.ordered)),
-                    },
-                    {
-                        label: i18n.t('static.supplyPlan.shipped'),
-                        stack: 1,
-                        yAxisID: 'A',
-                        backgroundColor: '#006789',
-                        borderColor: 'rgba(179,181,198,1)',
-                        pointBackgroundColor: 'rgba(179,181,198,1)',
-                        pointBorderColor: '#fff',
-                        pointHoverBackgroundColor: '#fff',
-                        pointHoverBorderColor: 'rgba(179,181,198,1)',
-                        data: this.state.jsonArrForGraph.map((item, index) => (item.shipped)),
-                    },
-                    {
-                        label: i18n.t('static.supplyPlan.delivered'),
-                        stack: 1,
-                        yAxisID: 'A',
-                        backgroundColor: '#002f6c',
-                        borderColor: 'rgba(179,181,198,1)',
-                        pointBackgroundColor: 'rgba(179,181,198,1)',
-                        pointBorderColor: '#fff',
-                        pointHoverBackgroundColor: '#fff',
-                        pointHoverBorderColor: 'rgba(179,181,198,1)',
-                        data: this.state.jsonArrForGraph.map((item, index) => (item.delivered)),
-                    }, {
-                        label: i18n.t('static.report.stock'),
-                        stack: 2,
-                        type: 'line',
-                        yAxisID: 'A',
-                        borderColor: '#cfcdc9',
-                        borderStyle: 'dotted',
-                        ticks: {
-                            fontSize: 2,
-                            fontColor: 'transparent',
-                        },
-                        lineTension: 0,
-                        pointStyle: 'line',
-                        pointRadius: 0,
-                        showInLegend: true,
-                        data: this.state.jsonArrForGraph.map((item, index) => (item.stock))
-                    }, {
-                        label: i18n.t('static.supplyPlan.consumption'),
-                        type: 'line',
-                        stack: 3,
-                        yAxisID: 'A',
-                        backgroundColor: 'transparent',
-                        borderColor: '#ba0c2f',
-                        borderStyle: 'dotted',
-                        ticks: {
-                            fontSize: 2,
-                            fontColor: 'transparent',
-                        },
-                        lineTension: 0,
-                        pointStyle: 'line',
-                        pointRadius: 0,
-                        showInLegend: true,
-                        data: this.state.jsonArrForGraph.map((item, index) => (item.consumption))
-                    },
-                    {
-                        label: i18n.t('static.supplyPlan.monthsOfStock'),
-                        type: 'line',
-                        stack: 4,
-                        yAxisID: 'B',
-                        backgroundColor: 'transparent',
-                        borderColor: '#118b70',
-                        borderStyle: 'dotted',
-                        ticks: {
-                            fontSize: 2,
-                            fontColor: 'transparent',
-                        },
-                        lineTension: 0,
-                        pointStyle: 'line',
-                        pointRadius: 0,
-                        showInLegend: true,
-                        data: this.state.jsonArrForGraph.map((item, index) => (item.mos))
-                    },
-                    {
-                        label: i18n.t('static.supplyPlan.minStockMos'),
-                        type: 'line',
-                        stack: 5,
-                        yAxisID: 'B',
-                        backgroundColor: 'transparent',
-                        borderColor: '#59cacc',
-                        borderStyle: 'dotted',
-                        borderDash: [10, 10],
-                        fill: '+1',
-                        ticks: {
-                            fontSize: 2,
-                            fontColor: 'transparent',
-                        },
-                        showInLegend: true,
-                        pointStyle: 'line',
-                        pointRadius: 0,
-                        yValueFormatString: "$#,##0",
-                        lineTension: 0,
-                        data: this.state.jsonArrForGraph.map((item, index) => (item.minMos))
-                    },
-                    {
-                        label: i18n.t('static.supplyPlan.maxStockMos'),
-                        type: 'line',
-                        stack: 6,
-                        yAxisID: 'B',
-                        backgroundColor: 'rgba(0,0,0,0)',
-                        borderColor: '#59cacc',
-                        borderStyle: 'dotted',
-                        borderDash: [10, 10],
-                        fill: true,
-                        ticks: {
-                            fontSize: 2,
-                            fontColor: 'transparent',
-                        },
-                        lineTension: 0,
-                        pointStyle: 'line',
-                        pointRadius: 0,
-                        showInLegend: true,
-                        yValueFormatString: "$#,##0",
-                        data: this.state.jsonArrForGraph.map((item, index) => (item.maxMos))
-                    }
-                ]
+                datasets: datasets
 
             };
+        }
+
         const { problemCategoryList } = this.state;
         let problemCategories = problemCategoryList.length > 0
             && problemCategoryList.map((item, i) => {
@@ -2751,9 +3016,9 @@ class EditSupplyPlanStatus extends Component {
                                             <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.planningUnitSettings")} : </b></span></li>
                                             <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.amcPastOrFuture")} : {this.state.monthsInPastForAMC}/{this.state.monthsInFutureForAMC}</span></li>
                                             <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.report.shelfLife")} : {this.state.shelfLife}</span></li>
-                                            <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.minStockMos")} : {this.state.minStockMoSQty}</span></li>
+                                            {this.state.planBasedOn == 1 ? <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.minStockMos")} : {this.state.minStockMoSQty}</span></li> : <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.product.minQuantity")} : {this.formatter(this.state.minQtyPpu)}</span></li>}
                                             <li><span className="lightgreenlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.reorderInterval")} : {this.state.reorderFrequency}</span></li>
-                                            <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.maxStockMos")} : {this.state.maxStockMoSQty}</span></li>
+                                            {this.state.planBasedOn == 1 ? <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.maxStockMos")} : {this.state.maxStockMoSQty}</span></li> : <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.product.distributionLeadTime")} : {this.formatter(this.state.distributionLeadTime)}</span></li>}
                                         </ul>
                                     </FormGroup>
                                     <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px' }} style={{ display: this.state.display }}>
@@ -3069,7 +3334,7 @@ class EditSupplyPlanStatus extends Component {
                                                                 this.state.expiredStockArr.map(item1 => {
                                                                     if (item1.toString() != "") {
                                                                         if (item1.qty != 0) {
-                                                                            return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('expiredStock', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, '')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                                            return (<td align="right" className="hoverTd redColor" onClick={() => this.toggleLarge('expiredStock', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, '')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                                                         } else {
                                                                             return (<td align="right"></td>)
                                                                         }
@@ -3084,11 +3349,11 @@ class EditSupplyPlanStatus extends Component {
                                                             <td align="left" className="sticky-col first-col clone"><b>{i18n.t('static.supplyPlan.endingBalance')}</b></td>
                                                             {
                                                                 this.state.closingBalanceArray.map((item1, count) => {
-                                                                    return (<td align="right" bgcolor={item1.balance == 0 ? '#BA0C2F' : ''} className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}>{item1.isActual == 1 ? <b><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} /></b> : <NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} />}</td>)
+                                                                    return (<td align="right" bgcolor={this.state.planBasedOn == 1 ? (item1.balance == 0 ? '#BA0C2F' : '') : (item1.balance == null ? "#cfcdc9" : item1.balance == 0 ? "#BA0C2F" : item1.balance < this.state.minQtyPpu ? "#f48521" : item1.balance > this.state.maxQtyArray[count] ? "#edb944" : "#118b70")} className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}>{item1.isActual == 1 ? <b><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} /></b> : <NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} />}</td>)
                                                                 })
                                                             }
                                                         </tr>
-                                                        <tr>
+                                                        {this.state.planBasedOn == 1 && <tr>
                                                             <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone"><b>{i18n.t('static.supplyPlan.monthsOfStock')}</b></td>
                                                             {
@@ -3096,7 +3361,16 @@ class EditSupplyPlanStatus extends Component {
                                                                     <td align="right" style={{ backgroundColor: item1 == null ? "#cfcdc9" : item1 == 0 ? "#BA0C2F" : item1 < this.state.minStockMoSQty ? "#f48521" : item1 > this.state.maxStockMoSQty ? "#edb944" : "#118b70" }}>{item1 != null ? <NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /> : i18n.t('static.supplyPlanFormula.na')}</td>
                                                                 ))
                                                             }
-                                                        </tr>
+                                                        </tr>}
+                                                        {this.state.planBasedOn == 2 && <tr>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                            <td align="left" className="sticky-col first-col clone"><b>{i18n.t('static.supplyPlan.maxQty')}</b></td>
+                                                            {
+                                                                this.state.maxQtyArray.map(item1 => (
+                                                                    <td align="right">{item1 != null ? <NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /> : ""}</td>
+                                                                ))
+                                                            }
+                                                        </tr>}
                                                         <tr>
                                                             <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone" title={i18n.t('static.supplyplan.amcmessage')}>{i18n.t('static.supplyPlan.amc')}</td>
@@ -3149,7 +3423,8 @@ class EditSupplyPlanStatus extends Component {
                                                     <div className="graphwidth">
                                                         <div className="col-md-12">
                                                             <div className="chart-wrapper chart-graph-report">
-                                                                <Bar id="cool-canvas1" data={bar} options={chartOptions} />
+                                                                {this.state.planBasedOn == 1 && <Bar id="cool-canvas" data={bar} options={chartOptions} />}
+                                                                {this.state.planBasedOn == 2 && <Bar id="cool-canvas" data={bar} options={chartOptions1} />}
                                                             </div>
                                                         </div>
                                                     </div>
@@ -3186,7 +3461,7 @@ class EditSupplyPlanStatus extends Component {
                     </Row>
                 </TabPane>
                 <TabPane tabId="2">
-                    <Col md="9 pl-0 mt-3">
+                    <Col md="12 pl-0 mt-3">
                         <div className="d-md-flex Selectdiv2">
                             <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
                                 <Label htmlFor="appendedInputButton">{i18n.t('static.report.problemStatus')}</Label>
@@ -3266,8 +3541,18 @@ class EditSupplyPlanStatus extends Component {
                                     </InputGroup>
                                 </div>
                             </FormGroup> */}
+                            {/* {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_PROBLEM') &&
+                                <div className="col-md-4 card-header-action">
+                                    <a className="pull-right" href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addMannualProblem}><i className="fa fa-plus-square"></i></a>
+                                </div>
+                            } */}
                         </div>
                     </Col>
+                    {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_PROBLEM') &&
+                        <div className="col-md-12 card-header-action">
+                            <a className="pull-right" style={{ marginTop: '-21px' }} href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addMannualProblem}><i className="fa fa-plus-square"></i></a>
+                        </div>
+                    }
                     <br />
                     <FormGroup className="col-md-6 mt-5 pl-0" >
                         <ul className="legendcommitversion list-group">
@@ -3276,7 +3561,7 @@ class EditSupplyPlanStatus extends Component {
                             <li><span className="problemList-yellow legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.problemList.low')} </span></li>
                         </ul>
                     </FormGroup>
-                    <div className="table-responsive RemoveStriped qat-problemListSearch">
+                    <div className="consumptionDataEntryTable RemoveStriped qat-problemListSearch EditStatusTable">
                         <div id="problemListDiv" className="" />
                     </div>
                 </TabPane>
@@ -3375,7 +3660,8 @@ class EditSupplyPlanStatus extends Component {
             },
                 () => {
                     this.el = jexcel(document.getElementById("problemListDiv"), '');
-                    this.el.destroy();
+                    // this.el.destroy();
+                    jexcel.destroy(document.getElementById("problemListDiv"), true);
                 });
 
             // let problemStatusId = ;
@@ -3473,7 +3759,9 @@ class EditSupplyPlanStatus extends Component {
                 this.setState({ message: i18n.t('static.report.selectProblemStatus'), problemList: [], loading: false },
                     () => {
                         this.el = jexcel(document.getElementById("problemListDiv"), '');
-                        this.el.destroy();
+                        // this.el.destroy();
+                        jexcel.destroy(document.getElementById("problemListDiv"), true);
+
                     });
             }
         }
@@ -3481,7 +3769,7 @@ class EditSupplyPlanStatus extends Component {
 
     filterProblemStatus = function (instance, cell, c, r, source) {
         var mylist = [];
-        var json = instance.jexcel.getJson(null, false)
+        // var json = instance.jexcel.getJson(null, false)
         mylist = this.state.problemStatusListForEdit;
         mylist = mylist.filter(c => c.userManaged == true);
         return mylist;
@@ -3507,7 +3795,9 @@ class EditSupplyPlanStatus extends Component {
             count++;
         }
         this.el = jexcel(document.getElementById("problemTransDiv"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("problemTransDiv"), true);
+
         var json = [];
         var data = dataArray;
 
@@ -3542,7 +3832,7 @@ class EditSupplyPlanStatus extends Component {
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
@@ -3554,11 +3844,11 @@ class EditSupplyPlanStatus extends Component {
             filters: true,
             parseFormulas: true,
             license: JEXCEL_PRO_KEY,
-            text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')} `,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')} `,
+            //     show: '',
+            //     entries: '',
+            // },
         };
         var problemTransEl = jexcel(document.getElementById("problemTransDiv"), options);
         this.el = problemTransEl;
@@ -3621,7 +3911,9 @@ class EditSupplyPlanStatus extends Component {
         // }
         // console.log("problemArray---->", problemArray);
         this.el = jexcel(document.getElementById("problemListDiv"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("problemListDiv"), true);
+
         var json = [];
         var data = problemArray;
 
@@ -3773,7 +4065,7 @@ class EditSupplyPlanStatus extends Component {
 
             ],
             updateTable: function (el, cell, x, y, source, value, id) {
-                var elInstance = el.jexcel;
+                var elInstance = el;
                 if (this.state.editable) {
                     var rowData = elInstance.getRowData(y);
                     if (rowData[12] == 4) {
@@ -3821,17 +4113,17 @@ class EditSupplyPlanStatus extends Component {
                 }
             }.bind(this),
             onsearch: function (el) {
-                el.jexcel.updateTable();
+                // el.jexcel.updateTable();
             },
             onfilter: function (el) {
-                el.jexcel.updateTable();
+                // el.jexcel.updateTable();
             },
             editable: this.state.editable,
-            text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')} `,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')} `,
+            //     show: '',
+            //     entries: '',
+            // },
 
             // updateTable: function (el, cell, x, y, source, value, id) {
             // }.bind(this),
@@ -3840,11 +4132,12 @@ class EditSupplyPlanStatus extends Component {
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
             allowDeleteRow: false,
+            allowManualInsertRow: false,
             onchange: this.rowChanged,
             // onselection: this.selected,
             // oneditionend: this.onedit,
@@ -3925,7 +4218,118 @@ class EditSupplyPlanStatus extends Component {
         }
     }
 
+    touchAllForAddingProblem(setTouched, errors) {
+        setTouched({
+            problemDescription: true,
+            modelPlanningUnitId: true,
+            modelCriticalityId: true,
+            suggession: true
+        }
+        )
+        this.validateFormForAddingProblem(errors)
+    }
+    validateFormForAddingProblem(errors) {
+        this.findFirstError('addProblemForm', (fieldName) => {
+            return Boolean(errors[fieldName])
+        })
+    }
+
+    addMannualProblem() {
+        console.log("-------------------addNewProblem--------------------");
+        this.getProblemCriticality();
+        this.setState({
+            isModalOpen: !this.state.isModalOpen,
+        }, () => {
+        });
+    }
+
+    submitManualProblem(criticalityId, regionId, modelPlanningUnitId, problemDescription, suggession) {
+        var json = {
+            "realmProblem": {
+                "realmProblemId": criticalityId == 1 ? "25" : criticalityId == 2 ? "26" : "27",
+                "problemType": {
+                    "id": "2"
+                }
+            },
+            "program": {
+                "id": this.props.match.params.programId
+            },
+            "versionId": this.props.match.params.versionId,
+            "problemStatus": {
+                "id": "1"
+            },
+            "dt": moment(new Date()).format("YYYY-MM-DD"),
+            "region": {
+                "id": regionId
+            },
+            "planningUnit": {
+                "id": modelPlanningUnitId
+            },
+            "data5": '{"problemDescription":"' + problemDescription + '", "suggession":"' + suggession + '"}',
+            "notes": ""
+        }
+        ProgramService.createManualProblem(json)
+            .then(response => {
+                if (response.status == 200) {
+                    // this.props.history.push('/report/editStatus/' + this.props.match.params.programId + '/' + this.props.match.params.versionId + '/' + false + '/green/' + i18n.t('static.problem.addedSuccessfully'));
+                    this.setState({
+                        message: response.data.message,
+                        problemReportChanged: 0,
+
+                        // isModalOpen: !this.state.isModalOpen,
+                    })
+                    // window.location.reload(false);
+                    this.componentDidMount();
+                    this.toggle(0, '2');
+
+                } else {
+                    this.setState({
+                        message: response.data.message,
+                    })
+                }
+            })
+            .catch(
+                error => {
+
+                    console.log(error)
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 404:
+                                this.props.history.push(`/login/${error.response.data.messageCode}`)
+                                break;
+                            case 500:
+                            case 401:
+                            case 403:
+                            case 406:
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                break;
+                        }
+                    }
+                }
+            );
+    }
+
+    modelOpenClose() {
+        this.setState({
+            isModalOpen: !this.state.isModalOpen
+        })
+    }
+
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
         const { statuses } = this.state;
         let statusList = statuses.length > 0
             && statuses.map((item, i) => {
@@ -4012,6 +4416,31 @@ class EditSupplyPlanStatus extends Component {
                 text: 'All', value: this.state.data.length
             }]
         }
+
+        const { planningUnits } = this.state;
+        let planningUnitList = planningUnits.length > 0
+            && planningUnits.map((item, i) => {
+                return (
+                    <option key={i} value={item.planningUnit.id}>{getLabelText(item.planningUnit.label, this.state.lang)}</option>
+                )
+            }, this);
+
+
+        const { criticalitiesList } = this.state;
+        let criticalities = criticalitiesList.length > 0
+            && criticalitiesList.map((item, i) => {
+                return (
+                    <option key={i} value={item.id}>{item.name}</option>
+                )
+            }, this);
+
+        const { regionList } = this.state;
+        let regions = regionList.length > 0
+            && regionList.map((item, i) => {
+                return (
+                    <option key={i} value={item.id}>{item.name}</option>
+                )
+            }, this);
 
         return (
             <div className="animated fadeIn">
@@ -4161,11 +4590,11 @@ class EditSupplyPlanStatus extends Component {
                                         </tfoot>
                                     </Table>
                                     {this.state.showConsumption == 1 && <ConsumptionInSupplyPlanComponent ref="consumptionChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} consumptionPage="supplyPlanCompare" useLocalData={0} />}
-                                    <div className="table-responsive mt-3">
+                                    <div className="mt-3">
                                         <div id="consumptionTable" />
                                     </div>
                                     <h6 className="red" id="div3">{this.state.consumptionBatchInfoDuplicateError || this.state.consumptionBatchInfoNoStockError || this.state.consumptionBatchError}</h6>
-                                    <div className="table-responsive">
+                                    <div className="">
                                         <div id="consumptionBatchInfoTable" className="AddListbatchtrHeight"></div>
                                     </div>
 
@@ -4366,11 +4795,11 @@ class EditSupplyPlanStatus extends Component {
                                         </>
                                     }
                                     {this.state.showInventory == 1 && <InventoryInSupplyPlanComponent ref="inventoryChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} inventoryPage="supplyPlanCompare" hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} adjustmentsDetailsClicked={this.adjustmentsDetailsClicked} useLocalData={0} />}
-                                    <div className="table-responsive mt-3">
-                                        <div id="adjustmentsTable" className="table-responsive " />
+                                    <div className="mt-3">
+                                        <div id="adjustmentsTable" className="" />
                                     </div>
                                     <h6 className="red" id="div3">{this.state.inventoryBatchInfoDuplicateError || this.state.inventoryBatchInfoNoStockError || this.state.inventoryBatchError}</h6>
-                                    <div className="table-responsive">
+                                    <div className="">
                                         <div id="inventoryBatchInfoTable" className="AddListbatchtrHeight"></div>
                                     </div>
 
@@ -4419,17 +4848,17 @@ class EditSupplyPlanStatus extends Component {
                                 <ModalBody>
                                     {this.state.showShipments == 1 && <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} hideFourthComponent={this.hideFourthComponent} hideFifthComponent={this.hideFifthComponent} shipmentPage="supplyPlanCompare" useLocalData={0} />}
                                     <h6 className="red" id="div2">{this.state.noFundsBudgetError || this.state.shipmentBatchError || this.state.shipmentError}</h6>
-                                    <div className="table-responsive">
+                                    <div className="">
                                         <div id="shipmentsDetailsTable" />
                                     </div>
 
                                     <h6 className="red" id="div3">{this.state.qtyCalculatorValidationError}</h6>
-                                    <div className="table-responsive RemoveStriped">
+                                    <div className="RemoveStriped">
                                         <div id="qtyCalculatorTable"></div>
                                     </div>
 
-                                    <div className="table-responsive RemoveStriped">
-                                        <div id="qtyCalculatorTable1"></div>
+                                    <div className="RemoveStriped">
+                                        <div id="qtyCalculatorTable1" className="jexcelremoveReadonlybackground"></div>
                                     </div>
 
                                     <div id="showSaveQtyButtonDiv" style={{ display: 'none' }}>
@@ -4437,14 +4866,14 @@ class EditSupplyPlanStatus extends Component {
                                     </div>
 
                                     <h6 className="red" id="div4">{this.state.shipmentDatesError}</h6>
-                                    <div className="table-responsive">
+                                    <div className="">
                                         <div id="shipmentDatesTable"></div>
                                     </div>
                                     <div id="showSaveShipmentsDatesButtonsDiv" style={{ display: 'none' }}>
                                         <Button size="md" color="danger" className="float-right mr-1 mb-2" onClick={() => this.actionCanceledShipments('shipmentDates')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                     </div>
                                     <h6 className="red" id="div5">{this.state.shipmentBatchInfoDuplicateError || this.state.shipmentValidationBatchError}</h6>
-                                    <div className="table-responsive">
+                                    <div className="">
                                         <div id="shipmentBatchInfoTable" className="AddListbatchtrHeight"></div>
                                     </div>
                                     <div id="showShipmentBatchInfoButtonsDiv" style={{ display: 'none' }}>
@@ -4581,7 +5010,7 @@ class EditSupplyPlanStatus extends Component {
                             <ModalBody>
                                 <br></br>
                                 <br></br>
-                                <div className="table-responsive RemoveStriped qat-problemListSearch">
+                                <div className="RemoveStriped qat-problemListSearch">
                                     <div id="problemTransDiv" className="" />
                                 </div>
 
@@ -4627,6 +5056,215 @@ class EditSupplyPlanStatus extends Component {
                             </ModalFooter> */}
                         </Modal>
                         {/* problem trans modal */}
+                        <Modal isOpen={this.state.isModalOpen}
+                            className={'modal-lg ' + this.props.className}>
+                            <ModalHeader>
+                                <strong>{i18n.t('static.dashboard.add.problem')}</strong>
+                                <Button size="md" onClick={this.modelOpenClose} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
+                            </ModalHeader>
+                            <ModalBody className='pb-lg-0'>
+                                {/* <h6 className="red" id="div3"></h6> */}
+                                <Col sm={12} style={{ flexBasis: 'auto' }}>
+                                    {/* <Card> */}
+                                    <Formik
+                                        initialValues={{
+                                            problemDescription: '',
+                                            modelPlanningUnitId: '',
+                                            modelCriticalityId: '',
+                                            suggession: ''
+                                        }}
+                                        validate={validateForAddingProblem(validationSchemaForAddingProblem)}
+                                        onSubmit={(values, { setSubmitting, setErrors }) => {
+                                            console.log("inside for prolem report changes if", this.state.problemReportChanged)
+
+                                            // if (!this.state.isSubmitClicked) {
+                                            var criticalityId = (document.getElementById("modelCriticalityId").value)
+                                            var regionId = (document.getElementById("modelRegionId").value);
+                                            var modelPlanningUnitId = (document.getElementById("modelPlanningUnitId").value);
+                                            var problemDescription = (document.getElementById("problemDescription").value);
+                                            var suggession = (document.getElementById("suggession").value);
+
+                                            if (this.state.problemReportChanged) {
+                                                this.setState({
+                                                    isModalOpen: !this.state.isModalOpen,
+                                                })
+                                                confirmAlert({
+                                                    message: 'There is some review changes in table, if you wish to add Manual problem than you will lose all review changes. Are you sure you want to add this manual problem ?',
+                                                    buttons: [
+                                                        {
+                                                            label: i18n.t('static.program.yes'),
+                                                            onClick: () => {
+                                                                this.setState({ loading: true, isSubmitClicked: true }, () => {
+                                                                    console.log("criticalityId", criticalityId)
+                                                                    this.submitManualProblem(criticalityId, regionId, modelPlanningUnitId, problemDescription, suggession);
+                                                                })
+                                                            }
+                                                        },
+                                                        {
+                                                            label: i18n.t('static.program.no'),
+                                                            onClick: () => {
+                                                                this.setState({
+                                                                    // problemReportChanged: !this.state.problemReportChanged,
+                                                                    isSubmitClicked: true
+                                                                })
+                                                                // 
+                                                            }
+                                                        }
+                                                    ]
+                                                });
+                                            } else {
+                                                this.setState({ loading: true, isSubmitClicked: true, isModalOpen: !this.state.isModalOpen }, () => {
+                                                    this.submitManualProblem(criticalityId, regionId, modelPlanningUnitId, problemDescription, suggession);
+
+                                                })
+                                            }
+                                            // this.setState({
+                                            //     problemReportChanged: !this.state.problemReportChanged,
+                                            //     // isSubmitClicked: true
+                                            // })
+                                            // this.toggle(0, '2');
+                                            // }
+
+                                        }}
+
+
+                                        render={
+                                            ({
+                                                values,
+                                                errors,
+                                                touched,
+                                                handleChange,
+                                                handleBlur,
+                                                handleSubmit,
+                                                isSubmitting,
+                                                isValid,
+                                                setTouched,
+                                                handleReset,
+                                                setFieldValue,
+                                                setFieldTouched
+                                            }) => (
+                                                <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='addProblemForm' autocomplete="off">
+                                                    {/* <CardBody> */}
+                                                    <div className="col-md-12">
+                                                        <div style={{ display: this.state.treeFlag ? "none" : "block" }} className="">
+                                                            <div className='row'>
+                                                                <FormGroup className="col-md-6">
+                                                                    <Label for="programCode">{i18n.t('static.planningunit.planningunit')}<span className="red Reqasterisk">*</span></Label>
+                                                                    <Input
+                                                                        type="select"
+                                                                        name="modelPlanningUnitId"
+                                                                        id="modelPlanningUnitId"
+                                                                        bsSize="sm"
+                                                                        valid={!errors.modelPlanningUnitId}
+                                                                        invalid={touched.modelPlanningUnitId && !!errors.modelPlanningUnitId}
+                                                                        onChange={(e) => { handleChange(e) }}
+                                                                        onBlur={handleBlur}
+                                                                        required
+                                                                    >
+                                                                        <option value="">{i18n.t('static.common.select')}</option>
+                                                                        {planningUnitList}
+                                                                    </Input>
+                                                                    <FormFeedback className="red">{errors.modelPlanningUnitId}</FormFeedback>
+                                                                </FormGroup>
+                                                                <FormGroup className="col-md-6">
+                                                                    <Label>{i18n.t('static.report.Criticality')}<span className="red Reqasterisk">*</span></Label>
+                                                                    <Input type="select"
+                                                                        bsSize="sm"
+                                                                        name="modelCriticalityId"
+                                                                        id="modelCriticalityId"
+                                                                        valid={!errors.modelCriticalityId}
+                                                                        invalid={touched.modelCriticalityId && !!errors.modelCriticalityId}
+                                                                        onChange={(e) => { handleChange(e) }}
+                                                                        onBlur={handleBlur}
+                                                                        required
+                                                                    >
+                                                                        <option value="0">{i18n.t('static.common.select')}</option>
+                                                                        {criticalities}
+                                                                    </Input>
+                                                                    <FormFeedback className="red">{errors.modelCriticalityId}</FormFeedback>
+                                                                </FormGroup>
+                                                            </div>
+                                                        </div>
+                                                        <div className="row">
+                                                            <FormGroup className="col-md-6">
+                                                                <Label>{i18n.t('static.region.region')}</Label>
+                                                                <Input type="select"
+                                                                    bsSize="sm"
+                                                                    name="modelRegionId"
+                                                                    id="modelRegionId"
+
+                                                                >
+                                                                    <option value="0">{i18n.t('static.common.select')}</option>
+                                                                    {regions}
+                                                                </Input>
+                                                                <FormFeedback className="red">{errors.modelRegionId}</FormFeedback>
+                                                            </FormGroup>
+                                                            <FormGroup className="col-md-6">
+                                                                <Label>{i18n.t('static.report.problemDescription')}<span className="red Reqasterisk">*</span></Label>
+                                                                <Input type="text"
+                                                                    // maxLength={600}
+                                                                    bsSize="sm"
+                                                                    name="problemDescription"
+                                                                    id="problemDescription"
+                                                                    valid={!errors.problemDescription}
+                                                                    invalid={touched.problemDescription && !!errors.problemDescription}
+                                                                    onChange={(e) => { handleChange(e) }}
+                                                                    onBlur={handleBlur}
+                                                                    required
+                                                                >
+                                                                </Input>
+                                                                <FormFeedback className="red">{errors.problemDescription}</FormFeedback>
+                                                            </FormGroup>
+
+                                                            {/* <FormGroup className="col-md-6">
+                                                                    <Label>{i18n.t('static.common.notes')}</Label>
+                                                                    <Input type="textarea"
+                                                                        // maxLength={600}
+                                                                        bsSize="sm"
+                                                                        name="notes"
+                                                                        id="notes"
+                                                                    // valid={!errors.problemId}
+                                                                    // invalid={touched.problemId && !!errors.problemId}
+                                                                    // onChange={(e) => { handleChange(e) }}
+                                                                    // onBlur={handleBlur}
+                                                                    // required
+                                                                    >
+                                                                    </Input>
+                                                                </FormGroup> */}
+                                                        </div>
+                                                        <div className='row'>
+                                                            <FormGroup className="col-md-6">
+                                                                <Label>{i18n.t('static.report.suggession')}<span className="red Reqasterisk">*</span></Label>
+                                                                <Input type="textarea"
+                                                                    // maxLength={600}
+                                                                    bsSize="sm"
+                                                                    name="suggession"
+                                                                    id="suggession"
+                                                                    valid={!errors.suggession}
+                                                                    invalid={touched.suggession && !!errors.suggession}
+                                                                    onChange={(e) => { handleChange(e) }}
+                                                                    onBlur={handleBlur}
+                                                                    required
+                                                                >
+                                                                </Input>
+                                                                <FormFeedback className="red">{errors.suggession}</FormFeedback>
+                                                            </FormGroup>
+                                                        </div>
+
+
+                                                        <FormGroup className="col-md-12 float-right pt-lg-4 pr-lg-0">
+                                                            <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.modelOpenClose}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                            <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                            <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                            &nbsp;
+                                                        </FormGroup>
+                                                    </div>
+                                                </Form>
+                                            )} />
+                                </Col>
+                                <br />
+                            </ModalBody>
+                        </Modal>
 
                         <Formik
                             enableReinitialize={true}

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import PipelineService from '../../api/PipelineService.js';
 import PlanningUnitService from '../../api/PlanningUnitService';
@@ -38,7 +38,9 @@ export default class PipelineProgramPlanningUnits extends Component {
 
     dropdownFilter = function (instance, cell, c, r, source) {
         var mylist = [];
-        var value = (instance.jexcel.getJson(null, false)[r])[c - 1];
+        // var value = (instance.jexcel.getJson(null, false)[r])[c - 1];
+        var value = (this.state.mapPlanningUnitEl.getJson(null, false)[r])[c - 1];
+
 
         var puList = []
         if (value != -1) {
@@ -129,8 +131,8 @@ export default class PipelineProgramPlanningUnits extends Component {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
             }
-            var columnName = jexcel.getColumnNameFromId([parseInt(x) + 1, y]);
-            instance.jexcel.setValue(columnName, '');
+            // var columnName = jexcel.getColumnNameFromId([parseInt(x) + 1, y]);
+            // instance.worksheets[0].setValue(columnName, '');
         }
 
         //Planning Unit
@@ -712,7 +714,9 @@ export default class PipelineProgramPlanningUnits extends Component {
                                             }
 
                                             this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
-                                            this.el.destroy();
+                                            // this.el.destroy();
+                                            jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
+
                                             var json = [];
                                             var data = productDataArr;
                                             // var data = []
@@ -788,6 +792,7 @@ export default class PipelineProgramPlanningUnits extends Component {
                                                         source: [{ id: true, name: i18n.t('static.common.active') }, { id: false, name: i18n.t('static.common.disabled') }]
                                                     }
                                                 ],
+                                                editable: false,
                                                 pagination: localStorage.getItem("sesRecordCount"),
                                                 filters: true,
                                                 contextMenu: function (obj, x, y, e) {
@@ -795,7 +800,7 @@ export default class PipelineProgramPlanningUnits extends Component {
                                                 }.bind(this),
                                                 search: true,
                                                 columnSorting: true,
-                                                tableOverflow: true,
+                                                // tableOverflow: true,
                                                 wordWrap: true,
                                                 paginationOptions: JEXCEL_PAGINATION_OPTION,
                                                 // position: 'top',
@@ -806,12 +811,12 @@ export default class PipelineProgramPlanningUnits extends Component {
                                                 // oneditionend: this.onedit,
                                                 copyCompatibility: true,
                                                 allowInsertRow: false,
-                                                text: {
-                                                    // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                                                    showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')} `,
-                                                    show: '',
-                                                    entries: '',
-                                                },
+                                                // text: {
+                                                //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                                                //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')} `,
+                                                //     show: '',
+                                                //     entries: '',
+                                                // },
                                                 onload: this.loadedJexcelCommonFunction,
                                                 oneditionend: this.oneditionend,
                                                 license: JEXCEL_PRO_KEY,
@@ -822,6 +827,7 @@ export default class PipelineProgramPlanningUnits extends Component {
                                             this.el = elVar;
                                             this.loaded();
                                             this.setState({
+                                                mapPlanningUnitEl: elVar,
                                                 loading: false
                                             })
 
@@ -1047,7 +1053,7 @@ export default class PipelineProgramPlanningUnits extends Component {
     }
 
     oneditionend = function (instance, cell, x, y, value) {
-        var elInstance = instance.jexcel;
+        var elInstance = instance;
         var rowData = elInstance.getRowData(y);
 
         if (x == 4 && !isNaN(rowData[4]) && rowData[4].toString().indexOf('.') != -1) {
@@ -1076,6 +1082,11 @@ export default class PipelineProgramPlanningUnits extends Component {
     }
 
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
         return (
             <>
                 <AuthenticationServiceComponent history={this.props.history} />

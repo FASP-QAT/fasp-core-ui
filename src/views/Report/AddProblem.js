@@ -16,7 +16,7 @@ import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 
 const initialValues = {
   programId: '',
-  problemId: '',
+  // problemId: '',
   planningUnitId: ''
 }
 const entityname = i18n.t('static.problem.problem');
@@ -24,8 +24,8 @@ const validationSchema = function (values) {
   return Yup.object().shape({
     programId: Yup.string()
       .required(i18n.t('static.budget.programtext')),
-    problemId: Yup.string()
-      .required(i18n.t('static.addProblem.problemError')),
+    // problemId: Yup.string()
+    //   .required(i18n.t('static.addProblem.problemError')),
     planningUnitId: Yup.string()
       .required(i18n.t('static.procurementUnit.validPlanningUnitText')),
 
@@ -84,7 +84,7 @@ class AddRoleComponent extends Component {
     setTouched({
       programId: true,
       planningUnitId: true,
-      problemId: true
+      // problemId: true
       // businessFunctions: true,
       // canCreateRoles: true
     }
@@ -297,7 +297,10 @@ class AddRoleComponent extends Component {
     var programId = document.getElementById("programId").value;
     var regionId = document.getElementById("regionId").value;
     var planningUnitId = document.getElementById("planningUnitId").value;
-    var problemId = document.getElementById("problemId").value;
+    // var problemId = document.getElementById("problemId").value;
+    var problemDescription = document.getElementById("problemDescription").value;
+    var suggession = document.getElementById("suggession").value;
+    var problemId = 13;
     var problemActionIndex = 0;
 
     var db1;
@@ -397,7 +400,7 @@ class AddRoleComponent extends Component {
               // console.log("programObj====>", programObj);
               // console.log("planningUnitObj====>", planningUnitObj);
               // console.log("regionObj====>", regionObj);
-              // console.log("problemObj====>", problemObj);
+              console.log("problemObj====>", problemObj);
               // console.log("problemActionList====>", problemActionList);
               problemActionIndex = problemActionList.length;
 
@@ -426,14 +429,18 @@ class AddRoleComponent extends Component {
 
                   },
                   shipmentId: '',
-                  data5: '',
+                  // data5: '',
+                  data5: {
+                    problemDescription: problemDescription,
+                    suggession: suggession
+                  },
 
                   problemActionIndex: problemActionIndex,
 
                   index: '',
                   problemCategory: {
-                    id: 1,
-                    label: { label_en: 'Data Quality' }
+                    id: 4,
+                    label: { label_en: 'Other' }
                   },
                   problemStatus: {
                     id: 1,
@@ -484,7 +491,7 @@ class AddRoleComponent extends Component {
 
                 }
                 problemActionList.push(json);
-                // console.log("problemActionList===>", problemActionList);
+                console.log("problemActionList===>", problemActionList);
 
 
                 var problemTransaction = db1.transaction(['programData'], 'readwrite');
@@ -505,6 +512,7 @@ class AddRoleComponent extends Component {
                 putRequest.onsuccess = function (event) {
                   var programId = document.getElementById("programId").value;
                   this.props.history.push(`/report/problemList/` + programId + '/' + false + '/green/' + i18n.t('static.problem.addedSuccessfully'));
+                  // this.props.history.push(`/report/supplyPlanVersionAndReview/` + programId + '/' + false + '/green/' + i18n.t('static.problem.addedSuccessfully'));
 
                 }.bind(this);
 
@@ -553,13 +561,13 @@ class AddRoleComponent extends Component {
         )
       }, this);
 
-    const { problemList } = this.state;
-    let problems = problemList.length > 0
-      && problemList.map((item, i) => {
-        return (
-          <option key={i} value={item.problem.problemId}>{getLabelText(item.problem.label, this.state.lang)}</option>
-        )
-      }, this);
+    // const { problemList } = this.state;
+    // let problems = problemList.length > 0
+    //   && problemList.map((item, i) => {
+    //     return (
+    //       <option key={i} value={item.problem.problemId}>{getLabelText(item.problem.label, this.state.lang)}</option>
+    //     )
+    //   }, this);
 
     return (
       <div className="animated fadeIn">
@@ -589,103 +597,133 @@ class AddRoleComponent extends Component {
                     handleReset,
                     setFieldValue,
                   }) => (
-                      <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='roleForm'>
-                        <CardBody className="pt-2 pb-0">
-                          <FormGroup>
-                            <Label for="programCode">{i18n.t('static.program.program')}<span className="red Reqasterisk">*</span></Label>
-                            <Input
-                              type="select"
-                              name="programId"
-                              id="programId"
-                              bsSize="sm"
-                              valid={!errors.programId}
-                              invalid={touched.programId && !!errors.programId}
-                              onChange={(e) => { handleChange(e); this.getPlanningUnitList() }}
-                              onBlur={handleBlur}
-                              required
-                            // value={this.state.budget.program.id}
-                            >
-                              <option value="">{i18n.t('static.common.select')}</option>
-                              {programs}
-                            </Input>
+                    <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='roleForm'>
+                      <CardBody className="pt-2 pb-0">
+                        <FormGroup>
+                          <Label for="programCode">{i18n.t('static.program.program')}<span className="red Reqasterisk">*</span></Label>
+                          <Input
+                            type="select"
+                            name="programId"
+                            id="programId"
+                            bsSize="sm"
+                            valid={!errors.programId}
+                            invalid={touched.programId && !!errors.programId}
+                            onChange={(e) => { handleChange(e); this.getPlanningUnitList() }}
+                            onBlur={handleBlur}
+                            required
+                          // value={this.state.budget.program.id}
+                          >
+                            <option value="">{i18n.t('static.common.select')}</option>
+                            {programs}
+                          </Input>
 
-                            <FormFeedback className="red">{errors.programId}</FormFeedback>
-                          </FormGroup>
-                          <FormGroup>
-                            <Label for="programCode">{i18n.t('static.planningunit.planningunit')}<span className="red Reqasterisk">*</span></Label>
-                            <Input
-                              type="select"
-                              name="planningUnitId"
-                              id="planningUnitId"
-                              bsSize="sm"
-                              valid={!errors.planningUnitId}
-                              invalid={touched.planningUnitId && !!errors.planningUnitId}
-                              onChange={(e) => { handleChange(e) }}
-                              onBlur={handleBlur}
-                              required
-                            >
-                              <option value="">{i18n.t('static.common.select')}</option>
-                              {planningUnits}
-                            </Input>
-                            <FormFeedback className="red">{errors.planningUnitId}</FormFeedback>
-                          </FormGroup>
-                          <FormGroup>
-                            <Label>{i18n.t('static.region.region')}</Label>
-                            <Input type="select"
-                              bsSize="sm"
-                              name="regionId"
-                              id="regionId"
+                          <FormFeedback className="red">{errors.programId}</FormFeedback>
+                        </FormGroup>
+                        <FormGroup>
+                          <Label for="programCode">{i18n.t('static.planningunit.planningunit')}<span className="red Reqasterisk">*</span></Label>
+                          <Input
+                            type="select"
+                            name="planningUnitId"
+                            id="planningUnitId"
+                            bsSize="sm"
+                            valid={!errors.planningUnitId}
+                            invalid={touched.planningUnitId && !!errors.planningUnitId}
+                            onChange={(e) => { handleChange(e) }}
+                            onBlur={handleBlur}
+                            required
+                          >
+                            <option value="">{i18n.t('static.common.select')}</option>
+                            {planningUnits}
+                          </Input>
+                          <FormFeedback className="red">{errors.planningUnitId}</FormFeedback>
+                        </FormGroup>
+                        <FormGroup>
+                          <Label>{i18n.t('static.region.region')}</Label>
+                          <Input type="select"
+                            bsSize="sm"
+                            name="regionId"
+                            id="regionId"
 
-                            >
-                              <option value="0">{i18n.t('static.common.select')}</option>
-                              {regions}
-                            </Input>
-                            <FormFeedback className="red">{errors.createdDate}</FormFeedback>
-                          </FormGroup>
-                          <FormGroup>
-                            <Label>{i18n.t('static.report.problem')} <span className="red Reqasterisk">*</span></Label>
-                            <Input type="select"
-                              bsSize="sm"
-                              name="problemId"
-                              id="problemId"
-                              valid={!errors.problemId}
-                              invalid={touched.problemId && !!errors.problemId}
-                              onChange={(e) => { handleChange(e) }}
-                              onBlur={handleBlur}
-                              required
-                            >
-                              <option value="">{i18n.t('static.common.select')}</option>
-                              {problems}
-                            </Input>
-                            <FormFeedback className="red">{errors.problemId}</FormFeedback>
-                          </FormGroup>
-                          <FormGroup>
-                            <Label>{i18n.t('static.common.notes')}</Label>
-                            <Input type="textarea"
-                              // maxLength={600}
-                              bsSize="sm"
-                              name="notes"
-                              id="notes"
-                            // valid={!errors.problemId}
-                            // invalid={touched.problemId && !!errors.problemId}
-                            // onChange={(e) => { handleChange(e) }}
-                            // onBlur={handleBlur}
-                            // required
-                            >
-                            </Input>
-                          </FormGroup>
-                        </CardBody>
-                        <CardFooter>
-                          <FormGroup>
-                            <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                            <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                            <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                          >
+                            <option value="0">{i18n.t('static.common.select')}</option>
+                            {regions}
+                          </Input>
+                          <FormFeedback className="red">{errors.createdDate}</FormFeedback>
+                        </FormGroup>
+                        {/* <FormGroup>
+                          <Label>{i18n.t('static.report.problem')} <span className="red Reqasterisk">*</span></Label>
+                          <Input type="select"
+                            bsSize="sm"
+                            name="problemId"
+                            id="problemId"
+                            valid={!errors.problemId}
+                            invalid={touched.problemId && !!errors.problemId}
+                            onChange={(e) => { handleChange(e) }}
+                            onBlur={handleBlur}
+                            required
+                          >
+                            <option value="">{i18n.t('static.common.select')}</option>
+                            {problems}
+                          </Input>
+                          <FormFeedback className="red">{errors.problemId}</FormFeedback>
+                        </FormGroup> */}
+                        <FormGroup>
+                          <Label>{i18n.t('static.report.problemDescription')}</Label>
+                          <Input type="text"
+                            // maxLength={600}
+                            bsSize="sm"
+                            name="problemDescription"
+                            id="problemDescription"
+                          // valid={!errors.problemId}
+                          // invalid={touched.problemId && !!errors.problemId}
+                          // onChange={(e) => { handleChange(e) }}
+                          // onBlur={handleBlur}
+                          // required
+                          >
+                          </Input>
+                        </FormGroup>
+                        <FormGroup>
+                          <Label>{i18n.t('static.report.suggession')}</Label>
+                          <Input type="textarea"
+                            // maxLength={600}
+                            bsSize="sm"
+                            name="suggession"
+                            id="suggession"
+                          // valid={!errors.problemId}
+                          // invalid={touched.problemId && !!errors.problemId}
+                          // onChange={(e) => { handleChange(e) }}
+                          // onBlur={handleBlur}
+                          // required
+                          >
+                          </Input>
+                        </FormGroup>
+                        <FormGroup>
+                          <Label>{i18n.t('static.common.notes')}</Label>
+                          <Input type="textarea"
+                            // maxLength={600}
+                            bsSize="sm"
+                            name="notes"
+                            id="notes"
+                          // valid={!errors.problemId}
+                          // invalid={touched.problemId && !!errors.problemId}
+                          // onChange={(e) => { handleChange(e) }}
+                          // onBlur={handleBlur}
+                          // required
+                          >
+                          </Input>
+                        </FormGroup>
+                      </CardBody>
+                      <CardFooter>
+                        <FormGroup>
+                          <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                          <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                          <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
 
-                            &nbsp;
-                          </FormGroup>
-                        </CardFooter>
-                      </Form>
-                    )} />
+                          &nbsp;
+                        </FormGroup>
+                      </CardFooter>
+                    </Form>
+                  )} />
             </Card>
           </Col>
         </Row>
@@ -693,7 +731,8 @@ class AddRoleComponent extends Component {
     );
   }
   cancelClicked() {
-    this.props.history.push(`/report/problemList/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
+    // this.props.history.push(`/report/problemList/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
+    this.props.history.push(`/report/supplyPlanVersionAndReview/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
   }
 
   resetClicked() {
