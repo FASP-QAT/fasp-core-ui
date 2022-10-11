@@ -225,7 +225,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             id: rcpuResult[k].realmCountryPlanningUnitId,
                             multiplier: rcpuResult[k].multiplier,
                             active: rcpuResult[k].active,
-                            label: rcpuResult[k].label
+                            label: rcpuResult[k].label,
+                            planningUnit:rcpuResult[k].planningUnit
                         }
                         realmCountryPlanningUnitList.push(rcpuJson);
                     }
@@ -4134,8 +4135,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 data: json,
                 columnDrag: true,
                 columns: [
-                    { title: i18n.t('static.supplyPlan.adjustesOrderQty'), type: 'dropdown', source: adjustedOrderQty, width: 120 },
-                    { title: i18n.t('static.supplyPlan.suggestedOrderQty'), type: 'numeric', textEditor: true, mask: '#,##', width: 120, readOnly: true },
+                    { title: i18n.t('static.supplyPlan.adjustesOrderQty'), type: 'hidden', source: adjustedOrderQty, width: 120,readOnly:true },
+                    { title: i18n.t('static.supplyPlan.suggestedOrderQty'), type: 'hidden', textEditor: true, mask: '#,##', width: 120, readOnly: true },
                     { title: i18n.t('static.supplyPlan.manualOrderQty'), type: 'numeric', textEditor: true, mask: '#,##', width: 120 },
                     { type: roundingOptionType, title: i18n.t('static.supplyPlan.orderBasedOn'), source: orderBasedOn, width: 120 },
                     { type: roundingOptionType, title: i18n.t('static.supplyPlan.roundingOption'), source: [{ id: 1, name: i18n.t('static.supplyPlan.roundDown') }, { id: 2, name: i18n.t('static.supplyPlan.roundUp') }], width: 120 },
@@ -4209,13 +4210,13 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     data: json1,
                     columnDrag: true,
                     columns: [
-                        { type: 'numeric', title: i18n.t('static.procurementAgentPlanningUnit.moq'), mask: '#,##.00', decimal: '.', width: 120 },
-                        { type: 'numeric', title: i18n.t('static.procurementAgentPlanningUnit.unitPerPalletEuro1'), mask: '#,##.00', decimal: '.', width: 120 },
-                        { type: 'numeric', title: i18n.t('static.procurementAgentPlanningUnit.unitPerPalletEuro2'), mask: '#,##.00', decimal: '.', width: 120 },
-                        { type: 'numeric', title: i18n.t('static.procurementUnit.unitsPerContainer'), mask: '#,##.00', decimal: '.', width: 120 },
-                        { type: 'numeric', title: i18n.t('static.supplyPlan.noOfPalletsEuro1'), mask: '#,##.00', decimal: '.', width: 120 },
-                        { type: 'numeric', title: i18n.t('static.supplyPlan.noOfPalletsEuro2'), mask: '#,##.00', decimal: '.', width: 120 },
-                        { type: 'numeric', title: i18n.t('static.supplyPlan.noOfContainers'), mask: '#,##.00', decimal: '.', width: 120 },
+                        { type: 'numeric', title: i18n.t('static.procurementAgentPlanningUnit.moq'), mask: '#,##.00', decimal: '.', width: 120,readOnly:true },
+                        { type: 'numeric', title: i18n.t('static.procurementAgentPlanningUnit.unitPerPalletEuro1'), mask: '#,##.00', decimal: '.', width: 120,readOnly:true },
+                        { type: 'numeric', title: i18n.t('static.procurementAgentPlanningUnit.unitPerPalletEuro2'), mask: '#,##.00', decimal: '.', width: 120,readOnly:true },
+                        { type: 'numeric', title: i18n.t('static.procurementUnit.unitsPerContainer'), mask: '#,##.00', decimal: '.', width: 120,readOnly:true },
+                        { type: 'numeric', title: i18n.t('static.supplyPlan.noOfPalletsEuro1'), mask: '#,##.00', decimal: '.', width: 120,readOnly:true },
+                        { type: 'numeric', title: i18n.t('static.supplyPlan.noOfPalletsEuro2'), mask: '#,##.00', decimal: '.', width: 120,readOnly:true },
+                        { type: 'numeric', title: i18n.t('static.supplyPlan.noOfContainers'), mask: '#,##.00', decimal: '.', width: 120,readOnly:true },
                         { type: 'hidden', readOnly: true },
                         { type: 'hidden', readOnly: true },
                         { type: 'hidden', readOnly: true },
