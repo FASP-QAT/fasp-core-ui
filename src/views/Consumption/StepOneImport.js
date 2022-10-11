@@ -465,13 +465,13 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 let healthAreaList = selectedForecastProgram.healthAreaList;
                 let tracerCategory = [];
 
-                for (var i = 0; i < healthAreaList.length; i++) {
-                    let a = this.state.tracerCategoryList.filter(c => c.healthArea.id == healthAreaList[i].id);
-                    a = a.map(ele => ele.tracerCategoryId);
-                    tracerCategory = tracerCategory.concat(a);
-                }
-                console.log("tracerCategory--------->1", healthAreaList);
-                console.log("tracerCategory--------->2", tracerCategory);
+                // for (var i = 0; i < healthAreaList.length; i++) {
+                //     let a = this.state.tracerCategoryList.filter(c => c.healthArea.id == healthAreaList[i].id);
+                //     a = a.map(ele => ele.tracerCategoryId);
+                //     tracerCategory = tracerCategory.concat(a);
+                // }
+                // console.log("tracerCategory--------->1", healthAreaList);
+                // console.log("tracerCategory--------->2", tracerCategory);
 
                 ProgramService.getPlanningUnitByProgramId(programId, tracerCategory)
                     .then(response => {
