@@ -163,6 +163,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     this.updateLinearRegressionData = this.updateLinearRegressionData.bind(this);
     this.updateTESData = this.updateTESData.bind(this);
     this.updateArimaData = this.updateArimaData.bind(this);
+    this.formulaChanged = this.formulaChanged.bind(this);
   }
 
   makeText = m => {
@@ -538,7 +539,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         }
       }
       this.setState({
-        count: count
+        count: count,
+        showDetailTable: true,
+        loading: false
       })
     }
   }
@@ -1479,16 +1482,16 @@ console.log("TES",this.state.jsonDataMovingAvg.length
 
             this.setState({
               // dataEl: "",
-              showDetailTable: true,
-              loading: false,
+              // showDetailTable: true,
+              // loading: false,
               message: i18n.t('static.compareAndSelect.dataSaved'),
               messageColor: "green",
               consumptionChanged: false,
               datasetJson:datasetJson
             }, () => {
+              this.ExtrapolatedParameters();
               this.getDatasetData();
               this.hideFirstComponent();
-              this.ExtrapolatedParameters();
             })
           }.bind(this)
         }.bind(this)
@@ -3252,7 +3255,7 @@ console.log("TES",this.state.jsonDataMovingAvg.length
       consumptionChanged: true,
       toggleDataChangeForSmallTable: false,
     }, () => {
-      elInstance.setValueFromCoords(38, 0, multiplier, true);
+      elInstance.setValueFromCoords(37, 0, multiplier, true);
     })
   }
 
@@ -3338,7 +3341,13 @@ console.log("TES",this.state.jsonDataMovingAvg.length
     // console.log("stop----", new Date())
 
   }
-
+ 
+  formulaChanged = function (instance, executions) {
+    var executions = executions;
+    for (var e = 0; e < executions.length; e++) {
+        this.changed(instance, executions[e].cell, executions[e].x, executions[e].y, executions[e].v)
+    }
+}
   buildJexcel() {
     var data = [];
     let dataArray1 = [];
@@ -3396,6 +3405,7 @@ console.log("TES",this.state.jsonDataMovingAvg.length
       //   entries: '',
       // },
       onload: this.loadedJexcel,
+      onformulachain: this.formulaChanged,
       pagination: false,
       filters: false,
       search: false,
