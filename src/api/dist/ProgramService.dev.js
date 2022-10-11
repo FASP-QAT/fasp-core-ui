@@ -271,14 +271,24 @@ function () {
       return _axios["default"].post("".concat(_Constants.API_URL, "/api/program/").concat(programId, "/tracerCategory/simple/planningUnit"), json, {});
     }
   }, {
-    key: "getProgramManagerListByProgramId",
-    value: function getProgramManagerListByProgramId(programId) {
-      return _axios["default"].get("".concat(_Constants.API_URL, "/api/user/programId/").concat(programId), {});
+    key: "checkIfLinkingExistsWithOtherProgram",
+    value: function checkIfLinkingExistsWithOtherProgram(json) {
+      return _axios["default"].post("".concat(_Constants.API_URL, "/api/erpLinking/otherProgramCheck"), json, {});
     }
   }, {
     key: "checkIfLinkingExistsWithOtherProgram",
     value: function checkIfLinkingExistsWithOtherProgram(json) {
       return _axios["default"].post("".concat(_Constants.API_URL, "/api/erpLinking/otherProgramCheck"), json, {});
+    }
+  }, {
+    key: "getProgramManagerListByProgramId",
+    value: function getProgramManagerListByProgramId(programId) {
+      return _axios["default"].get("".concat(_Constants.API_URL, "/api/user/programId/").concat(programId), {});
+    }
+  }, {
+    key: "createManualProblem",
+    value: function createManualProblem(json) {
+      return _axios["default"].post("".concat(_Constants.API_URL, "/api/problemReport/createManualProblem"), json, {});
     }
   }, {
     key: "getDatasetVersions",

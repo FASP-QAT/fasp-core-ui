@@ -1243,8 +1243,8 @@ export default class ShipmentDetails extends React.Component {
                             <div className="card-header-actions">
                                 <div className="card-header-action">
                                     <a className="card-header-action">
-                                        {/* {this.state.programId != 0 && }&nbsp;&nbsp; */}
-                                        {this.state.programId != 0 && this.state.planningUnitId != 0 &&
+                                        {/* {this.state.programId != 0 && <a href="javascript:void();" onClick={this.toggleReplan}><i className="fa fa-calendar"></i></a>}&nbsp;&nbsp; */}
+                                        {this.state.programId != 0 && this.state.planningUnit.length > 0 &&
                                             <a href='javascript:;' onClick={this.exportCSV} ><span style={{ cursor: 'pointer' }}><small className="supplyplanformulas">{i18n.t('static.dataentry.downloadTemplate')}</small></span></a>
                                         }
                                         {/* <a href={`${API_URL}/file/shipmentDataEntryTemplate`}><span style={{ cursor: 'pointer' }}><small className="supplyplanformulas">{i18n.t('static.dataentry.downloadTemplate')}</small></span></a> */}
@@ -1365,7 +1365,7 @@ export default class ShipmentDetails extends React.Component {
                         <FormGroup>
                             <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                             {this.state.shipmentChangedFlag == 1 && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipments()}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>}&nbsp;
-                            {this.refs.shipmentChild != undefined && <Button id="addRowButtonId" color="info" size="md" className="float-right mr-1" type="button" onClick={this.refs.shipmentChild.addRowInJexcel}> {i18n.t('static.common.addRow')}</Button>}&nbsp;
+                            {this.refs.shipmentChild != undefined && <Button id="addRowButtonId" color="info" size="md" className="float-right mr-1" type="button" onClick={this.refs.shipmentChild.addRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}&nbsp;
                             <a style={{marginTop:"-1.5px"}} className="float-right mr-1" href="javascript:void();" title={i18n.t("static.supplyPlan.planMultiplePusByDate")} onClick={this.toggleReplan}><i className="fa fa-calendar fa-3x"></i></a>
                             &nbsp;
                         </FormGroup>
@@ -1747,7 +1747,7 @@ export default class ShipmentDetails extends React.Component {
 
 
                                             console.log("ProgramJson@@@@@@@@@@", programJson);
-                                            var month = moment(this.state.singleValue.year + (this.state.singleValue.month <= 9 ? "-0" + this.state.singleValue.month : this.state.singleValue.month) + "-01").format("YYYY-MM-DD")
+                                            var month = moment(this.state.singleValue.year + (this.state.singleValue.month <= 9 ? "-0" + this.state.singleValue.month : "-"+this.state.singleValue.month) + "-01").format("YYYY-MM-DD")
                                             var sstd = {}
                                             if (programPlanningUnit.planBasedOn == 1) {
                                                 var currentMonth = moment(Date.now()).utcOffset('-0500').startOf('month').format("YYYY-MM-DD");
@@ -2015,7 +2015,7 @@ export default class ShipmentDetails extends React.Component {
                                             var programId = (document.getElementById("programId").value)
                                             var puList = [...new Set(this.state.planningUnitIdsPlan.map(ele => ele.value))];
                                             if (puList.length > 0 && showPlanningUnitAndQtyList.length > 0) {
-                                                calculateSupplyPlan(programId, 0, 'programData', 'shipment1', this, puList, moment(this.state.singleValue.year + (this.state.singleValue.month <= 9 ? "-0" + this.state.singleValue.month : this.state.singleValue.month) + "-01").format("YYYY-MM-DD"));
+                                                calculateSupplyPlan(programId, 0, 'programData', 'shipment1', this, puList, moment(this.state.singleValue.year + (this.state.singleValue.month <= 9 ? "-0" + this.state.singleValue.month : "-"+this.state.singleValue.month) + "-01").format("YYYY-MM-DD"));
                                             } else {
                                                 this.setState({
                                                     showPlanningUnitAndQtyList: [],
