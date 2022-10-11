@@ -1014,7 +1014,7 @@ export default class syncPage extends Component {
   }
 
   generateDataAfterResolveConflictsForQPL() {
-    console.log("+++in generate QPL ", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
+    // console.log("+++in generate QPL ", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
     this.setState({ loading: true });
     var db1;
     var storeOS;
@@ -1063,7 +1063,7 @@ export default class syncPage extends Component {
       consumptionData = consumptionData.concat(oldProgramDataConsumption.filter(c => c.consumptionId == 0));
       var uniquePlanningUnitsInConsumption = [];
       consumptionJson.map(c => uniquePlanningUnitsInConsumption = uniquePlanningUnitsInConsumption.concat(parseInt(c[1])));
-      console.log("uniquePlanningUnitsInConsumption+++", uniquePlanningUnitsInConsumption);
+      // console.log("uniquePlanningUnitsInConsumption+++", uniquePlanningUnitsInConsumption);
 
       uniquePlanningUnitsInConsumption.map(c => {
         actionList.push({
@@ -1132,13 +1132,13 @@ export default class syncPage extends Component {
 
       var shipmentLinkedJson = this.state.mergedShipmentLinkedJexcel.getJson();
       var linkedShipmentListLocal = this.state.oldProgramData.shipmentLinkingList != null ? this.state.oldProgramData.shipmentLinkingList : [];
-      console.log("linkedShipmentListLocal@@@@@@@@@@@@@@@@@@", linkedShipmentListLocal)
+      // console.log("linkedShipmentListLocal@@@@@@@@@@@@@@@@@@", linkedShipmentListLocal)
       var shipmentLinkingIdFromLocal = [...new Set(linkedShipmentListLocal.map(ele => ele.shipmentLinkingId))].filter(c => c !== 0);
-      console.log("shipmentLinkingIdFromLocal@@@@@@@@@@@@@@@@@@", shipmentLinkingIdFromLocal)
+      // console.log("shipmentLinkingIdFromLocal@@@@@@@@@@@@@@@@@@", shipmentLinkingIdFromLocal)
       var linkedShipmentListServer = this.state.latestProgramData.shipmentLinkingList != null ? this.state.latestProgramData.shipmentLinkingList.filter(c => !shipmentLinkingIdFromLocal.includes(c.shipmentLinkingId)) : [];
-      console.log("linkedShipmentListServer@@@@@@@@@@@@@@@@@@", linkedShipmentListServer)
+      // console.log("linkedShipmentListServer@@@@@@@@@@@@@@@@@@", linkedShipmentListServer)
       var mergedList = linkedShipmentListLocal.concat(linkedShipmentListServer);
-      console.log("mergedList@@@@@@@@@@@@@@@@@@", mergedList)
+      // console.log("mergedList@@@@@@@@@@@@@@@@@@", mergedList)
       for (var s = 0; s < shipmentLinkedJson.length; s++) {
         //Accept server version
         if (shipmentLinkedJson[s][11] == 3) {
@@ -1209,10 +1209,10 @@ export default class syncPage extends Component {
         if (checkIfThereIsOnlyOneChildShipmentOrNot.length == 0) {
           activateParentShipment = true;
         }
-        console.log("@@@@@@@@@@@@@@@@deletedRowsListServer[dr].childShipmentId", deletedRowsListServer[dr].childShipmentId);
-        console.log("@@@@@@@@@@@@@@@@ShipmentData", shipmentData)
+        // console.log("@@@@@@@@@@@@@@@@deletedRowsListServer[dr].childShipmentId", deletedRowsListServer[dr].childShipmentId);
+        // console.log("@@@@@@@@@@@@@@@@ShipmentData", shipmentData)
         var shipmentIndex = shipmentData.findIndex(c => deletedRowsListServer[dr].childShipmentId > 0 ? c.shipmentId == deletedRowsListServer[dr].childShipmentId : c.tempShipmentId == deletedRowsListServer[dr].tempChildShipmentId);
-        console.log("@@@@@@@@@@@@@@@@index", shipmentIndex);
+        // console.log("@@@@@@@@@@@@@@@@index", shipmentIndex);
         shipmentData[shipmentIndex].active = false;
         shipmentData[shipmentIndex].lastModifiedBy.userId = curUser;
         shipmentData[shipmentIndex].lastModifiedBy.username = username;
@@ -1243,7 +1243,7 @@ export default class syncPage extends Component {
 
       var uniquePlanningUnitsInShipment = [];
       shipmentJson.map(c => uniquePlanningUnitsInShipment = uniquePlanningUnitsInShipment.concat(parseInt(c[1])));
-      console.log("uniquePlanningUnitsInConsumption+++", uniquePlanningUnitsInConsumption);
+      // console.log("uniquePlanningUnitsInConsumption+++", uniquePlanningUnitsInConsumption);
 
       uniquePlanningUnitsInShipment.map(c => {
         actionList.push({
@@ -1263,8 +1263,8 @@ export default class syncPage extends Component {
           date: moment(Date.now()).startOf('month').format("YYYY-MM-DD")
         });
       })
-      console.log("shipmentList@@@@@@@@@@@@@", shipmentData);
-      console.log("shipmentLinkingList@@@@@@@@@@@@@", linkedShipmentsList);
+      // console.log("shipmentList@@@@@@@@@@@@@", shipmentData);
+      // console.log("shipmentLinkingList@@@@@@@@@@@@@", linkedShipmentsList);
 
       programJson.consumptionList = consumptionData;
       programJson.inventoryList = inventoryData;
@@ -1280,7 +1280,7 @@ export default class syncPage extends Component {
       var batchInfoList = programJson.batchInfoList;
       var problemReportList = programJson.problemReportList;
       var supplyPlan = programJson.supplyPlan;
-      console.log("Supply Plan full+++", supplyPlan);
+      // console.log("Supply Plan full+++", supplyPlan);
       var generalData = programJson;
       delete generalData.consumptionList;
       delete generalData.inventoryList;
@@ -1298,7 +1298,7 @@ export default class syncPage extends Component {
           batchInfoList: batchInfoList.filter(c => c.planningUnitId == planningUnitDataListFromState[pu].planningUnitId),
           supplyPlan: supplyPlan.filter(c => c.planningUnitId == planningUnitDataListFromState[pu].planningUnitId)
         }
-        console.log("Supply Plan filtered+++", supplyPlan.filter(c => c.planningUnitId == planningUnitDataListFromState[pu].planningUnitId));
+        // console.log("Supply Plan filtered+++", supplyPlan.filter(c => c.planningUnitId == planningUnitDataListFromState[pu].planningUnitId));
         var encryptedPlanningUnitDataText = CryptoJS.AES.encrypt(JSON.stringify(planningUnitDataJson), SECRET_KEY).toString();
         planningUnitDataList.push({ planningUnitId: planningUnitDataListFromState[pu].planningUnitId, planningUnitData: encryptedPlanningUnitDataText })
       }
@@ -1321,7 +1321,7 @@ export default class syncPage extends Component {
         this.props.hideFirstComponent();
       }.bind(this);
       putRequest.onsuccess = function (event) {
-        console.log("+++Ready data for QPL ", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
+        // console.log("+++Ready data for QPL ", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
         this.refs.problemListChild.qatProblemActions((this.state.programId).value, "loading", false);
       }.bind(this);
     }.bind(this);
@@ -1426,11 +1426,11 @@ export default class syncPage extends Component {
         })
           .catch(
             error => {
-              console.log("@@@Error1", error);
-              console.log("@@@Error1", error.message);
-              console.log("@@@Error1", error.response ? error.response.status : "")
+              // console.log("@@@Error1", error);
+              // console.log("@@@Error1", error.message);
+              // console.log("@@@Error1", error.response ? error.response.status : "")
               if (error.message === "Network Error") {
-                console.log("+++in catch 1")
+                // console.log("+++in catch 1")
                 this.setState({
                   message: 'static.common.networkError',
                   loading: false,
@@ -1462,7 +1462,7 @@ export default class syncPage extends Component {
                     });
                     break;
                   default:
-                    console.log("+++in catch 2")
+                    // console.log("+++in catch 2")
                     this.setState({
                       message: 'static.unkownError',
                       loading: false,
@@ -1479,7 +1479,7 @@ export default class syncPage extends Component {
   }
 
   checkLastModifiedDateForProgram(value) {
-    console.log("+++Started with commit version", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
+    // console.log("+++Started with commit version", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
     document.getElementById("detailsDiv").style.display = "block";
     this.setState({
       programId: value,
@@ -1507,8 +1507,8 @@ export default class syncPage extends Component {
     }
 
     var programId = value != "" && value != undefined ? value.value : 0;
-    console.log("@@@ProgramId", programId);
-    console.log("@@@this.state.programList", this.state.programList);
+    // console.log("@@@ProgramId", programId);
+    // console.log("@@@this.state.programList", this.state.programList);
     var programVersion = (this.state.programList).filter(c => c.value == programId)[0].version;
     var singleProgramId = (this.state.programList).filter(c => c.value == programId)[0].programId;
 
@@ -1517,7 +1517,7 @@ export default class syncPage extends Component {
       ProgramService.getLastModifiedDateForProgram(singleProgramId, programVersion).then(response1 => {
         if (response1.status == 200) {
           var lastModifiedDate = response1.data;
-          console.log("LastModifiedDate+++", lastModifiedDate);
+          // console.log("LastModifiedDate+++", lastModifiedDate);
           var db1;
           var storeOS;
           getDatabase();
@@ -1550,11 +1550,11 @@ export default class syncPage extends Component {
           }.bind(this)
         }
       }).catch(error => {
-        console.log("@@@Error1", error);
-        console.log("@@@Error1", error.message);
-        console.log("@@@Error1", error.response ? error.response.status : "")
+        // console.log("@@@Error1", error);
+        // console.log("@@@Error1", error.message);
+        // console.log("@@@Error1", error.response ? error.response.status : "")
         if (error.message === "Network Error") {
-          console.log("+++in catch 1")
+          // console.log("+++in catch 1")
           this.setState({
             message: 'static.common.networkError',
             loading: false,
@@ -1586,7 +1586,7 @@ export default class syncPage extends Component {
               });
               break;
             default:
-              console.log("+++in catch 2")
+              // console.log("+++in catch 2")
               this.setState({
                 message: 'static.unkownError',
                 loading: false,
@@ -1619,14 +1619,14 @@ export default class syncPage extends Component {
           ProgramService.getAllProgramData(programRequestJson)
             .then(response => {
               if (response.status == 200) {
-                console.log("+++Response for latest version success", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
+                // console.log("+++Response for latest version success", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
 
                 AuthenticationService.setupAxiosInterceptors();
                 // var programRequestJson1 = { programId: (programId.split("_"))[0], versionId: programVersion }
                 // ProgramService.getProgramData(programRequestJson1)
                 //   .then(response1 => {
                 //     if (response1.status == 200) {
-                console.log("+++Response for downloaded version", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
+                // console.log("+++Response for downloaded version", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
 
                 var db1;
                 var storeOS;
@@ -1695,7 +1695,7 @@ export default class syncPage extends Component {
                         programRequestProgramJson: programJson,
                         planningUnitDataList: planningUnitDataList
                       })
-                      console.log("+++Response of local version", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
+                      // console.log("+++Response of local version", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
                       // var dProgramDataTransaction = db1.transaction(['downloadedProgramData'], 'readwrite');
                       // var dProgramDataOs = dProgramDataTransaction.objectStore('downloadedProgramData');
                       // var dProgramRequest = dProgramDataOs.get(value != "" && value != undefined ? value.value : 0);
@@ -1934,7 +1934,7 @@ export default class syncPage extends Component {
                                               regionList.push(regionJson);
 
                                             }
-                                            console.log("+++Completion of basic flow", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
+                                            // console.log("+++Completion of basic flow", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
                                             var latestProgramDataConsumption = latestProgramData.consumptionList;
                                             var oldProgramDataConsumption = oldProgramData.consumptionList;
                                             var downloadedProgramDataConsumption = downloadedProgramData.consumptionList;
@@ -2117,7 +2117,7 @@ export default class syncPage extends Component {
                                               fundingSourceList: fundingSourceList,
                                               procurementAgentList: procurementAgentList
                                             })
-                                            console.log("+++Consumption jexcel completed", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
+                                            // console.log("+++Consumption jexcel completed", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
 
                                             // Inventory part
                                             var latestProgramDataInventory = latestProgramData.inventoryList;
@@ -2295,7 +2295,7 @@ export default class syncPage extends Component {
                                             this.setState({
                                               mergedInventoryJexcel: mergedInventoryJexcel
                                             })
-                                            console.log("+++Inventory jexcel completed", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
+                                            // console.log("+++Inventory jexcel completed", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
 
                                             // Batch info
                                             var latestProgramDataBatchInfo = latestProgramData.batchInfoList;
@@ -2490,8 +2490,8 @@ export default class syncPage extends Component {
                                             // Shipment Linked part
                                             var latestProgramDataShipmentLinked = latestProgramData.shipmentLinkingList != null ? latestProgramData.shipmentLinkingList : [];
                                             var oldProgramDataShipmentLinked = oldProgramData.shipmentLinkingList != null ? oldProgramData.shipmentLinkingList.filter(c => c.shipmentLinkingId > 0 || (c.shipmentLinkingId == 0 && c.active == true)) : [];
-                                            console.log("latestProgramDataShipmentLinked@@@@@@@@@@@@@", latestProgramDataShipmentLinked)
-                                            console.log("oldProgramDataShipmentLinked@@@@@@@@@@@@@", oldProgramDataShipmentLinked)
+                                            // console.log("latestProgramDataShipmentLinked@@@@@@@@@@@@@", latestProgramDataShipmentLinked)
+                                            // console.log("oldProgramDataShipmentLinked@@@@@@@@@@@@@", oldProgramDataShipmentLinked)
                                             var downloadedProgramDataShipmentLinked = downloadedProgramData.shipmentLinkingList != null ? downloadedProgramData.shipmentLinkingList : [];
 
                                             // var modifiedShipmentIds = []
@@ -2532,8 +2532,8 @@ export default class syncPage extends Component {
                                               var downloadedProgramDataShipmentLinkedFiltered = downloadedProgramDataShipmentLinked.filter(c => uniqueRoNoAndRoPrimeLineNo[cd] == (c.roNo + "|" + c.roPrimeLineNo))
                                               var listFromAPI = responseLinking.data;
                                               var listFromAPIFiltered = listFromAPI.filter(c => uniqueRoNoAndRoPrimeLineNo[cd] == c.roNo + "|" + c.roPrimeLineNo);
-                                              console.log("latestProgramDataShipmentLinkedFiltered@@@@@@@@@@@@@", latestProgramDataShipmentLinkedFiltered)
-                                              console.log("oldProgramDataShipmentLinkedFiltered@@@@@@@@@@@@@", oldProgramDataShipmentLinkedFiltered)
+                                              // console.log("latestProgramDataShipmentLinkedFiltered@@@@@@@@@@@@@", latestProgramDataShipmentLinkedFiltered)
+                                              // console.log("oldProgramDataShipmentLinkedFiltered@@@@@@@@@@@@@", oldProgramDataShipmentLinkedFiltered)
                                               var arr = [];
                                               var arr1 = [];
                                               var arr2 = [];
@@ -2548,15 +2548,15 @@ export default class syncPage extends Component {
                                                   })
                                                 }
                                               }
-                                              console.log("oldProgramDataShipmentLinkedFiltered@@@@@@@@", oldProgramDataShipmentLinkedFiltered)
-                                              console.log("oldProgramData.shipmentList@@@@@@@", (oldProgramData.shipmentList.filter(c => oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length - 1].parentShipmentId == 0 ? c.tempParentLinkedShipmentId == oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length - 1].tempParentShipmentId : c.parentLinkedShipmentId == oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length - 1].parentShipmentId)))
+                                              // console.log("oldProgramDataShipmentLinkedFiltered@@@@@@@@", oldProgramDataShipmentLinkedFiltered)
+                                              // console.log("oldProgramData.shipmentList@@@@@@@", (oldProgramData.shipmentList.filter(c => oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length - 1].parentShipmentId == 0 ? c.tempParentLinkedShipmentId == oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length - 1].tempParentShipmentId : c.parentLinkedShipmentId == oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length - 1].parentShipmentId)))
                                               if (oldProgramDataShipmentLinkedFiltered.length > 0) {
                                                 arr1.push(oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length - 1].parentShipmentId);
                                                 (oldProgramData.shipmentList.filter(c => oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length - 1].parentShipmentId == 0 ? c.tempParentLinkedShipmentId == oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length - 1].tempParentShipmentId : c.parentLinkedShipmentId == oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length - 1].parentShipmentId)).map(item => {
                                                   arr1.push(item.shipmentId)
                                                 })
                                               }
-                                              var oldShipmentDetails = oldProgramData.shipmentList.filter(c => oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length - 1].childShipmentId > 0 ? c.shipmentId == oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length - 1].childShipmentId : c.tempShipmentId == oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length - 1].tempChildShipmentId);
+                                              var oldShipmentDetails = oldProgramDataShipmentLinkedFiltered.length>0?oldProgramData.shipmentList.filter(c => oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length - 1].childShipmentId > 0 ? c.shipmentId == oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length - 1].childShipmentId : c.tempShipmentId == oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length - 1].tempChildShipmentId):[];
                                               var latestShipmentDetails = latestProgramDataShipmentLinkedFiltered.length>0?latestProgramData.shipmentList.filter(c => latestProgramDataShipmentLinkedFiltered[latestProgramDataShipmentLinkedFiltered.length - 1].childShipmentId > 0 ? c.shipmentId == latestProgramDataShipmentLinkedFiltered[latestProgramDataShipmentLinkedFiltered.length - 1].childShipmentId : c.tempShipmentId == latestProgramDataShipmentLinkedFiltered[latestProgramDataShipmentLinkedFiltered.length - 1].tempChildShipmentId):[];
                                               data[0] = uniqueRoNoAndRoPrimeLineNo[cd].split("|")[0] + " - " + uniqueRoNoAndRoPrimeLineNo[cd].split("|")[1];
                                               data[1] = uniqueRoNoAndRoPrimeLineNo[cd].split("|")[1];
@@ -2573,8 +2573,8 @@ export default class syncPage extends Component {
                                               data[12] = listFromAPIFiltered.length > 0 ? listFromAPIFiltered[listFromAPIFiltered.length - 1].realmCountryPlanningUnit.multiplier : latestShipmentDetails.length > 0 ? latestShipmentDetails[0].realmCountryPlanningUnit.multiplier : "";
                                               data[13] = listFromAPIFiltered.length > 0 ? listFromAPIFiltered[listFromAPIFiltered.length - 1].conversionFactor : latestProgramDataShipmentLinkedFiltered.length > 0 ? latestProgramDataShipmentLinkedFiltered[latestProgramDataShipmentLinkedFiltered.length - 1].active == 1 || latestProgramDataShipmentLinkedFiltered[latestProgramDataShipmentLinkedFiltered.length - 1].active == true ? true : false : false;
                                               data[14] = oldProgramDataShipmentLinkedFiltered.length > 0 ? oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length - 1].shipmentLinkingId : "";
-                                              data[15] = latestProgramDataShipmentLinkedFiltered.length > 0 ? latestProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length - 1].shipmentLinkingId : "";
-                                              data[16] = downloadedProgramDataShipmentLinkedFiltered.length > 0 ? downloadedProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length - 1].shipmentLinkingId : "";
+                                              data[15] = latestProgramDataShipmentLinkedFiltered.length > 0 ? latestProgramDataShipmentLinkedFiltered[latestProgramDataShipmentLinkedFiltered.length - 1].shipmentLinkingId : "";
+                                              data[16] = downloadedProgramDataShipmentLinkedFiltered.length > 0 ? downloadedProgramDataShipmentLinkedFiltered[downloadedProgramDataShipmentLinkedFiltered.length - 1].shipmentLinkingId : "";
                                               data[17] = 4;
                                               data[18] = (oldProgramDataShipmentLinkedFiltered.length > 0 && latestProgramDataShipmentLinkedFiltered.length == 0) || (oldProgramDataShipmentLinkedFiltered.length == 0 && latestProgramDataShipmentLinkedFiltered.length > 0) ? (oldProgramDataShipmentLinkedFiltered.length > 0 && latestProgramDataShipmentLinkedFiltered.length == 0) ? oldProgramData.currentVersion.versionId : latestProgramData.currentVersion.versionId : "";
                                               data[19] = cd;
@@ -2837,7 +2837,7 @@ export default class syncPage extends Component {
                                                 //     }.bind(this)
                                                 //   })
                                                 // }
-                                                console.log("items@@@@@@@@@@@@@@@@@@@@@", items);
+                                                // console.log("items@@@@@@@@@@@@@@@@@@@@@", items);
                                                 return items;
                                               }.bind(this)
                                             };
@@ -2847,7 +2847,7 @@ export default class syncPage extends Component {
                                             this.setState({
                                               mergedShipmentLinkedJexcel: mergedShipmentLinkedJexcel,
                                             })
-                                            console.log("+++Shipment Jexcel completed", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
+                                            // console.log("+++Shipment Jexcel completed", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
                                             this.setState({
                                               oldProgramDataConsumption: oldProgramDataConsumption,
                                               oldProgramDataInventory: oldProgramDataInventory,
@@ -2899,11 +2899,11 @@ export default class syncPage extends Component {
             })
             .catch(
               error => {
-                console.log("@@@Error2", error);
-                console.log("@@@Error2", error.message);
-                console.log("@@@Error2", error.response ? error.response.status : "")
+                // console.log("@@@Error2", error);
+                // console.log("@@@Error2", error.message);
+                // console.log("@@@Error2", error.response ? error.response.status : "")
                 if (error.message === "Network Error") {
-                  console.log("+++in catch 3")
+                  // console.log("+++in catch 3")
                   this.setState({
                     message: 'static.common.networkError',
                     loading: false
@@ -2932,7 +2932,7 @@ export default class syncPage extends Component {
                       });
                       break;
                     default:
-                      console.log("+++in catch 4")
+                      // console.log("+++in catch 4")
                       this.setState({
                         message: 'static.unkownError',
                         loading: false
@@ -2955,11 +2955,11 @@ export default class syncPage extends Component {
       })
         .catch(
           error => {
-            console.log("@@@Error3", error);
-            console.log("@@@Error3", error.message);
-            console.log("@@@Error3", error.response ? error.response.status : "")
+            // console.log("@@@Error3", error);
+            // console.log("@@@Error3", error.message);
+            // console.log("@@@Error3", error.response ? error.response.status : "")
             if (error.message === "Network Error") {
-              console.log("+++in catch 5")
+              // console.log("+++in catch 5")
               this.setState({
                 message: 'static.common.networkError',
                 loading: false
@@ -2988,7 +2988,7 @@ export default class syncPage extends Component {
                   });
                   break;
                 default:
-                  console.log("+++in catch 6")
+                  // console.log("+++in catch 6")
                   this.setState({
                     message: 'static.unkownError',
                     loading: false
@@ -3220,7 +3220,7 @@ export default class syncPage extends Component {
   }
 
   recursiveConflictsForShipmentLinking(instance) {
-    console.log("In resolve conflicts@@@@@@@@@@@@")
+    // console.log("In resolve conflicts@@@@@@@@@@@@")
     var elInstance = instance;
     var jsonData = elInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
@@ -3266,7 +3266,7 @@ export default class syncPage extends Component {
               isChanged: true
             })
           } else if ((jsonData[c])[14] === "" && (jsonData[c])[15] != (jsonData[c])[16]) {
-            console.log("In else if")
+            // console.log("In else if")
             elInstance.setValueFromCoords(17, c, 3, true);
             for (var i = 0; i < colArr.length; i++) {
               var col = (colArr[i]).concat(parseInt(c) + 1);
@@ -3333,11 +3333,11 @@ export default class syncPage extends Component {
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI']
     elInstance.options.editable = true;
     for (var c = 0; c < jsonData.length; c++) {
-      console.log("(jsonData[c])[34] Mohit", (jsonData[c])[34] == "")
+      // console.log("(jsonData[c])[34] Mohit", (jsonData[c])[34] == "")
       if ((jsonData[c])[34] == "") {
         for (var i = 0; i < colArr.length; i++) {
           var col = (colArr[i]).concat(parseInt(c) + 1);
-          console.log("Col@@@@@@", col)
+          // console.log("Col@@@@@@", col)
           elInstance.setStyle(col, "background-color", "transparent");
           elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
           elInstance.setValueFromCoords(36, c, 2, true);
@@ -3349,7 +3349,7 @@ export default class syncPage extends Component {
         for (var i = 0; i < colArr.length; i++) {
           var col = (colArr[i]).concat(parseInt(c) + 1);
           elInstance.setStyle(col, "background-color", "transparent");
-          console.log("Mohit above latest")
+          // console.log("Mohit above latest")
           elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
           elInstance.setValueFromCoords(36, c, 3, true);
         }
@@ -3372,7 +3372,7 @@ export default class syncPage extends Component {
               var col = (colArr[j]).concat(parseInt(c) + 1);
               elInstance.setValueFromCoords(j, c, latestData[j], true);
               elInstance.setStyle(col, "background-color", "transparent");
-              console.log("Mohit above latest 1")
+              // console.log("Mohit above latest 1")
               elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
               elInstance.setValueFromCoords(36, c, 3, true);
               (jsonData[c])[36] = 3;
@@ -3410,7 +3410,7 @@ export default class syncPage extends Component {
               var col = (colArr[32]).concat(parseInt(c) + 1);
               elInstance.setValueFromCoords(31, c, latestData[j], true);
               elInstance.setStyle(col, "background-color", "transparent");
-              console.log("Mohit above latest 3")
+              // console.log("Mohit above latest 3")
               elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
               elInstance.setValueFromCoords(36, c, 3, true);
             } else if ((jsonData[c])[35] != "" && latestData[31] == downloadedData[31]) {
@@ -3434,14 +3434,14 @@ export default class syncPage extends Component {
       }
     }
     elInstance.orderBy(36, 0);
-    console.log("ElInstance.getJsonMohit", elInstance.getJson(null, false))
+    // console.log("ElInstance.getJsonMohit", elInstance.getJson(null, false))
     elInstance.options.editable = false;
   }
 
   getNote(row, lang) {
     var transList = row.problemTransList.filter(c => c.reviewed == false);
     if (transList.length == 0) {
-      console.log("this problem report id do not have trans+++", row.problemReportId);
+      // console.log("this problem report id do not have trans+++", row.problemReportId);
       return ""
     } else {
       var listLength = transList.length;
@@ -3599,9 +3599,9 @@ export default class syncPage extends Component {
               elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
             }
           }
-          console.log("RowData[11+++", rowData[11]);
-          console.log("OldData[11+++", oldData[11]);
-          console.log("LatestData[11]+++", latestData[11]);
+          // console.log("RowData[11+++", rowData[11]);
+          // console.log("OldData[11+++", oldData[11]);
+          // console.log("LatestData[11]+++", latestData[11]);
           if ((oldData[11] == latestData[11]) || (oldData[11] == "" && latestData[11] == null) || (oldData[11] == null && latestData[11] == "")) {
           } else {
             if (rowData[11] == oldData[11]) {
@@ -4374,12 +4374,12 @@ export default class syncPage extends Component {
               // programJson.inventoryList = inventoryData;
               // programJson.shipmentList = shipmentData;
               programJson.problemReportList = problemReportList;
-              console.log("ProgramJson.consumption+++", programJson.consumptionList);
+              // console.log("ProgramJson.consumption+++", programJson.consumptionList);
               // programJson.problemReportList = [];
               programJson.versionType = { id: document.getElementById("versionType").value };
               programJson.versionStatus = { id: PENDING_APPROVAL_VERSION_STATUS };
               programJson.notes = document.getElementById("notes").value;
-              console.log("ProgramJson+++", programJson);
+              // console.log("ProgramJson+++", programJson);
               // ProgramService.getLatestVersionForProgram((this.state.singleProgramId)).then(response => {
               //   if (response.status == 200) {
               //     if (response.data == this.state.comparedLatestVersion) {
@@ -4388,7 +4388,7 @@ export default class syncPage extends Component {
               // if (response1.data == false) {
               ProgramService.saveProgramData(programJson, this.state.comparedLatestVersion).then(response => {
                 if (response.status == 200) {
-                  console.log(")))) Commit Request generated successfully");
+                  // console.log(")))) Commit Request generated successfully");
                   // var programDataTransaction1 = db1.transaction(['programData'], 'readwrite');
                   // var programDataOs1 = programDataTransaction1.objectStore('programData');
                   // var programRequest1 = programDataOs1.delete((this.state.programId).value);
@@ -4453,7 +4453,7 @@ export default class syncPage extends Component {
                   // var putRequest1 = downloadedProgramSaveData.put(item);
                   var putRequest2 = programQPLDetailSaveData.put(programQPLDetails);
                   localStorage.setItem("sesProgramId", "");
-                  console.log(")))) Made program readonly");
+                  // console.log(")))) Made program readonly");
                   // this.props.history.push({ pathname: `/masterDataSync/green/` + i18n.t('static.message.commitSuccess'), state: { "programIds": json.programId + "_v" + version + "_uId_" + userId } })
                   this.setState({
                     progressPer: 50
@@ -4474,11 +4474,11 @@ export default class syncPage extends Component {
               })
                 .catch(
                   error => {
-                    console.log("@@@Error4", error);
-                    console.log("@@@Error4", error.message);
-                    console.log("@@@Error4", error.response ? error.response.status : "")
+                    // console.log("@@@Error4", error);
+                    // console.log("@@@Error4", error.message);
+                    // console.log("@@@Error4", error.response ? error.response.status : "")
                     if (error.message === "Network Error") {
-                      console.log("+++in catch 7")
+                      // console.log("+++in catch 7")
                       this.setState({
                         message: 'static.common.networkError',
                         color: "red",
@@ -4522,7 +4522,7 @@ export default class syncPage extends Component {
                           });
                           break;
                         default:
-                          console.log("+++in catch 8")
+                          // console.log("+++in catch 8")
                           this.setState({
                             message: 'static.unkownError',
                             loading: false,
@@ -4776,7 +4776,7 @@ export default class syncPage extends Component {
   }
 
   getLatestProgram(notificationDetails) {
-    console.log(")))) inside getting latest version")
+    // console.log(")))) inside getting latest version")
     this.setState({ loading: true });
     var checkboxesChecked = [];
     var programIdsToSyncArray = [];
@@ -4790,11 +4790,11 @@ export default class syncPage extends Component {
       }
     }
     // checkboxesChecked.push({ programId: programId, versionId: -1 })
-    console.log(")))) Before calling get notification api")
+    // console.log(")))) Before calling get notification api")
     ProgramService.getAllProgramData(checkboxesChecked)
       .then(response => {
-        console.log(")))) After calling get notification api")
-        console.log("Resposne+++", response);
+        // console.log(")))) After calling get notification api")
+        // console.log("Resposne+++", response);
         var json = response.data;
         var updatedJson = [];
         for (var r = 0; r < json.length; r++) {
@@ -4805,7 +4805,7 @@ export default class syncPage extends Component {
           var batchInfoList = json[r].batchInfoList;
           var problemReportList = json[r].problemReportList;
           var supplyPlan = json[r].supplyPlan;
-          console.log("Supply plan+++", supplyPlan)
+          // console.log("Supply plan+++", supplyPlan)
           var generalData = json[r];
           delete generalData.consumptionList;
           delete generalData.inventoryList;
@@ -4826,7 +4826,7 @@ export default class syncPage extends Component {
               batchInfoList: batchInfoList.filter(c => c.planningUnitId == planningUnitList[pu].id),
               supplyPlan: supplyPlan.filter(c => c.planningUnitId == planningUnitList[pu].id)
             }
-            console.log("Supply plan Filtered+++", supplyPlan.filter(c => c.planningUnitId == planningUnitList[pu].id));
+            // console.log("Supply plan Filtered+++", supplyPlan.filter(c => c.planningUnitId == planningUnitList[pu].id));
             var encryptedPlanningUnitDataText = CryptoJS.AES.encrypt(JSON.stringify(planningUnitDataJson), SECRET_KEY).toString();
             planningUnitDataList.push({ planningUnitId: planningUnitList[pu].id, planningUnitData: encryptedPlanningUnitDataText })
           }
@@ -4862,13 +4862,13 @@ export default class syncPage extends Component {
             var myResult = [];
             myResult = getRequest.result;
             var userId = AuthenticationService.getLoggedInUserId();
-            console.log("Myresult+++", myResult);
+            // console.log("Myresult+++", myResult);
 
             var programDataTransaction1 = db1.transaction(['programData'], 'readwrite');
             var programDataOs1 = programDataTransaction1.objectStore('programData');
             for (var dpd = 0; dpd < programIdsSuccessfullyCommitted.length; dpd++) {
               var checkIfProgramExists = myResult.filter(c => c.programId == programIdsSuccessfullyCommitted[dpd].notificationDetails.program.id && c.version == programIdsSuccessfullyCommitted[dpd].notificationDetails.committedVersionId && c.readonly == 1 && c.userId == userId);
-              console.log("checkIfProgramExists+++", checkIfProgramExists);
+              // console.log("checkIfProgramExists+++", checkIfProgramExists);
               var programIdToDelete = 0;
               if (checkIfProgramExists.length > 0) {
                 programIdToDelete = checkIfProgramExists[0].id;
@@ -4881,7 +4881,7 @@ export default class syncPage extends Component {
 
               for (var dpd = 0; dpd < programIdsSuccessfullyCommitted.length; dpd++) {
                 var checkIfProgramExists = myResult.filter(c => c.programId == programIdsSuccessfullyCommitted[dpd].notificationDetails.program.id && c.version == programIdsSuccessfullyCommitted[dpd].notificationDetails.committedVersionId && c.readonly == 1 && c.userId == userId);
-                console.log("checkIfProgramExists+++", checkIfProgramExists);
+                // console.log("checkIfProgramExists+++", checkIfProgramExists);
                 var programIdToDelete = 0;
                 if (checkIfProgramExists.length > 0) {
                   programIdToDelete = checkIfProgramExists[0].id;
@@ -4894,7 +4894,7 @@ export default class syncPage extends Component {
 
                 for (var dpd = 0; dpd < programIdsSuccessfullyCommitted.length; dpd++) {
                   var checkIfProgramExists = myResult.filter(c => c.programId == programIdsSuccessfullyCommitted[dpd].notificationDetails.program.id && c.version == programIdsSuccessfullyCommitted[dpd].notificationDetails.committedVersionId && c.readonly == 1 && c.userId == userId);
-                  console.log("checkIfProgramExists+++", checkIfProgramExists);
+                  // console.log("checkIfProgramExists+++", checkIfProgramExists);
                   var programIdToDelete = 0;
                   if (checkIfProgramExists.length > 0) {
                     programIdToDelete = checkIfProgramExists[0].id;
@@ -4976,7 +4976,7 @@ export default class syncPage extends Component {
                         var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);
                       }
                       programQPLDetailsTransaction.oncomplete = function (event) {
-                        console.log(")))) Data saved successfully")
+                        // console.log(")))) Data saved successfully")
                         this.setState({
                           progressPer: 100
                         })
@@ -4997,9 +4997,9 @@ export default class syncPage extends Component {
   }
 
   goToMasterDataSync(programIds) {
-    console.log("ProgramIds++++", programIds);
-    console.log("this props++++", this)
-    console.log("this props++++", this.props)
+    // console.log("ProgramIds++++", programIds);
+    // console.log("this props++++", this)
+    // console.log("this props++++", this.props)
     this.props.history.push({ pathname: `/syncProgram/green/` + i18n.t('static.message.commitSuccess'), state: { "programIds": programIds } });
   }
 
@@ -5010,7 +5010,7 @@ export default class syncPage extends Component {
   }
 
   fetchData() {
-    console.log("+++in fetch data", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
+    // console.log("+++in fetch data", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
     var db1;
     getDatabase();
     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -5085,7 +5085,7 @@ export default class syncPage extends Component {
             //       && f.planningUnit.id == oldProgramDataProblemList[c].planningUnit.id
             //       && f.realmProblem.problem.problemId == oldProgramDataProblemList[c].realmProblem.problem.problemId);
             // }
-            console.log("Index-------------->", index);
+            // console.log("Index-------------->", index);
             // var index = -1;
             if (index == -1) {
               mergedProblemListData.push(oldProgramDataProblemList[c]);
@@ -5277,7 +5277,7 @@ export default class syncPage extends Component {
 
         var mergedProblemListJexcel = jexcel(document.getElementById("mergedVersionProblemList"), options);
         this.el = mergedProblemListJexcel;
-        console.log("+++QPL jexcel completed ", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
+        // console.log("+++QPL jexcel completed ", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
         this.setState({
           mergedProblemListJexcel: mergedProblemListJexcel,
           oldProgramDataProblemList: oldProgramDataProblemList,
