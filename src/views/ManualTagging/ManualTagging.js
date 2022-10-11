@@ -610,7 +610,11 @@ export default class ManualTagging extends Component {
                 }
             }
             shipmentList = shipmentList.filter(c => c.erpFlag.toString() == "false" && c.active.toString() == "true" && c.accountFlag.toString() == "true" && c.procurementAgent.id == PSM_PROCUREMENT_AGENT_ID && SHIPMENT_ID_ARR_MANUAL_TAGGING.includes(c.shipmentStatus.id.toString()));
-            shipmentList = shipmentList.filter(c => (moment(c.expectedDeliveryDate).format("YYYY-MM-DD") < moment(Date.now()).subtract(6, 'months').format("YYYY-MM-DD") && ([3, 4, 5, 6, 9]).includes(c.shipmentStatus.id.toString())) || (moment(c.expectedDeliveryDate).format("YYYY-MM-DD") >= moment(Date.now()).subtract(6, 'months').format("YYYY-MM-DD") && SHIPMENT_ID_ARR_MANUAL_TAGGING.includes(c.shipmentStatus.id.toString())));
+            shipmentList = shipmentList.filter(c => (
+                // moment(c.expectedDeliveryDate).format("YYYY-MM-DD") < moment(Date.now()).subtract(6, 'months').format("YYYY-MM-DD") && 
+                // ([3, 4, 5, 6, 9]).includes(c.shipmentStatus.id.toString())) || (
+                    // moment(c.expectedDeliveryDate).format("YYYY-MM-DD") >= moment(Date.now()).subtract(6, 'months').format("YYYY-MM-DD") && 
+                    SHIPMENT_ID_ARR_MANUAL_TAGGING.includes(c.shipmentStatus.id.toString())));
             var listArray = shipmentList;
             listArray.sort((a, b) => {
                 var itemLabelA = a.shipmentId;
@@ -1049,7 +1053,7 @@ export default class ManualTagging extends Component {
                                 // console.log("jsonvalue@@@@@@@@################",json[j][1])
                                 if (json[j][17] == this.state.instance.getValueFromCoords(17, y, true)) {
                                     if (j != y) {
-                                        this.state.instance.setValueFromCoords(9, j, value, true);
+                                        this.state.instance.setValueFromCoords(9, j, rcpuFilter.id, true);
                                         this.state.instance.setValueFromCoords(12, j, Math.round(this.state.instance.getValueFromCoords(10, j) * rcpuFilter.multiplier), true);
                                         this.state.instance.setValueFromCoords(11, j, Number(rcpuFilter.multiplier), true);
                                         this.state.instance.setValueFromCoords(19, j, Math.round(this.state.instance.getValueFromCoords(10, j)), true);
@@ -2985,7 +2989,11 @@ export default class ManualTagging extends Component {
                     var fullShipmentList = shipmentList;
                     if (this.state.active1) {
                         shipmentList = shipmentList.filter(c => c.erpFlag.toString() == "false" && c.active.toString() == "true" && c.accountFlag.toString() == "true" && c.procurementAgent.id == PSM_PROCUREMENT_AGENT_ID && SHIPMENT_ID_ARR_MANUAL_TAGGING.includes(c.shipmentStatus.id.toString()));
-                        shipmentList = shipmentList.filter(c => (moment(c.expectedDeliveryDate).format("YYYY-MM-DD") < moment(Date.now()).subtract(6, 'months').format("YYYY-MM-DD") && ([3, 4, 5, 6, 9]).includes(c.shipmentStatus.id.toString())) || (moment(c.expectedDeliveryDate).format("YYYY-MM-DD") >= moment(Date.now()).subtract(6, 'months').format("YYYY-MM-DD") && SHIPMENT_ID_ARR_MANUAL_TAGGING.includes(c.shipmentStatus.id.toString())));
+                        shipmentList = shipmentList.filter(c => (
+                            // moment(c.expectedDeliveryDate).format("YYYY-MM-DD") < moment(Date.now()).subtract(6, 'months').format("YYYY-MM-DD") && 
+                            // ([3, 4, 5, 6, 9]).includes(c.shipmentStatus.id.toString())) || (
+                                // moment(c.expectedDeliveryDate).format("YYYY-MM-DD") >= moment(Date.now()).subtract(6, 'months').format("YYYY-MM-DD") && 
+                                SHIPMENT_ID_ARR_MANUAL_TAGGING.includes(c.shipmentStatus.id.toString())));
                     } else if (this.state.active2) {
                         shipmentList = shipmentList.filter(c => c.erpFlag.toString() == "true" && c.active.toString() == "true" && c.accountFlag.toString() == "true" && c.procurementAgent.id == PSM_PROCUREMENT_AGENT_ID);
                         console.log("ShipmentList@@@@@@@@@@@@@@@", shipmentList);
