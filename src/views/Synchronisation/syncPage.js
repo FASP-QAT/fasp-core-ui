@@ -128,6 +128,7 @@ export default class syncPage extends Component {
     this.generateDataAfterResolveConflictsForQPL = this.generateDataAfterResolveConflictsForQPL.bind(this);
     this.notesChange = this.notesChange.bind(this);
     this.checkLastModifiedDateForProgram = this.checkLastModifiedDateForProgram.bind(this)
+    this.onchangepage=this.onchangepage.bind(this)
     // this.checkValidations = this.checkValidations.bind(this);
   }
 
@@ -2712,6 +2713,7 @@ export default class syncPage extends Component {
                                               allowDeleteRow: false,
                                               editable: false,
                                               onload: this.loadedFunctionForMergeShipmentLinked,
+                                              onchangepage: this.onchangepage,
                                               filters: true,
                                               license: JEXCEL_PRO_KEY,
                                               text: {
@@ -3219,13 +3221,135 @@ export default class syncPage extends Component {
     elInstance.options.editable = false;
   }
 
+  onchangepage(el, pageNo, oldPageNo) {
+    var elInstance = el.jexcel;
+    var jsonData = elInstance.getJson(null, false);
+    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+    elInstance.options.editable = true;
+    var jsonLength = (pageNo + 1) * (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+    if (jsonLength == undefined) {
+        jsonLength = 15
+    }
+    if (jsonData.length < jsonLength) {
+        jsonLength = jsonData.length;
+    }
+    var start = pageNo * (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+    for (var c = start; c < jsonLength; c++) {
+
+      if (jsonData[c][2] !== "" && jsonData[c][8] !== "" && jsonData[c][2] !== jsonData[c][8]) {
+        this.setState({
+          conflictsCount: this.state.conflictsCount + 1,
+          shipmentAlreadyLinkedToOtherProgCount: this.state.shipmentAlreadyLinkedToOtherProgCount + 1
+        })
+        elInstance.setValueFromCoords(17, c, 6, true);
+        for (var j = 0; j < colArr.length; j++) {
+          var col = (colArr[j]).concat(parseInt(c) + 1);
+          // elInstance.setStyle(col, "background-color", "transparent");
+          // elInstance.setStyle(col, "background-color", "red");
+          var cell = elInstance.getCell(col);
+          cell.classList.add('commitShipmentAlreadyLinkedToOtherPro');
+        }
+      } else {
+        var checkIfSameParentShipmentIdExists = jsonData.filter((d, index) => (((jsonData[c][5] !== "" && jsonData[c][5] === d[11] && jsonData[c][21] !== d[20]) || (jsonData[c][11] !== "" && jsonData[c][11] === d[5]) && jsonData[c][21] !== d[20]) && !jsonData[c][22].includes(index) && c != index)).length;
+        if (checkIfSameParentShipmentIdExists > 0) {
+          this.setState({
+            conflictsCount: this.state.conflictsCount + 1
+          })
+          elInstance.setValueFromCoords(17, c, 1, true);
+          for (var j = 0; j < colArr.length; j++) {
+            var col = (colArr[j]).concat(parseInt(c) + 1);
+            // elInstance.setStyle(col, "background-color", "transparent");
+            // elInstance.setStyle(col, "background-color", "yellow");
+            var cell = elInstance.getCell(col);
+            cell.classList.add('commitConflict');
+          }
+        } else {
+          if ((jsonData[c])[15] === "" && (jsonData[c])[14] === 0) {
+            elInstance.setValueFromCoords(17, c, 2, true);
+            for (var i = 0; i < colArr.length; i++) {
+              var col = (colArr[i]).concat(parseInt(c) + 1);
+              var cell = elInstance.getCell(col);
+              cell.classList.add('commitLocal');
+
+            }
+            this.setState({
+              isChanged: true
+            })
+          } else if ((jsonData[c])[14] === "" && (jsonData[c])[15] != (jsonData[c])[16]) {
+            // console.log("In else if")
+            elInstance.setValueFromCoords(17, c, 3, true);
+            for (var i = 0; i < colArr.length; i++) {
+              var col = (colArr[i]).concat(parseInt(c) + 1);
+              var cell = elInstance.getCell(col);
+              cell.classList.add('commitServer');
+
+            }
+            this.setState({
+              isChanged: true
+            })
+          } else if ((jsonData[c])[15] == (jsonData[c])[14]) {
+            if ((jsonData[c])[7] != (jsonData[c])[13]) {
+              if ((jsonData[c])[7] == (jsonData[c])[25]) {
+                elInstance.setValueFromCoords(17, c, 3, true);
+                var col = (colArr[13]).concat(parseInt(c) + 1);
+                var cell = elInstance.getCell(col);
+                cell.classList.add('commitServer');
+                this.setState({
+                  isChanged: true
+                })
+
+              } else if ((jsonData[c])[13] == (jsonData[c])[25]) {
+                elInstance.setValueFromCoords(17, c, 3, true);
+                var col = (colArr[7]).concat(parseInt(c) + 1);
+                var cell = elInstance.getCell(col);
+                cell.classList.add('commitLocal');
+                this.setState({
+                  isChanged: true
+                })
+              }
+            } else {
+              for (var j = 0; j < colArr.length; j++) {
+                var col = (colArr[j]).concat(parseInt(c) + 1);
+                var cell = elInstance.getCell(col);
+                cell.classList.add('commitNoChange');
+              }
+            }
+          } else if ((jsonData[c])[15] !== "" && (jsonData[c])[14] !== "" && (jsonData[c])[14] !== (jsonData[c])[15]) {
+            this.setState({
+              conflictsCount: this.state.conflictsCount + 1
+            })
+            elInstance.setValueFromCoords(17, c, 1, true);
+            for (var j = 0; j < colArr.length; j++) {
+              var col = (colArr[j]).concat(parseInt(c) + 1);
+              var cell = elInstance.getCell(col);
+              cell.classList.add('commitConflict');
+            }
+          }
+        }
+      }
+    }
+    elInstance.options.editable = false;
+  }
+
   recursiveConflictsForShipmentLinking(instance) {
     // console.log("In resolve conflicts@@@@@@@@@@@@")
     var elInstance = instance;
     var jsonData = elInstance.getJson();
+    var jsonLength;
+        
+            if ((document.getElementsByClassName("jexcel_pagination_dropdown")[0] != undefined)) {
+                jsonLength = 1 * (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+            }
+       
+        if (jsonLength == undefined) {
+            jsonLength = 15
+        }
+        if (jsonData.length < jsonLength) {
+            jsonLength = jsonData.length;
+        }
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
     elInstance.options.editable = true;
-    for (var c = 0; c < jsonData.length; c++) {
+    for (var c = 0; c < jsonLength; c++) {
       if (jsonData[c][2] !== "" && jsonData[c][8] !== "" && jsonData[c][2] !== jsonData[c][8]) {
         this.setState({
           conflictsCount: this.state.conflictsCount + 1,
