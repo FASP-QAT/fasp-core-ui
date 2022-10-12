@@ -267,8 +267,10 @@ class EquivalancyUnit extends Component {
             columns: [
 
                 {
-                    title: 'equivalancyUnitId',
-                    type: 'hidden',
+                    title: 'A',
+                    visible:false,
+                    // title: 'equivalancyUnitId',
+                    // type: 'hidden',
                     // readOnly: true
                 },
                 {
@@ -286,14 +288,18 @@ class EquivalancyUnit extends Component {
                 },
 
                 {
-                    title: i18n.t('static.healtharea.realm'),
-                    type: 'hidden',
+                    title: 'A',
+                    visible:false,
+                    // title: i18n.t('static.healtharea.realm'),
+                    // type: 'hidden',
                     // readOnly: true
                     // textEditor: true,
                 },
                 {
-                    title: i18n.t('static.common.notes'),
-                    type: 'hidden',
+                    title: 'A',
+                    visible:false,
+                    // title: i18n.t('static.common.notes'),
+                    // type: 'hidden',
                     // readOnly: true
                     textEditor: true,
                 },
@@ -314,12 +320,16 @@ class EquivalancyUnit extends Component {
                     readOnly: true
                 },
                 {
-                    title: 'isChange',
-                    type: 'hidden'
+                    // title: 'isChange',
+                    // type: 'hidden'
+                    title: 'A',
+                    visible:false,
                 },
                 {
-                    title: 'addNewRow',
-                    type: 'hidden'
+                    // title: 'addNewRow',
+                    // type: 'hidden'
+                    title: 'A',
+                    visible:false,
                 }
 
             ],
@@ -603,8 +613,10 @@ class EquivalancyUnit extends Component {
             columns: [
 
                 {
-                    title: 'equivalancyUnitMappingId',
-                    type: 'hidden',
+                    title: 'A',
+                    visible:false,
+                    // title: 'equivalancyUnitMappingId',
+                    // type: 'hidden',
                     // readOnly: true
                 },
                 {
@@ -681,24 +693,34 @@ class EquivalancyUnit extends Component {
                     readOnly: true
                 },
                 {
-                    title: 'isChange',
-                    type: 'hidden'
+                    title: 'A',
+                    visible:false,
+                    // title: 'isChange',
+                    // type: 'hidden'
                 },
                 {
-                    title: 'forecastingUnitId',
-                    type: 'hidden'
+                    // title: 'forecastingUnitId',
+                    // type: 'hidden'
+                    title: 'A',
+                    visible:false,
                 },
                 {
-                    title: 'typeId',
-                    type: 'hidden'
+                    // title: 'typeId',
+                    // type: 'hidden'
+                    title: 'A',
+                    visible:false,
                 },
                 {
-                    title: 'addNewRow',
-                    type: 'hidden'
+                    // title: 'addNewRow',
+                    // type: 'hidden'
+                    title: 'A',
+                    visible:false,
                 },
                 {
-                    title: 'countVar',
-                    type: 'hidden'
+                    // title: 'countVar',
+                    // type: 'hidden'
+                    title: 'A',
+                    visible:false,
                 }
 
             ],

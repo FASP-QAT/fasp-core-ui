@@ -750,16 +750,22 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                     type: 'checkbox'
                 },
                 {
-                    type: 'hidden',
-                    title: "Already exists"
+                    // type: 'hidden',
+                    // title: "Already exists"
+                    title: 'A',
+                    visible:false,
                 },
                 {
-                    type: 'hidden',
-                    title: "Supply Planning unit Id"
+                    // type: 'hidden',
+                    // title: "Supply Planning unit Id"
+                    title: 'A',
+                    visible:false,
                 },
                 {
-                    type: 'hidden',
-                    title: "Supply Planning Region Id"
+                    // type: 'hidden',
+                    // title: "Supply Planning Region Id"
+                    title: 'A',
+                    visible:false,
                 },
 
                 // {

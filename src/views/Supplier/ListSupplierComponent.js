@@ -441,9 +441,11 @@ class SupplierListComponent extends Component {
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: 'supplierId',
-                    type: 'hidden',
+                    // title: 'supplierId',
+                    // type: 'hidden',
                     // readOnly: true
+                    title: 'A',
+                    visible:false
                 },
                 {
                     title: i18n.t('static.realm.realm'),

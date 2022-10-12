@@ -249,12 +249,16 @@ class ProgramIntegration extends Component {
                                                                 type: 'checkbox'
                                                             },
                                                             {
-                                                                title: 'integrationProgramId',
-                                                                type: 'hidden'
+                                                                // title: 'integrationProgramId',
+                                                                // type: 'hidden'
+                                                                title: 'A',
+                                                                visible:false
                                                             },
                                                             {
-                                                                title: 'isChange',
-                                                                type: 'hidden'
+                                                                // title: 'isChange',
+                                                                // type: 'hidden'
+                                                                title: 'A',
+                                                                visible:false
                                                             }
 
                                                         ],

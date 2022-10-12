@@ -1016,10 +1016,12 @@ export default class ExpiredInventory extends Component {
                     // readOnly: true
                 },
                 {
-                    type: 'hidden'
+                    // type: 'hidden'
+                    visible:false
                 },
                 {
-                    type: 'hidden'
+                    // type: 'hidden'
+                    visible:false
                 }
             ],
             // text: {

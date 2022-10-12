@@ -1098,16 +1098,22 @@ class VersionSettingsComponent extends Component {
                     }// 9 J
                 },
                 {
-                    title: 'isLocal',
-                    type: 'hidden',//10 K
+                    // title: 'isLocal',
+                    // type: 'hidden',//10 K
+                    title: 'A',
+                    visible:false,
                 },
                 {
-                    title: 'versionId',
-                    type: 'hidden',//11 L
+                    // title: 'versionId',
+                    // type: 'hidden',//11 L
+                    title: 'A',
+                    visible:false,
                 },
                 {
-                    title: 'isChanged',
-                    type: 'hidden',//12 M
+                    // title: 'isChanged',
+                    // type: 'hidden',//12 M
+                    title: 'A',
+                    visible:false,
                 },
                 {
                     title: i18n.t('static.program.noOfDaysInMonth'),
@@ -1139,12 +1145,16 @@ class VersionSettingsComponent extends Component {
                     // readOnly: true
                 },//16 Q
                 {
-                    title: 'localCalling',
-                    type: 'hidden',//17 R
+                    // title: 'localCalling',
+                    // type: 'hidden',//17 R
+                    title: 'A',
+                    visible:false,
                 },
                 {
-                    title: 'datasetData',
-                    type: 'hidden',//17 R
+                    // title: 'datasetData',
+                    // type: 'hidden',//17 R
+                    title: 'A',
+                    visible:false,
                 },
 
             ],

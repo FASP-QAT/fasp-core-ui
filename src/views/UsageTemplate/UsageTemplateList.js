@@ -907,8 +907,9 @@ class usageTemplate extends Component {
             columns: [
 
                 {
-                    title: 'usageTemplateId',
-                    type: 'hidden',
+                    title: 'A', visible:false,
+                    // title: 'usageTemplateId',
+                    // type: 'hidden',
                     readOnly: true //0 A
                 },
                 {
@@ -1031,21 +1032,25 @@ class usageTemplate extends Component {
                     textEditor: true, //16 Q
                 },
                 {
-                    title: 'isChange',
-                    type: 'hidden' //17 R
+                    // title: 'isChange',
+                    // type: 'hidden' //17 R
+                    title: 'A', visible:false,
                 },
                 {
-                    title: 'addNewRow',
-                    type: 'hidden'//18 S
+                    // title: 'addNewRow',
+                    // type: 'hidden'//18 S
+                    title: 'A', visible:false,
                 },
                 {
-                    title: 'typeId',
-                    type: 'hidden'//19 T
+                    // title: 'typeId',
+                    // type: 'hidden'//19 T
+                    title: 'A', visible:false,
                 },
                 {
-                    title: i18n.t('static.program.notes'),
-                    type: 'hidden',
+                    // title: i18n.t('static.program.notes'),
+                    // type: 'hidden',
                     // width: 400 //20 U
+                    title: 'A', visible:false,
                 },
                 {
                     title: i18n.t('static.checkbox.active'),
@@ -1055,8 +1060,9 @@ class usageTemplate extends Component {
                     // readOnly: true //21 V
                 },
                 {
-                    title: 'createdBy',
-                    type: 'hidden',
+                    title: 'A', visible:false,
+                    // title: 'createdBy',
+                    // type: 'hidden',
                     // width: 400 //22 W
                 },
 

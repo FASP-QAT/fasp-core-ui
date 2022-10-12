@@ -1712,36 +1712,52 @@ export default class TreeExtrapolationComponent extends React.Component {
                     readOnly: true
                 },
                 {
-                    title: 'manualChangeAffectsFutureMonth',
-                    type: 'hidden'
+                    // title: 'manualChangeAffectsFutureMonth',
+                    // type: 'hidden'
+                    title: 'A',
+                    visible:false,
                 },
                 {
-                    title: 'extrapolationMethodId',
-                    type: 'hidden'
+                    title: 'A',
+                    visible:false,
+                    // title: 'extrapolationMethodId',
+                    // type: 'hidden'
                 },
                 {
-                    title: 'tesLower',
-                    type: 'hidden'
+                    title: 'A',
+                    visible:false,
+                    // title: 'tesLower',
+                    // type: 'hidden'
                 },
                 {
-                    title: 'tesUpper',
-                    type: 'hidden'
+                    title: 'A',
+                    visible:false,
+                    // title: 'tesUpper',
+                    // type: 'hidden'
                 },
                 {
-                    title: 'arimaLower',
-                    type: 'hidden'
+                    title: 'A',
+                    visible:false,
+                    // title: 'arimaLower',
+                    // type: 'hidden'
                 },
                 {
-                    title: 'arimaUpper',
-                    type: 'hidden'
+                    title: 'A',
+                    visible:false,
+                    // title: 'arimaUpper',
+                    // type: 'hidden'
                 },
                 {
-                    title: 'lrLower',
-                    type: 'hidden'
+                    title: 'A',
+                    visible:false,
+                    // title: 'lrLower',
+                    // type: 'hidden'
                 },
                 {
-                    title: 'lrUpper',
-                    type: 'hidden'
+                    title: 'A',
+                    visible:false,
+                    // title: 'lrUpper',
+                    // type: 'hidden'
                 },
                 // {
                 //     title: 'cumulativeManualChange',

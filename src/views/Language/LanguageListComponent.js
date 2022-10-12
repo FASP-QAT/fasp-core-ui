@@ -390,8 +390,10 @@ export default class LanguageListComponent extends Component {
                                 colHeaderClasses: ["Reqasterisk"],
                                 columns: [
                                     {
-                                        title: 'LanguageId',
-                                        type: 'hidden',
+                                        title: 'A',
+                                        visible:false
+                                        // title: 'LanguageId',
+                                        // type: 'hidden',
                                         // readOnly: true
                                     },
                                     {

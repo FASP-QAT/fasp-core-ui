@@ -2875,8 +2875,10 @@ export default class CreateTreeTemplate extends Component {
                     readOnly: true
                 },
                 {
-                    title: 'Node data id',
-                    type: 'hidden',
+                    // title: 'Node data id',
+                    // type: 'hidden',
+                    title: 'A',
+                    visible:false,
 
                 },
                 {
@@ -2886,38 +2888,52 @@ export default class CreateTreeTemplate extends Component {
                     readOnly: true
                 },
                 {
-                    title: 'Perc without manual change',
-                    type: 'hidden',
+                    // title: 'Perc without manual change',
+                    // type: 'hidden',
+                    title: 'A',
+                    visible:false,
 
                 },
                 {
-                    title: 'Manual change',
-                    type: 'hidden',
+                    // title: 'Manual change',
+                    // type: 'hidden',
+                    title: 'A',
+                    visible:false,
 
                 },
                 {
-                    title: 'FU per month',
-                    type: 'hidden',
+                    // title: 'FU per month',
+                    // type: 'hidden',
+                    title: 'A',
+                    visible:false,
 
                 },
                 {
-                    title: 'Cycle',
-                    type: 'hidden',
+                    // title: 'Cycle',
+                    // type: 'hidden',
+                    title: 'A',
+                    visible:false,
 
                 },
                 {
-                    title: 'Diff',
-                    type: 'hidden',
+                    // title: 'Diff',
+                    // type: 'hidden',
+                    title: 'A',
+                    visible:false,
 
                 },
                 {
-                    title: 'No of patients',
-                    type: 'hidden',
+                    // title: 'No of patients',
+                    // type: 'hidden',
+                    title: 'A',
+                    visible:false,
 
                 },
                 {
-                    title: 'Without Lag',
-                    type: 'hidden',
+                    // title: 'Without Lag',
+                    // type: 'hidden',
+                    title: 'A',
+                    visible:false,
 
                 },
 
@@ -3009,8 +3025,10 @@ export default class CreateTreeTemplate extends Component {
                 },
                 {
                     // 1
-                    title: i18n.t('static.tree.monthStartNoSeasonality'),
-                    type: 'hidden',
+                    // title: i18n.t('static.tree.monthStartNoSeasonality'),
+                    // type: 'hidden',
+                    title: 'A',
+                    visible:false,
                     mask: '#,##0.0000', decimal: '.',
                     readOnly: true
 
@@ -3051,12 +3069,16 @@ export default class CreateTreeTemplate extends Component {
                     readOnly: true
                 },
                 {
-                    title: "Node data id",
-                    type: 'hidden',
+                    // title: "Node data id",
+                    // type: 'hidden',
+                    title: 'A',
+                    visible:false,
                 },
                 {
-                    title: "Manual change Effect future month",
-                    type: 'hidden',
+                    // title: "Manual change Effect future month",
+                    // type: 'hidden',
+                    title: 'A',
+                    visible:false,
                 }
 
 
@@ -3345,17 +3367,23 @@ export default class CreateTreeTemplate extends Component {
                 },
                 //9 J
                 {
-                    title: 'nodeDataModelingId',
-                    type: 'hidden'
+                    // title: 'nodeDataModelingId',
+                    // type: 'hidden'
+                    title: 'A',
+                    visible:false,
                 },
                 //10 K
                 {
-                    title: 'isChanged',
-                    type: 'hidden'
+                    // title: 'isChanged',
+                    // type: 'hidden'
+                    title: 'A',
+                    visible:false,
                 },
                 {
-                    title: 'isTransfer',
-                    type: 'hidden'
+                    // title: 'isTransfer',
+                    // type: 'hidden'
+                    title: 'A',
+                    visible:false,
                 },
 
             ],

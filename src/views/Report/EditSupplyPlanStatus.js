@@ -3923,30 +3923,40 @@ class EditSupplyPlanStatus extends Component {
             // colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: 'problemReportId',
-                    type: 'hidden',
+                    // title: 'problemReportId',
+                    // type: 'hidden',
+                    title: 'A',
+                    visible:false,
                     width: 0
                 },
                 {
-                    title: 'problemActionIndex',
-                    type: 'hidden',
+                    // title: 'problemActionIndex',
+                    // type: 'hidden',
+                    title: 'A',
+                    visible:false,
                     width: 0
                 },
                 {
-                    title: i18n.t('static.program.programCode'),
-                    type: 'hidden',
+                    // title: i18n.t('static.program.programCode'),
+                    // type: 'hidden',
+                    title: 'A',
+                    visible:false,
                     width: 0
                     // readOnly:true
                 },
                 {
-                    title: i18n.t('static.program.versionId'),
-                    type: 'hidden',
+                    // title: i18n.t('static.program.versionId'),
+                    // type: 'hidden',
+                    title: 'A',
+                    visible:false,
                     readOnly: true,
                     width: 70
                 },
                 {
-                    title: i18n.t('static.region.region'),
-                    type: 'hidden',
+                    // title: i18n.t('static.region.region'),
+                    // type: 'hidden',
+                    title: 'A',
+                    visible:false,
                     width: 0
                 },
                 {
@@ -3956,8 +3966,10 @@ class EditSupplyPlanStatus extends Component {
                     width: 120
                 },
                 {
-                    title: i18n.t('static.report.month'),
-                    type: 'hidden',
+                    // title: i18n.t('static.report.month'),
+                    // type: 'hidden',
+                    title: 'A',
+                    visible:false,
                     width: 0
                 },
                 {
@@ -3993,28 +4005,38 @@ class EditSupplyPlanStatus extends Component {
                     width: 120
                 },
                 {
-                    title: i18n.t('static.common.action'),
-                    type: 'hidden',
+                    // title: i18n.t('static.common.action'),
+                    // type: 'hidden',
+                    title: 'A',
+                    visible:false,
                     width: 0
                 },
                 {
-                    title: 'planningUnitId',
-                    type: 'hidden',
+                    // title: 'planningUnitId',
+                    // type: 'hidden',
+                    title: 'A',
+                    visible:false,
                     width: 0
                 },
                 {
-                    title: 'problemId',
-                    type: 'hidden',
+                    // title: 'problemId',
+                    // type: 'hidden',
+                    title: 'A',
+                    visible:false,
                     width: 0
                 },
                 {
-                    title: 'actionUrl',
-                    type: 'hidden',
+                    // title: 'actionUrl',
+                    // type: 'hidden',
+                    title: 'A',
+                    visible:false,
                     width: 0
                 },
                 {
-                    title: 'criticalitiId',
-                    type: 'hidden',
+                    // title: 'criticalitiId',
+                    // type: 'hidden',
+                    title: 'A',
+                    visible:false,
                     width: 0
                 },
 
@@ -4052,13 +4074,17 @@ class EditSupplyPlanStatus extends Component {
                 },
 
                 {
-                    title: 'isChanged',
-                    type: 'hidden',
+                    title: 'A',
+                    visible:false,
+                    // title: 'isChanged',
+                    // type: 'hidden',
                     width: 0
                 },
                 {
-                    title: 'transList',
-                    type: 'hidden',
+                    title: 'A',
+                    visible:false,
+                    // title: 'transList',
+                    // type: 'hidden',
                     width: 0
                 },
 

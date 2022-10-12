@@ -682,13 +682,17 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                                 type: 'text'
                                             },
                                             {
-                                                title: 'Procurment Agent Procurment Unit Id',
-                                                type: 'hidden',
+                                                // title: 'Procurment Agent Procurment Unit Id',
+                                                // type: 'hidden',
                                                 // readOnly: true
+                                                title: 'A',
+                                                visible:false
                                             },
                                             {
-                                                title: 'Changed Flag',
-                                                type: 'hidden'
+                                                // title: 'Changed Flag',
+                                                // type: 'hidden'
+                                                title: 'A',
+                                                visible:false
                                             },
 
                                         ],

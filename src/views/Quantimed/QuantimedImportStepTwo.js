@@ -549,7 +549,8 @@ export default class QunatimedImportStepTwo extends Component {
                                 { type: 'text', title: i18n.t('static.quantimed.quantimedProductIdLabel'), readOnly: true },
                                 { type: 'text', title: i18n.t('static.quantimed.quantimedPlanningUnitLabel'), readOnly: true },
                                 { type: 'dropdown', source: programPlanningUnitsArr, title: i18n.t('static.supplyPlan.qatProduct'), autocomplete: true },
-                                { type: 'hidden', title: 'Previous Program Planning Unit' },
+                                // { type: 'hidden', title: 'Previous Program Planning Unit' },
+                                { title: 'A',visible:false },
                                 { type: 'numeric', title: i18n.t('static.quantimed.conversionFactor'), mask: '#,##.00', decimal: '.', readOnly: true },
                             ],
                             // text: {

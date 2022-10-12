@@ -210,16 +210,22 @@ class CountrySpecificPrices extends Component {
                                             type: 'checkbox'
                                         },
                                         {
-                                            title: 'programPlanningUnitId',
-                                            type: 'hidden'
+                                            // title: 'programPlanningUnitId',
+                                            // type: 'hidden'
+                                            title: 'A',
+                                            visible:false
                                         },
                                         {
-                                            title: 'programPlanningUnitProcurementAgentId',
-                                            type: 'hidden'
+                                            // title: 'programPlanningUnitProcurementAgentId',
+                                            // type: 'hidden'
+                                            title: 'A',
+                                            visible:false
                                         },
                                         {
-                                            title: 'isChange',
-                                            type: 'hidden'
+                                            // title: 'isChange',
+                                            // type: 'hidden'
+                                            title: 'A',
+                                            visible:false
                                         },
 
                                     ],

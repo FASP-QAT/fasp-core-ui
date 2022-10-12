@@ -125,8 +125,10 @@ class ListProcurementAgentComponent extends Component {
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: 'procurementAgentTypeId',
-                    type: 'hidden',
+                    // title: 'procurementAgentTypeId',
+                    // type: 'hidden',
+                    title: 'A',
+                    visible:false
                 },
                 {
                     title: i18n.t('static.realm.realm'),

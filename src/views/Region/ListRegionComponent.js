@@ -580,9 +580,11 @@ class RegionListComponent extends Component {
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: 'regionListId',
-                    type: 'hidden',
+                    // title: 'regionListId',
+                    // type: 'hidden',
                     // readOnly: true
+                    title: 'A',
+                    visible:false
                 },
                 {
                     title: i18n.t('static.region.country'),

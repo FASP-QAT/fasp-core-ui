@@ -150,9 +150,11 @@ class forecastMethod extends Component {
             columns: [
 
                 {
-                    title: 'forecastMethodId',
-                    type: 'hidden',
+                    // title: 'forecastMethodId',
+                    // type: 'hidden',
                     // readOnly: true
+                    title: 'A',
+                    visible:false
                 },
                 // {
                 //     title: i18n.t('static.product.realm'),
@@ -197,16 +199,22 @@ class forecastMethod extends Component {
                     readOnly: true
                 },
                 {
-                    title: 'forecastMethodTypeId',
-                    type: 'hidden'
+                    // title: 'forecastMethodTypeId',
+                    // type: 'hidden'
+                    title: 'A',
+                    visible:false
                 },
                 {
-                    title: 'isChange',
-                    type: 'hidden'
+                    // title: 'isChange',
+                    // type: 'hidden'
+                    title: 'A',
+                    visible:false
                 },
                 {
-                    title: 'addNewRow',
-                    type: 'hidden'
+                    // title: 'addNewRow',
+                    // type: 'hidden'
+                    title: 'A',
+                    visible:false
                 }
 
 

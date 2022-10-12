@@ -284,8 +284,10 @@ class ListRoleComponent extends Component {
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: 'roleId',
-                    type: 'hidden',
+                    title: 'A',
+                    visible:false,
+                    // title: 'roleId',
+                    // type: 'hidden',
                     readOnly: true
                 },
                 {

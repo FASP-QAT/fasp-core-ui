@@ -465,8 +465,8 @@ export default class CountryListComponent extends Component {
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: 'countryId',
-                    type: 'hidden',
+                    title: 'A',
+                    visible:false,
                     readOnly: true
                 },
                 {

@@ -782,9 +782,11 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     readOnly: true//0 A
                 },
                 {
-                    title: 'Supply Plan Planning Unit Id',
-                    type: 'hidden',
+                    title: 'A',
+                    // title: 'Supply Plan Planning Unit Id',
+                    // type: 'hidden',
                     // readOnly: true//1 B
+                    visible:false,
                 },
                 {
                     title: i18n.t('static.importFromQATSupplyPlan.supplyPlanPlanningUnit'),
@@ -792,24 +794,32 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     readOnly: true,//2 C
                 },
                 {
-                    title: 'multiplier',
-                    type: 'hidden',
+                    title: 'A',
+                    // title: 'multiplier',
+                    // type: 'hidden',
                     // readOnly: true//3 D
+                    visible:false,
                 },
                 {
-                    title: 'forecastingUnitId',
-                    type: 'hidden',
+                    title: 'A',
+                    // title: 'forecastingUnitId',
+                    // type: 'hidden',
                     // readOnly: true//4 E
+                    visible:false,
                 },
                 {
-                    title: 'tracerCategoryId',
-                    type: 'hidden',
+                    title: 'A',
+                    // title: 'tracerCategoryId',
+                    // type: 'hidden',
                     // readOnly: true//5 F
+                    visible:false,
                 },
                 {
-                    title: 'Forecast Planning Unit Id',
-                    type: 'hidden',
+                    title: 'A',
+                    // title: 'Forecast Planning Unit Id',
+                    // type: 'hidden',
                     // readOnly: true//6 G
+                    visible:false,
                 },
                 {
                     title: i18n.t('static.importFromQATSupplyPlan.forecastPlanningUnit'),
@@ -818,9 +828,11 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     // filter: this.filterPlanningUnitBasedOnTracerCategory//7 H
                 },
                 {
-                    title: 'ForecastMultiplier',
-                    type: 'hidden',
+                    title: 'A',
+                    // title: 'ForecastMultiplier',
+                    // type: 'hidden',
                     // readOnly: true//8 I
+                    visible:false,
                 },
                 {
                     title: i18n.t('static.importFromQATSupplyPlan.conversionFactor'),
@@ -830,14 +842,18 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     textEditor: true,//9 J
                 },
                 {
-                    title: 'Match',
-                    type: 'hidden',
+                    title: 'A',
+                    // title: 'Match',
+                    // type: 'hidden',
                     // readOnly: true//10 K
+                    visible:false,
                 },
                 {
-                    title: 'Supply plan Forcast unit id',
-                    type: 'hidden',
+                    title: 'A',
+                    // title: 'Supply plan Forcast unit id',
+                    // type: 'hidden',
                     // readOnly: true//11 L
+                    visible:false,
                 }
 
 

@@ -301,9 +301,12 @@ export default class StepTwoImportMapPlanningUnits extends Component {
             columns: [
 
                 {
-                    title: 'id',
-                    type: 'hidden',
-                    readOnly: true
+                    title: 'A',
+                    visible:false,
+                    // title: 'id',
+                    // type: 'hidden',
+                    readOnly: true,
+                    
                 },
                 {
                     title: i18n.t('static.importFromQATSupplyPlan.supplyPlanRegion'),

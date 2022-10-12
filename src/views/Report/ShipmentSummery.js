@@ -847,8 +847,10 @@ class ShipmentSummery extends Component {
                     // readOnly: true
                 },
                 {
-                    title: i18n.t('static.supplyPlan.consideAsEmergencyOrder'),
-                    type: 'hidden',
+                    title: 'A',
+                    visible:false
+                    // title: i18n.t('static.supplyPlan.consideAsEmergencyOrder'),
+                    // type: 'hidden',
                     // readOnly: true
                 },
                 {
@@ -928,8 +930,10 @@ class ShipmentSummery extends Component {
                     // readOnly: true
                 },
                 {
-                    title: 'Planning Unit Id',
-                    type: 'hidden',
+                    title: 'A',
+                    visible:false
+                    // title: 'Planning Unit Id',
+                    // type: 'hidden',
                     // readOnly: true
                 },
 

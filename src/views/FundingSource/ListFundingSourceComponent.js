@@ -436,9 +436,11 @@ class FundingSourceListComponent extends Component {
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: 'fundingSourceId',
-                    type: 'hidden',
+                    // title: 'fundingSourceId',
+                    // type: 'hidden',
                     // readOnly: true
+                    title: 'A',
+                    visible:false,
                 },
                 {
                     title: i18n.t('static.realm.realm'),

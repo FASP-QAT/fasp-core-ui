@@ -455,8 +455,9 @@ class ListUserComponent extends Component {
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: 'userId',
-                    type: 'hidden',
+                    // title: 'userId',
+                    // type: 'hidden',
+                    title: 'A', visible:false
                 },
                 {
                     title: i18n.t('static.realm.realm'),
@@ -1242,8 +1243,9 @@ class ListUserComponent extends Component {
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: 'userId',
-                    type: 'hidden',//0A
+                    // title: 'userId',
+                    // type: 'hidden',//0A
+                    title: 'A', visible:false,
                 },
                 {
                     title: i18n.t('static.realm.realm'),
@@ -2113,8 +2115,9 @@ class ListUserComponent extends Component {
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: 'userId', //0A 
-                    type: 'hidden',
+                    // title: 'userId', //0A 
+                    // type: 'hidden',
+                    title: 'A', visible:false,
                 },
                 {
                     title: i18n.t('static.user.username'),

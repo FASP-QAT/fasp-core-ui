@@ -273,7 +273,7 @@ export default class ManualTagging extends Component {
                 { title: i18n.t('static.shipment.totalCost'), type: 'numeric', mask: '#,##.00', disabledMaskOnEdition: true, textEditor: true, decimal: '.', width: 100 },
                 { title: i18n.t('static.mt.dataReceivedOn'), type: 'calendar', options: { format: JEXCEL_DATE_FORMAT }, width: 100 },
                 { title: i18n.t('static.manualTagging.changeCode'), type: 'text', width: 100 },
-                { type: 'hidden' }
+                { visible:false }
             ],
             pagination: false,
             search: false,
@@ -349,7 +349,7 @@ export default class ManualTagging extends Component {
                 { title: i18n.t('static.supplyPlan.shipmentQty'), type: 'numeric', mask: '#,##.00', disabledMaskOnEdition: true, textEditor: true, decimal: '.', width: 100 },
                 { title: i18n.t('static.mt.dataReceivedOn'), type: 'calendar', options: { format: JEXCEL_DATE_FORMAT }, width: 100 },
                 { title: i18n.t('static.manualTagging.changeCode'), type: 'text', width: 100 },
-                { type: 'hidden' }
+                { visible:false }
             ],
             pagination: false,
             search: false,
@@ -3375,8 +3375,10 @@ export default class ManualTagging extends Component {
                                 width: 80
                             },
                             {
-                                title: i18n.t('static.supplyPlan.qatProduct'),
-                                type: 'hidden',
+                                title: 'A',
+                                visible:false,
+                                // title: i18n.t('static.supplyPlan.qatProduct'),
+                                // type: 'hidden',
                                 readOnly: true,
                                 width: 150
                             },
@@ -3406,8 +3408,10 @@ export default class ManualTagging extends Component {
                             },
 
                             {
-                                title: i18n.t('shipmentTransId'),
-                                type: 'hidden',
+                                title: 'A',
+                                visible:false,
+                                // title: i18n.t('shipmentTransId'),
+                                // type: 'hidden',
                                 readOnly: true,
                                 width: 0
                             },
@@ -3454,14 +3458,18 @@ export default class ManualTagging extends Component {
                                 width: 150
                             },
                             {
-                                title: i18n.t('shipmentTransId'),
-                                type: 'hidden',
+                                title: 'A',
+                                visible:false,
+                                // title: i18n.t('shipmentTransId'),
+                                // type: 'hidden',
                                 readOnly: true,
                                 width: 0
                             },
                             {
-                                title: i18n.t('shipmentTransId'),
-                                type: 'hidden',
+                                title: 'A',
+                                visible:false,
+                                // title: i18n.t('shipmentTransId'),
+                                // type: 'hidden',
                                 readOnly: true,
                                 width: 0
                             },

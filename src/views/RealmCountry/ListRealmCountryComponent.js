@@ -133,8 +133,10 @@ class ListRealmCountryComponent extends Component {
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: 'realmCountryId',
-                    type: 'hidden',
+                    // title: 'realmCountryId',
+                    // type: 'hidden',
+                    title: 'A',
+                    visible:false,
                 },
                 {
                     title: i18n.t('static.realm.realm'),

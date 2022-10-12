@@ -472,8 +472,10 @@ class AddprogramPlanningUnit extends Component {
                                                                     width:120
                                                                 },
                                                                 {
-                                                                    title: 'Id',
-                                                                    type: 'hidden',
+                                                                    title: 'A',
+                                                                    visible:false,
+                                                                    // title: 'Id',
+                                                                    // type: 'hidden',
                                                                     readOnly: true
                                                                 },
                                                                 {
@@ -481,24 +483,34 @@ class AddprogramPlanningUnit extends Component {
                                                                     type: 'checkbox'
                                                                 },
                                                                 {
-                                                                    title: 'Changed Flag',
-                                                                    type: 'hidden'
+                                                                    // title: 'Changed Flag',
+                                                                    // type: 'hidden'
+                                                                    title: 'A',
+                                                                    visible:false,
                                                                 },
                                                                 {
-                                                                    title: 'ProgramId',
-                                                                    type: 'hidden'
+                                                                    // title: 'ProgramId',
+                                                                    // type: 'hidden'
+                                                                    title: 'A',
+                                                                    visible:false,
                                                                 },
                                                                 {
-                                                                    title: 'Min Mos',
-                                                                    type: 'hidden'
+                                                                    // title: 'Min Mos',
+                                                                    // type: 'hidden'
+                                                                    title: 'A',
+                                                                    visible:false,
                                                                 },
                                                                 {
-                                                                    title: 'Min Qty',
-                                                                    type: 'hidden'
+                                                                    // title: 'Min Qty',
+                                                                    // type: 'hidden'
+                                                                    title: 'A',
+                                                                    visible:false,
                                                                 },
                                                                 {
-                                                                    title: 'Distribution Lead Time',
-                                                                    type: 'hidden'
+                                                                    // title: 'Distribution Lead Time',
+                                                                    // type: 'hidden'
+                                                                    title: 'A',
+                                                                    visible:false,
                                                                 }
 
 

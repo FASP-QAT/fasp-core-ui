@@ -698,8 +698,10 @@ class ForecastMetrics extends Component {
           type: 'numeric', mask: '#,##'
         },
         {
-          title: i18n.t('static.report.error'),
-          type: 'hidden',
+          // title: i18n.t('static.report.error'),
+          // type: 'hidden',
+          title: 'A',
+          visible:false
         },
       ],
       editable: false,

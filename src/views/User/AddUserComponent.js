@@ -927,8 +927,9 @@ class AddUserComponent extends Component {
             columns: [
 
                 {
-                    title: i18n.t('static.username.username'),
-                    type: 'hidden',
+                    title: 'A', visible:false,
+                    // title: i18n.t('static.username.username'),
+                    // type: 'hidden',
                     readOnly: true
                 },
                 {

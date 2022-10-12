@@ -677,8 +677,10 @@ export default class DataSourceListComponent extends Component {
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: 'dataSourceId',
-                    type: 'hidden',
+                    title: 'A',
+                    visible:false,
+                    // title: 'dataSourceId',
+                    // type: 'hidden',
                     // readOnly: true
                 },
                 {
