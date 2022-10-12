@@ -361,7 +361,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                                     bd = bd[0];
                                                     var shipmentQtyWps = 0;
                                                     if (shipmentArr[j].shipmentStatus.id != PLANNED_SHIPMENT_STATUS) {
-                                                        shipmentQtyWps = batchListForShipments[b].shipmentQty;
+                                                        shipmentQtyWps = Math.round(Number(batchListForShipments[b].shipmentQty) * Number(shipmentArr[j].realmCountryPlanningUnit.multiplier));
                                                     }
                                                     var json = {
                                                         batchId: bd.batchId,
@@ -374,7 +374,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                                         consumption: 0,
                                                         adjustment: 0,
                                                         stock: 0,
-                                                        shipment: batchListForShipments[b].shipmentQty,
+                                                        shipment: Math.round(Number(batchListForShipments[b].shipmentQty) * Number(shipmentArr[j].realmCountryPlanningUnit.multiplier)),
                                                         shipmentWps: shipmentQtyWps,
                                                         expiredQty: 0,
                                                         expiredQtyWps: 0
@@ -383,9 +383,9 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                                 }
 
                                             } else {
-                                                myArray[index].shipment = Number(myArray[index].shipment) + Number(batchListForShipments[b].shipmentQty);
+                                                myArray[index].shipment = Number(myArray[index].shipment) + Math.round(Number(batchListForShipments[b].shipmentQty) * Number(shipmentArr[j].realmCountryPlanningUnit.multiplier));
                                                 if (shipmentArr[j].shipmentStatus.id != PLANNED_SHIPMENT_STATUS) {
-                                                    myArray[index].shipmentWps = Number(myArray[index].shipmentWps) + Number(batchListForShipments[b].shipmentQty);
+                                                    myArray[index].shipmentWps = Number(myArray[index].shipmentWps) + Math.round(Number(batchListForShipments[b].shipmentQty) * Number(shipmentArr[j].realmCountryPlanningUnit.multiplier));
                                                 }
                                             }
                                             var index = myArray.findIndex(c => c.batchNo == batchNo && moment(c.expiryDate).format("YYYY-MM") && moment(expiryDate).format("YYYY-MM"));
