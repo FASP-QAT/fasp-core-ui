@@ -601,7 +601,9 @@ class ShipmentGlobalView extends Component {
 
 
     getCountrys() {
-
+        this.setState({
+            loading: true
+        })
         // AuthenticationService.setupAxiosInterceptors();
         let realmId = AuthenticationService.getRealmId();//document.getElementById('realmId').value
         RealmCountryService.getRealmCountryForProgram(realmId)
@@ -614,8 +616,8 @@ class ShipmentGlobalView extends Component {
                 });
                 this.setState({
                     // countrys: response.data.map(ele => ele.realmCountry)
-                    countrys: listArray
-                }, () => { this.fetchData(); })
+                    countrys: listArray, loading: false
+                }, () => { this.getPrograms(); })
             }).catch(
                 error => {
                     this.setState({
@@ -663,7 +665,7 @@ class ShipmentGlobalView extends Component {
 
     }
     getPlanningUnit() {
-
+        this.setState({ loading: true })
         let productCategoryId = document.getElementById("productCategoryId").value;
         // AuthenticationService.setupAxiosInterceptors();
         var lang = this.state.lang
@@ -673,7 +675,7 @@ class ShipmentGlobalView extends Component {
                     return getLabelText(a.label, lang).localeCompare(getLabelText(b.label, lang)); //using String.prototype.localCompare()
                 });
                 this.setState({
-                    planningUnits: response.data,
+                    planningUnits: response.data, loading: false
                 }, () => {
                     this.fetchData()
                 });
@@ -791,11 +793,11 @@ class ShipmentGlobalView extends Component {
     componentDidMount() {
 
         this.getCountrys();
-        this.getPrograms();
-        this.getProductCategories();
-        // this.getProcurementAgent();
-        this.getFundingSource();
-        this.getProcurementAgentType();
+        // this.getPrograms();
+        // this.getProductCategories();
+        // // this.getProcurementAgent();
+        // this.getFundingSource();
+        // this.getProcurementAgentType();
         document.getElementById("procurementAgentDiv").style.display = "none";
         document.getElementById("procurementAgentTypeDiv").style.display = "none";
 
@@ -803,7 +805,9 @@ class ShipmentGlobalView extends Component {
     }
 
     getPrograms = () => {
-
+        this.setState({
+            loading: true
+        })
         ProgramService.getProgramList()
             .then(response => {
                 console.log(JSON.stringify(response.data))
@@ -813,9 +817,10 @@ class ShipmentGlobalView extends Component {
                     var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
                     return itemLabelA > itemLabelB ? 1 : -1;
                 });
-                this.getProcurementAgent(this.state.programValues);
                 this.setState({
                     programs: listArray, loading: false
+                }, () => {
+                    this.getProductCategories();
                 })
             }).catch(
                 error => {
@@ -942,7 +947,7 @@ class ShipmentGlobalView extends Component {
     }
 
     getProcurementAgent = (programIds) => {
-
+        this.setState({ loading: true })
         // AuthenticationService.setupAxiosInterceptors();
         ProcurementAgentService.getProcurementAgentListAll()
             .then(response => {
@@ -998,6 +1003,7 @@ class ShipmentGlobalView extends Component {
     }
 
     getProcurementAgentType = () => {
+        this.setState({ loading: true })
         ProcurementAgentService.getProcurementAgentTypeListAll()
             .then(response => {
                 let realmId = AuthenticationService.getRealmId();
@@ -1010,7 +1016,7 @@ class ShipmentGlobalView extends Component {
                 console.log("listArray", listArray)
                 this.setState({
                     procurementAgentTypes: listArray.filter(c => c.active == true && realmId == c.realm.id), loading: false,
-                })
+                }, () => { this.fetchData(); })
             }).catch(
                 error => {
                     this.setState({
@@ -1037,7 +1043,8 @@ class ShipmentGlobalView extends Component {
     }
 
     getFundingSource = () => {
-
+        console.log("==>>inside funding src")
+        this.setState({ loading: true })
         // AuthenticationService.setupAxiosInterceptors();
         FundingSourceService.getFundingSourceListAll()
             .then(response => {
@@ -1050,7 +1057,7 @@ class ShipmentGlobalView extends Component {
                 });
                 this.setState({
                     fundingSources: listArray, loading: false
-                })
+                }, () => { this.getProcurementAgentType(); })
             }).catch(
                 error => {
                     this.setState({
@@ -1120,6 +1127,9 @@ class ShipmentGlobalView extends Component {
     }
 
     getProductCategories() {
+        this.setState({
+            loading: true
+        })
         // AuthenticationService.setupAxiosInterceptors();
         let realmId = AuthenticationService.getRealmId();
         ProductService.getProductCategoryList(realmId)
@@ -1134,7 +1144,7 @@ class ShipmentGlobalView extends Component {
                 });
                 this.setState({
                     productCategories: list, loading: false
-                })
+                }, () => { this.getFundingSource(); })
             }).catch(
                 error => {
                     this.setState({
@@ -1201,7 +1211,6 @@ class ShipmentGlobalView extends Component {
         //         }
         //     }
         // );
-        this.getPlanningUnit();
     }
 
     toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
@@ -1241,7 +1250,7 @@ class ShipmentGlobalView extends Component {
     }
 
     fetchData = () => {
-
+        console.log("==>>inside fetch data")
         let viewby = document.getElementById("viewById").value;
         let realmId = AuthenticationService.getRealmId()
         let procurementAgentIds = this.state.procurementAgentValues.length == this.state.procurementAgents.length ? [] : this.state.procurementAgentValues.map(ele => (ele.value).toString());

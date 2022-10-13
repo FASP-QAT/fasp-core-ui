@@ -55,7 +55,7 @@ import ReportService from '../../api/ReportService';
 import ProgramService from '../../api/ProgramService';
 import 'chartjs-plugin-annotation';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import {MultiSelect} from "react-multi-select-component";
+import { MultiSelect } from "react-multi-select-component";
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 // const { getToggledOptions } = utils;
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
@@ -533,7 +533,7 @@ class GlobalConsumption extends Component {
       programLabels: programIds.map(ele => ele.label)
     }, () => {
 
-      this.filterData(this.state.rangeValue)
+      // this.filterData(this.state.rangeValue)
       this.getPlanningUnit();
     })
 
@@ -683,6 +683,7 @@ class GlobalConsumption extends Component {
   }
 
   getCountrys() {
+    this.setState({ loading: true })
     if (isSiteOnline()) {
 
       let realmId = AuthenticationService.getRealmId();
@@ -697,7 +698,8 @@ class GlobalConsumption extends Component {
           });
           this.setState({
             // countrys: response.data.map(ele => ele.realmCountry)
-            countrys: listArray
+            countrys: listArray,
+            loading: false
           })
         }).catch(
           error => {
@@ -803,7 +805,8 @@ class GlobalConsumption extends Component {
             return itemLabelA > itemLabelB ? 1 : -1;
           });
           this.setState({
-            countrys: proList
+            countrys: proList,
+            loading: false
           })
 
         }.bind(this);
@@ -815,6 +818,7 @@ class GlobalConsumption extends Component {
   }
 
   getPlanningUnit() {
+    this.setState({ loading: true })
     let programValues = this.state.programValues;
     // console.log("programValues----->", programValues);
     this.setState({
@@ -832,7 +836,10 @@ class GlobalConsumption extends Component {
               return itemLabelA > itemLabelB ? 1 : -1;
             });
             this.setState({
-              planningUnits: listArray,
+              planningUnits: listArray, loading: false
+            }, () => {
+              this.filterData(this.state.rangeValue)
+
             })
           }).catch(
             error => {
@@ -880,7 +887,7 @@ class GlobalConsumption extends Component {
   }
 
   getPrograms() {
-
+    this.setState({ loading: true })
     ProgramService.getProgramList()
       .then(response => {
         console.log(JSON.stringify(response.data))
@@ -892,6 +899,8 @@ class GlobalConsumption extends Component {
         });
         this.setState({
           programs: listArray, loading: false
+        }, () => {
+          this.getCountrys();
         })
       }).catch(
         error => {
@@ -964,19 +973,22 @@ class GlobalConsumption extends Component {
 
   componentDidMount() {
 
-    this.getPrograms()
-    this.getCountrys();
+    // this.getPrograms()
+    // this.getCountrys();
     this.getRelamList();
     // this.getProductCategories()
   }
 
   getRelamList = () => {
     // AuthenticationService.setupAxiosInterceptors();
+    this.setState({ loading: true })
     RealmService.getRealmListAll()
       .then(response => {
         if (response.status == 200) {
           this.setState({
             realmList: response.data, loading: false
+          }, () => {
+            this.getPrograms()
           })
         } else {
           this.setState({
