@@ -248,10 +248,10 @@ export default class TreeExtrapolationComponent extends React.Component {
         this.pickRange1 = React.createRef();
         var startDate = moment("2021-05-01").format("YYYY-MM-DD");
         var endDate = moment("2022-02-01").format("YYYY-MM-DD");
-        var startDate1 = moment(Date.now()).subtract(24, 'months').startOf('month').format("YYYY-MM-DD");
+        var startDate1 = moment(Date.now()).startOf('month').subtract(23, 'months').startOf('month').format("YYYY-MM-DD");
         var endDate1 = moment(Date.now()).startOf('month').format("YYYY-MM-DD");
         this.state = {
-            rangeValue1: { from: { year: Number(moment(startDate1).startOf('month').format("YYYY")), month: Number(moment(startDate1).startOf('month').format("M")) }, to: { year: Number(moment(endDate1).startOf('month').format("YYYY")), month: Number(moment(endDate1).startOf('month').format("M")) } },
+            rangeValue1: { from: { year: new Date(startDate1).getFullYear(), month: new Date(startDate1).getMonth() + 1 }, to: { year: new Date(endDate1).getFullYear(), month: new Date(endDate1).getMonth() + 1 } },
             seasonality: 0,
             dataChanged: false,
             buttonFalg: 1,
@@ -291,6 +291,7 @@ export default class TreeExtrapolationComponent extends React.Component {
             ],
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
+            maxDateForHistoricalData:{ year: new Date(endDate1).getFullYear(), month: new Date().getMonth() + 1 },
             rangeValue: { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() + 1 }, to: { year: new Date(endDate).getFullYear(), month: new Date(endDate).getMonth() + 1 } },
             movingAvgId: true,
             semiAvgId: true,
@@ -378,7 +379,7 @@ export default class TreeExtrapolationComponent extends React.Component {
 
     handleRangeDissmis1(value) {
         console.log("date range value---", value);
-        this.setState({ rangeValue1: value }, () => {
+        this.setState({ rangeValue1: value,dataChanged:true }, () => {
 
             this.getDateDifference();
 
@@ -1498,7 +1499,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                             }
 
                         }
-                        this.setState({ monthArray, rangeValue1 }, () => {
+                        this.setState({ monthArray }, () => {
                             this.getDateDifference();
                         });
                         // monthArray.push('2025-01-01');
@@ -3690,7 +3691,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                             />
                                                         </Picker> */}
                                                         <Picker
-                                                            years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                                            years={{ min: this.state.minDate, max: this.state.maxDateForHistoricalData }}
                                                             // ref={this.pickRange1}
                                                             ref={this.pickRange1}
                                                             value={rangeValue1}
