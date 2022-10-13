@@ -533,7 +533,7 @@ class GlobalConsumption extends Component {
       programLabels: programIds.map(ele => ele.label)
     }, () => {
 
-      this.filterData(this.state.rangeValue)
+      // this.filterData(this.state.rangeValue)
       this.getPlanningUnit();
     })
 
@@ -818,6 +818,7 @@ class GlobalConsumption extends Component {
   }
 
   getPlanningUnit() {
+    this.setState({ loading: true })
     let programValues = this.state.programValues;
     // console.log("programValues----->", programValues);
     this.setState({
@@ -835,7 +836,10 @@ class GlobalConsumption extends Component {
               return itemLabelA > itemLabelB ? 1 : -1;
             });
             this.setState({
-              planningUnits: listArray,
+              planningUnits: listArray, loading: false
+            }, () => {
+              this.filterData(this.state.rangeValue)
+
             })
           }).catch(
             error => {
