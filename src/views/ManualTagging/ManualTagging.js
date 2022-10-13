@@ -1741,20 +1741,33 @@ export default class ManualTagging extends Component {
         var validation = this.checkValidation();
 
         var tableJson = this.state.instance.getJson(null, false);
-        let count = 0, qty = 0;
+        let count = 0, qty = 0, qty1 = 0;
         for (var i = 0; i < tableJson.length; i++) {
             var map1 = new Map(Object.entries(tableJson[i]));
             if (this.state.active2) {
                 count++;
                 if (map1.get("0")) {
-                    qty = Number(qty) + Number(this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""));
+                    // qty = Number(qty) + Number(this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""));
                 }
             }
             else {
                 if (map1.get("0")) {
                     console.log("value---", Number(this.el.getValue(`M${parseInt(i) + 1}`, true).toString().replaceAll(",", "")));
-                    qty = Number(qty) + Number(this.el.getValue(`M${parseInt(i) + 1}`, true).toString().replaceAll(",", ""));
+                    // qty = Number(qty) + Number(this.el.getValue(`M${parseInt(i) + 1}`, true).toString().replaceAll(",", ""));
                     count++;
+                }
+            }
+
+            if (tableJson[i][0] && tableJson[i][14] == 0) {
+                var filterList = tableJson.filter((c) => c[17] == tableJson[i][17]);
+                var getUniqueOrderNoAndPrimeLineNoList = filterList.filter((v, i, a) => a.findIndex(t => (t[16].roNo === v[16].roNo && t[16].roPrimeLineNo === v[16].roPrimeLineNo && t[16].knShipmentNo === v[16].knShipmentNo && t[16].orderNo === v[16].orderNo && t[16].primeLineNo === v[16].primeLineNo)) === i);
+                console.log("getUniqueOrderNoAndPrimeLineNoList@@@@@@@@@@@@@@@", getUniqueOrderNoAndPrimeLineNoList)
+                for (var uq = 0; uq < getUniqueOrderNoAndPrimeLineNoList.length; uq++) {
+                    qty1 = 0;
+                    tableJson.filter(c => c[16].roNo == getUniqueOrderNoAndPrimeLineNoList[uq][16].roNo && c[16].roPrimeLineNo == getUniqueOrderNoAndPrimeLineNoList[uq][16].roPrimeLineNo && c[16].knShipmentNo == getUniqueOrderNoAndPrimeLineNoList[uq][16].knShipmentNo && c[16].orderNo == getUniqueOrderNoAndPrimeLineNoList[uq][16].orderNo && c[16].primeLineNo == getUniqueOrderNoAndPrimeLineNoList[uq][16].primeLineNo).map(item => {
+                        qty1 += Number(item[10]) * Number(this.state.instance.getValue(`L${parseInt(i) + 1}`, true).toString().replaceAll("\,", "")) * Number(this.state.instance.getValue(`S${parseInt(i) + 1}`, true).toString().replaceAll("\,", ""));
+                    })
+                    qty += Math.round(qty1);
                 }
             }
         }
