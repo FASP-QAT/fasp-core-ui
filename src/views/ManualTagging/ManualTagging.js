@@ -613,8 +613,8 @@ export default class ManualTagging extends Component {
             shipmentList = shipmentList.filter(c => (
                 // moment(c.expectedDeliveryDate).format("YYYY-MM-DD") < moment(Date.now()).subtract(6, 'months').format("YYYY-MM-DD") && 
                 // ([3, 4, 5, 6, 9]).includes(c.shipmentStatus.id.toString())) || (
-                    // moment(c.expectedDeliveryDate).format("YYYY-MM-DD") >= moment(Date.now()).subtract(6, 'months').format("YYYY-MM-DD") && 
-                    SHIPMENT_ID_ARR_MANUAL_TAGGING.includes(c.shipmentStatus.id.toString())));
+                // moment(c.expectedDeliveryDate).format("YYYY-MM-DD") >= moment(Date.now()).subtract(6, 'months').format("YYYY-MM-DD") && 
+                SHIPMENT_ID_ARR_MANUAL_TAGGING.includes(c.shipmentStatus.id.toString())));
             var listArray = shipmentList;
             listArray.sort((a, b) => {
                 var itemLabelA = a.shipmentId;
@@ -811,7 +811,7 @@ export default class ManualTagging extends Component {
     // -----------start of changed function
 
     changeTab2 = function (instance, cell, x, y, value) {
-        console.log("Y Mohit",y)
+        console.log("Y Mohit", y)
         if (!this.state.changedDataForTab2) {
             this.setState({
                 changedDataForTab2: true
@@ -1741,20 +1741,33 @@ export default class ManualTagging extends Component {
         var validation = this.checkValidation();
 
         var tableJson = this.state.instance.getJson(null, false);
-        let count = 0, qty = 0;
+        let count = 0, qty = 0, qty1 = 0;
         for (var i = 0; i < tableJson.length; i++) {
             var map1 = new Map(Object.entries(tableJson[i]));
             if (this.state.active2) {
                 count++;
                 if (map1.get("0")) {
-                    qty = Number(qty) + Number(this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""));
+                    // qty = Number(qty) + Number(this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""));
                 }
             }
             else {
                 if (map1.get("0")) {
                     console.log("value---", Number(this.el.getValue(`M${parseInt(i) + 1}`, true).toString().replaceAll(",", "")));
-                    qty = Number(qty) + Number(this.el.getValue(`M${parseInt(i) + 1}`, true).toString().replaceAll(",", ""));
+                    // qty = Number(qty) + Number(this.el.getValue(`M${parseInt(i) + 1}`, true).toString().replaceAll(",", ""));
                     count++;
+                }
+            }
+
+            if (tableJson[i][0] && tableJson[i][14] == 0) {
+                var filterList = tableJson.filter((c) => c[17] == tableJson[i][17]);
+                var getUniqueOrderNoAndPrimeLineNoList = filterList.filter((v, i, a) => a.findIndex(t => (t[16].roNo === v[16].roNo && t[16].roPrimeLineNo === v[16].roPrimeLineNo && t[16].knShipmentNo === v[16].knShipmentNo && t[16].orderNo === v[16].orderNo && t[16].primeLineNo === v[16].primeLineNo)) === i);
+                console.log("getUniqueOrderNoAndPrimeLineNoList@@@@@@@@@@@@@@@", getUniqueOrderNoAndPrimeLineNoList)
+                for (var uq = 0; uq < getUniqueOrderNoAndPrimeLineNoList.length; uq++) {
+                    qty1 = 0;
+                    tableJson.filter(c => c[16].roNo == getUniqueOrderNoAndPrimeLineNoList[uq][16].roNo && c[16].roPrimeLineNo == getUniqueOrderNoAndPrimeLineNoList[uq][16].roPrimeLineNo && c[16].knShipmentNo == getUniqueOrderNoAndPrimeLineNoList[uq][16].knShipmentNo && c[16].orderNo == getUniqueOrderNoAndPrimeLineNoList[uq][16].orderNo && c[16].primeLineNo == getUniqueOrderNoAndPrimeLineNoList[uq][16].primeLineNo).map(item => {
+                        qty1 += Number(item[10]) * Number(this.state.instance.getValue(`L${parseInt(i) + 1}`, true).toString().replaceAll("\,", "")) * Number(this.state.instance.getValue(`S${parseInt(i) + 1}`, true).toString().replaceAll("\,", ""));
+                    })
+                    qty += Math.round(qty1);
                 }
             }
         }
@@ -1916,7 +1929,7 @@ export default class ManualTagging extends Component {
                         for (var mdf = 0; mdf < modifiedDataFilter.length; mdf++) {
                             console.log("@@@@@@@@@@@@@@@@=====================>Mdf", modifiedDataFilter[mdf]);
                             if (modifiedDataFilter[mdf][0] == true && modifiedDataFilter[mdf][23] == 1 && modifiedDataFilter[mdf][17].planningUnit.id == planningUnitId) {
-                                console.log("@@@@@@@@@@@@@@@@=====================>in if",modifiedDataFilter[mdf][17]);
+                                console.log("@@@@@@@@@@@@@@@@=====================>in if", modifiedDataFilter[mdf][17]);
                                 var linkedShipmentsListIndex = linkedShipmentsList.findIndex(c => (modifiedDataFilter[mdf][17].shipmentId > 0 ? modifiedDataFilter[mdf][17].shipmentId == c.childShipmentId : modifiedDataFilter[mdf][17].tempShipmentId == c.tempChildShipmentId) && c.active.toString() == "true");
                                 var linkedShipmentsListFilter = linkedShipmentsList.filter(c => (modifiedDataFilter[mdf][17].shipmentId > 0 ? modifiedDataFilter[mdf][17].shipmentId == c.childShipmentId : modifiedDataFilter[mdf][17].tempShipmentId == c.tempChildShipmentId) && c.active.toString() == "true");
                                 linkedShipmentsList[linkedShipmentsListIndex].conversionFactor = 1;
@@ -1925,9 +1938,9 @@ export default class ManualTagging extends Component {
                                 linkedShipmentsList[linkedShipmentsListIndex].lastModifiedDate = curDate;
                                 var shipmentIndex = shipmentList.findIndex(c => modifiedDataFilter[mdf][17].shipmentId > 0 ? c.shipmentId == modifiedDataFilter[mdf][17].shipmentId : c.tempShipmentId == modifiedDataFilter[mdf][17].tempShipmentId);
                                 var rcpu = this.state.realmCountryPlanningUnitList.filter(c => c.id == this.state.languageEl.getValueFromCoords(8, mdf))[0];
-                                console.log("ARU Mohit",this.state.languageEl.getValueFromCoords(8, mdf))
-                                console.log("RCPU Mohit",rcpu)
-                                console.log("shipmentIndex Mohit",shipmentIndex)
+                                console.log("ARU Mohit", this.state.languageEl.getValueFromCoords(8, mdf))
+                                console.log("RCPU Mohit", rcpu)
+                                console.log("shipmentIndex Mohit", shipmentIndex)
                                 shipmentList[shipmentIndex].notes = this.state.languageEl.getValue(`N${parseInt(mdf) + 1}`, true);
                                 shipmentList[shipmentIndex].shipmentQty = Math.round(Number(Number(this.state.languageEl.getValue(`AG${parseInt(mdf) + 1}`, true).toString().replaceAll("\,", "")) * Number(this.state.languageEl.getValue(`K${parseInt(mdf) + 1}`, true).toString().replaceAll("\,", ""))));
                                 shipmentList[shipmentIndex].shipmentRcpuQty = Math.round(Number(this.state.languageEl.getValue(`AG${parseInt(mdf) + 1}`, true).toString().replaceAll("\,", "")));
@@ -2992,8 +3005,8 @@ export default class ManualTagging extends Component {
                         shipmentList = shipmentList.filter(c => (
                             // moment(c.expectedDeliveryDate).format("YYYY-MM-DD") < moment(Date.now()).subtract(6, 'months').format("YYYY-MM-DD") && 
                             // ([3, 4, 5, 6, 9]).includes(c.shipmentStatus.id.toString())) || (
-                                // moment(c.expectedDeliveryDate).format("YYYY-MM-DD") >= moment(Date.now()).subtract(6, 'months').format("YYYY-MM-DD") && 
-                                SHIPMENT_ID_ARR_MANUAL_TAGGING.includes(c.shipmentStatus.id.toString())));
+                            // moment(c.expectedDeliveryDate).format("YYYY-MM-DD") >= moment(Date.now()).subtract(6, 'months').format("YYYY-MM-DD") && 
+                            SHIPMENT_ID_ARR_MANUAL_TAGGING.includes(c.shipmentStatus.id.toString())));
                     } else if (this.state.active2) {
                         shipmentList = shipmentList.filter(c => c.erpFlag.toString() == "true" && c.active.toString() == "true" && c.accountFlag.toString() == "true" && c.procurementAgent.id == PSM_PROCUREMENT_AGENT_ID);
                         console.log("ShipmentList@@@@@@@@@@@@@@@", shipmentList);
