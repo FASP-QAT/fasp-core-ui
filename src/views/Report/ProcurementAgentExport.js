@@ -93,6 +93,7 @@ class ProcurementAgentExport extends Component {
     }
 
     getPrograms = () => {
+        this.setState({ loading: true })
         if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors();
             ProgramService.getProgramList()
@@ -252,6 +253,7 @@ class ProcurementAgentExport extends Component {
 
     getProcurementAgent = () => {
         let programId = document.getElementById("programId").value;
+        this.setState({ loading: true })
 
         if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors();
@@ -612,6 +614,7 @@ class ProcurementAgentExport extends Component {
                 else {
                     // AuthenticationService.setupAxiosInterceptors();
 
+                    this.setState({ loading: true })
                     //let productCategoryId = document.getElementById("productCategoryId").value;
                     ProgramService.getActiveProgramPlaningUnitListByProgramId(programId).then(response => {
                         // console.log('**' + JSON.stringify(response.data))
@@ -622,7 +625,7 @@ class ProcurementAgentExport extends Component {
                             return itemLabelA > itemLabelB ? 1 : -1;
                         });
                         this.setState({
-                            planningUnits: listArray, message: ''
+                            planningUnits: listArray, message: '', loading: false
                         }, () => {
                             this.fetchData();
                         })
@@ -630,6 +633,7 @@ class ProcurementAgentExport extends Component {
                         error => {
                             this.setState({
                                 planningUnits: [],
+                                loading: false
                             })
                             if (error.message === "Network Error") {
                                 this.setState({
@@ -1391,11 +1395,13 @@ class ProcurementAgentExport extends Component {
                     }
                     console.log("inputjson-------", inputjson);
                     // AuthenticationService.setupAxiosInterceptors();
+                    this.setState({ loading: true })
+
                     ReportService.procurementAgentExporttList(inputjson)
                         .then(response => {
                             console.log("Online Data------", response.data);
                             this.setState({
-                                data: response.data
+                                data: response.data, loading: false
                             }, () => {
                                 // this.consolidatedProgramList();
                                 // this.consolidatedProcurementAgentList();
@@ -1719,12 +1725,14 @@ class ProcurementAgentExport extends Component {
                         planningUnitIds: planningUnitIds,
                         includePlannedShipments: includePlannedShipments,
                     }
+                    this.setState({ loading: true })
+
                     // AuthenticationService.setupAxiosInterceptors();
                     ReportService.fundingSourceExportList(inputjson)
                         .then(response => {
                             // console.log(JSON.stringify(response.data))
                             this.setState({
-                                data: response.data
+                                data: response.data, loading: false
                             }, () => {
                                 // this.consolidatedProgramList();
                                 this.consolidatedFundingSourceList();
@@ -2030,12 +2038,14 @@ class ProcurementAgentExport extends Component {
                         planningUnitIds: planningUnitIds,
                         includePlannedShipments: includePlannedShipments,
                     }
+                    this.setState({ loading: true })
+
                     // AuthenticationService.setupAxiosInterceptors();
                     ReportService.AggregateShipmentByProduct(inputjson)
                         .then(response => {
                             console.log("Online Data------", response.data);
                             this.setState({
-                                data: response.data
+                                data: response.data, loading: false
                             }, () => {
                                 // this.consolidatedProgramList();
                                 this.buildJExcel();
@@ -2253,6 +2263,7 @@ class ProcurementAgentExport extends Component {
     }
 
     getFundingSource = () => {
+        this.setState({ loading: true })
         if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors();
             FundingSourceService.getFundingSourceListAll()
@@ -2733,7 +2744,7 @@ class ProcurementAgentExport extends Component {
                                     </div>
                                 </FormGroup>
 
-                                <FormGroup className="col-md-3">
+                                <FormGroup className="col-md-3" style={{ zIndex: '1' }}>
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.program.isincludeplannedshipment')}</Label>
                                     <div className="controls ">
                                         <InputGroup>
@@ -2752,7 +2763,7 @@ class ProcurementAgentExport extends Component {
                                     </div>
                                 </FormGroup>
 
-                                <FormGroup className="col-md-3">
+                                <FormGroup className="col-md-3" style={{ zIndex: '1' }}>
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.common.display')}</Label>
                                     <div className="controls ">
                                         <InputGroup>
@@ -2774,7 +2785,7 @@ class ProcurementAgentExport extends Component {
                                     </div>
                                 </FormGroup>
 
-                                <FormGroup className="col-md-3" id="procurementAgentDiv">
+                                <FormGroup className="col-md-3" id="procurementAgentDiv" style={{ zIndex: '1' }}>
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.procurementagent.procurementagent')}</Label>
                                     <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                                     <div className="controls">
@@ -2793,7 +2804,7 @@ class ProcurementAgentExport extends Component {
 
                                     </div>
                                 </FormGroup>
-                                <FormGroup className="col-md-3" id="fundingSourceDiv">
+                                <FormGroup className="col-md-3" id="fundingSourceDiv" style={{ zIndex: '1' }}>
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.budget.fundingsource')}</Label>
                                     <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                                     <div className="controls">
