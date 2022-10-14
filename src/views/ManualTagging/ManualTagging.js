@@ -3996,10 +3996,10 @@ export default class ManualTagging extends Component {
                     paginationOptions: JEXCEL_PAGINATION_OPTION,
                     position: 'top',
                     filters: true,
-                    license: JEXCEL_PRO_KEY
-                    // contextMenu: function (obj, x, y, e) {
-                    //     return false;
-                    // }.bind(this),
+                    license: JEXCEL_PRO_KEY,
+                    contextMenu: function (obj, x, y, e) {
+                        return false;
+                    }.bind(this),
                 };
             }
 
