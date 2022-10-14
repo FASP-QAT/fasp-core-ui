@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<meta name="">
+	<title>Aide</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<style>
+		table, td, div, h1, p {font-family: Arial, sans-serif;line-height: 20px;}
+		body{padding: 0;margin: 0;color: #272127;}
+	
+/* .table1 td, th {
+  border: 1px solid #c8ced3;
+  text-align: left;
+  padding: 8px;
+  border-collapse: collapse!important;
+  width: 100%;
+}*/
+.table1 td {
+  border: 1px solid #c8ced3!important;
+  padding: 6px;
+  font-size: 13px;
+}
+.table1 th {
+  border: 1px solid #c8ced3!important;
+  padding: 6px;
+  font-size: 13px;
+}
+.table1 {
+  /* width: 100%; */
+  border-collapse: collapse;
+}
+a {
+    color: #205493;
+    /* text-decoration: none; */
+    background-color: transparent;
+}
+	</style>
+</head>
+<body style="margin:0;padding:0;background:#e4e5e6;">
+	<table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+		<tr>
+			<td align="center" style="padding:0;">
+				<table role="presentation" style="max-width: 910px;min-width:100%;margin-top:20px;margin-bottom:20px;border-collapse:collapse;border:1px solid #fff;border-spacing:0;text-align:left;border-radius: 0.25rem;background-color: #fff;">
+					<tr>
+						<td style="padding:10px 30px 20px 30px;">
+							<table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+								<tr>
+									
+									<td style="padding:0 0 10px 0;color:#153643;">
+										<h3 style="color: #002f6c;font-weight: 600;font-size: 19px;">Ajouter/Modifier un nœud - Modélisation/Transfert
+										</h3>
+										<p>
+											<p style="font-size: 13px;">
+												<span style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold;">But :</span>Si un nœud change au fil du temps, un utilisateur peut utiliser 
+												l'onglet Modélisation/Transfert pour modéliser la croissance/la baisse au sein d'un 
+												nœud unique ou un transfert d'un nœud à un autre. Notez que cette fonctionnalité n'est 
+												disponible que pour les nœuds de nombre (#) et les nœuds de pourcentage (%) (les 
+												nœuds des unités de prévision et  unités de planification y compris).
+											</p>
+										</p>
+										<p><p style="font-size: 13px;">
+											<span style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold;">Utilisation de cet onglet :</span><br>La modélisation et le transfert 
+											peuvent avoir quatre types différents  de modélisation.: </p>
+										</p>
+
+										<p>
+											<div class="pl-lg-4 pr-lg-4 table1">
+												<table  style="border-collapse: collapse;">
+													<thead>
+														<tr>
+															<th style="width: 130px;">Type de modélisation</th>
+															<th># Calcul de nœud</th>
+															<th>% Calcul de nœud</th>
+														</tr>
+													</thead>
+													<tbody>
+														<tr>
+															<td>Linéaire (#)</td>
+															<td>+/- un nombre fixe chaque mois</td>
+															<td>N / A</td>
+														</tr>
+														<tr>
+															<td>Linéaire (%)</td>
+															<td>+/- un pourcentage statique chaque mois, calculé en fonction du mois de départ</td>
+															<td>N / A</td>
+														</tr>
+														<tr>
+															<td>Exponentiel (%)</td>
+															<td>+/- un pourcentage chaque mois, calculé sur le mois précédent comme un pourcentage glissant</td>
+															<td>N / A</td>
+														</tr>
+														<tr>
+															<td>Linéaire (% point)</td>
+															<td>N / A</td>
+															<td>+/- un pourcentage statique chaque mois (par exemple, si le mois de départ est de 30 % et que la variation est de +1 % chaque mois, le mois suivant est de 31 %, le suivant est de 32 %, ainsi de suite)</td>
+														</tr>
+													</tbody>
+												</table>
+											</div>
+										</p>
+										
+										<p style="font-size: 13px"><b><i class="fa fa-calculator" aria-hidden="true"></i></b> QAT dispose d'un outil de calcul de modélisation pour les utilisateurs s'ils ont besoin d'aide pour calculer la variation d'un mois à l'autre dans le temps en fonction d'une date cible et d'un
+											pourcentage de fin ou d'une variation totale en pourcentage dans le temps. Le calculateur de modélisation n'est disponible que pour un nœud # et un nœud %.<br>Additionally, by clicking on “Show Monthly Data,” users can see how their modelling and
+											transfer inputs have affected the monthly data in both a graphical and tabular form. In the tabular data, users may add a manual change for a specific month or input a seasonality index percentage (only available for # nodes), as needed. If a user
+											checks “Manual Change affects future month,” the manual amount added to the end of the month will carry over to the beginning of the next month. If neither of these fields are relevant, users can uncheck “Show (seasonality &amp;) manual change” to
+											hide these columns.</p>
+
+											<p><span style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold; font-size: 13px;">Règles pour les nœuds de transfert:</span>
+												<ul style="font-size: 13px">
+													<li>Le nœud numérique ne peut être transféré qu'à un autre noeud numérique, et ils doivent être au même niveau</li>
+													<li>Percentage nodes can only transfer to other percentage nodes and must belong to the same parent. </li>
+													<li>The order of operations for calculating a transfer occurs from the left to the right in the forecast tree. A transfer cannot be made from right to left, thus a user should be careful when designing their tree and determining where each node should
+														be placed. </li>
+													<li>Transfers are always negative from the source node and positive to the destination node. </li>
+													<li>Extrapolation is not allowed on a node that also has a transfer, whether that be to/from another node. </li>
+												</ul>
+											</p>
+										
+											<p><span style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold; font-size: 13px;">Exemples :</span>
+												<ul style="font-size: 13px;">
+													<li><b>Croissance simple</b> (# linéaire) - l'exemple ci-dessous montre une croissance de la population chaque mois de 500/mois de janvier 2022 à décembre 2024.<br><span><img  src="../ShowGuidanceFiles/img/ModelingTransferScreenshot1.jpg" style="border: 1px solid rgb(255, 255, 255);margin: 10px 0px 20px 0px;
+														padding: 10px;border-radius: 5px;max-width:100%;height: auto;"></span></li>
+													<li><b>Perte simple</b> (# linéaire) - l'exemple ci-dessous montre l'attrition chaque mois de 100/mois de janvier 2022 à décembre 2024. QAT utilise un nombre négatif pour indiquer une diminution ou une perte.<br><span><img  src="../ShowGuidanceFiles/img/ModelingTransferScreenshot2.jpg" style="border: 1px solid rgb(255, 255, 255);margin: 10px 0px 20px 0px;
+														padding: 10px;border-radius: 5px;max-width:100%;height: auto;"></span></li>
+													<li><b>Croissance simple</b> (% linéaire) - l'exemple ci-dessous montre une croissance démographique régulière de 2 % chaque mois de janvier 2022 à décembre 2024. QAT a calculé que ce changement augmente la population de 108,64 chaque mois.<br><span><img src="../ShowGuidanceFiles/img/ModelingTransferScreenshot3.jpg" style="border: 1px solid rgb(255, 255, 255);margin: 10px 0px 20px 0px;
+														padding: 10px;border-radius: 5px;max-width:100%;height: auto;"></span></li>
+													<li><b>Croissance simple</b> (exponentielle %) - l'exemple ci-dessous montre une croissance démographique de 1 % chaque mois de janvier 2022 à décembre 2024. Parce que la croissance est exponentielle, le changement diffère chaque mois.<span><img style="border: 1px solid rgb(255, 255, 255);margin: 10px 0px 20px 0px;
+														padding: 10px;border-radius: 5px;max-width:100%;height: auto;" src="../ShowGuidanceFiles/img/ModelingTransferScreenshot4.jpg" ></span>
+														<ul>
+															<li>QAT calcule cette variation à 54,32 en janvier-22 </li>
+															<li>QAT calcule cette variation à 54,86 en février-22 et </li>
+															<li>QAT calcule ce changement à 55,41 en mars 22 </li>
+														</ul>
+													</li><br>
+													<li><p><b>Perte pluriannuelle</b> - l'exemple ci-dessous montre un taux d'attrition (perte) différent chaque année. L'année 1 (janvier 2022 à décembre 2022) diminue la population de 1 % ou 54,32 chaque mois, l'année 2 (janvier 2023 à décembre 2023) diminue
+														la population de 2 % ou 95,6 chaque mois, etc. QAT utilise un nombre négatif pour désigner un diminution ou perte.</p><span><img  src="../ShowGuidanceFiles/img/ModelingTransferScreenshot5.jpg" style="border: 1px solid rgb(255, 255, 255);margin: 10px 0px 20px 0px;
+															padding: 10px;border-radius: 5px;max-width:100%;height: auto;"></span></li>
+													<li><p><b>Transfert</b> - l'exemple ci-dessous montre un transfert de 250 patients chaque mois pendant un an, de janvier 2022 à décembre 2022, du nœud actuel (Adultes 1ère ligne) vers un autre nœud (Adultes 2e ligne). Ce transfert apparaîtra également
+														sur l'autre nœud (Adultes 2e ligne) grisé pour signifier un changement non modifiable.</p><span><img  src="../ShowGuidanceFiles/img/ModelingTransferScreenshot6.jpg" style="border: 1px solid rgb(255, 255, 255);margin: 10px 0px 20px 0px;
+															padding: 10px;border-radius: 5px;max-width:100%;height: auto;"></span></li>
+												</ul>
+											</p>
+
+									</li>
+								</ol>
+							</p>
+				</td>
+				</tr>
+				
+		
+							</table>
+						</td>
+					</tr>
+					
+				</table>
+			</td>
+		</tr>
+	</table>
+</body>
+</html>
