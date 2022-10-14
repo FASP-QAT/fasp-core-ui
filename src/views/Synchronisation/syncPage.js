@@ -5194,7 +5194,7 @@ export default class syncPage extends Component {
                   // && oldProgramDataProblemList[c].newAdded != true
                   && f.shipmentId == oldProgramDataProblemList[c].shipmentId &&
                   !existingProblemReportId.includes(f.problemReportId));
-            } else if (oldProgramDataProblemList[c].realmProblem.problem.problemId == 23 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 24) {
+            } else if (oldProgramDataProblemList[c].realmProblem.problem.problemId == 23 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 24 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 29) {
               index = latestProgramDataProblemList.findIndex(
                 f =>
                   f.planningUnit.id == oldProgramDataProblemList[c].planningUnit.id
