@@ -1476,7 +1476,20 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           datasetData = (CryptoJS.AES.encrypt(JSON.stringify(datasetJson), SECRET_KEY)).toString()
           myResult.programData = datasetData;
           var putRequest = datasetTransaction.put(myResult);
-
+          // putRequest.oncomplete = function (event) {
+          //   console.log("in side datasetDetails")
+          //   db1 = e.target.result;
+          //   var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
+          //   var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
+          //   var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.datasetId);
+          //   datasetDetailsRequest.onsuccess = function (e) {         
+          //     var datasetDetailsRequestJson = datasetDetailsRequest.result;
+          //     datasetDetailsRequestJson.changed = 1;
+          //     var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+          //     datasetDetailsRequest1.onsuccess = function (event) {
+                   
+          //         }}
+          // }      
           putRequest.onerror = function (event) {
           }.bind(this);
           putRequest.onsuccess = function (event) {
@@ -1485,7 +1498,18 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             //this.el.destroy();
             //this.el = jexcel(document.getElementById("smallTableDiv"), '');
             //this.el.destroy();
-
+            console.log("in side datasetDetails")
+            db1 = e.target.result;
+            var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
+            var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
+            var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.datasetId);
+            datasetDetailsRequest.onsuccess = function (e) {         
+              var datasetDetailsRequestJson = datasetDetailsRequest.result;
+              datasetDetailsRequestJson.changed = 1;
+              var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+              datasetDetailsRequest1.onsuccess = function (event) {
+                   
+                  }}
 
             this.setState({
               // dataEl: "",
