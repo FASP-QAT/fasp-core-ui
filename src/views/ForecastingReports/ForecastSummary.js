@@ -41,7 +41,10 @@ import ProcurementSurplusGap from '../../assets/img/ProcurementSurplusGap.png';
 import ProductCost from '../../assets/img/ProductCost.png';
 import ProjectStockatForecastend from '../../assets/img/ProjectStockatForecastend.png';
 import TotalCost from '../../assets/img/TotalCost.png';
-
+import showguidanceforForecastSummaryEn from '../../../src/ShowGuidanceFiles/ForecastSummaryEn.html'
+import showguidanceforForecastSummaryFr from '../../../src/ShowGuidanceFiles/ForecastSummaryFr.html'
+import showguidanceforForecastSummaryPr from '../../../src/ShowGuidanceFiles/ForecastSummaryPr.html'
+import showguidanceforForecastSummarySp from '../../../src/ShowGuidanceFiles/ForecastSummarySp.html'
 
 
 const ref = React.createRef();
@@ -3583,8 +3586,16 @@ class ForecastSummary extends Component {
                         <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
                     </ModalHeader>
                     <div>
-                        <ModalBody>
-                            <div>
+                    <ModalBody>
+                        <div dangerouslySetInnerHTML={ {__html:localStorage.getItem('lang') == 'en' ?
+                showguidanceforForecastSummaryEn :
+                localStorage.getItem('lang') == 'fr' ?
+                showguidanceforForecastSummaryFr :
+                  localStorage.getItem('lang') == 'sp' ?
+                  showguidanceforForecastSummarySp :
+                  showguidanceforForecastSummaryPr
+              } } />
+                            {/* <div>
                                 <h3 className='ShowGuidanceHeading'>{i18n.t('static.ForecastSummary.ForecastSummary')}</h3>
                             </div>
                             <p>
@@ -3623,9 +3634,7 @@ class ForecastSummary extends Component {
                                     <li><img className="formula-img-mr-showGuidance" src={ProjectStockatForecastend} /><br></br></li>
                                     <li><img style={{ border: '1px solid #fff', padding: '10px', borderRadius: '5px' }} src={DesiredStockatForecasend} /><br></br></li>
                                     <li><img className="formula-img-mr-showGuidance" src={ProcurementSurplusGap} /><br></br></li>
-                                    {/* <li>Project Stock at Forecast end = (Starting Stock) + (Existing Shipments) - (Forecasted Quantity) </li>
-            <li>Desired Stock at Forecast end = (Forecasted Quantity) / (Forecast Period) * (Desired Months of Stock) </li>
-            <li>Procurement Surplus/Gap = (Projected Stock at Forecast end) - (Desired Stock at Forecast end) </li> */}
+                                  
                                 </ul>
                             </p>
                             <p>
@@ -3665,9 +3674,7 @@ class ForecastSummary extends Component {
                                     <li><img className="formula-img-mr-showGuidance1 img-fluid" src={ProductCost} /><br></br></li>
                                     <li><img className="formula-img-mr-showGuidance1 img-fluid" src={FreightCost} /><br></br></li>
                                     <li><img className="formula-img-mr-showGuidance1 img-fluid" src={TotalCost} /><br></br></li>
-                                    {/* <li>Product Cost = Procurement Gap * Unit Cost </li>
-            <li>Freight Cost = Product Cost * Freight Percentage </li>
-            <li>Total Cost = Product Cost + Freight Cost </li> */}
+                                 
                                 </ul>
                             </p>
                             <p>
@@ -3677,7 +3684,7 @@ class ForecastSummary extends Component {
                                     <li>{i18n.t('static.ForecastSummary.FreightCost')} = $38,500 * 7% = $2,695</li>
                                     <li>{i18n.t('static.ForecastSummary.TotalCost')} = $38,500 + $2,695 = $41,195</li>
                                 </ul>
-                            </p>
+                            </p> */}
 
                         </ModalBody>
                     </div>

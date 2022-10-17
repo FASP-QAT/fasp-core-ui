@@ -25,6 +25,10 @@ import { JEXCEL_INTEGER_REGEX } from '../../Constants.js'
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 import { calculateError } from "../Extrapolation/ErrorCalculations";
 import AuthenticationService from '../Common/AuthenticationService.js';
+import showguidanceTreeExtrapolationEn from '../../../src/ShowGuidanceFiles/BuildTreeExtrapolationNodeEn.html'
+import showguidanceTreeExtrapolationFr from '../../../src/ShowGuidanceFiles/BuildTreeExtrapolationNodeFr.html'
+import showguidanceTreeExtrapolationSp from '../../../src/ShowGuidanceFiles/BuildTreeExtrapolationNodeSp.html'
+import showguidanceTreeExtrapolationPr from '../../../src/ShowGuidanceFiles/BuildTreeExtrapolationNodePr.html'
 
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -4207,8 +4211,16 @@ export default class TreeExtrapolationComponent extends React.Component {
                         <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
                     </ModalHeader>
                     <div>
-                        <ModalBody>
-                            <div>
+                    <ModalBody className="ModalBodyPadding">
+                        <div dangerouslySetInnerHTML={ {__html:localStorage.getItem('lang') == 'en' ?
+                showguidanceTreeExtrapolationEn :
+                localStorage.getItem('lang') == 'fr' ?
+                showguidanceTreeExtrapolationFr :
+                  localStorage.getItem('lang') == 'sp' ?
+                  showguidanceTreeExtrapolationSp :
+                  showguidanceTreeExtrapolationPr
+              } } />
+                            {/* <div>
                                 <h3 className='ShowGuidanceHeading'>{i18n.t('static.extrapolation.ExtrapolationNode')}</h3>
                             </div>
                             <p>
@@ -4235,14 +4247,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                         </li>
                                     </ol>
                                 </p>
-                            </p>
-                            <p>
-                                {/* <b>NOTE:  The minimum values needed to get correct graphs and reports for the various features are below: <br></br>
-                                    <span className="ml-lg-5">* TES, Holt-Winters:  Needs at least 24 months of actual consumption data<br></br></span>
-                                    <span className="ml-lg-5">* ARIMA:  Needs at least 14 months of actual consumption data<br></br></span>
-                                    <span className="ml-lg-5">* Moving Average, Semi-Averages, and Linear Regression:  Needs at least 3 months of actual consumption data</span>
-                                </b> */}
-                            </p>
+                            </p> */}
                         </ModalBody>
                     </div>
                 </Modal>
