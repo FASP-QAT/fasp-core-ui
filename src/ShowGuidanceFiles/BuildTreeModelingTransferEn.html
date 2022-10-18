@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<meta name="">
+	<title>Show Guidance</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<style>
+		table, td, div, h1, p {font-family: Arial, sans-serif;line-height: 20px;}
+		body{padding: 0;margin: 0;color: #272127;}
+	
+/* .table1 td, th {
+  border: 1px solid #c8ced3;
+  text-align: left;
+  padding: 8px;
+  border-collapse: collapse!important;
+  width: 100%;
+}*/
+.table1 td {
+  border: 1px solid #c8ced3!important;
+  padding: 6px;
+  font-size: 13px;
+}
+.table1 th {
+  border: 1px solid #c8ced3!important;
+  padding: 6px;
+  font-size: 13px;
+}
+.table1 {
+  /* width: 100%; */
+  border-collapse: collapse;
+}
+a {
+    color: #205493;
+    /* text-decoration: none; */
+    background-color: transparent;
+}
+	</style>
+</head>
+<body style="margin:0;padding:0;background:#e4e5e6;">
+	<table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+		<tr>
+			<td align="center" style="padding:0;">
+				<table role="presentation" style="max-width: 910px;min-width:100%;margin-top:20px;margin-bottom:20px;border-collapse:collapse;border:1px solid #fff;border-spacing:0;text-align:left;border-radius: 0.25rem;background-color: #fff;">
+					<tr>
+						<td style="padding:10px 30px 20px 30px;">
+							<table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+								<tr>
+									
+									<td style="padding:0 0 10px 0;color:#153643;">
+										<h3 style="color: #002f6c;font-weight: 600;font-size: 19px;">Add/Edit Node - Modeling/Transfer
+										</h3>
+										<p>
+											<p style="font-size: 13px;">
+												<span style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold;">Purpose :</span>If a node changes over time, a user 
+												can utilize the Modeling/Transfer tab to model growth/loss within a single node or a transfer 
+												from one node to another. Note that this functionality is only available for Number (#) Nodes 
+												and Percentage (%) Nodes (including Forecasting Units and Planning Units). 
+											</p>
+										</p>
+										<p>
+											<p style="font-size: 13px;">
+												<span  style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold;">Using this tab :</span><br>Modeling and transfer can have 
+												four different modeling types: 
+											</p>
+										</p>
+
+										<p>
+											<div class="pl-lg-4 pr-lg-4 table1">
+												<table  style="border-collapse: collapse;">
+													<thead>
+														<tr>
+															<th style="width: 130px;">Modeling Type</th>
+															<th># Node Calculation</th>
+															<th>% Node Calculation</th>
+														</tr>
+													</thead>
+													<tbody>
+														<tr>
+															<td>Linear (#)</td>
+															<td>+/- a static number each month</td>
+															<td>N/A</td>
+														</tr>
+														<tr>
+															<td>Linear (%)</td>
+															<td>+/- a static percentage each month, calculated based on the starting month</td>
+															<td>N/A</td>
+														</tr>
+														<tr>
+															<td>Exponential (%)</td>
+															<td>+/- a percentage each month, calculated on the previous month as a rolling percentage</td>
+															<td>N/A</td>
+														</tr>
+														<tr>
+															<td>Linear (% point)</td>
+															<td>N/A</td>
+															<td>+/- a static percentage each month (e.g. if the starting month is 30% and the change is +1% each month, next month is 
+																31%, the next is 32%, and so on)</td>
+															</tr>
+														</tbody>
+													</table>
+												</div>
+											</p>
+											<p style="font-size: 13px;">
+												<b><i class="fa fa-calculator" aria-hidden="true"></i></b> QAT has a modeling calculator tool for users should 
+												they need assistance in calculating the month-on-month change over time based on an ending 
+												target date &amp; percentage or total percentage change over time. The modelling 
+												calculator is only available for a # node and a % node.<br>Additionally, by clicking on 
+												"Show Monthly Data," users can see how their modelling and transfer inputs have 
+												affected the monthly data in both a graphical and tabular form. In the tabular data, 
+												users may add a manual change for a specific month or input a seasonality index 
+												percentage (only available for # nodes), as needed. If a user checks
+												 "Manual Change affects future month," the manual amount added to the end of 
+												 the month will carry over to the beginning of the next month. If neither of
+												  these fields are relevant, users can uncheck "Show (seasonality &amp;) manual change" to hide 
+												  these columns.
+											</p>
+											<p style="font-size: 13px;">
+												<span style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold; font-size: 13px;" >Rules for Transfer Nodes:
+												</span>
+												<ul style="font-size: 13px;">
+													<li>Number nodes can only transfer to other number nodes and must 
+														belong to the same level.</li>
+													<li>Percentage nodes can only transfer to other percentage nodes and must 
+														belong to the same parent. </li>
+													<li>The order of operations for calculating a transfer occurs from the 
+														left to the right in the forecast tree. A transfer cannot be made from 
+														right to left, thus a user should be careful when designing their tree 
+														and determining where each node should be placed. </li>
+													<li>Transfers are always negative from the source node and positive to the 
+														destination node. </li>
+													<li>Extrapolation is not allowed on a node that also has a transfer, 
+														whether that be to/from another node. </li>
+												</ul>
+											</p>
+											<p style="font-size: 13px;">
+												<span style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold; font-size: 13px;">Examples :</span>
+												<ul style="font-size: 13px;">
+													<li><b>Simple Growth</b> (linear #) - the example below shows a population 
+														growth each month by 500/month from January 2022 to December 2024.<br>
+													<span><img  src="../ShowGuidanceFiles/img/ModelingTransferScreenshot1.jpg" style="border: 1px solid rgb(255, 255, 255);margin: 10px 0px 20px 0px;
+														padding: 10px;border-radius: 5px;max-width:100%;height: auto;"></span></li>
+													<li><b>Simple Loss</b> (linear #) - the example below shows attrition each month by 100/month 
+														from January 2022 to December 2024. QAT utilizes a negative number to denote a decrease 
+														or loss.<br>
+													<span><img  src="../ShowGuidanceFiles/img/ModelingTransferScreenshot2.jpg"  style="border: 1px solid rgb(255, 255, 255);margin: 10px 0px 20px 0px;
+														padding: 10px;border-radius: 5px;max-width:100%;height: auto;"></span></li>
+													<li><p><b>Simple Growth</b> (linear %) - the example below shows a steady population growth 
+														each month by 2% from January 2022 to December 2024. QAT has calculated this change to 
+														be increasing the population by 108.64 each month.</p><br>
+													<span><img class="formula-img-mr img-fluid mb-lg-0 mt-lg-0" src="../ShowGuidanceFiles/img/ModelingTransferScreenshot3.jpg"  style="border: 1px solid rgb(255, 255, 255);margin: 10px 0px 20px 0px;
+														padding: 10px;border-radius: 5px;max-width:100%;height: auto;"></span></li>
+													<li><b>Simple Growth</b> (exponential %) - the example below shows a population growth each 
+														month by 1% from January 2022 to December 2024. Because the growth is exponential, the 
+														change differs each month.
+													<span><img src="../ShowGuidanceFiles/img/ModelingTransferScreenshot4.jpg"  style="border: 1px solid rgb(255, 255, 255);margin: 10px 0px 20px 0px;
+														padding: 10px;border-radius: 5px;max-width:100%;height: auto;"></span>
+													<ul>
+														<li>QAT calculates this change to be 54.32 in Jan-22 month, </li>
+														<li>QAT calculates this change to be 54.86 in Feb-22 month, and </li>
+														<li>QAT calculates this change to be 55.41 in Mar-22  </li>
+													</ul>
+												</li>
+												<br>
+												<li><p><b>Multi-year Loss</b> - the example below shows a different rate of attrition (loss) 
+													each year. Year 1 (January 2022 to December 2022) decreases the population by 1% or 
+													54.32 each month, Year 2 (January 2023 to December 2023) decreases the population 
+													by 2% or 95.6 each month, etc. QAT utilizes a negative number to denote a decrease 
+													or loss.</p>
+												<span><img  src="../ShowGuidanceFiles/img/ModelingTransferScreenshot5.jpg"  style="border: 1px solid rgb(255, 255, 255);margin: 10px 0px 20px 0px;
+													padding: 10px;border-radius: 5px;max-width:100%;height: auto;"></span>
+													</li>
+													<li><p><b>Transfer</b> - the example below shows a transfer of 
+													250 patients each month for one year, January 2022 to December 2022, from the current node 
+													(Adults 1st Line) to another node (Adults 2nd Line). This transfer will also appear on the 
+													other node (Adults 2nd Line) greyed-out to signify an non-editable change.</p>
+												<span><img src="../ShowGuidanceFiles/img/ModelingTransferScreenshot6.jpg"  style="border: 1px solid rgb(255, 255, 255);margin: 10px 0px 20px 0px;
+													padding: 10px;border-radius: 5px;max-width:100%;height: auto;"></span>
+											</li>
+										</ul>
+									</p>
+										
+										
+										
+
+									</li>
+								</ol>
+							</p>
+				</td>
+				</tr>
+				
+		
+							</table>
+						</td>
+					</tr>
+					
+				</table>
+			</td>
+		</tr>
+	</table>
+</body>
+</html>
