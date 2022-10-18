@@ -171,14 +171,14 @@ class DefaultHeader extends Component {
           {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_COMMIT_DATASET') && this.props.activeModule == 1 &&
             <NavItem className="">
               <NavLink to="#" className="nav-link">
-                {console.log("localStorage.getItem(sesLocalVersionChange)----" + this.props.changeIcon)}
+                {console.log("localStorage.getItem(sesLocalVersionChange)----" + this.props.fuChangeIcon)}
 
-                {this.props.changeIcon &&
+                {this.props.fuChangeIcon &&
                   // <img src={iconsUparrowRed} className="HelpIcon" onClick={this.props.commitProgram} title={i18n.t('static.header.changesInLocalVersion')} style={{ width: '30px', height: '30px' }} />
                   <i class="nav-icon cui-cloud-upload icons" onClick={this.props.commitProgramFC} title={i18n.t('static.header.changesInLocalVersion')} style={{ fontSize: '25px', paddingTop: '2px', paddingLeft: '5px', color: '#BA0C2F',lineHeight:'57px' }}></i>
 
                 }
-                {!this.props.changeIcon &&
+                {!this.props.fuChangeIcon &&
                   // <img src={iconsUparrowBlue} className="HelpIcon" onClick={this.props.commitProgram} title={i18n.t('static.header.changesInLocalVersion')} style={{ width: '30px', height: '30px' }} />
                   <i class="nav-icon cui-cloud-upload icons" onClick={this.props.commitProgramFC} title={i18n.t('static.header.changesInLocalVersion')} style={{ fontSize: '25px', paddingTop: '2px', paddingLeft: '5px', color: '#a7c6ed',lineHeight:'57px' }}></i>
 
@@ -219,6 +219,11 @@ class DefaultHeader extends Component {
               </a>
             </span>
           </NavItem>
+          <NavItem className="" title={'Refresh page'}>
+            <span className="nav-link">
+            <svg  onClick={this.refreshPage} style={{cursor: 'pointer', width: '28px', height: '28px', color:'#a7c6ed' }} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon icon-xxl" role="img"><path fill="var(--ci-primary-color, currentColor)" d="M265.614,206.387H456V16H424V149.887L397.863,123.75c-79.539-79.539-208.96-79.54-288.5,0s-79.539,208.96,0,288.5a204.232,204.232,0,0,0,288.5,0l-22.627-22.627c-67.063,67.063-176.182,67.063-243.244,0s-67.063-176.183,0-243.246,176.182-67.063,243.245,0l28.01,28.01H265.614Z" class="ci-primary"></path></svg>
+            </span>
+            </NavItem>
 
           <NavItem className="">
             <NavLink to="#" className="nav-link">

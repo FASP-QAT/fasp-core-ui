@@ -783,6 +783,7 @@ class DefaultLayout extends Component {
     this.onAction = this._onAction.bind(this)
     this.onActive = this._onActive.bind(this)
     this.onIdle = this._onIdle.bind(this)
+    this.getDatasetData = this.getDatasetData.bind(this);
     this.getProgramData = this.getProgramData.bind(this);
     this.getNotificationCount = this.getNotificationCount.bind(this);
     this.toggle = this.toggle.bind(this);
@@ -850,6 +851,7 @@ class DefaultLayout extends Component {
       }
       // var n=this.state.activeTab[0]==='1'?'Supply planning':'Forecasting'
       console.log("P*** Call indexed db methods0---------------------------")
+      this.getDatasetData();
       this.getProgramData();
       this.getNotificationCount();
       // this.getDownloadedPrograms();
@@ -1113,6 +1115,78 @@ class DefaultLayout extends Component {
     }.bind(this)
 
   }
+
+  getDatasetData() {
+    console.log("P***get programs called");
+    var db1;
+    getDatabase();
+    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+    openRequest.onerror = function (event) {
+      this.setState({
+        message: i18n.t('static.program.errortext'),
+        color: '#BA0C2F'
+      })
+    }.bind(this);
+    openRequest.onsuccess = function (e) {
+      db1 = e.target.result;
+      var transaction = db1.transaction(['datasetDetails'], 'readwrite');
+      var program = transaction.objectStore('datasetDetails');
+      var getRequest = program.getAll();
+      getRequest.onerror = function (event) {
+        this.setState({
+          message: i18n.t('static.program.errortext'),
+          color: '#BA0C2F',
+          loading: false
+        })
+      }.bind(this);
+      getRequest.onsuccess = function (event) {
+        var myResult = [];
+        myResult = getRequest.result;
+        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+        var userId = userBytes.toString(CryptoJS.enc.Utf8);
+        var programDatasetChanged = 0;
+        console.log(" programDatasetChanged@@@!", programDatasetChanged);
+        console.log("myResult@@@!", myResult);
+          
+        for (var i = 0; i < myResult.length; i++) {
+          console.log("userId@@@!", userId);
+          console.log("myResult[i].userId==userId@@@1", myResult[i].userId==userId);
+            
+          if (myResult[i].userId == userId) {
+            console.log("myResult[i].changed@@@!", myResult[i].changed);
+            
+            if (myResult[i].changed == 1) {
+              programDatasetChanged = 1;
+              break;
+            }
+          }
+        }
+        this.setState({
+          programDatasetChanged: programDatasetChanged
+        })
+        console.log("Program modified Final@@@!", programDatasetChanged);
+        if (programDatasetChanged == 1) {
+          console.log("P***d---hurrey local version changed-------------------------------------------------------------");
+          localStorage.setItem("sesLocalVersionChange", true);
+          this.setState({ fuChangeIcon: true });
+          console.log("P***d--------in if---------------")
+        } else {
+          localStorage.setItem("sesLocalVersionChange", false);
+          this.setState({ fuChangeIcon: false });
+          console.log("P***d--------in else---------------")
+        }
+        // let finalmax = moment.max(proList.map(d => moment(d.lastModifiedDate)))
+        // this.setState({
+        //   programDataLastModifiedDate: moment.max(proList.map(d => moment(d.lastModifiedDate)))
+        // }, () => {
+        //   // this.props.func(this, this.state.programDataLastModifiedDate, this.state.downloadedProgramDataLastModifiedDate)
+        // })
+        // this.getDownloadedPrograms();
+      }.bind(this);
+    }.bind(this)
+  }
+
+
   // getDownloadedPrograms() {
   //   console.log("P***get programs called 1");
   //   var db1;
@@ -1283,7 +1357,7 @@ class DefaultLayout extends Component {
 
         <AppHeader fixed >
           <Suspense fallback={this.loading()}>
-            <DefaultHeader onLogout={e => this.signOut(e)} onChangePassword={e => this.changePassword(e)} onChangeDashboard={e => this.showDashboard(e)} shipmentLinkingAlerts={e => this.showShipmentLinkingAlerts(e)} latestProgram={e => this.goToLoadProgram(e)} latestProgramFC={e => this.goToLoadProgramFC(e)} title={this.state.name} notificationCount={this.state.notificationCount} changeIcon={this.state.changeIcon} commitProgram={e => this.goToCommitProgram(e)} commitProgramFC={e => this.goToCommitProgramFC(e)} goOffline={e => this.goOffline(e)} goOnline={e => this.goOnline(e)} activeModule={this.state.activeTab == 1 ? 1 : 2} />
+            <DefaultHeader onLogout={e => this.signOut(e)} onChangePassword={e => this.changePassword(e)} onChangeDashboard={e => this.showDashboard(e)} shipmentLinkingAlerts={e => this.showShipmentLinkingAlerts(e)} latestProgram={e => this.goToLoadProgram(e)} latestProgramFC={e => this.goToLoadProgramFC(e)} title={this.state.name} notificationCount={this.state.notificationCount} changeIcon={this.state.changeIcon} fuChangeIcon={this.state.fuChangeIcon} commitProgram={e => this.goToCommitProgram(e)} commitProgramFC={e => this.goToCommitProgramFC(e)} goOffline={e => this.goOffline(e)} goOnline={e => this.goOnline(e)} activeModule={this.state.activeTab == 1 ? 1 : 2} />
           </Suspense>
         </AppHeader>
         <div className="app-body">
