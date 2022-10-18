@@ -21,8 +21,14 @@ import { Prompt } from 'react-router';
 import { exportPDF, noForecastSelectedClicked, missingMonthsClicked, missingBranchesClicked, nodeWithPercentageChildrenClicked } from '../DataSet/DataCheckComponent.js';
 import pdfIcon from '../../assets/img/pdf.png';
 import ProgramService from '../../api/ProgramService';
+import showguidanceEn from '../../../src/ShowGuidanceFiles/UpdateVersionSettingsEn.html'
+import showguidanceFr from '../../../src/ShowGuidanceFiles/UpdateVersionSettingsFr.html'
+import showguidanceSp from '../../../src/ShowGuidanceFiles/UpdateVersionSettingsSp.html'
+import showguidancePr from '../../../src/ShowGuidanceFiles/UpdateVersionSettingsPr.html'
+
 import DatasetService from '../../api/DatasetService';
 import { resolve } from "path";
+
 const ref = React.createRef();
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -617,6 +623,19 @@ class VersionSettingsComponent extends Component {
                             console.log("---hurrey---");
                         })
                         transaction.oncomplete = function (event) {
+                            console.log("in side datasetDetails")
+                            db1 = e.target.result;
+                            var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
+                            var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
+                            var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.datasetId);
+                            datasetDetailsRequest.onsuccess = function (e) {         
+                              var datasetDetailsRequestJson = datasetDetailsRequest.result;
+                              datasetDetailsRequestJson.changed = 1;
+                              var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+                              datasetDetailsRequest1.onsuccess = function (event) {
+                                   
+                                  }}
+                  
                             this.setState({
                                 loading: false,
                                 message: i18n.t('static.mt.dataUpdateSuccess'),
@@ -1720,10 +1739,20 @@ class VersionSettingsComponent extends Component {
                         <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
                     </ModalHeader>
                     <div>
-                        <ModalBody>
+                        <ModalBody className="ModalBodyPadding">
+                            <div dangerouslySetInnerHTML={{
+                                __html: localStorage.getItem('lang') == 'en' ?
+                                    showguidanceEn :
+                                    localStorage.getItem('lang') == 'fr' ?
+                                        showguidanceFr :
+                                        localStorage.getItem('lang') == 'sp' ?
+                                            showguidanceSp :
+                                            showguidancePr
+                            }} />
+                            {/*                        
                             <div>
-                                <h3 className='ShowGuidanceHeading'>{i18n.t('static.UpdateversionSettings.UpdateversionSettings')}</h3>
-                            </div>
+                               <h3 className='ShowGuidanceHeading'>{i18n.t('static.UpdateversionSettings.UpdateversionSettings')}</h3>
+                           </div>
                             <p>
                                 <p style={{ fontSize: '13px' }}><span className="UnderLineText">{i18n.t('static.listTree.purpose')}</span> {i18n.t('static.VersionSetting.enableUsersTo')}</p>
                             </p>
@@ -1751,7 +1780,9 @@ class VersionSettingsComponent extends Component {
                                         </ol>
                                     </li>
                                 </ol>
-                            </p>
+                                </li>
+                            </ol>
+                            </p>  */}
                         </ModalBody>
                     </div>
                 </Modal>

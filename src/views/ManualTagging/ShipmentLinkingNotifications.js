@@ -910,7 +910,6 @@ export default class ShipmentLinkingNotifications extends Component {
             allowDeleteRow: false,
             onselection: this.selectedForNotification,
             onchange: this.changed,
-
             // oneditionend: this.onedit,
             copyCompatibility: true,
             allowExport: false,

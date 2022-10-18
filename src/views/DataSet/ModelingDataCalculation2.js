@@ -61,16 +61,16 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
             for (var tl = 0; tl < treeList.length; tl++) {
                 var tree = treeList[tl];
                 var flatListUnsorted = tree.tree.flatList;
-                console.log("flatListUnsorted---",flatListUnsorted);
+                console.log("flatListUnsorted---", flatListUnsorted);
                 var sortOrderArray = [...new Set(flatListUnsorted.map(ele => (ele.sortOrder)))];
-                console.log("sortOrderArray---",sortOrderArray);
+                console.log("sortOrderArray---", sortOrderArray);
                 var sortedArray = sortOrderArray.sort();
-                console.log("sortedArray---",sortedArray);
+                console.log("sortedArray---", sortedArray);
                 var flatList = [];
                 for (var i = 0; i < sortedArray.length; i++) {
                     flatList.push(flatListUnsorted.filter(c => c.sortOrder == sortedArray[i])[0]);
                 }
-                console.log("flatList push---",flatList);
+                console.log("flatList push---", flatList);
                 var transferToNodeList = [];
                 // if (nodeId != -1) {
                 //     var curNode = flatList.filter(c => c.id == nodeId)[0];
@@ -82,12 +82,12 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                 //         flatList = flatList.filter(c => c.id == nodeId);
                 //     }
                 // }
-                console.log("datasetJson calc---",datasetJson);
-                console.log("flatList.length---",flatList.length);
+                console.log("datasetJson calc---", datasetJson);
+                console.log("flatList.length---", flatList.length);
                 for (var fl = 0; fl < flatList.length; fl++) {
-                    console.log("flatList[fl]---",flatList[fl]);
+                    console.log("flatList[fl]---", flatList[fl]);
                     var payload = flatList[fl].payload;
-                    console.log("flatList[fl] payload---",flatList[fl].payload);
+                    console.log("flatList[fl] payload---", flatList[fl].payload);
                     if (payload.nodeType.id != 1) {
                         var nodeDataMap = payload.nodeDataMap;
                         var scenarioList = tree.scenarioList;
@@ -196,7 +196,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                     // console.log("curDate---", curDate);
                                     curDate = moment(nodeDataMapForScenario.month).add(i, 'months').format("YYYY-MM-DD");
                                     var nodeDataModelingList = (nodeDataModelingListWithTransfer).filter(c => moment(curDate).format("YYYY-MM") >= moment(c.startDate).format("YYYY-MM") && moment(curDate).format("YYYY-MM") <= moment(c.stopDate).format("YYYY-MM"));
-                                    nodeDataModelingList=nodeDataModelingList.filter(c=>c.dataValue!="" && c.dataValue!="NaN" && c.dataValue!=undefined && c.increaseDecrease!="");
+                                    nodeDataModelingList = nodeDataModelingList.filter(c => c.dataValue != "" && c.dataValue != "NaN" && c.dataValue != undefined && c.increaseDecrease != "");
                                     var nodeDataOverrideList = (nodeDataMapForScenario.nodeDataOverrideList);
                                     var startValue = 0;
                                     // console.log("nodeDataMapForScenario---", nodeDataMapForScenario)
@@ -509,13 +509,66 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                             totalValue = fuPerMonth * calculatedValue;
 
                                         } else {
-                                            var noOfPersons = nodeDataMapForScenario.fuNode.noOfPersons;
-                                            if (nodeDataMapForScenario.fuNode.oneTimeUsage == "true" || nodeDataMapForScenario.fuNode.oneTimeUsage == true) {
-                                                fuPerMonth = noOfForecastingUnitsPerPerson / noOfPersons;
-                                                totalValue = fuPerMonth * calculatedValue;
+                                            // Need to change this logic
+                                            var usagePeriodId;
+                                            var usageTypeId;
+                                            var usageFrequency;
+                                            var repeatUsagePeriodId;
+                                            var oneTimeUsage;
+                                            usageTypeId = nodeDataMapForScenario.fuNode.usageType.id;
+                                            if (usageTypeId == 1) {
+                                                oneTimeUsage = nodeDataMapForScenario.fuNode.oneTimeUsage;
+                                            }
+                                            if (usageTypeId == 2 || (oneTimeUsage != null && oneTimeUsage != "" && oneTimeUsage.toString() == "false")) {
+                                                usagePeriodId = nodeDataMapForScenario.fuNode.usagePeriod.usagePeriodId;
+                                            }
+                                            usageFrequency = nodeDataMapForScenario.fuNode.usageFrequency;
+                                            var noOfMonthsInUsagePeriod = 0;
+                                            if ((usagePeriodId != null && usagePeriodId != "") && (usageTypeId == 2 || (oneTimeUsage == "false" || oneTimeUsage == false))) {
+                                                var convertToMonth = (props.state.usagePeriodList.filter(c => c.usagePeriodId == usagePeriodId))[0].convertToMonth;
+                                                if (usageTypeId == 2) {
+                                                    var div = (convertToMonth * usageFrequency);
+                                                    if (div != 0) {
+                                                        noOfMonthsInUsagePeriod = usageFrequency / convertToMonth;
+                                                        console.log("noOfMonthsInUsagePeriod---", noOfMonthsInUsagePeriod);
+                                                    }
+                                                } else {
+                                                    // var noOfFUPatient = this.state.noOfFUPatient;
+                                                    var noOfFUPatient;
+                                                    if (payload.nodeType.id == 4) {
+                                                        noOfFUPatient = nodeDataMapForScenario.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "") / nodeDataMapForScenario.fuNode.noOfPersons.toString().replaceAll(",", "");
+                                                    } else {
+                                                        noOfFUPatient = nodeDataMapForScenario.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "") / nodeDataMapForScenario.fuNode.noOfPersons.toString().replaceAll(",", "");
+                                                    }
+                                                    noOfMonthsInUsagePeriod = convertToMonth * usageFrequency * noOfFUPatient;
+                                                }
+                                                if (oneTimeUsage != "true" && oneTimeUsage != true && usageTypeId == 1) {
+                                                    repeatUsagePeriodId = nodeDataMapForScenario.fuNode.repeatUsagePeriod.usagePeriodId;
+                                                    if (repeatUsagePeriodId != "") {
+                                                        convertToMonth = (props.state.usagePeriodList.filter(c => c.usagePeriodId == repeatUsagePeriodId))[0].convertToMonth;
+                                                    } else {
+                                                        convertToMonth = 0;
+                                                    }
+                                                }
+                                                var noFURequired = oneTimeUsage != "true" && oneTimeUsage != true ? (nodeDataMapForScenario.fuNode.repeatCount / convertToMonth) * noOfMonthsInUsagePeriod : noOfFUPatient;
+                                            } else if (usageTypeId == 1 && oneTimeUsage != null && (oneTimeUsage == "true" || oneTimeUsage == true)) {
+                                                if (payload.nodeType.id == 4) {
+                                                    noFURequired = nodeDataMapForScenario.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "");
+                                                } else {
+                                                    noFURequired = nodeDataMapForScenario.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "");
+                                                }
+                                            }
+                                            if (nodeDataMapForScenario.fuNode.usageType.id == 2) {
+                                                var noOfPersons = nodeDataMapForScenario.fuNode.noOfPersons;
+                                                if (nodeDataMapForScenario.fuNode.oneTimeUsage == "true" || nodeDataMapForScenario.fuNode.oneTimeUsage == true) {
+                                                    fuPerMonth = noOfForecastingUnitsPerPerson / noOfPersons;
+                                                    totalValue = fuPerMonth * calculatedValue;
+                                                } else {
+                                                    fuPerMonth = ((noOfForecastingUnitsPerPerson / noOfPersons) * usageFrequency * convertToMonth);
+                                                    totalValue = fuPerMonth * calculatedValue;
+                                                }
                                             } else {
-                                                fuPerMonth = ((noOfForecastingUnitsPerPerson / noOfPersons) * usageFrequency * convertToMonth);
-                                                totalValue = fuPerMonth * calculatedValue;
+                                                totalValue = noFURequired * calculatedValue;
                                             }
                                         }
                                         calculatedValue = totalValue;

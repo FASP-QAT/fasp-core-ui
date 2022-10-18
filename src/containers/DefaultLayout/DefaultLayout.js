@@ -297,8 +297,10 @@ const CompareAndSelectScenario = React.lazy(() => import('../../views/CompareAnd
 const ConsumptionDataEntryAndAdjustment = React.lazy(() => import('../../views/ConsumptionDataEntryandAdjustment/ConsumptionDataEntryAndAdjustment.js'))
 const BuildTree = React.lazy(() => import('../../views/DataSet/BuildTreeComponent'));
 const ListTreeTemplate = React.lazy(() => import('../../views/DataSet/ListTreeTemplateComponent'));
+const ListBranchTreeTemplate = React.lazy(() => import('../../views/DataSet/ListBranchTemplateComponent'));
 const CommitTree = React.lazy(() => import('../../views/DataSet/CommitTreeComponent.js'));
 const CreateTreeTemplate = React.lazy(() => import('../../views/DataSet/CreateTreeTemplateComponent'));
+const BranchTemplate = React.lazy(() => import('../../views/DataSet/BranchTemplateComponent'));
 const LoadDeleteDataSet = React.lazy(() => import('../../views/DataSet/LoadDeleteDataSet'));
 const ExportDataset = React.lazy(() => import('../../views/DataSet/ExportDataset'));
 const ImportDataset = React.lazy(() => import('../../views/DataSet/ImportDataset'));
@@ -327,6 +329,8 @@ const routes = [
   { path: '/dataset/loadDeleteDataSet/:message', name: 'Load/Delete Local Version', component: LoadDeleteDataSet },
   { path: '/dataset/listTreeTemplate/:color/:message', name: 'static.dataset.TreeTemplate', component: ListTreeTemplate },
   { path: '/dataset/listTreeTemplate/', exact: true, name: 'static.dataset.TreeTemplate', component: ListTreeTemplate },
+  { path: '/dataset/listBranchTreeTemplate/:color/:message', name: 'static.dataset.BranchTreeTemplate', component: ListBranchTreeTemplate },
+  { path: '/dataset/listBranchTreeTemplate/', exact: true, name: 'static.dataset.BranchTreeTemplate', component: ListBranchTreeTemplate },
   { path: '/validation/modelingValidation', exact: true, name: 'static.dashboard.modelingValidation', component: ModelingValidation },
   { path: '/report/compareVersion', exact: true, name: 'static.dashboard.Versioncomarition', component: CompareVersion },
   { path: '/validation/productValidation', exact: true, name: 'static.dashboard.productValidation', component: ProductValidation },
@@ -336,8 +340,10 @@ const routes = [
   { path: '/dataentry/consumptionDataEntryAndAdjustment/:color/:message', exact: true, name: 'static.dashboard.dataEntryAndAdjustments', component: ConsumptionDataEntryAndAdjustment },
   { path: '/dataentry/consumptionDataEntryAndAdjustment/:planningUnitId', exact: true, name: 'static.dashboard.dataEntryAndAdjustments', component: ConsumptionDataEntryAndAdjustment },
   { path: '/dataset/createTreeTemplate/:templateId', name: 'Create Tree Template', component: CreateTreeTemplate },
+  { path: '/dataset/branchTemplate/:templateId', name: 'static.dataset.createBranchTreeTemplate', component: BranchTemplate },
   { path: '/dataSet/buildTree/', exact: true, name: 'static.common.managetree', component: BuildTree },
   { path: '/dataSet/buildTree/tree/:treeId/:programId', exact: true, name: 'static.common.managetree', component: BuildTree },
+  { path: '/dataSet/buildTree/treeServer/:treeId/:programId/:isLocal', exact: true, name: 'static.common.managetree', component: BuildTree },
   { path: '/dataSet/buildTree/tree/:treeId/:programId/:scenarioId', name: 'static.common.managetree', component: BuildTree },
   { path: '/dataSet/buildTree/template/:templateId', exact: true, name: 'static.common.managetree', component: BuildTree },
   { path: '/consumptionDetails/:programId/:versionId/:planningUnitId', name: 'static.consumptionDetailHead.consumptionDetail', component: ConsumptionDetails },
@@ -783,6 +789,7 @@ class DefaultLayout extends Component {
     this.onAction = this._onAction.bind(this)
     this.onActive = this._onActive.bind(this)
     this.onIdle = this._onIdle.bind(this)
+    this.getDatasetData = this.getDatasetData.bind(this);
     this.getProgramData = this.getProgramData.bind(this);
     this.getNotificationCount = this.getNotificationCount.bind(this);
     this.toggle = this.toggle.bind(this);
@@ -793,10 +800,18 @@ class DefaultLayout extends Component {
   }
 
   refreshPage() {
+    // setTimeout(()=>{
+    //     window.location.reload(false);
+    // }, 500);
+    // console.log('page to reload')
+    // this.componentDidMount()
+}
+ 
+  // refreshPage() {
     // setTimeout(() => {
     // window.location.reload(false);
     // }, 0);
-  }
+  // }
 
   checkEvent = (e) => {
     // console.log("checkEvent called---", e);
@@ -850,6 +865,7 @@ class DefaultLayout extends Component {
       }
       // var n=this.state.activeTab[0]==='1'?'Supply planning':'Forecasting'
       console.log("P*** Call indexed db methods0---------------------------")
+      this.getDatasetData();
       this.getProgramData();
       this.getNotificationCount();
       // this.getDownloadedPrograms();
@@ -1113,6 +1129,78 @@ class DefaultLayout extends Component {
     }.bind(this)
 
   }
+
+  getDatasetData() {
+    console.log("P***get programs called");
+    var db1;
+    getDatabase();
+    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+    openRequest.onerror = function (event) {
+      this.setState({
+        message: i18n.t('static.program.errortext'),
+        color: '#BA0C2F'
+      })
+    }.bind(this);
+    openRequest.onsuccess = function (e) {
+      db1 = e.target.result;
+      var transaction = db1.transaction(['datasetDetails'], 'readwrite');
+      var program = transaction.objectStore('datasetDetails');
+      var getRequest = program.getAll();
+      getRequest.onerror = function (event) {
+        this.setState({
+          message: i18n.t('static.program.errortext'),
+          color: '#BA0C2F',
+          loading: false
+        })
+      }.bind(this);
+      getRequest.onsuccess = function (event) {
+        var myResult = [];
+        myResult = getRequest.result;
+        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+        var userId = userBytes.toString(CryptoJS.enc.Utf8);
+        var programDatasetChanged = 0;
+        console.log(" programDatasetChanged@@@!", programDatasetChanged);
+        console.log("myResult@@@!", myResult);
+          
+        for (var i = 0; i < myResult.length; i++) {
+          console.log("userId@@@!", userId);
+          console.log("myResult[i].userId==userId@@@1", myResult[i].userId==userId);
+            
+          if (myResult[i].userId == userId) {
+            console.log("myResult[i].changed@@@!", myResult[i].changed);
+            
+            if (myResult[i].changed == 1) {
+              programDatasetChanged = 1;
+              break;
+            }
+          }
+        }
+        this.setState({
+          programDatasetChanged: programDatasetChanged
+        })
+        console.log("Program modified Final@@@!", programDatasetChanged);
+        if (programDatasetChanged == 1) {
+          console.log("P***d---hurrey local version changed-------------------------------------------------------------");
+          localStorage.setItem("sesLocalVersionChange", true);
+          this.setState({ fuChangeIcon: true });
+          console.log("P***d--------in if---------------")
+        } else {
+          localStorage.setItem("sesLocalVersionChange", false);
+          this.setState({ fuChangeIcon: false });
+          console.log("P***d--------in else---------------")
+        }
+        // let finalmax = moment.max(proList.map(d => moment(d.lastModifiedDate)))
+        // this.setState({
+        //   programDataLastModifiedDate: moment.max(proList.map(d => moment(d.lastModifiedDate)))
+        // }, () => {
+        //   // this.props.func(this, this.state.programDataLastModifiedDate, this.state.downloadedProgramDataLastModifiedDate)
+        // })
+        // this.getDownloadedPrograms();
+      }.bind(this);
+    }.bind(this)
+  }
+
+
   // getDownloadedPrograms() {
   //   console.log("P***get programs called 1");
   //   var db1;
@@ -1283,7 +1371,7 @@ class DefaultLayout extends Component {
 
         <AppHeader fixed >
           <Suspense fallback={this.loading()}>
-            <DefaultHeader onLogout={e => this.signOut(e)} onChangePassword={e => this.changePassword(e)} onChangeDashboard={e => this.showDashboard(e)} shipmentLinkingAlerts={e => this.showShipmentLinkingAlerts(e)} latestProgram={e => this.goToLoadProgram(e)} latestProgramFC={e => this.goToLoadProgramFC(e)} title={this.state.name} notificationCount={this.state.notificationCount} changeIcon={this.state.changeIcon} commitProgram={e => this.goToCommitProgram(e)} commitProgramFC={e => this.goToCommitProgramFC(e)} goOffline={e => this.goOffline(e)} goOnline={e => this.goOnline(e)} activeModule={this.state.activeTab == 1 ? 1 : 2} />
+            <DefaultHeader onLogout={e => this.signOut(e)} onChangePassword={e => this.changePassword(e)} onChangeDashboard={e => this.showDashboard(e)} shipmentLinkingAlerts={e => this.showShipmentLinkingAlerts(e)} latestProgram={e => this.goToLoadProgram(e)} latestProgramFC={e => this.goToLoadProgramFC(e)} title={this.state.name} notificationCount={this.state.notificationCount} changeIcon={this.state.changeIcon} fuChangeIcon={this.state.fuChangeIcon} commitProgram={e => this.goToCommitProgram(e)} commitProgramFC={e => this.goToCommitProgramFC(e)} goOffline={e => this.goOffline(e)} goOnline={e => this.goOnline(e)} activeModule={this.state.activeTab == 1 ? 1 : 2} />
           </Suspense>
         </AppHeader>
         <div className="app-body">
@@ -2005,6 +2093,17 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.dataset.TreeTemplate'),
                             url: '/dataset/listTreeTemplate',
+                            icon: 'fa fa-sitemap',
+                            attributes: {
+                              hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_TREE_TEMPLATE') && this.state.activeTab == 1 ? false : true),
+                              onClick: e => {
+                                this.refreshPage();
+                              }
+                            }
+                          },
+                          {
+                            name: i18n.t('static.dataset.BranchTreeTemplate'),
+                            url: '/dataset/listBranchTreeTemplate',
                             icon: 'fa fa-sitemap',
                             attributes: {
                               hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_TREE_TEMPLATE') && this.state.activeTab == 1 ? false : true),
@@ -2898,17 +2997,17 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-list',
                             attributes: { hidden: ((((this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_GLOBAL_VIEW_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_FORECAST_MATRIX_REPORT'))) && this.state.activeTab == 2) ? false : true) },
                             children: [
-                              {
-                                name: i18n.t('static.dashboard.consumption'),
-                                url: '/report/consumption',
-                                icon: 'fa fa-bar-chart',
-                                attributes: {
-                                  hidden: ((this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_REPORT') && this.state.activeTab == 2) ? false : true),
-                                  onClick: e => {
-                                    this.refreshPage();
-                                  }
-                                }
-                              },
+                              // {
+                              //   name: i18n.t('static.dashboard.consumption'),
+                              //   url: '/report/consumption',
+                              //   icon: 'fa fa-bar-chart',
+                              //   attributes: {
+                              //     hidden: ((this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_REPORT') && this.state.activeTab == 2) ? false : true),
+                              //     onClick: e => {
+                              //       this.refreshPage();
+                              //     }
+                              //   }
+                              // },
                               {
                                 name: i18n.t('static.dashboard.globalconsumption'),
                                 url: '/report/globalConsumption',
@@ -2920,20 +3019,9 @@ class DefaultLayout extends Component {
                                   }
                                 }
                               },
-                              {
-                                name: i18n.t('static.report.forecasterrorovertime'),
-                                url: '/report/forecastOverTheTime',
-                                icon: 'fa fa-line-chart',
-                                attributes: {
-                                  hidden: ((this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT') && this.state.activeTab == 2) ? false : true),
-                                  onClick: e => {
-                                    this.refreshPage();
-                                  }
-                                }
-                              },
                               // {
-                              //   name: 'Forecast Error (Monthly) (New)',
-                              //   url: '/report/consumptionForecastErrorSupplyPlan',
+                              //   name: i18n.t('static.report.forecasterrorovertime'),
+                              //   url: '/report/forecastOverTheTime',
                               //   icon: 'fa fa-line-chart',
                               //   attributes: {
                               //     hidden: ((this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT') && this.state.activeTab == 2) ? false : true),
@@ -2942,6 +3030,17 @@ class DefaultLayout extends Component {
                               //     }
                               //   }
                               // },
+                              {
+                                name: 'Forecast Error (Monthly) (New)',
+                                url: '/report/consumptionForecastErrorSupplyPlan',
+                                icon: 'fa fa-line-chart',
+                                attributes: {
+                                  hidden: ((this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT') && this.state.activeTab == 2) ? false : true),
+                                  onClick: e => {
+                                    this.refreshPage();
+                                  }
+                                }
+                              },
                               {
                                 name: i18n.t('static.dashboard.forecastmetrics'),
                                 url: '/report/forecastMetrics',

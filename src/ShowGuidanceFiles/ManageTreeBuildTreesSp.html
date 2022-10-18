@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<meta name="">
+	<title>Mostrar guía</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<style>
+		table, td, div, h1, p {font-family: Arial, sans-serif;line-height: 20px;}
+		body{padding: 0;margin: 0;color: #272127;}
+	
+/* .table1 td, th {
+  border: 1px solid #c8ced3;
+  text-align: left;
+  padding: 8px;
+  border-collapse: collapse!important;
+  width: 100%;
+}*/
+.table1 td {
+  border: 1px solid #c8ced3!important;
+  padding: 6px;
+  font-size: 13px;
+}
+.table1 th {
+  border: 1px solid #c8ced3!important;
+  padding: 6px;
+  font-size: 13px;
+}
+.table1 {
+  /* width: 100%; */
+  border-collapse: collapse;
+}
+a {
+    color: #205493;
+    /* text-decoration: none; */
+    background-color: transparent;
+}
+	</style>
+</head>
+<body style="margin:0;padding:0;background:#e4e5e6;">
+	<table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+		<tr>
+			<td align="center" style="padding:0;">
+				<table role="presentation" style="max-width: 910px;min-width:100%;margin-top:20px;margin-bottom:20px;border-collapse:collapse;border:1px solid #fff;border-spacing:0;text-align:left;border-radius: 0.25rem;background-color: #fff;">
+					<tr>
+						<td style="padding:10px 30px 20px 30px;">
+							<table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+								<tr>
+									
+									<td style="padding:0 0 10px 0;color:#153643;">
+										<h3 style="color: #002f6c;font-weight: 600;font-size: 19px;">Administrar árbol - Construir árboles
+										</h3>
+										<p style="font-size: 13px;"><span style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold;">Objetivo</span> Permita que los usuarios administren y construyan árboles de pronóstico y escenarios, para cualquier pronóstico que no 
+											sea de consumo (demográfico, morbilidad, servicios, etc.). Tenga en cuenta que hay más orientación disponible después de hacer clic en cualquier nodo específico.</p>
+											<p style="font-size: 13px;">
+												<span style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold;">Usando esta pantalla :</span>
+												<br>
+												<span style="font-weight: bold;">Administrar el árbol:</span> Haga clic en el icono de engranaje <i class="fa fa-cog" aria-hidden="true"></i> para mostrar y editar u ocultar el método de pronóstico, el nombre del árbol y la región.</p>
+												<p style="font-size: 13px;"><span style="font-weight: bold; font-size: 13px;">Construyendo el árbol:</span>El árbol de pronóstico se construye de arriba hacia 
+													abajo, utilizando diferentes tipos de nodos. Consulte los tipos de nodos y las 
+													acciones de nodos a continuación. Cada árbol de pronóstico debe incluir uno o 
+													más nodos de unidades de planificación, que forman la salida del pronóstico, para 
+													que ese árbol esté disponible en la pantalla "<a href="/#/report/compareAndSelectScenario" target="_blank">Comparar y seleccionar</a>". Cada Nodo de 
+													Unidad de Planificación debe provenir de un Nodo de Unidad de Pronóstico.  </p>
+
+													<p style="font-size: 13px; font-weight: bold;"><span class="">Acciones de nodo :</span></p>
+													<ul class="pl-lg-4" style="font-size: 13px;">
+														<li><i class="fa fa-trash-o" aria-hidden="true" style="color: rgb(0, 47, 108);"></i> Eliminar: elimina el nodo seleccionado </li>
+														<li><i class="fa fa-clone" aria-hidden="true" style="color: rgb(0, 47, 108);"></i> Duplicar: Duplica el nodo seleccionado bajo el mismo padre </li>
+														<li><i class="fa fa-plus-square-o" aria-hidden="true" style="color: rgb(0, 47, 108);"></i> Agregar: agrega un hijo al nodo seleccionado.</li>
+													</ul>
+
+													<p style="font-size: 13px;">
+														<p style="font-size: 14px; font-weight: bold;">
+															<span class="">Tipo de nodo  :</span>
+														</p>
+														<div class="pl-lg-4 pr-lg-4 pt-lg-4 table1">
+															<table style="border-collapse: collapse;">
+																<thead>
+																	<tr>
+																		<th style="width: 130px;">Tipo de nodo</th>
+																		<th>Valor </th>
+																		<th>Niños potenciales</th>
+																		<th>Funcionalidad avanzada</th>
+																	</tr>
+																</thead>
+																<tbody>
+																	<tr>
+																		<td class="BgLightBlue"><b>Agregación ∑</b></td>
+																		<td>suma de niños</td>
+																		<td><b style="color: rgb(0, 47, 108);">∑</b> o Número</td>
+																		<td>-</td>
+																	</tr>
+																	<tr>
+																		<td class="BgLightBlue"><b>Número #</b></td>
+																		<td>Definido en este nodo</td>
+																		<td>% or <b style="background: rgb(255, 255, 255); color: rgb(0, 47, 108); padding: 3px;"><i class="fa fa-cube" aria-hidden="true"></i></b></td>
+																		<td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i class="fa fa-link"></i>, <i class="fa fa-line-chart"></i></td>
+																	</tr>
+																	<tr>
+																		<td class="BgLightBlue"><b>Porcentaje %</b></td>
+																		<td>Definido como un porcentaje del padre</td>
+																		<td>% or <b style="background: rgb(255, 255, 255); color: rgb(0, 47, 108); padding: 3px;"><i class="fa fa-cube" aria-hidden="true"></i></b></td>
+																		<td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i class="fa fa-link"></i></td>
+																	</tr>
+																	<tr>
+																		<td class="BgDarkBlue"><b>Unidad de previsión <i class="fa fa-cube" aria-hidden="true"></i></b></td>
+																		<td>Definido como un porcentaje de los parámetros de la unidad principal y de pronóstico</td>
+																		<td><b style="background: rgb(255, 255, 255); color: rgb(0, 47, 108); padding: 3px;"><i class="fa fa-cubes" aria-hidden="true"></i></b></td>
+																		<td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i class="fa fa-link"></i></td>
+																	</tr>
+																	<tr>
+																		<td class="BgDarkBlue"><b>Unidad de Planificación <i class="fa fa-cubes" aria-hidden="true"></i></b></td>
+																		<td>Definido como un porcentaje de los parámetros de la unidad principal y de planificación</td>
+																		<td>-</td>
+																		<td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i class="fa fa-link"></i></td>
+																	</tr>
+																</tbody>
+															</table>
+														</div>
+													</p>
+													<p style="font-size: 13px;">
+														<span style="font-size: 13px; font-weight: bold;">Cambios a lo largo del tiempo</span><br>Estructura de árbol :
+														<ul style="font-size: 13px;">
+															<li><b><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i> Modelado:</b> Permite al usuario especificar la tasa exacta de cambio</li>
+															<li><b><i class="fa fa-link"></i> Transferir:</b> Permite a los usuarios vincular dos nodos, por lo que la disminución del nodo de 
+																origen está vinculada al aumento del nodo de destino. Útil para transiciones.</li>
+															<li><b><i class="fa fa-line-chart"></i> Extrapolación:</b> Permite a los usuarios utilizar datos históricos para extrapolar cambios futuros</li>
+														</ul>
+													</p>
+
+													<p style="font-size: 13px;">
+														<span style="font-size: 13px; font-weight: bold;">Uso de escenarios :</span><br>Los escenarios se utilizan para modelar diferentes valores para el mismo árbol. 
+														Para agregar, editar o eliminar un escenario, utilice el <i class="fa fa-cog" aria-hidden="true"></i> junto al menú desplegable del escenario. Use el menú desplegable de escenarios 
+														para seleccionar qué escenario ver y editar.
+														<div class="pl-lg-4 pr-lg-4 pt-lg-4 table1">
+															<table style="border-collapse: collapse;">
+																<thead>
+																	<tr>
+																		<th style="width: 130px;">Fijo para todos los escenarios</th>
+																		<th style="width: 230px;">Único para cada escenario</th>
+																	</tr>
+																</thead>
+																<tbody>
+																	<tr>
+																		<td>Estructura de árbol</td>
+																		<td>Valor de nodo</td>
+																	</tr>
+																	<tr>
+																		<td>Título del nodo</td>
+																		<td>Mes</td>
+																	</tr>
+																	<tr>
+																		<td>Tipo de nodo</td>
+																		<td>notas</td>
+																	</tr>
+																	<tr>
+																		<td></td>
+																		<td>Modelado/Transferencia/Extrapolación</td>
+																	</tr>
+																</tbody>
+															</table>
+														</div>
+													</p>
+
+									</li>
+								</ol>
+							</p>
+				</td>
+				</tr>
+				
+		
+							</table>
+						</td>
+					</tr>
+					
+				</table>
+			</td>
+		</tr>
+	</table>
+</body>
+</html>

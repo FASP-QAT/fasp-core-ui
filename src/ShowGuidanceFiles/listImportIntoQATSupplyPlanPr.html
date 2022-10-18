@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<meta name="">
+	<title>Show Guidance</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<style>
+		table, td, div, h1, p {font-family: Arial, sans-serif;line-height: 20px;}
+		body{padding: 0;margin: 0;color: #272127;}
+	
+/* .table1 td, th {
+  border: 1px solid #c8ced3;
+  text-align: left;
+  padding: 8px;
+  border-collapse: collapse!important;
+  width: 100%;
+}*/
+.table1 td {
+  border: 1px solid #c8ced3!important;
+  padding: 6px;
+  font-size: 13px;
+}
+.table1 th {
+  border: 1px solid #c8ced3!important;
+  padding: 6px;
+  font-size: 13px;
+}
+.table1 {
+  /* width: 100%; */
+  border-collapse: collapse;
+}
+a {
+    color: #205493;
+    /* text-decoration: none; */
+    background-color: transparent;
+}
+	</style>
+</head>
+<body style="margin:0;padding:0;background:#e4e5e6;">
+	<table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+		<tr>
+			<td align="center" style="padding:0;">
+				<table role="presentation" style="font-size:13px;max-width: 910px;min-width:100%;margin-top:20px;margin-bottom:20px;border-collapse:collapse;border:1px solid #fff;border-spacing:0;text-align:left;border-radius: 0.25rem;background-color: #fff;">
+					<tr>
+						<td>
+							<table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+								<tr>
+									
+									<td style="padding:0 0 10px 0;color:#153643;">
+										<h3 style="color: #002f6c;font-weight: 600;font-size: 19px;">Importação de previsões QAT</h3>
+                                        <p><p style="font-size: 13px;"><span style="border-collapse: collapse;font-weight:bold;"><u>Objetivo :</u></span> Permita que os usuários importem previsões criadas por QAT para programas de plano de fornecimento. As previsões só estão disponíveis para importação se 1) forem confirmadas como versão final e 2) houver uma previsão selecionada para cada unidade de planejamento.</p></p>
+                                        <p style="font-size: 13px;"><span style="border-collapse: collapse;font-weight:bold;"><u>Usando esta tela :</u></span></p>
+
+                                        <p><p style="font-size: 13px;"></p><p><b>(Passo 1)</b><ul><li>Selecione de qual programa de previsão importar (somente as previsões finais estão disponíveis)</li><li>Selecione para qual programa de plano de suprimentos importar. </li><li>Selecione o intervalo de datas dos dados de previsão a serem importados, que são restritos da seguinte forma:<ul><li>Deve estar dentro do período de previsão</li><li>consumo previsto mais antigo que você pode importar é 6 meses antes do mês atual. </li><li>Se todo o período de previsão tiver mais de 6 meses no passado, a previsão não poderá ser importada e a versão não aparecerá no menu suspenso do programa </li></ul></li><li>Na tabela exibida, selecione e mapeie as unidades de planejamento.<ul><li>Para cada Unidade de Planejamento de Previsão, o QAT requer uma Unidade de Planejamento de Plano de Fornecimento e um fator de conversão correspondentes. O QAT mapeia automaticamente as correspondências exatas da unidade de planejamento, mas os usuários podem substituir o mapeamento da unidade de planejamento e o fator de conversão. </li><li>Nem todas as unidades de planejamento de previsão precisam ser importadas, no entanto, todas as unidades de planejamento de previsão devem ter uma seleção na tabela de mapeamento. Por exemplo, na tabela abaixo, mesmo que 2 produtos não estejam sendo importados, você ainda precisa selecionar "Não importar".</li><br><img class="img-fluid" src="/importintoqatsupplyplanscreenshot-1.jpg" style="width: 971px;"></ul></li></ul></p><p><b>(Passo 2) </b>Região(ões) de previsão:<ul><li>Previsão nacional para o plano nacional de abastecimento<div class="pl-lg-4 pr-lg-4 pt-lg-4 table1"><table style="border-collapse: collapse;"><thead><tr><th>Região(ões) de previsão</th><th>% de previsão</th><th>Região do Plano de Abastecimento</th></tr></thead><tbody><tr><td>Nacional</td><td>100</td><td>Nacional</td></tr></tbody></table></div></li></ul><ul><li>Previsão multirregional para plano de fornecimento multirregional<div class="pl-lg-4 pr-lg-4 pt-lg-4 table1"><table style="border-collapse: collapse;"><thead><tr><th>Região(ões) de previsão</th><th>% de previsão</th><th>Região do Plano de Abastecimento</th></tr></thead><tbody><tr><td>Norte</td><td>100</td><td>Norte</td></tr><tr><td>Leste</td><td>100</td><td>Leste</td></tr><tr><td>Sul</td><td>100</td><td>Sul</td></tr></tbody></table></div></li></ul><ul><li>Previsão multirregional para o plano de abastecimento nacional -<div class="pl-lg-4 pr-lg-4 pt-lg-4 table1"><table style="border-collapse: collapse;"><thead><tr><th>Região(ões) de previsão</th><th>% de previsão</th><th>Região do Plano de Abastecimento</th></tr></thead><tbody><tr><td>Norte</td><td>100</td><td>Nacional</td></tr><tr><td>Leste</td><td>100</td><td>Nacional</td></tr><tr><td>Sul</td><td>100</td><td>Nacional</td></tr></tbody></table></div></li></ul><ul><li>Previsão nacional para plano de abastecimento multirregional - observe que o processo de importação precisa ser repetido para cada região do plano de abastecimento.<div class="pl-lg-4 pr-lg-4 pt-lg-4 table1"><table style="border-collapse: collapse;"><thead><tr><th>Região(ões) de previsão</th><th>% de previsão</th><th>Região do Plano de Abastecimento</th></tr></thead><tbody><tr><td>Nacional</td><td>20</td><td>Norte</td></tr></tbody></table></div><br><div class="pl-lg-4 pr-lg-4 pt-lg-4 table1"><table style="border-collapse: collapse;"><thead><tr><th>Região(ões) de previsão</th><th>% de previsão</th><th>Região do Plano de Abastecimento</th></tr></thead><tbody><tr><td>Nacional</td><td>45</td><td>Sul</td></tr></tbody></table></div><br><div class="pl-lg-4 pr-lg-4 pt-lg-4 table1"><table style="border-collapse: collapse;"><thead><tr><th>Região(ões) de previsão</th><th>% de previsão</th><th>Região do Plano de Abastecimento</th></tr></thead><tbody><tr><td>Nacional</td><td>35</td><td>Leste</td></tr></tbody></table></div></li></ul></p><p><b>(Etapa 3) </b><br>O QAT listará cada registro de previsão a ser importado (uma linha para cada combinação de unidade de planejamento, região e mês).<ul><li>QAT calcula o Consumo Previsto a ser importado da seguinte forma: </li><img class="formula-img-mr img-fluid mb-lg-0" src="/ForecastedConsumptionimported.png" style="border: 1px solid rgb(255, 255, 255); margin-left: -20px;"><p>Para o exemplo a seguir:<ul><li>Uma previsão nacional que será dividida em duas regiões de 50% cada</li><li>Unidade de Planejamento de Previsão está em pacotes de 3 e a Unidade de Planejamento do Plano de Fornecimento está em pacotes de 1 (Fator de conversão = 3)</li><li>A previsão nacional para o mês X foi de 100 (packs de 3)</li><li>Forecast of 100 * 50% * 3 = 150  (pacotes de 1) serão importados para cada região para o mês X</li></ul></p><li>Se houver um consumo previsto existente no plano de abastecimento, a célula "Consumo Previsto Atual" será destacada em amarelo. </li><li>Use a opção Importar? coluna para desmarcar quaisquer previsões que você NÃO deseja importar para o plano de fornecimento. Se marcado, o Consumo Previsto Convertido substituirá a previsão do Plano de Fornecimento. Se desmarcada, a previsão atual do Plano de Fornecimento permanecerá.</li><br><img class="img-fluid" src="/importintoqatsupplyplanscreenshot-2.jpg" style="width: 971px;"></ul></p></p>
+
+                                            
+				
+						
+				</td>
+				</tr>
+				
+		
+							</table>
+						</td>
+					</tr>
+					
+				</table>
+			</td>
+		</tr>
+	</table>
+</body>
+</html>
