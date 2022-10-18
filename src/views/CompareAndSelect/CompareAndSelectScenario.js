@@ -28,6 +28,10 @@ import NumberFormat from 'react-number-format';
 import jsPDF from "jspdf";
 import { LOGO } from '../../CommonComponent/Logo';
 import forcasterror from '../../assets/img/ForecastError-Formula.png';
+import compareAndSelectScenarioEn from '../../../src/ShowGuidanceFiles/compareAndSelectScenarioEn.html'
+import compareAndSelectScenarioFr from '../../../src/ShowGuidanceFiles/compareAndSelectScenarioFr.html'
+import compareAndSelectScenarioSp from '../../../src/ShowGuidanceFiles/compareAndSelectScenarioSp.html'
+import compareAndSelectScenarioPr from '../../../src/ShowGuidanceFiles/compareAndSelectScenarioPr.html'
 
 const ref = React.createRef();
 const pickerLang = {
@@ -2551,8 +2555,16 @@ class CompareAndSelectScenario extends Component {
                         <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
                     </ModalHeader>
                     <div>
-                        <ModalBody>
-                            <div>
+                    <ModalBody>
+                        <div dangerouslySetInnerHTML={ {__html:localStorage.getItem('lang') == 'en' ?
+                compareAndSelectScenarioEn :
+                localStorage.getItem('lang') == 'fr' ?
+                compareAndSelectScenarioFr :
+                  localStorage.getItem('lang') == 'sp' ?
+                  compareAndSelectScenarioSp :
+                  compareAndSelectScenarioPr
+              } } />
+                            {/* <div>
                                 <h3 className='ShowGuidanceHeading'>{i18n.t('static.CompareSelect.CompareAndSelect')}</h3>
                             </div>
                             <p>
@@ -2582,7 +2594,7 @@ class CompareAndSelectScenario extends Component {
                                     <li>{i18n.t('static.CompareSelect.ByDefault')}  </li>
                                     <li>{i18n.t('static.CompareSelect.ViewForecastingUnit')} <a href='/#/dataset/versionSettings' target="_blank" style={{ textDecoration: 'underline' }}>{i18n.t('static.versionSettings.versionSettings')}</a> screen. </li>
                                 </ul>
-                            </p>
+                            </p> */}
                         </ModalBody>
                     </div>
                 </Modal>

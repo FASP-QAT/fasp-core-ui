@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<meta name="">
+	<title>Mostrar guía</title>
+	<style>
+		table, td, div, h1, p {font-family: Arial, sans-serif;line-height: 20px;}
+		body{padding: 0;margin: 0;color: #272127;}
+		a {
+    color: #205493;
+    /* text-decoration: none; */
+    background-color: transparent;
+}
+	</style>
+</head>
+<body style="margin:0;padding:0;background:#e4e5e6;">
+	<table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+		<tr>
+			<td align="center" style="padding:0;">
+				<table role="presentation" style="max-width: 910px;min-width:100%;margin-top:20px;margin-bottom:20px;border-collapse:collapse;border:1px solid #fff;border-spacing:0;text-align:left;border-radius: 0.25rem;background-color: #fff;">
+					<tr>
+						<td style="padding:10px 30px 20px 30px;">
+							<table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+								
+								<tr>
+									<h3 style="color: #002f6c;font-weight: 600;font-size: 19px;">Ingreso y ajuste de datos</h3>
+									<td style="padding:0 0 10px 0;color:#153643;">
+										<p style="font-size: 13px;"><span style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold;">Objetivo</span> Permita a los usuarios preparar datos históricos de consumo antes de pasar al '<a href="/#/Extrapolation/extrapolateData" target="_blank" style="text-decoration: underline;">Extrapolación</a>' pantalla. El consumo real histórico puede ser cantidades vendidas, cantidades entregadas al usuario o cantidades emitidas por las instalaciones de almacenamiento. En esta pantalla, los usuarios pueden ajustar los datos de consumo históricos que se ingresaron manualmente en esta pantalla o que se importaron de un programa de plan de suministro de QAT (si desea importar, vaya primero a la '<a href="/#/importFromQATSupplyPlan/listImportFromQATSupplyPlan" target="_blank" style="text-decoration: underline;">Importar desde el plan de suministro QAT</a>' screen). </p>
+										<p style="font-size: 13px;"><span style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold;">Usando esta pantalla:</span></p>
+					
+											<ol type="1">
+												<li style="font-size:13px;">Seleccione el programa de pronóstico y el período de revisión deseado. De forma predeterminada, QAT preselecciona un rango de fechas de 36 meses antes del inicio del período de pronóstico. Se muestra una tabla no editable y todos los productos relacionados con este programa de previsión, junto con sus datos de consumo ajustados si ha ingresado previamente esos datos; de lo contrario, verá celdas amarillas que indican que no se han ingresado datos de consumo. Por defecto, los productos y el consumo se muestran en unidades de planificación. El usuario también puede expandir cada fila de la tabla para mostrar el consumo por región, si maneja un programa multi-región.  </li>
+												<li style="font-size:13px;">En la tabla superior, haga clic en un producto para mostrar la tabla de datos detallada de ese producto. La tabla de datos detallada tendrá una sección para cada región de su programa.</li>
+												<li style="font-size:13px;">La tabla de datos detallados permite a los usuarios agregar, editar, ajustar o eliminar registros históricos de consumo.
+													<ol type="a">
+														<li>Si desea ingresar datos manualmente, ingrese el consumo histórico para cada región 
+															y mes en la fila "Consumo real".  </li>
+														<li>Si ha importado datos de QAT, verá su consumo histórico importado en la fila "Consumo real".  </li>
+														<li>De manera predeterminada, se supone que los datos se ingresan en la Unidad de 
+															planificación. Sin embargo, el usuario puede especificar la unidad apropiada para los 
+															datos detallados haciendo clic en el enlace cambiar debajo del nombre del producto y 
+															en la ventana emergente posterior, eligiendo ingresar datos usando la unidad de 
+															planificación, las cantidades de la unidad de pronóstico (aplicando un reino -factor de conversión administrado) u otra 
+															unidad ingresada por el usuario (y factor de conversión). 
+														</li>
+														</ol>
+													</li>
+											<li style="font-size:13px;">Hay tres formas de ajustar los datos.:
+												<ol type="a">
+													<li><b>Ajustar por subregistro</b>: El valor predeterminado es 100% de informes cada mes. El usuario puede cambiar 
+														esto al valor correcto. QAT calculará el consumo ajustado por subregistro. </li>
+													<li><b>Ajuste por desabastecimiento</b>: Para los datos importados, la cantidad de días sin existencias se extrae del 
+														programa del plan de suministro de QAT, si se recopilan datos. El valor predeterminado para los días de desabastecimiento es 
+														cero días (se supone que el producto siempre está en stock). El usuario puede cambiar 
+														esto al valor correcto. El valor predeterminado para la cantidad de días en un mes se 
+														basa en los días calendario, pero los usuarios pueden ajustar la cantidad de días utilizados 
+														para el cálculo de agotamiento de existencias en '<a href="/#/dataset/versionSettings" target="_blank" style="text-decoration: underline;">Actualizar la configuración de la versión</a>'. </li>
+														<p class="pl-lg-5"><span style="font-style: italic;"><b>Tasa de desabastecimiento</b> = Agotado (días)/ (# de días en el mes). </span><br>
+															<span style="font-style: italic;"><b>Consumo ajustado</b> = Consumo real / Tasa de informes / (1 - Tasa de desabastecimiento) </span>
+														</p>
+														<p>Por ejemplo, si para un mes determinado, un producto tuvo un consumo de 1.000 unidades, 
+															estuvo agotado durante 5 de los 31 días del mes y la tasa de informes fue del 98 %.: <br>
+															<span class="pl-lg-5" style="font-style: italic;"><b> Tasa de desabastecimiento </b>= 5 days stocked out /31 days in a month = 16.1%. </span><br>
+															<span class="pl-lg-5" style="font-style: italic;"><b>  Consumo ajustado </b>= 1,000 units / 98% Reporting / (1 - 16.1%) = 1,217</span>  
+														</p>
+													<li>Interpolación de valores perdidos: Haga clic en el botón verde "Interpolar" en el centro derecho de 
+														la pantalla para buscar períodos en los que el valor de consumo está en blanco y reemplazarlos con un valor 
+														interpolado. QAT interpola encontrando los valores más cercanos a cada lado 
+														(antes o después del espacio en blanco), calcula la línea recta entre ellos y usa esa 
+														fórmula de línea recta para calcular el valor de los espacios en blanco.  
+														Tenga en cuenta que QAT no interpolará los meses en los que el consumo real sea cero. 
+														QAT solo interpolará si hay al menos un punto de datos antes y un punto de datos después 
+														de los valores en blanco.<br>Matemáticamente:<br>
+												<ul>
+													<li>Donde las x representan meses y las y representan el consumo real,</li>
+													<li>Donde los valores de datos conocidos son (x0, y0) y (x1, y1) </li>
+													<li>Donde los valores de datos desconocidos son (x, y) </li>
+													<li>La fórmula para la recta interpolada es </li>
+												</ul>
+												<span><img class="formula-img-mr img-fluid mb-lg-0" src="../ShowGuidanceFiles/img/dataentryScreenshot-1.png" style="border: 1px solid rgb(255, 255, 255); width: 250px;"></span><br>
+												<span><img class="formula-img-mr img-fluid mb-lg-0 mt-lg-0" src="../ShowGuidanceFiles/img/dataentryScreenshot-2.png" style="border: 1px solid rgb(255, 255, 255); width: 250px;"></span>
+											</li>
+											<li>Use el gráfico debajo de la tabla de datos detallados para ver los datos ajustados  </li>
+										</ol>
+									</li>
+									<li style="font-size:13px;">Haga clic en "Enviar" para guardar los datos ingresados </li>
+									<li style="font-size:13px;">Repita los pasos 2 a 4 para cada unidad de planificación</li>
+
+								</ol>
+							</p>
+				</td>
+				</tr>
+	
+							</table>
+						</td>
+					</tr>
+					
+				</table>
+			</td>
+		</tr>
+	</table>
+</body>
+</html>

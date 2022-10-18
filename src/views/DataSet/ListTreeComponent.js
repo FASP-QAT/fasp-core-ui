@@ -23,6 +23,10 @@ import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import moment from 'moment';
 import { calculateModelingData } from '../../views/DataSet/ModelingDataCalculation2';
+import ListTreeEn from '../../../src/ShowGuidanceFiles/ManageTreeListTreeEn.html';
+import ListTreeFr from '../../../src/ShowGuidanceFiles/ManageTreeListTreeFr.html';
+import ListTreeSp from '../../../src/ShowGuidanceFiles/ManageTreeListTreeSp.html';
+import ListTreePr from '../../../src/ShowGuidanceFiles/ManageTreeListTreePr.html';
 const entityname = i18n.t('static.common.listtree');
 
 const validationSchema = function (values) {
@@ -1516,8 +1520,18 @@ export default class ListTreeComponent extends Component {
                             <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
                         </ModalHeader>
                         <div>
-                            <ModalBody>
-                                <div>
+                        <ModalBody className="ModalBodyPadding">
+
+<div dangerouslySetInnerHTML={{
+    __html: localStorage.getItem('lang') == 'en' ?
+        ListTreeEn :
+        localStorage.getItem('lang') == 'fr' ?
+            ListTreeFr :
+            localStorage.getItem('lang') == 'sp' ?
+                ListTreeSp :
+                ListTreePr
+}} />
+                                {/* <div>
                                     <h3 className='ShowGuidanceHeading'>{i18n.t('static.listTree.manageTreeTreeList')}</h3>
                                 </div>
                                 <p>
@@ -1544,7 +1558,7 @@ export default class ListTreeComponent extends Component {
                                             <li>{i18n.t('static.listTree.submitHelpDeskTicket')} </li>
                                         </ul>
                                     </p>
-                                </p>
+                                </p> */}
 
                             </ModalBody>
                         </div>

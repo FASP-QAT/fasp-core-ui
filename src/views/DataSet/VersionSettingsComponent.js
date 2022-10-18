@@ -22,6 +22,10 @@ import { exportPDF, noForecastSelectedClicked, missingMonthsClicked, missingBran
 import pdfIcon from '../../assets/img/pdf.png';
 import ProgramService from '../../api/ProgramService';
 import DatasetService from '../../api/DatasetService';
+import showguidanceEn from '../../../src/ShowGuidanceFiles/UpdateVersionSettingsEn.html'
+import showguidanceFr from '../../../src/ShowGuidanceFiles/UpdateVersionSettingsFr.html'
+import showguidanceSp from '../../../src/ShowGuidanceFiles/UpdateVersionSettingsSp.html'
+import showguidancePr from '../../../src/ShowGuidanceFiles/UpdateVersionSettingsPr.html'
 import { resolve } from "path";
 const ref = React.createRef();
 const pickerLang = {
@@ -1730,8 +1734,16 @@ class VersionSettingsComponent extends Component {
                         <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
                     </ModalHeader>
                     <div>
-                        <ModalBody>
-                            <div>
+                    <ModalBody className="ModalBodyPadding">
+                        <div dangerouslySetInnerHTML={ {__html:localStorage.getItem('lang') == 'en' ?
+                showguidanceEn :
+                localStorage.getItem('lang') == 'fr' ?
+                showguidanceFr :
+                  localStorage.getItem('lang') == 'sp' ?
+                  showguidanceSp :
+                  showguidancePr
+              } } />
+                            {/* <div>
                                 <h3 className='ShowGuidanceHeading'>{i18n.t('static.UpdateversionSettings.UpdateversionSettings')}</h3>
                             </div>
                             <p>
@@ -1761,7 +1773,7 @@ class VersionSettingsComponent extends Component {
                                         </ol>
                                     </li>
                                 </ol>
-                            </p>
+                            </p> */}
                         </ModalBody>
                     </div>
                 </Modal>
