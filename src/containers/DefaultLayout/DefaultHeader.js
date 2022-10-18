@@ -171,14 +171,14 @@ class DefaultHeader extends Component {
           {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_COMMIT_DATASET') && this.props.activeModule == 1 &&
             <NavItem className="">
               <NavLink to="#" className="nav-link">
-                {console.log("localStorage.getItem(sesLocalVersionChange)----" + this.props.changeIcon)}
+                {console.log("localStorage.getItem(sesLocalVersionChange)----" + this.props.fuChangeIcon)}
 
-                {this.props.changeIcon &&
+                {this.props.fuChangeIcon &&
                   // <img src={iconsUparrowRed} className="HelpIcon" onClick={this.props.commitProgram} title={i18n.t('static.header.changesInLocalVersion')} style={{ width: '30px', height: '30px' }} />
                   <i class="nav-icon cui-cloud-upload icons" onClick={this.props.commitProgramFC} title={i18n.t('static.header.changesInLocalVersion')} style={{ fontSize: '25px', paddingTop: '2px', paddingLeft: '5px', color: '#BA0C2F',lineHeight:'57px' }}></i>
 
                 }
-                {!this.props.changeIcon &&
+                {!this.props.fuChangeIcon &&
                   // <img src={iconsUparrowBlue} className="HelpIcon" onClick={this.props.commitProgram} title={i18n.t('static.header.changesInLocalVersion')} style={{ width: '30px', height: '30px' }} />
                   <i class="nav-icon cui-cloud-upload icons" onClick={this.props.commitProgramFC} title={i18n.t('static.header.changesInLocalVersion')} style={{ fontSize: '25px', paddingTop: '2px', paddingLeft: '5px', color: '#a7c6ed',lineHeight:'57px' }}></i>
 

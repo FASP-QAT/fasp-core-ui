@@ -2820,6 +2820,17 @@ export default class PlanningUnitSetting extends Component {
                     console.log("---hurrey---");
                 })
                 transaction.oncomplete = function (event) {
+                    console.log("in side datasetDetails")
+                    db1 = e.target.result;
+                    var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
+                    var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
+                    var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.datasetId);
+                    datasetDetailsRequest.onsuccess = function (e) {         
+                    var datasetDetailsRequestJson = datasetDetailsRequest.result;
+                    datasetDetailsRequestJson.changed = 1;
+                    var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+                    datasetDetailsRequest1.onsuccess = function (event) {
+                  }}
                     // this.props.updateStepOneData("message", i18n.t('static.mt.dataUpdateSuccess'));
                     // this.props.updateStepOneData("color", "green");
                     // this.setState({
@@ -2922,6 +2933,17 @@ export default class PlanningUnitSetting extends Component {
                     console.log("---hurrey---");
                 })
                 transaction.oncomplete = function (event) {
+                    console.log("in side datasetDetails")
+                    db1 = e.target.result;
+                    var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
+                    var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
+                    var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.datasetId);
+                    datasetDetailsRequest.onsuccess = function (e) {         
+                    var datasetDetailsRequestJson = datasetDetailsRequest.result;
+                    datasetDetailsRequestJson.changed = 1;
+                    var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+                    datasetDetailsRequest1.onsuccess = function (event) {
+                  }}
                     console.log("Data update success");
                     // alert("success");
                 }.bind(this);
@@ -3049,6 +3071,17 @@ export default class PlanningUnitSetting extends Component {
                     console.log("---hurrey---");
                 })
                 transaction.oncomplete = function (event) {
+                    console.log("in side datasetDetails")
+                    db1 = e.target.result;
+                    var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
+                    var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
+                    var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.datasetId);
+                    datasetDetailsRequest.onsuccess = function (e) {         
+                    var datasetDetailsRequestJson = datasetDetailsRequest.result;
+                    datasetDetailsRequestJson.changed = 1;
+                    var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+                    datasetDetailsRequest1.onsuccess = function (event) {
+                  }}
                     // this.props.updateStepOneData("message", i18n.t('static.mt.dataUpdateSuccess'));
                     // this.props.updateStepOneData("color", "green");
                     // this.setState({

@@ -534,115 +534,125 @@ class VersionSettingsComponent extends Component {
             }
             if (cont) {
                 this.setState({
-                    loading: true
-                })
-                var tableJson = this.el.getJson(null, false);
-                var programs = [];
-                var count = 0;
-                for (var i = 0; i < tableJson.length; i++) {
-                    var map1 = new Map(Object.entries(tableJson[i]));
-                    console.log("12 map---" + map1.get("12"))
-                    if (parseInt(map1.get("12")) === 1) {
-                        console.log("map1.get(11)---", map1.get("11"));
-                        console.log("map1.get(13)---", map1.get("13"));
-                        console.log("map1.get(7)---", map1.get("7"));
-                        console.log("map1.get(9)---", map1.get("9"));
-                        var notes = map1.get("4");
-                        var startDate = map1.get("7");
-                        var stopDate = map1.get("9");
-                        var id = map1.get("11");
-                        var noOfDaysInMonth = Number(map1.get("13"));
-                        console.log("start date ---", startDate);
-                        console.log("stop date ---", stopDate);
-                        console.log("noOfDaysInMonth ---", noOfDaysInMonth);
-                        var program = (this.state.datasetList.filter(x => x.id == id)[0]);
-                        var databytes = CryptoJS.AES.decrypt(program.programData, SECRET_KEY);
-                        var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
-                        programData.currentVersion.forecastStartDate = moment(startDate).startOf('month').format("YYYY-MM-DD");
-                        programData.currentVersion.forecastStopDate = moment(stopDate).startOf('month').format("YYYY-MM-DD");
-                        programData.currentVersion.daysInMonth = noOfDaysInMonth;
-                        programData.currentVersion.notes = notes;
-
-
-                        programData.currentVersion.freightPerc = this.el.getValue(`O${parseInt(i) + 1}`, true).toString().replaceAll("%", "");
-                        programData.currentVersion.forecastThresholdHighPerc = this.el.getValue(`P${parseInt(i) + 1}`, true).toString().replaceAll("%", "");
-                        programData.currentVersion.forecastThresholdLowPerc = this.el.getValue(`Q${parseInt(i) + 1}`, true).toString().replaceAll("%", "");
-
-                        programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
-                        program.programData = programData;
-                        // var db1;
-                        // getDatabase();
-                        // var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                        // openRequest.onerror = function (event) {
-                        //     this.setState({
-                        //         message: i18n.t('static.program.errortext'),
-                        //         color: 'red'
-                        //     })
-                        //     this.hideFirstComponent()
-                        // }.bind(this);
-                        // openRequest.onsuccess = function (e) {
-                        //     db1 = e.target.result;
-                        //     var transaction = db1.transaction(['datasetData'], 'readwrite');
-                        //     var programTransaction = transaction.objectStore('datasetData');
-                        //     var programRequest = programTransaction.put(program);
-                        //     programRequest.onerror = function (e) {
-
-                        //     }.bind(this);
-                        //     programRequest.onsuccess = function (e) {
-
-                        //     }.bind(this);
-                        // }.bind(this);
-                        programs.push(program);
-                        count++;
-                    }
-                }
-                console.log("programs to update---", programs);
-                if (count > 0) {
-                    var db1;
-                    getDatabase();
-                    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                    openRequest.onerror = function (event) {
-                        this.setState({
-                            message: i18n.t('static.program.errortext'),
-                            color: 'red'
-                        })
-                        this.hideFirstComponent()
-                    }.bind(this);
-                    openRequest.onsuccess = function (e) {
-                        db1 = e.target.result;
-                        var transaction = db1.transaction(['datasetData'], 'readwrite');
-                        var programTransaction = transaction.objectStore('datasetData');
-                        programs.forEach(program => {
-                            var programRequest = programTransaction.put(program);
-                            console.log("---hurrey---");
-                        })
-                        transaction.oncomplete = function (event) {
-                            this.setState({
-                                loading: false,
-                                message: i18n.t('static.mt.dataUpdateSuccess'),
-                                color: "green",
-                                isChanged: false
-                            }, () => {
-                                this.hideSecondComponent();
-                                // this.getOnLineDatasetsVersion();
-                            });
-                            console.log("Data update success");
-                        }.bind(this);
-                        transaction.onerror = function (event) {
-                            this.setState({
-                                loading: false,
-                                // message: 'Error occured.',
-                                color: "red",
-                            }, () => {
-                                this.hideSecondComponent();
-                            });
-                            console.log("Data update errr");
-                        }.bind(this);
-                    }.bind(this);
-                }
-            }
-        } else {
-
+                   loading: true
+               })
+               var tableJson = this.el.getJson(null, false);
+               var programs = [];
+               var count = 0;
+               for (var i = 0; i < tableJson.length; i++) {
+                   var map1 = new Map(Object.entries(tableJson[i]));
+                   console.log("12 map---" + map1.get("12"))
+                   if (parseInt(map1.get("12")) === 1) {
+                       console.log("map1.get(11)---", map1.get("11"));
+                       console.log("map1.get(13)---", map1.get("13"));
+                       console.log("map1.get(7)---", map1.get("7"));
+                       console.log("map1.get(9)---", map1.get("9"));
+                       var notes = map1.get("4");
+                       var startDate = map1.get("7");
+                       var stopDate = map1.get("9");
+                       var id = map1.get("11");
+                       var noOfDaysInMonth = Number(map1.get("13"));
+                       console.log("start date ---", startDate);
+                       console.log("stop date ---", stopDate);
+                       console.log("noOfDaysInMonth ---", noOfDaysInMonth);
+                       var program = (this.state.datasetList.filter(x => x.id == id)[0]);
+                       var databytes = CryptoJS.AES.decrypt(program.programData, SECRET_KEY);
+                       var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+                       programData.currentVersion.forecastStartDate = moment(startDate).startOf('month').format("YYYY-MM-DD");
+                       programData.currentVersion.forecastStopDate = moment(stopDate).startOf('month').format("YYYY-MM-DD");
+                       programData.currentVersion.daysInMonth = noOfDaysInMonth;
+                       programData.currentVersion.notes = notes;
+   
+   
+                       programData.currentVersion.freightPerc = this.el.getValue(`O${parseInt(i) + 1}`, true).toString().replaceAll("%", "");
+                       programData.currentVersion.forecastThresholdHighPerc = this.el.getValue(`P${parseInt(i) + 1}`, true).toString().replaceAll("%", "");
+                       programData.currentVersion.forecastThresholdLowPerc = this.el.getValue(`Q${parseInt(i) + 1}`, true).toString().replaceAll("%", "");
+   
+                       programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
+                       program.programData = programData;
+                       // var db1;
+                       // getDatabase();
+                       // var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                       // openRequest.onerror = function (event) {
+                       //     this.setState({
+                       //         message: i18n.t('static.program.errortext'),
+                       //         color: 'red'
+                       //     })
+                       //     this.hideFirstComponent()
+                       // }.bind(this);
+                       // openRequest.onsuccess = function (e) {
+                       //     db1 = e.target.result;
+                       //     var transaction = db1.transaction(['datasetData'], 'readwrite');
+                       //     var programTransaction = transaction.objectStore('datasetData');
+                       //     var programRequest = programTransaction.put(program);
+                       //     programRequest.onerror = function (e) {
+   
+                       //     }.bind(this);
+                       //     programRequest.onsuccess = function (e) {
+   
+                       //     }.bind(this);
+                       // }.bind(this);
+                       programs.push(program);
+                       count++;
+                   }
+               }
+               console.log("programs to update---", programs);
+               if (count > 0) {
+                   var db1;
+                   getDatabase();
+                   var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                   openRequest.onerror = function (event) {
+                       this.setState({
+                           message: i18n.t('static.program.errortext'),
+                           color: 'red'
+                       })
+                       this.hideFirstComponent()
+                   }.bind(this);
+                   openRequest.onsuccess = function (e) {
+                       db1 = e.target.result;
+                       var transaction = db1.transaction(['datasetData'], 'readwrite');
+                       var programTransaction = transaction.objectStore('datasetData');
+                       programs.forEach(program => {
+                           var programRequest = programTransaction.put(program);
+                           console.log("---hurrey---");
+                       })
+                       transaction.oncomplete = function (event) {
+                           console.log("in side datasetDetails")
+                           db1 = e.target.result;
+                           var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
+                           var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
+                           var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.datasetId);
+                           datasetDetailsRequest.onsuccess = function (e) {         
+                             var datasetDetailsRequestJson = datasetDetailsRequest.result;
+                             datasetDetailsRequestJson.changed = 1;
+                             var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+                             datasetDetailsRequest1.onsuccess = function (event) {                               
+                                 }}
+   
+                           this.setState({
+                               loading: false,
+                               message: i18n.t('static.mt.dataUpdateSuccess'),
+                               color: "green",
+                               isChanged: false
+                           }, () => {
+                               this.hideSecondComponent();
+                               // this.getOnLineDatasetsVersion();
+                           });
+                           console.log("Data update success");
+                       }.bind(this);
+                       transaction.onerror = function (event) {
+                           this.setState({
+                               loading: false,
+                               // message: 'Error occured.',
+                               color: "red",
+                           }, () => {
+                               this.hideSecondComponent();
+                           });
+                           console.log("Data update errr");
+                       }.bind(this);
+                   }.bind(this);
+               }
+           }
         }
     }
 
