@@ -2523,7 +2523,7 @@ export default class ManualTagging extends Component {
                         artmisList: response.data.filter(c => !linkedRoNoAndRoPrimeLineNo.includes(c.roNo + "|" + c.roPrimeLineNo) && (this.state.roPrimeLineNoForTab3 != "" ? c.roPrimeLineNo == this.state.roPrimeLineNoForTab3 : true)),
                         displayButton: false
                     }, () => {
-                        this.buildJExcelERP();
+                        this.buildJExcelERP(true);
                     })
                 }).catch(
                     error => {
@@ -2580,7 +2580,7 @@ export default class ManualTagging extends Component {
                 displayButton: false
             }, () => {
                 // if (this.state.buildJexcelRequired) {
-                this.buildJExcelERP();
+                this.buildJExcelERP(true);
                 // }
             })
         }
@@ -3337,7 +3337,7 @@ export default class ManualTagging extends Component {
             );
     }
 
-    buildJExcelERP() {
+    buildJExcelERP(build) {
         this.setState({
             table1Loader: false
         },
@@ -3349,7 +3349,22 @@ export default class ManualTagging extends Component {
 
                 if (this.state.active1) {
                     console.log("Final Shipment Id@@@@@@@", this.state.finalShipmentId)
-                    var list = this.state.showAllShipments ? this.state.outputList.filter(c => c.planningUnit.id == this.state.outputListAfterSearch[0].planningUnit.id) : this.state.outputListAfterSearch;
+                    var updatedList = [];
+                    updatedList.push(this.state.outputListAfterSearch[0]);
+                    updatedList = updatedList.concat(this.state.outputList.filter(c => c.planningUnit.id == this.state.outputListAfterSearch[0].planningUnit.id).filter(d => this.state.outputListAfterSearch[0].shipmentId > 0 ? d.shipmentId != this.state.outputListAfterSearch[0].shipmentId : d.tempShipmentId != this.state.outputListAfterSearch[0].tempShipmentId))
+                    var finalShipmentId = [];
+                    if (!this.state.showAllShipments) {
+                        finalShipmentId.push({ "shipmentId": this.state.outputListAfterSearch[0].shipmentId, "tempShipmentId": this.state.outputListAfterSearch[0].shipmentId > 0 ? null : this.state.outputListAfterSearch[0].tempShipmentId, "index": 0, "qty": this.state.outputListAfterSearch[0].shipmentQty })
+                        var qtyFinalShipment = 0;
+                        finalShipmentId.map(c => {
+                            qtyFinalShipment += Number(c.qty)
+                        })
+                        this.setState({
+                            originalQty: qtyFinalShipment,
+                            finalShipmentId: finalShipmentId,
+                        });
+                    }
+                    var list = this.state.showAllShipments ? updatedList : this.state.outputListAfterSearch;
                     console.log("List@@@@@@@@@Mohit", list)
                     var dataArray1 = [];
                     var data1 = [];
@@ -3524,290 +3539,300 @@ export default class ManualTagging extends Component {
 
                     }
                 }
-                let erpDataList = this.state.artmisList;
-                console.log('erpDataList****************', erpDataList)
-                let erpDataArray = [];
-                let count = 0;
-                let qty = 0;
-                let convertedQty = 0;
-                // if (erpDataList.length > 0) {
-                for (var j = 0; j < erpDataList.length; j++) {
-                    data = [];
-                    // if (this.state.active3) {
-                    //     data[0] = 0;
-                    //     data[1] = erpDataList[j].erpOrderId;
-                    //     data[2] = erpDataList[j].roNo + ' - ' + erpDataList[j].roPrimeLineNo + " | " + erpDataList[j].orderNo + ' - ' + erpDataList[j].primeLineNo;
-                    //     data[3] = getLabelText(erpDataList[j].erpPlanningUnit.label);
-                    //     data[4] = erpDataList[j].expectedDeliveryDate;
-                    //     data[5] = erpDataList[j].erpStatus;
-                    //     data[6] = erpDataList[j].shipmentQty;
-                    //     data[7] = '';
-                    //     // let convertedQty = this.addCommas(erpDataList[j].shipmentQty * 1);
-                    //     data[8] = erpDataList[j].shipmentQty;
-                    //     data[9] = '';
-                    //     data[10] = 0;
-                    //     data[11] = erpDataList[j].orderNo;
-                    //     data[12] = erpDataList[j].primeLineNo;
-                    //     data[13] = erpDataList[j].erpPlanningUnit.id;
+                if (build) {
+                    let erpDataList = this.state.artmisList;
+                    console.log('erpDataList****************', erpDataList)
+                    let erpDataArray = [];
+                    let count = 0;
+                    let qty = 0;
+                    let convertedQty = 0;
+                    // if (erpDataList.length > 0) {
+                    for (var j = 0; j < erpDataList.length; j++) {
+                        data = [];
+                        // if (this.state.active3) {
+                        //     data[0] = 0;
+                        //     data[1] = erpDataList[j].erpOrderId;
+                        //     data[2] = erpDataList[j].roNo + ' - ' + erpDataList[j].roPrimeLineNo + " | " + erpDataList[j].orderNo + ' - ' + erpDataList[j].primeLineNo;
+                        //     data[3] = getLabelText(erpDataList[j].erpPlanningUnit.label);
+                        //     data[4] = erpDataList[j].expectedDeliveryDate;
+                        //     data[5] = erpDataList[j].erpStatus;
+                        //     data[6] = erpDataList[j].shipmentQty;
+                        //     data[7] = '';
+                        //     // let convertedQty = this.addCommas(erpDataList[j].shipmentQty * 1);
+                        //     data[8] = erpDataList[j].shipmentQty;
+                        //     data[9] = '';
+                        //     data[10] = 0;
+                        //     data[11] = erpDataList[j].orderNo;
+                        //     data[12] = erpDataList[j].primeLineNo;
+                        //     data[13] = erpDataList[j].erpPlanningUnit.id;
 
-                    // } else {
-                    console.log("order no ---", erpDataList[j].orderNo + " active---", erpDataList[j].active)
-                    data[0] = this.state.active3 ? true : false;//A
-                    data[1] = erpDataList[j].roNo + ' - ' + erpDataList[j].roPrimeLineNo + ' | ' + erpDataList[j].orderNo + ' - ' + erpDataList[j].primeLineNo + (erpDataList[j].knShipmentNo != '' && erpDataList[j].knShipmentNo != null ? ' | ' + erpDataList[j].knShipmentNo : "");//B
-                    data[2] = erpDataList[j].orderNo + ' | ' + erpDataList[j].primeLineNo;//C
-                    data[3] = getLabelText(erpDataList[j].erpPlanningUnit.label);//D
-                    data[4] = erpDataList[j].expectedDeliveryDate;//E
-                    data[5] = erpDataList[j].erpShipmentStatus;//F
-                    data[6] = erpDataList[j].knShipmentNo;//G
-                    data[7] = erpDataList[j].batchNo;//H
-                    data[8] = erpDataList[j].expiryDate;//I
-                    data[9] = "";//J
-                    data[10] = erpDataList[j].erpQty;//K
-                    // let conversionFactor = (erpDataList[j].conversionFactor != null && erpDataList[j].conversionFactor != "" ? erpDataList[j].conversionFactor : '');
-                    data[11] = "";//L
-                    // convertedQty = erpDataList[j].quantity * (erpDataList[j].conversionFactor != null && erpDataList[j].conversionFactor != "" ? erpDataList[j].conversionFactor : 1);
-                    // data[11] = ``;
-                    data[12] = "";//M
-                    data[13] = "";//N
-                    data[14] = erpDataArray.filter(c => c[17] == erpDataList[j].roNo + ' | ' + erpDataList[j].roPrimeLineNo).length > 0 ? 1 : 0;
-                    data[15] = erpDataList[j].qatEquivalentShipmentStatus;
-                    data[16] = erpDataList[j];
-                    data[17] = erpDataList[j].roNo + ' | ' + erpDataList[j].roPrimeLineNo
-                    data[18] = 1;
-                    data[19] = ""
-                    data[20] = planningUnitId;
-                    // data[9] = "";
-                    // data[10] = "";
-                    // data[11] = "";
-                    // data[12] = "";
-                    // data[13] = "";
-                    // // data[10] = 0;
-                    // // data[11] = erpDataList[j].orderNo;
-                    // // data[12] = erpDataList[j].primeLineNo;
-                    // // data[13] = 0;
-                    // // if (erpDataList[j].active) {
-                    // //     qty = Number(qty) + convertedQty;
-                    // // }
-                    // }
-                    erpDataArray[count] = data;
-                    count++;
+                        // } else {
+                        console.log("order no ---", erpDataList[j].orderNo + " active---", erpDataList[j].active)
+                        data[0] = this.state.active3 ? true : false;//A
+                        data[1] = erpDataList[j].roNo + ' - ' + erpDataList[j].roPrimeLineNo + ' | ' + erpDataList[j].orderNo + ' - ' + erpDataList[j].primeLineNo + (erpDataList[j].knShipmentNo != '' && erpDataList[j].knShipmentNo != null ? ' | ' + erpDataList[j].knShipmentNo : "");//B
+                        data[2] = erpDataList[j].orderNo + ' | ' + erpDataList[j].primeLineNo;//C
+                        data[3] = getLabelText(erpDataList[j].erpPlanningUnit.label);//D
+                        data[4] = erpDataList[j].expectedDeliveryDate;//E
+                        data[5] = erpDataList[j].erpShipmentStatus;//F
+                        data[6] = erpDataList[j].knShipmentNo;//G
+                        data[7] = erpDataList[j].batchNo;//H
+                        data[8] = erpDataList[j].expiryDate;//I
+                        data[9] = "";//J
+                        data[10] = erpDataList[j].erpQty;//K
+                        // let conversionFactor = (erpDataList[j].conversionFactor != null && erpDataList[j].conversionFactor != "" ? erpDataList[j].conversionFactor : '');
+                        data[11] = "";//L
+                        // convertedQty = erpDataList[j].quantity * (erpDataList[j].conversionFactor != null && erpDataList[j].conversionFactor != "" ? erpDataList[j].conversionFactor : 1);
+                        // data[11] = ``;
+                        data[12] = "";//M
+                        data[13] = "";//N
+                        data[14] = erpDataArray.filter(c => c[17] == erpDataList[j].roNo + ' | ' + erpDataList[j].roPrimeLineNo).length > 0 ? 1 : 0;
+                        data[15] = erpDataList[j].qatEquivalentShipmentStatus;
+                        data[16] = erpDataList[j];
+                        data[17] = erpDataList[j].roNo + ' | ' + erpDataList[j].roPrimeLineNo
+                        data[18] = 1;
+                        data[19] = ""
+                        data[20] = planningUnitId;
+                        // data[9] = "";
+                        // data[10] = "";
+                        // data[11] = "";
+                        // data[12] = "";
+                        // data[13] = "";
+                        // // data[10] = 0;
+                        // // data[11] = erpDataList[j].orderNo;
+                        // // data[12] = erpDataList[j].primeLineNo;
+                        // // data[13] = 0;
+                        // // if (erpDataList[j].active) {
+                        // //     qty = Number(qty) + convertedQty;
+                        // // }
+                        // }
+                        erpDataArray[count] = data;
+                        count++;
+                    }
+                    this.setState({
+                        totalQuantity: this.addCommas(Math.round(qty)),
+                        displayTotalQty: (qty > 0 ? true : false)
+                    });
+                    console.log("TableDiv1@@@@@@@@@@@@@@@@@@@@@", document.getElementById("tableDiv1"))
+                    this.el = jexcel(document.getElementById("tableDiv1"), '');
+                    // this.el.destroy();
+                    jexcel.destroy(document.getElementById("tableDiv1"), true);
+
+                    var json = [];
+                    var data = erpDataArray;
+                    // var data = [];
+
+                    var options = {
+                        data: data,
+                        columnDrag: true,
+                        colHeaderClasses: ["Reqasterisk"],
+                        columns: [
+                            {
+                                title: i18n.t('static.mt.linkColumn'),
+                                type: 'checkbox',
+                                width: 60
+                            },
+                            {
+                                title: i18n.t('static.mt.roNoAndRoLineNo'),
+                                type: 'text',
+                                readOnly: true,
+                                width: 150
+                            },
+                            {
+                                title: i18n.t('static.mt.orderNoAndPrimeLineNo'),
+                                type: 'hidden',
+                                readOnly: true,
+                                width: 0
+                            },
+                            {
+                                title: i18n.t('static.dashboard.planningunitheader'),
+                                type: 'text',
+                                readOnly: true,
+                                width: 200
+                            },
+                            {
+                                title: i18n.t('static.supplyPlan.mtexpectedDeliveryDate'),
+                                type: 'calendar',
+                                readOnly: true,
+                                options: { format: JEXCEL_DATE_FORMAT },
+                                width: 80
+                            },
+                            {
+                                title: i18n.t('static.shipmentDataEntry.shipmentStatus'),
+                                type: 'text',
+                                readOnly: true,
+                                width: 60
+                            },
+                            {
+                                title: i18n.t('static.mt.knShipmentNo'),
+                                type: 'hidden',
+                                readOnly: true,
+                                width: 0
+                            },
+                            {
+                                title: i18n.t('static.mt.batchNo'),
+                                type: 'text',
+                                readOnly: true,
+                                width: 80
+                            },
+                            {
+                                title: i18n.t('static.supplyPlan.expiryDate'),
+                                type: 'calendar',
+                                readOnly: true,
+                                options: { format: JEXCEL_DATE_FORMAT },
+                                width: 80
+                            },
+                            {
+                                title: i18n.t('static.manualTagging.aru'),
+                                type: 'dropdown',
+                                source: this.state.realmCountryPlanningUnitList,
+                                filter: this.filterRealmCountryPlanningUnit1,
+                                width: 150
+                            },
+                            {
+                                title: i18n.t('static.supplyPlan.qty'),
+                                type: 'numeric',
+                                mask: '#,##', decimal: '.',
+                                readOnly: true,
+                                width: 80
+                            },
+                            {
+                                title: i18n.t('static.manualTagging.conversionERPToPU'),
+                                type: 'numeric',
+                                mask: '#,##0.00',
+                                decimal: '.',
+                                textEditor: true,
+                                disabledMaskOnEdition: true,
+                                width: 80
+                            },
+                            {
+                                title: i18n.t('static.manualTagging.convertedQATShipmentQty'),
+                                type: 'numeric',
+                                mask: '#,##',
+                                decimal: '.',
+                                readOnly: true,
+                                width: 80
+                            },
+                            {
+                                title: i18n.t('static.program.notes'),
+                                type: 'text',
+                                width: 200
+                            },
+                            {
+                                title: "Exists",
+                                type: 'hidden',
+                            },
+                            {
+                                title: "QAT shipment status",
+                                type: 'hidden',
+                            },
+                            {
+                                title: "Object",
+                                type: 'hidden',
+                            },
+                            {
+                                title: "Ro No and Ro Prime line No",
+                                type: 'hidden',
+                            },
+                            {
+                                title: "Multiplier",
+                                type: 'hidden',
+                            },
+                            {
+                                title: "QAT Rcpu Qty",
+                                type: 'hidden',
+                            },
+                            {
+                                title: "QAT Rcpu Qty",
+                                type: 'hidden',
+                            },
+                        ],
+                        // footers: [['Total','1','1','1','1',0,0,0,0]],
+                        editable: true,
+                        // text: {
+                        //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                        //     show: '',
+                        //     entries: '',
+                        // },
+                        onsearch: function (el) {
+                            // el.jexcel.updateTable();
+                        },
+                        onfilter: function (el) {
+                            // el.jexcel.updateTable();
+                        },
+                        onload: this.loadedERP,
+                        pagination: localStorage.getItem("sesRecordCount"),
+                        filters: true,
+                        search: true,
+                        columnSorting: true,
+                        // tableOverflow: true,
+                        wordWrap: true,
+                        paginationOptions: JEXCEL_PAGINATION_OPTION,
+                        position: 'top',
+                        allowInsertColumn: false,
+                        allowManualInsertColumn: false,
+                        allowDeleteRow: false,
+                        onchange: this.changed,
+                        updateTable: function (el, cell, x, y, source, value, id) {
+                            var elInstance = el;
+                            if (y != null) {
+                                var rowData = elInstance.getRowData(y);
+                                if (rowData[14] == 0 && rowData[0]) {
+                                    var cell = elInstance.getCell(("J").concat(parseInt(y) + 1))
+                                    cell.classList.remove('readonly');
+                                    var cell = elInstance.getCell(("L").concat(parseInt(y) + 1))
+                                    cell.classList.add('readonly');
+                                    var cell = elInstance.getCell(("N").concat(parseInt(y) + 1))
+                                    cell.classList.remove('readonly');
+                                } else {
+                                    var cell = elInstance.getCell(("J").concat(parseInt(y) + 1))
+                                    cell.classList.add('readonly');
+                                    var cell = elInstance.getCell(("L").concat(parseInt(y) + 1))
+                                    cell.classList.add('readonly');
+                                    var cell = elInstance.getCell(("N").concat(parseInt(y) + 1))
+                                    cell.classList.add('readonly');
+                                }
+                                if (rowData[14] == 1) {
+                                    var cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
+                                    cell.classList.add('readonly');
+                                }
+                            }
+                        }.bind(this),
+                        // oneditionend: this.oneditionend,
+                        copyCompatibility: true,
+                        allowManualInsertRow: false,
+                        parseFormulas: true,
+                        onpaste: this.onPaste,
+                        // oneditionend: this.oneditionend,
+                        // text: {
+                        //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                        //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                        //     show: '',
+                        //     entries: '',
+                        // },
+
+                        license: JEXCEL_PRO_KEY,
+                        contextMenu: function (obj, x, y, e) {
+                            return false;
+                        }.bind(this),
+
+                    };
+                    var instance = jexcel(document.getElementById("tableDiv1"), options);
+                    this.el = instance;
+                    this.setState({
+                        instance, loading: false,
+                        buildJexcelRequired: true,
+                        table1Loader: true,
+                        loading1: false
+                    })
+                } else {
+                    this.setState({
+                        loading: false,
+                        buildJexcelRequired: true,
+                        table1Loader: true,
+                        loading1: false
+                    })
                 }
-                this.setState({
-                    totalQuantity: this.addCommas(Math.round(qty)),
-                    displayTotalQty: (qty > 0 ? true : false)
-                });
-                console.log("TableDiv1@@@@@@@@@@@@@@@@@@@@@", document.getElementById("tableDiv1"))
-                this.el = jexcel(document.getElementById("tableDiv1"), '');
-                // this.el.destroy();
-                jexcel.destroy(document.getElementById("tableDiv1"), true);
 
-                var json = [];
-                var data = erpDataArray;
-                // var data = [];
-
-                var options = {
-                    data: data,
-                    columnDrag: true,
-                    colHeaderClasses: ["Reqasterisk"],
-                    columns: [
-                        {
-                            title: i18n.t('static.mt.linkColumn'),
-                            type: 'checkbox',
-                            width: 60
-                        },
-                        {
-                            title: i18n.t('static.mt.roNoAndRoLineNo'),
-                            type: 'text',
-                            readOnly: true,
-                            width: 150
-                        },
-                        {
-                            title: i18n.t('static.mt.orderNoAndPrimeLineNo'),
-                            type: 'hidden',
-                            readOnly: true,
-                            width: 0
-                        },
-                        {
-                            title: i18n.t('static.dashboard.planningunitheader'),
-                            type: 'text',
-                            readOnly: true,
-                            width: 200
-                        },
-                        {
-                            title: i18n.t('static.supplyPlan.mtexpectedDeliveryDate'),
-                            type: 'calendar',
-                            readOnly: true,
-                            options: { format: JEXCEL_DATE_FORMAT },
-                            width: 80
-                        },
-                        {
-                            title: i18n.t('static.shipmentDataEntry.shipmentStatus'),
-                            type: 'text',
-                            readOnly: true,
-                            width: 60
-                        },
-                        {
-                            title: i18n.t('static.mt.knShipmentNo'),
-                            type: 'hidden',
-                            readOnly: true,
-                            width: 0
-                        },
-                        {
-                            title: i18n.t('static.mt.batchNo'),
-                            type: 'text',
-                            readOnly: true,
-                            width: 80
-                        },
-                        {
-                            title: i18n.t('static.supplyPlan.expiryDate'),
-                            type: 'calendar',
-                            readOnly: true,
-                            options: { format: JEXCEL_DATE_FORMAT },
-                            width: 80
-                        },
-                        {
-                            title: i18n.t('static.manualTagging.aru'),
-                            type: 'dropdown',
-                            source: this.state.realmCountryPlanningUnitList,
-                            filter: this.filterRealmCountryPlanningUnit1,
-                            width: 150
-                        },
-                        {
-                            title: i18n.t('static.supplyPlan.qty'),
-                            type: 'numeric',
-                            mask: '#,##', decimal: '.',
-                            readOnly: true,
-                            width: 80
-                        },
-                        {
-                            title: i18n.t('static.manualTagging.conversionERPToPU'),
-                            type: 'numeric',
-                            mask: '#,##0.00',
-                            decimal: '.',
-                            textEditor: true,
-                            disabledMaskOnEdition: true,
-                            width: 80
-                        },
-                        {
-                            title: i18n.t('static.manualTagging.convertedQATShipmentQty'),
-                            type: 'numeric',
-                            mask: '#,##',
-                            decimal: '.',
-                            readOnly: true,
-                            width: 80
-                        },
-                        {
-                            title: i18n.t('static.program.notes'),
-                            type: 'text',
-                            width: 200
-                        },
-                        {
-                            title: "Exists",
-                            type: 'hidden',
-                        },
-                        {
-                            title: "QAT shipment status",
-                            type: 'hidden',
-                        },
-                        {
-                            title: "Object",
-                            type: 'hidden',
-                        },
-                        {
-                            title: "Ro No and Ro Prime line No",
-                            type: 'hidden',
-                        },
-                        {
-                            title: "Multiplier",
-                            type: 'hidden',
-                        },
-                        {
-                            title: "QAT Rcpu Qty",
-                            type: 'hidden',
-                        },
-                        {
-                            title: "QAT Rcpu Qty",
-                            type: 'hidden',
-                        },
-                    ],
-                    // footers: [['Total','1','1','1','1',0,0,0,0]],
-                    editable: true,
-                    // text: {
-                    //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                    //     show: '',
-                    //     entries: '',
-                    // },
-                    onsearch: function (el) {
-                        // el.jexcel.updateTable();
-                    },
-                    onfilter: function (el) {
-                        // el.jexcel.updateTable();
-                    },
-                    onload: this.loadedERP,
-                    pagination: localStorage.getItem("sesRecordCount"),
-                    filters: true,
-                    search: true,
-                    columnSorting: true,
-                    // tableOverflow: true,
-                    wordWrap: true,
-                    paginationOptions: JEXCEL_PAGINATION_OPTION,
-                    position: 'top',
-                    allowInsertColumn: false,
-                    allowManualInsertColumn: false,
-                    allowDeleteRow: false,
-                    onchange: this.changed,
-                    updateTable: function (el, cell, x, y, source, value, id) {
-                        var elInstance = el;
-                        if (y != null) {
-                            var rowData = elInstance.getRowData(y);
-                            if (rowData[14] == 0 && rowData[0]) {
-                                var cell = elInstance.getCell(("J").concat(parseInt(y) + 1))
-                                cell.classList.remove('readonly');
-                                var cell = elInstance.getCell(("L").concat(parseInt(y) + 1))
-                                cell.classList.add('readonly');
-                                var cell = elInstance.getCell(("N").concat(parseInt(y) + 1))
-                                cell.classList.remove('readonly');
-                            } else {
-                                var cell = elInstance.getCell(("J").concat(parseInt(y) + 1))
-                                cell.classList.add('readonly');
-                                var cell = elInstance.getCell(("L").concat(parseInt(y) + 1))
-                                cell.classList.add('readonly');
-                                var cell = elInstance.getCell(("N").concat(parseInt(y) + 1))
-                                cell.classList.add('readonly');
-                            }
-                            if (rowData[14] == 1) {
-                                var cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
-                                cell.classList.add('readonly');
-                            }
-                        }
-                    }.bind(this),
-                    // oneditionend: this.oneditionend,
-                    copyCompatibility: true,
-                    allowManualInsertRow: false,
-                    parseFormulas: true,
-                    onpaste: this.onPaste,
-                    // oneditionend: this.oneditionend,
-                    // text: {
-                    //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                    //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                    //     show: '',
-                    //     entries: '',
-                    // },
-
-                    license: JEXCEL_PRO_KEY,
-                    contextMenu: function (obj, x, y, e) {
-                        return false;
-                    }.bind(this),
-
-                };
-                var instance = jexcel(document.getElementById("tableDiv1"), options);
-                this.el = instance;
-                this.setState({
-                    instance, loading: false,
-                    buildJexcelRequired: true,
-                    table1Loader: true,
-                    loading1: false
-                })
                 // }
             })
     }
@@ -4615,7 +4640,7 @@ export default class ManualTagging extends Component {
             artmisList: filterOnRoNoAndRoPrimeLineNo,
             displayButton: false
         }, () => {
-            this.buildJExcelERP()
+            this.buildJExcelERP(true)
         })
 
     }
@@ -5090,7 +5115,7 @@ export default class ManualTagging extends Component {
         this.setState({
             showAllShipments: e.target.checked
         }, () => {
-            this.buildJExcelERP()
+            this.buildJExcelERP(false)
         })
     }
 
