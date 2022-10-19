@@ -883,13 +883,14 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                 var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                                 var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
                                 var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.datasetId);
-                                datasetDetailsRequest.onsuccess = function (e) {         
-                                  var datasetDetailsRequestJson = datasetDetailsRequest.result;
-                                  datasetDetailsRequestJson.changed = 1;
-                                  var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
-                                  datasetDetailsRequest1.onsuccess = function (event) {
-                                       
-                                      }}
+                                datasetDetailsRequest.onsuccess = function (e) {
+                                    var datasetDetailsRequestJson = datasetDetailsRequest.result;
+                                    datasetDetailsRequestJson.changed = 1;
+                                    var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+                                    datasetDetailsRequest1.onsuccess = function (event) {
+
+                                    }
+                                }
                                 console.log("Data update success");
                                 this.setState({
                                     isChanged1: false
@@ -1186,12 +1187,18 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                     type: 'checkbox'//I8
                 },
                 {
-                    title: 'duplicate',
-                    type: 'hidden'//J9
+                    // title: 'duplicate',
+                    // type: 'hidden'//J9
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
                 {
-                    title: 'regionId',
-                    type: 'hidden'//K10
+                    // title: 'regionId',
+                    // type: 'hidden'//K10
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
 
 

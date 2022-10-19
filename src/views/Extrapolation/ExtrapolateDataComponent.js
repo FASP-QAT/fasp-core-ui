@@ -588,73 +588,105 @@ export default class ExtrapolateDataComponent extends React.Component {
                     },
                     {
                         title: i18n.t('static.extrapolation.movingAverages'),
-                        type: this.state.movingAvgId ? 'numeric' : 'hidden',
+                        type: this.state.movingAvgId ? 'numeric' : 'text',
+                        visible: this.state.movingAvgId ? true : false,
                         mask: '#,##.00', decimal: '.'
                     },
                     {
                         title: i18n.t('static.extrapolation.semiAverages'),
-                        type: this.state.semiAvgId ? 'numeric' : 'hidden',
+                        type: this.state.semiAvgId ? 'numeric' : 'text',
+                        visible: this.state.semiAvgId ? true : false,
                         mask: '#,##.00', decimal: '.'
                     },
                     {
                         title: i18n.t('static.extrapolation.linearRegression'),
-                        type: this.state.linearRegressionId ? 'numeric' : 'hidden',
+                        type: this.state.linearRegressionId ? 'numeric' : 'text',
+                        visible: this.state.linearRegressionId ? true : false,
                         mask: '#,##.00', decimal: '.'
                     },
                     {
-                        title: i18n.t('static.extrapolation.tesLower'),
-                        type: 'hidden',
-                        mask: '#,##.00', decimal: '.'
+                        // title: i18n.t('static.extrapolation.tesLower'),
+                        // type: 'hidden',
+                        // mask: '#,##.00', decimal: '.'
+                        title: 'A',
+                        type: 'text',
+                        visible: false
                     },
                     {
                         title: i18n.t('static.extrapolation.tes'),
-                        type: this.state.smoothingId ? 'numeric' : 'hidden',
+                        type: this.state.smoothingId ? 'numeric' : 'text',
+                        visible: this.state.smoothingId ? true : false,
                         mask: '#,##.00', decimal: '.'
                     },
                     {
-                        title: i18n.t('static.extrapolation.tesUpper'),
-                        type: 'hidden',
-                        mask: '#,##.00', decimal: '.'
+                        // title: i18n.t('static.extrapolation.tesUpper'),
+                        // type: 'hidden',
+                        // mask: '#,##.00', decimal: '.'
+                        title: 'A',
+                        type: 'text',
+                        visible: false
                     },
                     {
                         title: i18n.t('static.extrapolation.arima'),
-                        type: this.state.arimaId ? 'numeric' : 'hidden',
+                        type: this.state.arimaId ? 'numeric' : 'text',
+                        visible: this.state.arimaId ? true : false,
                         mask: '#,##.00', decimal: '.'
                     },
                     {
-                        title: i18n.t('static.extrapolation.linearRegression') + " L",
-                        type: 'hidden',
-                        mask: '#,##.00', decimal: '.'
+                        // title: i18n.t('static.extrapolation.linearRegression') + " L",
+                        // type: 'hidden',
+                        // mask: '#,##.00', decimal: '.'
+                        title: 'A',
+                        type: 'text',
+                        visible: false
                     },
                     {
-                        title: i18n.t('static.extrapolation.linearRegression') + " H",
-                        type: 'hidden',
-                        mask: '#,##.00', decimal: '.'
+                        // title: i18n.t('static.extrapolation.linearRegression') + " H",
+                        // type: 'hidden',
+                        // mask: '#,##.00', decimal: '.'
+                        title: 'A',
+                        type: 'text',
+                        visible: false
                     },
                     {
-                        title: i18n.t('static.extrapolation.arima') + " L",
-                        type: 'hidden',
-                        mask: '#,##.00', decimal: '.'
+                        // title: i18n.t('static.extrapolation.arima') + " L",
+                        // type: 'hidden',
+                        // mask: '#,##.00', decimal: '.'
+                        title: 'A',
+                        type: 'text',
+                        visible: false
                     },
                     {
-                        title: i18n.t('static.extrapolation.arima') + " H",
-                        type: 'hidden',
-                        mask: '#,##.00', decimal: '.'
+                        // title: i18n.t('static.extrapolation.arima') + " H",
+                        // type: 'hidden',
+                        // mask: '#,##.00', decimal: '.'
+                        title: 'A',
+                        type: 'text',
+                        visible: false
                     },
                     {
-                        title: i18n.t('static.extrapolation.linearRegression') + " CI",
-                        type: 'hidden',
-                        mask: '#,##.00', decimal: '.'
+                        // title: i18n.t('static.extrapolation.linearRegression') + " CI",
+                        // type: 'hidden',
+                        // mask: '#,##.00', decimal: '.'
+                        title: 'A',
+                        type: 'text',
+                        visible: false
                     },
                     {
-                        title: i18n.t('static.extrapolation.tes') + " CI",
-                        type: 'hidden',
-                        mask: '#,##.00', decimal: '.'
+                        // title: i18n.t('static.extrapolation.tes') + " CI",
+                        // type: 'hidden',
+                        // mask: '#,##.00', decimal: '.'
+                        title: 'A',
+                        type: 'text',
+                        visible: false
                     },
                     {
-                        title: i18n.t('static.extrapolation.arima') + " CI",
-                        type: 'hidden',
-                        mask: '#,##.00', decimal: '.'
+                        // title: i18n.t('static.extrapolation.arima') + " CI",
+                        // type: 'hidden',
+                        // mask: '#,##.00', decimal: '.'
+                        title: 'A',
+                        type: 'text',
+                        visible: false
                     },
                 ],
             // text: {
@@ -1351,13 +1383,14 @@ export default class ExtrapolateDataComponent extends React.Component {
                         var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                         var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
                         var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.datasetId);
-                        datasetDetailsRequest.onsuccess = function (e) {         
-                          var datasetDetailsRequestJson = datasetDetailsRequest.result;
-                          datasetDetailsRequestJson.changed = 1;
-                          var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
-                          datasetDetailsRequest1.onsuccess = function (event) {
-                               
-                              }}
+                        datasetDetailsRequest.onsuccess = function (e) {
+                            var datasetDetailsRequestJson = datasetDetailsRequest.result;
+                            datasetDetailsRequestJson.changed = 1;
+                            var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+                            datasetDetailsRequest1.onsuccess = function (event) {
+
+                            }
+                        }
 
                         // let id = AuthenticationService.displayDashboardBasedOnRole();
                         // this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.compareAndSelect.dataSaved'));
@@ -1755,7 +1788,8 @@ export default class ExtrapolateDataComponent extends React.Component {
         if (this.state.planningUnitId > 0 && this.state.regionId > 0) {
 
             console.log("Inside if parameter", this.state.loading)
-            this.setState({ loading: true,
+            this.setState({
+                loading: true,
                 movingAvgData: [],
                 semiAvgData: [],
                 linearRegressionData: [],
@@ -4039,9 +4073,9 @@ export default class ExtrapolateDataComponent extends React.Component {
                         <FormGroup>
                             <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                             {this.state.forecastProgramId != "" && this.state.planningUnitId > 0 && <button className="mr-1 float-right btn btn-info btn-md" onClick={this.toggledata}>{this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}</button>}
-                            {this.state.forecastProgramId != "" && this.state.planningUnitId > 0 &&  <> <Button type="button" id="dataCheck" size="md" color="info" className="float-right mr-1" onClick={() => this.openDataCheckModel()}><i className="fa fa-check"></i>{i18n.t('static.common.dataCheck')}</Button></>}
+                            {this.state.forecastProgramId != "" && this.state.planningUnitId > 0 && <> <Button type="button" id="dataCheck" size="md" color="info" className="float-right mr-1" onClick={() => this.openDataCheckModel()}><i className="fa fa-check"></i>{i18n.t('static.common.dataCheck')}</Button></>}
                             {/* {this.state.showData && <> <Button type="button" id="dataCheck" size="md" color="info" className="float-right mr-1" onClick={() => this.openDataCheckModel()}><i className="fa fa-check"></i>{i18n.t('static.common.dataCheck')}</Button></>} */}
-                            
+
                             &nbsp;
                         </FormGroup>
                     </CardFooter>
@@ -4052,16 +4086,17 @@ export default class ExtrapolateDataComponent extends React.Component {
                         <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
                     </ModalHeader>
                     <div>
-                    <ModalBody className="ModalBodyPadding">
-                        <div dangerouslySetInnerHTML={ {__html:localStorage.getItem('lang') == 'en' ?
-                ExtrapolationshowguidanceEn :
-                localStorage.getItem('lang') == 'fr' ?
-                ExtrapolationshowguidanceFr :
-                  localStorage.getItem('lang') == 'sp' ?
-                  ExtrapolationshowguidanceSp :
-                  ExtrapolationshowguidancePr
-              } } />
-                     
+                        <ModalBody className="ModalBodyPadding">
+                            <div dangerouslySetInnerHTML={{
+                                __html: localStorage.getItem('lang') == 'en' ?
+                                    ExtrapolationshowguidanceEn :
+                                    localStorage.getItem('lang') == 'fr' ?
+                                        ExtrapolationshowguidanceFr :
+                                        localStorage.getItem('lang') == 'sp' ?
+                                            ExtrapolationshowguidanceSp :
+                                            ExtrapolationshowguidancePr
+                            }} />
+
                             {/* <div>
                                 <h3 className='ShowGuidanceHeading'>{i18n.t('static.commitTree.extrapolation')}</h3>
                             </div>

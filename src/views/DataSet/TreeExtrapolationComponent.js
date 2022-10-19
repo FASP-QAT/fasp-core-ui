@@ -972,7 +972,7 @@ export default class TreeExtrapolationComponent extends React.Component {
         nodeDataExtrapolation.extrapolationDataList = jexcelDataArr;
         console.log("jexcel data final data available---", jexcelDataArr);
 
-        this.setState({ jexcelDataArr, nodeDataExtrapolation, isChanged: true, noDataMessage:""}, () => {
+        this.setState({ jexcelDataArr, nodeDataExtrapolation, isChanged: true, noDataMessage: "" }, () => {
             // setTimeout(() => {
             console.log("tableJson for extrapolation---", this.state.jexcelDataArr);
             if (jexcelDataArr.length > 0) {
@@ -1071,7 +1071,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                             this.setState({
                                 arimaData: [],
                                 arimaError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" },
-                                noDataMessage:""
+                                noDataMessage: ""
                             })
                         }
                     } else {
@@ -1104,7 +1104,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                 this.setState({
                                     arimaData: [],
                                     arimaError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" },
-                                    noDataMessage:""
+                                    noDataMessage: ""
                                 });
                             }
                         }
@@ -1122,7 +1122,7 @@ export default class TreeExtrapolationComponent extends React.Component {
     }
 
     interpolate() {
-        this.setState({ extrapolationLoader: true, isChanged: true,noDataMessage:"" }, () => {
+        this.setState({ extrapolationLoader: true, isChanged: true, noDataMessage: "" }, () => {
             setTimeout(() => {
                 var monthArray = this.state.monthArray;
                 var jexcelDataArr = [];
@@ -1660,31 +1660,36 @@ export default class TreeExtrapolationComponent extends React.Component {
                 },
                 {
                     title: 'Moving Averages',
-                    type: this.state.movingAvgId ? 'number' : 'hidden',
+                    type: this.state.movingAvgId ? 'number' : 'text',
+                    visible: this.state.movingAvgId ? true : false,
                     mask: '#,##0.0000',
                     readOnly: true
                 },
                 {
                     title: 'Semi-Averages',
-                    type: this.state.semiAvgId ? 'number' : 'hidden',
+                    type: this.state.semiAvgId ? 'number' : 'text',
+                    visible: this.state.semiAvgId ? true : false,
                     mask: '#,##0.0000',
                     readOnly: true
                 },
                 {
                     title: 'Linear Regression',
-                    type: this.state.linearRegressionId ? 'number' : 'hidden',
+                    type: this.state.linearRegressionId ? 'number' : 'text',
+                    visible: this.state.linearRegressionId ? true : false,
                     mask: '#,##0.0000',
                     readOnly: true
                 },
                 {
                     title: 'TES',
-                    type: this.state.smoothingId ? 'number' : 'hidden',
+                    type: this.state.smoothingId ? 'number' : 'text',
+                    visible: this.state.smoothingId ? true : false,
                     mask: '#,##0.0000',
                     readOnly: true
                 },
                 {
                     title: 'ARIMA',
-                    type: this.state.arimaId ? 'number' : 'hidden',
+                    type: this.state.arimaId ? 'number' : 'text',
+                    visible: this.state.arimaId ? true : false,
                     mask: '#,##0.0000',
                     readOnly: true
                 },
@@ -1716,36 +1721,60 @@ export default class TreeExtrapolationComponent extends React.Component {
                     readOnly: true
                 },
                 {
-                    title: 'manualChangeAffectsFutureMonth',
-                    type: 'hidden'
+                    // title: 'manualChangeAffectsFutureMonth',
+                    // type: 'hidden'
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
                 {
-                    title: 'extrapolationMethodId',
-                    type: 'hidden'
+                    // title: 'extrapolationMethodId',
+                    // type: 'hidden'
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
                 {
-                    title: 'tesLower',
-                    type: 'hidden'
+                    // title: 'tesLower',
+                    // type: 'hidden'
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
                 {
-                    title: 'tesUpper',
-                    type: 'hidden'
+                    // title: 'tesUpper',
+                    // type: 'hidden'
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
                 {
-                    title: 'arimaLower',
-                    type: 'hidden'
+                    // title: 'arimaLower',
+                    // type: 'hidden'
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
                 {
-                    title: 'arimaUpper',
-                    type: 'hidden'
+                    // title: 'arimaUpper',
+                    // type: 'hidden'
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
                 {
-                    title: 'lrLower',
-                    type: 'hidden'
+                    // title: 'lrLower',
+                    // type: 'hidden'
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
                 {
-                    title: 'lrUpper',
-                    type: 'hidden'
+                    // title: 'lrUpper',
+                    // type: 'hidden'
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
                 // {
                 //     title: 'cumulativeManualChange',
@@ -3953,7 +3982,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                             <div className="col-md-12 row text-left pt-lg-0 pl-lg-0">
 
                                                 <div className="col-md-6 pl-lg-0">
-                                                <h5 className={"red"} id="div9">{this.state.noDataMessage}</h5>
+                                                    <h5 className={"red"} id="div9">{this.state.noDataMessage}</h5>
                                                     {!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && <><Button type="button" color="success" className="float-left mr-1" size="md" onClick={this.interpolate}>Interpolate</Button>
                                                         <Button type="submit" id="extrapolateButton" size="md" color="info" className="float-left mr-1" onClick={() => this.touchAllExtrapolation(setTouched, errors, 0)}><i className="fa fa-calculator"></i> Extrapolate</Button></>}
                                                 </div>
@@ -4211,15 +4240,16 @@ export default class TreeExtrapolationComponent extends React.Component {
                         <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
                     </ModalHeader>
                     <div>
-                    <ModalBody className="ModalBodyPadding">
-                        <div dangerouslySetInnerHTML={ {__html:localStorage.getItem('lang') == 'en' ?
-                showguidanceTreeExtrapolationEn :
-                localStorage.getItem('lang') == 'fr' ?
-                showguidanceTreeExtrapolationFr :
-                  localStorage.getItem('lang') == 'sp' ?
-                  showguidanceTreeExtrapolationSp :
-                  showguidanceTreeExtrapolationPr
-              } } />
+                        <ModalBody className="ModalBodyPadding">
+                            <div dangerouslySetInnerHTML={{
+                                __html: localStorage.getItem('lang') == 'en' ?
+                                    showguidanceTreeExtrapolationEn :
+                                    localStorage.getItem('lang') == 'fr' ?
+                                        showguidanceTreeExtrapolationFr :
+                                        localStorage.getItem('lang') == 'sp' ?
+                                            showguidanceTreeExtrapolationSp :
+                                            showguidanceTreeExtrapolationPr
+                            }} />
                             {/* <div>
                                 <h3 className='ShowGuidanceHeading'>{i18n.t('static.extrapolation.ExtrapolationNode')}</h3>
                             </div>

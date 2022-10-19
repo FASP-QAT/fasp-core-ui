@@ -273,7 +273,12 @@ export default class ManualTagging extends Component {
                 { title: i18n.t('static.shipment.totalCost'), type: 'numeric', mask: '#,##.00', disabledMaskOnEdition: true, textEditor: true, decimal: '.', width: 100 },
                 { title: i18n.t('static.mt.dataReceivedOn'), type: 'calendar', options: { format: JEXCEL_DATE_FORMAT }, width: 100 },
                 { title: i18n.t('static.manualTagging.changeCode'), type: 'text', width: 100 },
-                { type: 'hidden' }
+                {
+                    // type: 'hidden' 
+                    title: 'A',
+                    type: 'text',
+                    visible: false
+                }
             ],
             pagination: false,
             search: false,
@@ -349,7 +354,12 @@ export default class ManualTagging extends Component {
                 { title: i18n.t('static.supplyPlan.shipmentQty'), type: 'numeric', mask: '#,##.00', disabledMaskOnEdition: true, textEditor: true, decimal: '.', width: 100 },
                 { title: i18n.t('static.mt.dataReceivedOn'), type: 'calendar', options: { format: JEXCEL_DATE_FORMAT }, width: 100 },
                 { title: i18n.t('static.manualTagging.changeCode'), type: 'text', width: 100 },
-                { type: 'hidden' }
+                {
+                    title: 'A',
+                    type: 'text',
+                    visible: false
+                    // type: 'hidden' 
+                }
             ],
             pagination: false,
             search: false,
@@ -3411,10 +3421,13 @@ export default class ManualTagging extends Component {
                                 width: 80
                             },
                             {
-                                title: i18n.t('static.supplyPlan.qatProduct'),
-                                type: 'hidden',
+                                // title: i18n.t('static.supplyPlan.qatProduct'),
+                                // type: 'hidden',
                                 readOnly: true,
-                                width: 150
+                                width: 150,
+                                title: 'A',
+                                type: 'text',
+                                visible: false
                             },
                             {
                                 title: i18n.t('static.commit.qatshipmentId'),
@@ -3442,10 +3455,13 @@ export default class ManualTagging extends Component {
                             },
 
                             {
-                                title: i18n.t('shipmentTransId'),
-                                type: 'hidden',
+                                // title: i18n.t('shipmentTransId'),
+                                // type: 'hidden',
                                 readOnly: true,
-                                width: 0
+                                width: 0,
+                                title: 'A',
+                                type: 'text',
+                                visible: false
                             },
                             {
                                 title: i18n.t('static.supplyPlan.mtexpectedDeliveryDate'),
@@ -3490,16 +3506,22 @@ export default class ManualTagging extends Component {
                                 width: 150
                             },
                             {
-                                title: i18n.t('shipmentTransId'),
-                                type: 'hidden',
+                                // title: i18n.t('shipmentTransId'),
+                                // type: 'hidden',
                                 readOnly: true,
-                                width: 0
+                                width: 0,
+                                title: 'A',
+                                type: 'text',
+                                visible: false
                             },
                             {
-                                title: i18n.t('shipmentTransId'),
-                                type: 'hidden',
+                                // title: i18n.t('shipmentTransId'),
+                                // type: 'hidden',
                                 readOnly: true,
-                                width: 0
+                                width: 0,
+                                title: 'A',
+                                type: 'text',
+                                visible: false
                             },
                         ],
                         // footers: [['Total','1','1','1','1',0,0,0,0]],
@@ -3638,10 +3660,13 @@ export default class ManualTagging extends Component {
                                 width: 150
                             },
                             {
-                                title: i18n.t('static.mt.orderNoAndPrimeLineNo'),
-                                type: 'hidden',
+                                // title: i18n.t('static.mt.orderNoAndPrimeLineNo'),
+                                // type: 'hidden',
                                 readOnly: true,
-                                width: 0
+                                width: 0,
+                                title: 'A',
+                                type: 'text',
+                                visible: false
                             },
                             {
                                 title: i18n.t('static.dashboard.planningunitheader'),
@@ -3663,10 +3688,13 @@ export default class ManualTagging extends Component {
                                 width: 60
                             },
                             {
-                                title: i18n.t('static.mt.knShipmentNo'),
-                                type: 'hidden',
+                                // title: i18n.t('static.mt.knShipmentNo'),
+                                // type: 'hidden',
                                 readOnly: true,
-                                width: 0
+                                width: 0,
+                                title: 'A',
+                                type: 'text',
+                                visible: false
                             },
                             {
                                 title: i18n.t('static.mt.batchNo'),
@@ -3718,32 +3746,53 @@ export default class ManualTagging extends Component {
                                 width: 200
                             },
                             {
-                                title: "Exists",
-                                type: 'hidden',
+                                // title: "Exists",
+                                // type: 'hidden',
+                                title: 'A',
+                                type: 'text',
+                                visible: false
                             },
                             {
-                                title: "QAT shipment status",
-                                type: 'hidden',
+                                // title: "QAT shipment status",
+                                // type: 'hidden',
+                                title: 'A',
+                                type: 'text',
+                                visible: false
                             },
                             {
-                                title: "Object",
-                                type: 'hidden',
+                                // title: "Object",
+                                // type: 'hidden',
+                                title: 'A',
+                                type: 'text',
+                                visible: false
                             },
                             {
-                                title: "Ro No and Ro Prime line No",
-                                type: 'hidden',
+                                // title: "Ro No and Ro Prime line No",
+                                // type: 'hidden',
+                                title: 'A',
+                                type: 'text',
+                                visible: false
                             },
                             {
-                                title: "Multiplier",
-                                type: 'hidden',
+                                // title: "Multiplier",
+                                // type: 'hidden',
+                                title: 'A',
+                                type: 'text',
+                                visible: false
                             },
                             {
-                                title: "QAT Rcpu Qty",
-                                type: 'hidden',
+                                // title: "QAT Rcpu Qty",
+                                // type: 'hidden',
+                                title: 'A',
+                                type: 'text',
+                                visible: false
                             },
                             {
-                                title: "QAT Rcpu Qty",
-                                type: 'hidden',
+                                // title: "QAT Rcpu Qty",
+                                // type: 'hidden',
+                                title: 'A',
+                                type: 'text',
+                                visible: false
                             },
                         ],
                         // footers: [['Total','1','1','1','1',0,0,0,0]],
@@ -3963,9 +4012,12 @@ export default class ManualTagging extends Component {
                             // mask: '#,##', decimal: '.'
                         },
                         {
-                            title: "shipmentTransId",
-                            type: 'hidden',
+                            // title: "shipmentTransId",
+                            // type: 'hidden',
                             width: 0,
+                            title: 'A',
+                            type: 'text',
+                            visible: false
                         },
                         {
                             title: i18n.t('static.supplyPlan.qatProduct'),
@@ -4007,9 +4059,12 @@ export default class ManualTagging extends Component {
                             width: 150,
                         },
                         {
-                            title: "Index",
-                            type: 'hidden',
+                            // title: "Index",
+                            // type: 'hidden',
                             width: 0,
+                            title: 'A',
+                            type: 'text',
+                            visible: false
                         },
                     ],
                     editable: false,
@@ -4062,11 +4117,14 @@ export default class ManualTagging extends Component {
                             // mask: '#,##', decimal: '.'
                         },
                         {
-                            title: i18n.t('static.mt.childShipmentId'),
-                            type: 'hidden',
+                            // title: i18n.t('static.mt.childShipmentId'),
+                            // type: 'hidden',
                             readOnly: true,
                             width: 0,
                             // mask: '#,##', decimal: '.'
+                            title: 'A',
+                            type: 'text',
+                            visible: false
                         },
                         {
                             title: i18n.t('static.manualTagging.RONO'),
@@ -4075,10 +4133,13 @@ export default class ManualTagging extends Component {
                             width: 80,
                         },
                         {
-                            title: i18n.t('static.manualTagging.procOrderNo'),
-                            type: 'hidden',
+                            // title: i18n.t('static.manualTagging.procOrderNo'),
+                            // type: 'hidden',
                             readOnly: true,
                             width: 0,
+                            title: 'A',
+                            type: 'text',
+                            visible: false
                         },
                         {
                             title: i18n.t('static.manualTagging.currentEstimetedDeliveryDate'),
@@ -4140,114 +4201,180 @@ export default class ManualTagging extends Component {
                             // readOnly: true
                         },
                         {
-                            title: "orderNo",
-                            type: 'hidden',
+                            // title: "orderNo",
+                            // type: 'hidden',
                             width: 0,
+                            title: 'A',
+                            type: 'text',
+                            visible: false
                         },
                         {
-                            title: "primeLineNo",
-                            type: 'hidden',
+                            // title: "primeLineNo",
+                            // type: 'hidden',
                             width: 0,
+                            title: 'A',
+                            type: 'text',
+                            visible: false
                         },
                         {
-                            title: "tempShipmentId",
-                            type: 'hidden',
+                            // title: "tempShipmentId",
+                            // type: 'hidden',
                             width: 0,
+                            title: 'A',
+                            type: 'text',
+                            visible: false
                         },
                         {
-                            title: "shipment list",
-                            type: 'hidden',
+                            // title: "shipment list",
+                            // type: 'hidden',
                             width: 0,
+                            title: 'A',
+                            type: 'text',
+                            visible: false
                         },
                         {
-                            title: "linked shipment list",
-                            type: 'hidden',
+                            // title: "linked shipment list",
+                            // type: 'hidden',
                             width: 0,
+                            title: 'A',
+                            type: 'text',
+                            visible: false
                         },
                         {
-                            title: "linked shipment list",
-                            type: 'hidden',
+                            // title: "linked shipment list",
+                            // type: 'hidden',
                             width: 0,
+                            title: 'A',
+                            type: 'text',
+                            visible: false
                         },
                         {
-                            title: "linked shipment list",
-                            type: 'hidden',
+                            // title: "linked shipment list",
+                            // type: 'hidden',
                             width: 0,
+                            title: 'A',
+                            type: 'text',
+                            visible: false
                         },
                         {
-                            title: "linked shipment list",
-                            type: 'hidden',
+                            // title: "linked shipment list",
+                            // type: 'hidden',
                             width: 0,
+                            title: 'A',
+                            type: 'text',
+                            visible: false
                         },
                         {
-                            title: "linked shipment list",
-                            type: 'hidden',
+                            // title: "linked shipment list",
+                            // type: 'hidden',
                             width: 0,
+                            title: 'A',
+                            type: 'text',
+                            visible: false
                         },
                         {
-                            title: "linked shipment list",
-                            type: 'hidden',
+                            // title: "linked shipment list",
+                            // type: 'hidden',
                             width: 0,
+                            title: 'A',
+                            type: 'text',
+                            visible: false
                         },
                         {
-                            title: "linked shipment list",
-                            type: 'hidden',
+                            // title: "linked shipment list",
+                            // type: 'hidden',
                             width: 0,
+                            title: 'A',
+                            type: 'text',
+                            visible: false
                         },
                         {
-                            title: "linked shipment list",
-                            type: 'hidden',
+                            // title: "linked shipment list",
+                            // type: 'hidden',
                             width: 0,
+                            title: 'A',
+                            type: 'text',
+                            visible: false
                         },
                         {
-                            title: "Original data",
-                            type: 'hidden',
+                            // title: "Original data",
+                            // type: 'hidden',
                             width: 0,
+                            title: 'A',
+                            type: 'text',
+                            visible: false
                         },
                         {
-                            title: "Ro No",
-                            type: 'hidden',
+                            // title: "Ro No",
+                            // type: 'hidden',
                             width: 0,
+                            title: 'A',
+                            type: 'text',
+                            visible: false
                         },
                         {
-                            title: "Ro Prime line no",
-                            type: 'hidden',
+                            // title: "Ro Prime line no",
+                            // type: 'hidden',
                             width: 0,
+                            title: 'A',
+                            type: 'text',
+                            visible: false
                         },
                         {
-                            title: "Same parent shipment Id check",
-                            type: 'hidden',
+                            // title: "Same parent shipment Id check",
+                            // type: 'hidden',
                             width: 0,
+                            title: 'A',
+                            type: 'text',
+                            visible: false
                         },
                         {
-                            title: "Same parent shipment Id check",
-                            type: 'hidden',
+                            // title: "Same parent shipment Id check",
+                            // type: 'hidden',
                             width: 0,
+                            title: 'A',
+                            type: 'text',
+                            visible: false
                         },
                         {
-                            title: "Same parent shipment Id check",
-                            type: 'hidden',
+                            // title: "Same parent shipment Id check",
+                            // type: 'hidden',
                             width: 0,
+                            title: 'A',
+                            type: 'text',
+                            visible: false
                         },
                         {
-                            title: "Same parent shipment Id check",
-                            type: 'hidden',
+                            // title: "Same parent shipment Id check",
+                            // type: 'hidden',
                             width: 0,
+                            title: 'A',
+                            type: 'text',
+                            visible: false
                         },
                         {
-                            title: "Same parent shipment Id check",
-                            type: 'hidden',
+                            // title: "Same parent shipment Id check",
+                            // type: 'hidden',
                             width: 0,
+                            title: 'A',
+                            type: 'text',
+                            visible: false
                         },
                         {
-                            title: "Same parent shipment Id check",
-                            type: 'hidden',
+                            // title: "Same parent shipment Id check",
+                            // type: 'hidden',
                             width: 0,
+                            title: 'A',
+                            type: 'text',
+                            visible: false
                         },
                         {
-                            title: "Same parent shipment Id check",
-                            type: 'hidden',
+                            // title: "Same parent shipment Id check",
+                            // type: 'hidden',
                             width: 0,
+                            title: 'A',
+                            type: 'text',
+                            visible: false
                         },
                     ],
                     editable: true,
@@ -4415,14 +4542,20 @@ export default class ManualTagging extends Component {
                             width: 50
                         },
                         {
-                            title: i18n.t('static.mt.orderNoAndPrimeLineNo'),
-                            type: 'hidden',
-                            width: 0
+                            // title: i18n.t('static.mt.orderNoAndPrimeLineNo'),
+                            // type: 'hidden',
+                            width: 0,
+                            title: 'A',
+                            type: 'text',
+                            visible: false
                         },
                         {
-                            title: i18n.t('static.mt.knShipmentNo'),
-                            type: 'hidden',
-                            width: 0
+                            // title: i18n.t('static.mt.knShipmentNo'),
+                            // type: 'hidden',
+                            width: 0,
+                            title: 'A',
+                            type: 'text',
+                            visible: false
                         },
                         {
                             title: i18n.t('static.manualTagging.erpPlanningUnit'),
@@ -4448,12 +4581,18 @@ export default class ManualTagging extends Component {
                             width: 45
                         },
                         {
-                            title: "Index",
-                            type: 'hidden',
+                            // title: "Index",
+                            // type: 'hidden',
+                            title: 'A',
+                            type: 'text',
+                            visible: false
                         },
                         {
-                            title: "TCId",
-                            type: 'hidden',
+                            // title: "TCId",
+                            // type: 'hidden',
+                            title: 'A',
+                            type: 'text',
+                            visible: false
                         },
                     ],
                     editable: false,

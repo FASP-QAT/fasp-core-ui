@@ -141,7 +141,7 @@ class RealmCountryRegion extends Component {
 
                         this.el = jexcel(document.getElementById("paputableDiv"), '');
                         // this.el.destroy();
-                        jexcel.destroy(document.getElementById("paputableDiv"),true);
+                        jexcel.destroy(document.getElementById("paputableDiv"), true);
                         var json = [];
                         var data = papuDataArr;
 
@@ -179,16 +179,25 @@ class RealmCountryRegion extends Component {
                                     type: 'checkbox'
                                 },
                                 {
-                                    title: 'realmCountryId',
-                                    type: 'hidden'
+                                    // title: 'realmCountryId',
+                                    // type: 'hidden'
+                                    title: 'A',
+                                    type: 'text',
+                                    visible: false
                                 },
                                 {
-                                    title: 'regionId',
-                                    type: 'hidden'
+                                    // title: 'regionId',
+                                    // type: 'hidden'
+                                    title: 'A',
+                                    type: 'text',
+                                    visible: false
                                 },
                                 {
-                                    title: 'isChange',
-                                    type: 'hidden'
+                                    // title: 'isChange',
+                                    // type: 'hidden'
+                                    title: 'A',
+                                    type: 'text',
+                                    visible: false
                                 }
 
                             ],
@@ -930,7 +939,7 @@ class RealmCountryRegion extends Component {
                                 <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                 <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>
                                 &nbsp;
-</FormGroup>
+                            </FormGroup>
                         </CardFooter>
                     </Card>
                 </div>

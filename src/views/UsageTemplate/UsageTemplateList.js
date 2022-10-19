@@ -907,8 +907,11 @@ class usageTemplate extends Component {
             columns: [
 
                 {
-                    title: 'usageTemplateId',
-                    type: 'hidden',
+                    // title: 'usageTemplateId',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false,
                     readOnly: true //0 A
                 },
                 {
@@ -1031,20 +1034,32 @@ class usageTemplate extends Component {
                     textEditor: true, //16 Q
                 },
                 {
-                    title: 'isChange',
-                    type: 'hidden' //17 R
+                    // title: 'isChange',
+                    // type: 'hidden' //17 R
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
                 {
-                    title: 'addNewRow',
-                    type: 'hidden'//18 S
+                    // title: 'addNewRow',
+                    // type: 'hidden'//18 S
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
                 {
-                    title: 'typeId',
-                    type: 'hidden'//19 T
+                    // title: 'typeId',
+                    // type: 'hidden'//19 T
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
                 {
-                    title: i18n.t('static.program.notes'),
-                    type: 'hidden',
+                    // title: i18n.t('static.program.notes'),
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                     // width: 400 //20 U
                 },
                 {
@@ -1055,8 +1070,11 @@ class usageTemplate extends Component {
                     // readOnly: true //21 V
                 },
                 {
-                    title: 'createdBy',
-                    type: 'hidden',
+                    // title: 'createdBy',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                     // width: 400 //22 W
                 },
 

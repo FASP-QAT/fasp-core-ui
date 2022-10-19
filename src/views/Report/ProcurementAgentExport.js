@@ -1073,12 +1073,18 @@ class ProcurementAgentExport extends Component {
         } else {
             obj1 = {
                 // hidden: true,
-                type: 'hidden',
+                // type: 'hidden',
+                title: 'A',
+                type: 'text',
+                visible: false
             }
 
             obj2 = {
                 // hidden: true
-                type: 'hidden',
+                // type: 'hidden',
+                title: 'A',
+                type: 'text',
+                visible: false
 
             }
         }

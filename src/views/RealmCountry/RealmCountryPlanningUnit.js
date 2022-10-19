@@ -219,7 +219,7 @@ class PlanningUnitCountry extends Component {
 
                                             this.el = jexcel(document.getElementById("paputableDiv"), '');
                                             // this.el.destroy();
-                                            jexcel.destroy(document.getElementById("paputableDiv"),true);
+                                            jexcel.destroy(document.getElementById("paputableDiv"), true);
                                             var json = [];
                                             var data = papuDataArr;
                                             var options = {
@@ -266,16 +266,25 @@ class PlanningUnitCountry extends Component {
                                                         type: 'checkbox'
                                                     },
                                                     {
-                                                        title: 'realmCountryId',
-                                                        type: 'hidden'
+                                                        // title: 'realmCountryId',
+                                                        // type: 'hidden'
+                                                        title: 'A',
+                                                        type: 'text',
+                                                        visible: false
                                                     },
                                                     {
-                                                        title: 'realmCountryPlanningUnitId',
-                                                        type: 'hidden'
+                                                        // title: 'realmCountryPlanningUnitId',
+                                                        // type: 'hidden'
+                                                        title: 'A',
+                                                        type: 'text',
+                                                        visible: false
                                                     },
                                                     {
-                                                        title: 'isChange',
-                                                        type: 'hidden'
+                                                        // title: 'isChange',
+                                                        // type: 'hidden'
+                                                        title: 'A',
+                                                        type: 'text',
+                                                        visible: false
                                                     }
 
                                                 ],
@@ -1099,9 +1108,9 @@ class PlanningUnitCountry extends Component {
                         <CardBody className="p-0">
 
                             <Col xs="12" sm="12">
-                            <div className='consumptionDataEntryTable'>
-                                <div id="paputableDiv" style={{ display: this.state.loading ? "none" : "block" }}>
-                                </div>
+                                <div className='consumptionDataEntryTable'>
+                                    <div id="paputableDiv" style={{ display: this.state.loading ? "none" : "block" }}>
+                                    </div>
                                 </div>
                                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
@@ -1123,7 +1132,7 @@ class PlanningUnitCountry extends Component {
                                 <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                 <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>
                                 &nbsp;
-</FormGroup>
+                            </FormGroup>
                         </CardFooter>
                     </Card>
                 </div>

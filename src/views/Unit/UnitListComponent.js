@@ -500,8 +500,11 @@ export default class UnitListComponent extends Component {
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: 'unitId',
-                    type: 'hidden',
+                    // title: 'unitId',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false,
                     readOnly: true
                 },
                 {
@@ -825,8 +828,8 @@ export default class UnitListComponent extends Component {
                         </Col>
 
                         <div className='consumptionDataEntryTable'>
-                        <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_UNIT') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
-                        </div>
+                            <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_UNIT') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
+                            </div>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>
                             <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >

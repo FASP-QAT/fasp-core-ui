@@ -989,12 +989,18 @@ class PlanningUnitCapacity extends Component {
                     type: 'checkbox'
                 },
                 {
-                    title: 'planningUnitId',
-                    type: 'hidden'
+                    // title: 'planningUnitId',
+                    // type: 'hidden'
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
                 {
-                    title: 'isChange',
-                    type: 'hidden'
+                    // title: 'isChange',
+                    // type: 'hidden'
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 }
 
             ],

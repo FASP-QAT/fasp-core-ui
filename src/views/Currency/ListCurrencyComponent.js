@@ -412,8 +412,11 @@ export default class CurrencyListComponent extends Component {
                             colHeaderClasses: ["Reqasterisk"],
                             columns: [
                                 {
-                                    title: 'currencyId',
-                                    type: 'hidden',
+                                    // title: 'currencyId',
+                                    // type: 'hidden',
+                                    title: 'A',
+                                    type: 'text',
+                                    visible: false,
                                     readOnly: true
                                 },
                                 {

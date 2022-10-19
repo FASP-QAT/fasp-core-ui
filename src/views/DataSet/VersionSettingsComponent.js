@@ -626,37 +626,50 @@ class VersionSettingsComponent extends Component {
                            var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                            var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
                            var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.datasetId);
-                           datasetDetailsRequest.onsuccess = function (e) {         
-                             var datasetDetailsRequestJson = datasetDetailsRequest.result;
-                             datasetDetailsRequestJson.changed = 1;
-                             var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+                            datasetDetailsRequest.onsuccess = function (e) {
+                                var datasetDetailsRequestJson = datasetDetailsRequest.result;
+                                datasetDetailsRequestJson.changed = 1;
+                                var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+                                datasetDetailsRequest1.onsuccess = function (event) {
                              datasetDetailsRequest1.onsuccess = function (event) {                               
-                                 }}
-   
-                           this.setState({
-                               loading: false,
-                               message: i18n.t('static.mt.dataUpdateSuccess'),
-                               color: "green",
-                               isChanged: false
-                           }, () => {
-                               this.hideSecondComponent();
-                               // this.getOnLineDatasetsVersion();
-                           });
-                           console.log("Data update success");
-                       }.bind(this);
-                       transaction.onerror = function (event) {
-                           this.setState({
-                               loading: false,
-                               // message: 'Error occured.',
-                               color: "red",
-                           }, () => {
-                               this.hideSecondComponent();
-                           });
-                           console.log("Data update errr");
-                       }.bind(this);
-                   }.bind(this);
-               }
-           }
+                                datasetDetailsRequest1.onsuccess = function (event) {
+                             datasetDetailsRequest1.onsuccess = function (event) {                               
+                                datasetDetailsRequest1.onsuccess = function (event) {
+                             datasetDetailsRequest1.onsuccess = function (event) {                               
+                                datasetDetailsRequest1.onsuccess = function (event) {
+                             datasetDetailsRequest1.onsuccess = function (event) {                               
+                                datasetDetailsRequest1.onsuccess = function (event) {
+                             datasetDetailsRequest1.onsuccess = function (event) {                               
+                                datasetDetailsRequest1.onsuccess = function (event) {
+                             datasetDetailsRequest1.onsuccess = function (event) {                               
+                                datasetDetailsRequest1.onsuccess = function (event) {
+                                }
+                            }
+
+                            this.setState({
+                                loading: false,
+                                message: i18n.t('static.mt.dataUpdateSuccess'),
+                                color: "green",
+                                isChanged: false
+                            }, () => {
+                                this.hideSecondComponent();
+                                // this.getOnLineDatasetsVersion();
+                            });
+                            console.log("Data update success");
+                        }.bind(this);
+                        transaction.onerror = function (event) {
+                            this.setState({
+                                loading: false,
+                                // message: 'Error occured.',
+                                color: "red",
+                            }, () => {
+                                this.hideSecondComponent();
+                            });
+                            console.log("Data update errr");
+                        }.bind(this);
+                    }.bind(this);
+                }
+            }
         }
     }
 
@@ -1066,8 +1079,11 @@ class VersionSettingsComponent extends Component {
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: 'programId',
-                    type: 'hidden',//0 A
+                    // title: 'programId',
+                    // type: 'hidden',//0 A
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
                 {
                     title: i18n.t('static.dashboard.programheader'),
@@ -1125,16 +1141,25 @@ class VersionSettingsComponent extends Component {
                     }// 9 J
                 },
                 {
-                    title: 'isLocal',
-                    type: 'hidden',//10 K
+                    // title: 'isLocal',
+                    // type: 'hidden',//10 K
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
                 {
-                    title: 'versionId',
-                    type: 'hidden',//11 L
+                    // title: 'versionId',
+                    // type: 'hidden',//11 L
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
                 {
-                    title: 'isChanged',
-                    type: 'hidden',//12 M
+                    // title: 'isChanged',
+                    // type: 'hidden',//12 M
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
                 {
                     title: i18n.t('static.program.noOfDaysInMonth'),
@@ -1166,12 +1191,18 @@ class VersionSettingsComponent extends Component {
                     // readOnly: true
                 },//16 Q
                 {
-                    title: 'localCalling',
-                    type: 'hidden',//17 R
+                    // title: 'localCalling',
+                    // type: 'hidden',//17 R
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
                 {
-                    title: 'datasetData',
-                    type: 'hidden',//17 R
+                    // title: 'datasetData',
+                    // type: 'hidden',//17 R
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
 
             ],
@@ -1734,15 +1765,16 @@ class VersionSettingsComponent extends Component {
                         <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
                     </ModalHeader>
                     <div>
-                    <ModalBody className="ModalBodyPadding">
-                        <div dangerouslySetInnerHTML={ {__html:localStorage.getItem('lang') == 'en' ?
-                showguidanceEn :
-                localStorage.getItem('lang') == 'fr' ?
-                showguidanceFr :
-                  localStorage.getItem('lang') == 'sp' ?
-                  showguidanceSp :
-                  showguidancePr
-              } } />
+                        <ModalBody className="ModalBodyPadding">
+                            <div dangerouslySetInnerHTML={{
+                                __html: localStorage.getItem('lang') == 'en' ?
+                                    showguidanceEn :
+                                    localStorage.getItem('lang') == 'fr' ?
+                                        showguidanceFr :
+                                        localStorage.getItem('lang') == 'sp' ?
+                                            showguidanceSp :
+                                            showguidancePr
+                            }} />
                             {/* <div>
                                 <h3 className='ShowGuidanceHeading'>{i18n.t('static.UpdateversionSettings.UpdateversionSettings')}</h3>
                             </div>

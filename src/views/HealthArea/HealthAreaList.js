@@ -413,13 +413,17 @@ export default class HealthAreaListComponent extends Component {
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: 'healthAreaId',
-                    type: 'hidden',
+                    // title: 'healthAreaId',
+                    // type: 'hidden',
                     // readOnly: true
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
                 {
                     title: i18n.t('static.healtharea.realm'),
-                    type: (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN') ? 'text' : 'hidden'),
+                    type: (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN') ? 'text' : 'text'),
+                    visible: (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN') ? true : false),
                     // readOnly: true
                 },
                 {

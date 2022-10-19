@@ -439,8 +439,8 @@ class AddprogramPlanningUnit extends Component {
                                                                     decimal: '.',
                                                                     mask: '#,##.00',
                                                                     disabledMaskOnEdition: true,
-                                                                    tooltip:i18n.t("static.programPU.localProcurementAgentTooltip"),
-                                                                    width:120
+                                                                    tooltip: i18n.t("static.programPU.localProcurementAgentTooltip"),
+                                                                    width: 120
                                                                 },
                                                                 {
                                                                     title: i18n.t('static.product.distributionLeadTime'),
@@ -458,8 +458,8 @@ class AddprogramPlanningUnit extends Component {
                                                                     // decimal:'.',
                                                                     mask: '#,##',
                                                                     disabledMaskOnEdition: true,
-                                                                    tooltip:i18n.t("static.programPU.shelfLifeTooltip"),
-                                                                    width:120
+                                                                    tooltip: i18n.t("static.programPU.shelfLifeTooltip"),
+                                                                    width: 120
                                                                 },
                                                                 {
                                                                     title: i18n.t('static.procurementAgentPlanningUnit.catalogPrice'),
@@ -468,12 +468,15 @@ class AddprogramPlanningUnit extends Component {
                                                                     // decimal:'.',
                                                                     mask: '#,##.00',
                                                                     disabledMaskOnEdition: true,
-                                                                    tooltip:i18n.t("static.programPU.catalogPriceTooltip"),
-                                                                    width:120
+                                                                    tooltip: i18n.t("static.programPU.catalogPriceTooltip"),
+                                                                    width: 120
                                                                 },
                                                                 {
-                                                                    title: 'Id',
-                                                                    type: 'hidden',
+                                                                    // title: 'Id',
+                                                                    // type: 'hidden',
+                                                                    title: 'A',
+                                                                    type: 'text',
+                                                                    visible: false,
                                                                     readOnly: true
                                                                 },
                                                                 {
@@ -481,24 +484,39 @@ class AddprogramPlanningUnit extends Component {
                                                                     type: 'checkbox'
                                                                 },
                                                                 {
-                                                                    title: 'Changed Flag',
-                                                                    type: 'hidden'
+                                                                    // title: 'Changed Flag',
+                                                                    // type: 'hidden'
+                                                                    title: 'A',
+                                                                    type: 'text',
+                                                                    visible: false
                                                                 },
                                                                 {
-                                                                    title: 'ProgramId',
-                                                                    type: 'hidden'
+                                                                    // title: 'ProgramId',
+                                                                    // type: 'hidden'
+                                                                    title: 'A',
+                                                                    type: 'text',
+                                                                    visible: false
                                                                 },
                                                                 {
-                                                                    title: 'Min Mos',
-                                                                    type: 'hidden'
+                                                                    // title: 'Min Mos',
+                                                                    // type: 'hidden'
+                                                                    title: 'A',
+                                                                    type: 'text',
+                                                                    visible: false
                                                                 },
                                                                 {
-                                                                    title: 'Min Qty',
-                                                                    type: 'hidden'
+                                                                    // title: 'Min Qty',
+                                                                    // type: 'hidden'
+                                                                    title: 'A',
+                                                                    type: 'text',
+                                                                    visible: false
                                                                 },
                                                                 {
-                                                                    title: 'Distribution Lead Time',
-                                                                    type: 'hidden'
+                                                                    // title: 'Distribution Lead Time',
+                                                                    // type: 'hidden'
+                                                                    title: 'A',
+                                                                    type: 'text',
+                                                                    visible: false
                                                                 }
 
 

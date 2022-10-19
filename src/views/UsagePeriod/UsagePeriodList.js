@@ -113,8 +113,11 @@ class UsagePeriod extends Component {
             columns: [
 
                 {
-                    title: 'usagePeriodId',
-                    type: 'hidden',
+                    // title: 'usagePeriodId',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false,
                     readOnly: true
                 },
                 {
@@ -148,12 +151,18 @@ class UsagePeriod extends Component {
                     readOnly: true
                 },
                 {
-                    title: 'isChange',
-                    type: 'hidden'
+                    // title: 'isChange',
+                    // type: 'hidden'
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
                 {
-                    title: 'addNewRow',
-                    type: 'hidden'
+                    // title: 'addNewRow',
+                    // type: 'hidden'
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
 
             ],

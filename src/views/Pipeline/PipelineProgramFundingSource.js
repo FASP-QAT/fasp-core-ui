@@ -209,8 +209,11 @@ export default class PipelineProgramFundingSource extends Component {
                                                 source: FundingSourceListQat,
                                                 //filter: this.dropdownFilter
                                             }, {
-                                                title: i18n.t('static.inventory.fundingSource'),
-                                                type: 'hidden',
+                                                // title: i18n.t('static.inventory.fundingSource'),
+                                                // type: 'hidden',
+                                                title: 'A',
+                                                type: 'text',
+                                                visible: false,
                                                 readonly: true
                                             }
                                         ],

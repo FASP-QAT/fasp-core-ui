@@ -463,8 +463,11 @@ class ListTracerCategoryComponent extends Component {
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: 'tracerCategoryId',
-                    type: 'hidden',
+                    // title: 'tracerCategoryId',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                     // readOnly: true
                 },
                 {

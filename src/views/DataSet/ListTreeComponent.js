@@ -192,13 +192,14 @@ export default class ListTreeComponent extends Component {
                 var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                 var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
                 var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.datasetId);
-                datasetDetailsRequest.onsuccess = function (e) {         
-                  var datasetDetailsRequestJson = datasetDetailsRequest.result;
-                  datasetDetailsRequestJson.changed = 1;
-                  var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
-                  datasetDetailsRequest1.onsuccess = function (event) {
-                       
-                      }}
+                datasetDetailsRequest.onsuccess = function (e) {
+                    var datasetDetailsRequestJson = datasetDetailsRequest.result;
+                    datasetDetailsRequestJson.changed = 1;
+                    var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+                    datasetDetailsRequest1.onsuccess = function (event) {
+
+                    }
+                }
                 this.setState({
                     // loading: false,
                     message: i18n.t('static.mt.dataUpdateSuccess'),
@@ -1087,8 +1088,11 @@ export default class ListTreeComponent extends Component {
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: 'Tree Id',
-                    type: 'hidden'
+                    // title: 'Tree Id',
+                    // type: 'hidden'
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
                 {
                     title: i18n.t('static.dashboard.programheader'),
@@ -1122,18 +1126,27 @@ export default class ListTreeComponent extends Component {
                     // readOnly: true
                 },
                 {
-                    title: 'ProgramId',
-                    type: 'hidden',
+                    // title: 'ProgramId',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                     // readOnly: true
                 },
                 {
-                    title: 'id',
-                    type: 'hidden',
+                    // title: 'id',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                     // readOnly: true
                 },
                 {
-                    title: 'versionId',
-                    type: 'hidden',
+                    // title: 'versionId',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                     // readOnly: true
                 },
                 {
@@ -1520,17 +1533,17 @@ export default class ListTreeComponent extends Component {
                             <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
                         </ModalHeader>
                         <div>
-                        <ModalBody className="ModalBodyPadding">
+                            <ModalBody className="ModalBodyPadding">
 
-<div dangerouslySetInnerHTML={{
-    __html: localStorage.getItem('lang') == 'en' ?
-        ListTreeEn :
-        localStorage.getItem('lang') == 'fr' ?
-            ListTreeFr :
-            localStorage.getItem('lang') == 'sp' ?
-                ListTreeSp :
-                ListTreePr
-}} />
+                                <div dangerouslySetInnerHTML={{
+                                    __html: localStorage.getItem('lang') == 'en' ?
+                                        ListTreeEn :
+                                        localStorage.getItem('lang') == 'fr' ?
+                                            ListTreeFr :
+                                            localStorage.getItem('lang') == 'sp' ?
+                                                ListTreeSp :
+                                                ListTreePr
+                                }} />
                                 {/* <div>
                                     <h3 className='ShowGuidanceHeading'>{i18n.t('static.listTree.manageTreeTreeList')}</h3>
                                 </div>

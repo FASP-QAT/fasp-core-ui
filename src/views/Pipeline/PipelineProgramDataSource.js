@@ -293,8 +293,11 @@ export default class PipelineProgramDataSource extends Component {
                                                         source: DataSourceListQat,
                                                         filter: this.dropdownFilter
                                                     }, {
-                                                        title: i18n.t('static.inventory.dataSource'),
-                                                        type: 'hidden',
+                                                        // title: i18n.t('static.inventory.dataSource'),
+                                                        // type: 'hidden',
+                                                        title: 'A',
+                                                        type: 'text',
+                                                        visible: false,
                                                         readonly: true
                                                     }
                                                 ],

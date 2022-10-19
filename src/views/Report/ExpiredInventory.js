@@ -1016,10 +1016,16 @@ export default class ExpiredInventory extends Component {
                     // readOnly: true
                 },
                 {
-                    type: 'hidden'
+                    // type: 'hidden'
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
                 {
-                    type: 'hidden'
+                    // type: 'hidden'
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 }
             ],
             // text: {
@@ -1404,7 +1410,7 @@ export default class ExpiredInventory extends Component {
 
                             </div>
                         </div>
-                        {this.state.outPutList.length > 0 && <span style={{ textAlign:'left'}}><b>{i18n.t("static.expiryReport.batchInfoNote")}</b></span>}
+                        {this.state.outPutList.length > 0 && <span style={{ textAlign: 'left' }}><b>{i18n.t("static.expiryReport.batchInfoNote")}</b></span>}
                         <div className="consumptionDataEntryTable ProgramListSearchAlignment">
                             <div id="tableDiv" className={document.getElementById("versionId") != null && document.getElementById("versionId").value.includes('Local') ? "jexcelremoveReadonlybackground RowClickableExpiredInventory" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
                             </div>
