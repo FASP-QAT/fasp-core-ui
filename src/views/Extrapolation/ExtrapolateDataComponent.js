@@ -35,6 +35,11 @@ import { Formik } from "formik";
 import { i } from "mathjs";
 import { JEXCEL_INTEGER_REGEX } from '../../Constants.js'
 import { calculateError } from "./ErrorCalculations";
+import ExtrapolationshowguidanceEn from '../../../src/ShowGuidanceFiles/ExtrapolationEn.html'
+import ExtrapolationshowguidanceFr from '../../../src/ShowGuidanceFiles/ExtrapolationFr.html'
+import ExtrapolationshowguidanceSp from '../../../src/ShowGuidanceFiles/ExtrapolationSp.html'
+import ExtrapolationshowguidancePr from '../../../src/ShowGuidanceFiles/ExtrapolationPr.html'
+
 
 
 const entityname = i18n.t('static.dashboard.extrapolation');
@@ -1341,6 +1346,19 @@ export default class ExtrapolateDataComponent extends React.Component {
                     }.bind(this);
                     putRequest.onsuccess = function (event) {
                         console.log("save");
+                        console.log("in side datasetDetails")
+                        db1 = e.target.result;
+                        var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
+                        var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
+                        var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.datasetId);
+                        datasetDetailsRequest.onsuccess = function (e) {         
+                          var datasetDetailsRequestJson = datasetDetailsRequest.result;
+                          datasetDetailsRequestJson.changed = 1;
+                          var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+                          datasetDetailsRequest1.onsuccess = function (event) {
+                               
+                              }}
+
                         // let id = AuthenticationService.displayDashboardBasedOnRole();
                         // this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.compareAndSelect.dataSaved'));
                         this.setState({
@@ -4034,8 +4052,17 @@ export default class ExtrapolateDataComponent extends React.Component {
                         <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
                     </ModalHeader>
                     <div>
-                        <ModalBody>
-                            <div>
+                    <ModalBody className="ModalBodyPadding">
+                        <div dangerouslySetInnerHTML={ {__html:localStorage.getItem('lang') == 'en' ?
+                ExtrapolationshowguidanceEn :
+                localStorage.getItem('lang') == 'fr' ?
+                ExtrapolationshowguidanceFr :
+                  localStorage.getItem('lang') == 'sp' ?
+                  ExtrapolationshowguidanceSp :
+                  ExtrapolationshowguidancePr
+              } } />
+                     
+                            {/* <div>
                                 <h3 className='ShowGuidanceHeading'>{i18n.t('static.commitTree.extrapolation')}</h3>
                             </div>
                             <p>
@@ -4103,7 +4130,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                         <li>{i18n.t('static.extrapolation.TrendingSeasonal')}
                                             <ul>
                                                 <li>{i18n.t('static.extrapolation.ARIMAModel')}</li>
-                                                {/* <li>{i18n.t('static.extrapolation.WintersExponential')}</li> */}
+                                              
                                                 <li>Triple Exponential Smoothing (Holt-Winters) <br></br>
 
                                                     Seasonal without trend, where the observed values have a seasonal component but no trend. Models applied to such datasets may include </li>
@@ -4112,13 +4139,10 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                     The models suggested here are neither exhaustive nor exclusive. QAT enables the user to apply a variety of extrapolation methods and then to compare them using best fit or forecast error metrics. </li>
                                             </ul>
                                         </li><br></br>
-                                        {/* <li>{i18n.t('static.extrapolation.SeasonalWithout')}
-                                            <ul>
-                                                <li>{i18n.t('static.extrapolation.Multiplicative')}</li><br></br> */}
+                                        
 
                                         <p>{i18n.t('static.extrapolation.SecondStep')} {i18n.t('static.extrapolation.ChoosingToDisregard')} </p>
-                                        {/* </ul>
-                                        </li> */}
+                                       
                                     </ul>
                                 </p>
                                 <b>4.{i18n.t('static.extrapolation.InterpretErrors')}</b>
@@ -4144,19 +4168,13 @@ export default class ExtrapolateDataComponent extends React.Component {
                                     </ul>
                                 </p>
                             </p>
-                            {/* <p>Methods are organized from simple to robust
-
-                                More sophisticated models are more sensitive to problems in the data
-
-                                If you have poorer data (missing data points, variable reporting rates, less than 12 months of data), use simpler forecast methods
-                            </p> */}
                             <p>
                                 <b>{i18n.t('static.versionSettings.note')} :  {i18n.t('static.extrapolation.YouHave')} {this.state.planningUnitId > 0 && this.state.regionId > 0 ? this.state.actualConsumptionList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId).length : 0} {i18n.t('static.extrapolation.MinimumValues')}: <br></br>
                                     <span className="ml-lg-5">* {i18n.t('static.extrapolation.TESHoltWinters')}: {i18n.t('static.extrapolation.LeastMonths')}<br></br></span>
                                     <span className="ml-lg-5">* {i18n.t('static.extrapolation.ARIMA')}:  {i18n.t('static.extrapolation.LeastFourteenMonths')}<br></br></span>
                                     <span className="ml-lg-5">* {i18n.t('static.extrapolation.MASALR')}: {i18n.t('static.extrapolation.LeastThreeMonths')}</span>
                                 </b>
-                            </p>
+                            </p> */}
                         </ModalBody>
                     </div>
                 </Modal>

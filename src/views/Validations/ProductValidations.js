@@ -443,10 +443,16 @@ class ProductValidation extends Component {
                 // console.log("+++UNit Label", getLabelText(nodeDataList.filter(c => c.flatItem.id == finalData[i].parentNodeFlatItem.parent)[0].flatItem.payload.nodeUnit.label, this.state.lang));
                 console.log("finalData[i].parentNodeNodeDataMap.fuNode.forecastingUnit", finalData[i].parentNodeNodeDataMap.fuNode.forecastingUnit);
                 try {
-                    selectedText1 = getLabelText(this.state.fuList.filter(c => c.forecastingUnitId == finalData[i].parentNodeNodeDataMap.fuNode.forecastingUnit.id)[0].unit.label, this.state.lang)
+                    if (finalData[i].parentNodeNodeDataMap.fuNode.forecastingUnit.id.toString().includes("Local")) {
+                        selectedText1 = getLabelText(this.state.fuList.filter(c => c.forecastingUnitId == finalData[i].parentNodeNodeDataMap.fuNode.forecastingUnit.id)[0].unit.label, this.state.lang)
+                    } else {
+                        selectedText1 = getLabelText(finalData[i].parentNodeNodeDataMap.fuNode.forecastingUnit.label, this.state.lang)
+                    }
                 } catch (error) {
+                console.log("error--->", error)    
                     selectedText1 = "";
                 }
+                console.log("selectedText1",selectedText1)
                 if (finalData[i].parentNodeNodeDataMap.fuNode.usageType.id == 2 || finalData[i].parentNodeNodeDataMap.fuNode.oneTimeUsage != "true") {
                     console.log("finalData[i].parentNodeNodeDataMap.fuNode+++", finalData[i].parentNodeNodeDataMap.fuNode)
                     var upListFiltered = this.state.upList.filter(c => c.usagePeriodId == finalData[i].parentNodeNodeDataMap.fuNode.usagePeriod.usagePeriodId);

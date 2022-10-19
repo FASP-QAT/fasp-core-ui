@@ -2146,7 +2146,7 @@ export default class SupplyPlanComponent extends React.Component {
         const chartOptions1 = {
             title: {
                 display: true,
-                text: this.props.items.planningUnitName != "" && this.props.items.planningUnitName != undefined && this.props.items.planningUnitName != null ? entityname + " - " + this.props.items.planningUnitName : entityname
+                text: this.props.items.planningUnitName != "" && this.props.items.planningUnitName != undefined && this.props.items.planningUnitName != null ? this.props.items.programSelect.label + " - " + this.props.items.planningUnitName : entityname
             },
             scales: {
                 yAxes: [{
@@ -2229,7 +2229,7 @@ export default class SupplyPlanComponent extends React.Component {
         var chartOptions2 = {
             title: {
                 display: true,
-                text: this.props.items.planningUnitName != "" && this.props.items.planningUnitName != undefined && this.props.items.planningUnitName != null ? entityname + " - " + this.props.items.planningUnitName : entityname
+                text: this.props.items.planningUnitName != "" && this.props.items.planningUnitName != undefined && this.props.items.planningUnitName != null ? this.props.items.programSelect.label + " - " + this.props.items.planningUnitName : entityname
             },
             scales: {
                 yAxes: [{

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<meta name="">
+	<title>Mostrar guía</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<style>
+		table, td, div, h1, p {font-family: Arial, sans-serif;line-height: 20px;}
+		body{padding: 0;margin: 0;color: #272127;}
+	
+/* .table1 td, th {
+  border: 1px solid #c8ced3;
+  text-align: left;
+  padding: 8px;
+  border-collapse: collapse!important;
+  width: 100%;
+}*/
+.table1 td {
+  border: 1px solid #c8ced3!important;
+  padding: 6px;
+  font-size: 13px;
+}
+.table1 th {
+  border: 1px solid #c8ced3!important;
+  padding: 6px;
+  font-size: 13px;
+}
+.table1 {
+  /* width: 100%; */
+  border-collapse: collapse;
+}
+a {
+    color: #205493;
+    /* text-decoration: none; */
+    background-color: transparent;
+}
+	</style>
+</head>
+<body style="margin:0;padding:0;background:#e4e5e6;">
+	<table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+		<tr>
+			<td align="center" style="padding:0;">
+				<table role="presentation" style="max-width: 910px;min-width:100%;margin-top:20px;margin-bottom:20px;border-collapse:collapse;border:1px solid #fff;border-spacing:0;text-align:left;border-radius: 0.25rem;background-color: #fff;">
+					<tr>
+						<td style="padding:10px 30px 20px 30px;">
+							<table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+								<tr>
+									
+									<td style="padding:0 0 10px 0;color:#153643;">
+										<h3 style="color: #002f6c;font-weight: 600;font-size: 19px;">Añadir/Editar nodo - Nodo de extrapolación
+
+										</h3>
+										<p><p style="font-size: 13px;"><span style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold;">Objetivo :</span>La pestaña de extrapolación permite a los usuarios pronosticar valores de nodos futuros extrapolando valores pasados. Esta funcionalidad solo está disponible en los nodos numéricos y es similar a la '<a href="/#/Extrapolation/extrapolateData" target="_blank" style="text-decoration: underline;">Extrapolación</a>' Métodos de extrapolación disponibles en QAT</p></p>
+										
+										<p>
+											<p style="font-size: 14px;"><span style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold;">Usando esta pestaña:  </span></p>
+											<p class="pl-lg-4">
+												<ol type="1" style="font-size: 13px;">
+													<li>En la tabla, ingrese los valores reales y las tasas de informes para sus datos anteriores. A partir de esta entrada, QAT calculará los valores históricos ajustados.</li>
+													<li>Si faltan datos, use el botón verde Interpolar para completar los datos faltantes.</li>
+													<li>(opcional) En la parte superior de la pantalla, seleccione qué métodos de pronóstico desea mostrar y actualice los parámetros de extrapolación.</li>
+													<li>Haz clic en Extrapolar. Todos los pronósticos seleccionados se mostrarán en la tabla principal y en los gráficos. </li>
+													<p class="pl-lg-4"><b>Nota:</b> meses de datos de consumo acutal. Los valores mínimos necesarios para las diversas características se encuentran a continuación.:<br><span class="ml-lg-5">* TES, Holt Winters:  Necesita al menos 24 meses de datos de consumo real<br></span>
+														<span
+															class="ml-lg-5">* ARIMA: estacionalidad : Se requieren datos históricos de al menos 13 meses. Sin estacionalidad: Se requieren datos históricos de al menos 2 meses<br></span><span class="ml-lg-5">* Media móvil</span></p>
+													<li>(opcional) En la tabla, agregue cualquier cambio manual (+/-). Estos cambios se suman o restan sobre los valores extrapolados.</li>
+													<li>Después de revisar la tabla principal, la tabla de errores y los gráficos, seleccione el método de pronóstico deseado en la parte inferior de la pantalla y haga clic en Guardar.</li>
+												</ol>
+											</p>
+										</p>
+									</li>
+								</ol>
+							</p>
+				</td>
+				</tr>
+				
+		
+							</table>
+						</td>
+					</tr>
+					
+				</table>
+			</td>
+		</tr>
+	</table>
+</body>
+</html>
