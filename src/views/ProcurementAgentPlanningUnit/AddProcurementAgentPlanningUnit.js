@@ -1037,12 +1037,18 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                                 type: 'checkbox'
                                                             },
                                                             {
-                                                                title: 'procurementAgentId',
-                                                                type: 'hidden'
+                                                                // title: 'procurementAgentId',
+                                                                // type: 'hidden'
+                                                                title: 'A',
+                                                                type: 'text',
+                                                                visible: false
                                                             },
                                                             {
-                                                                title: 'isChange',
-                                                                type: 'hidden'
+                                                                // title: 'isChange',
+                                                                // type: 'hidden'
+                                                                title: 'A',
+                                                                type: 'text',
+                                                                visible: false
                                                             }
 
                                                         ],

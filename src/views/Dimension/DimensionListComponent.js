@@ -316,8 +316,11 @@ export default class DimensionListComponent extends Component {
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: 'dimensionId',
-                    type: 'hidden',
+                    // title: 'dimensionId',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false,
                     readOnly: true
                 },
                 {

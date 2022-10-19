@@ -579,9 +579,12 @@ export default class ShipmentDelinking extends Component {
                     // readOnly: true
                 },
                 {
-                    title: i18n.t('static.commit.shipmentTransId'),
-                    type: 'hidden',
+                    // title: i18n.t('static.commit.shipmentTransId'),
+                    // type: 'hidden',
                     // readOnly: true
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
                 {
                     title: i18n.t('static.supplyPlan.mtexpectedDeliveryDate'),

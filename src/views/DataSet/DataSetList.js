@@ -172,12 +172,18 @@ export default class ProgramList extends Component {
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: 'programId',
-                    type: 'hidden',
+                    // title: 'programId',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
                 {
-                    title: i18n.t('static.program.realm'),
-                    type: 'hidden',
+                    // title: i18n.t('static.program.realm'),
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                     // readOnly: true
                 },
                 {

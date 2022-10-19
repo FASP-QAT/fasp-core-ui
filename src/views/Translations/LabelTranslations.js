@@ -73,9 +73,19 @@ export default class DatabaseTranslations extends React.Component {
                             label[i] = data;
                         }
                         var colHeadersArray = [];
-                        colHeadersArray.push({ type: 'hidden', title: `${i18n.t('static.translation.labelId')}` })
+                        colHeadersArray.push({
+                            // type: 'hidden', title: `${i18n.t('static.translation.labelId')}`
+                            title: 'A',
+                            type: 'text',
+                            visible: false
+                        })
                         colHeadersArray.push({ type: 'text', readOnly: true, title: `${i18n.t('static.translation.labelId')}` })
-                        colHeadersArray.push({ type: 'hidden', title: `${i18n.t('static.translation.isModified')}` })
+                        colHeadersArray.push({
+                            // type: 'hidden', title: `${i18n.t('static.translation.isModified')}` 
+                            title: 'A',
+                            type: 'text',
+                            visible: false
+                        })
                         for (var l = 0; l < languageList.length; l++) {
                             colHeadersArray.push({ type: 'text', title: languageList[l].label.label_en })
                         }

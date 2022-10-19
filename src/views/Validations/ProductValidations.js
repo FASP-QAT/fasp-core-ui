@@ -449,10 +449,10 @@ class ProductValidation extends Component {
                         selectedText1 = getLabelText(finalData[i].parentNodeNodeDataMap.fuNode.forecastingUnit.label, this.state.lang)
                     }
                 } catch (error) {
-                console.log("error--->", error)    
+                    console.log("error--->", error)
                     selectedText1 = "";
                 }
-                console.log("selectedText1",selectedText1)
+                console.log("selectedText1", selectedText1)
                 if (finalData[i].parentNodeNodeDataMap.fuNode.usageType.id == 2 || finalData[i].parentNodeNodeDataMap.fuNode.oneTimeUsage != "true") {
                     console.log("finalData[i].parentNodeNodeDataMap.fuNode+++", finalData[i].parentNodeNodeDataMap.fuNode)
                     var upListFiltered = this.state.upList.filter(c => c.usagePeriodId == finalData[i].parentNodeNodeDataMap.fuNode.usagePeriod.usagePeriodId);
@@ -632,8 +632,11 @@ class ProductValidation extends Component {
                         type: 'numeric', mask: '#,##.00', decimal: '.'
                     },
                     {
-                        title: "IsTotal",
-                        type: 'hidden'
+                        // title: "IsTotal",
+                        // type: 'hidden'
+                        title: 'A',
+                        type: 'text',
+                        visible: false
                     },
                 ],
                 // text: {

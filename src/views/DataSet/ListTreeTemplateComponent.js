@@ -294,8 +294,11 @@ export default class ListTreeTemplate extends Component {
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: 'Template Id',
-                    type: 'hidden',
+                    // title: 'Template Id',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
                 {
                     title: i18n.t('static.listTreeTemp.templateName'),

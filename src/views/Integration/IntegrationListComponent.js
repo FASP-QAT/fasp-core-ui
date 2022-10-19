@@ -63,8 +63,11 @@ export default class IntegrationListComponent extends Component {
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: 'integrationId',
-                    type: 'hidden',
+                    // title: 'integrationId',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                     // readOnly: true
                 },
                 {

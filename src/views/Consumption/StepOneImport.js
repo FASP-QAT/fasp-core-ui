@@ -783,8 +783,11 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     readOnly: true//0 A
                 },
                 {
-                    title: 'Supply Plan Planning Unit Id',
-                    type: 'hidden',
+                    // title: 'Supply Plan Planning Unit Id',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                     // readOnly: true//1 B
                 },
                 {
@@ -793,23 +796,35 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     readOnly: true,//2 C
                 },
                 {
-                    title: 'multiplier',
-                    type: 'hidden',
+                    // title: 'multiplier',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                     // readOnly: true//3 D
                 },
                 {
-                    title: 'forecastingUnitId',
-                    type: 'hidden',
+                    // title: 'forecastingUnitId',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                     // readOnly: true//4 E
                 },
                 {
-                    title: 'tracerCategoryId',
-                    type: 'hidden',
+                    // title: 'tracerCategoryId',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                     // readOnly: true//5 F
                 },
                 {
-                    title: 'Forecast Planning Unit Id',
-                    type: 'hidden',
+                    // title: 'Forecast Planning Unit Id',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                     // readOnly: true//6 G
                 },
                 {
@@ -819,8 +834,11 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     // filter: this.filterPlanningUnitBasedOnTracerCategory//7 H
                 },
                 {
-                    title: 'ForecastMultiplier',
-                    type: 'hidden',
+                    // title: 'ForecastMultiplier',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                     // readOnly: true//8 I
                 },
                 {
@@ -831,13 +849,19 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     textEditor: true,//9 J
                 },
                 {
-                    title: 'Match',
-                    type: 'hidden',
+                    // title: 'Match',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                     // readOnly: true//10 K
                 },
                 {
-                    title: 'Supply plan Forcast unit id',
-                    type: 'hidden',
+                    // title: 'Supply plan Forcast unit id',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                     // readOnly: true//11 L
                 }
 

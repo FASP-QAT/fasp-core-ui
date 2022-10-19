@@ -797,28 +797,43 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     textEditor: true,//3 D
                 },
                 {
-                    title: 'Id',
-                    type: 'hidden',
+                    // title: 'Id',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                     // readOnly: true//4 E
                 },
                 {
-                    title: 'Id',
-                    type: 'hidden',
+                    // title: 'Id',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                     // readOnly: true//5 F
                 },
                 {
-                    title: 'Forcast planning unit id',
-                    type: 'hidden',
+                    // title: 'Forcast planning unit id',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                     // readOnly: true//6 G
                 },
                 {
-                    title: 'Selected Forecast Map',
-                    type: 'hidden',
+                    // title: 'Selected Forecast Map',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                     // readOnly: true//7 H
                 },
                 {
-                    title: 'No Forecast Selected',
-                    type: 'hidden',
+                    // title: 'No Forecast Selected',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                     // readOnly: true//8 I
                 }
 

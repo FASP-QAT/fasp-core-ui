@@ -139,7 +139,7 @@ class forecastMethod extends Component {
 
         this.el = jexcel(document.getElementById("paputableDiv"), '');
         // this.el.destroy();
-        jexcel.destroy(document.getElementById("paputableDiv"),true);
+        jexcel.destroy(document.getElementById("paputableDiv"), true);
         var json = [];
         var data = papuDataArr;
 
@@ -150,9 +150,12 @@ class forecastMethod extends Component {
             columns: [
 
                 {
-                    title: 'forecastMethodId',
-                    type: 'hidden',
+                    // title: 'forecastMethodId',
+                    // type: 'hidden',
                     // readOnly: true
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
                 // {
                 //     title: i18n.t('static.product.realm'),
@@ -197,16 +200,25 @@ class forecastMethod extends Component {
                     readOnly: true
                 },
                 {
-                    title: 'forecastMethodTypeId',
-                    type: 'hidden'
+                    // title: 'forecastMethodTypeId',
+                    // type: 'hidden'
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
                 {
-                    title: 'isChange',
-                    type: 'hidden'
+                    // title: 'isChange',
+                    // type: 'hidden'
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
                 {
-                    title: 'addNewRow',
-                    type: 'hidden'
+                    // title: 'addNewRow',
+                    // type: 'hidden'
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 }
 
 
@@ -1039,8 +1051,8 @@ class forecastMethod extends Component {
                             {/* <h5>{i18n.t('static.common.customWarningMessage')}</h5> */}
                             <h5>{i18n.t("static.placeholder.forecastMethod")}</h5>
                             <div className="consumptionDataEntryTable">
-                            <div id="paputableDiv" style={{ display: this.state.loading ? "none" : "block", marginTop: '-13px' }} className={(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_FORECAST_METHOD') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_FORECAST_METHOD')) ? "RowClickable" : "jexcelremoveReadonlybackground"}>
-                            </div>
+                                <div id="paputableDiv" style={{ display: this.state.loading ? "none" : "block", marginTop: '-13px' }} className={(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_FORECAST_METHOD') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_FORECAST_METHOD')) ? "RowClickable" : "jexcelremoveReadonlybackground"}>
+                                </div>
                             </div>
                             <div style={{ display: this.state.loading ? "block" : "none" }}>
                                 <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >

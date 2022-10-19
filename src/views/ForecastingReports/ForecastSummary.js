@@ -1555,17 +1555,41 @@ class ForecastSummary extends Component {
                                         }
                                     }
                                     var columns = [];
-                                    columns.push({ title: i18n.t('static.product.unit1'), type: 'hidden', width: 100, readOnly: true });//A0
-                                    columns.push({ title: i18n.t('static.product.product'), type: 'hidden', width: 100, readOnly: true });//B1
+                                    columns.push({
+                                        // title: i18n.t('static.product.unit1'), type: 'hidden', 
+                                        title: 'A',
+                                        type: 'text',
+                                        visible: false,
+                                        width: 100, readOnly: true
+                                    });//A0
+                                    columns.push({
+                                        // title: i18n.t('static.product.product'), type: 'hidden', 
+                                        title: 'A',
+                                        type: 'text',
+                                        visible: false,
+                                        width: 100, readOnly: true
+                                    });//B1
                                     columns.push({ title: i18n.t('static.product.product'), type: 'text', width: 100, readOnly: true });//C2
                                     for (var k = 0; k < regRegionList.length; k++) {
                                         columns.push({ title: i18n.t('static.compareVersion.selectedForecast'), type: 'dropdown', width: 100, source: tsList, filter: this.filterTsList });//D3
                                         columns.push({ title: i18n.t('static.forecastReport.forecastQuantity'), type: 'numeric', textEditor: true, mask: '#,##.00', decimal: '.', width: 100, readOnly: true });//E4
                                         columns.push({ title: i18n.t('static.program.notes'), type: 'text', width: 100 });//F5
                                     }
-                                    columns.push({ title: i18n.t('static.supplyPlan.type'), type: 'hidden', width: 100, readOnly: true });//G6
+                                    columns.push({
+                                        title: 'A',
+                                        type: 'text',
+                                        visible: false,
+                                        // title: i18n.t('static.supplyPlan.type'), type: 'hidden', 
+                                        width: 100, readOnly: true
+                                    });//G6
                                     columns.push({ title: i18n.t('static.forecastOutput.totalForecastQuantity'), type: 'numeric', textEditor: true, mask: '#,##.00', decimal: '.', width: 100, readOnly: true });//H7
-                                    columns.push({ title: 'forecast Blank', type: 'hidden', width: 100, readOnly: true });//G6
+                                    columns.push({
+                                        // title: 'forecast Blank', type: 'hidden', 
+                                        title: 'A',
+                                        type: 'text',
+                                        visible: false,
+                                        width: 100, readOnly: true
+                                    });//G6
                                     let nestedHeaders = [];
                                     // nestedHeaders.push(
                                     //     {
@@ -1868,9 +1892,27 @@ class ForecastSummary extends Component {
                             }
 
                             var columns = [];
-                            columns.push({ title: i18n.t('static.product.unit1'), type: 'hidden', width: 100, readOnly: true });//A0
-                            columns.push({ title: i18n.t('static.product.unit1'), type: 'hidden', width: 100, readOnly: true });//A0
-                            columns.push({ title: i18n.t('static.product.product'), type: 'text', width: 100, readOnly: true });//C2
+                            columns.push({
+                                // title: i18n.t('static.product.unit1'), type: 'hidden', 
+                                title: 'A',
+                                type: 'text',
+                                visible: false,
+                                width: 100, readOnly: true
+                            });//A0
+                            columns.push({
+                                // title: i18n.t('static.product.unit1'), type: 'hidden', 
+                                title: 'A',
+                                type: 'text',
+                                visible: false,
+                                width: 100, readOnly: true
+                            });//A0
+                            columns.push({
+                                // title: i18n.t('static.product.product'), type: 'text', 
+                                title: 'A',
+                                type: 'text',
+                                visible: false,
+                                width: 100, readOnly: true
+                            });//C2
 
                             for (var k = 0; k < uniqueRegionList.length; k++) {
                                 columns.push({ title: i18n.t('static.compareVersion.selectedForecast'), type: 'text', width: 100, readOnly: true });//D3
