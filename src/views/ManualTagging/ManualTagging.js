@@ -3368,7 +3368,7 @@ export default class ManualTagging extends Component {
                     console.log("List@@@@@@@@@Mohit", list)
                     var dataArray1 = [];
                     var data1 = [];
-                    var finalShipmentId = this.state.finalShipmentId;
+                    var finalShipmentId = this.state.showAllShipments ? this.state.finalShipmentId : finalShipmentId;
                     var shipmentListArr = [...new Set(finalShipmentId.filter(c => c.shipmentId != 0).map(ele => (ele.shipmentId)))]
                     var tempShipmentListArr = [...new Set(finalShipmentId.filter(c => c.tempShipmentId != 0 && c.tempShipmentId != null).map(ele => (ele.tempShipmentId)))]
 
