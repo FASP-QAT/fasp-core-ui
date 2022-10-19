@@ -8920,7 +8920,7 @@ export default class BuildTree extends Component {
                                                         <Label htmlFor="currencyId">{i18n.t('static.product.unit1')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover9" onClick={this.toggleForecastingUnitPU} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
 
                                                     </FormGroup> */}
-                                                    <FormGroup className="col-md-6">
+                                                    <FormGroup className="col-md-7">
                                                         <Label htmlFor="currencyId">{i18n.t('static.product.unit1')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover9" onClick={this.toggleForecastingUnitPU} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                         <Input type="text"
                                                             id="forecastingUnitPU"
@@ -8939,37 +8939,39 @@ export default class BuildTree extends Component {
                                                     {/* <FormGroup className="col-md-2">
                                                         <Label htmlFor="currencyId">{this.state.parentScenario.fuNode.usageType.id == 2 ? "# of FU / month / " : "# of FU / usage / "}{this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label.label_en} <i class="fa fa-info-circle icons pl-lg-2" id="Popover11" onClick={this.toggleHashOfUMonth} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                     </FormGroup> */}
-                                                    <FormGroup className="col-md-2">
-                                                        <Label htmlFor="currencyId">{this.state.parentScenario.fuNode.usageType.id == 2 ? "# of FU/month/" : "# of FU/usage/ "}{this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label.label_en} <i class="fa fa-info-circle icons pl-lg-2" id="Popover11" onClick={this.toggleHashOfUMonth} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
-                                                        <Input type="text"
-                                                            id="forecastingUnitPU"
-                                                            name="forecastingUnitPU"
-                                                            bsSize="sm"
-                                                            readOnly={true}
+                                                    <FormGroup className="col-md-3">
+                                                        <Label htmlFor="currencyId">{this.state.parentScenario.fuNode.usageType.id == 2 ? "# of FU / month / " : "# of FU / "}{this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label.label_en} <i class="fa fa-info-circle icons pl-lg-2" id="Popover11" onClick={this.toggleHashOfUMonth} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                        <div className='d-flex'>
+                                                            <Input type="text"
+                                                                id="forecastingUnitPU"
+                                                                name="forecastingUnitPU"
+                                                                bsSize="sm"
+                                                                readOnly={true}
+                                                                className="mr-2"
+                                                                value={addCommas(this.state.parentScenario.fuNode.usageType.id == 2 ? (this.state.parentScenario.fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) : this.state.noOfMonthsInUsagePeriod)}>
 
-                                                            value={addCommas(this.state.parentScenario.fuNode.usageType.id == 2 ? (this.state.parentScenario.fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) : this.state.noOfMonthsInUsagePeriod)}>
+                                                            </Input>
+                                                            {/* </FormGroup>
+                                                    <FormGroup className="col-md-2" style={{ marginTop: "25px" }}> */}
+                                                            <Input type="select"
+                                                                id="forecastingUnitUnitPU"
+                                                                name="forecastingUnitUnitPU"
+                                                                bsSize="sm"
+                                                                disabled="true"
+                                                                onChange={(e) => { this.dataChange(e) }}
+                                                                value={this.state.parentScenario.fuNode.forecastingUnit.unit.id}>
 
-                                                        </Input>
-                                                    </FormGroup>
-                                                    <FormGroup className="col-md-2" style={{ marginTop: "25px" }}>
-                                                        <Input type="select"
-                                                            id="forecastingUnitUnitPU"
-                                                            name="forecastingUnitUnitPU"
-                                                            bsSize="sm"
-                                                            disabled="true"
-                                                            onChange={(e) => { this.dataChange(e) }}
-                                                            value={this.state.parentScenario.fuNode.forecastingUnit.unit.id}>
-
-                                                            <option value=""></option>
-                                                            {this.state.nodeUnitList.length > 0
-                                                                && this.state.unitList.map((item, i) => {
-                                                                    return (
-                                                                        <option key={i} value={item.unitId}>
-                                                                            {getLabelText(item.label, this.state.lang)}
-                                                                        </option>
-                                                                    )
-                                                                }, this)}
-                                                        </Input>
+                                                                <option value=""></option>
+                                                                {this.state.nodeUnitList.length > 0
+                                                                    && this.state.unitList.map((item, i) => {
+                                                                        return (
+                                                                            <option key={i} value={item.unitId}>
+                                                                                {getLabelText(item.label, this.state.lang)}
+                                                                            </option>
+                                                                        )
+                                                                    }, this)}
+                                                            </Input>
+                                                        </div>
                                                     </FormGroup>
                                                 </>
                                             }
@@ -8984,7 +8986,7 @@ export default class BuildTree extends Component {
                                                         <Label htmlFor="currencyId">{i18n.t('static.conversion.ConversionFactorFUPU')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover13" onClick={this.toggleConversionFactorFUPU} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                     </FormGroup> */}
                                                     <FormGroup className="col-md-2">
-                                                        <Label htmlFor="currencyId">{i18n.t('static.conversion.ConversionFactorFUPU')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover13" onClick={this.toggleConversionFactorFUPU} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                        <Label htmlFor="currencyId">Conversion (FU:PU) <i class="fa fa-info-circle icons pl-lg-2" id="Popover13" onClick={this.toggleConversionFactorFUPU} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                         <Input type="text"
                                                             id="conversionFactor"
                                                             name="conversionFactor"
@@ -9000,7 +9002,7 @@ export default class BuildTree extends Component {
                                                             <PopoverBody>{i18n.t('static.tooltip.planningUnitNode')}</PopoverBody>
                                                         </Popover>
                                                     </div>
-                                                    <FormGroup className="col-md-6" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 5 ? 'block' : 'none' }}>
+                                                    <FormGroup className="col-md-7" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 5 ? 'block' : 'none' }}>
                                                         <Label htmlFor="currencyId">{i18n.t('static.product.product')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover12" onClick={this.togglePlanningUnitNode} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                         <Input type="select"
                                                             id="planningUnitId"
@@ -9029,35 +9031,39 @@ export default class BuildTree extends Component {
                                                             <PopoverBody>{i18n.t('static.tooltip.NoOfPUUsage')}</PopoverBody>
                                                         </Popover>
                                                     </div>
-                                                    <FormGroup className="col-md-2">
-                                                        <Label htmlFor="currencyId">{this.state.parentScenario.fuNode.usageType.id == 2 ? "# of PU/month/ " : "# of PU/usage/ "}{this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label.label_en} <i class="fa fa-info-circle icons pl-lg-2" id="Popover14" onClick={this.toggleNoOfPUUsage} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
-                                                        <Input type="text"
-                                                            id="noOfPUUsage"
-                                                            name="noOfPUUsage"
-                                                            bsSize="sm"
-                                                            readOnly={true}
-                                                            value={addCommas(this.state.parentScenario.fuNode.usageType.id == 2 ? this.round((this.state.parentScenario.fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) / this.state.conversionFactor) : this.round(this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor))}>
-                                                        </Input>
-                                                    </FormGroup>
-                                                    <FormGroup className="col-md-2" style={{ marginTop: "25px" }}>
-                                                        <Input type="select"
-                                                            id="planningUnitUnitPU"
-                                                            name="planningUnitUnitPU"
-                                                            bsSize="sm"
-                                                            disabled="true"
-                                                            onChange={(e) => { this.dataChange(e) }}
-                                                            value={this.state.currentScenario.puNode.planningUnit.unit.id}>
+                                                    <FormGroup className="col-md-3">
+                                                        <Label htmlFor="currencyId">{this.state.parentScenario.fuNode.usageType.id == 2 ? "# of PU / month / " : "# of PU /  "}{this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label.label_en} <i class="fa fa-info-circle icons pl-lg-2" id="Popover14" onClick={this.toggleNoOfPUUsage} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                        <div className='d-flex'>
+                                                            <Input type="text"
+                                                                id="noOfPUUsage"
+                                                                name="noOfPUUsage"
+                                                                bsSize="sm"
+                                                                className="mr-2"
+                                                                readOnly={true}
+                                                                value={addCommas(this.state.parentScenario.fuNode.usageType.id == 2 ? this.round((this.state.parentScenario.fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) / this.state.conversionFactor) : this.round(this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor))}>
 
-                                                            <option value=""></option>
-                                                            {this.state.unitList.length > 0
-                                                                && this.state.unitList.map((item, i) => {
-                                                                    return (
-                                                                        <option key={i} value={item.unitId}>
-                                                                            {getLabelText(item.label, this.state.lang)}
-                                                                        </option>
-                                                                    )
-                                                                }, this)}
-                                                        </Input>
+                                                            </Input>
+                                                            {/* </FormGroup>
+                                                    <FormGroup className="col-md-2" style={{ marginTop: "25px" }}> */}
+                                                            <Input type="select"
+                                                                id="planningUnitUnitPU"
+                                                                name="planningUnitUnitPU"
+                                                                bsSize="sm"
+                                                                disabled="true"
+                                                                onChange={(e) => { this.dataChange(e) }}
+                                                                value={this.state.currentScenario.puNode.planningUnit.unit.id}>
+
+                                                                <option value=""></option>
+                                                                {this.state.unitList.length > 0
+                                                                    && this.state.unitList.map((item, i) => {
+                                                                        return (
+                                                                            <option key={i} value={item.unitId}>
+                                                                                {getLabelText(item.label, this.state.lang)}
+                                                                            </option>
+                                                                        )
+                                                                    }, this)}
+                                                            </Input>
+                                                        </div>
                                                     </FormGroup>
 
                                                     {this.state.parentScenario.fuNode.usageType.id == 2 &&
@@ -9080,7 +9086,7 @@ export default class BuildTree extends Component {
                                                             </FormGroup>
 
                                                             <FormGroup className="col-md-6">
-                                                                <Label htmlFor="currencyId"># PU/ Interval/{this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.parent != null && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id).length > 0 && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id)[0].label.label_en}(Reference)</Label>
+                                                                <Label htmlFor="currencyId"># PU / Interval / {this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.parent != null && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id).length > 0 && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id)[0].label.label_en}(Reference)</Label>
                                                                 <Input type="number"
                                                                     id="puPerVisitQATCalculated"
                                                                     name="puPerVisitQATCalculated"
@@ -9117,7 +9123,7 @@ export default class BuildTree extends Component {
                                                                 <FormFeedback className="red">{errors.refillMonths}</FormFeedback>
                                                             </FormGroup>
                                                             <FormGroup className="col-md-6">
-                                                                <Label htmlFor="currencyId">{this.state.currentItemConfig.parentItem != null && this.state.parentScenario.fuNode != null && this.state.parentScenario.fuNode.usageType.id == 2 ? "# PU/ Interval /" : "# PU/ "}{this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.parent != null && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id).length > 0 && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id)[0].label.label_en}(s)</Label>
+                                                                <Label htmlFor="currencyId">{this.state.currentItemConfig.parentItem != null && this.state.parentScenario.fuNode != null && this.state.parentScenario.fuNode.usageType.id == 2 ? "# PU / Interval / " : "# PU / "}{this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.parent != null && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id).length > 0 && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id)[0].label.label_en}(s)</Label>
                                                                 <Input type="number"
                                                                     id="puPerVisit"
                                                                     name="puPerVisit"
@@ -9210,7 +9216,7 @@ export default class BuildTree extends Component {
                                                             </FormGroup>
                                                             <FormGroup className="col-md-6"></FormGroup>
                                                             <FormGroup className="col-md-6">
-                                                                <Label htmlFor="currencyId"># PU/{this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.parent != null && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id).length > 0 && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id)[0].label.label_en}(s) (Calculated)</Label>
+                                                                <Label htmlFor="currencyId"># PU / {this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.parent != null && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id).length > 0 && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id)[0].label.label_en}(s) (Calculated)</Label>
                                                                 <Input type="number"
                                                                     id="puPerVisitQATCalculated"
                                                                     name="puPerVisitQATCalculated"
@@ -9223,7 +9229,7 @@ export default class BuildTree extends Component {
                                                             </FormGroup>
                                                             <FormGroup className="col-md-6"></FormGroup>
                                                             <FormGroup className="col-md-6" style={{ display: this.state.parentScenario.fuNode != null && (this.state.currentScenario.puNode.sharePlanningUnit == "false" || this.state.currentScenario.puNode.sharePlanningUnit == false || this.state.parentScenario.fuNode.usageType.id == 2) ? 'block' : 'none' }}>
-                                                                <Label htmlFor="currencyId">{this.state.currentItemConfig.parentItem != null && this.state.parentScenario.fuNode != null && this.state.parentScenario.fuNode.usageType.id == 2 ? "# PU/ Interval /" : "# PU/ "}{this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.parent != null && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id).length > 0 && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id)[0].label.label_en}(s)</Label>
+                                                                <Label htmlFor="currencyId">{this.state.currentItemConfig.parentItem != null && this.state.parentScenario.fuNode != null && this.state.parentScenario.fuNode.usageType.id == 2 ? "# PU / Interval / " : "# PU / "}{this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.parent != null && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id).length > 0 && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id)[0].label.label_en}(s)</Label>
                                                                 <Input type="number"
                                                                     id="puPerVisit"
                                                                     name="puPerVisit"
