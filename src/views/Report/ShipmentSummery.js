@@ -847,8 +847,11 @@ class ShipmentSummery extends Component {
                     // readOnly: true
                 },
                 {
-                    title: i18n.t('static.supplyPlan.consideAsEmergencyOrder'),
-                    type: 'hidden',
+                    // title: i18n.t('static.supplyPlan.consideAsEmergencyOrder'),
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                     // readOnly: true
                 },
                 {
@@ -928,8 +931,11 @@ class ShipmentSummery extends Component {
                     // readOnly: true
                 },
                 {
-                    title: 'Planning Unit Id',
-                    type: 'hidden',
+                    // title: 'Planning Unit Id',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                     // readOnly: true
                 },
 
@@ -2556,17 +2562,17 @@ class ShipmentSummery extends Component {
                                         <div className="row">
                                             <div className="col-md-12 pl-0 pr-0">
                                                 {this.state.shipmentDetailsFundingSourceList.length > 0 &&
-                                                <div className='fixTableHead'>
-                                                    <Table id="mytable1" responsive className="table-bordered table-striped text-center ">
-                                                        <thead>
-                                                            <tr>
-                                                                <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'center' }}>{i18n.t('static.budget.fundingsource')}</th>
-                                                                <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'right' }}>{i18n.t('static.report.orders')}</th>
-                                                                <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'right' }}>{i18n.t('static.report.qtyBaseUnit')}</th>
-                                                                <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'right' }}>{i18n.t('static.report.costUsd')}</th>
-                                                            </tr>
-                                                        </thead>
-                                                        {/* <tbody>
+                                                    <div className='fixTableHead'>
+                                                        <Table id="mytable1" responsive className="table-bordered table-striped text-center ">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'center' }}>{i18n.t('static.budget.fundingsource')}</th>
+                                                                    <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'right' }}>{i18n.t('static.report.orders')}</th>
+                                                                    <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'right' }}>{i18n.t('static.report.qtyBaseUnit')}</th>
+                                                                    <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'right' }}>{i18n.t('static.report.costUsd')}</th>
+                                                                </tr>
+                                                            </thead>
+                                                            {/* <tbody>
                                                         <tr>
                                                             <td style={{ 'text-align': 'center' }}>Global Fund</td>
                                                             <td style={{ 'text-align': 'right' }}>2</td>
@@ -2580,21 +2586,21 @@ class ShipmentSummery extends Component {
                                                             <td style={{ 'text-align': 'right' }}>7,480,000</td>
                                                         </tr>
                                                     </tbody> */}
-                                                        <tbody>
-                                                            {this.state.shipmentDetailsFundingSourceList.length > 0 &&
-                                                                this.state.shipmentDetailsFundingSourceList.map((item, idx) =>
-                                                                    <tr id="addr0" key={idx} >
-                                                                        <td style={{ 'text-align': 'center' }}>{getLabelText(this.state.shipmentDetailsFundingSourceList[idx].fundingSource.label, this.state.lang)}</td>
-                                                                        <td style={{ 'text-align': 'right' }}>{this.state.shipmentDetailsFundingSourceList[idx].orderCount}</td>
-                                                                        <td style={{ 'text-align': 'right' }}>{(this.state.shipmentDetailsFundingSourceList[idx].quantity).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
-                                                                        <td style={{ 'text-align': 'right' }}>{(Number(this.state.shipmentDetailsFundingSourceList[idx].cost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
-                                                                    </tr>
-                                                                )}
-                                                        </tbody>
+                                                            <tbody>
+                                                                {this.state.shipmentDetailsFundingSourceList.length > 0 &&
+                                                                    this.state.shipmentDetailsFundingSourceList.map((item, idx) =>
+                                                                        <tr id="addr0" key={idx} >
+                                                                            <td style={{ 'text-align': 'center' }}>{getLabelText(this.state.shipmentDetailsFundingSourceList[idx].fundingSource.label, this.state.lang)}</td>
+                                                                            <td style={{ 'text-align': 'right' }}>{this.state.shipmentDetailsFundingSourceList[idx].orderCount}</td>
+                                                                            <td style={{ 'text-align': 'right' }}>{(this.state.shipmentDetailsFundingSourceList[idx].quantity).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                                            <td style={{ 'text-align': 'right' }}>{(Number(this.state.shipmentDetailsFundingSourceList[idx].cost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                                        </tr>
+                                                                    )}
+                                                            </tbody>
 
-                                                    </Table>
+                                                        </Table>
                                                     </div>
-                                                    }
+                                                }
                                             </div>
                                         </div>
 

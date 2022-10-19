@@ -328,8 +328,11 @@ export default class PlanningUnitCapacityList extends Component {
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: 'planningUnitCapacityId',
-                    type: 'hidden',
+                    // title: 'planningUnitCapacityId',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                     // readOnly: true
                 },
                 {

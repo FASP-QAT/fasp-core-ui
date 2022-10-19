@@ -2565,8 +2565,11 @@ export default class BuildTree extends Component {
                     readOnly: true
                 },
                 {
-                    title: i18n.t('static.tree.%of') + " " + getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang) + " " + i18n.t('static.tree.monthStart'),
-                    type: 'hidden',
+                    // title: i18n.t('static.tree.%of') + " " + getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang) + " " + i18n.t('static.tree.monthStart'),
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false,
                     mask: '#,##0.0000', decimal: '.',
                     readOnly: true
 
@@ -2601,54 +2604,80 @@ export default class BuildTree extends Component {
                 },
                 {
                     title: getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) + " " + i18n.t('static.consumption.forcast'),
-                    type: this.state.currentItemConfig.context.payload.nodeType.id == 4 || this.state.currentItemConfig.context.payload.nodeType.id == 5 ? 'hidden' : 'numeric',
+                    type: this.state.currentItemConfig.context.payload.nodeType.id == 4 || this.state.currentItemConfig.context.payload.nodeType.id == 5 ? 'text' : 'numeric',
+                    visible: this.state.currentItemConfig.context.payload.nodeType.id == 4 || this.state.currentItemConfig.context.payload.nodeType.id == 5 ? false : true,
                     mask: '#,##0.0000', decimal: '.',
                     readOnly: true
                 },
                 {
-                    title: 'Node data id',
-                    type: 'hidden',
+                    // title: 'Node data id',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
 
                 },
                 {
                     title: this.state.currentItemConfig.context.payload.nodeType.id == 4 || this.state.currentItemConfig.context.payload.nodeType.id == 5 ? getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) + " " + i18n.t('static.consumption.forcast') : '# of PUs',
-                    type: this.state.currentItemConfig.context.payload.nodeType.id == 5 || this.state.currentItemConfig.context.payload.nodeType.id == 4 ? 'numeric' : 'hidden',
+                    type: this.state.currentItemConfig.context.payload.nodeType.id == 5 || this.state.currentItemConfig.context.payload.nodeType.id == 4 ? 'numeric' : 'text',
+                    visible: this.state.currentItemConfig.context.payload.nodeType.id == 5 || this.state.currentItemConfig.context.payload.nodeType.id == 4 ? true : false,
                     mask: '#,##0.0000', decimal: '.',
                     readOnly: true
                 },
                 {
-                    title: 'Perc without manual change',
-                    type: 'hidden',
+                    // title: 'Perc without manual change',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
 
                 },
                 {
-                    title: 'Manual change',
-                    type: 'hidden',
+                    // title: 'Manual change',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
 
                 },
                 {
-                    title: 'FU per month',
-                    type: 'hidden',
+                    // title: 'FU per month',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
 
                 },
                 {
-                    title: 'Cycle',
-                    type: 'hidden',
+                    // title: 'Cycle',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
 
                 },
                 {
-                    title: 'Diff',
-                    type: 'hidden',
+                    // title: 'Diff',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
 
                 },
                 {
-                    title: 'No of patients',
-                    type: 'hidden',
+                    // title: 'No of patients',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
 
                 },
                 {
-                    title: 'Without Lag',
-                    type: 'hidden',
+                    // title: 'Without Lag',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
 
                 },
 
@@ -2740,8 +2769,11 @@ export default class BuildTree extends Component {
                 },
                 {
                     // 1
-                    title: i18n.t('static.tree.monthStartNoSeasonality'),
-                    type: 'hidden',
+                    // title: i18n.t('static.tree.monthStartNoSeasonality'),
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false,
                     mask: '#,##0.0000', decimal: '.',
                     readOnly: true
 
@@ -2763,7 +2795,8 @@ export default class BuildTree extends Component {
                 {
                     // 4
                     title: i18n.t('static.tree.seasonalityIndex'),
-                    type: this.state.seasonality == true ? 'numeric' : 'hidden',
+                    type: this.state.seasonality == true ? 'numeric' : 'text',
+                    visible: this.state.seasonality == true ? true : false,
                     disabledMaskOnEdition: true,
                     textEditor: true,
                     mask: '#,##0.0000%', decimal: '.',
@@ -2772,7 +2805,8 @@ export default class BuildTree extends Component {
                 {
                     // 5
                     title: i18n.t('static.tree.manualChange+-'),
-                    type: this.state.seasonality == true ? 'numeric' : 'hidden',
+                    type: this.state.seasonality == true ? 'numeric' : 'text',
+                    visible: this.state.seasonality == true ? true : false,
                     mask: '#,##0.0000', decimal: '.',
                     readOnly: !this.state.aggregationNode ? true : false
                 },
@@ -2783,12 +2817,18 @@ export default class BuildTree extends Component {
                     readOnly: true
                 },
                 {
-                    title: "Node data id",
-                    type: 'hidden',
+                    // title: "Node data id",
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
                 {
-                    title: "Manual change Effect future month",
-                    type: 'hidden',
+                    // title: "Manual change Effect future month",
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 }
 
 
@@ -3930,7 +3970,8 @@ export default class BuildTree extends Component {
                 },
                 {
                     title: i18n.t('static.tree.MonthlyChange#'),
-                    type: this.state.currentItemConfig.context.payload.nodeType.id == 2 ? 'numeric' : 'hidden',
+                    type: this.state.currentItemConfig.context.payload.nodeType.id == 2 ? 'numeric' : 'text',
+                    visible: this.state.currentItemConfig.context.payload.nodeType.id == 2 ? true : false,
                     mask: '#,##0.0000', decimal: '.',
                     textEditor: true,
                     disabledMaskOnEdition: true
@@ -3952,16 +3993,25 @@ export default class BuildTree extends Component {
 
                 },
                 {
-                    title: 'nodeDataModelingId',
-                    type: 'hidden'
+                    // title: 'nodeDataModelingId',
+                    // type: 'hidden'
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
                 {
-                    title: 'isChanged',
-                    type: 'hidden'
+                    // title: 'isChanged',
+                    // type: 'hidden'
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
                 {
-                    title: 'isTransfer',
-                    type: 'hidden'
+                    // title: 'isTransfer',
+                    // type: 'hidden'
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
 
             ],

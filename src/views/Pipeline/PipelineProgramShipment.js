@@ -1116,8 +1116,11 @@ export default class PipelineProgramShipment extends Component {
 
                 },
                 {
-                    title: i18n.t('static.shipment.ordereddate'),
-                    type: 'hidden',
+                    // title: i18n.t('static.shipment.ordereddate'),
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                     // options: { format: 'DD-MMM-YYYY' }
 
                 }, {
@@ -1161,8 +1164,11 @@ export default class PipelineProgramShipment extends Component {
                 },
 
                 {
-                    title: 'Index',
-                    type: 'hidden'
+                    // title: 'Index',
+                    // type: 'hidden'
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 }
 
             ],

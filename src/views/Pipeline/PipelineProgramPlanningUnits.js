@@ -771,8 +771,11 @@ export default class PipelineProgramPlanningUnits extends Component {
                                                         type: 'numeric', mask: '#,##.00', disabledMaskOnEdition: true, textEditor: true, decimal: '.'
                                                     },
                                                     {
-                                                        title: i18n.t('static.report.id'),
-                                                        type: 'hidden'
+                                                        // title: i18n.t('static.report.id'),
+                                                        // type: 'hidden'
+                                                        title: 'A',
+                                                        type: 'text',
+                                                        visible: false
                                                     },
                                                     {
                                                         title: i18n.t('static.pipeline.localprocurementleadtime'),

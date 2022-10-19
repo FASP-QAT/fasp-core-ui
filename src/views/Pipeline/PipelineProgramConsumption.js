@@ -515,7 +515,12 @@ export default class PipelineProgramConsumption extends Component {
                                                 source: [{ id: true, name: i18n.t('static.consumption.actual') }, { id: false, name: i18n.t('static.consumption.forcast') }]
                                             },
 
-                                            { title: 'Index', type: 'hidden' },
+                                            {
+                                                // title: 'Index', type: 'hidden'
+                                                title: 'A',
+                                                type: 'text',
+                                                visible: false
+                                            },
                                             // { title: 'Last Modified date', type: 'text', readOnly: true },
                                             // { title: 'Last Modified by', type: 'text', readOnly: true }
                                         ],

@@ -869,28 +869,46 @@ export default class ShipmentLinkingNotifications extends Component {
                     readOnly: true
                 },
                 {
-                    title: "Original data",
-                    type: 'hidden',
+                    // title: "Original data",
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
                 {
-                    title: "Notification Id",
-                    type: 'hidden',
+                    // title: "Notification Id",
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
                 {
-                    title: "Shipment Linking Id",
-                    type: 'hidden',
+                    // title: "Shipment Linking Id",
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
                 {
-                    title: "Order No",
-                    type: 'hidden',
+                    // title: "Order No",
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
                 {
-                    title: "Prime Line No",
-                    type: 'hidden',
+                    // title: "Prime Line No",
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
                 {
-                    title: "Changed",
-                    type: 'hidden',
+                    // title: "Changed",
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
             ],
             editable: true,
@@ -1084,12 +1102,18 @@ export default class ShipmentLinkingNotifications extends Component {
                     readOnly: true
                 },
                 {
-                    title: "programId",
-                    type: 'hidden',
+                    // title: "programId",
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
                 {
-                    title: "programId",
-                    type: 'hidden',
+                    // title: "programId",
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 }
             ],
             editable: false,
@@ -1358,7 +1382,12 @@ export default class ShipmentLinkingNotifications extends Component {
                 { title: i18n.t('static.shipment.totalCost'), type: 'numeric', mask: '#,##.00', disabledMaskOnEdition: true, textEditor: true, decimal: '.', width: 100 },
                 { title: i18n.t('static.mt.dataReceivedOn'), type: 'calendar', options: { format: JEXCEL_DATE_FORMAT }, width: 100 },
                 { title: i18n.t('static.manualTagging.changeCode'), type: 'text', width: 100 },
-                { type: 'hidden' }
+                {
+                    // type: 'hidden'
+                    title: 'A',
+                    type: 'text',
+                    visible: false
+                }
             ],
             pagination: false,
             search: false,
@@ -1436,7 +1465,12 @@ export default class ShipmentLinkingNotifications extends Component {
                 { title: i18n.t('static.supplyPlan.shipmentQty'), type: 'numeric', mask: '#,##.00', disabledMaskOnEdition: true, textEditor: true, decimal: '.', width: 100 },
                 { title: i18n.t('static.mt.dataReceivedOn'), type: 'calendar', options: { format: JEXCEL_DATE_FORMAT }, width: 100 },
                 { title: i18n.t('static.manualTagging.changeCode'), type: 'text', width: 100 },
-                { type: 'hidden' }
+                {
+                    // type: 'hidden' 
+                    title: 'A',
+                    type: 'text',
+                    visible: false
+                }
             ],
             pagination: false,
             search: false,

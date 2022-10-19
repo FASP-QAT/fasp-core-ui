@@ -1897,7 +1897,7 @@ class EditSupplyPlanStatus extends Component {
                                     var cbForMonth1 = spd1.length > 0 ? spd1[0].closingBalance : 0;
                                     var cbForMonth2 = spd2.length > 0 ? spd2[0].closingBalance : 0;
                                     var cbForMonth3 = spd3.length > 0 ? spd3[0].closingBalance : 0;
-                                    var unmetDemandForMonth1=spd1.length > 0 ? spd1[0].unmetDemand : 0;
+                                    var unmetDemandForMonth1 = spd1.length > 0 ? spd1[0].unmetDemand : 0;
 
                                     var maxStockForMonth1 = spd1.length > 0 ? spd1[0].maxStock : 0;
                                     var minStockForMonth1 = spd1.length > 0 ? spd1[0].minStock : 0;
@@ -3923,30 +3923,45 @@ class EditSupplyPlanStatus extends Component {
             // colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: 'problemReportId',
-                    type: 'hidden',
+                    // title: 'problemReportId',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false,
                     width: 0
                 },
                 {
-                    title: 'problemActionIndex',
-                    type: 'hidden',
+                    // title: 'problemActionIndex',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false,
                     width: 0
                 },
                 {
-                    title: i18n.t('static.program.programCode'),
-                    type: 'hidden',
+                    // title: i18n.t('static.program.programCode'),
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false,
                     width: 0
                     // readOnly:true
                 },
                 {
-                    title: i18n.t('static.program.versionId'),
-                    type: 'hidden',
+                    // title: i18n.t('static.program.versionId'),
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false,
                     readOnly: true,
                     width: 70
                 },
                 {
-                    title: i18n.t('static.region.region'),
-                    type: 'hidden',
+                    // title: i18n.t('static.region.region'),
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false,
                     width: 0
                 },
                 {
@@ -3956,8 +3971,11 @@ class EditSupplyPlanStatus extends Component {
                     width: 120
                 },
                 {
-                    title: i18n.t('static.report.month'),
-                    type: 'hidden',
+                    // title: i18n.t('static.report.month'),
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false,
                     width: 0
                 },
                 {
@@ -3993,28 +4011,43 @@ class EditSupplyPlanStatus extends Component {
                     width: 120
                 },
                 {
-                    title: i18n.t('static.common.action'),
-                    type: 'hidden',
+                    // title: i18n.t('static.common.action'),
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false,
                     width: 0
                 },
                 {
-                    title: 'planningUnitId',
-                    type: 'hidden',
+                    // title: 'planningUnitId',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false,
                     width: 0
                 },
                 {
-                    title: 'problemId',
-                    type: 'hidden',
+                    // title: 'problemId',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false,
                     width: 0
                 },
                 {
-                    title: 'actionUrl',
-                    type: 'hidden',
+                    // title: 'actionUrl',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false,
                     width: 0
                 },
                 {
-                    title: 'criticalitiId',
-                    type: 'hidden',
+                    // title: 'criticalitiId',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false,
                     width: 0
                 },
 
@@ -4047,18 +4080,25 @@ class EditSupplyPlanStatus extends Component {
                 },
                 {
                     title: i18n.t('static.supplyPlanReview.reviewNotes'),
-                    type: !this.state.editable ? 'hidden' : 'text',
+                    type: !this.state.editable ? 'text' : 'text',
+                    visible: !this.state.editable ? false : true,
                     width: 120,
                 },
 
                 {
-                    title: 'isChanged',
-                    type: 'hidden',
+                    // title: 'isChanged',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false,
                     width: 0
                 },
                 {
-                    title: 'transList',
-                    type: 'hidden',
+                    // title: 'transList',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false,
                     width: 0
                 },
 
