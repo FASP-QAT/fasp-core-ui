@@ -455,7 +455,7 @@ class ProductValidation extends Component {
                 console.log("selectedText1", selectedText1)
                 if (finalData[i].parentNodeNodeDataMap.fuNode.usageType.id == 2 || finalData[i].parentNodeNodeDataMap.fuNode.oneTimeUsage != "true") {
                     console.log("finalData[i].parentNodeNodeDataMap.fuNode+++", finalData[i].parentNodeNodeDataMap.fuNode)
-                    var upListFiltered = this.state.upList.filter(c => c.usagePeriodId == finalData[i].parentNodeNodeDataMap.fuNode.usagePeriod.usagePeriodId);
+                    var upListFiltered = this.state.upList.filter(c => finalData[i].parentNodeNodeDataMap.fuNode.usagePeriod!=null && c.usagePeriodId == finalData[i].parentNodeNodeDataMap.fuNode.usagePeriod.usagePeriodId);
                     if (upListFiltered.length > 0) {
                         selectedText2 = getLabelText(upListFiltered[0].label, this.state.lang);
                     }
@@ -485,7 +485,7 @@ class ProductValidation extends Component {
                     var usageFrequency;
 
                     usageTypeId = finalData[i].parentNodeNodeDataMap.fuNode.usageType.id;
-                    usagePeriodId = finalData[i].parentNodeNodeDataMap.fuNode.usagePeriod.usagePeriodId;
+                    usagePeriodId = finalData[i].parentNodeNodeDataMap.fuNode.usagePeriod!=null?finalData[i].parentNodeNodeDataMap.fuNode.usagePeriod.usagePeriodId:"";
                     usageFrequency = finalData[i].parentNodeNodeDataMap.fuNode.usageFrequency;
                     var noOfMonthsInUsagePeriod = 0;
                     if (usagePeriodId != null && usagePeriodId != "") {

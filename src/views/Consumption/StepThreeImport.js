@@ -66,7 +66,8 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             jsonDataTes: [],
             jsonDataArima: [],
             count: 0,
-            countRecived: 0
+            countRecived: 0,
+            datasetId: 0
         }
 
         this.buildJexcel = this.buildJexcel.bind(this);
@@ -1279,7 +1280,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
         var languageEl = jexcel(document.getElementById("mapImport"), options);
         this.el = languageEl;
         this.setState({
-            languageEl: languageEl, loading: false, buildCSVTable: buildCSVTable, isChanged1: true
+            languageEl: languageEl, loading: false, buildCSVTable: buildCSVTable, isChanged1: true, datasetId: this.props.items.forecastProgramId
         }, () => {
             this.props.updateStepOneData("loading", false);
             this.changeColor();
