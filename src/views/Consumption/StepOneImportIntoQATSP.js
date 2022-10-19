@@ -668,7 +668,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             })
             this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
             // this.el.destroy();
-            jexcel.destroy(document.getElementById("mapPlanningUnit"),true);
+            jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
             document.getElementById("stepOneBtn").disabled = true;
         } else if (versionId == 0) {
             this.setState({
@@ -678,7 +678,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             })
             this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
             // this.el.destroy();
-            jexcel.destroy(document.getElementById("mapPlanningUnit"),true);
+            jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
             document.getElementById("stepOneBtn").disabled = true;
         } else if (programId == 0) {
             this.setState({
@@ -688,7 +688,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             })
             this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
             // this.el.destroy();
-            jexcel.destroy(document.getElementById("mapPlanningUnit"),true);
+            jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
             document.getElementById("stepOneBtn").disabled = true;
         } else {
             this.setState({
@@ -697,7 +697,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 message: ''
             })
             this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
-            jexcel.destroy(document.getElementById("mapPlanningUnit"),true);
+            jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
             // this.el.destroy();
             document.getElementById("stepOneBtn").disabled = true;
         }
@@ -745,17 +745,17 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
         this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
         // this.el.destroy();
-        jexcel.destroy(document.getElementById("mapPlanningUnit"),true);
+        jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
 
 
         this.el = jexcel(document.getElementById("mapRegion"), '');
         // this.el.destroy();
-        jexcel.destroy(document.getElementById("mapRegion"),true);
+        jexcel.destroy(document.getElementById("mapRegion"), true);
 
 
         this.el = jexcel(document.getElementById("mapImport"), '');
         // this.el.destroy();
-        jexcel.destroy(document.getElementById("mapImport"),true);
+        jexcel.destroy(document.getElementById("mapImport"), true);
 
 
         var json = [];
@@ -916,7 +916,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
         };
 
         myVar = jexcel(document.getElementById("mapPlanningUnit"), options);
-        this.el=myVar
+        this.el = myVar
         this.setState({
             loading: false,
             mapPlanningUnitEl: myVar
@@ -1336,14 +1336,15 @@ export default class StepOneImportMapPlanningUnits extends Component {
                         </ModalHeader>
                         <div>
                             <ModalBody>
-                            <div dangerouslySetInnerHTML={ {__html:localStorage.getItem('lang') == 'en' ?
-                listImportIntoQATSupplyPlanEn :
-                localStorage.getItem('lang') == 'fr' ?
-                listImportIntoQATSupplyPlanFr :
-                  localStorage.getItem('lang') == 'sp' ?
-                  listImportIntoQATSupplyPlanSp :
-                  listImportIntoQATSupplyPlanPr
-              } } />
+                                <div dangerouslySetInnerHTML={{
+                                    __html: localStorage.getItem('lang') == 'en' ?
+                                        listImportIntoQATSupplyPlanEn :
+                                        localStorage.getItem('lang') == 'fr' ?
+                                            listImportIntoQATSupplyPlanFr :
+                                            localStorage.getItem('lang') == 'sp' ?
+                                                listImportIntoQATSupplyPlanSp :
+                                                listImportIntoQATSupplyPlanPr
+                                }} />
                                 {/* <div>
                                     <h3 className='ShowGuidanceHeading'>{i18n.t('static.importIntoQATSupplyPlan.importIntoQATSupplyPlan')}</h3>
                                 </div>

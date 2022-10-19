@@ -30,7 +30,6 @@ import showguidanceTreeExtrapolationFr from '../../../src/ShowGuidanceFiles/Buil
 import showguidanceTreeExtrapolationSp from '../../../src/ShowGuidanceFiles/BuildTreeExtrapolationNodeSp.html'
 import showguidanceTreeExtrapolationPr from '../../../src/ShowGuidanceFiles/BuildTreeExtrapolationNodePr.html'
 
-
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
@@ -296,7 +295,7 @@ export default class TreeExtrapolationComponent extends React.Component {
             ],
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
-            maxDateForHistoricalData:{ year: new Date(endDate1).getFullYear(), month: new Date().getMonth() + 1 },
+            maxDateForHistoricalData: { year: new Date(endDate1).getFullYear(), month: new Date().getMonth() + 1 },
             rangeValue: { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() + 1 }, to: { year: new Date(endDate).getFullYear(), month: new Date(endDate).getMonth() + 1 } },
             movingAvgId: true,
             semiAvgId: true,
@@ -384,7 +383,7 @@ export default class TreeExtrapolationComponent extends React.Component {
 
     handleRangeDissmis1(value) {
         console.log("date range value---", value);
-        this.setState({ rangeValue1: value,dataChanged:true }, () => {
+        this.setState({ rangeValue1: value, dataChanged: true }, () => {
 
             this.getDateDifference();
 
@@ -4424,17 +4423,18 @@ export default class TreeExtrapolationComponent extends React.Component {
                         <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
                     </ModalHeader>
                     <div>
-                         <ModalBody className="ModalBodyPadding">
-                        <div dangerouslySetInnerHTML={ {__html:localStorage.getItem('lang') == 'en' ?
-                showguidanceTreeExtrapolationEn :
-                localStorage.getItem('lang') == 'fr' ?
-                showguidanceTreeExtrapolationFr :
-                  localStorage.getItem('lang') == 'sp' ?
-                  showguidanceTreeExtrapolationSp :
-                  showguidanceTreeExtrapolationPr
-              } } />
-              
-                         {/* <ModalBody>
+                        <ModalBody className="ModalBodyPadding">
+                            <div dangerouslySetInnerHTML={{
+                                __html: localStorage.getItem('lang') == 'en' ?
+                                    showguidanceTreeExtrapolationEn :
+                                    localStorage.getItem('lang') == 'fr' ?
+                                        showguidanceTreeExtrapolationFr :
+                                        localStorage.getItem('lang') == 'sp' ?
+                                            showguidanceTreeExtrapolationSp :
+                                            showguidanceTreeExtrapolationPr
+                            }} />
+
+                            {/* <ModalBody>
                             <div>
                                 <h3 className='ShowGuidanceHeading'>{i18n.t('static.extrapolation.ExtrapolationNode')}</h3>
                             </div>
@@ -4463,8 +4463,8 @@ export default class TreeExtrapolationComponent extends React.Component {
                                     </ol>
                                 </p>
                             </p> */}
-                           
-                        </ModalBody> 
+
+                        </ModalBody>
                     </div>
                 </Modal>
 

@@ -41,13 +41,10 @@ import ProcurementSurplusGap from '../../assets/img/ProcurementSurplusGap.png';
 import ProductCost from '../../assets/img/ProductCost.png';
 import ProjectStockatForecastend from '../../assets/img/ProjectStockatForecastend.png';
 import TotalCost from '../../assets/img/TotalCost.png';
-
 import showguidanceforForecastSummaryEn from '../../../src/ShowGuidanceFiles/ForecastSummaryEn.html'
 import showguidanceforForecastSummaryFr from '../../../src/ShowGuidanceFiles/ForecastSummaryFr.html'
 import showguidanceforForecastSummaryPr from '../../../src/ShowGuidanceFiles/ForecastSummaryPr.html'
 import showguidanceforForecastSummarySp from '../../../src/ShowGuidanceFiles/ForecastSummarySp.html'
-
-
 
 
 const ref = React.createRef();
@@ -2993,13 +2990,14 @@ class ForecastSummary extends Component {
                     var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                     var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
                     var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.datasetId);
-                    datasetDetailsRequest.onsuccess = function (e) {         
-                      var datasetDetailsRequestJson = datasetDetailsRequest.result;
-                      datasetDetailsRequestJson.changed = 1;
-                      var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
-                      datasetDetailsRequest1.onsuccess = function (event) {
-                           
-                          }}
+                    datasetDetailsRequest.onsuccess = function (e) {
+                        var datasetDetailsRequestJson = datasetDetailsRequest.result;
+                        datasetDetailsRequestJson.changed = 1;
+                        var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+                        datasetDetailsRequest1.onsuccess = function (event) {
+
+                        }
+                    }
                     this.setState({
                         isChanged1: false,
                         message1: i18n.t('static.compareAndSelect.dataSaved'),
@@ -3602,14 +3600,15 @@ class ForecastSummary extends Component {
                     </ModalHeader>
                     <div>
                         <ModalBody>
-                        <div dangerouslySetInnerHTML={ {__html:localStorage.getItem('lang') == 'en' ?
-                showguidanceforForecastSummaryEn :
-                localStorage.getItem('lang') == 'fr' ?
-                showguidanceforForecastSummaryFr :
-                  localStorage.getItem('lang') == 'sp' ?
-                  showguidanceforForecastSummarySp :
-                  showguidanceforForecastSummaryPr
-              } } />
+                            <div dangerouslySetInnerHTML={{
+                                __html: localStorage.getItem('lang') == 'en' ?
+                                    showguidanceforForecastSummaryEn :
+                                    localStorage.getItem('lang') == 'fr' ?
+                                        showguidanceforForecastSummaryFr :
+                                        localStorage.getItem('lang') == 'sp' ?
+                                            showguidanceforForecastSummarySp :
+                                            showguidanceforForecastSummaryPr
+                            }} />
                             {/* <div>
                                 <h3 className='ShowGuidanceHeading'>{i18n.t('static.ForecastSummary.ForecastSummary')}</h3>
                             </div>
