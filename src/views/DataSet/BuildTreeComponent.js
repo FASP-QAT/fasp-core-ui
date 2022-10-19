@@ -73,7 +73,6 @@ import showguidanceModelingTransferFr from '../../../src/ShowGuidanceFiles/Build
 import showguidanceModelingTransferSp from '../../../src/ShowGuidanceFiles/BuildTreeModelingTransferSp.html'
 import showguidanceModelingTransferPr from '../../../src/ShowGuidanceFiles/BuildTreeModelingTransferPr.html'
 
-
 // const ref = React.createRef();
 const entityname = 'Tree';
 const pickerLang = {
@@ -2507,7 +2506,7 @@ export default class BuildTree extends Component {
             data[8] = this.state.currentItemConfig.context.payload.nodeType.id == 4 || (this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 2) ? j >= lagInMonths ? `=IF(P${parseInt(j) + 1 - lagInMonths}<0,0,P${parseInt(j) + 1 - lagInMonths})` : 0 : `=IF(P${parseInt(j) + 1}<0,0,P${parseInt(j) + 1})`;
             data[9] = `=ROUND(IF(B${parseInt(j) + 1}+C${parseInt(j) + 1}<0,0,B${parseInt(j) + 1}+C${parseInt(j) + 1}),4)`
             data[10] = this.state.currentScenario.manualChangesEffectFuture;
-            data[11] = this.state.currentItemConfig.context.payload.nodeType.id == 4 ? ((this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usageType.id==2?fuPerMonth:this.state.noFURequired) : 1;
+            data[11] = this.state.currentItemConfig.context.payload.nodeType.id == 4 ? ((this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usageType.id == 2 ? fuPerMonth : this.state.noFURequired) : 1;
             data[12] = `=FLOOR.MATH(${j}/${monthsPerVisit},1)`;
             if (this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 2) {
                 var dataValue = 0;
@@ -7199,7 +7198,7 @@ export default class BuildTree extends Component {
         }
 
         if (event.target.name === "sharePlanningUnit") {
-            console.log("event.target.name",event.target.value);
+            console.log("event.target.name", event.target.value);
             (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.sharePlanningUnit = event.target.id === "sharePlanningUnitFalse" ? false : true;
             this.qatCalculatedPUPerVisit(0);
             this.getUsageText();
@@ -8494,33 +8493,33 @@ export default class BuildTree extends Component {
 
                                                 {/* {this.state.aggregationNode && */}
 
-                                        <FormGroup className="col-md-6" style={{ display: this.state.aggregationNode && this.state.currentItemConfig.context.payload.nodeType.id <4? 'block' : 'none' }}>
-                                            <Label htmlFor="currencyId">{i18n.t('static.tree.nodeUnit')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input
-                                                type="select"
-                                                id="nodeUnitId"
-                                                name="nodeUnitId"
-                                                bsSize="sm"
-                                                valid={!errors.nodeUnitId && this.state.currentItemConfig.context.payload.nodeUnit.id != ''}
-                                                invalid={touched.nodeUnitId && !!errors.nodeUnitId}
-                                                onBlur={handleBlur}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                required
-                                                disabled={this.state.currentItemConfig.context.payload.nodeType.id > 3 ? true : false}
-                                                value={this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.parentItem.payload.nodeUnit.id : this.state.currentItemConfig.context.payload.nodeUnit.id}
-                                            >
-                                                <option value="">{i18n.t('static.common.select')}</option>
-                                                {this.state.nodeUnitList.length > 0
-                                                    && this.state.nodeUnitList.map((item, i) => {
-                                                        return (
-                                                            <option key={i} value={item.unitId}>
-                                                                {getLabelText(item.label, this.state.lang)}
-                                                            </option>
-                                                        )
-                                                    }, this)}
-                                            </Input>
-                                            <FormFeedback className="red">{errors.nodeUnitId}</FormFeedback>
-                                        </FormGroup>
+                                                <FormGroup className="col-md-6" style={{ display: this.state.aggregationNode && this.state.currentItemConfig.context.payload.nodeType.id < 4 ? 'block' : 'none' }}>
+                                                    <Label htmlFor="currencyId">{i18n.t('static.tree.nodeUnit')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Input
+                                                        type="select"
+                                                        id="nodeUnitId"
+                                                        name="nodeUnitId"
+                                                        bsSize="sm"
+                                                        valid={!errors.nodeUnitId && this.state.currentItemConfig.context.payload.nodeUnit.id != ''}
+                                                        invalid={touched.nodeUnitId && !!errors.nodeUnitId}
+                                                        onBlur={handleBlur}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        required
+                                                        disabled={this.state.currentItemConfig.context.payload.nodeType.id > 3 ? true : false}
+                                                        value={this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.parentItem.payload.nodeUnit.id : this.state.currentItemConfig.context.payload.nodeUnit.id}
+                                                    >
+                                                        <option value="">{i18n.t('static.common.select')}</option>
+                                                        {this.state.nodeUnitList.length > 0
+                                                            && this.state.nodeUnitList.map((item, i) => {
+                                                                return (
+                                                                    <option key={i} value={item.unitId}>
+                                                                        {getLabelText(item.label, this.state.lang)}
+                                                                    </option>
+                                                                )
+                                                            }, this)}
+                                                    </Input>
+                                                    <FormFeedback className="red">{errors.nodeUnitId}</FormFeedback>
+                                                </FormGroup>
 
                                                 {/* } */}
                                                 {/* {this.state.currentItemConfig.context.payload.nodeType.id != 1 && */}
@@ -8598,38 +8597,38 @@ export default class BuildTree extends Component {
                                                 </FormGroup>
                                                 {/* </> */}
 
-                                        {/* } */}
-                                        {/* {this.state.aggregationNode && */}
-                                        <div>
-                                            <Popover placement="top" isOpen={this.state.popoverOpenNodeValue} target="Popover7" trigger="hover" toggle={this.toggleNodeValue}>
-                                                <PopoverBody>{this.state.numberNode ? i18n.t('static.tooltip.NodeValue') : i18n.t('static.tooltip.NumberNodeValue')}</PopoverBody>
-                                            </Popover>
-                                        </div>
-                                        <FormGroup className="col-md-6" style={{ display: this.state.aggregationNode ? 'block' : 'none' }}>
-{(this.state.currentItemConfig.context.payload.nodeType.id <4) && 
-                                            <Label htmlFor="currencyId">{i18n.t('static.tree.nodeValue')}{this.state.numberNode}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover7" onClick={this.toggleNodeValue} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>}
-{(this.state.currentItemConfig.context.payload.nodeType.id >=4) && 
-                                            <Label htmlFor="currencyId"> {this.state.currentScenario.dataValue} % of {i18n.t('static.tree.parentValue')} {i18n.t('static.common.for')} {moment(this.state.currentScenario.month).format(`MMM-YYYY`)} {this.state.numberNode}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover7" onClick={this.toggleNodeValue} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>}
+                                                {/* } */}
+                                                {/* {this.state.aggregationNode && */}
+                                                <div>
+                                                    <Popover placement="top" isOpen={this.state.popoverOpenNodeValue} target="Popover7" trigger="hover" toggle={this.toggleNodeValue}>
+                                                        <PopoverBody>{this.state.numberNode ? i18n.t('static.tooltip.NodeValue') : i18n.t('static.tooltip.NumberNodeValue')}</PopoverBody>
+                                                    </Popover>
+                                                </div>
+                                                <FormGroup className="col-md-6" style={{ display: this.state.aggregationNode ? 'block' : 'none' }}>
+                                                    {(this.state.currentItemConfig.context.payload.nodeType.id < 4) &&
+                                                        <Label htmlFor="currencyId">{i18n.t('static.tree.nodeValue')}{this.state.numberNode}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover7" onClick={this.toggleNodeValue} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>}
+                                                    {(this.state.currentItemConfig.context.payload.nodeType.id >= 4) &&
+                                                        <Label htmlFor="currencyId"> {this.state.currentScenario.dataValue} % of {i18n.t('static.tree.parentValue')} {i18n.t('static.common.for')} {moment(this.state.currentScenario.month).format(`MMM-YYYY`)} {this.state.numberNode}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover7" onClick={this.toggleNodeValue} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>}
 
-                                            <Input type="text"
-                                                id="nodeValue"
-                                                name="nodeValue"
-                                                bsSize="sm"
-                                                valid={!errors.nodeValue && (this.state.currentItemConfig.context.payload.nodeType.id != 1 && this.state.currentItemConfig.context.payload.nodeType.id != 2) ? addCommas(this.state.currentScenario.calculatedDataValue) : addCommas(this.state.currentScenario.dataValue) != ''}
-                                                invalid={touched.nodeValue && !!errors.nodeValue}
-                                                onBlur={handleBlur}
-                                                readOnly={this.state.numberNode || this.state.currentScenario.extrapolation ? true : false}
-                                                onChange={(e) => {
-                                                    handleChange(e);
-                                                    this.dataChange(e)
-                                                }}
-                                                // step={.01}
-                                                // value={this.getNodeValue(this.state.currentItemConfig.context.payload.nodeType.id)}
-                                                value={this.state.numberNode ? this.state.currentScenario.calculatedDataValue == 0 ? "0" : addCommas(this.state.currentScenario.calculatedDataValue) : addCommas(this.state.currentScenario.dataValue)}
-                                            ></Input>
-                                            <FormFeedback className="red">{errors.nodeValue}</FormFeedback>
-                                        </FormGroup>
-                                        {/* } */}
+                                                    <Input type="text"
+                                                        id="nodeValue"
+                                                        name="nodeValue"
+                                                        bsSize="sm"
+                                                        valid={!errors.nodeValue && (this.state.currentItemConfig.context.payload.nodeType.id != 1 && this.state.currentItemConfig.context.payload.nodeType.id != 2) ? addCommas(this.state.currentScenario.calculatedDataValue) : addCommas(this.state.currentScenario.dataValue) != ''}
+                                                        invalid={touched.nodeValue && !!errors.nodeValue}
+                                                        onBlur={handleBlur}
+                                                        readOnly={this.state.numberNode || this.state.currentScenario.extrapolation ? true : false}
+                                                        onChange={(e) => {
+                                                            handleChange(e);
+                                                            this.dataChange(e)
+                                                        }}
+                                                        // step={.01}
+                                                        // value={this.getNodeValue(this.state.currentItemConfig.context.payload.nodeType.id)}
+                                                        value={this.state.numberNode ? this.state.currentScenario.calculatedDataValue == 0 ? "0" : addCommas(this.state.currentScenario.calculatedDataValue) : addCommas(this.state.currentScenario.dataValue)}
+                                                    ></Input>
+                                                    <FormFeedback className="red">{errors.nodeValue}</FormFeedback>
+                                                </FormGroup>
+                                                {/* } */}
 
                                                 <FormGroup className="col-md-6">
                                                     <Label htmlFor="currencyId">{i18n.t('static.common.note')}</Label>
@@ -10820,7 +10819,7 @@ export default class BuildTree extends Component {
                                 </button>}
 
                         </>}
-                    {parseInt(itemConfig.payload.nodeType.id) != 5 && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE')  && this.props.match.params.isLocal != 2 &&
+                    {parseInt(itemConfig.payload.nodeType.id) != 5 && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && this.props.match.params.isLocal != 2 &&
 
                         <button key="4" type="button" className="StyledButton TreeIconStyle TreeIconStyleCopyPaddingTop" style={{ background: 'none' }}
                             onClick={(event) => {
@@ -10831,7 +10830,7 @@ export default class BuildTree extends Component {
                             <i class="fa fa-sitemap" aria-hidden="true"></i>
                         </button>
                     }
-                    {parseInt(itemConfig.payload.nodeType.id) != 5 && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE')  && this.props.match.params.isLocal != 2 &&
+                    {parseInt(itemConfig.payload.nodeType.id) != 5 && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && this.props.match.params.isLocal != 2 &&
                         <button key="1" type="button" className="StyledButton TreeIconStyle TreeIconStylePlusPaddingTop" style={{ background: 'none' }}
                             onClick={(event) => {
                                 console.log("add button called---------");
@@ -11739,15 +11738,16 @@ export default class BuildTree extends Component {
                     <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
                 </ModalHeader>
                 <div>
-                <ModalBody className="ModalBodyPadding">
-                        <div dangerouslySetInnerHTML={ {__html:localStorage.getItem('lang') == 'en' ?
-                showguidanceModelingTransferEn :
-                localStorage.getItem('lang') == 'fr' ?
-                showguidanceModelingTransferFr :
-                  localStorage.getItem('lang') == 'sp' ?
-                  showguidanceModelingTransferSp :
-                  showguidanceModelingTransferPr
-              } } />
+                    <ModalBody className="ModalBodyPadding">
+                        <div dangerouslySetInnerHTML={{
+                            __html: localStorage.getItem('lang') == 'en' ?
+                                showguidanceModelingTransferEn :
+                                localStorage.getItem('lang') == 'fr' ?
+                                    showguidanceModelingTransferFr :
+                                    localStorage.getItem('lang') == 'sp' ?
+                                        showguidanceModelingTransferSp :
+                                        showguidanceModelingTransferPr
+                        }} />
                         {/* <div>
                             <h3 className='ShowGuidanceHeading'>{i18n.t('static.ModelingTransfer.ModelingTransfer')} </h3>
                         </div>
@@ -11863,17 +11863,17 @@ export default class BuildTree extends Component {
                     <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
                 </ModalHeader>
                 <div>
-
-                <ModalBody className="ModalBodyPadding">
-                        <div dangerouslySetInnerHTML={ {__html:localStorage.getItem('lang') == 'en' ?
-                showguidanceAddEditNodeDataEn :
-                localStorage.getItem('lang') == 'fr' ?
-                showguidanceAddEditNodeDataFr :
-                  localStorage.getItem('lang') == 'sp' ?
-                  showguidanceAddEditNodeDataSp :
-                  showguidanceAddEditNodeDataPr
-              } } />
-                    {/* <ModalBody>
+                    <ModalBody className="ModalBodyPadding">
+                        <div dangerouslySetInnerHTML={{
+                            __html: localStorage.getItem('lang') == 'en' ?
+                                showguidanceAddEditNodeDataEn :
+                                localStorage.getItem('lang') == 'fr' ?
+                                    showguidanceAddEditNodeDataFr :
+                                    localStorage.getItem('lang') == 'sp' ?
+                                        showguidanceAddEditNodeDataSp :
+                                        showguidanceAddEditNodeDataPr
+                        }} />
+                        {/* <ModalBody>
                         <div>
                             <h3 className='ShowGuidanceHeading'>{i18n.t('static.NodeData.AddEditNode')}</h3>
                         </div>
@@ -12005,14 +12005,15 @@ export default class BuildTree extends Component {
                 </ModalHeader>
                 <div>
                     <ModalBody className="ModalBodyPadding">
-                        <div dangerouslySetInnerHTML={ {__html:localStorage.getItem('lang') == 'en' ?
-                showguidanceBuildTreeEn :
-                localStorage.getItem('lang') == 'fr' ?
-                showguidanceBuildTreeFr :
-                  localStorage.getItem('lang') == 'sp' ?
-                  showguidanceBuildTreeSp :
-                  showguidanceBuildTreePr
-              } } />
+                        <div dangerouslySetInnerHTML={{
+                            __html: localStorage.getItem('lang') == 'en' ?
+                                showguidanceBuildTreeEn :
+                                localStorage.getItem('lang') == 'fr' ?
+                                    showguidanceBuildTreeFr :
+                                    localStorage.getItem('lang') == 'sp' ?
+                                        showguidanceBuildTreeSp :
+                                        showguidanceBuildTreePr
+                        }} />
                         {/* <div>
                             <h3 className='ShowGuidanceHeading'>{i18n.t('static.ManageTree.BuildTree')}</h3>
                         </div>

@@ -1350,13 +1350,14 @@ export default class ExtrapolateDataComponent extends React.Component {
                         var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                         var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
                         var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.datasetId);
-                        datasetDetailsRequest.onsuccess = function (e) {         
-                          var datasetDetailsRequestJson = datasetDetailsRequest.result;
-                          datasetDetailsRequestJson.changed = 1;
-                          var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
-                          datasetDetailsRequest1.onsuccess = function (event) {
-                               
-                              }}
+                        datasetDetailsRequest.onsuccess = function (e) {
+                            var datasetDetailsRequestJson = datasetDetailsRequest.result;
+                            datasetDetailsRequestJson.changed = 1;
+                            var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+                            datasetDetailsRequest1.onsuccess = function (event) {
+
+                            }
+                        }
 
                         // let id = AuthenticationService.displayDashboardBasedOnRole();
                         // this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.compareAndSelect.dataSaved'));
@@ -1754,7 +1755,8 @@ export default class ExtrapolateDataComponent extends React.Component {
         if (this.state.planningUnitId > 0 && this.state.regionId > 0) {
 
             console.log("Inside if parameter", this.state.loading)
-            this.setState({ loading: true,
+            this.setState({
+                loading: true,
                 movingAvgData: [],
                 semiAvgData: [],
                 linearRegressionData: [],
@@ -4038,9 +4040,9 @@ export default class ExtrapolateDataComponent extends React.Component {
                         <FormGroup>
                             <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                             {this.state.forecastProgramId != "" && this.state.planningUnitId > 0 && <button className="mr-1 float-right btn btn-info btn-md" onClick={this.toggledata}>{this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}</button>}
-                            {this.state.forecastProgramId != "" && this.state.planningUnitId > 0 &&  <> <Button type="button" id="dataCheck" size="md" color="info" className="float-right mr-1" onClick={() => this.openDataCheckModel()}><i className="fa fa-check"></i>{i18n.t('static.common.dataCheck')}</Button></>}
+                            {this.state.forecastProgramId != "" && this.state.planningUnitId > 0 && <> <Button type="button" id="dataCheck" size="md" color="info" className="float-right mr-1" onClick={() => this.openDataCheckModel()}><i className="fa fa-check"></i>{i18n.t('static.common.dataCheck')}</Button></>}
                             {/* {this.state.showData && <> <Button type="button" id="dataCheck" size="md" color="info" className="float-right mr-1" onClick={() => this.openDataCheckModel()}><i className="fa fa-check"></i>{i18n.t('static.common.dataCheck')}</Button></>} */}
-                            
+
                             &nbsp;
                         </FormGroup>
                     </CardFooter>
@@ -4052,14 +4054,15 @@ export default class ExtrapolateDataComponent extends React.Component {
                     </ModalHeader>
                     <div>
                         <ModalBody className="ModalBodyPadding">
-                        <div dangerouslySetInnerHTML={ {__html:localStorage.getItem('lang') == 'en' ?
-                ExtrapolationshowguidanceEn :
-                localStorage.getItem('lang') == 'fr' ?
-                ExtrapolationshowguidanceFr :
-                  localStorage.getItem('lang') == 'sp' ?
-                  ExtrapolationshowguidanceSp :
-                  ExtrapolationshowguidancePr
-              } } />
+                            <div dangerouslySetInnerHTML={{
+                                __html: localStorage.getItem('lang') == 'en' ?
+                                    ExtrapolationshowguidanceEn :
+                                    localStorage.getItem('lang') == 'fr' ?
+                                        ExtrapolationshowguidanceFr :
+                                        localStorage.getItem('lang') == 'sp' ?
+                                            ExtrapolationshowguidanceSp :
+                                            ExtrapolationshowguidancePr
+                            }} />
                             {/* <div>
                                 <h3 className='ShowGuidanceHeading'>{i18n.t('static.commitTree.extrapolation')}</h3>
                             </div>

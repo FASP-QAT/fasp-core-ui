@@ -27,6 +27,10 @@ import showguidanceSp from '../../../src/ShowGuidanceFiles/UpdateVersionSettings
 import showguidancePr from '../../../src/ShowGuidanceFiles/UpdateVersionSettingsPr.html'
 
 import DatasetService from '../../api/DatasetService';
+import showguidanceEn from '../../../src/ShowGuidanceFiles/UpdateVersionSettingsEn.html'
+import showguidanceFr from '../../../src/ShowGuidanceFiles/UpdateVersionSettingsFr.html'
+import showguidanceSp from '../../../src/ShowGuidanceFiles/UpdateVersionSettingsSp.html'
+import showguidancePr from '../../../src/ShowGuidanceFiles/UpdateVersionSettingsPr.html'
 import { resolve } from "path";
 
 const ref = React.createRef();
@@ -628,14 +632,15 @@ class VersionSettingsComponent extends Component {
                             var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                             var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
                             var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.datasetId);
-                            datasetDetailsRequest.onsuccess = function (e) {         
-                              var datasetDetailsRequestJson = datasetDetailsRequest.result;
-                              datasetDetailsRequestJson.changed = 1;
-                              var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
-                              datasetDetailsRequest1.onsuccess = function (event) {
-                                   
-                                  }}
-                  
+                            datasetDetailsRequest.onsuccess = function (e) {
+                                var datasetDetailsRequestJson = datasetDetailsRequest.result;
+                                datasetDetailsRequestJson.changed = 1;
+                                var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+                                datasetDetailsRequest1.onsuccess = function (event) {
+
+                                }
+                            }
+
                             this.setState({
                                 loading: false,
                                 message: i18n.t('static.mt.dataUpdateSuccess'),

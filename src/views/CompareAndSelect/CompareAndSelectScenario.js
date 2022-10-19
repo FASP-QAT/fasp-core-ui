@@ -776,7 +776,7 @@ class CompareAndSelectScenario extends Component {
                 loading: false,
                 viewById: viewById == 3 && equivalencyUnit.length == 0 ? 1 : viewById,
                 equivalencyUnitList: equivalencyUnit,
-                changed:false
+                changed: false
             }, () => {
                 if (planningUnitId > 0) {
                     this.showData();
@@ -1588,7 +1588,7 @@ class CompareAndSelectScenario extends Component {
         localStorage.setItem("sesDatasetVersionId", versionIdSes);
         this.setState({
             datasetId: datasetId,
-            changed:false
+            changed: false
         }, () => {
             if (datasetId != "") {
                 console.log("in if for set@@@", this.state.datasetList);
@@ -1732,7 +1732,7 @@ class CompareAndSelectScenario extends Component {
         this.setState({
             regionId: event.target.value,
             regionName: regionName.length > 0 ? getLabelText(regionName[0].label, this.state.lang) : "",
-            changed:false
+            changed: false
         }, () => {
             if (regionId > 0) {
                 this.showData()
@@ -1902,12 +1902,13 @@ class CompareAndSelectScenario extends Component {
                     var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                     var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
                     var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.datasetId);
-                    datasetDetailsRequest.onsuccess = function (e) {         
-                      var datasetDetailsRequestJson = datasetDetailsRequest.result;
-                      datasetDetailsRequestJson.changed = 1;
-                      var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
-                      datasetDetailsRequest1.onsuccess = function (event) {
-                          }}
+                    datasetDetailsRequest.onsuccess = function (e) {
+                        var datasetDetailsRequestJson = datasetDetailsRequest.result;
+                        datasetDetailsRequestJson.changed = 1;
+                        var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+                        datasetDetailsRequest1.onsuccess = function (event) {
+                        }
+                    }
                     this.setState({
                         message: 'static.compareAndSelect.dataSaved',
                         changed: false,
@@ -2556,14 +2557,15 @@ class CompareAndSelectScenario extends Component {
                     </ModalHeader>
                     <div>
                         <ModalBody>
-                        <div dangerouslySetInnerHTML={ {__html:localStorage.getItem('lang') == 'en' ?
-                compareAndSelectScenarioEn :
-                localStorage.getItem('lang') == 'fr' ?
-                compareAndSelectScenarioFr :
-                  localStorage.getItem('lang') == 'sp' ?
-                  compareAndSelectScenarioSp :
-                  compareAndSelectScenarioPr
-              } } />
+                            <div dangerouslySetInnerHTML={{
+                                __html: localStorage.getItem('lang') == 'en' ?
+                                    compareAndSelectScenarioEn :
+                                    localStorage.getItem('lang') == 'fr' ?
+                                        compareAndSelectScenarioFr :
+                                        localStorage.getItem('lang') == 'sp' ?
+                                            compareAndSelectScenarioSp :
+                                            compareAndSelectScenarioPr
+                            }} />
                             {/* <div>
                                 <h3 className='ShowGuidanceHeading'>{i18n.t('static.CompareSelect.CompareAndSelect')}</h3>
                             </div>

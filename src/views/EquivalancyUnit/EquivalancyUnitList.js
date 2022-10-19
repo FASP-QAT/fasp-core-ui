@@ -35,7 +35,6 @@ import showguidanceforEquivalencyUnitFr from '../../../src/ShowGuidanceFiles/Equ
 import showguidanceforEquivalencyUnitPr from '../../../src/ShowGuidanceFiles/EquivalencyUnitPr.html'
 import showguidanceforEquivalencyUnitSp from '../../../src/ShowGuidanceFiles/EquivalencyUnitSp.html'
 
-
 const entityname = i18n.t('static.equivalancyUnit.equivalancyUnits')
 
 
