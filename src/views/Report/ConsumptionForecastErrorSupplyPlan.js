@@ -109,7 +109,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             planningUnitId: "",
             forecastingUnitId: "",
             equivalencyUnitId: "",
-            dataList:[],
+            dataList: [],
             show: false
         }, () => {
             localStorage.setItem("sesVersionIdReport", '');
@@ -129,7 +129,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             // AuthenticationService.setupAxiosInterceptors();
             ProgramService.getProgramList()
                 .then(response => {
-                    console.log(JSON.stringify(response.data))
+                    console.log("ProgramList", JSON.stringify(response.data))
                     this.setState({
                         programs: response.data, loading: false, show: false
                     }, () => { this.consolidatedProgramList() })
@@ -443,7 +443,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                     }
                 }
                 this.setState({
-                    regions: regionList,
+                    regions: regionList
                 }, () => {
                     this.getPlanningUnitAndForcastingUnit();
                 })
@@ -803,7 +803,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                         } else {
 
                             document.getElementById("equivelencyUnitDiv").style.display = "none";
-                            this.setState({ message: "No equivalency unit data available for the selected forcecasting Unit ", equivalencyUnitList: [] });
+                            this.setState({ message: "No equivalency unit data available for the selected forecasting unit ", equivalencyUnitList: [] });
                             console.log("No FU associated");
                         }
                         console.log("filteredEQUnit---Result-->", filteredEQUnit);
@@ -843,7 +843,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                         var listArray = response.data;
                         if (listArray.length == 0) {
                             document.getElementById("equivelencyUnitDiv").style.display = "none";
-                            this.setState({ message: 'No equivalency unit data available for the selected forcecasting unit' });
+                            this.setState({ message: 'No equivalency unit data available for the selected forecasting unit' });
                         } else {
                             var listArray = response.data;
                             listArray.sort((a, b) => {
@@ -1867,7 +1867,8 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             && programs.map((item, i) => {
                 return (
                     <option key={i} value={item.programId}>
-                        {getLabelText(item.label, this.state.lang)}
+                        {/* {getLabelText(item.label, this.state.lang)} */}
+                        {item.programCode}
                     </option>
                 )
             }, this);
@@ -1887,7 +1888,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             && versions.map((item, i) => {
                 return (
                     <option key={i} value={item.versionId}>
-                        {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)}
+                        {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)}  ({(moment(item.createdDate).format(`MMM DD YYYY`))})
                     </option>
                 )
             }, this);
@@ -1905,7 +1906,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         var chartOptions = {
             title: {
                 display: true,
-                text: 'Monthly Forecast - ' + (this.state.viewById == 1 ?
+                text: (this.state.viewById == 1 ?
                     this.state.planningUnits.filter(c => c.planningUnit.id == this.state.planningUnitId).length > 0 ?
                         this.state.planningUnits.filter(c => c.planningUnit.id == this.state.planningUnitId)[0].planningUnit.label.label_en : '' :
                     this.state.forecastingUnits.filter(c => c.id == this.state.forecastingUnitId).length > 0 ?
@@ -1958,13 +1959,13 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                 cell1 += ' %';
                                 return cell1;
                             },
-                            max:100
+                            max: 100
                         },
                         gridLines: {
                             drawBorder: true, lineWidth: 0
                         },
                         position: 'right',
-                        
+
                     }
                 ],
                 xAxes: [{
@@ -2132,20 +2133,15 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                             name="programId"
                                                             id="programId"
                                                             bsSize="sm"
-                                                            // onChange={this.filterVersion}
-                                                            onChange={(e) => { this.setProgramId(e) }}
+                                                            // onChange={(e) => { this.filterVersion(); this.updateMonthsforAMCCalculations() }}
+                                                            onChange={(e) => { this.setProgramId(e); }}
                                                             value={this.state.programId}
+
                                                         >
                                                             <option value="0">{i18n.t('static.common.select')}</option>
-                                                            {programs.length > 0
-                                                                && programs.map((item, i) => {
-                                                                    return (
-                                                                        <option key={i} value={item.programId}>
-                                                                            {getLabelText(item.label, this.state.lang)}
-                                                                        </option>
-                                                                    )
-                                                                }, this)}
+                                                            {programList}
                                                         </Input>
+
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
@@ -2400,10 +2396,10 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                                     var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
                                                                     totalError += isNaN(data[0].errorPerc) ? '' : (data[0].errorPerc == null || data[0].errorPerc == 'Infinity') ? '' : data[0].errorPerc;
                                                                     countError += 1;
-                                                                    return (<td><NumberFormat displayType={'text'} thousandSeparator={true} />{isNaN(data[0].errorPerc) ? '' : (data[0].errorPerc == null || data[0].errorPerc == 'Infinity') ? '' : this.PercentageFormatter(data[0].errorPerc)}</td>)
+                                                                    return (<td><b><NumberFormat displayType={'text'} thousandSeparator={true} />{isNaN(data[0].errorPerc) ? '' : (data[0].errorPerc == null || data[0].errorPerc == 'Infinity') ? '' : this.PercentageFormatter(data[0].errorPerc)}</b></td>)
 
                                                                 })}
-                                                                <td className="sticky-col first-col clone hoverTd" align="left">{this.PercentageFormatter(totalError / countError)}</td>
+                                                                <td className="sticky-col first-col clone hoverTd" align="left"><b>{this.PercentageFormatter(totalError / countError)}</b></td>
                                                             </tr>
                                                             <tr className="hoverTd">
                                                                 <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordion(0)}>
@@ -2414,10 +2410,10 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                                     var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
                                                                     totalForcaste += Number(data[0].forecastQty);
                                                                     countForcaste += 1;
-                                                                    return (<td><NumberFormat displayType={'text'} thousandSeparator={true} /> {(Number(data[0].forecastQty).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>)
+                                                                    return (<td><b><NumberFormat displayType={'text'} thousandSeparator={true} /> {(Number(data[0].forecastQty).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>)
 
                                                                 })}
-                                                                <td className="sticky-col first-col clone hoverTd" align="left">{(Number(totalForcaste / countForcaste).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                                <td className="sticky-col first-col clone hoverTd" align="left"><b>{(Number(totalForcaste / countForcaste).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
                                                             </tr>
                                                             {this.state.regions.map(r => {
                                                                 var totalRegion = 0;
@@ -2444,9 +2440,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                                     // actualQty/(noOfDays - dayOfStockOut) * noOfDays
                                                                     totalActal += Number(this.state.consumptionAdjForStockOutId ? (data[0].actualQty / (item1.noOfDays - totalDaysOfStockOut) * item1.noOfDays) : data[0].actualQty);
                                                                     countActal += 1;
-                                                                    return (<td><NumberFormat displayType={'text'} thousandSeparator={true} />{(Number(this.state.consumptionAdjForStockOutId ? (data[0].actualQty / (item1.noOfDays - totalDaysOfStockOut) * item1.noOfDays) : (data[0].actualQty)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>)
+                                                                    return (<td><b><NumberFormat displayType={'text'} thousandSeparator={true} />{(Number(this.state.consumptionAdjForStockOutId ? (data[0].actualQty / (item1.noOfDays - totalDaysOfStockOut) * item1.noOfDays) : (data[0].actualQty)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>)
                                                                 })}
-                                                                <td className="sticky-col first-col clone hoverTd" align="left">{(Number(totalActal / countActal).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                                <td className="sticky-col first-col clone hoverTd" align="left"><b>{(Number(totalActal / countActal).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
                                                             </tr>
                                                             {this.state.regions.map(r => {
                                                                 var totalRegion = 0;
@@ -2471,9 +2467,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                                 <td className="sticky-col first-col clone hoverTd" align="left"><b>Difference</b></td>
                                                                 {this.state.monthArray.map((item1, count) => {
                                                                     var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
-                                                                    return (<td style={{ color: (data[0].actualQty - data[0].forecastQty) < 0 ? 'red' : 'black' }}><NumberFormat displayType={'text'} thousandSeparator={true} />{(Number(data[0].actualQty - data[0].forecastQty).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>)
+                                                                    return (<td style={{ color: (data[0].actualQty - data[0].forecastQty) < 0 ? 'red' : 'black' }}><b><NumberFormat displayType={'text'} thousandSeparator={true} />{(Number(data[0].actualQty - data[0].forecastQty).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>)
                                                                 })}
-                                                                <td className="sticky-col first-col clone hoverTd" align="left" style={{ color: ((totalActal / countActal) - (totalForcaste / countForcaste)) < 0 ? 'red' : 'black' }} >{(Number((totalActal / countActal) - (totalForcaste / countForcaste)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                                <td className="sticky-col first-col clone hoverTd" align="left" style={{ color: ((totalActal / countActal) - (totalForcaste / countForcaste)) < 0 ? 'red' : 'black' }} ><b>{(Number((totalActal / countActal) - (totalForcaste / countForcaste)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
                                                             </tr>
                                                             {this.state.regions.map(r => {
                                                                 var totalRegion = 0;
