@@ -21,11 +21,6 @@ import { Prompt } from 'react-router';
 import { exportPDF, noForecastSelectedClicked, missingMonthsClicked, missingBranchesClicked, nodeWithPercentageChildrenClicked } from '../DataSet/DataCheckComponent.js';
 import pdfIcon from '../../assets/img/pdf.png';
 import ProgramService from '../../api/ProgramService';
-import showguidanceEn from '../../../src/ShowGuidanceFiles/UpdateVersionSettingsEn.html'
-import showguidanceFr from '../../../src/ShowGuidanceFiles/UpdateVersionSettingsFr.html'
-import showguidanceSp from '../../../src/ShowGuidanceFiles/UpdateVersionSettingsSp.html'
-import showguidancePr from '../../../src/ShowGuidanceFiles/UpdateVersionSettingsPr.html'
-
 import DatasetService from '../../api/DatasetService';
 import showguidanceEn from '../../../src/ShowGuidanceFiles/UpdateVersionSettingsEn.html'
 import showguidanceFr from '../../../src/ShowGuidanceFiles/UpdateVersionSettingsFr.html'
