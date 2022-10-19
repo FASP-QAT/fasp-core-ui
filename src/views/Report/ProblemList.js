@@ -750,6 +750,9 @@ export default class ConsumptionDetails extends React.Component {
                 {
                     // title: 'actionUrl',
                     // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
 
                 {
