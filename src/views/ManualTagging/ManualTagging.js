@@ -109,7 +109,8 @@ export default class ManualTagging extends Component {
             roPrimeLineNoForTab3: "",
             planningUnitsBasedOnTracerCategory: [],
             test: 0,
-            showAllShipments: false
+            showAllShipments: false,
+            lang: localStorage.getItem('lang')
 
         }
 

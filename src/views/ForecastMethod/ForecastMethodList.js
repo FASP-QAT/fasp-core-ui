@@ -38,7 +38,8 @@ class forecastMethod extends Component {
             realms: [],
             loading: true,
             forecastMethodTypeList: [],
-            isChanged: false
+            isChanged: false,
+            lang: localStorage.getItem('lang')
         }
         // this.setTextAndValue = this.setTextAndValue.bind(this);
         // this.disableRow = this.disableRow.bind(this);

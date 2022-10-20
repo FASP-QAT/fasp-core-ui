@@ -1331,7 +1331,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 <div>
                     <Popover placement="top" isOpen={this.state.popoverOpenProgramSetting} target="Popover2" trigger="hover" toggle={this.toggleProgramSetting}>
                         {/* <PopoverBody>{i18n.t('static.tooltip.planningProgramSetting')} </PopoverBody> */}
-                        <PopoverBody>If the last month of your forecast is more than 6 months old, it will not appear in the version dropdown. Please consider importing forecast data for future months.</PopoverBody>
+                        <PopoverBody>{i18n.t('static.importIntoSP.versionTitle')}</PopoverBody>
                     </Popover>
                 </div>
                 <div style={{ display: this.props.items.loading ? "none" : "block" }} >

@@ -3371,7 +3371,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       var data = [];
 
       data[0] = this.state.tempConsumptionUnitObject.consumptionDataType == 2 ? true : false;
-      data[1] = 'Planning Unit';
+      data[1] = i18n.t('static.product.product');
       data[2] = getLabelText(this.state.selectedConsumptionUnitObject.planningUnit.label, this.state.lang);
       data[3] = this.state.selectedConsumptionUnitObject.planningUnit.multiplier;
       data[4] = Number(1).toFixed(4);
@@ -3380,7 +3380,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       dataArray1.push(data);
       data = [];
       data[0] = this.state.tempConsumptionUnitObject.consumptionDataType == 1 ? true : false;
-      data[1] = 'Forecasting Unit';
+      data[1] = i18n.t('static.forecastingunit.forecastingunit');
       data[2] = getLabelText(this.state.selectedConsumptionUnitObject.planningUnit.forecastingUnit.label, this.state.lang);
       data[3] = 1;
       data[4] = Number(1 / this.state.selectedConsumptionUnitObject.planningUnit.multiplier).toFixed(4);
@@ -3388,7 +3388,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       dataArray1.push(data);
       data = [];
       data[0] = this.state.tempConsumptionUnitObject.consumptionDataType == 3 ? true : false;
-      data[1] = 'Other Unit';
+      data[1] = i18n.t('static.common.otherUnit');
       data[2] = this.state.tempConsumptionUnitObject.consumptionDataType == 3 ? this.state.otherUnitName : "";
       data[3] = this.state.tempConsumptionUnitObject.consumptionDataType == 3 ? this.state.selectedPlanningUnitMultiplier : Number(0);
       data[4] = `=ROUND(1/D1*ROUND(D3,4),4)`;

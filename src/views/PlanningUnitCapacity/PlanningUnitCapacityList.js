@@ -280,7 +280,8 @@ export default class PlanningUnitCapacityList extends Component {
             planningUnits: [],
             planningUnitCapacityList: [],
             message: '',
-            selSource: []
+            selSource: [],
+            lang: localStorage.getItem('lang')
 
         }
         this.filterData = this.filterData.bind(this);
