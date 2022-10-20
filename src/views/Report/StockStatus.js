@@ -1209,8 +1209,8 @@ class StockStatus extends Component {
                           console.log(totalforecastConsumption)
                           var json = {
                             dt: new Date(from, month - 1),
-                            forecastedConsumptionQty: totalforecastConsumption,
-                            actualConsumptionQty: totalActualConsumption,
+                            forecastedConsumptionQty: Number(totalforecastConsumption),
+                            actualConsumptionQty: Number(totalActualConsumption),
                             actualConsumption: list[0].actualFlag,
                             finalConsumptionQty: list[0].consumptionQty,
                             shipmentQty: totalShipmentQty,
@@ -1685,8 +1685,8 @@ class StockStatus extends Component {
                           console.log(totalforecastConsumption)
                           var json = {
                             dt: new Date(from, month - 1),
-                            forecastedConsumptionQty: totalforecastConsumption,
-                            actualConsumptionQty: totalActualConsumption,
+                            forecastedConsumptionQty: Number(totalforecastConsumption),
+                            actualConsumptionQty: Number(totalActualConsumption),
                             actualConsumption: list[0].actualFlag,
                             finalConsumptionQty: list[0].consumptionQty,
                             shipmentQty: totalShipmentQty,
