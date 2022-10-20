@@ -116,7 +116,8 @@ class usageTemplate extends Component {
             usagePeriodDisplayList: [],
             dimensionList: [],
             isChanged1: false,
-            dataEl: ''
+            dataEl: '',
+            lang: localStorage.getItem('lang')
         }
         // this.setTextAndValue = this.setTextAndValue.bind(this);
         // this.disableRow = this.disableRow.bind(this);

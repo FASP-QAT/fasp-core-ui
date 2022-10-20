@@ -538,7 +538,8 @@ export default class DataSourceListComponent extends Component {
             dataSourceList: [],
             message: '',
             selSource: [],
-            loading: true
+            loading: true,
+            lang: localStorage.getItem('lang')
 
 
         }

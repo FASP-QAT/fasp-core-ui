@@ -337,7 +337,8 @@ class SupplierListComponent extends Component {
             supplierList: [],
             message: '',
             selSource: [],
-            loading: true
+            loading: true,
+            lang: localStorage.getItem('lang')
         }
         this.editSupplier = this.editSupplier.bind(this);
         this.addSupplier = this.addSupplier.bind(this);

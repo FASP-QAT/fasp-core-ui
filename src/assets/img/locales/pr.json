@@ -2856,5 +2856,13 @@
     "static.supplyPlanFormula.maxMonthOfStockEx2": "Máx = Menor entre ([Maior entre (4,3) +3], 18)",
     "static.organisation.organisationheader": "Organização",
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Máx = 7",
-    "static.supplyPlanFormula.maxMonthOfStockEx4": "Máx = Menor entre (7,18)"
+    "static.supplyPlanFormula.maxMonthOfStockEx4": "Máx = Menor entre (7,18)",
+    "static.loadDelDataset.keepLatestVersionDeleteOldVersion":"Mantenha a versão mais recente e exclua as versões mais antigas.",
+    "static.loadDelDataset.deleteVersion": "Excluir a versão",
+    "static.common.loadProgramFirst": "Se você não vir o(s) programa(s) desejado(s), carregue-o(s) primeiro.",
+    "static.common.encryptData":"Deseja criptografar dados?",
+    "static.compareVersion.selectedForecastTitle": "Método de previsão que foi selecionado para a previsão final. As previsões são selecionadas na tela Comparar e Selecionar Previsão.",
+    "static.compareVersion.selectedForecastQtyTitle": "Quantidade prevista para todo o período de previsão.",
+    "static.importIntoSP.versionTitle": "Se o último mês da sua previsão tiver mais de 6 meses, ele não aparecerá na lista suspensa de versões. Considere importar dados de previsão para meses futuros.",
+    "static.common.refreshPage": "Atualizar a página"
 }

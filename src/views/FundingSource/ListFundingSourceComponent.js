@@ -358,7 +358,8 @@ class FundingSourceListComponent extends Component {
             fundingSourceList: [],
             message: '',
             selSource: [],
-            loading: true
+            loading: true,
+            lang: localStorage.getItem('lang')
         }
         this.editFundingSource = this.editFundingSource.bind(this);
         this.addFundingSource = this.addFundingSource.bind(this);

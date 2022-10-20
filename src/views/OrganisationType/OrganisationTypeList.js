@@ -34,7 +34,8 @@ export default class OrganisationTypeListComponent extends Component {
             organisationsType: [],
             message: "",
             selSource: [],
-            loading: true
+            loading: true,
+            lang: localStorage.getItem('lang')
         }
         this.editOrganisationType = this.editOrganisationType.bind(this);
         this.addOrganisationType = this.addOrganisationType.bind(this);

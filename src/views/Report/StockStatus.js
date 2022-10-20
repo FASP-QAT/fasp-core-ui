@@ -122,7 +122,8 @@ class StockStatus extends Component {
       maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
       programId: '',
       versionId: '',
-      planningUnitLabel: ''
+      planningUnitLabel: '',
+      lang: localStorage.getItem('lang')
     };
     this.filterData = this.filterData.bind(this);
     this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
