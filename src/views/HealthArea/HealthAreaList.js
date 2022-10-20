@@ -368,7 +368,8 @@ export default class HealthAreaListComponent extends Component {
             healthAreas: [],
             message: "",
             selSource: [],
-            loading: true
+            loading: true,
+            lang: localStorage.getItem('lang'),
         }
         this.editHealthArea = this.editHealthArea.bind(this);
         this.addHealthArea = this.addHealthArea.bind(this);
@@ -399,7 +400,7 @@ export default class HealthAreaListComponent extends Component {
         //     data = [];
         //     healthAreasArray[0] = data;
         // }
-        // console.log("healthAreasArray---->", healthAreasArray);
+        console.log("healthAreasArray---->", this.state.lang);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         // this.el.destroy();
         jexcel.destroy(document.getElementById("tableDiv"), true);
@@ -413,13 +414,17 @@ export default class HealthAreaListComponent extends Component {
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: 'healthAreaId',
-                    type: 'hidden',
+                    // title: 'healthAreaId',
+                    // type: 'hidden',
                     // readOnly: true
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
                 {
                     title: i18n.t('static.healtharea.realm'),
-                    type: (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN') ? 'text' : 'hidden'),
+                    type: (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN') ? 'text' : 'text'),
+                    visible: (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN') ? true : false),
                     // readOnly: true
                 },
                 {

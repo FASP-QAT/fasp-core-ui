@@ -580,8 +580,11 @@ class RegionListComponent extends Component {
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: 'regionListId',
-                    type: 'hidden',
+                    // title: 'regionListId',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                     // readOnly: true
                 },
                 {

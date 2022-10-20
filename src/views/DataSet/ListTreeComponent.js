@@ -155,9 +155,7 @@ export default class ListTreeComponent extends Component {
             versions: [],
             allProgramList: [],
             programs: [],
-
-
-
+            lang: localStorage.getItem('lang')
         }
         this.toggleDeropdownSetting = this.toggleDeropdownSetting.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
@@ -217,13 +215,14 @@ export default class ListTreeComponent extends Component {
                 var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                 var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
                 var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.datasetId);
-                datasetDetailsRequest.onsuccess = function (e) {         
-                  var datasetDetailsRequestJson = datasetDetailsRequest.result;
-                  datasetDetailsRequestJson.changed = 1;
-                  var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
-                  datasetDetailsRequest1.onsuccess = function (event) {
-                       
-                      }}
+                datasetDetailsRequest.onsuccess = function (e) {
+                    var datasetDetailsRequestJson = datasetDetailsRequest.result;
+                    datasetDetailsRequestJson.changed = 1;
+                    var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+                    datasetDetailsRequest1.onsuccess = function (event) {
+
+                    }
+                }
                 this.setState({
                     loading: false,
                     message: i18n.t('static.mt.dataUpdateSuccess'),
@@ -1363,8 +1362,11 @@ export default class ListTreeComponent extends Component {
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: 'Tree Id',
-                    type: 'hidden'
+                    // title: 'Tree Id',
+                    // type: 'hidden'
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
                 {
                     title: i18n.t('static.dashboard.programheader'),
@@ -1398,18 +1400,27 @@ export default class ListTreeComponent extends Component {
                     // readOnly: true
                 },
                 {
-                    title: 'ProgramId',
-                    type: 'hidden',
+                    // title: 'ProgramId',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                     // readOnly: true
                 },
                 {
-                    title: 'id',
-                    type: 'hidden',
+                    // title: 'id',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                     // readOnly: true
                 },
                 {
-                    title: 'versionId',
-                    type: 'hidden',
+                    // title: 'versionId',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                     // readOnly: true
                 },
                 {

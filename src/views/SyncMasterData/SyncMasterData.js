@@ -556,7 +556,7 @@ export default class SyncMasterData extends Component {
                                                             linkedShipmentsList[linkedShipmentsListIndex].lastModifiedBy.username = username;
                                                             linkedShipmentsList[linkedShipmentsListIndex].lastModifiedDate = curDate;
                                                             shipmentDataList[index].shipmentQty = Math.round(shipmentQty);
-                                                            shipmentDataList[index].shipmentARUQty = Math.round(shipmentARUQty);
+                                                            shipmentDataList[index].shipmentRcpuQty = Math.round(shipmentARUQty);
                                                             shipmentDataList[index].freightCost = shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].shippingCost;
                                                             shipmentDataList[index].productCost = shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].price * shipmentQty;
                                                             shipmentDataList[index].rate = shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].price;

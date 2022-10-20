@@ -66,7 +66,8 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             jsonDataTes: [],
             jsonDataArima: [],
             count: 0,
-            countRecived: 0
+            countRecived: 0,
+            datasetId: 0
         }
 
         this.buildJexcel = this.buildJexcel.bind(this);
@@ -883,13 +884,14 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                 var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                                 var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
                                 var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.datasetId);
-                                datasetDetailsRequest.onsuccess = function (e) {         
-                                  var datasetDetailsRequestJson = datasetDetailsRequest.result;
-                                  datasetDetailsRequestJson.changed = 1;
-                                  var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
-                                  datasetDetailsRequest1.onsuccess = function (event) {
-                                       
-                                      }}
+                                datasetDetailsRequest.onsuccess = function (e) {
+                                    var datasetDetailsRequestJson = datasetDetailsRequest.result;
+                                    datasetDetailsRequestJson.changed = 1;
+                                    var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+                                    datasetDetailsRequest1.onsuccess = function (event) {
+
+                                    }
+                                }
                                 console.log("Data update success");
                                 this.setState({
                                     isChanged1: false
@@ -1186,12 +1188,18 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                     type: 'checkbox'//I8
                 },
                 {
-                    title: 'duplicate',
-                    type: 'hidden'//J9
+                    // title: 'duplicate',
+                    // type: 'hidden'//J9
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
                 {
-                    title: 'regionId',
-                    type: 'hidden'//K10
+                    // title: 'regionId',
+                    // type: 'hidden'//K10
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
 
 
@@ -1263,13 +1271,16 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             },
             editable: true,
             license: JEXCEL_PRO_KEY,
-            contextMenu: false,
+            // contextMenu: false,
+            contextMenu: function (obj, x, y, e) {
+                return false;
+            }.bind(this)
         };
 
         var languageEl = jexcel(document.getElementById("mapImport"), options);
         this.el = languageEl;
         this.setState({
-            languageEl: languageEl, loading: false, buildCSVTable: buildCSVTable, isChanged1: true
+            languageEl: languageEl, loading: false, buildCSVTable: buildCSVTable, isChanged1: true, datasetId: this.props.items.forecastProgramId
         }, () => {
             this.props.updateStepOneData("loading", false);
             this.changeColor();

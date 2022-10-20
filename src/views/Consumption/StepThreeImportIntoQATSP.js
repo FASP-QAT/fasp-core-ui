@@ -654,15 +654,15 @@ export default class StepThreeImportMapPlanningUnits extends Component {
 
         this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
         // this.el.destroy();
-        jexcel.destroy(document.getElementById("mapPlanningUnit"),true);
+        jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
 
         this.el = jexcel(document.getElementById("mapRegion"), '');
         // this.el.destroy();
-        jexcel.destroy(document.getElementById("mapRegion"),true);
+        jexcel.destroy(document.getElementById("mapRegion"), true);
 
         this.el = jexcel(document.getElementById("mapImport"), '');
         // this.el.destroy();
-        jexcel.destroy(document.getElementById("mapImport"),true);
+        jexcel.destroy(document.getElementById("mapImport"), true);
 
         var json = [];
         var data = papuDataArr;
@@ -750,16 +750,25 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                     type: 'checkbox'
                 },
                 {
-                    type: 'hidden',
-                    title: "Already exists"
+                    // type: 'hidden',
+                    // title: "Already exists"
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
                 {
-                    type: 'hidden',
-                    title: "Supply Planning unit Id"
+                    // type: 'hidden',
+                    // title: "Supply Planning unit Id"
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
                 {
-                    type: 'hidden',
-                    title: "Supply Planning Region Id"
+                    // type: 'hidden',
+                    // title: "Supply Planning Region Id"
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
 
                 // {

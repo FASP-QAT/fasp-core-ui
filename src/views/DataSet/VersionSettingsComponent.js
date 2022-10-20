@@ -21,14 +21,12 @@ import { Prompt } from 'react-router';
 import { exportPDF, noForecastSelectedClicked, missingMonthsClicked, missingBranchesClicked, nodeWithPercentageChildrenClicked } from '../DataSet/DataCheckComponent.js';
 import pdfIcon from '../../assets/img/pdf.png';
 import ProgramService from '../../api/ProgramService';
+import DatasetService from '../../api/DatasetService';
 import showguidanceEn from '../../../src/ShowGuidanceFiles/UpdateVersionSettingsEn.html'
 import showguidanceFr from '../../../src/ShowGuidanceFiles/UpdateVersionSettingsFr.html'
 import showguidanceSp from '../../../src/ShowGuidanceFiles/UpdateVersionSettingsSp.html'
 import showguidancePr from '../../../src/ShowGuidanceFiles/UpdateVersionSettingsPr.html'
-
-import DatasetService from '../../api/DatasetService';
 import { resolve } from "path";
-
 const ref = React.createRef();
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -628,14 +626,14 @@ class VersionSettingsComponent extends Component {
                             var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                             var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
                             var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.datasetId);
-                            datasetDetailsRequest.onsuccess = function (e) {         
-                              var datasetDetailsRequestJson = datasetDetailsRequest.result;
-                              datasetDetailsRequestJson.changed = 1;
-                              var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
-                              datasetDetailsRequest1.onsuccess = function (event) {
-                                   
-                                  }}
-                  
+                            datasetDetailsRequest.onsuccess = function (e) {
+                                var datasetDetailsRequestJson = datasetDetailsRequest.result;
+                                datasetDetailsRequestJson.changed = 1;
+                                var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+                                datasetDetailsRequest1.onsuccess = function (event) {
+                                }
+                            }
+
                             this.setState({
                                 loading: false,
                                 message: i18n.t('static.mt.dataUpdateSuccess'),
@@ -660,8 +658,6 @@ class VersionSettingsComponent extends Component {
                     }.bind(this);
                 }
             }
-        } else {
-
         }
     }
 
@@ -1071,8 +1067,11 @@ class VersionSettingsComponent extends Component {
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: 'programId',
-                    type: 'hidden',//0 A
+                    // title: 'programId',
+                    // type: 'hidden',//0 A
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
                 {
                     title: i18n.t('static.dashboard.programheader'),
@@ -1130,16 +1129,25 @@ class VersionSettingsComponent extends Component {
                     }// 9 J
                 },
                 {
-                    title: 'isLocal',
-                    type: 'hidden',//10 K
+                    // title: 'isLocal',
+                    // type: 'hidden',//10 K
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
                 {
-                    title: 'versionId',
-                    type: 'hidden',//11 L
+                    // title: 'versionId',
+                    // type: 'hidden',//11 L
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
                 {
-                    title: 'isChanged',
-                    type: 'hidden',//12 M
+                    // title: 'isChanged',
+                    // type: 'hidden',//12 M
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
                 {
                     title: i18n.t('static.program.noOfDaysInMonth'),
@@ -1171,12 +1179,15 @@ class VersionSettingsComponent extends Component {
                     // readOnly: true
                 },//16 Q
                 {
-                    title: 'localCalling',
-                    type: 'hidden',//17 R
+                    // title: 'localCalling',
+                    // type: 'hidden',//17 R
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
                 {
-                    title: 'datasetData',
-                    type: 'hidden',//17 R
+                    // title: 'datasetData',
+                    // type: 'hidden',//17 R
                 },
 
             ],
@@ -1749,10 +1760,9 @@ class VersionSettingsComponent extends Component {
                                             showguidanceSp :
                                             showguidancePr
                             }} />
-                            {/*                        
-                            <div>
-                               <h3 className='ShowGuidanceHeading'>{i18n.t('static.UpdateversionSettings.UpdateversionSettings')}</h3>
-                           </div>
+                            {/* <div>
+                                <h3 className='ShowGuidanceHeading'>{i18n.t('static.UpdateversionSettings.UpdateversionSettings')}</h3>
+                            </div>
                             <p>
                                 <p style={{ fontSize: '13px' }}><span className="UnderLineText">{i18n.t('static.listTree.purpose')}</span> {i18n.t('static.VersionSetting.enableUsersTo')}</p>
                             </p>
@@ -1780,9 +1790,7 @@ class VersionSettingsComponent extends Component {
                                         </ol>
                                     </li>
                                 </ol>
-                                </li>
-                            </ol>
-                            </p>  */}
+                            </p> */}
                         </ModalBody>
                     </div>
                 </Modal>

@@ -98,6 +98,7 @@ class SupplyPlanVersionAndReview extends Component {
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() + 1 },
             programId: -1,
+            lang: localStorage.getItem('lang')
 
         };
 
@@ -231,18 +232,27 @@ class SupplyPlanVersionAndReview extends Component {
                     // readOnly: true
                 },
                 {
-                    title: 'versionTypeId',
-                    type: 'hidden',
+                    // title: 'versionTypeId',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                     // readOnly: true
                 },
                 {
-                    title: 'versionStatusId',
-                    type: 'hidden',
+                    // title: 'versionStatusId',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                     // readOnly: true
                 },
                 {
-                    title: 'programId',
-                    type: 'hidden',
+                    // title: 'programId',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
 
                 }
             ],

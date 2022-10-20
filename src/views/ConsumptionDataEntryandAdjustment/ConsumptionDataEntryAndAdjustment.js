@@ -314,7 +314,12 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           columns.push({ title: moment(monthArray[j].date).format(DATE_FORMAT_CAP_WITHOUT_DATE), type: 'numeric', textEditor: true, mask: '#,##.00', decimal: '.', disabledMaskOnEdition: true, width: 100 })
         }
         data[monthArray.length + 1] = multiplier;
-        columns.push({ type: 'hidden', title: 'Multiplier' })
+        columns.push({
+          // type: 'hidden', title: 'Multiplier'
+          title: 'A',
+          type: 'text',
+          visible: false
+        })
         dataArray.push(data)
         data = [];
         for (var r = 0; r < regionList.length; r++) {
@@ -1487,7 +1492,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           //     datasetDetailsRequestJson.changed = 1;
           //     var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
           //     datasetDetailsRequest1.onsuccess = function (event) {
-                   
+
           //         }}
           // }      
           putRequest.onerror = function (event) {
@@ -1503,13 +1508,14 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
             var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
             var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.datasetId);
-            datasetDetailsRequest.onsuccess = function (e) {         
+            datasetDetailsRequest.onsuccess = function (e) {
               var datasetDetailsRequestJson = datasetDetailsRequest.result;
               datasetDetailsRequestJson.changed = 1;
               var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
               datasetDetailsRequest1.onsuccess = function (event) {
-                   
-                  }}
+
+              }
+            }
 
             this.setState({
               // dataEl: "",
@@ -3350,13 +3356,13 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     // console.log("stop----", new Date())
 
   }
- 
+
   formulaChanged = function (instance, executions) {
     var executions = executions;
     for (var e = 0; e < executions.length; e++) {
-        this.changed(instance, executions[e].cell, executions[e].x, executions[e].y, executions[e].v)
+      this.changed(instance, executions[e].cell, executions[e].x, executions[e].y, executions[e].v)
     }
-}
+  }
   buildJexcel() {
     var data = [];
     let dataArray1 = [];
@@ -3365,7 +3371,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       var data = [];
 
       data[0] = this.state.tempConsumptionUnitObject.consumptionDataType == 2 ? true : false;
-      data[1] = 'Planning Unit';
+      data[1] = i18n.t('static.product.product');
       data[2] = getLabelText(this.state.selectedConsumptionUnitObject.planningUnit.label, this.state.lang);
       data[3] = this.state.selectedConsumptionUnitObject.planningUnit.multiplier;
       data[4] = Number(1).toFixed(4);
@@ -3374,7 +3380,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       dataArray1.push(data);
       data = [];
       data[0] = this.state.tempConsumptionUnitObject.consumptionDataType == 1 ? true : false;
-      data[1] = 'Forecasting Unit';
+      data[1] = i18n.t('static.forecastingunit.forecastingunit');
       data[2] = getLabelText(this.state.selectedConsumptionUnitObject.planningUnit.forecastingUnit.label, this.state.lang);
       data[3] = 1;
       data[4] = Number(1 / this.state.selectedConsumptionUnitObject.planningUnit.multiplier).toFixed(4);
@@ -3382,7 +3388,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       dataArray1.push(data);
       data = [];
       data[0] = this.state.tempConsumptionUnitObject.consumptionDataType == 3 ? true : false;
-      data[1] = 'Other Unit';
+      data[1] = i18n.t('static.common.otherUnit');
       data[2] = this.state.tempConsumptionUnitObject.consumptionDataType == 3 ? this.state.otherUnitName : "";
       data[3] = this.state.tempConsumptionUnitObject.consumptionDataType == 3 ? this.state.selectedPlanningUnitMultiplier : Number(0);
       data[4] = `=ROUND(1/D1*ROUND(D3,4),4)`;
@@ -3405,7 +3411,12 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         { title: ' ', type: 'text', textEditor: true },//2 C
         { title: i18n.t('static.dataentry.conversionToFu'), type: 'numeric', mask: '#,##.00', decimal: '.', textEditor: true },//3 D
         { title: i18n.t('static.dataentry.conversionToPu'), type: 'numeric', decimal: '.', readOnly: true },//4 E
-        { title: 'Conversion Type', type: 'hidden' }//5 F
+        {
+          // title: 'Conversion Type', type: 'hidden' 
+          title: 'A',
+          type: 'text',
+          visible: false
+        }//5 F
       ],
       // text: {
       //   // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,

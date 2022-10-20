@@ -1821,7 +1821,7 @@ class DefaultLayout extends Component {
                             url: '/equivalancyUnit/listEquivalancyUnit',
                             icon: 'fa fa-exchange',
                             attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_EQUIVALENCY_UNIT_MAPPING') && this.state.activeTab == 1 ? false : true),
+                              hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_EQUIVALENCY_UNIT_MAPPING') ? false : true),
                               onClick: e => {
                                 this.refreshPage();
                               }
@@ -1938,7 +1938,7 @@ class DefaultLayout extends Component {
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LOAD_DELETE_DATASET') && this.state.activeTab == 1 ? false : true) }
                           },
                           {
-                            name: 'Import Program',
+                            name: i18n.t('static.dashboard.importprogram'),
                             url: '/dataset/importDataset',
                             icon: 'fa fa-download',
                             attributes: {
@@ -1949,7 +1949,7 @@ class DefaultLayout extends Component {
                             }
                           },
                           {
-                            name: 'Export Program',
+                            name: i18n.t('static.dashboard.exportprogram'),
                             url: '/dataset/exportDataset',
                             icon: 'fa fa-upload',
                             attributes: {

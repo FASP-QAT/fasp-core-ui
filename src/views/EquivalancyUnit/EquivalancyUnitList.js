@@ -35,7 +35,6 @@ import showguidanceforEquivalencyUnitFr from '../../../src/ShowGuidanceFiles/Equ
 import showguidanceforEquivalencyUnitPr from '../../../src/ShowGuidanceFiles/EquivalencyUnitPr.html'
 import showguidanceforEquivalencyUnitSp from '../../../src/ShowGuidanceFiles/EquivalencyUnitSp.html'
 
-
 const entityname = i18n.t('static.equivalancyUnit.equivalancyUnits')
 
 
@@ -69,6 +68,7 @@ class EquivalancyUnit extends Component {
             isChanged: false,
             isChanged1: false,
             countVar: 0,
+            lang: localStorage.getItem('lang')
         }
 
         this.cancelClicked = this.cancelClicked.bind(this);
@@ -272,9 +272,12 @@ class EquivalancyUnit extends Component {
             columns: [
 
                 {
-                    title: 'equivalancyUnitId',
-                    type: 'hidden',
+                    // title: 'equivalancyUnitId',
+                    // type: 'hidden',
                     // readOnly: true
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
                 {
                     title: i18n.t('static.program.healtharea'),
@@ -291,14 +294,20 @@ class EquivalancyUnit extends Component {
                 },
 
                 {
-                    title: i18n.t('static.healtharea.realm'),
-                    type: 'hidden',
+                    // title: i18n.t('static.healtharea.realm'),
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                     // readOnly: true
                     // textEditor: true,
                 },
                 {
-                    title: i18n.t('static.common.notes'),
-                    type: 'hidden',
+                    // title: i18n.t('static.common.notes'),
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false,
                     // readOnly: true
                     textEditor: true,
                 },
@@ -319,12 +328,18 @@ class EquivalancyUnit extends Component {
                     readOnly: true
                 },
                 {
-                    title: 'isChange',
-                    type: 'hidden'
+                    // title: 'isChange',
+                    // type: 'hidden'
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
                 {
-                    title: 'addNewRow',
-                    type: 'hidden'
+                    // title: 'addNewRow',
+                    // type: 'hidden'
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 }
 
             ],
@@ -608,8 +623,11 @@ class EquivalancyUnit extends Component {
             columns: [
 
                 {
-                    title: 'equivalancyUnitMappingId',
-                    type: 'hidden',
+                    // title: 'equivalancyUnitMappingId',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                     // readOnly: true
                 },
                 {
@@ -686,24 +704,39 @@ class EquivalancyUnit extends Component {
                     readOnly: true
                 },
                 {
-                    title: 'isChange',
-                    type: 'hidden'
+                    // title: 'isChange',
+                    // type: 'hidden'
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
                 {
-                    title: 'forecastingUnitId',
-                    type: 'hidden'
+                    // title: 'forecastingUnitId',
+                    // type: 'hidden'
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
                 {
-                    title: 'typeId',
-                    type: 'hidden'
+                    // title: 'typeId',
+                    // type: 'hidden'
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
                 {
-                    title: 'addNewRow',
-                    type: 'hidden'
+                    // title: 'addNewRow',
+                    // type: 'hidden'
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
                 {
-                    title: 'countVar',
-                    type: 'hidden'
+                    // title: 'countVar',
+                    // type: 'hidden'
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 }
 
             ],

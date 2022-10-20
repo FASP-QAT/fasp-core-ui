@@ -122,7 +122,8 @@ class StockStatus extends Component {
       maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
       programId: '',
       versionId: '',
-      planningUnitLabel: ''
+      planningUnitLabel: '',
+      lang: localStorage.getItem('lang')
     };
     this.filterData = this.filterData.bind(this);
     this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
@@ -1209,8 +1210,8 @@ class StockStatus extends Component {
                           console.log(totalforecastConsumption)
                           var json = {
                             dt: new Date(from, month - 1),
-                            forecastedConsumptionQty: totalforecastConsumption,
-                            actualConsumptionQty: totalActualConsumption,
+                            forecastedConsumptionQty: Number(totalforecastConsumption),
+                            actualConsumptionQty: Number(totalActualConsumption),
                             actualConsumption: list[0].actualFlag,
                             finalConsumptionQty: list[0].consumptionQty,
                             shipmentQty: totalShipmentQty,
@@ -1685,8 +1686,8 @@ class StockStatus extends Component {
                           console.log(totalforecastConsumption)
                           var json = {
                             dt: new Date(from, month - 1),
-                            forecastedConsumptionQty: totalforecastConsumption,
-                            actualConsumptionQty: totalActualConsumption,
+                            forecastedConsumptionQty: Number(totalforecastConsumption),
+                            actualConsumptionQty: Number(totalActualConsumption),
                             actualConsumption: list[0].actualFlag,
                             finalConsumptionQty: list[0].consumptionQty,
                             shipmentQty: totalShipmentQty,
