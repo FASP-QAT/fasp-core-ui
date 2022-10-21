@@ -322,46 +322,16 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                             { title: i18n.t('static.inventory.dataSource'), type: 'dropdown', source: dataSourceList, width: 120, filter: this.filterDataSourceBasedOnConsumptionType },
                             { title: i18n.t('static.supplyPlan.alternatePlanningUnit'), type: 'dropdown', source: realmCountryPlanningUnitList, filter: this.filterRealmCountryPlanningUnit, width: 150 },
                             { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: 'numeric', textEditor: true, mask: '#,##', decimal: '.', textEditor: true, disabledMaskOnEdition: true, width: 120, },
-                            { title: i18n.t('static.unit.multiplierFromARUTOPU'), type: 'numeric', mask: '#,##0.0000', decimal: '.', width: 90, readOnly: true },
+                            { title: i18n.t('static.unit.multiplierFromARUTOPU'), type: 'numeric', mask: '#,##0.00', decimal: '.', width: 90, readOnly: true },
                             { title: i18n.t('static.supplyPlan.quantityPU'), type: 'numeric', mask: '#,##.00', decimal: '.', width: 120, readOnly: true },
                             { title: i18n.t('static.consumption.daysofstockout'), type: 'numeric', mask: '#,##', decimal: '.', disabledMaskOnEdition: true, textEditor: true, width: 80 },
                             { title: i18n.t('static.program.notes'), type: 'text', width: 400 },
                             { title: i18n.t('static.inventory.active'), type: 'checkbox', width: 100, readOnly: !consumptionEditable },
-                            {
-                                // type: 'hidden', title: i18n.t('static.supplyPlan.batchInfo'), 
-                                title: 'A',
-                                type: 'text',
-                                visible: false,
-                                width: 0, readOnly: true
-                            },
-                            {
-                                // type: 'hidden', title: i18n.t('static.supplyPlan.index'), 
-                                title: 'A',
-                                type: 'text',
-                                visible: false,
-                                width: 0, readOnly: true
-                            },
-                            {
-                                // type: 'hidden', title: i18n.t('static.supplyPlan.isChanged'), 
-                                title: 'A',
-                                type: 'text',
-                                visible: false,
-                                width: 0, readOnly: true
-                            },
-                            {
-                                // type: 'hidden', 
-                                title: 'A',
-                                type: 'text',
-                                visible: false,
-                                width: 0, readOnly: true
-                            },
-                            {
-                                // type: 'hidden', 
-                                title: 'A',
-                                type: 'text',
-                                visible: false,
-                                width: 0, readOnly: true
-                            }
+                            { type: 'hidden', title: i18n.t('static.supplyPlan.batchInfo'), width: 0, readOnly: true },
+                            { type: 'hidden', title: i18n.t('static.supplyPlan.index'), width: 0, readOnly: true },
+                            { type: 'hidden', title: i18n.t('static.supplyPlan.isChanged'), width: 0, readOnly: true },
+                            { type: 'hidden', width: 0, readOnly: true },
+                            { type: 'hidden', width: 0, readOnly: true }
                         ],
                         pagination: paginationOption,
                         onformulachain: this.formulaChanged,
@@ -555,26 +525,9 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                 { title: i18n.t('static.supplyPlan.batchId'), type: 'dropdown', source: batchList, filter: this.filterBatchInfoForExistingDataForConsumption, width: 100 },
                 { title: i18n.t('static.supplyPlan.expiryDate'), type: 'text', readOnly: true, width: 150 },
                 { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: 'numeric', mask: '#,##', disabledMaskOnEdition: true, textEditor: true, width: 80 },
-                {
-                    // title: i18n.t('static.supplyPlan.consumptionTransBatchInfoId'), type: 'hidden', 
-                    title: 'A',
-                    type: 'text',
-                    visible: false,
-                    width: 0
-                },
-                {
-                    // title: i18n.t('static.supplyPlan.rowNumber'), type: 'hidden', 
-                    title: 'A',
-                    type: 'text',
-                    visible: false,
-                    width: 0
-                },
-                {
-                    // type: 'hidden'
-                    title: 'A',
-                    type: 'text',
-                    visible: false
-                }
+                { title: i18n.t('static.supplyPlan.consumptionTransBatchInfoId'), type: 'hidden', width: 0 },
+                { title: i18n.t('static.supplyPlan.rowNumber'), type: 'hidden', width: 0 },
+                { type: 'hidden' }
             ],
             pagination: false,
             search: false,
