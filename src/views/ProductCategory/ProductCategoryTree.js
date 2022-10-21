@@ -72,7 +72,8 @@ export default class ProductCategoryTree extends Component {
             searchQuery: null,
             searchFocusIndex: 0,
             searchFoundCount: null,
-            loading: true
+            loading: true,
+            lang: localStorage.getItem('lang')
             // searchFocusIndex: 0
 
 

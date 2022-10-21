@@ -419,7 +419,8 @@ export default class PlanningUnitListComponent extends Component {
             selSource: [],
             realmId: '',
             realms: [],
-            loading: true
+            loading: true,
+            lang: localStorage.getItem('lang')
 
         }
         this.editPlanningUnit = this.editPlanningUnit.bind(this);

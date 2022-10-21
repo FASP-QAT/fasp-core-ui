@@ -251,7 +251,8 @@ class ShipmentSummery extends Component {
             budgetValues: [],
             budgetLabels: [],
 
-            filteredBudgetList: []
+            filteredBudgetList: [],
+            lang: localStorage.getItem('lang')
         };
         this.formatLabel = this.formatLabel.bind(this);
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)

@@ -98,6 +98,7 @@ class SupplyPlanVersionAndReview extends Component {
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() + 1 },
             programId: -1,
+            lang: localStorage.getItem('lang')
 
         };
 

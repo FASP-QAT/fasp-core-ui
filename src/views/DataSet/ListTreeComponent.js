@@ -155,9 +155,7 @@ export default class ListTreeComponent extends Component {
             versions: [],
             allProgramList: [],
             programs: [],
-
-
-
+            lang: localStorage.getItem('lang')
         }
         this.toggleDeropdownSetting = this.toggleDeropdownSetting.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);

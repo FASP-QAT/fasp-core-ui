@@ -105,6 +105,7 @@ export default class PlanningUnitSetting extends Component {
             productCategoryList: [],
             productCategoryListNew: [],
             planningUnitList: [],
+            lang: localStorage.getItem('lang')
 
         }
         this.toggleProgramSetting = this.toggleProgramSetting.bind(this);
@@ -3242,7 +3243,7 @@ export default class PlanningUnitSetting extends Component {
                                         <div>
                                             <Popover placement="top" isOpen={this.state.popoverOpenProgramSetting} target="Popover2" trigger="hover" toggle={this.toggleProgramSetting}>
                                                 {/* <PopoverBody>{i18n.t('static.tooltip.planningProgramSetting')} </PopoverBody> */}
-                                                <PopoverBody>If you dont see the desired program(s), please load them first.</PopoverBody>
+                                                <PopoverBody>{i18n.t('static.common.loadProgramFirst')}</PopoverBody>
                                             </Popover>
                                         </div>
                                         <FormGroup className="col-md-3">
