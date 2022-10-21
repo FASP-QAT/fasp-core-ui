@@ -527,7 +527,7 @@
     "static.shipment.ordereddate": "Date de commande",
     "static.user.lastLoginDate": "Date de la dernière connexion",
     "static.report.noofmonth": "Nombre de mois inclus dans le calcul",
-    "static.common.showGuidance": "Aide",
+    "static.common.showGuidance": "Afficher les conseils",
     "static.mt.oneOrderAtATime": "Veuillez ne sélectionner quune seule commande à la fois.",
     "static.commitTree.serverProcessing": "Traitement Serveur",
     "static.manualTagging.shippingCost": "Frais d`expédition",

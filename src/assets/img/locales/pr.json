@@ -527,7 +527,7 @@
     "static.shipment.ordereddate": "Data de requisição",
     "static.user.lastLoginDate": "Data do último login",
     "static.report.noofmonth": "Número de meses incluídos no cálculo",
-    "static.common.showGuidance": "Mostrar guia",
+    "static.common.showGuidance": "Mostrar orientação",
     "static.mt.oneOrderAtATime": "Selecione apenas 1 pedido de cada vez.",
     "static.commitTree.serverProcessing": "Processamento de servidor",
     "static.manualTagging.shippingCost": "Custo de envio (USD)",
