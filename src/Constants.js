@@ -1,9 +1,9 @@
 // export const API_URL='https://fasp.altius.cc/FASP'
 // export const API_URL='https://api-mod2.altius.cc'
-export const API_URL = 'http://localhost:8084'
+// export const API_URL = 'http://localhost:8084'
 // export const API_URL = 'http://server6.altius.cc:8080/FASP'
 
-// export const API_URL = 'https://uat-api.quantificationanalytics.org'
+export const API_URL = 'https://uat-api.quantificationanalytics.org'
 // export const API_URL = 'https://api.quantificationanalytics.org'
 // export const API_URL = 'https://demo-api.quantificationanalytics.org'
 
@@ -50,7 +50,7 @@ export const FIRST_DATA_ENTRY_DATE = '2017-01-01'
 export const NOTES_FOR_QAT_ADJUSTMENTS = 'Adjustment calculated by the system due to an actual stock count'
 export const TBD_PROCUREMENT_AGENT_ID = 11
 export const TBD_FUNDING_SOURCE = 8
-export const TOTAL_NO_OF_MASTERS_IN_SYNC = 44
+export const TOTAL_NO_OF_MASTERS_IN_SYNC = 45
 export const QAT_REALM_COUNTRY_PLANNING_UNIT = 1
 export const DECIMAL_NO_REGEX = /^\d+(\.\d{1,4})?$/
 export const INTEGER_NO_REGEX = /^[0-9\b]+$/
@@ -67,7 +67,7 @@ export const SPACE_REGEX = /^[^\s]+(\s+[^\s]+)*$/
 export const PERCENTAGE_REGEX = /^0?[0-9]?[0-9]$|^(100)$/
 export const NO_DECIMAL_PERCENTAGE_REGEX = /^[0-9\b]+$/
 export const INDEXED_DB_NAME = "fasp"
-export const INDEXED_DB_VERSION = 7
+export const INDEXED_DB_VERSION = 9
 export const ACTUAL_CONSUMPTION_TYPE = 1;
 export const FORCASTED_CONSUMPTION_TYPE = 2;
 export const LATEST_VERSION_COLOUR = "#e5edf5"

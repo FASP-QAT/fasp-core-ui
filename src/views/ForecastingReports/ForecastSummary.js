@@ -1555,17 +1555,41 @@ class ForecastSummary extends Component {
                                         }
                                     }
                                     var columns = [];
-                                    columns.push({ title: i18n.t('static.product.unit1'), type: 'hidden', width: 100, readOnly: true });//A0
-                                    columns.push({ title: i18n.t('static.product.product'), type: 'hidden', width: 100, readOnly: true });//B1
+                                    columns.push({
+                                        // title: i18n.t('static.product.unit1'), type: 'hidden', 
+                                        title: 'A',
+                                        type: 'text',
+                                        visible: false,
+                                        width: 100, readOnly: true
+                                    });//A0
+                                    columns.push({
+                                        // title: i18n.t('static.product.product'), type: 'hidden', 
+                                        title: 'A',
+                                        type: 'text',
+                                        visible: false,
+                                        width: 100, readOnly: true
+                                    });//B1
                                     columns.push({ title: i18n.t('static.product.product'), type: 'text', width: 100, readOnly: true });//C2
                                     for (var k = 0; k < regRegionList.length; k++) {
                                         columns.push({ title: i18n.t('static.compareVersion.selectedForecast'), type: 'dropdown', width: 100, source: tsList, filter: this.filterTsList });//D3
                                         columns.push({ title: i18n.t('static.forecastReport.forecastQuantity'), type: 'numeric', textEditor: true, mask: '#,##.00', decimal: '.', width: 100, readOnly: true });//E4
                                         columns.push({ title: i18n.t('static.program.notes'), type: 'text', width: 100 });//F5
                                     }
-                                    columns.push({ title: i18n.t('static.supplyPlan.type'), type: 'hidden', width: 100, readOnly: true });//G6
+                                    columns.push({
+                                        title: 'A',
+                                        type: 'text',
+                                        visible: false,
+                                        // title: i18n.t('static.supplyPlan.type'), type: 'hidden', 
+                                        width: 100, readOnly: true
+                                    });//G6
                                     columns.push({ title: i18n.t('static.forecastOutput.totalForecastQuantity'), type: 'numeric', textEditor: true, mask: '#,##.00', decimal: '.', width: 100, readOnly: true });//H7
-                                    columns.push({ title: 'forecast Blank', type: 'hidden', width: 100, readOnly: true });//G6
+                                    columns.push({
+                                        // title: 'forecast Blank', type: 'hidden', 
+                                        title: 'A',
+                                        type: 'text',
+                                        visible: false,
+                                        width: 100, readOnly: true
+                                    });//G6
                                     let nestedHeaders = [];
                                     // nestedHeaders.push(
                                     //     {
@@ -1868,9 +1892,27 @@ class ForecastSummary extends Component {
                             }
 
                             var columns = [];
-                            columns.push({ title: i18n.t('static.product.unit1'), type: 'hidden', width: 100, readOnly: true });//A0
-                            columns.push({ title: i18n.t('static.product.unit1'), type: 'hidden', width: 100, readOnly: true });//A0
-                            columns.push({ title: i18n.t('static.product.product'), type: 'text', width: 100, readOnly: true });//C2
+                            columns.push({
+                                // title: i18n.t('static.product.unit1'), type: 'hidden', 
+                                title: 'A',
+                                type: 'text',
+                                visible: false,
+                                width: 100, readOnly: true
+                            });//A0
+                            columns.push({
+                                // title: i18n.t('static.product.unit1'), type: 'hidden', 
+                                title: 'A',
+                                type: 'text',
+                                visible: false,
+                                width: 100, readOnly: true
+                            });//A0
+                            columns.push({
+                                // title: i18n.t('static.product.product'), type: 'text', 
+                                title: 'A',
+                                type: 'text',
+                                visible: false,
+                                width: 100, readOnly: true
+                            });//C2
 
                             for (var k = 0; k < uniqueRegionList.length; k++) {
                                 columns.push({ title: i18n.t('static.compareVersion.selectedForecast'), type: 'text', width: 100, readOnly: true });//D3
@@ -2989,7 +3031,7 @@ class ForecastSummary extends Component {
                     db1 = e.target.result;
                     var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                     var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
-                    var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.datasetId);
+                    var datasetDetailsRequest = datasetDetailsTransaction.get(id);
                     datasetDetailsRequest.onsuccess = function (e) {         
                       var datasetDetailsRequestJson = datasetDetailsRequest.result;
                       datasetDetailsRequestJson.changed = 1;
@@ -3598,15 +3640,16 @@ class ForecastSummary extends Component {
                         <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
                     </ModalHeader>
                     <div>
-                    <ModalBody>
-                        <div dangerouslySetInnerHTML={ {__html:localStorage.getItem('lang') == 'en' ?
-                showguidanceforForecastSummaryEn :
-                localStorage.getItem('lang') == 'fr' ?
-                showguidanceforForecastSummaryFr :
-                  localStorage.getItem('lang') == 'sp' ?
-                  showguidanceforForecastSummarySp :
-                  showguidanceforForecastSummaryPr
-              } } />
+                        <ModalBody>
+                            <div dangerouslySetInnerHTML={{
+                                __html: localStorage.getItem('lang') == 'en' ?
+                                    showguidanceforForecastSummaryEn :
+                                    localStorage.getItem('lang') == 'fr' ?
+                                        showguidanceforForecastSummaryFr :
+                                        localStorage.getItem('lang') == 'sp' ?
+                                            showguidanceforForecastSummarySp :
+                                            showguidanceforForecastSummaryPr
+                            }} />
                             {/* <div>
                                 <h3 className='ShowGuidanceHeading'>{i18n.t('static.ForecastSummary.ForecastSummary')}</h3>
                             </div>
@@ -3646,7 +3689,7 @@ class ForecastSummary extends Component {
                                     <li><img className="formula-img-mr-showGuidance" src={ProjectStockatForecastend} /><br></br></li>
                                     <li><img style={{ border: '1px solid #fff', padding: '10px', borderRadius: '5px' }} src={DesiredStockatForecasend} /><br></br></li>
                                     <li><img className="formula-img-mr-showGuidance" src={ProcurementSurplusGap} /><br></br></li>
-                                  
+                                 
                                 </ul>
                             </p>
                             <p>
@@ -3686,7 +3729,7 @@ class ForecastSummary extends Component {
                                     <li><img className="formula-img-mr-showGuidance1 img-fluid" src={ProductCost} /><br></br></li>
                                     <li><img className="formula-img-mr-showGuidance1 img-fluid" src={FreightCost} /><br></br></li>
                                     <li><img className="formula-img-mr-showGuidance1 img-fluid" src={TotalCost} /><br></br></li>
-                                 
+                                
                                 </ul>
                             </p>
                             <p>

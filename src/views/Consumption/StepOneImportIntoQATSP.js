@@ -668,7 +668,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             })
             this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
             // this.el.destroy();
-            jexcel.destroy(document.getElementById("mapPlanningUnit"),true);
+            jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
             document.getElementById("stepOneBtn").disabled = true;
         } else if (versionId == 0) {
             this.setState({
@@ -678,7 +678,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             })
             this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
             // this.el.destroy();
-            jexcel.destroy(document.getElementById("mapPlanningUnit"),true);
+            jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
             document.getElementById("stepOneBtn").disabled = true;
         } else if (programId == 0) {
             this.setState({
@@ -688,7 +688,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             })
             this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
             // this.el.destroy();
-            jexcel.destroy(document.getElementById("mapPlanningUnit"),true);
+            jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
             document.getElementById("stepOneBtn").disabled = true;
         } else {
             this.setState({
@@ -697,7 +697,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 message: ''
             })
             this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
-            jexcel.destroy(document.getElementById("mapPlanningUnit"),true);
+            jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
             // this.el.destroy();
             document.getElementById("stepOneBtn").disabled = true;
         }
@@ -745,17 +745,17 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
         this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
         // this.el.destroy();
-        jexcel.destroy(document.getElementById("mapPlanningUnit"),true);
+        jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
 
 
         this.el = jexcel(document.getElementById("mapRegion"), '');
         // this.el.destroy();
-        jexcel.destroy(document.getElementById("mapRegion"),true);
+        jexcel.destroy(document.getElementById("mapRegion"), true);
 
 
         this.el = jexcel(document.getElementById("mapImport"), '');
         // this.el.destroy();
-        jexcel.destroy(document.getElementById("mapImport"),true);
+        jexcel.destroy(document.getElementById("mapImport"), true);
 
 
         var json = [];
@@ -797,28 +797,43 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     textEditor: true,//3 D
                 },
                 {
-                    title: 'Id',
-                    type: 'hidden',
+                    // title: 'Id',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                     // readOnly: true//4 E
                 },
                 {
-                    title: 'Id',
-                    type: 'hidden',
+                    // title: 'Id',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                     // readOnly: true//5 F
                 },
                 {
-                    title: 'Forcast planning unit id',
-                    type: 'hidden',
+                    // title: 'Forcast planning unit id',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                     // readOnly: true//6 G
                 },
                 {
-                    title: 'Selected Forecast Map',
-                    type: 'hidden',
+                    // title: 'Selected Forecast Map',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                     // readOnly: true//7 H
                 },
                 {
-                    title: 'No Forecast Selected',
-                    type: 'hidden',
+                    // title: 'No Forecast Selected',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                     // readOnly: true//8 I
                 }
 
@@ -916,7 +931,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
         };
 
         myVar = jexcel(document.getElementById("mapPlanningUnit"), options);
-        this.el=myVar
+        this.el = myVar
         this.setState({
             loading: false,
             mapPlanningUnitEl: myVar
@@ -1316,7 +1331,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 <div>
                     <Popover placement="top" isOpen={this.state.popoverOpenProgramSetting} target="Popover2" trigger="hover" toggle={this.toggleProgramSetting}>
                         {/* <PopoverBody>{i18n.t('static.tooltip.planningProgramSetting')} </PopoverBody> */}
-                        <PopoverBody>If the last month of your forecast is more than 6 months old, it will not appear in the version dropdown. Please consider importing forecast data for future months.</PopoverBody>
+                        <PopoverBody>{i18n.t('static.importIntoSP.versionTitle')}</PopoverBody>
                     </Popover>
                 </div>
                 <div style={{ display: this.props.items.loading ? "none" : "block" }} >
@@ -1335,16 +1350,16 @@ export default class StepOneImportMapPlanningUnits extends Component {
                             <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
                         </ModalHeader>
                         <div>
-                        <ModalBody>
-                            <div dangerouslySetInnerHTML={ {__html:localStorage.getItem('lang') == 'en' ?
-                listImportIntoQATSupplyPlanEn :
-                localStorage.getItem('lang') == 'fr' ?
-                listImportIntoQATSupplyPlanFr :
-                  localStorage.getItem('lang') == 'sp' ?
-                  listImportIntoQATSupplyPlanSp :
-                  listImportIntoQATSupplyPlanPr
-              } } />
-                      
+                            <ModalBody>
+                                <div dangerouslySetInnerHTML={{
+                                    __html: localStorage.getItem('lang') == 'en' ?
+                                        listImportIntoQATSupplyPlanEn :
+                                        localStorage.getItem('lang') == 'fr' ?
+                                            listImportIntoQATSupplyPlanFr :
+                                            localStorage.getItem('lang') == 'sp' ?
+                                                listImportIntoQATSupplyPlanSp :
+                                                listImportIntoQATSupplyPlanPr
+                                }} />
                                 {/* <div>
                                     <h3 className='ShowGuidanceHeading'>{i18n.t('static.importIntoQATSupplyPlan.importIntoQATSupplyPlan')}</h3>
                                 </div>

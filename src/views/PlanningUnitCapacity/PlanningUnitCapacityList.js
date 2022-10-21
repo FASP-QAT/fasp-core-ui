@@ -280,7 +280,8 @@ export default class PlanningUnitCapacityList extends Component {
             planningUnits: [],
             planningUnitCapacityList: [],
             message: '',
-            selSource: []
+            selSource: [],
+            lang: localStorage.getItem('lang')
 
         }
         this.filterData = this.filterData.bind(this);
@@ -328,8 +329,11 @@ export default class PlanningUnitCapacityList extends Component {
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: 'planningUnitCapacityId',
-                    type: 'hidden',
+                    // title: 'planningUnitCapacityId',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                     // readOnly: true
                 },
                 {

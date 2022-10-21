@@ -111,8 +111,11 @@ class ScaleUpType extends Component {
             columns: [
 
                 {
-                    title: 'scaleUpTypeId',
-                    type: 'hidden',
+                    // title: 'scaleUpTypeId',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false,
                     readOnly: true
                 },
                 {
@@ -138,12 +141,18 @@ class ScaleUpType extends Component {
                     readOnly: true
                 },
                 {
-                    title: 'isChange',
-                    type: 'hidden'
+                    // title: 'isChange',
+                    // type: 'hidden'
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
                 {
-                    title: 'addNewRow',
-                    type: 'hidden'
+                    // title: 'addNewRow',
+                    // type: 'hidden'
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 }
 
 
@@ -735,7 +744,7 @@ class ScaleUpType extends Component {
                                     <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                 }
                                 {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_MODELING_TYPE') &&
-                                    <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>
+                                    <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> {i18n.t('static.common.addRow')}</Button>
                                 }
                                 &nbsp;
                             </FormGroup>

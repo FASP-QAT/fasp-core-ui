@@ -125,12 +125,16 @@ class ListProcurementAgentComponent extends Component {
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: 'procurementAgentTypeId',
-                    type: 'hidden',
+                    // title: 'procurementAgentTypeId',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
                 {
                     title: i18n.t('static.realm.realm'),
-                    type: (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN') ? 'text' : 'hidden'),
+                    type: (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN') ? 'text' : 'text'),
+                    visible: (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN') ? true : false),
                     // readOnly: true
                 },
                 {
@@ -478,7 +482,10 @@ class ListProcurementAgentComponent extends Component {
                                 </FormGroup>
                             </Col>
                         }
-                        {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROCUREMENT_AGENT') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
+                        {/* <div id="loader" className="center"></div> */}
+                        <div className='consumptionDataEntryTable'>
+                            <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROCUREMENT_AGENT') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
+                        </div>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>
                             <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >

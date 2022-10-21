@@ -38,11 +38,18 @@ import dataentryScreenshot1 from '../../assets/img/dataentryScreenshot-1.png';
 import dataentryScreenshot2 from '../../assets/img/dataentryScreenshot-2.png';
 import dataentryScreenshot3 from '../../assets/img/dataentryScreenshot-3.png';
 import { round } from "mathjs";
+
+import showguidanceConsumptionDataEntryEn from '../../../src/ShowGuidanceFiles/ConsumptionDataEntryandAdjustmentEn.html'
+import showguidanceConsumptionDataEntryFr from '../../../src/ShowGuidanceFiles/ConsumptionDataEntryandAdjustmentFr.html'
+import showguidanceConsumptionDataEntrySp from '../../../src/ShowGuidanceFiles/ConsumptionDataEntryandAdjustmentSp.html'
+import showguidanceConsumptionDataEntryPr from '../../../src/ShowGuidanceFiles/ConsumptionDataEntryandAdjustmentPr.html'
+
 import { calculateMovingAvg } from '../Extrapolation/MovingAverages';
 import { calculateSemiAverages } from '../Extrapolation/SemiAverages';
 import { calculateLinearRegression } from '../Extrapolation/LinearRegression';
 import { calculateTES } from '../Extrapolation/TESNew';
 import { calculateArima } from '../Extrapolation/Arima';
+
 
 const entityname = i18n.t('static.dashboard.dataEntryAndAdjustment');
 const ref = React.createRef();
@@ -307,7 +314,12 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           columns.push({ title: moment(monthArray[j].date).format(DATE_FORMAT_CAP_WITHOUT_DATE), type: 'numeric', textEditor: true, mask: '#,##.00', decimal: '.', disabledMaskOnEdition: true, width: 100 })
         }
         data[monthArray.length + 1] = multiplier;
-        columns.push({ type: 'hidden', title: 'Multiplier' })
+        columns.push({
+          // type: 'hidden', title: 'Multiplier'
+          title: 'A',
+          type: 'text',
+          visible: false
+        })
         dataArray.push(data)
         data = [];
         for (var r = 0; r < regionList.length; r++) {
@@ -513,8 +525,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           }
           var forecastMinDate = moment(datasetJson.currentVersion.forecastStartDate).format("YYYY-MM-DD");
           var forecastMaxDate = moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM-DD");
-          const monthsDiff = moment(new Date(moment(maxDate).format("YYYY-MM-DD")>moment(forecastMaxDate).format("YYYY-MM-DD")?moment(maxDate).format("YYYY-MM-DD"):moment(forecastMaxDate).format("YYYY-MM-DD"))).diff(new Date(moment(minDate).format("YYYY-MM-DD")<moment(forecastMinDate).format("YYYY-MM-DD")?moment(minDate).format("YYYY-MM-DD"):moment(forecastMinDate).format("YYYY-MM-DD")), 'months', true);
-          const noOfMonthsForProjection = (monthsDiff+1) - inputDataMovingAvg.length;
+          const monthsDiff = moment(new Date(moment(maxDate).format("YYYY-MM-DD") > moment(forecastMaxDate).format("YYYY-MM-DD") ? moment(maxDate).format("YYYY-MM-DD") : moment(forecastMaxDate).format("YYYY-MM-DD"))).diff(new Date(moment(minDate).format("YYYY-MM-DD") < moment(forecastMinDate).format("YYYY-MM-DD") ? moment(minDate).format("YYYY-MM-DD") : moment(forecastMinDate).format("YYYY-MM-DD")), 'months', true);
+          const noOfMonthsForProjection = (monthsDiff + 1) - inputDataMovingAvg.length;
 
           if (inputDataMovingAvg.filter(c => c.actual != null).length >= 3) {
             count++;
@@ -561,19 +573,19 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       console.log("countRecivedMov", this.state.countRecived)
       console.log("countMov", this.state.count)
 
-console.log("outSide****",(this.state.jsonDataMovingAvg.length
-  + this.state.jsonDataSemiAverage.length
-  + this.state.jsonDataLinearRegression.length
-  + this.state.jsonDataTes.length
-  + this.state.jsonDataArima.length
-  == this.state.count))
+      console.log("outSide****", (this.state.jsonDataMovingAvg.length
+        + this.state.jsonDataSemiAverage.length
+        + this.state.jsonDataLinearRegression.length
+        + this.state.jsonDataTes.length
+        + this.state.jsonDataArima.length
+        == this.state.count))
       if (this.state.jsonDataMovingAvg.length
         + this.state.jsonDataSemiAverage.length
         + this.state.jsonDataLinearRegression.length
         + this.state.jsonDataTes.length
         + this.state.jsonDataArima.length
         == this.state.count) {
-          console.log("inside if")
+        console.log("inside if")
         this.saveForecastConsumptionExtrapolation();
       }
     })
@@ -592,12 +604,12 @@ console.log("outSide****",(this.state.jsonDataMovingAvg.length
     }, () => {
       console.log("countRecivedSemi", this.state.countRecived)
       console.log("countSemi", this.state.count)
-console.log("Semi outside if", this.state.jsonDataMovingAvg.length
-+ this.state.jsonDataSemiAverage.length
-+ this.state.jsonDataLinearRegression.length
-+ this.state.jsonDataTes.length
-+ this.state.jsonDataArima.length
-== this.state.count)
+      console.log("Semi outside if", this.state.jsonDataMovingAvg.length
+        + this.state.jsonDataSemiAverage.length
+        + this.state.jsonDataLinearRegression.length
+        + this.state.jsonDataTes.length
+        + this.state.jsonDataArima.length
+        == this.state.count)
       if (this.state.jsonDataMovingAvg.length
         + this.state.jsonDataSemiAverage.length
         + this.state.jsonDataLinearRegression.length
@@ -619,12 +631,12 @@ console.log("Semi outside if", this.state.jsonDataMovingAvg.length
     }, () => {
       console.log("countRecivedL", this.state.countRecived)
       console.log("countL", this.state.count)
-console.log("linear outside***",this.state.jsonDataMovingAvg.length
-+ this.state.jsonDataSemiAverage.length
-+ this.state.jsonDataLinearRegression.length
-+ this.state.jsonDataTes.length
-+ this.state.jsonDataArima.length
-== this.state.count)
+      console.log("linear outside***", this.state.jsonDataMovingAvg.length
+        + this.state.jsonDataSemiAverage.length
+        + this.state.jsonDataLinearRegression.length
+        + this.state.jsonDataTes.length
+        + this.state.jsonDataArima.length
+        == this.state.count)
 
       if (this.state.jsonDataMovingAvg.length
         + this.state.jsonDataSemiAverage.length
@@ -647,12 +659,12 @@ console.log("linear outside***",this.state.jsonDataMovingAvg.length
     }, () => {
       console.log("countRecivedT", this.state.countRecived)
       console.log("countT", this.state.count)
-console.log("TES",this.state.jsonDataMovingAvg.length
-+ this.state.jsonDataSemiAverage.length
-+ this.state.jsonDataLinearRegression.length
-+ this.state.jsonDataTes.length
-+ this.state.jsonDataArima.length
-== this.state.count)
+      console.log("TES", this.state.jsonDataMovingAvg.length
+        + this.state.jsonDataSemiAverage.length
+        + this.state.jsonDataLinearRegression.length
+        + this.state.jsonDataTes.length
+        + this.state.jsonDataArima.length
+        == this.state.count)
 
       if (this.state.jsonDataMovingAvg.length
         + this.state.jsonDataSemiAverage.length
@@ -676,11 +688,11 @@ console.log("TES",this.state.jsonDataMovingAvg.length
       console.log("countRecivedA", this.state.countRecived)
       console.log("countA", this.state.count)
       console.log("Arima", this.state.jsonDataMovingAvg.length
-      + this.state.jsonDataSemiAverage.length
-      + this.state.jsonDataLinearRegression.length
-      + this.state.jsonDataTes.length
-      + this.state.jsonDataArima.length
-      == this.state.count)
+        + this.state.jsonDataSemiAverage.length
+        + this.state.jsonDataLinearRegression.length
+        + this.state.jsonDataTes.length
+        + this.state.jsonDataArima.length
+        == this.state.count)
       if (this.state.jsonDataMovingAvg.length
         + this.state.jsonDataSemiAverage.length
         + this.state.jsonDataLinearRegression.length
@@ -1423,7 +1435,7 @@ console.log("TES",this.state.jsonDataMovingAvg.length
                       userId: curUser
                     },
                     createdDate: curDate,
-                    daysOfStockOut: daysOfStockOutValue!==""?Math.round(daysOfStockOutValue):daysOfStockOutValue,
+                    daysOfStockOut: daysOfStockOutValue !== "" ? Math.round(daysOfStockOutValue) : daysOfStockOutValue,
                     exculde: false,
                     forecastConsumptionId: 0,
                     month: moment(monthArray[i].date).startOf('month').format("YYYY-MM-DD"),
@@ -1480,7 +1492,7 @@ console.log("TES",this.state.jsonDataMovingAvg.length
           //     datasetDetailsRequestJson.changed = 1;
           //     var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
           //     datasetDetailsRequest1.onsuccess = function (event) {
-                   
+
           //         }}
           // }      
           putRequest.onerror = function (event) {
@@ -1496,13 +1508,14 @@ console.log("TES",this.state.jsonDataMovingAvg.length
             var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
             var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
             var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.datasetId);
-            datasetDetailsRequest.onsuccess = function (e) {         
+            datasetDetailsRequest.onsuccess = function (e) {
               var datasetDetailsRequestJson = datasetDetailsRequest.result;
               datasetDetailsRequestJson.changed = 1;
               var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
               datasetDetailsRequest1.onsuccess = function (event) {
-                   
-                  }}
+
+              }
+            }
 
             this.setState({
               // dataEl: "",
@@ -1511,7 +1524,7 @@ console.log("TES",this.state.jsonDataMovingAvg.length
               message: i18n.t('static.compareAndSelect.dataSaved'),
               messageColor: "green",
               consumptionChanged: false,
-              datasetJson:datasetJson
+              datasetJson: datasetJson
             }, () => {
               this.ExtrapolatedParameters();
               this.getDatasetData();
@@ -2982,8 +2995,18 @@ console.log("TES",this.state.jsonDataMovingAvg.length
             <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
           </ModalHeader>
           <div>
-            <ModalBody>
-              <div>
+            <ModalBody className="ModalBodyPadding">
+              <div dangerouslySetInnerHTML={{
+                __html: localStorage.getItem('lang') == 'en' ?
+                  showguidanceConsumptionDataEntryEn :
+                  localStorage.getItem('lang') == 'fr' ?
+                    showguidanceConsumptionDataEntryFr :
+                    localStorage.getItem('lang') == 'sp' ?
+                      showguidanceConsumptionDataEntrySp :
+                      showguidanceConsumptionDataEntryPr
+              }} />
+
+              {/* <div>
                 <h3 className='ShowGuidanceHeading'>{i18n.t('static.dashboard.dataEntryAndAdjustments')} </h3>
               </div>
               <p>
@@ -3035,49 +3058,17 @@ console.log("TES",this.state.jsonDataMovingAvg.length
                         {i18n.t('static.dataEntryAndAdjustments.GraphBelow')}  </li>
                     </ol>
                   </li>
-                  {/* <li>The detailed data table allows users to add, edit, adjust, or delete historical consumption records. 
-                                   <ol type="a">
-                                     <li><b>Interpolating missing values:</b> Click the green 'Interpolate' button above the top right corner of the unit table to search for periods where the consumption value is blank and replace them with an interpolated value. QAT interpolates by finding the nearest values on either side (before or after the blank), calculates the straight line in between them and uses that straight-line formula to calculate the value for the blank(s).  Note that QAT will not interpolate for months where actual consumption is zero. QAT will only interpolate if there is at least one data point before and one data point after the blank <br></br>value(s).
-                                     Mathematically:<br></br>
-                                    Where x's represent months, and y's represent actual consumption,<br></br>
-                                    Where known data values are (x0 , y0) and (x1 , y1)<br></br>
-                                    Where any unknown data values are (x, y)<br></br>
-                                    The formula for the interpolated line is<br></br>
-                                    <span><img className="formula-img-mr img-fluid mb-lg-0" src={dataentryScreenshot1} style={{border:'1px solid #fff',width:'250px'}}/></span><br></br>
-                                    <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0" src={dataentryScreenshot2} style={{border:'1px solid #fff',width:'250px'}}/></span>
-
-                                     </li>
-                                     <li><b>Adjust for under-reporting:</b> The default value is 100% reporting every month. The user can change this to the correct value. QAT will calculate the adjusted consumption due to underreporting using the formula below. </li>
-                                     <li><b>Adjust for stock outs:</b> For imported data, the number of stock out days is pulled in from the QAT supply plan program, if data is collected. The default value for stock out days is zero days (product assumed always in stock). The user can change this to the correct value. The default value for number of days in a month are based on the calendar days, but users can adjust the number of days used for the stock out calculation in '<a href="/#/Extrapolation/extrapolateData" target="_blank" style={{textDecoration:'underline'}}>Update Version Settings</a>'.</li><br></br>
-                                     <p>
-                                      <span style={{fontStyle:'italic'}}><b>Stock Out Rate</b> = Stocked Out (days)/ (# of Days in Month).</span><br></br>
-                                      <span style={{fontStyle:'italic'}}><b> Adjusted Consumption</b> = Actual Consumption / Reporting Rate / (1 - Stock Out Rate)</span></p>
-                                      <p>
-                                      For example, if for a given month, a product had a consumption of 1,000 units, was out-of-stock for 5 out of 31 days in the month and the reporting rate was 98%:<br></br>
-                                      Stock Out Rate = 5 days stocked out /31 days in a month = 16.1%.<br></br>
-                                      Adjusted Consumption = 1,000 units / 98% Reporting / (1 - 16.1%) = 1,217
-
-                                 </p>
-                                 <li>Use the graph below the Detailed Data table to view the adjusted data</li>
-                                
-                                   </ol>
-                                   </li>
-                                */}
+                  
                   <li>{i18n.t('static.dataEntryAndAdjustments.ClickSubmit')} </li>
                   <li>{i18n.t('static.dataEntryAndAdjustments.RepeatSteps')}
 
-                    {/* <span><img className="formula-img-mr img-fluid mb-lg-0 mt-lg-0" src={dataentryScreenshot3} style={{border:'1px solid #fff'}}/></span> */}
+                   
                   </li>
 
 
                 </ol>
-              </p>
-              {/* <p>Methods are organized from simple to robust
-
-                More sophisticated models are more sensitive to problems in the data
-
-                If you have poorer data (missing data points, variable reporting rates, less than 12 months of data), use simpler forecast methods
               </p> */}
+
             </ModalBody>
           </div>
         </Modal>
@@ -3365,13 +3356,13 @@ console.log("TES",this.state.jsonDataMovingAvg.length
     // console.log("stop----", new Date())
 
   }
- 
+
   formulaChanged = function (instance, executions) {
     var executions = executions;
     for (var e = 0; e < executions.length; e++) {
-        this.changed(instance, executions[e].cell, executions[e].x, executions[e].y, executions[e].v)
+      this.changed(instance, executions[e].cell, executions[e].x, executions[e].y, executions[e].v)
     }
-}
+  }
   buildJexcel() {
     var data = [];
     let dataArray1 = [];
@@ -3380,7 +3371,7 @@ console.log("TES",this.state.jsonDataMovingAvg.length
       var data = [];
 
       data[0] = this.state.tempConsumptionUnitObject.consumptionDataType == 2 ? true : false;
-      data[1] = 'Planning Unit';
+      data[1] = i18n.t('static.product.product');
       data[2] = getLabelText(this.state.selectedConsumptionUnitObject.planningUnit.label, this.state.lang);
       data[3] = this.state.selectedConsumptionUnitObject.planningUnit.multiplier;
       data[4] = Number(1).toFixed(4);
@@ -3389,7 +3380,7 @@ console.log("TES",this.state.jsonDataMovingAvg.length
       dataArray1.push(data);
       data = [];
       data[0] = this.state.tempConsumptionUnitObject.consumptionDataType == 1 ? true : false;
-      data[1] = 'Forecasting Unit';
+      data[1] = i18n.t('static.forecastingunit.forecastingunit');
       data[2] = getLabelText(this.state.selectedConsumptionUnitObject.planningUnit.forecastingUnit.label, this.state.lang);
       data[3] = 1;
       data[4] = Number(1 / this.state.selectedConsumptionUnitObject.planningUnit.multiplier).toFixed(4);
@@ -3397,7 +3388,7 @@ console.log("TES",this.state.jsonDataMovingAvg.length
       dataArray1.push(data);
       data = [];
       data[0] = this.state.tempConsumptionUnitObject.consumptionDataType == 3 ? true : false;
-      data[1] = 'Other Unit';
+      data[1] = i18n.t('static.common.otherUnit');
       data[2] = this.state.tempConsumptionUnitObject.consumptionDataType == 3 ? this.state.otherUnitName : "";
       data[3] = this.state.tempConsumptionUnitObject.consumptionDataType == 3 ? this.state.selectedPlanningUnitMultiplier : Number(0);
       data[4] = `=ROUND(1/D1*ROUND(D3,4),4)`;
@@ -3420,7 +3411,12 @@ console.log("TES",this.state.jsonDataMovingAvg.length
         { title: ' ', type: 'text', textEditor: true },//2 C
         { title: i18n.t('static.dataentry.conversionToFu'), type: 'numeric', mask: '#,##.00', decimal: '.', textEditor: true },//3 D
         { title: i18n.t('static.dataentry.conversionToPu'), type: 'numeric', decimal: '.', readOnly: true },//4 E
-        { title: 'Conversion Type', type: 'hidden' }//5 F
+        {
+          // title: 'Conversion Type', type: 'hidden' 
+          title: 'A',
+          type: 'text',
+          visible: false
+        }//5 F
       ],
       // text: {
       //   // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,

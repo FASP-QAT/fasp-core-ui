@@ -316,8 +316,11 @@ export default class DimensionListComponent extends Component {
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: 'dimensionId',
-                    type: 'hidden',
+                    // title: 'dimensionId',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false,
                     readOnly: true
                 },
                 {
@@ -532,8 +535,7 @@ export default class DimensionListComponent extends Component {
                     <CardBody className="table-responsive pt-md-1 pb-md-1">
                         {/* <div id="loader" className="center"></div> */}
                         <div className='consumptionDataEntryTable'>
-                            <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DIMENSION') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
-                            </div>
+                            <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DIMENSION') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"}></div>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>
                             <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >

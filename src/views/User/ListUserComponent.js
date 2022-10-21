@@ -455,12 +455,16 @@ class ListUserComponent extends Component {
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: 'userId',
-                    type: 'hidden',
+                    // title: 'userId',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
                 {
                     title: i18n.t('static.realm.realm'),
-                    type: (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN') ? 'text' : 'hidden'),
+                    type: (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN') ? 'text' : 'text'),
+                    visible: (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN') ? true : false),
                     // readOnly: true
                 },
                 {
@@ -920,8 +924,9 @@ class ListUserComponent extends Component {
                 <TabPane tabId="1" className='pb-lg-0'>
                     {/* <Card> */}
                     <CardBody className="pl-lg-1 pr-lg-1 pt-lg-0">
-                        {/* <div id="tableDiv1" className="table-responsive consumptionDataEntryTable"> */}
+                        <div className="consumptionDataEntryTable">
                         <div id="tableDiv1" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USER') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
+                        </div>
                         </div>
                     </CardBody>
                     {/* <CardFooter> */}
@@ -939,8 +944,9 @@ class ListUserComponent extends Component {
                 <TabPane tabId="2" className='pb-lg-0'>
                     {/* <Card> */}
                     <CardBody className="pl-lg-1 pr-lg-1 pt-lg-0">
-                        {/* <div id="tableDiv2" className="table-responsive consumptionDataEntryTable"> */}
+                        <div className="consumptionDataEntryTable">
                         <div id="tableDiv2" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USER') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
+                        </div>
                         </div>
                     </CardBody>
                     {/* <CardFooter> */}
@@ -1242,12 +1248,16 @@ class ListUserComponent extends Component {
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: 'userId',
-                    type: 'hidden',//0A
+                    // title: 'userId',
+                    // type: 'hidden',//0A
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
                 {
                     title: i18n.t('static.realm.realm'),
-                    type: (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN') ? 'text' : 'hidden'),
+                    type: (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN') ? 'text' : 'text'),
+                    visible: (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN') ? true : false),
                     // type: 'hidden',
                     // readOnly: true//1B
                 },
@@ -2113,8 +2123,11 @@ class ListUserComponent extends Component {
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: 'userId', //0A 
-                    type: 'hidden',
+                    // title: 'userId', //0A 
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
                 {
                     title: i18n.t('static.user.username'),
@@ -2359,7 +2372,9 @@ class ListUserComponent extends Component {
                         <TabContent activeTab={this.state.activeTab1[0]}>
                             {this.tabPane1()}
                         </TabContent>
+                        <div className='consumptionDataEntryTable'>
                         <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USER') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
+                        </div>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>
                             <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >

@@ -27,7 +27,8 @@ export default class IntegrationListComponent extends Component {
             integrationList: [],
             message: '',
             selSource: [],
-            loading: true
+            loading: true,
+            lang: localStorage.getItem('lang')
         }
         this.addNewIntegration = this.addNewIntegration.bind(this);
         this.editIntegration = this.editIntegration.bind(this);
@@ -63,8 +64,11 @@ export default class IntegrationListComponent extends Component {
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: 'integrationId',
-                    type: 'hidden',
+                    // title: 'integrationId',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                     // readOnly: true
                 },
                 {

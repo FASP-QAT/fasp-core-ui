@@ -209,8 +209,11 @@ export default class PipelineProgramProcurementAgent extends Component {
                                                 source: ProcurementAgentListQat,
                                                 //filter: this.dropdownFilter
                                             }, {
-                                                title: i18n.t('static.inventory.procurementAgent'),
-                                                type: 'hidden',
+                                                // title: i18n.t('static.inventory.procurementAgent'),
+                                                // type: 'hidden',
+                                                title: 'A',
+                                                type: 'text',
+                                                visible: false,
                                                 readonly: true
                                             }
                                         ],

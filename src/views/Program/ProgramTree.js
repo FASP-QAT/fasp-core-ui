@@ -699,8 +699,8 @@ class Program extends Component {
                                     <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.loadProgram.oldVersion')}</span></li>
                                     <li><span className="greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.loadProgram.latestVersion')} </span></li>
                                     <li><span className=" blacklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.loadProgram.notDownloaded')} </span></li>
-                                    <li><span><img width="18" title="Clean up" src={cleanUp} className="CleanUpIcon"></img></span> <span className="legendDeleteCleanupText">Keep latest  version and delete older versions.</span></li>
-                                    <li><span className=""><i title="Delete" className="fa fa-trash DeleteIcon"></i></span> <span className="legendDeleteCleanupText">Delete the version</span></li>
+                                    <li><span><img width="18" title="Clean up" src={cleanUp} className="CleanUpIcon"></img></span> <span className="legendDeleteCleanupText">{i18n.t('static.loadDelDataset.keepLatestVersionDeleteOldVersion')}</span></li>
+                                    <li><span className=""><i title="Delete" className="fa fa-trash DeleteIcon"></i></span> <span className="legendDeleteCleanupText">{i18n.t('static.loadDelDataset.deleteVersion')}</span></li>
                                 </ul>
                                 </div>
                                 <Col md="3 pl-0" id="realmDiv">

@@ -875,8 +875,11 @@ class EditUserComponent extends Component {
             columns: [
 
                 {
-                    title: i18n.t('static.username.username'),
-                    type: 'hidden',
+                    // title: i18n.t('static.username.username'),
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false,
                     readOnly: true//0A
                 },
                 {
@@ -1862,7 +1865,7 @@ class EditUserComponent extends Component {
                                             </CardBody>
                                             <CardFooter>
                                                 <FormGroup>
-                                                    <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>
+                                                    <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> {i18n.t('static.common.addRow')}</Button>
                                                     &nbsp;
                                                 </FormGroup>
                                             </CardFooter>

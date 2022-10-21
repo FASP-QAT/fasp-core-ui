@@ -358,7 +358,8 @@ class FundingSourceListComponent extends Component {
             fundingSourceList: [],
             message: '',
             selSource: [],
-            loading: true
+            loading: true,
+            lang: localStorage.getItem('lang')
         }
         this.editFundingSource = this.editFundingSource.bind(this);
         this.addFundingSource = this.addFundingSource.bind(this);
@@ -436,13 +437,17 @@ class FundingSourceListComponent extends Component {
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: 'fundingSourceId',
-                    type: 'hidden',
+                    // title: 'fundingSourceId',
+                    // type: 'hidden',
                     // readOnly: true
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
                 {
                     title: i18n.t('static.realm.realm'),
-                    type: (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN') ? 'text' : 'hidden'),
+                    type: (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN') ? 'text' : 'text'),
+                    visible: (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN') ? true : false),
                     // readOnly: true
                 },
                 {
