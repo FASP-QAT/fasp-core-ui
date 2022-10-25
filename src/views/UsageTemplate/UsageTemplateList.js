@@ -1074,268 +1074,6 @@ class usageTemplate extends Component {
             //         }
             //     ],
             // ],
-            onsearch: function (el) {
-                var elInstance = el;
-                var json = elInstance.getJson();
-                let roleArray = this.state.roleArray;
-                var jsonLength;
-                jsonLength = json.length;
-                console.log("JsonLength", jsonLength)
-
-                for (var j = 0; j < jsonLength; j++) {
-                    try {
-                        var rowData = elInstance.getRowData(j);
-
-                        //left align
-                        elInstance.setStyle(`B${parseInt(j) + 1}`, 'text-align', 'left');
-                        var rowData = elInstance.getRowData(j);
-
-                        var typeId = rowData[6];
-                        var oneTimeUsage = rowData[10];
-
-                        console.log("roleArray--------->1", j);
-                        console.log("roleArray--------->2", elInstance);
-                        if (typeId == 2) {
-                            var cell1 = elInstance.getCell(("H").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                            var cell1 = elInstance.getCell(("K").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                        } else {
-                            var cell1 = elInstance.getCell(("H").concat(parseInt(j) + 1))
-                            cell1.classList.remove('readonly');
-                            var cell1 = elInstance.getCell(("K").concat(parseInt(j) + 1))
-                            cell1.classList.remove('readonly');
-                        }
-
-                        if (oneTimeUsage) {
-                            var cell1 = elInstance.getCell(("L").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                            var cell1 = elInstance.getCell(("M").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                        } else {
-                            var cell1 = elInstance.getCell(("L").concat(parseInt(j) + 1))
-                            cell1.classList.remove('readonly');
-                            var cell1 = elInstance.getCell(("M").concat(parseInt(j) + 1))
-                            cell1.classList.remove('readonly');
-                        }
-
-                        if (typeId == 1 && oneTimeUsage == false) {
-                            // elInstance.setValueFromCoords(19, y, 'for', true);
-                            var cell1 = elInstance.getCell(("N").concat(parseInt(j) + 1))
-                            cell1.classList.remove('readonly');
-                            var cell1 = elInstance.getCell(("O").concat(parseInt(j) + 1))
-                            cell1.classList.remove('readonly');
-                        } else {
-                            var cell1 = elInstance.getCell(("N").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                            var cell1 = elInstance.getCell(("O").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                        }
-
-
-                        var typeId = rowData[19];
-                        var userId = rowData[22];
-                        var curUser = AuthenticationService.getLoggedInUserId();
-                        // if ((roleArray.includes('ROLE_REALM_ADMIN') && typeId != -1 && typeId != 0) || (roleArray.includes('ROLE_DATASET_ADMIN') && typeId == -1 && typeId != 0)) {
-                        if ((roleArray.includes('ROLE_DATASET_ADMIN') && ((typeId == -1 && typeId != 0) || curUser != userId))) {
-                            var cell1 = elInstance.getCell(("B").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                            var cell1 = elInstance.getCell(("C").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                            var cell1 = elInstance.getCell(("D").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                            var cell1 = elInstance.getCell(("E").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                            var cell1 = elInstance.getCell(("F").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                            var cell1 = elInstance.getCell(("G").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                            var cell1 = elInstance.getCell(("H").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                            var cell1 = elInstance.getCell(("J").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                            var cell1 = elInstance.getCell(("K").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                            var cell1 = elInstance.getCell(("L").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                            var cell1 = elInstance.getCell(("M").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                            var cell1 = elInstance.getCell(("N").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                            var cell1 = elInstance.getCell(("O").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                            var cell1 = elInstance.getCell(("U").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-
-                        }
-
-                        if (!roleArray.includes('ROLE_REALM_ADMIN') && !roleArray.includes('ROLE_DATASET_ADMIN')) {
-                            var cell1 = elInstance.getCell(("B").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                            var cell1 = elInstance.getCell(("C").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                            var cell1 = elInstance.getCell(("D").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                            var cell1 = elInstance.getCell(("E").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                            var cell1 = elInstance.getCell(("F").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                            var cell1 = elInstance.getCell(("G").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                            var cell1 = elInstance.getCell(("H").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                            var cell1 = elInstance.getCell(("J").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                            var cell1 = elInstance.getCell(("K").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                            var cell1 = elInstance.getCell(("L").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                            var cell1 = elInstance.getCell(("M").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                            var cell1 = elInstance.getCell(("N").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                            var cell1 = elInstance.getCell(("O").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                            var cell1 = elInstance.getCell(("U").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                        }
-                    } catch (err) {
-
-                    }
-
-                }
-            }.bind(this),
-            onfilter: function (el, terms, rowNumbers) {
-                var elInstance = el;
-                var json = elInstance.getJson();
-                let roleArray = this.state.roleArray;
-                var jsonLength;
-                jsonLength = json.length;
-                console.log("JsonLength", jsonLength)
-
-                for (var j = 0; j < jsonLength; j++) {
-                    try {
-                        var rowData = elInstance.getRowData(j);
-
-                        //left align
-                        elInstance.setStyle(`B${parseInt(j) + 1}`, 'text-align', 'left');
-                        var rowData = elInstance.getRowData(j);
-
-                        var typeId = rowData[6];
-                        var oneTimeUsage = rowData[10];
-
-                        // console.log("roleArray--------->1", j);
-                        // console.log("roleArray--------->2", elInstance);
-                        if (typeId == 2) {
-                            var cell1 = elInstance.getCell(("H").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                            var cell1 = elInstance.getCell(("K").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                        } else {
-                            var cell1 = elInstance.getCell(("H").concat(parseInt(j) + 1))
-                            cell1.classList.remove('readonly');
-                            var cell1 = elInstance.getCell(("K").concat(parseInt(j) + 1))
-                            cell1.classList.remove('readonly');
-                        }
-
-                        if (oneTimeUsage) {
-                            var cell1 = elInstance.getCell(("L").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                            var cell1 = elInstance.getCell(("M").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                        } else {
-                            var cell1 = elInstance.getCell(("L").concat(parseInt(j) + 1))
-                            cell1.classList.remove('readonly');
-                            var cell1 = elInstance.getCell(("M").concat(parseInt(j) + 1))
-                            cell1.classList.remove('readonly');
-                        }
-
-                        if (typeId == 1 && oneTimeUsage == false) {
-                            // elInstance.setValueFromCoords(19, y, 'for', true);
-                            var cell1 = elInstance.getCell(("N").concat(parseInt(j) + 1))
-                            cell1.classList.remove('readonly');
-                            var cell1 = elInstance.getCell(("O").concat(parseInt(j) + 1))
-                            cell1.classList.remove('readonly');
-                        } else {
-                            var cell1 = elInstance.getCell(("N").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                            var cell1 = elInstance.getCell(("O").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                        }
-
-
-                        var typeId = rowData[19];
-                        var userId = rowData[22];
-                        var curUser = AuthenticationService.getLoggedInUserId();
-                        // if ((roleArray.includes('ROLE_REALM_ADMIN') && typeId != -1 && typeId != 0) || (roleArray.includes('ROLE_DATASET_ADMIN') && typeId == -1 && typeId != 0)) {
-                        if ((roleArray.includes('ROLE_DATASET_ADMIN') && ((typeId == -1 && typeId != 0) || curUser != userId))) {
-                            var cell1 = elInstance.getCell(("B").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                            var cell1 = elInstance.getCell(("C").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                            var cell1 = elInstance.getCell(("D").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                            var cell1 = elInstance.getCell(("E").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                            var cell1 = elInstance.getCell(("F").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                            var cell1 = elInstance.getCell(("G").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                            var cell1 = elInstance.getCell(("H").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                            var cell1 = elInstance.getCell(("J").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                            var cell1 = elInstance.getCell(("K").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                            var cell1 = elInstance.getCell(("L").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                            var cell1 = elInstance.getCell(("M").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                            var cell1 = elInstance.getCell(("N").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                            var cell1 = elInstance.getCell(("O").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                            var cell1 = elInstance.getCell(("U").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-
-                        }
-
-                        if (!roleArray.includes('ROLE_REALM_ADMIN') && !roleArray.includes('ROLE_DATASET_ADMIN')) {
-                            var cell1 = elInstance.getCell(("B").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                            var cell1 = elInstance.getCell(("C").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                            var cell1 = elInstance.getCell(("D").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                            var cell1 = elInstance.getCell(("E").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                            var cell1 = elInstance.getCell(("F").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                            var cell1 = elInstance.getCell(("G").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                            var cell1 = elInstance.getCell(("H").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                            var cell1 = elInstance.getCell(("J").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                            var cell1 = elInstance.getCell(("K").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                            var cell1 = elInstance.getCell(("L").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                            var cell1 = elInstance.getCell(("M").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                            var cell1 = elInstance.getCell(("N").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                            var cell1 = elInstance.getCell(("O").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                            var cell1 = elInstance.getCell(("U").concat(parseInt(j) + 1))
-                            cell1.classList.add('readonly');
-                        }
-                    } catch (err) {
-
-                    }
-
-                }
-            }.bind(this),
             updateTable: function (el, cell, x, y, source, value, id) {
                 if (y != null) {
                     // var elInstance = el.jexcel;
@@ -1474,7 +1212,7 @@ class usageTemplate extends Component {
             parseFormulas: true,
             // onpaste: this.onPaste,
             onsearch: function (el) {
-                var elInstance = el.jexcel;
+                var elInstance = el;
                 var json = elInstance.getJson();
                 let roleArray = this.state.roleArray;
                 var jsonLength;
@@ -1537,7 +1275,7 @@ class usageTemplate extends Component {
                         var curUser = AuthenticationService.getLoggedInUserId();
                         // if ((roleArray.includes('ROLE_REALM_ADMIN') && typeId != -1 && typeId != 0) || (roleArray.includes('ROLE_DATASET_ADMIN') && typeId == -1 && typeId != 0)) {
                         // if ((roleArray.includes('ROLE_DATASET_ADMIN') && ((typeId == -1 && typeId != 0) || curUser != userId))) {
-                        if ((roleArray.includes('ROLE_DATASET_ADMIN') && ((typeId == -1 && typeId != 0))) || (roleArray.includes('ROLE_REALM_ADMIN') && ((typeId == -1 && typeId != 0) || curUser != userId))) {
+                        if ((roleArray.includes('ROLE_DATASET_ADMIN') && ((typeId == -1 && typeId != 0))) || (!roleArray.includes('ROLE_REALM_ADMIN') && ((typeId == -1 && typeId != 0) || curUser != userId))) {
 
                             var cell1 = elInstance.getCell(("B").concat(parseInt(j) + 1))
                             cell1.classList.add('readonly');
@@ -1615,7 +1353,7 @@ class usageTemplate extends Component {
                 }
             }.bind(this),
             onfilter: function (el) {
-                var elInstance = el.jexcel;
+                var elInstance = el;
                 var json = elInstance.getJson();
                 let roleArray = this.state.roleArray;
                 var jsonLength;
@@ -1678,7 +1416,7 @@ class usageTemplate extends Component {
                         var curUser = AuthenticationService.getLoggedInUserId();
                         // if ((roleArray.includes('ROLE_REALM_ADMIN') && typeId != -1 && typeId != 0) || (roleArray.includes('ROLE_DATASET_ADMIN') && typeId == -1 && typeId != 0)) {
                         // if ((roleArray.includes('ROLE_DATASET_ADMIN') && ((typeId == -1 && typeId != 0) || curUser != userId))) {
-                        if ((roleArray.includes('ROLE_DATASET_ADMIN') && ((typeId == -1 && typeId != 0))) || (roleArray.includes('ROLE_REALM_ADMIN') && ((typeId == -1 && typeId != 0) || curUser != userId))) {
+                        if ((roleArray.includes('ROLE_DATASET_ADMIN') && ((typeId == -1 && typeId != 0))) || (!roleArray.includes('ROLE_REALM_ADMIN') && ((typeId == -1 && typeId != 0) || curUser != userId))) {
 
                             var cell1 = elInstance.getCell(("B").concat(parseInt(j) + 1))
                             cell1.classList.add('readonly');
@@ -2993,7 +2731,7 @@ class usageTemplate extends Component {
 
             // if ((roleArray.includes('ROLE_REALM_ADMIN') && typeId != -1 && typeId != 0) || (roleArray.includes('ROLE_DATASET_ADMIN') && typeId == -1 && typeId != 0)) {
             // if ((roleArray.includes('ROLE_DATASET_ADMIN') && ((typeId == -1 && typeId != 0) || (roleArray.includes('ROLE_REALM_ADMIN') && typeId != -1 && typeId != 0)))) {
-            if ((roleArray.includes('ROLE_DATASET_ADMIN') && (typeId == -1 && typeId != 0)) || (roleArray.includes('ROLE_REALM_ADMIN') && (typeId == -1 && typeId != 0 || userId != ""))) {
+            if ((roleArray.includes('ROLE_DATASET_ADMIN') && (typeId == -1 && typeId != 0)) || (!roleArray.includes('ROLE_REALM_ADMIN') && (typeId == -1 && typeId != 0 || userId != ""))) {
 
                 // console.log("roleArrayinsideIf--------->onchangepage", roleArray, "---", userId);
 
@@ -3157,8 +2895,8 @@ class usageTemplate extends Component {
             var typeId = rowData[6];
             var oneTimeUsage = rowData[10];
 
-            console.log("roleArray--------->1", j);
-            console.log("roleArray--------->2", elInstance);
+            // console.log("roleArray--------->1", j);
+            // console.log("roleArray--------->2", elInstance);
             if (typeId == 2) {
                 var cell1 = elInstance.getCell(("H").concat(parseInt(j) + 1))
                 cell1.classList.add('readonly');
@@ -3202,7 +2940,7 @@ class usageTemplate extends Component {
             var curUser = AuthenticationService.getLoggedInUserId();
             // if ((roleArray.includes('ROLE_REALM_ADMIN') && typeId != -1 && typeId != 0) || (roleArray.includes('ROLE_DATASET_ADMIN') && typeId == -1 && typeId != 0)) {
             // if ((roleArray.includes('ROLE_DATASET_ADMIN') && ((typeId == -1 && typeId != 0) || curUser != userId))) {
-            if ((roleArray.includes('ROLE_DATASET_ADMIN') && ((typeId == -1 && typeId != 0))) || (roleArray.includes('ROLE_REALM_ADMIN') && ((typeId == -1 && typeId != 0) || curUser != userId))) {
+            if ((roleArray.includes('ROLE_DATASET_ADMIN') && ((typeId == -1 && typeId != 0))) || (!roleArray.includes('ROLE_REALM_ADMIN') && ((typeId == -1 && typeId != 0) || curUser != userId))) {
 
                 // console.log("roleArrayinsideIf--------->2", elInstance);
 
