@@ -2989,7 +2989,7 @@ class ForecastSummary extends Component {
                     db1 = e.target.result;
                     var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                     var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
-                    var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.datasetId);
+                    var datasetDetailsRequest = datasetDetailsTransaction.get(id);
                     datasetDetailsRequest.onsuccess = function (e) {         
                       var datasetDetailsRequestJson = datasetDetailsRequest.result;
                       datasetDetailsRequestJson.changed = 1;
