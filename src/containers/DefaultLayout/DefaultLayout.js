@@ -1807,7 +1807,7 @@ class DefaultLayout extends Component {
                             url: '/equivalancyUnit/listEquivalancyUnit',
                             icon: 'fa fa-exchange',
                             attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_EQUIVALENCY_UNIT_MAPPING') && this.state.activeTab == 1 ? false : true),
+                              hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_EQUIVALENCY_UNIT_MAPPING') ? false : true),
                               onClick: e => {
                                 this.refreshPage();
                               }
