@@ -532,6 +532,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             data = [];
             data[0] = monthArrayPart2[j];
             var consumptionData = actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayPart2[j]).format("YYYY-MM") && c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId);
+            var consumptionDataActual=consumptionData.filter(c=>moment(c.month).format("YYYY-MM")>=moment(startDateFromRangeValue1).format("YYYY-MM") && moment(c.month).format("YYYY-MM")<=moment(stopDateFromRangeValue1).format("YYYY-MM"));
             if (checkIfAnyMissingActualConsumption == false && consumptionData.length == 0 && moment(monthArrayPart2[j]).format("YYYY-MM") >= moment(actualStartDate).format("YYYY-MM") && moment(monthArrayPart2[j]).format("YYYY-MM") <= moment(actualStopDate).format("YYYY-MM")) {
                 checkIfAnyMissingActualConsumption = true;
             }
@@ -548,7 +549,7 @@ export default class ExtrapolateDataComponent extends React.Component {
 
             // var CI = this.state.CI;
             //var consumptionData = actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM") && c.planningUnit.id == this.state.planningUnitId);
-            data[1] = consumptionData.length > 0 ? consumptionData[0].puAmount : "";
+            data[1] = consumptionDataActual.length > 0 ? consumptionDataActual[0].puAmount : "";
             consumptionDataArr.push(consumptionData.length > 0 ? consumptionData[0].puAmount : null);
             data[2] = movingAvgDataFilter.length > 0 && movingAvgDataFilter[0].forecast != null ? movingAvgDataFilter[0].forecast.toFixed(2) : '';
             data[3] = semiAvgDataFilter.length > 0 && semiAvgDataFilter[0].forecast != null ? semiAvgDataFilter[0].forecast.toFixed(2) : '';
@@ -1350,7 +1351,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                         db1 = e.target.result;
                         var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                         var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
-                        var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.datasetId);
+                        var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.forecastProgramId);
                         datasetDetailsRequest.onsuccess = function (e) {         
                           var datasetDetailsRequestJson = datasetDetailsRequest.result;
                           datasetDetailsRequestJson.changed = 1;
