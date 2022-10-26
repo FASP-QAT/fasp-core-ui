@@ -621,6 +621,9 @@ export default class CommitTreeComponent extends React.Component {
                                             var nodeDataModelingListUpdated=[];
                                             for(var nml=0;nml<nodeDataModelingList.length;nml++){
                                                 if(nodeDataModelingList[nml].dataValue!=="" && nodeDataModelingList[nml].dataValue!=="NaN" && nodeDataModelingList[nml].dataValue!==undefined && nodeDataModelingList[nml].increaseDecrease!==""){
+                                                    if(nodeDataModelingList[nml].transferNodeDataId=="null" || nodeDataModelingList[nml].transferNodeDataId===""){
+                                                        nodeDataModelingList[nml].transferNodeDataId=null;
+                                                    }
                                                     nodeDataModelingListUpdated.push(nodeDataModelingList[nml]);
                                                 }
                                             }
