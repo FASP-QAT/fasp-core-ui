@@ -129,6 +129,9 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
     }
 
     componentDidMount() {
+        
+        document.getElementById("adjustmentsTableDiv").closest('.card').classList.add("removeCardwrap");
+
     }
 
     showInventoryData() {
