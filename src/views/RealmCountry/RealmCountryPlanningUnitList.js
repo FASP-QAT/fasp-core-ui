@@ -825,13 +825,17 @@ export default class RealmCountryPlanningUnitList extends Component {
                 if (realmCountryPlanningUnitId == 0) {
                     var cell = elInstance.getCell(`B${parseInt(y) + 1}`)
                     var cellA = elInstance.getCell(`A${parseInt(y) + 1}`)
+                    var cellF = elInstance.getCell(`F${parseInt(y) + 1}`)
                     cell.classList.remove('readonly');
                     cellA.classList.remove('readonly');
+                    cellF.classList.remove('readonly');
                 } else {
                     var cell = elInstance.getCell(`B${parseInt(y) + 1}`)
                     var cellA = elInstance.getCell(`A${parseInt(y) + 1}`)
+                    var cellF = elInstance.getCell(`F${parseInt(y) + 1}`)
                     cell.classList.add('readonly');
                     cellA.classList.add('readonly');
+                    cellF.classList.add('readonly');
                 }
 
             },
