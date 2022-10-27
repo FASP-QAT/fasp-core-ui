@@ -425,28 +425,28 @@ export default class CompareVersionTableCompareVersion extends Component {
         // }
         // for (var r = 0; r < regionList2.length; r++) {
         columns.push({
-            title: 'A',
-            type: 'text',
-            visible: false
-            // title: i18n.t('static.compareVersion.selectedForecast')
+            // title: 'A',
+            // type: 'text',
+            // visible: false
+            title: i18n.t('static.compareVersion.selectedForecast')
             , width: 200,
-            // type: 'hidden'
+            type: 'hidden'
         })
         columns.push({
-            // title: i18n.t('static.compareVersion.forecastQty'), 
+            title: i18n.t('static.compareVersion.forecastQty'), 
             width: 120,
-            // type: 'hidden' 
-            title: 'A',
-            type: 'text',
-            visible: false
+            type: 'hidden' 
+            // title: 'A',
+            // type: 'text',
+            // visible: false
         })
         columns.push({
-            // title: i18n.t('static.program.notes'), 
+            title: i18n.t('static.program.notes'), 
             width: 210,
-            title: 'A',
-            type: 'text',
-            visible: false
-            // type: 'hidden'
+            // title: 'A',
+            // type: 'text',
+            // visible: false
+            type: 'hidden'
         })
         // }
 

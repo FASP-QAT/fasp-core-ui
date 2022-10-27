@@ -315,10 +315,10 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         }
         data[monthArray.length + 1] = multiplier;
         columns.push({
-          // type: 'hidden', title: 'Multiplier'
-          title: 'A',
-          type: 'text',
-          visible: false
+          type: 'hidden', title: 'Multiplier'
+          // title: 'A',
+          // type: 'text',
+          // visible: false
         })
         dataArray.push(data)
         data = [];
@@ -3412,10 +3412,10 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         { title: i18n.t('static.dataentry.conversionToFu'), type: 'numeric', mask: '#,##.00', decimal: '.', textEditor: true },//3 D
         { title: i18n.t('static.dataentry.conversionToPu'), type: 'numeric', decimal: '.', readOnly: true },//4 E
         {
-          // title: 'Conversion Type', type: 'hidden' 
-          title: 'A',
-          type: 'text',
-          visible: false
+          title: 'Conversion Type', type: 'hidden' 
+          // title: 'A',
+          // type: 'text',
+          // visible: false
         }//5 F
       ],
       // text: {

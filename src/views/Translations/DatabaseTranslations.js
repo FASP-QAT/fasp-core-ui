@@ -59,10 +59,10 @@ export default class DatabaseTranslations extends React.Component {
                 }
                 var colHeadersArray = [];
                 colHeadersArray.push({
-                    // type: 'hidden', title: `${i18n.t('static.translation.labelId')}`
-                    title: 'A',
-                    type: 'text',
-                    visible: false
+                    type: 'hidden', title: `${i18n.t('static.translation.labelId')}`
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                 })
                 colHeadersArray.push({ type: 'text', title: `${i18n.t('static.translation.labelFor')}` })
                 colHeadersArray.push({ type: 'text', title: `${i18n.t('static.databaseTranslations.relatedTo')}` })

@@ -588,105 +588,105 @@ export default class ExtrapolateDataComponent extends React.Component {
                     },
                     {
                         title: i18n.t('static.extrapolation.movingAverages'),
-                        type: this.state.movingAvgId ? 'numeric' : 'text',
-                        visible: this.state.movingAvgId ? true : false,
+                        type: this.state.movingAvgId ? 'numeric' : 'hidden',
+                        // visible: this.state.movingAvgId ? true : false,
                         mask: '#,##.00', decimal: '.'
                     },
                     {
                         title: i18n.t('static.extrapolation.semiAverages'),
-                        type: this.state.semiAvgId ? 'numeric' : 'text',
-                        visible: this.state.semiAvgId ? true : false,
+                        type: this.state.semiAvgId ? 'numeric' : 'hidden',
+                        // visible: this.state.semiAvgId ? true : false,
                         mask: '#,##.00', decimal: '.'
                     },
                     {
                         title: i18n.t('static.extrapolation.linearRegression'),
-                        type: this.state.linearRegressionId ? 'numeric' : 'text',
-                        visible: this.state.linearRegressionId ? true : false,
+                        type: this.state.linearRegressionId ? 'numeric' : 'hidden',
+                        // visible: this.state.linearRegressionId ? true : false,
                         mask: '#,##.00', decimal: '.'
                     },
                     {
-                        // title: i18n.t('static.extrapolation.tesLower'),
-                        // type: 'hidden',
+                        title: i18n.t('static.extrapolation.tesLower'),
+                        type: 'hidden',
                         // mask: '#,##.00', decimal: '.'
-                        title: 'A',
-                        type: 'text',
-                        visible: false
+                        // title: 'A',
+                        // type: 'text',
+                        // visible: false
                     },
                     {
                         title: i18n.t('static.extrapolation.tes'),
-                        type: this.state.smoothingId ? 'numeric' : 'text',
-                        visible: this.state.smoothingId ? true : false,
+                        type: this.state.smoothingId ? 'numeric' : 'hidden',
+                        // visible: this.state.smoothingId ? true : false,
                         mask: '#,##.00', decimal: '.'
                     },
                     {
-                        // title: i18n.t('static.extrapolation.tesUpper'),
-                        // type: 'hidden',
+                        title: i18n.t('static.extrapolation.tesUpper'),
+                        type: 'hidden',
                         // mask: '#,##.00', decimal: '.'
-                        title: 'A',
-                        type: 'text',
-                        visible: false
+                        // title: 'A',
+                        // type: 'text',
+                        // visible: false
                     },
                     {
                         title: i18n.t('static.extrapolation.arima'),
-                        type: this.state.arimaId ? 'numeric' : 'text',
-                        visible: this.state.arimaId ? true : false,
+                        type: this.state.arimaId ? 'numeric' : 'hidden',
+                        // visible: this.state.arimaId ? true : false,
                         mask: '#,##.00', decimal: '.'
                     },
                     {
-                        // title: i18n.t('static.extrapolation.linearRegression') + " L",
-                        // type: 'hidden',
+                        title: i18n.t('static.extrapolation.linearRegression') + " L",
+                        type: 'hidden',
                         // mask: '#,##.00', decimal: '.'
-                        title: 'A',
-                        type: 'text',
-                        visible: false
+                        // title: 'A',
+                        // type: 'text',
+                        // visible: false
                     },
                     {
-                        // title: i18n.t('static.extrapolation.linearRegression') + " H",
-                        // type: 'hidden',
+                        title: i18n.t('static.extrapolation.linearRegression') + " H",
+                        type: 'hidden',
                         // mask: '#,##.00', decimal: '.'
-                        title: 'A',
-                        type: 'text',
-                        visible: false
+                        // title: 'A',
+                        // type: 'text',
+                        // visible: false
                     },
                     {
-                        // title: i18n.t('static.extrapolation.arima') + " L",
-                        // type: 'hidden',
+                        title: i18n.t('static.extrapolation.arima') + " L",
+                        type: 'hidden',
                         // mask: '#,##.00', decimal: '.'
-                        title: 'A',
-                        type: 'text',
-                        visible: false
+                        // title: 'A',
+                        // type: 'text',
+                        // visible: false
                     },
                     {
-                        // title: i18n.t('static.extrapolation.arima') + " H",
-                        // type: 'hidden',
+                        title: i18n.t('static.extrapolation.arima') + " H",
+                        type: 'hidden',
                         // mask: '#,##.00', decimal: '.'
-                        title: 'A',
-                        type: 'text',
-                        visible: false
+                        // title: 'A',
+                        // type: 'text',
+                        // visible: false
                     },
                     {
-                        // title: i18n.t('static.extrapolation.linearRegression') + " CI",
-                        // type: 'hidden',
+                        title: i18n.t('static.extrapolation.linearRegression') + " CI",
+                        type: 'hidden',
                         // mask: '#,##.00', decimal: '.'
-                        title: 'A',
-                        type: 'text',
-                        visible: false
+                        // title: 'A',
+                        // type: 'text',
+                        // visible: false
                     },
                     {
-                        // title: i18n.t('static.extrapolation.tes') + " CI",
-                        // type: 'hidden',
+                        title: i18n.t('static.extrapolation.tes') + " CI",
+                        type: 'hidden',
                         // mask: '#,##.00', decimal: '.'
-                        title: 'A',
-                        type: 'text',
-                        visible: false
+                        // title: 'A',
+                        // type: 'text',
+                        // visible: false
                     },
                     {
-                        // title: i18n.t('static.extrapolation.arima') + " CI",
-                        // type: 'hidden',
+                        title: i18n.t('static.extrapolation.arima') + " CI",
+                        type: 'hidden',
                         // mask: '#,##.00', decimal: '.'
-                        title: 'A',
-                        type: 'text',
-                        visible: false
+                        // title: 'A',
+                        // type: 'text',
+                        // visible: false
                     },
                 ],
             // text: {

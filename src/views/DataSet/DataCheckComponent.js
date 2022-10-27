@@ -354,8 +354,8 @@ export function buildJxl1(props) {
             for (var nwp = 0; nwp < nodeWithPercentageChildren.length; nwp++) {
                 columnsArray.push({
                     title: getLabelText(nodeWithPercentageChildren[nwp].label, props.state.lang),
-                    type: nodeWithPercentageChildrenWithHundredCent[nwp] == 1 ? 'numeric' : 'text',
-                    visible: nodeWithPercentageChildrenWithHundredCent[nwp] == 1 ? true : false,
+                    type: nodeWithPercentageChildrenWithHundredCent[nwp] == 1 ? 'numeric' : 'hidden',
+                    // visible: nodeWithPercentageChildrenWithHundredCent[nwp] == 1 ? true : false,
                     mask: '#,##.00%', decimal: '.'
                     // readOnly: true
                 });
@@ -416,8 +416,8 @@ export function buildJxl(props) {
             for (var nwp = 0; nwp < nodeWithPercentageChildren.length; nwp++) {
                 columnsArray.push({
                     title: getLabelText(nodeWithPercentageChildren[nwp].label, props.state.lang),
-                    type: nodeWithPercentageChildrenWithHundredCent[nwp] == 1 ? 'numeric' : 'text',
-                    visible: nodeWithPercentageChildrenWithHundredCent[nwp] == 1 ? true : false,
+                    type: nodeWithPercentageChildrenWithHundredCent[nwp] == 1 ? 'numeric' : 'hidden',
+                    // visible: nodeWithPercentageChildrenWithHundredCent[nwp] == 1 ? true : false,
                     mask: '#,##.00%', decimal: '.'
                     // readOnly: true
                 });

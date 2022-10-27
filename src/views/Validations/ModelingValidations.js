@@ -516,13 +516,13 @@ class ModelingValidation extends Component {
             columns.push({ title: i18n.t('static.inventoryDate.inventoryReport'), type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' } });
             var nodeVal = [...new Set(this.state.nodeVal.map(ele => (ele.label)))];
             for (var k = 0; k < nodeVal.length; k++) {
-                columns.push({ title: nodeVal[k], type: displayBy == 1 ? 'numeric' : 'text', visible: displayBy == 1 ? true : false, mask: displayBy == 1 ? '#,##.00' : '#,##.00 %', decimal: '.' });
+                columns.push({ title: nodeVal[k], type: displayBy == 1 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,##.00 %', decimal: '.' });
             }
-            columns.push({ title: i18n.t('static.supplyPlan.total'), type: displayBy == 1 ? 'numeric' : 'text', visible: displayBy == 1 ? true : false, mask: displayBy == 1 ? '#,##.00' : '#,## %' });
+            columns.push({ title: i18n.t('static.supplyPlan.total'), type: displayBy == 1 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,## %' });
             for (var k = 0; k < nodeVal.length; k++) {
-                columns.push({ title: nodeVal[k], type: displayBy == 2 ? 'numeric' : 'text', visible: displayBy == 2 ? true : false, mask: displayBy == 1 ? '#,##.00' : '#,##.00 %', decimal: '.' });
+                columns.push({ title: nodeVal[k], type: displayBy == 2 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,##.00 %', decimal: '.' });
             }
-            columns.push({ title: i18n.t('static.supplyPlan.total'), type: displayBy == 2 ? 'numeric' : 'text', visible: displayBy == 2 ? true : false, mask: displayBy == 1 ? '#,##.00' : '#,## %' });
+            columns.push({ title: i18n.t('static.supplyPlan.total'), type: displayBy == 2 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,## %' });
             var data = [];
             var dataArr = [];
             var nodeVal = [...new Set(this.state.nodeVal.map(ele => (ele.label)))];
@@ -1139,13 +1139,13 @@ class ModelingValidation extends Component {
         }
         doc.addImage(canvasImg, 'png', 50, startYtable, 750, 260, 'CANVAS');
         var columns = [];
-        this.state.columns.filter(c => c.visible != false).map((item, idx) => { columns.push(item.title) });
+        this.state.columns.filter(c => c.type != 'hidden').map((item, idx) => { columns.push(item.title) });
         var dataArr = [];
         var dataArr1 = [];
         this.state.dataEl.getJson(null, false).map(ele => {
             dataArr = [];
             this.state.columns.map((item, idx) => {
-                if (item.visible != false) {
+                if (item.type != 'hidden') {
                     if (item.type == 'numeric') {
                         if (item.mask != undefined && item.mask.toString().includes("%")) {
                             dataArr.push(this.formatter(ele[idx]) + " %");
@@ -1234,14 +1234,14 @@ class ModelingValidation extends Component {
         // columns.push(i18n.t('static.common.product') + " " + i18n.t('static.common.text'));
         // columns.push(i18n.t('static.productValidation.cost'));
         const headers = [];
-        this.state.columns.filter(c => c.visible != false).map((item, idx) => { headers[idx] = (item.title).replaceAll(' ', '%20').replaceAll('#', '%23') });
+        this.state.columns.filter(c => c.type != 'hidden').map((item, idx) => { headers[idx] = (item.title).replaceAll(' ', '%20').replaceAll('#', '%23') });
 
         var A = [this.addDoubleQuoteToRowContent(headers)];
         var B = []
         this.state.dataEl.getJson(null, false).map(ele => {
             B = [];
             this.state.columns.map((item, idx) => {
-                if (item.visible != false) {
+                if (item.type != 'hidden') {
                     if (item.mask != undefined && item.mask.toString().includes("%")) {
                         B.push((ele[idx] + (" %")).toString().replaceAll(',', ' ').replaceAll(' ', '%20').replaceAll(' ', '%20'));
                     } else if (item.type == 'calendar') {

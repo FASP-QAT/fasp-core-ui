@@ -3923,45 +3923,45 @@ class EditSupplyPlanStatus extends Component {
             // colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    // title: 'problemReportId',
-                    // type: 'hidden',
-                    title: 'A',
-                    type: 'text',
-                    visible: false,
+                    title: 'problemReportId',
+                    type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false,
                     width: 0
                 },
                 {
-                    // title: 'problemActionIndex',
-                    // type: 'hidden',
-                    title: 'A',
-                    type: 'text',
-                    visible: false,
+                    title: 'problemActionIndex',
+                    type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false,
                     width: 0
                 },
                 {
-                    // title: i18n.t('static.program.programCode'),
-                    // type: 'hidden',
-                    title: 'A',
-                    type: 'text',
-                    visible: false,
+                    title: i18n.t('static.program.programCode'),
+                    type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false,
                     width: 0
                     // readOnly:true
                 },
                 {
-                    // title: i18n.t('static.program.versionId'),
-                    // type: 'hidden',
-                    title: 'A',
-                    type: 'text',
-                    visible: false,
+                    title: i18n.t('static.program.versionId'),
+                    type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false,
                     readOnly: true,
                     width: 70
                 },
                 {
-                    // title: i18n.t('static.region.region'),
-                    // type: 'hidden',
-                    title: 'A',
-                    type: 'text',
-                    visible: false,
+                    title: i18n.t('static.region.region'),
+                    type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false,
                     width: 0
                 },
                 {
@@ -3971,11 +3971,11 @@ class EditSupplyPlanStatus extends Component {
                     width: 120
                 },
                 {
-                    // title: i18n.t('static.report.month'),
-                    // type: 'hidden',
-                    title: 'A',
-                    type: 'text',
-                    visible: false,
+                    title: i18n.t('static.report.month'),
+                    type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false,
                     width: 0
                 },
                 {
@@ -4011,43 +4011,43 @@ class EditSupplyPlanStatus extends Component {
                     width: 120
                 },
                 {
-                    // title: i18n.t('static.common.action'),
-                    // type: 'hidden',
-                    title: 'A',
-                    type: 'text',
-                    visible: false,
+                    title: i18n.t('static.common.action'),
+                    type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false,
                     width: 0
                 },
                 {
-                    // title: 'planningUnitId',
-                    // type: 'hidden',
-                    title: 'A',
-                    type: 'text',
-                    visible: false,
+                    title: 'planningUnitId',
+                    type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false,
                     width: 0
                 },
                 {
-                    // title: 'problemId',
-                    // type: 'hidden',
-                    title: 'A',
-                    type: 'text',
-                    visible: false,
+                    title: 'problemId',
+                    type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false,
                     width: 0
                 },
                 {
-                    // title: 'actionUrl',
-                    // type: 'hidden',
-                    title: 'A',
-                    type: 'text',
-                    visible: false,
+                    title: 'actionUrl',
+                    type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false,
                     width: 0
                 },
                 {
-                    // title: 'criticalitiId',
-                    // type: 'hidden',
-                    title: 'A',
-                    type: 'text',
-                    visible: false,
+                    title: 'criticalitiId',
+                    type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false,
                     width: 0
                 },
 
@@ -4080,25 +4080,25 @@ class EditSupplyPlanStatus extends Component {
                 },
                 {
                     title: i18n.t('static.supplyPlanReview.reviewNotes'),
-                    type: !this.state.editable ? 'text' : 'text',
-                    visible: !this.state.editable ? false : true,
+                    type: !this.state.editable ? 'hidden' : 'text',
+                    // visible: !this.state.editable ? false : true,
                     width: 120,
                 },
 
                 {
-                    // title: 'isChanged',
-                    // type: 'hidden',
-                    title: 'A',
-                    type: 'text',
-                    visible: false,
+                    title: 'isChanged',
+                    type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false,
                     width: 0
                 },
                 {
-                    // title: 'transList',
-                    // type: 'hidden',
-                    title: 'A',
-                    type: 'text',
-                    visible: false,
+                    title: 'transList',
+                    type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false,
                     width: 0
                 },
 

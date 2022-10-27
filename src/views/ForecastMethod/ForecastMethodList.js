@@ -151,12 +151,12 @@ class forecastMethod extends Component {
             columns: [
 
                 {
-                    // title: 'forecastMethodId',
-                    // type: 'hidden',
-                    // readOnly: true
-                    title: 'A',
-                    type: 'text',
-                    visible: false
+                    title: 'forecastMethodId',
+                    type: 'hidden',
+                    readOnly: true
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                 },
                 // {
                 //     title: i18n.t('static.product.realm'),
@@ -201,25 +201,25 @@ class forecastMethod extends Component {
                     readOnly: true
                 },
                 {
-                    // title: 'forecastMethodTypeId',
-                    // type: 'hidden'
-                    title: 'A',
-                    type: 'text',
-                    visible: false
+                    title: 'forecastMethodTypeId',
+                    type: 'hidden'
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                 },
                 {
-                    // title: 'isChange',
-                    // type: 'hidden'
-                    title: 'A',
-                    type: 'text',
-                    visible: false
+                    title: 'isChange',
+                    type: 'hidden'
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                 },
                 {
-                    // title: 'addNewRow',
-                    // type: 'hidden'
-                    title: 'A',
-                    type: 'text',
-                    visible: false
+                    title: 'addNewRow',
+                    type: 'hidden'
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                 }
 
 

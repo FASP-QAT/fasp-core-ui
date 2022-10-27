@@ -1833,36 +1833,36 @@ export default class TreeExtrapolationComponent extends React.Component {
                 },
                 {
                     title: 'Moving Averages',
-                    type: this.state.movingAvgId ? 'number' : 'text',
-                    visible: this.state.movingAvgId ? true : false,
+                    type: this.state.movingAvgId ? 'number' : 'hidden',
+                    // visible: this.state.movingAvgId ? true : false,
                     mask: '#,##0.0000',
                     readOnly: true
                 },
                 {
                     title: 'Semi-Averages',
-                    type: this.state.semiAvgId ? 'number' : 'text',
-                    visible: this.state.semiAvgId ? true : false,
+                    type: this.state.semiAvgId ? 'number' : 'hidden',
+                    // visible: this.state.semiAvgId ? true : false,
                     mask: '#,##0.0000',
                     readOnly: true
                 },
                 {
                     title: 'Linear Regression',
-                    type: this.state.linearRegressionId ? 'number' : 'text',
-                    visible: this.state.linearRegressionId ? true : false,
+                    type: this.state.linearRegressionId ? 'number' : 'hidden',
+                    // visible: this.state.linearRegressionId ? true : false,
                     mask: '#,##0.0000',
                     readOnly: true
                 },
                 {
                     title: 'TES',
-                    type: this.state.smoothingId ? 'number' : 'text',
-                    visible: this.state.smoothingId ? true : false,
+                    type: this.state.smoothingId ? 'number' : 'hidden',
+                    // visible: this.state.smoothingId ? true : false,
                     mask: '#,##0.0000',
                     readOnly: true
                 },
                 {
                     title: 'ARIMA',
-                    type: this.state.arimaId ? 'number' : 'text',
-                    visible: this.state.arimaId ? true : false,
+                    type: this.state.arimaId ? 'number' : 'hidden',
+                    // visible: this.state.arimaId ? true : false,
                     mask: '#,##0.0000',
                     readOnly: true
                 },
@@ -1894,60 +1894,60 @@ export default class TreeExtrapolationComponent extends React.Component {
                     readOnly: true
                 },
                 {
-                    // title: 'manualChangeAffectsFutureMonth',
-                    // type: 'hidden'
-                    title: 'A',
-                    type: 'text',
-                    visible: false
+                    title: 'manualChangeAffectsFutureMonth',
+                    type: 'hidden'
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                 },
                 {
-                    // title: 'extrapolationMethodId',
-                    // type: 'hidden'
-                    title: 'A',
-                    type: 'text',
-                    visible: false
+                    title: 'extrapolationMethodId',
+                    type: 'hidden'
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                 },
                 {
-                    // title: 'tesLower',
-                    // type: 'hidden'
-                    title: 'A',
-                    type: 'text',
-                    visible: false
+                    title: 'tesLower',
+                    type: 'hidden'
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                 },
                 {
-                    // title: 'tesUpper',
-                    // type: 'hidden'
-                    title: 'A',
-                    type: 'text',
-                    visible: false
+                    title: 'tesUpper',
+                    type: 'hidden'
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                 },
                 {
-                    // title: 'arimaLower',
-                    // type: 'hidden'
-                    title: 'A',
-                    type: 'text',
-                    visible: false
+                    title: 'arimaLower',
+                    type: 'hidden'
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                 },
                 {
-                    // title: 'arimaUpper',
-                    // type: 'hidden'
-                    title: 'A',
-                    type: 'text',
-                    visible: false
+                    title: 'arimaUpper',
+                    type: 'hidden'
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                 },
                 {
-                    // title: 'lrLower',
-                    // type: 'hidden'
-                    title: 'A',
-                    type: 'text',
-                    visible: false
+                    title: 'lrLower',
+                    type: 'hidden'
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                 },
                 {
-                    // title: 'lrUpper',
-                    // type: 'hidden'
-                    title: 'A',
-                    type: 'text',
-                    visible: false
+                    title: 'lrUpper',
+                    type: 'hidden'
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                 },
                 // {
                 //     title: 'cumulativeManualChange',

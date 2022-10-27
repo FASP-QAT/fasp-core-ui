@@ -298,11 +298,11 @@ export default class StepTwoImportMapPlanningUnits extends Component {
             colWidths: [100, 100, 100, 100, 100],
             columns: [
                 {
-                    // title: "Forecast Region(s) id",
-                    // type: 'hidden',
-                    title: 'A',
-                    type: 'text',
-                    visible: false,
+                    title: "Forecast Region(s) id",
+                    type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false,
                     readOnly: true,//0 A
                 },
                 {

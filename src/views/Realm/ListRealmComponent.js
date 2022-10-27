@@ -389,11 +389,11 @@ export default class ReactListComponent extends Component {
                             colHeaderClasses: ["Reqasterisk"],
                             columns: [
                                 {
-                                    // title: 'realmId',
-                                    // type: 'hidden',
-                                    title: 'A',
-                                    type: 'text',
-                                    visible: false
+                                    title: 'realmId',
+                                    type: 'hidden',
+                                    // title: 'A',
+                                    // type: 'text',
+                                    // visible: false
                                 },
                                 {
                                     title: i18n.t('static.realm.realmName'),

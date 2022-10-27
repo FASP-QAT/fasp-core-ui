@@ -500,11 +500,11 @@ export default class UnitListComponent extends Component {
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    // title: 'unitId',
-                    // type: 'hidden',
-                    title: 'A',
-                    type: 'text',
-                    visible: false,
+                    title: 'unitId',
+                    type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false,
                     readOnly: true
                 },
                 {
