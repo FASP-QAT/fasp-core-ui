@@ -1716,7 +1716,9 @@ export default class ManualTagging extends Component {
                 this.setState({
                     planningUnits: [],
                     planningUnitsBasedOnTracerCategory: [],
-                    notLinkedShipments: []
+                    notLinkedShipments: [],
+                    outputList:[],
+                    selectedShipment:[]
                 })
             }
         })
