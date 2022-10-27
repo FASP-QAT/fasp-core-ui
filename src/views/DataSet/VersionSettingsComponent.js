@@ -625,14 +625,20 @@ class VersionSettingsComponent extends Component {
                            db1 = e.target.result;
                            var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                            var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
-                           var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.datasetId);
-                           datasetDetailsRequest.onsuccess = function (e) {         
-                             var datasetDetailsRequestJson = datasetDetailsRequest.result;
-                             datasetDetailsRequestJson.changed = 1;
-                             var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
-                             datasetDetailsRequest1.onsuccess = function (event) {                               
-                                 }}
-   
+                           programs.forEach(program => {
+                            var datasetDetailsRequest = datasetDetailsTransaction.get(program.id);
+                            datasetDetailsRequest.onsuccess = function (e) {         
+                                var datasetDetailsRequestJson = datasetDetailsRequest.result;
+                                datasetDetailsRequestJson.changed = 1;
+                                var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+                                datasetDetailsRequest1.onsuccess = function (event) {                               
+                                    }}                         
+                            console.log("---hurrey---");
+                             })
+                        
+                           
+
+                           
                            this.setState({
                                loading: false,
                                message: i18n.t('static.mt.dataUpdateSuccess'),
