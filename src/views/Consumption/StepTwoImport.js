@@ -303,6 +303,9 @@ export default class StepTwoImportMapPlanningUnits extends Component {
                 {
                     title: 'id',
                     type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false,
                     readOnly: true
                 },
                 {

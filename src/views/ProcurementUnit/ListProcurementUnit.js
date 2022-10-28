@@ -437,6 +437,9 @@ export default class ListProcurementUnit extends Component {
         {
           title: 'procurementUnitId',
           type: 'hidden',
+          // title: 'A',
+          // type: 'text',
+          // visible: false
         },
         {
           title: i18n.t('static.procurementUnit.planningUnit'),
