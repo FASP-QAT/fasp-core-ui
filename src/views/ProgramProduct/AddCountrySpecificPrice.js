@@ -210,25 +210,25 @@ class CountrySpecificPrices extends Component {
                                             type: 'checkbox'
                                         },
                                         {
-                                            // title: 'programPlanningUnitId',
-                                            // type: 'hidden'
-                                            title: 'A',
-                                            type: 'text',
-                                            visible: false
+                                            title: 'programPlanningUnitId',
+                                            type: 'hidden'
+                                            // title: 'A',
+                                            // type: 'text',
+                                            // visible: false
                                         },
                                         {
-                                            // title: 'programPlanningUnitProcurementAgentId',
-                                            // type: 'hidden'
-                                            title: 'A',
-                                            type: 'text',
-                                            visible: false
+                                            title: 'programPlanningUnitProcurementAgentId',
+                                            type: 'hidden'
+                                            // title: 'A',
+                                            // type: 'text',
+                                            // visible: false
                                         },
                                         {
-                                            // title: 'isChange',
-                                            // type: 'hidden'
-                                            title: 'A',
-                                            type: 'text',
-                                            visible: false
+                                            title: 'isChange',
+                                            type: 'hidden'
+                                            // title: 'A',
+                                            // type: 'text',
+                                            // visible: false
                                         },
 
                                     ],

@@ -179,25 +179,25 @@ class RealmCountryRegion extends Component {
                                     type: 'checkbox'
                                 },
                                 {
-                                    // title: 'realmCountryId',
-                                    // type: 'hidden'
-                                    title: 'A',
-                                    type: 'text',
-                                    visible: false
+                                    title: 'realmCountryId',
+                                    type: 'hidden'
+                                    // title: 'A',
+                                    // type: 'text',
+                                    // visible: false
                                 },
                                 {
-                                    // title: 'regionId',
-                                    // type: 'hidden'
-                                    title: 'A',
-                                    type: 'text',
-                                    visible: false
+                                    title: 'regionId',
+                                    type: 'hidden'
+                                    // title: 'A',
+                                    // type: 'text',
+                                    // visible: false
                                 },
                                 {
-                                    // title: 'isChange',
-                                    // type: 'hidden'
-                                    title: 'A',
-                                    type: 'text',
-                                    visible: false
+                                    title: 'isChange',
+                                    type: 'hidden'
+                                    // title: 'A',
+                                    // type: 'text',
+                                    // visible: false
                                 }
 
                             ],

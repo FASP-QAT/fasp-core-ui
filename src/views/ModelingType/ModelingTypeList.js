@@ -111,11 +111,11 @@ class ScaleUpType extends Component {
             columns: [
 
                 {
-                    // title: 'scaleUpTypeId',
-                    // type: 'hidden',
-                    title: 'A',
-                    type: 'text',
-                    visible: false,
+                    title: 'scaleUpTypeId',
+                    type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false,
                     readOnly: true
                 },
                 {
@@ -141,18 +141,18 @@ class ScaleUpType extends Component {
                     readOnly: true
                 },
                 {
-                    // title: 'isChange',
-                    // type: 'hidden'
-                    title: 'A',
-                    type: 'text',
-                    visible: false
+                    title: 'isChange',
+                    type: 'hidden'
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                 },
                 {
-                    // title: 'addNewRow',
-                    // type: 'hidden'
-                    title: 'A',
-                    type: 'text',
-                    visible: false
+                    title: 'addNewRow',
+                    type: 'hidden'
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                 }
 
 

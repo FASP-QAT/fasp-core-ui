@@ -783,12 +783,12 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     readOnly: true//0 A
                 },
                 {
-                    // title: 'Supply Plan Planning Unit Id',
-                    // type: 'hidden',
-                    title: 'A',
-                    type: 'text',
-                    visible: false
-                    // readOnly: true//1 B
+                    title: 'Supply Plan Planning Unit Id',
+                    type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
+                    readOnly: true//1 B
                 },
                 {
                     title: i18n.t('static.importFromQATSupplyPlan.supplyPlanPlanningUnit'),
@@ -796,36 +796,36 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     readOnly: true,//2 C
                 },
                 {
-                    // title: 'multiplier',
-                    // type: 'hidden',
-                    title: 'A',
-                    type: 'text',
-                    visible: false
-                    // readOnly: true//3 D
+                    title: 'multiplier',
+                    type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
+                    readOnly: true//3 D
                 },
                 {
-                    // title: 'forecastingUnitId',
-                    // type: 'hidden',
-                    title: 'A',
-                    type: 'text',
-                    visible: false
-                    // readOnly: true//4 E
+                    title: 'forecastingUnitId',
+                    type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
+                    readOnly: true//4 E
                 },
                 {
-                    // title: 'tracerCategoryId',
-                    // type: 'hidden',
-                    title: 'A',
-                    type: 'text',
-                    visible: false
-                    // readOnly: true//5 F
+                    title: 'tracerCategoryId',
+                    type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
+                    readOnly: true//5 F
                 },
                 {
-                    // title: 'Forecast Planning Unit Id',
-                    // type: 'hidden',
-                    title: 'A',
-                    type: 'text',
-                    visible: false
-                    // readOnly: true//6 G
+                    title: 'Forecast Planning Unit Id',
+                    type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
+                    readOnly: true//6 G
                 },
                 {
                     title: i18n.t('static.importFromQATSupplyPlan.forecastPlanningUnit'),
@@ -834,12 +834,12 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     // filter: this.filterPlanningUnitBasedOnTracerCategory//7 H
                 },
                 {
-                    // title: 'ForecastMultiplier',
-                    // type: 'hidden',
-                    title: 'A',
-                    type: 'text',
-                    visible: false
-                    // readOnly: true//8 I
+                    title: 'ForecastMultiplier',
+                    type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
+                    readOnly: true//8 I
                 },
                 {
                     title: i18n.t('static.importFromQATSupplyPlan.conversionFactor'),
@@ -849,20 +849,20 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     textEditor: true,//9 J
                 },
                 {
-                    // title: 'Match',
-                    // type: 'hidden',
-                    title: 'A',
-                    type: 'text',
-                    visible: false
-                    // readOnly: true//10 K
+                    title: 'Match',
+                    type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
+                    readOnly: true//10 K
                 },
                 {
-                    // title: 'Supply plan Forcast unit id',
-                    // type: 'hidden',
-                    title: 'A',
-                    type: 'text',
-                    visible: false
-                    // readOnly: true//11 L
+                    title: 'Supply plan Forcast unit id',
+                    type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
+                    readOnly: true//11 L
                 }
 
 

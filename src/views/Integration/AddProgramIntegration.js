@@ -249,18 +249,18 @@ class ProgramIntegration extends Component {
                                                                 type: 'checkbox'
                                                             },
                                                             {
-                                                                // title: 'integrationProgramId',
-                                                                // type: 'hidden'
-                                                                title: 'A',
-                                                                type: 'text',
-                                                                visible: false
+                                                                title: 'integrationProgramId',
+                                                                type: 'hidden'
+                                                                // title: 'A',
+                                                                // type: 'text',
+                                                                // visible: false
                                                             },
                                                             {
-                                                                // title: 'isChange',
-                                                                // type: 'hidden',
-                                                                title: 'A',
-                                                                type: 'text',
-                                                                visible: false
+                                                                title: 'isChange',
+                                                                type: 'hidden',
+                                                                // title: 'A',
+                                                                // type: 'text',
+                                                                // visible: false
                                                             }
 
                                                         ],

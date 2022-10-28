@@ -884,25 +884,25 @@ export default class MapPlanningUnits extends Component {
                                             width: 120
                                         },
                                         {
-                                            // title: 'Min Mos',
-                                            // type: 'hidden'
-                                            title: 'A',
-                                            type: 'text',
-                                            visible: false
+                                            title: 'Min Mos',
+                                            type: 'hidden'
+                                            // title: 'A',
+                                            // type: 'text',
+                                            // visible: false
                                         },
                                         {
-                                            // title: 'Min Qty',
-                                            // type: 'hidden'
-                                            title: 'A',
-                                            type: 'text',
-                                            visible: false
+                                            title: 'Min Qty',
+                                            type: 'hidden'
+                                            // title: 'A',
+                                            // type: 'text',
+                                            // visible: false
                                         },
                                         {
-                                            // title: 'Lead Distribution Time',
-                                            // type: 'hidden'
-                                            title: 'A',
-                                            type: 'text',
-                                            visible: false
+                                            title: 'Lead Distribution Time',
+                                            type: 'hidden'
+                                            // title: 'A',
+                                            // type: 'text',
+                                            // visible: false
                                         },
 
                                     ],

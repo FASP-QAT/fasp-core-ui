@@ -272,12 +272,12 @@ class EquivalancyUnit extends Component {
             columns: [
 
                 {
-                    // title: 'equivalancyUnitId',
-                    // type: 'hidden',
-                    // readOnly: true
-                    title: 'A',
-                    type: 'text',
-                    visible: false
+                    title: 'equivalancyUnitId',
+                    type: 'hidden',
+                    readOnly: true
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                 },
                 {
                     title: i18n.t('static.program.healtharea'),
@@ -294,22 +294,22 @@ class EquivalancyUnit extends Component {
                 },
 
                 {
-                    // title: i18n.t('static.healtharea.realm'),
-                    // type: 'hidden',
-                    title: 'A',
-                    type: 'text',
-                    visible: false
+                    title: i18n.t('static.healtharea.realm'),
+                    type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                     // readOnly: true
                     // textEditor: true,
                 },
                 {
-                    // title: i18n.t('static.common.notes'),
-                    // type: 'hidden',
-                    title: 'A',
-                    type: 'text',
-                    visible: false,
+                    title: i18n.t('static.common.notes'),
+                    type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false,
                     // readOnly: true
-                    textEditor: true,
+                    // textEditor: true,
                 },
                 {
                     title: i18n.t('static.checkbox.active'),
@@ -328,18 +328,18 @@ class EquivalancyUnit extends Component {
                     readOnly: true
                 },
                 {
-                    // title: 'isChange',
-                    // type: 'hidden'
-                    title: 'A',
-                    type: 'text',
-                    visible: false
+                    title: 'isChange',
+                    type: 'hidden'
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                 },
                 {
-                    // title: 'addNewRow',
-                    // type: 'hidden'
-                    title: 'A',
-                    type: 'text',
-                    visible: false
+                    title: 'addNewRow',
+                    type: 'hidden'
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                 }
 
             ],
@@ -623,11 +623,11 @@ class EquivalancyUnit extends Component {
             columns: [
 
                 {
-                    // title: 'equivalancyUnitMappingId',
-                    // type: 'hidden',
-                    title: 'A',
-                    type: 'text',
-                    visible: false
+                    title: 'equivalancyUnitMappingId',
+                    type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                     // readOnly: true
                 },
                 {
@@ -704,39 +704,39 @@ class EquivalancyUnit extends Component {
                     readOnly: true
                 },
                 {
-                    // title: 'isChange',
-                    // type: 'hidden'
-                    title: 'A',
-                    type: 'text',
-                    visible: false
+                    title: 'isChange',
+                    type: 'hidden'
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                 },
                 {
-                    // title: 'forecastingUnitId',
-                    // type: 'hidden'
-                    title: 'A',
-                    type: 'text',
-                    visible: false
+                    title: 'forecastingUnitId',
+                    type: 'hidden'
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                 },
                 {
-                    // title: 'typeId',
-                    // type: 'hidden'
-                    title: 'A',
-                    type: 'text',
-                    visible: false
+                    title: 'typeId',
+                    type: 'hidden'
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                 },
                 {
-                    // title: 'addNewRow',
-                    // type: 'hidden'
-                    title: 'A',
-                    type: 'text',
-                    visible: false
+                    title: 'addNewRow',
+                    type: 'hidden'
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                 },
                 {
-                    // title: 'countVar',
-                    // type: 'hidden'
-                    title: 'A',
-                    type: 'text',
-                    visible: false
+                    title: 'countVar',
+                    type: 'hidden'
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                 }
 
             ],

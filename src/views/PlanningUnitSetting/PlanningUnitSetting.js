@@ -2193,51 +2193,51 @@ export default class PlanningUnitSetting extends Component {
                     // readOnly: true //8I
                 },
                 {
-                    // title: 'programPlanningUnitId',
-                    // type: 'hidden',
-                    title: 'A',
-                    type: 'text',
-                    visible: false
+                    title: 'programPlanningUnitId',
+                    type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                     // readOnly: true //9J
                 },
                 {
-                    // title: 'isChange',
-                    // type: 'hidden',
-                    title: 'A',
-                    type: 'text',
-                    visible: false
+                    title: 'isChange',
+                    type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                     // readOnly: true //10K
                 },
                 {
-                    // title: 'isNewRowAdded',
-                    // type: 'hidden',
-                    title: 'A',
-                    type: 'text',
-                    visible: false
+                    title: 'isNewRowAdded',
+                    type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                     // readOnly: true //11L
                 },
                 {
-                    // title: 'selected forecast map',
-                    // type: 'hidden',
-                    title: 'A',
-                    type: 'text',
-                    visible: false
+                    title: 'selected forecast map',
+                    type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                     // readOnly: true //12M
                 },
                 {
-                    // title: 'indexVar',
-                    // type: 'hidden',
-                    title: 'A',
-                    type: 'text',
-                    visible: false
+                    title: 'indexVar',
+                    type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                     // readOnly: true //13N
                 },
                 {
-                    // title: 'treeForecast',
-                    // type: 'hidden',
-                    title: 'A',
-                    type: 'text',
-                    visible: false
+                    title: 'treeForecast',
+                    type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                     // readOnly: true //14O
                 },
                 {
@@ -2252,11 +2252,11 @@ export default class PlanningUnitSetting extends Component {
                     // readOnly: true //16Q
                 },
                 {
-                    // title: 'active',
-                    // type: 'hidden',
-                    title: 'A',
-                    type: 'text',
-                    visible: false
+                    title: 'active',
+                    type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                     // readOnly: true //17R
                 },
             ],

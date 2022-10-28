@@ -632,11 +632,11 @@ class ProductValidation extends Component {
                         type: 'numeric', mask: '#,##.00', decimal: '.'
                     },
                     {
-                        // title: "IsTotal",
-                        // type: 'hidden'
-                        title: 'A',
-                        type: 'text',
-                        visible: false
+                        title: "IsTotal",
+                        type: 'hidden'
+                        // title: 'A',
+                        // type: 'text',
+                        // visible: false
                     },
                 ],
                 // text: {

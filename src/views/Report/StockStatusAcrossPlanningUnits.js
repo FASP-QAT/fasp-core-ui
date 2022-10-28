@@ -857,11 +857,11 @@ class StockStatusAcrossPlanningUnits extends Component {
                     width: 120
                 },
                 {
-                    // title: i18n.t('static.report.amc'),
-                    // type: 'hidden'
-                    title: 'A',
-                    type: 'text',
-                    visible: false
+                    title: i18n.t('static.report.amc'),
+                    type: 'hidden'
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                 },
             ],
             editable: false,

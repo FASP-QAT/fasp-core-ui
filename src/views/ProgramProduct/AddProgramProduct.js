@@ -472,11 +472,11 @@ class AddprogramPlanningUnit extends Component {
                                                                     width: 120
                                                                 },
                                                                 {
-                                                                    // title: 'Id',
-                                                                    // type: 'hidden',
-                                                                    title: 'A',
-                                                                    type: 'text',
-                                                                    visible: false,
+                                                                    title: 'Id',
+                                                                    type: 'hidden',
+                                                                    // title: 'A',
+                                                                    // type: 'text',
+                                                                    // visible: false,
                                                                     readOnly: true
                                                                 },
                                                                 {
@@ -484,39 +484,39 @@ class AddprogramPlanningUnit extends Component {
                                                                     type: 'checkbox'
                                                                 },
                                                                 {
-                                                                    // title: 'Changed Flag',
-                                                                    // type: 'hidden'
-                                                                    title: 'A',
-                                                                    type: 'text',
-                                                                    visible: false
+                                                                    title: 'Changed Flag',
+                                                                    type: 'hidden'
+                                                                    // title: 'A',
+                                                                    // type: 'text',
+                                                                    // visible: false
                                                                 },
                                                                 {
-                                                                    // title: 'ProgramId',
-                                                                    // type: 'hidden'
-                                                                    title: 'A',
-                                                                    type: 'text',
-                                                                    visible: false
+                                                                    title: 'ProgramId',
+                                                                    type: 'hidden'
+                                                                    // title: 'A',
+                                                                    // type: 'text',
+                                                                    // visible: false
                                                                 },
                                                                 {
-                                                                    // title: 'Min Mos',
-                                                                    // type: 'hidden'
-                                                                    title: 'A',
-                                                                    type: 'text',
-                                                                    visible: false
+                                                                    title: 'Min Mos',
+                                                                    type: 'hidden'
+                                                                    // title: 'A',
+                                                                    // type: 'text',
+                                                                    // visible: false
                                                                 },
                                                                 {
-                                                                    // title: 'Min Qty',
-                                                                    // type: 'hidden'
-                                                                    title: 'A',
-                                                                    type: 'text',
-                                                                    visible: false
+                                                                    title: 'Min Qty',
+                                                                    type: 'hidden'
+                                                                    // title: 'A',
+                                                                    // type: 'text',
+                                                                    // visible: false
                                                                 },
                                                                 {
-                                                                    // title: 'Distribution Lead Time',
-                                                                    // type: 'hidden'
-                                                                    title: 'A',
-                                                                    type: 'text',
-                                                                    visible: false
+                                                                    title: 'Distribution Lead Time',
+                                                                    type: 'hidden'
+                                                                    // title: 'A',
+                                                                    // type: 'text',
+                                                                    // visible: false
                                                                 }
 
 

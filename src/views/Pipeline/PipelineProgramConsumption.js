@@ -516,10 +516,10 @@ export default class PipelineProgramConsumption extends Component {
                                             },
 
                                             {
-                                                // title: 'Index', type: 'hidden'
-                                                title: 'A',
-                                                type: 'text',
-                                                visible: false
+                                                title: 'Index', type: 'hidden'
+                                                // title: 'A',
+                                                // type: 'text',
+                                                // visible: false
                                             },
                                             // { title: 'Last Modified date', type: 'text', readOnly: true },
                                             // { title: 'Last Modified by', type: 'text', readOnly: true }
