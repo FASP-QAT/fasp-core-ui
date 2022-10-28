@@ -232,27 +232,27 @@ class SupplyPlanVersionAndReview extends Component {
                     // readOnly: true
                 },
                 {
-                    // title: 'versionTypeId',
-                    // type: 'hidden',
-                    title: 'A',
-                    type: 'text',
-                    visible: false
+                    title: 'versionTypeId',
+                    type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                     // readOnly: true
                 },
                 {
-                    // title: 'versionStatusId',
-                    // type: 'hidden',
-                    title: 'A',
-                    type: 'text',
-                    visible: false
+                    title: 'versionStatusId',
+                    type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                     // readOnly: true
                 },
                 {
-                    // title: 'programId',
-                    // type: 'hidden',
-                    title: 'A',
-                    type: 'text',
-                    visible: false
+                    title: 'programId',
+                    type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
 
                 }
             ],
