@@ -414,6 +414,9 @@ export default class CurrencyListComponent extends Component {
                                 {
                                     title: 'currencyId',
                                     type: 'hidden',
+                                    // title: 'A',
+                                    // type: 'text',
+                                    // visible: false,
                                     readOnly: true
                                 },
                                 {
@@ -542,16 +545,18 @@ export default class CurrencyListComponent extends Component {
             });
         }
     }
-    selected = function (instance, cell, x, y, value) {
+    selected = function (instance, cell, x, y, value, e) {
+        if (e.buttons == 1) {
 
-        if ((x == 0 && value != 0) || (y == 0)) {
-            // console.log("HEADER SELECTION--------------------------");
-        } else {
-            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_CURRENCY')) {
-                this.props.history.push({
-                    pathname: `/currency/editCurrency/${this.el.getValueFromCoords(0, x)}`,
-                    // state: { currency: currency }
-                });
+            if ((x == 0 && value != 0) || (y == 0)) {
+                // console.log("HEADER SELECTION--------------------------");
+            } else {
+                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_CURRENCY')) {
+                    this.props.history.push({
+                        pathname: `/currency/editCurrency/${this.el.getValueFromCoords(0, x)}`,
+                        // state: { currency: currency }
+                    });
+                }
             }
         }
     }.bind(this);
@@ -609,8 +614,7 @@ export default class CurrencyListComponent extends Component {
                     <CardBody className="table-responsive pt-md-1 pb-md-1">
                         {/* <div id="loader" className="center"></div> */}
                         <div className='consumptionDataEntryTable'>
-                            <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_CURRENCY') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
-                            </div>
+                            <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_CURRENCY') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"}></div>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>
                             <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >

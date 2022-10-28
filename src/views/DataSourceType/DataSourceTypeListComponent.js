@@ -359,7 +359,8 @@ export default class DataSourceTypeListComponent extends Component {
             dataSourceList: [],
             message: '',
             selSource: [],
-            loading: true
+            loading: true,
+            lang: localStorage.getItem('lang')
         }
 
         this.editDataSourceType = this.editDataSourceType.bind(this);
@@ -442,11 +443,16 @@ export default class DataSourceTypeListComponent extends Component {
                 {
                     title: 'DataSourceTypeId',
                     type: 'hidden',
-                    // readOnly: true
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
+                    readOnly: true
                 },
                 {
                     title: i18n.t('static.realm.realm'),
                     type: (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN') ? 'text' : 'hidden'),
+                    // visible: (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN') ? true : false),
+
                     // readOnly: true
                 },
                 {

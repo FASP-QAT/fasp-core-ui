@@ -501,7 +501,7 @@ export default class ExportDataset extends Component {
                                             <Label
                                                 className="form-check-label"
                                                 check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                {'Do you want to encrypt data?'}
+                                                {i18n.t('static.common.encryptData')}
                                             </Label>
                                         </div>
                                     </FormGroup>

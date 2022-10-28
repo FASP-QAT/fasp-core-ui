@@ -211,6 +211,9 @@ export default class PipelineProgramProcurementAgent extends Component {
                                             }, {
                                                 title: i18n.t('static.inventory.procurementAgent'),
                                                 type: 'hidden',
+                                                // title: 'A',
+                                                // type: 'text',
+                                                // visible: false,
                                                 readonly: true
                                             }
                                         ],

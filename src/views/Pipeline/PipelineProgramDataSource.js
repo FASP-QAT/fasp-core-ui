@@ -295,6 +295,9 @@ export default class PipelineProgramDataSource extends Component {
                                                     }, {
                                                         title: i18n.t('static.inventory.dataSource'),
                                                         type: 'hidden',
+                                                        // title: 'A',
+                                                        // type: 'text',
+                                                        // visible: false,
                                                         readonly: true
                                                     }
                                                 ],

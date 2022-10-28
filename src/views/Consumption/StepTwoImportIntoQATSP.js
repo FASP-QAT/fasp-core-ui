@@ -272,15 +272,15 @@ export default class StepTwoImportMapPlanningUnits extends Component {
 
         this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
         // this.el.destroy();
-        jexcel.destroy(document.getElementById("mapPlanningUnit"),true);
+        jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
 
         this.el = jexcel(document.getElementById("mapRegion"), '');
         // this.el.destroy();
-        jexcel.destroy(document.getElementById("mapRegion"),true);
+        jexcel.destroy(document.getElementById("mapRegion"), true);
 
         this.el = jexcel(document.getElementById("mapImport"), '');
         // this.el.destroy();
-        jexcel.destroy(document.getElementById("mapImport"),true);
+        jexcel.destroy(document.getElementById("mapImport"), true);
 
         var json = [];
         var papuList11 = this.state.selSource2;
@@ -300,6 +300,9 @@ export default class StepTwoImportMapPlanningUnits extends Component {
                 {
                     title: "Forecast Region(s) id",
                     type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false,
                     readOnly: true,//0 A
                 },
                 {
