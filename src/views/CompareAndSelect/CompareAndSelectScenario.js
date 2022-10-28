@@ -224,12 +224,21 @@ class CompareAndSelectScenario extends Component {
                 var regionList = tree.regionList.filter(c => c.id == this.state.regionId);
                 var scenarioList = regionList.length > 0 ? treeList[tl].scenarioList : [];
                 for (var sl = 0; sl < scenarioList.length; sl++) {
-                    var flatList = tree.tree.flatList.filter(c => c.payload.nodeDataMap[scenarioList[sl].id][0].puNode != null && c.payload.nodeDataMap[scenarioList[sl].id][0].puNode.planningUnit.id == this.state.planningUnitId && (c.payload).nodeType.id == 5);
+                    try {
+                        var flatList = tree.tree.flatList.filter(c => c.payload.nodeDataMap[scenarioList[sl].id] != undefined && c.payload.nodeDataMap[scenarioList[sl].id][0].puNode != null && c.payload.nodeDataMap[scenarioList[sl].id][0].puNode.planningUnit.id == this.state.planningUnitId && (c.payload).nodeType.id == 5);
+                    } catch (err) {
+                        flatList = []
+                    }
                     if (colourArrayCount > 10) {
                         colourArrayCount = 0;
                     }
-                    var readonly = flatList.length > 0 ? false : true
-                    var dataForPlanningUnit = treeList[tl].tree.flatList.filter(c => (c.payload.nodeDataMap[scenarioList[sl].id])[0].puNode != null && (c.payload.nodeDataMap[scenarioList[sl].id])[0].puNode.planningUnit.id == this.state.planningUnitId && (c.payload).nodeType.id == 5);
+                    var readonly = flatList.length > 0 ? false : true;
+                    dataForPlanningUnit = [];
+                    try {
+                        var dataForPlanningUnit = treeList[tl].tree.flatList.filter(c => (c.payload.nodeDataMap[scenarioList[sl].id])[0].puNode != null && (c.payload.nodeDataMap[scenarioList[sl].id])[0].puNode.planningUnit.id == this.state.planningUnitId && (c.payload).nodeType.id == 5);
+                    } catch (err) {
+                        dataForPlanningUnit = []
+                    }
                     console.log("dataForPlanningUnit####", dataForPlanningUnit);
                     var data = [];
                     if (dataForPlanningUnit.length > 0) {
@@ -776,7 +785,7 @@ class CompareAndSelectScenario extends Component {
                 loading: false,
                 viewById: viewById == 3 && equivalencyUnit.length == 0 ? 1 : viewById,
                 equivalencyUnitList: equivalencyUnit,
-                changed:false
+                changed: false
             }, () => {
                 if (planningUnitId > 0) {
                     this.showData();
@@ -1588,7 +1597,7 @@ class CompareAndSelectScenario extends Component {
         localStorage.setItem("sesDatasetVersionId", versionIdSes);
         this.setState({
             datasetId: datasetId,
-            changed:false
+            changed: false
         }, () => {
             if (datasetId != "") {
                 console.log("in if for set@@@", this.state.datasetList);
@@ -1732,7 +1741,7 @@ class CompareAndSelectScenario extends Component {
         this.setState({
             regionId: event.target.value,
             regionName: regionName.length > 0 ? getLabelText(regionName[0].label, this.state.lang) : "",
-            changed:false
+            changed: false
         }, () => {
             if (regionId > 0) {
                 this.showData()
@@ -1902,12 +1911,13 @@ class CompareAndSelectScenario extends Component {
                     var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                     var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
                     var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.datasetId);
-                    datasetDetailsRequest.onsuccess = function (e) {         
-                      var datasetDetailsRequestJson = datasetDetailsRequest.result;
-                      datasetDetailsRequestJson.changed = 1;
-                      var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
-                      datasetDetailsRequest1.onsuccess = function (event) {
-                          }}
+                    datasetDetailsRequest.onsuccess = function (e) {
+                        var datasetDetailsRequestJson = datasetDetailsRequest.result;
+                        datasetDetailsRequestJson.changed = 1;
+                        var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+                        datasetDetailsRequest1.onsuccess = function (event) {
+                        }
+                    }
                     this.setState({
                         message: 'static.compareAndSelect.dataSaved',
                         changed: false,
@@ -2555,15 +2565,16 @@ class CompareAndSelectScenario extends Component {
                         <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
                     </ModalHeader>
                     <div>
-                    <ModalBody>
-                        <div dangerouslySetInnerHTML={ {__html:localStorage.getItem('lang') == 'en' ?
-                compareAndSelectScenarioEn :
-                localStorage.getItem('lang') == 'fr' ?
-                compareAndSelectScenarioFr :
-                  localStorage.getItem('lang') == 'sp' ?
-                  compareAndSelectScenarioSp :
-                  compareAndSelectScenarioPr
-              } } />
+                        <ModalBody>
+                            <div dangerouslySetInnerHTML={{
+                                __html: localStorage.getItem('lang') == 'en' ?
+                                    compareAndSelectScenarioEn :
+                                    localStorage.getItem('lang') == 'fr' ?
+                                        compareAndSelectScenarioFr :
+                                        localStorage.getItem('lang') == 'sp' ?
+                                            compareAndSelectScenarioSp :
+                                            compareAndSelectScenarioPr
+                            }} />
                             {/* <div>
                                 <h3 className='ShowGuidanceHeading'>{i18n.t('static.CompareSelect.CompareAndSelect')}</h3>
                             </div>

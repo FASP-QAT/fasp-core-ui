@@ -35,7 +35,8 @@ class UsagePeriod extends Component {
             message: '',
             selSource: [],
             loading: true,
-            isChanged: false
+            isChanged: false,
+            lang: localStorage.getItem('lang')
         }
         // this.setTextAndValue = this.setTextAndValue.bind(this);
         // this.disableRow = this.disableRow.bind(this);
@@ -115,6 +116,9 @@ class UsagePeriod extends Component {
                 {
                     title: 'usagePeriodId',
                     type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false,
                     readOnly: true
                 },
                 {
@@ -150,10 +154,16 @@ class UsagePeriod extends Component {
                 {
                     title: 'isChange',
                     type: 'hidden'
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                 },
                 {
                     title: 'addNewRow',
                     type: 'hidden'
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                 },
 
             ],
@@ -818,7 +828,7 @@ class UsagePeriod extends Component {
                                     <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                 }
                                 {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_USAGE_PERIOD') &&
-                                    <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>
+                                    <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}>{i18n.t('static.common.addRow')}</Button>
                                 }
                                 &nbsp;
                             </FormGroup>

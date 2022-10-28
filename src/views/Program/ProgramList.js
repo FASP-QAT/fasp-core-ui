@@ -514,6 +514,9 @@ export default class ProgramList extends Component {
         {
           title: 'programId',
           type: 'hidden',
+          // title: 'A',
+          // type: 'text',
+          // visible: false
         },
         {
           title: i18n.t('static.program.realm'),

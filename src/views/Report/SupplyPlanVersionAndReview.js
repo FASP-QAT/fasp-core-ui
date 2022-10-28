@@ -98,6 +98,7 @@ class SupplyPlanVersionAndReview extends Component {
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() + 1 },
             programId: -1,
+            lang: localStorage.getItem('lang')
 
         };
 
@@ -231,18 +232,27 @@ class SupplyPlanVersionAndReview extends Component {
                     // readOnly: true
                 },
                 {
-                    title: 'versionTypeId',
-                    type: 'hidden',
+                    // title: 'versionTypeId',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                     // readOnly: true
                 },
                 {
-                    title: 'versionStatusId',
-                    type: 'hidden',
+                    // title: 'versionStatusId',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                     // readOnly: true
                 },
                 {
-                    title: 'programId',
-                    type: 'hidden',
+                    // title: 'programId',
+                    // type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
 
                 }
             ],
@@ -280,44 +290,46 @@ class SupplyPlanVersionAndReview extends Component {
         })
     }
 
-    selected = function (instance, cell, x, y, value) {
+    selected = function (instance, cell, x, y, value, e) {
+        if (e.buttons == 1) {
 
-        if ((x == 0 && value != 0) || (y == 0)) {
-            // console.log("HEADER SELECTION--------------------------");
-        } else {
-            var hasRole = true;
-            // console.log("AuthenticationService.getLoggedInUserRole()====>", AuthenticationService.getLoggedInUserRole());
-            // AuthenticationService.getLoggedInUserRole().map(c => {
-            //     if (c.roleId == 'ROLE_SUPPLY_PLAN_REVIEWER') {
-            //         hasRole = true;
+            if ((x == 0 && value != 0) || (y == 0)) {
+                // console.log("HEADER SELECTION--------------------------");
+            } else {
+                var hasRole = true;
+                // console.log("AuthenticationService.getLoggedInUserRole()====>", AuthenticationService.getLoggedInUserRole());
+                // AuthenticationService.getLoggedInUserRole().map(c => {
+                //     if (c.roleId == 'ROLE_SUPPLY_PLAN_REVIEWER') {
+                //         hasRole = true;
 
-            //     }
-            // });
+                //     }
+                // });
 
-            if (hasRole) {
+                if (hasRole) {
 
 
-                // let countryId = document.getElementById("countryId").value;
-                // let versionStatusId = this.el.getValueFromCoords(5, x);
-                // let versionTypeId =this.el.getValueFromCoords(2, x);
+                    // let countryId = document.getElementById("countryId").value;
+                    // let versionStatusId = this.el.getValueFromCoords(5, x);
+                    // let versionTypeId =this.el.getValueFromCoords(2, x);
 
-                console.log("instance----->", instance.jexcel, "----------->", x);
-                var elInstance = instance;
-                var rowData = elInstance.getRowData(x);
-                console.log("rowData==>", rowData);
-                let programId = rowData[11];
-                let versionStatusId = rowData[10];
-                let versionTypeId = rowData[9];
-                // console.log("====>", versionStatusId, "====>", versionTypeId);
+                    console.log("instance----->", instance.jexcel, "----------->", x);
+                    var elInstance = instance;
+                    var rowData = elInstance.getRowData(x);
+                    console.log("rowData==>", rowData);
+                    let programId = rowData[11];
+                    let versionStatusId = rowData[10];
+                    let versionTypeId = rowData[9];
+                    // console.log("====>", versionStatusId, "====>", versionTypeId);
 
-                // if (versionStatusId == 1 && versionTypeId == 2) {
-                this.props.history.push({
-                    pathname: `/report/editStatus/${programId}/${this.el.getValueFromCoords(1, x)}`,
+                    // if (versionStatusId == 1 && versionTypeId == 2) {
+                    this.props.history.push({
+                        pathname: `/report/editStatus/${programId}/${this.el.getValueFromCoords(1, x)}`,
 
-                });
-                // }
+                    });
+                    // }
+                }
+
             }
-
         }
     }.bind(this);
 
@@ -1350,4 +1362,3 @@ class SupplyPlanVersionAndReview extends Component {
 
 
 export default SupplyPlanVersionAndReview
-

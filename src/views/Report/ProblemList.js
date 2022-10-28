@@ -650,22 +650,37 @@ export default class ConsumptionDetails extends React.Component {
                 {
                     title: 'problemReportId',
                     type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                 },
                 {
                     title: 'problemActionIndex',
                     type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                 },
                 {
                     title: i18n.t('static.program.programCode'),
                     type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                 },
                 {
                     title: i18n.t('static.program.versionId'),
                     type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                 },
                 {
                     title: i18n.t('static.region.region'),
                     type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                 },
                 {
                     title: i18n.t('static.planningunit.planningunit'),
@@ -675,6 +690,9 @@ export default class ConsumptionDetails extends React.Component {
                 {
                     title: i18n.t('static.report.month'),
                     type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                 },
                 // {
                 //     title: i18n.t('static.report.createdDate'),
@@ -711,23 +729,35 @@ export default class ConsumptionDetails extends React.Component {
                 {
                     title: i18n.t('static.common.action'),
                     type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                 },
                 {
                     title: 'planningUnitId',
                     type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                 },
                 {
                     title: 'problemId',
                     type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                 },
                 {
-                    title: 'actionUrl',
-                    type: 'hidden',
+                    // title: 'actionUrl',
+                    // type: 'hidden',
                 },
 
                 {
                     title: 'Problem Type',
                     type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                 },
                 {
                     title: i18n.t('static.supplyPlanReview.review'),
@@ -753,10 +783,16 @@ export default class ConsumptionDetails extends React.Component {
                 {
                     title: 'isChanged',
                     type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                 },
                 {
                     title: 'problemType',
                     type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                 },
             ],
             editable: !qplEditable,
@@ -1060,7 +1096,6 @@ export default class ConsumptionDetails extends React.Component {
 
     selected = function (instance, cell, x, y, value, e) {
         if (e.buttons == 1) {
-
             // console.log("y+++", y);
             if (y == 5 || y == 7 || y == 8 || y == 9) {
                 if ((x == 0 && value != 0) || (y == 0)) {
@@ -1075,6 +1110,8 @@ export default class ConsumptionDetails extends React.Component {
                                 var planningunitId = this.el.getValueFromCoords(13, x);
                                 var programId = document.getElementById('programId').value;
                                 var versionId = this.el.getValueFromCoords(3, x)
+                                console.log("onclick------>", this.el.getValueFromCoords(15, x), "==", programId, "===", versionId, "===", planningunitId);
+
                                 window.open(window.location.origin + `/#${this.el.getValueFromCoords(15, x)}/${programId}/${versionId}/${planningunitId}`);
                                 // let problemStatusId = document.getElementById('problemStatusId').value;
                                 // let problemTypeId = document.getElementById('problemTypeId').value;
@@ -1092,7 +1129,6 @@ export default class ConsumptionDetails extends React.Component {
                                 //     pathname: `/report/editProblem/${this.el.getValueFromCoords(0, x)}/${this.state.programId}/${index}/${problemStatusId}/${problemTypeId}`,
                                 // });
                             }
-
                         }
                     }
                 }
@@ -1830,7 +1866,7 @@ export default class ConsumptionDetails extends React.Component {
                             {this.state.showProblemDashboard == 1 && <ProblemListDashboard problemListUnFilttered={this.state.problemReportListUnFiltered} problemCategoryList={this.state.problemCategoryList} problemStatusList={this.state.problemStatusList} />}
 
                             {/* <div className="ProgramListSearch"> */}
-                            <div className='ProblemListTableBorder'>
+                            <div className='ProblemListTableBorder ProgramListSearchAlignment'>
                                 <div id="tableDiv" className='consumptionDataEntryTable' style={{ display: this.state.loading ? "none" : "block" }}>
                                 </div>
                             </div>

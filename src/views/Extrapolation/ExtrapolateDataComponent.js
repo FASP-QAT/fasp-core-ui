@@ -41,7 +41,6 @@ import ExtrapolationshowguidanceSp from '../../../src/ShowGuidanceFiles/Extrapol
 import ExtrapolationshowguidancePr from '../../../src/ShowGuidanceFiles/ExtrapolationPr.html'
 
 
-
 const entityname = i18n.t('static.dashboard.extrapolation');
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -590,72 +589,104 @@ export default class ExtrapolateDataComponent extends React.Component {
                     {
                         title: i18n.t('static.extrapolation.movingAverages'),
                         type: this.state.movingAvgId ? 'numeric' : 'hidden',
+                        // visible: this.state.movingAvgId ? true : false,
                         mask: '#,##.00', decimal: '.'
                     },
                     {
                         title: i18n.t('static.extrapolation.semiAverages'),
                         type: this.state.semiAvgId ? 'numeric' : 'hidden',
+                        // visible: this.state.semiAvgId ? true : false,
                         mask: '#,##.00', decimal: '.'
                     },
                     {
                         title: i18n.t('static.extrapolation.linearRegression'),
                         type: this.state.linearRegressionId ? 'numeric' : 'hidden',
+                        // visible: this.state.linearRegressionId ? true : false,
                         mask: '#,##.00', decimal: '.'
                     },
                     {
                         title: i18n.t('static.extrapolation.tesLower'),
                         type: 'hidden',
-                        mask: '#,##.00', decimal: '.'
+                        // mask: '#,##.00', decimal: '.'
+                        // title: 'A',
+                        // type: 'text',
+                        // visible: false
                     },
                     {
                         title: i18n.t('static.extrapolation.tes'),
                         type: this.state.smoothingId ? 'numeric' : 'hidden',
+                        // visible: this.state.smoothingId ? true : false,
                         mask: '#,##.00', decimal: '.'
                     },
                     {
                         title: i18n.t('static.extrapolation.tesUpper'),
                         type: 'hidden',
-                        mask: '#,##.00', decimal: '.'
+                        // mask: '#,##.00', decimal: '.'
+                        // title: 'A',
+                        // type: 'text',
+                        // visible: false
                     },
                     {
                         title: i18n.t('static.extrapolation.arima'),
                         type: this.state.arimaId ? 'numeric' : 'hidden',
+                        // visible: this.state.arimaId ? true : false,
                         mask: '#,##.00', decimal: '.'
                     },
                     {
                         title: i18n.t('static.extrapolation.linearRegression') + " L",
                         type: 'hidden',
-                        mask: '#,##.00', decimal: '.'
+                        // mask: '#,##.00', decimal: '.'
+                        // title: 'A',
+                        // type: 'text',
+                        // visible: false
                     },
                     {
                         title: i18n.t('static.extrapolation.linearRegression') + " H",
                         type: 'hidden',
-                        mask: '#,##.00', decimal: '.'
+                        // mask: '#,##.00', decimal: '.'
+                        // title: 'A',
+                        // type: 'text',
+                        // visible: false
                     },
                     {
                         title: i18n.t('static.extrapolation.arima') + " L",
                         type: 'hidden',
-                        mask: '#,##.00', decimal: '.'
+                        // mask: '#,##.00', decimal: '.'
+                        // title: 'A',
+                        // type: 'text',
+                        // visible: false
                     },
                     {
                         title: i18n.t('static.extrapolation.arima') + " H",
                         type: 'hidden',
-                        mask: '#,##.00', decimal: '.'
+                        // mask: '#,##.00', decimal: '.'
+                        // title: 'A',
+                        // type: 'text',
+                        // visible: false
                     },
                     {
                         title: i18n.t('static.extrapolation.linearRegression') + " CI",
                         type: 'hidden',
-                        mask: '#,##.00', decimal: '.'
+                        // mask: '#,##.00', decimal: '.'
+                        // title: 'A',
+                        // type: 'text',
+                        // visible: false
                     },
                     {
                         title: i18n.t('static.extrapolation.tes') + " CI",
                         type: 'hidden',
-                        mask: '#,##.00', decimal: '.'
+                        // mask: '#,##.00', decimal: '.'
+                        // title: 'A',
+                        // type: 'text',
+                        // visible: false
                     },
                     {
                         title: i18n.t('static.extrapolation.arima') + " CI",
                         type: 'hidden',
-                        mask: '#,##.00', decimal: '.'
+                        // mask: '#,##.00', decimal: '.'
+                        // title: 'A',
+                        // type: 'text',
+                        // visible: false
                     },
                 ],
             // text: {
@@ -1756,7 +1787,8 @@ export default class ExtrapolateDataComponent extends React.Component {
         if (this.state.planningUnitId > 0 && this.state.regionId > 0) {
 
             console.log("Inside if parameter", this.state.loading)
-            this.setState({ loading: true,
+            this.setState({
+                loading: true,
                 movingAvgData: [],
                 semiAvgData: [],
                 linearRegressionData: [],
@@ -3338,7 +3370,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                 </Picker>
                                             </div>
                                         </FormGroup>
-                                        <div className="MorginTopMonth">
+                                        <div className="MarginTopCustformonth">
                                             <Label>{this.state.monthsDiff} {i18n.t('static.report.month')}</Label>
                                         </div></>}
 
@@ -4040,9 +4072,9 @@ export default class ExtrapolateDataComponent extends React.Component {
                         <FormGroup>
                             <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                             {this.state.forecastProgramId != "" && this.state.planningUnitId > 0 && <button className="mr-1 float-right btn btn-info btn-md" onClick={this.toggledata}>{this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}</button>}
-                            {this.state.forecastProgramId != "" && this.state.planningUnitId > 0 &&  <> <Button type="button" id="dataCheck" size="md" color="info" className="float-right mr-1" onClick={() => this.openDataCheckModel()}><i className="fa fa-check"></i>{i18n.t('static.common.dataCheck')}</Button></>}
+                            {this.state.forecastProgramId != "" && this.state.planningUnitId > 0 && <> <Button type="button" id="dataCheck" size="md" color="info" className="float-right mr-1" onClick={() => this.openDataCheckModel()}><i className="fa fa-check"></i>{i18n.t('static.common.dataCheck')}</Button></>}
                             {/* {this.state.showData && <> <Button type="button" id="dataCheck" size="md" color="info" className="float-right mr-1" onClick={() => this.openDataCheckModel()}><i className="fa fa-check"></i>{i18n.t('static.common.dataCheck')}</Button></>} */}
-                            
+
                             &nbsp;
                         </FormGroup>
                     </CardFooter>
@@ -4053,16 +4085,16 @@ export default class ExtrapolateDataComponent extends React.Component {
                         <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
                     </ModalHeader>
                     <div>
-                    <ModalBody className="ModalBodyPadding">
-                        <div dangerouslySetInnerHTML={ {__html:localStorage.getItem('lang') == 'en' ?
-                ExtrapolationshowguidanceEn :
-                localStorage.getItem('lang') == 'fr' ?
-                ExtrapolationshowguidanceFr :
-                  localStorage.getItem('lang') == 'sp' ?
-                  ExtrapolationshowguidanceSp :
-                  ExtrapolationshowguidancePr
-              } } />
-                     
+                        <ModalBody className="ModalBodyPadding">
+                            <div dangerouslySetInnerHTML={{
+                                __html: localStorage.getItem('lang') == 'en' ?
+                                    ExtrapolationshowguidanceEn :
+                                    localStorage.getItem('lang') == 'fr' ?
+                                        ExtrapolationshowguidanceFr :
+                                        localStorage.getItem('lang') == 'sp' ?
+                                            ExtrapolationshowguidanceSp :
+                                            ExtrapolationshowguidancePr
+                            }} />
                             {/* <div>
                                 <h3 className='ShowGuidanceHeading'>{i18n.t('static.commitTree.extrapolation')}</h3>
                             </div>
@@ -4131,7 +4163,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                         <li>{i18n.t('static.extrapolation.TrendingSeasonal')}
                                             <ul>
                                                 <li>{i18n.t('static.extrapolation.ARIMAModel')}</li>
-                                              
+                        
                                                 <li>Triple Exponential Smoothing (Holt-Winters) <br></br>
 
                                                     Seasonal without trend, where the observed values have a seasonal component but no trend. Models applied to such datasets may include </li>
@@ -4140,10 +4172,10 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                     The models suggested here are neither exhaustive nor exclusive. QAT enables the user to apply a variety of extrapolation methods and then to compare them using best fit or forecast error metrics. </li>
                                             </ul>
                                         </li><br></br>
-                                        
+                
 
                                         <p>{i18n.t('static.extrapolation.SecondStep')} {i18n.t('static.extrapolation.ChoosingToDisregard')} </p>
-                                       
+                                    
                                     </ul>
                                 </p>
                                 <b>4.{i18n.t('static.extrapolation.InterpretErrors')}</b>
@@ -4169,6 +4201,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                     </ul>
                                 </p>
                             </p>
+                        
                             <p>
                                 <b>{i18n.t('static.versionSettings.note')} :  {i18n.t('static.extrapolation.YouHave')} {this.state.planningUnitId > 0 && this.state.regionId > 0 ? this.state.actualConsumptionList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId).length : 0} {i18n.t('static.extrapolation.MinimumValues')}: <br></br>
                                     <span className="ml-lg-5">* {i18n.t('static.extrapolation.TESHoltWinters')}: {i18n.t('static.extrapolation.LeastMonths')}<br></br></span>

@@ -1557,7 +1557,7 @@ export default class DemographicScenarioOne extends Component {
                             <CardFooter>
                                 <FormGroup>
                                     <Button color="success" size="md" className="float-right mr-1" type="button" > Export</Button>
-                                    <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRowInJexcel()}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>
+                                    <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRowInJexcel()}> {i18n.t('static.common.addRow')}</Button>
                                     &nbsp;
                                 </FormGroup>
                             </CardFooter>

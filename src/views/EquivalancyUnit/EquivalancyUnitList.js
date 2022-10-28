@@ -68,6 +68,7 @@ class EquivalancyUnit extends Component {
             isChanged: false,
             isChanged1: false,
             countVar: 0,
+            lang: localStorage.getItem('lang')
         }
 
         this.cancelClicked = this.cancelClicked.bind(this);
@@ -273,7 +274,10 @@ class EquivalancyUnit extends Component {
                 {
                     title: 'equivalancyUnitId',
                     type: 'hidden',
-                    // readOnly: true
+                    readOnly: true
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                 },
                 {
                     title: i18n.t('static.program.healtharea'),
@@ -292,14 +296,20 @@ class EquivalancyUnit extends Component {
                 {
                     title: i18n.t('static.healtharea.realm'),
                     type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                     // readOnly: true
                     // textEditor: true,
                 },
                 {
                     title: i18n.t('static.common.notes'),
                     type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false,
                     // readOnly: true
-                    textEditor: true,
+                    // textEditor: true,
                 },
                 {
                     title: i18n.t('static.checkbox.active'),
@@ -320,10 +330,16 @@ class EquivalancyUnit extends Component {
                 {
                     title: 'isChange',
                     type: 'hidden'
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                 },
                 {
                     title: 'addNewRow',
                     type: 'hidden'
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                 }
 
             ],
@@ -609,6 +625,9 @@ class EquivalancyUnit extends Component {
                 {
                     title: 'equivalancyUnitMappingId',
                     type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                     // readOnly: true
                 },
                 {
@@ -687,22 +706,37 @@ class EquivalancyUnit extends Component {
                 {
                     title: 'isChange',
                     type: 'hidden'
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                 },
                 {
                     title: 'forecastingUnitId',
                     type: 'hidden'
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                 },
                 {
                     title: 'typeId',
                     type: 'hidden'
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                 },
                 {
                     title: 'addNewRow',
                     type: 'hidden'
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                 },
                 {
                     title: 'countVar',
                     type: 'hidden'
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                 }
 
             ],
@@ -2945,7 +2979,7 @@ class EquivalancyUnit extends Component {
                             <FormGroup>
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 {this.state.isChanged && <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
-                                <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>
+                                <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> {i18n.t('static.common.addRow')}</Button>
                                 &nbsp;
                             </FormGroup>
                         }
@@ -2958,7 +2992,7 @@ class EquivalancyUnit extends Component {
                             <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
                         </ModalHeader>
                         <div>
-                        <ModalBody>
+                            <ModalBody>
                                 <div dangerouslySetInnerHTML={{
                                     __html: localStorage.getItem('lang') == 'en' ?
                                         showguidanceforEquivalencyUnitEn :
@@ -2969,109 +3003,109 @@ class EquivalancyUnit extends Component {
                                                 showguidanceforEquivalencyUnitPr
                                 }} />
                                 {/* <div>
-                                    <h3 className='ShowGuidanceHeading'>{i18n.t('static.equivalancyUnit.equivalancyUnits')}</h3>
-                                </div>
-                                <p>
-                                    <p style={{ fontSize: '13px' }}><span className="UnderLineText">{i18n.t('static.listTree.purpose')} :</span> {i18n.t('static.equivalancyUnit.EnableUser')}
-                                    </p>
-                                </p>
-                                <p style={{ fontSize: '13px' }}>
-                                    <p style={{ fontSize: '13px' }}><span className="UnderLineText">{i18n.t('static.listTree.useThisScreen')}:</span><br></br>
-                                        <b>{i18n.t('static.equivalancyUnit.MappingEquivalency')}</b><br></br>
-                                        {i18n.t('static.equivalancyUnit.ManageMappings')} {i18n.t('static.equivalancyUnit.ProgramAdmins')}
-                                    </p>
-                                </p>
-                                <p>
-                                    {i18n.t('static.equivalancyUnit.ForecastingMedicines')}
-                                    <table className="table table-bordered ">
-                                        <thead>
-                                            <tr>
-                                                <th>Equivalency Unit</th>
-                                                <th>Forecasting Unit</th>
-                                                <th>Conversion to EU</th>
-                                                <th style={{ width: '150px' }}>Average Treatment required to cure QATitis</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>1 Treatment for QATitis </td>
-                                                <td>1 tablet of FASPicillin</td>
-                                                <td>14</td>
-                                                <td>1 tablet a day for 2 weeks</td>
-                                            </tr>
-                                            <tr>
-                                                <td>1 Treatment for QATitis </td>
-                                                <td>5mL tube of FASPasone (cream)</td>
-                                                <td>1</td>
-                                                <td>0.5mL/day applied on the forehead over 10 days (1 tube total)</td>
-                                            </tr>
-                                            <tr>
-                                                <td>1 Treatment for QATitis </td>
-                                                <td>2mL vial of FASPicaine (injection)</td>
-                                                <td>0.5</td>
-                                                <td>One injection of 1mL (Two people can share one vial)</td>
-                                            </tr>
-                                            <tr>
-                                                <td>1 Treatment for QATitis </td>
-                                                <td>1 bar of white chocolate</td>
-                                                <td>2</td>
-                                                <td rowspan="3">2 bars of chocolate. The type of chocolate does not matter, as all chocolate contains the natural form of FASPicillin.  </td>
-                                            </tr>
-                                            <tr>
-                                                <td>1 Treatment for QATitis  </td>
-                                                <td>1 bar of dark chocolate</td>
-                                                <td>2</td>
-
-                                            </tr>
-                                            <tr>
-                                                <td>1 Treatment for QATitis </td>
-                                                <td>1 bar of milk chocolate</td>
-                                                <td>2</td>
-
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </p>
-                                <p style={{ fontSize: '13px' }}>
-                                    <b>{i18n.t('static.equivalancyUnit.CreatingManaging')}  </b><br></br>
-                                    {i18n.t('static.equivalancyUnit.ExistingEquivalency')}
-                                </p>
-                                <p>
-                                    <b>{i18n.t('static.equivalancyUnit.EquivalencyUsed')}</b>
-                                    <ul>
-                                        <li>{i18n.t('static.equivalancyUnit.InThe')} Forecasting Module '<a href="/#/report/compareAndSelectScenario" target="_blank" style={{ textDecoration: 'underline' }}>{i18n.t('static.dashboard.compareAndSelect')}</a>' {i18n.t('static.equivalancyUnit.ForecastsInEUs')} {i18n.t('static.equivalancyUnit.DisplayTheirForecast')} </li>
-                                        <li>{i18n.t('static.equivalancyUnit.InThe')} Forecasting Module '<a href="/#/forecastReport/forecastOutput" target="_blank" style={{ textDecoration: 'underline' }}>{i18n.t('static.dashboard.monthlyForecast')}</a>' {i18n.t('static.equivalancyUnit.SelectedForecasts')} {i18n.t('static.equivalancyUnit.UserForecasted')}</li>
-                                        <li>In the Supply Planning Module '<a href="/#/report/consumptionForecastErrorSupplyPlan" target="_blank" style={{ textDecoration: 'underline' }}>Forecast Error (Monthly)</a> Report'  screen, users can also view the actual and forecasted consumption in Equivalency Units. </li>
-                                    </ul>
-                                </p>
-                                <p>
-                                    <table className="table table-bordered ">
-                                        <thead>
-                                            <tr>
-                                                <th>Forecast</th>
-                                                <th>Equivalent in "Treatments for QATitis"</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>10,000 bars of dark chocolate </td>
-                                                <td style={{ textAlign: 'center' }}>5,000</td>
-                                            </tr>
-                                            <tr>
-                                                <td>10,000 bars of white chocolate </td>
-                                                <td style={{ textAlign: 'center' }}>5,000</td>
-                                            </tr>
-                                            <tr>
-                                                <td>14,000 tablets of FASPicillin </td>
-                                                <td style={{ textAlign: 'center' }}>1,000</td>
-                                            </tr>
-                                            <tr>
-                                                <td style={{ textAlign: 'right', borderLeft: '1px solid #fff', borderBottom: '1px solid #fff' }}><b>Total</b></td>
-                                                <td style={{ textAlign: 'center' }}><b>7,000</b></td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </p> */}
+           <h3 className='ShowGuidanceHeading'>{i18n.t('static.equivalancyUnit.equivalancyUnits')}</h3>
+       </div>
+        <p>
+            <p style={{fontSize:'13px'}}><span className="UnderLineText">{i18n.t('static.listTree.purpose')} :</span> {i18n.t('static.equivalancyUnit.EnableUser')}
+            </p>
+        </p>
+        <p style={{fontSize:'13px'}}>
+            <p style={{fontSize:'13px'}}><span className="UnderLineText">{i18n.t('static.listTree.useThisScreen')}:</span><br></br>
+            <b>{i18n.t('static.equivalancyUnit.MappingEquivalency')}</b><br></br>
+            {i18n.t('static.equivalancyUnit.ManageMappings')} {i18n.t('static.equivalancyUnit.ProgramAdmins')}
+            </p>
+        </p>
+        <p>
+        {i18n.t('static.equivalancyUnit.ForecastingMedicines')}
+        <table className="table table-bordered ">
+                                <thead>
+                                <tr>
+                                    <th>Equivalency Unit</th>
+                                    <th>Forecasting Unit</th>
+                                    <th>Conversion to EU</th>
+                                    <th style={{width:'150px'}}>Average Treatment required to cure QATitis</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>1 Treatment for QATitis </td>
+                                    <td>1 tablet of FASPicillin</td>
+                                    <td>14</td>
+                                    <td>1 tablet a day for 2 weeks</td>
+                                </tr>
+                                <tr>
+                                    <td>1 Treatment for QATitis </td>
+                                    <td>5mL tube of FASPasone (cream)</td>
+                                    <td>1</td>
+                                    <td>0.5mL/day applied on the forehead over 10 days (1 tube total)</td>
+                                </tr>
+                                <tr>
+                                    <td>1 Treatment for QATitis </td>
+                                    <td>2mL vial of FASPicaine (injection)</td>
+                                    <td>0.5</td>
+                                    <td>One injection of 1mL (Two people can share one vial)</td>
+                                </tr>
+                                <tr>
+                                    <td>1 Treatment for QATitis </td>
+                                    <td>1 bar of white chocolate</td>
+                                    <td>2</td>
+                                    <td rowspan="3">2 bars of chocolate. The type of chocolate does not matter, as all chocolate contains the natural form of FASPicillin.  </td>
+                                </tr>
+                                <tr>
+                                    <td>1 Treatment for QATitis  </td>
+                                    <td>1 bar of dark chocolate</td>
+                                    <td>2</td>
+                                    
+                                </tr>
+                                <tr>
+                                    <td>1 Treatment for QATitis </td>
+                                    <td>1 bar of milk chocolate</td>
+                                    <td>2</td>
+                                    
+                                </tr>
+                                </tbody>
+                                </table>
+        </p>
+        <p style={{fontSize:'13px'}}>
+        <b>{i18n.t('static.equivalancyUnit.CreatingManaging')}  </b><br></br>
+        {i18n.t('static.equivalancyUnit.ExistingEquivalency')}
+         </p>
+        <p>
+        <b>{i18n.t('static.equivalancyUnit.EquivalencyUsed')}</b>
+        <ul>
+            <li>{i18n.t('static.equivalancyUnit.InThe')} Forecasting Module '<a href="/#/report/compareAndSelectScenario" target="_blank" style={{textDecoration:'underline'}}>{i18n.t('static.dashboard.compareAndSelect')}</a>' {i18n.t('static.equivalancyUnit.ForecastsInEUs')} {i18n.t('static.equivalancyUnit.DisplayTheirForecast')} </li>
+            <li>{i18n.t('static.equivalancyUnit.InThe')} Forecasting Module '<a href="/#/forecastReport/forecastOutput" target="_blank" style={{textDecoration:'underline'}}>{i18n.t('static.dashboard.monthlyForecast')}</a>' {i18n.t('static.equivalancyUnit.SelectedForecasts')} {i18n.t('static.equivalancyUnit.UserForecasted')}</li>
+            <li>In the Supply Planning Module '<a href="/#/report/consumptionForecastErrorSupplyPlan" target="_blank" style={{textDecoration:'underline'}}>Forecast Error (Monthly)</a> Report'  screen, users can also view the actual and forecasted consumption in Equivalency Units. </li>
+        </ul>
+        </p>
+        <p>
+        <table className="table table-bordered ">
+                                <thead>
+                                <tr>
+                                    <th>Forecast</th>
+                                    <th>Equivalent in "Treatments for QATitis"</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>10,000 bars of dark chocolate </td>
+                                    <td style={{textAlign:'center'}}>5,000</td>
+                                </tr>
+                                <tr>
+                                    <td>10,000 bars of white chocolate </td>
+                                    <td style={{textAlign:'center'}}>5,000</td>
+                                </tr>
+                                <tr>
+                                    <td>14,000 tablets of FASPicillin </td>
+                                    <td style={{textAlign:'center'}}>1,000</td>
+                                </tr>
+                                <tr>
+                                    <td style={{textAlign:'right',borderLeft:'1px solid #fff',borderBottom:'1px solid #fff'}}><b>Total</b></td>
+                                    <td style={{textAlign:'center'}}><b>7,000</b></td>
+                                </tr>
+                                </tbody>
+                                </table>
+        </p> */}
 
                             </ModalBody>
                         </div>
@@ -3096,7 +3130,7 @@ class EquivalancyUnit extends Component {
                             {(this.state.roleArray.includes('ROLE_REALM_ADMIN') || this.state.roleArray.includes('ROLE_DATASET_ADMIN')) &&
                                 <div className="mr-0">
                                     {this.state.isChanged1 && <Button type="submit" size="md" color="success" className="float-right" onClick={this.formSubmit1} ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
-                                    <Button color="info" size="md" className="float-right mr-1" id="eqUnitAddRow" type="button" onClick={() => this.addRow1()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>
+                                    <Button color="info" size="md" className="float-right mr-1" id="eqUnitAddRow" type="button" onClick={() => this.addRow1()}>{i18n.t('static.common.addRow')}</Button>
                                 </div>
                             }
                             <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.modelOpenClose()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>

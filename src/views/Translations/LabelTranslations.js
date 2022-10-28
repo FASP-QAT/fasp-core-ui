@@ -73,9 +73,19 @@ export default class DatabaseTranslations extends React.Component {
                             label[i] = data;
                         }
                         var colHeadersArray = [];
-                        colHeadersArray.push({ type: 'hidden', title: `${i18n.t('static.translation.labelId')}` })
+                        colHeadersArray.push({
+                            type: 'hidden', title: `${i18n.t('static.translation.labelId')}`
+                            // title: 'A',
+                            // type: 'text',
+                            // visible: false
+                        })
                         colHeadersArray.push({ type: 'text', readOnly: true, title: `${i18n.t('static.translation.labelId')}` })
-                        colHeadersArray.push({ type: 'hidden', title: `${i18n.t('static.translation.isModified')}` })
+                        colHeadersArray.push({
+                            type: 'hidden', title: `${i18n.t('static.translation.isModified')}` 
+                            // title: 'A',
+                            // type: 'text',
+                            // visible: false
+                        })
                         for (var l = 0; l < languageList.length; l++) {
                             colHeadersArray.push({ type: 'text', title: languageList[l].label.label_en })
                         }
@@ -357,9 +367,11 @@ export default class DatabaseTranslations extends React.Component {
 
                                 <strong>{i18n.t('static.label.labelTranslations')}</strong>
                             </CardHeader> */}
-                            <CardBody className="table-responsive pt-md-1 pb-md-1">
+                            <CardBody className="pt-md-1 pb-md-1">
                                 {/* <div id="loader" className="center"></div> */}
+                                <div className="consumptionDataEntryTable">
                                 <div id="labelTranslationTable" style={{ display: this.state.loading ? "none" : "block" }}></div>
+                                </div>
                                 <Row style={{ display: this.state.loading ? "block" : "none" }}>
                                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                                         <div class="align-items-center">

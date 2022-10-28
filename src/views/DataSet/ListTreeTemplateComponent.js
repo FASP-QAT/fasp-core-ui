@@ -60,7 +60,8 @@ export default class ListTreeTemplate extends Component {
             message: '',
             loading: true,
             treeTemplateName: '',
-            isModalOpen: false
+            isModalOpen: false,
+            lang: localStorage.getItem('lang')
         }
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
@@ -296,6 +297,9 @@ export default class ListTreeTemplate extends Component {
                 {
                     title: 'Template Id',
                     type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                 },
                 {
                     title: i18n.t('static.listTreeTemp.templateName'),

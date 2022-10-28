@@ -791,18 +791,30 @@ export default class RealmCountryPlanningUnitList extends Component {
                 {
                     title: 'realmCountryId',
                     type: 'hidden'
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                 },
                 {
                     title: 'realmCountryPlanningUnitId',
                     type: 'hidden'
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                 },
                 {
                     title: 'isChange',
                     type: 'hidden'
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                 },
                 {
                     title: 'multiplier',
                     type: 'hidden'
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                 }
 
             ],
@@ -813,13 +825,17 @@ export default class RealmCountryPlanningUnitList extends Component {
                 if (realmCountryPlanningUnitId == 0) {
                     var cell = elInstance.getCell(`B${parseInt(y) + 1}`)
                     var cellA = elInstance.getCell(`A${parseInt(y) + 1}`)
+                    var cellF = elInstance.getCell(`F${parseInt(y) + 1}`)
                     cell.classList.remove('readonly');
                     cellA.classList.remove('readonly');
+                    cellF.classList.remove('readonly');
                 } else {
                     var cell = elInstance.getCell(`B${parseInt(y) + 1}`)
                     var cellA = elInstance.getCell(`A${parseInt(y) + 1}`)
+                    var cellF = elInstance.getCell(`F${parseInt(y) + 1}`)
                     cell.classList.add('readonly');
                     cellA.classList.add('readonly');
+                    cellF.classList.add('readonly');
                 }
 
             },
@@ -1507,7 +1523,7 @@ export default class RealmCountryPlanningUnitList extends Component {
                                 <FormGroup>
                                     <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                     <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                    <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>
+                                    <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> {i18n.t('static.common.addRow')}</Button>
                                     &nbsp;
                                 </FormGroup>
                             }

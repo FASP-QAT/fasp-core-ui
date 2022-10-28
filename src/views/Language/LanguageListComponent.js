@@ -392,6 +392,9 @@ export default class LanguageListComponent extends Component {
                                     {
                                         title: 'LanguageId',
                                         type: 'hidden',
+                                        // title: 'A',
+                                        // type: 'text',
+                                        // visible: false
                                         // readOnly: true
                                     },
                                     {
